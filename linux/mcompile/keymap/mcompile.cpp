@@ -20,8 +20,8 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 /** @brief Collect the key data, translate it to kmx and append to the existing keyboard */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
 
-/** @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
-int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPairs, GdkKeymap* keymap);
+/** @brief  return a vector of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
+int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, std::vector<KMX_WORD> &dk_vec, GdkKeymap* keymap);
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
@@ -94,7 +94,10 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
   }
 
   if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
-    KMX_SaveKeyboard(kmxfile, outfile);
+    if(!KMX_SaveKeyboard(kmxfile, outfile)) {
+      KMX_LogError(L"Failed to save keyboard (%d)\n", errno);
+      return 3;
+    }
   }
 
   delete kmxfile;
@@ -358,9 +361,9 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
     return 0;
   }
 
-  for (int i = 0; i < s_ndkids; i++) {
-    if (s_dkids[i].src_deadkey == deadkey) {
-      return s_dkids[i].dst_deadkey;
+  for (int xi = 0; xi < s_ndkids; xi++) {
+    if (s_dkids[xi].src_deadkey == deadkey) {
+      return s_dkids[xi].dst_deadkey;
     }
   }
 
@@ -399,8 +402,8 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
  * @param  dk_Table   a vector of all possible deadkey combinations for all Linux keyboards
  */
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap, vec_dword_2D dk_Table) {
-  KMX_WORD deadkeys[size_DK_array] = {0};
-  KMX_WORD* pdk;
+
+  std::vector<KMX_WORD> vec_deadkeys;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
   // Then for each character, go through and map it through
@@ -412,13 +415,14 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping);  // dkid, vk, shift);   // I4353
   KMX_AddDeadkeyRule(kbd, dkid, vk_US, shift);
 
-  KMX_GetDeadkeys(dk_Table, deadkey, pdk = deadkeys, keymap);  // returns array of [usvk, ch_out] pairs
+  KMX_GetDeadkeys(dk_Table, deadkey, vec_deadkeys, keymap);  // returns vector of [usvk, ch_out] pairs
 
-  while (*pdk) {
+  int n=0;
+  while (n < (int)vec_deadkeys.size()) {
     // Look up the ch
-    KMX_DWORD KeyValUnderlying = (KMX_DWORD) KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
-    KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk + 1), *(pdk + 2));
-    pdk += 3;
+    KMX_DWORD KeyValUnderlying = (KMX_DWORD) KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, vec_deadkeys[n]);
+    KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, vec_deadkeys[n + 1], vec_deadkeys[n + 2]);
+    n += 3;
   }
 }
 
@@ -521,44 +525,34 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 }
 
 /**
- * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
+ * @brief  return a vector of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
  * @param      dk_Table    shiftstate of the deadkey
  * @param      deadkey     deadkey character
- * @param[out] outputPairs pointer to array of [usvk, ch_out] pairs
+ * @param[out] dk_vec vector of [usvk, ch_out] pairs
  * @param      keymap      pointer to  the currently used (underlying) keyboard Layout
  * @return size of array of [usvk, ch_out] pairs
  */
-int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPairs, GdkKeymap* keymap) {
-  KMX_WORD* p = outputPairs;
+
+int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, std::vector<KMX_WORD> &dk_vec, GdkKeymap* keymap) {
+
   KMX_DWORD shift;
   vec_dword_2D dk_SingleTable;
-  int no_dk_counter = 0;
-  int p_counter = 0;
 
   query_dk_combinations_for_specific_dk(dk_Table, deadkey, dk_SingleTable);
   for (int i = 0; i < (int)dk_SingleTable.size(); i++) {
     KMX_WORD vk = KMX_change_keyname_to_capital(dk_SingleTable[i][1], shift, keymap);
     if (vk != 0) {
 
-      if( p_counter < size_DK_array - 3) {
+        dk_vec.push_back(vk);
+        dk_vec.push_back(shift);
+        dk_vec.push_back(dk_SingleTable[i][2]);
 
-        *p++ = vk;
-        *p++ = shift;
-        *p++ = dk_SingleTable[i][2];
-
-        p_counter = p_counter+3;
-
-      } else {
-        no_dk_counter++;
-      }
     } else {
       KMX_LogError(L"Warning: complex deadkey not supported.");
     }
   }
-  if(p_counter >= size_DK_array -3)
-    KMX_LogError(L"Warning: %i deadkeys have not been processed.", no_dk_counter);
-  *p = 0;
-  return (p - outputPairs);
+
+  return dk_vec.size();
 }
 
 /**
