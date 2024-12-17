@@ -1,9 +1,14 @@
-import { xml2js } from '@keymanapp/developer-utils';
-import JSZip from 'jszip';
-import KEYMAN_VERSION from "@keymanapp/keyman-version";
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
+import JSZip from 'jszip';
+
+import { KpsFileReader } from '@keymanapp/developer-utils';
+import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpJsonFile, SchemaValidators, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerCallbacks, KpsFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/developer-utils';
+
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
@@ -147,12 +152,18 @@ export class KmpCompiler implements KeymanCompiler {
    * @internal
    */
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
-    const kps = this.loadKpsFile(kpsFilename);
-    if(!kps) {
-      // errors will already have been reported by loadKpsFile
+    const reader = new KpsFileReader(this.callbacks);
+    const data = this.callbacks.loadFile(kpsFilename);
+    if(!data) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
       return null;
     }
-    const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps);
+    const kps = reader.read(data);
+    if(!kps) {
+      // errors will already have been reported by KpsFileReader
+      return null;
+    }
+    const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps.Package);
     if(!kmp) {
       return null;
     }
@@ -164,40 +175,6 @@ export class KmpCompiler implements KeymanCompiler {
     }
 
     return kmp;
-  }
-
-  /**
-   * @internal
-   */
-  public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
-    // Load the KPS data from XML as JS structured data.
-    const buffer = this.callbacks.loadFile(kpsFilename);
-    if(!buffer) {
-      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
-      return null;
-    }
-    const data = new TextDecoder().decode(buffer);
-
-    const kpsPackage = (() => {
-        let a: KpsFile.KpsPackage;
-        let parser = new xml2js.Parser({
-          explicitArray: false
-        });
-
-        try {
-          parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
-        } catch(e) {
-          this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));
-        }
-        return a;
-    })();
-
-    if(!kpsPackage) {
-      return null;
-    }
-
-    const kps: KpsFile.KpsFile = kpsPackage.Package;
-    return kps;
   }
 
   readonly normalizePath = (path: string) => path || path === '' ? path.trim().replaceAll('\\','/') : undefined;
@@ -254,10 +231,10 @@ export class KmpCompiler implements KeymanCompiler {
     // Add related package metadata
     //
 
-    if(kps.RelatedPackages) {
+    if(kps.RelatedPackages?.RelatedPackage?.length) {
       // Note: 'relationship' field is required for kmp.json but optional for .kps, only
       // two values are supported -- deprecates or related.
-      kmp.relatedPackages = (this.arrayWrap(kps.RelatedPackages.RelatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
+      kmp.relatedPackages = kps.RelatedPackages.RelatedPackage.map(p =>
         ({id: p.$.ID, relationship: p.$.Relationship == 'deprecates' ? 'deprecates' : 'related'})
       );
     }
@@ -266,12 +243,12 @@ export class KmpCompiler implements KeymanCompiler {
     // Add file metadata
     //
 
-    if(kps.Files && kps.Files.File) {
-      kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
+    if(kps.Files?.File?.length) {
+      kmp.files = kps.Files.File.map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: (file.Description ?? '').trim(),
-          copyLocation: parseInt(file.CopyLocation, 10) || undefined
+          description: '',  // kmp.json still requires description, but we ignore the input Description field
+          // note: we no longer emit copyLocation as of 18.0; it was always optional
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
@@ -293,43 +270,43 @@ export class KmpCompiler implements KeymanCompiler {
     if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.files.push({
         name: KMP_INF_FILENAME,
-        description: "Package information"
+        description: ""
       });
     }
 
     // Add the standard kmp.json self-referential to match existing implementations
     kmp.files.push({
       name: KMP_JSON_FILENAME,
-      description: "Package information (JSON)"
+      description: ""
     });
 
     //
     // Add keyboard metadata
     //
 
-    if(kps.Keyboards && kps.Keyboards.Keyboard) {
-      kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
+    if(kps.Keyboards?.Keyboard?.length) {
+      kmp.keyboards = kps.Keyboards.Keyboard.map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
         name:keyboard.Name?.trim(),
         id:keyboard.ID?.trim(),
         version:keyboard.Version?.trim(),
         rtl:keyboard.RTL == 'True' ? true : undefined,
-        languages: keyboard.Languages ?
-          this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :
+        languages: keyboard.Languages?.Language?.length ?
+          this.kpsLanguagesToKmpLanguages(keyboard.Languages.Language) :
           [],
-        examples: keyboard.Examples ?
-          (this.arrayWrap(keyboard.Examples.Example) as KpsFile.KpsFileLanguageExample[]).map(
+        examples: keyboard.Examples?.Example?.length ?
+          keyboard.Examples.Example.map(
             e => ({id: e.$.ID, keys: e.$.Keys, text: e.$.Text, note: e.$.Note})
           ) as KmpJsonFile.KmpJsonFileExample[] :
           undefined,
-        webDisplayFonts: keyboard.WebDisplayFonts ?
-          (this.arrayWrap(keyboard.WebDisplayFonts.Font) as KpsFile.KpsFileFont[]).map(
+        webDisplayFonts: keyboard.WebDisplayFonts?.Font?.length ?
+          keyboard.WebDisplayFonts.Font.map(
             e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
-        webOskFonts: keyboard.WebOSKFonts ?
-          (this.arrayWrap(keyboard.WebOSKFonts.Font) as KpsFile.KpsFileFont[]).map(
+        webOskFonts: keyboard.WebOSKFonts?.Font?.length ?
+          keyboard.WebOSKFonts.Font.map(
             e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
@@ -340,12 +317,12 @@ export class KmpCompiler implements KeymanCompiler {
     // Add lexical-model metadata
     //
 
-    if(kps.LexicalModels && kps.LexicalModels.LexicalModel) {
-      kmp.lexicalModels = this.arrayWrap(kps.LexicalModels.LexicalModel).map((model: KpsFile.KpsFileLexicalModel) => ({
+    if(kps.LexicalModels?.LexicalModel?.length) {
+      kmp.lexicalModels = kps.LexicalModels.LexicalModel.map((model: KpsFile.KpsFileLexicalModel) => ({
         name:model.Name.trim(),
         id:model.ID.trim(),
-        languages: model.Languages ?
-          this.kpsLanguagesToKmpLanguages(this.arrayWrap(model.Languages.Language) as KpsFile.KpsFileLanguage[]) : []
+        languages: model.Languages?.Language?.length ?
+          this.kpsLanguagesToKmpLanguages(model.Languages.Language) : []
       }));
     }
 
@@ -398,8 +375,8 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.startMenu = {};
       if(kps.StartMenu.AddUninstallEntry === '') kmp.startMenu.addUninstallEntry = true;
       if(kps.StartMenu.Folder) kmp.startMenu.folder = kps.StartMenu.Folder;
-      if(kps.StartMenu.Items && kps.StartMenu.Items.Item) {
-        kmp.startMenu.items = this.arrayWrap(kps.StartMenu.Items.Item).map((item: KpsFile.KpsFileStartMenuItem) => ({
+      if(kps.StartMenu?.Items?.Item?.length) {
+        kmp.startMenu.items = kps.StartMenu.Items.Item.map((item: KpsFile.KpsFileStartMenuItem) => ({
           filename: item.FileName,
           name: item.Name,
           arguments: item.Arguments,
@@ -438,9 +415,9 @@ export class KmpCompiler implements KeymanCompiler {
     ];
 
     for (let [src,dst,isMarkdown] of keys) {
-      if (kpsInfo[src]) {
+      if (kpsInfo[src]?._ && (kpsInfo[src]._.trim() || kpsInfo[src].$?.URL)) {
         kmpInfo[dst] = {
-          description: (kpsInfo[src]._ ?? (typeof kpsInfo[src] == 'string' ? kpsInfo[src].toString() : '')).trim()
+          description: (kpsInfo[src]._ ?? '').trim()
         };
         if(isMarkdown) {
           kmpInfo[dst].description = markdownToHTML(kmpInfo[dst].description, false).trim();
@@ -452,13 +429,6 @@ export class KmpCompiler implements KeymanCompiler {
     }
 
     return kmpInfo;
-  };
-
-  private arrayWrap(a: unknown) {
-    if (Array.isArray(a)) {
-      return a;
-    }
-    return [a];
   };
 
   private kpsLanguagesToKmpLanguages(language: KpsFile.KpsFileLanguage[]): KmpJsonFile.KmpJsonFileLanguage[] {

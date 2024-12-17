@@ -40,6 +40,8 @@ configure_file(
 
 exe = executable(
   'ibus-engine-keyman',
+  c_args: defns,
+  cpp_args: defns,
   sources: [engine_files, util_files],
   dependencies: deps,
   include_directories: include_dirs,

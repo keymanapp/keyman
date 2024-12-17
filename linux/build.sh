@@ -6,12 +6,16 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
 ################################ Main script ################################
 
 builder_describe \
   "Build Keyman for Linux." \
+  "@/resources/tools/check-markdown  test:help" \
   ":config=keyman-config             keyman-config" \
   ":engine=ibus-keyman               ibus-keyman" \
+  ":help                             Online documentation" \
   ":service=keyman-system-service    keyman-system-service" \
   ":mcompile=mcompile/keymap         mnemonic layout recompiler for Linux" \
   "clean" \
@@ -37,3 +41,4 @@ test_action() {
 }
 
 builder_run_action test test_action
+builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/linux/docs/help"

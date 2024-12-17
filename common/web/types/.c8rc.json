@@ -1,0 +1,12 @@
+{
+  "exclude": [
+    "src/keyboard-object.ts",
+    "src/lexical-model-types.ts",
+    "src/outputTarget.interface.ts",
+    "src/*.d.ts",
+    "src/main.ts",
+    "src/schemas/*",
+    "src/schema-validators.ts",
+    "src/schemas.ts"
+  ]
+}

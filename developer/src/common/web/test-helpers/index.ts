@@ -1,7 +1,61 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/developer-utils';
+import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError, CompilerNetAsyncCallbacks, DefaultCompilerFileSystemAsyncCallbacks, CompilerFileSystemAsyncCallbacks } from '@keymanapp/developer-utils';
+import { fileURLToPath } from 'url';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
+
+const { TEST_SAVE_FIXTURES } = process.env;
+
+class TestCompilerNetAsyncCallbacks implements CompilerNetAsyncCallbacks {
+  constructor(private basePath: string) {
+  }
+
+  urlToPath(url: string): string {
+    const p = new URL(url);
+    return path.join(this.basePath, p.hostname, p.pathname.replaceAll(/[^a-z0-9_.!@#$%() -]/ig, '#'));
+  }
+
+  async fetchBlob(url: string): Promise<Uint8Array> {
+    const p = this.urlToPath(url);
+
+    if(TEST_SAVE_FIXTURES) {
+      // When TEST_SAVE_FIXTURES env variable is set, we will do the actual
+      // fetch from the origin so that we can build the fixtures easily
+      console.log(`Downloading file ${url} --> ${p}`);
+      let response: Response;
+      try {
+        response = await fetch(url);
+      } catch(e) {
+        console.error(`failed to download ${url}`);
+        console.error(e);
+        throw e; // yes, we want to abort the download
+      }
+
+      fs.mkdirSync(path.dirname(p), {recursive: true});
+      if(!response.ok) {
+        // We won't save a file, just delete any existing file
+        if(fs.existsSync(p)) {
+          fs.rmSync(p);
+        }
+      } else {
+        const data = new Uint8Array(await response.arrayBuffer());
+        fs.writeFileSync(p, data);
+      }
+    }
+
+    if(!fs.existsSync(p)) {
+      // missing file, this is okay
+      return null;
+    }
+    const data: Uint8Array = fs.readFileSync(p);
+    return data;
+  }
+
+  async fetchJSON(url: string): Promise<any> {
+    const data = await this.fetchBlob(url);
+    return data ? JSON.parse(new TextDecoder().decode(data)) : null;
+  }
+}
 
 /**
  * A CompilerCallbacks implementation for testing
@@ -10,6 +64,14 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   /* TestCompilerCallbacks */
 
   messages: CompilerEvent[] = [];
+  readonly _net: TestCompilerNetAsyncCallbacks;
+  readonly _fsAsync: DefaultCompilerFileSystemAsyncCallbacks = new DefaultCompilerFileSystemAsyncCallbacks(this);
+
+  constructor(basePath?: string) {
+    if(basePath) {
+      this._net = new TestCompilerNetAsyncCallbacks(basePath);
+    }
+  }
 
   clear() {
     this.messages = [];
@@ -23,6 +85,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   hasMessage(code: number): boolean {
     return this.messages.find((item) => item.code == code) === undefined ? false : true;
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return fileURLToPath(url);
   }
 
   /** true of at least one error */
@@ -48,12 +114,24 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return fs.statSync(filename)?.size;
   }
 
+  isDirectory(filename: string): boolean {
+    return fs.statSync(filename)?.isDirectory();
+  }
+
   get path(): CompilerPathCallbacks {
     return path;
   }
 
   get fs(): CompilerFileSystemCallbacks {
     return fs;
+  }
+
+  get net(): CompilerNetAsyncCallbacks {
+    return this._net;
+  }
+
+  get fsAsync(): CompilerFileSystemAsyncCallbacks {
+    return this._fsAsync;
   }
 
   resolveFilename(baseFilename: string, filename: string): string {
