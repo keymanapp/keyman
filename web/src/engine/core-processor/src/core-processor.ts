@@ -1,4 +1,4 @@
-type km_core_attr = import('./import/core/km-core-interface.js').km_core_attr;
+type km_core_attr = import('./import/core/keymancore.js').km_core_attr;
 
 export class CoreProcessor {
   private instance: any;

@@ -32,8 +32,6 @@ else
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
-  # TODO: why do we need this defn here?
-  defns += ['-DKM_CORE_LIBRARY']
   icu_if_not_on_wasm = []
 else
   # only include this if NOT on wasm.
@@ -54,19 +52,21 @@ if cpp_compiler.get_id() == 'emscripten'
     '-g', '-Wlimited-postlink-optimizations',
     '-lembind'
   ]
+  util_normalize_table_generator = executable(
+    'util_normalize_table_generator',
+    ['util_normalize_table_generator.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc],
+    link_args: links,
+    dependencies: [icu_uc, icu_i18n],
+  )
 
-  util_normalize_table_generator = executable('util_normalize_table_generator',
-      ['util_normalize_table_generator.cpp'],
-      cpp_args: defns + warns,
-      include_directories: [inc],
-      link_args: links,
-      dependencies: [icu_uc, icu_i18n],
-      )
-
-  util_normalize_table_h = custom_target('util_normalize_table.h',
-                      output: 'util_normalize_table.h',
-                      command: [util_normalize_table_generator],
-                      capture:true)
+  util_normalize_table_h = custom_target(
+    'util_normalize_table.h',
+    output: 'util_normalize_table.h',
+    command: [util_normalize_table_generator],
+    capture:true
+  )
 
   generated_headers += util_normalize_table_h
 endif
@@ -138,14 +138,24 @@ mock_files = files(
   'mock/mock_processor.cpp',
 )
 
+extra_defns = []
+extra_links = []
 if cpp_compiler.get_id() == 'emscripten'
-  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1',
-    '-sEXPORT_ES6', '-sENVIRONMENT=web,webview',
-    '--emit-tsd', 'km-core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
-
-  links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
-      # Forcing inclusion of debug symbols
-      '-g', '-Wlimited-postlink-optimizations', '--bind']
+  extra_defns += ['-g']
+  extra_links += ['-sSAFE_HEAP=1', wasm_exported_runtime_methods,
+    # Forcing inclusion of debug symbols
+    '-g', '-Wlimited-postlink-optimizations',
+    '--emit-tsd', 'keymancore.d.ts',
+    '-lembind'
+  ]
+  host_links = [
+    '--whole-archive',
+    '-sALLOW_MEMORY_GROWTH=1',
+    '-sMODULARIZE=1', '-sEXPORT_NAME=createCoreProcessor',
+    '-sEXPORT_ES6',
+    '-sENVIRONMENT=web,webview',
+    # '-sERROR_ON_UNDEFINED_SYMBOLS=0'
+  ]
 endif
 
 lib = library('keymancore',
@@ -155,8 +165,8 @@ lib = library('keymancore',
   mock_files,
   version_res,
   generated_headers,
-  cpp_args: defns + warns + flags,
-  link_args: links,
+  cpp_args: defns + extra_defns + warns + flags,
+  link_args: links + extra_links,
   version: lib_version,
   include_directories: inc,
   pic: true,
@@ -179,9 +189,9 @@ pkg.generate(
 if cpp_compiler.get_id() == 'emscripten'
   # Build an executable
   host = executable('km-core',
-    cpp_args: defns,
+    cpp_args: defns + extra_defns,
     include_directories: inc,
-    link_args: links + host_links,
+    link_args: links + host_links + extra_links,
     objects: lib.extract_all_objects(recursive: false))
 
   if get_option('buildtype') == 'release'

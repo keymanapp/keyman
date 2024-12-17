@@ -23,7 +23,7 @@ builder_describe "Keyman Core WASM integration" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 builder_describe_outputs \
-  configure    "/web/src/engine/core-processor/src/import/core/km-core-interface.d.ts" \
+  configure    "/web/src/engine/core-processor/src/import/core/keymancore.d.ts" \
   build        "/web/build/${SUBPROJECT_NAME}/lib/index.mjs"
 
 builder_parse "$@"
@@ -41,12 +41,12 @@ do_configure() {
   mkdir -p "src/import/core/"
   # we don't need this file for release builds, but it's nice to have
   # for reference and auto-completion
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/km-core-interface.d.ts" "src/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "src/import/core/"
 }
 
 copy_deps() {
   mkdir -p "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core-interface.d.ts "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.js,.wasm} "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
 }
 
