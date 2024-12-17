@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.161 alpha 2024-12-17
+
+* fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
+
 ## 18.0.160 alpha 2024-12-16
 
 * feat(ios): configurable keyboard height (#12571)
