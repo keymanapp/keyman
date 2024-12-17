@@ -435,6 +435,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskShiftState = NO;
   _oskOptionState = NO;
   _oskControlState = NO;
+  [self displayModifierKeysState];
   [self displayKeyLabelsForLayer];
 }
 
@@ -643,16 +644,9 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      */
     _oskShiftState = NO;
     
-    if (state) {
-      os_log_debug([KMELogs oskLog], "hardware shift key pressed");
-      [self displayKeyLabelsForLayer];
-      [self displaysShiftKeysAsPressed:YES];
-    }
-    else {
-      os_log_debug([KMELogs oskLog], "hardware shift key released");
-      [self displayKeyLabelsForLayer];
-      [self displaysShiftKeysAsPressed:NO];
-    }
+    os_log_debug([KMELogs oskLog], "hardware shift key released");
+    [self displayKeyLabelsForLayer];
+    [self displayShiftKeysState];
   }
 }
 
@@ -662,12 +656,12 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     if (state) {
       os_log_debug([KMELogs oskLog], "OSK shift key selected");
       [self displayKeyLabelsForLayer];
-      [self displaysShiftKeysAsPressed:YES];
+      [self displayShiftKeysState];
     }
     else if (!self.physicalShiftState) {
       os_log_debug([KMELogs oskLog], "OSK shift key de-selected");
       [self displayKeyLabelsForLayer];
-      [self displaysShiftKeysAsPressed:NO];
+      [self displayShiftKeysState];
     }
   }
 }
@@ -681,15 +675,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskOptionState = NO;
-
-    if (state) {
-      [self displayKeyLabelsForLayer];
-      [self displaysOptionKeysAsPressed:YES];
-    }
-    else {
-      [self displayKeyLabelsForLayer];
-      [self displaysOptionKeysAsPressed:NO];
-    }
+    [self displayKeyLabelsForLayer];
+    [self displayOptionKeysState];
   }
 }
 
@@ -698,11 +685,11 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     _oskOptionState = state;
     if (state) {
       [self displayKeyLabelsForLayer];
-      [self displaysOptionKeysAsPressed:YES];
+      [self displayOptionKeysState];
     }
     else if (!self.physicalOptionState) {
       [self displayKeyLabelsForLayer];
-      [self displaysOptionKeysAsPressed:NO];
+      [self displayOptionKeysState];
     }
   }
 }
@@ -716,15 +703,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskControlState = NO;
-
-    if (state) {
-      [self displayKeyLabelsForLayer];
-      [self displaysControlKeysAsPressed:YES];
-    }
-    else {
-      [self displayKeyLabelsForLayer];
-      [self displaysControlKeysAsPressed:NO];
-    }
+    [self displayKeyLabelsForLayer];
+    [self displayControlKeysState];
   }
 }
 
@@ -733,30 +713,39 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     _oskControlState = state;
     if (state) {
       [self displayKeyLabelsForLayer];
-      [self displaysControlKeysAsPressed:YES];
+      [self displayControlKeysState];
     }
     else if (!self.physicalControlState) {
       [self displayKeyLabelsForLayer];
-      [self displaysControlKeysAsPressed:NO];
+      [self displayControlKeysState];
     }
   }
 }
 
-- (void)displaysShiftKeysAsPressed:(BOOL)pressed {
+- (void)displayModifierKeysState {
+  [self displayShiftKeysState];
+  [self displayOptionKeysState];
+  [self displayControlKeysState];
+}
+
+- (void)displayShiftKeysState {
+  BOOL pressed = self.oskShiftState || self.physicalShiftState;
   KeyView *leftShiftKey = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
   KeyView *rightShiftKey = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
   [leftShiftKey setKeyPressed:pressed];
   [rightShiftKey setKeyPressed:pressed];
 }
 
-- (void)displaysOptionKeysAsPressed:(BOOL)pressed {
+- (void)displayOptionKeysState {
+  BOOL pressed = self.oskOptionState || self.physicalOptionState;
   KeyView *leftOptionKey = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
   KeyView *rightOptionKey = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
   [leftOptionKey setKeyPressed:pressed];
   [rightOptionKey setKeyPressed:pressed];
 }
 
-- (void)displaysControlKeysAsPressed:(BOOL)pressed {
+- (void)displayControlKeysState {
+  BOOL pressed = self.oskControlState || self.physicalControlState;
   KeyView *leftControlKey = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
   KeyView *rightControlKey = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
   [leftControlKey setKeyPressed:pressed];
