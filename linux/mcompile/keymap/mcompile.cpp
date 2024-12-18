@@ -530,7 +530,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
  * @param      deadkey     deadkey character
  * @param[out] dk_vec vector of [usvk, ch_out] pairs
  * @param      keymap      pointer to  the currently used (underlying) keyboard Layout
- * @return size of vector of [usvk, ch_out] pairs
+ * @return size of array of [usvk, ch_out] pairs
  */
 
 int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, std::vector<KMX_WORD> &dk_vec, GdkKeymap* keymap) {
