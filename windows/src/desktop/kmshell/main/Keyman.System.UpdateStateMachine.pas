@@ -656,7 +656,6 @@ end;
 procedure IdleState.HandleInstallNow;
 begin
   bucStateContext.CurrentState.HandleCheck;
-  // TODO: How do we notify the command line no update available
 end;
 
 { UpdateAvailableState }
@@ -778,9 +777,6 @@ begin
     // Failed three times in this process return to the
     // IdleState to wait 7 days before trying again
     ChangeState(IdleState);
-    // TODO: Future could go to a RetryState which serialized the a retry count
-    // to disk. Then it could try launch the download again on the next
-    // kmshell start event.
   end
   else
   begin
