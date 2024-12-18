@@ -74,6 +74,12 @@
   [self.oskView clearOskModifiers];
 }
 
+- (void) showWindow:(id) sender {
+  [super showWindow:sender];
+
+  os_log_info([KMLogs oskLog], "OSKWindowController showWindow");
+}
+
 - (void)helpAction:(id)sender {
   NSString *kvkPath = [self AppDelegate].kvk.filePath;
   if (!kvkPath)

@@ -140,7 +140,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskLayout = nil;
   _oskDefaultNKeys = nil;
   
-  [self displayKeyLabelsForLayer];
+  [self updateKeyLabelsForState];
 }
 
 - (void)initOSKKeys {
@@ -174,7 +174,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     py += keyHeight;
   }
   
-  [self displayKeyLabelsForLayer];
+  [self updateKeyLabelsForState];
 }
 
 - (NSArray *)oskLayout {
@@ -435,8 +435,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskShiftState = NO;
   _oskOptionState = NO;
   _oskControlState = NO;
-  [self displayModifierKeysState];
-  [self displayKeyLabelsForLayer];
+  [self updateModifierKeysForState];
+  [self updateKeyLabelsForState];
 }
 
 - (void)resetOSK {
@@ -536,22 +536,13 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 }
 
 /**
- * Display the key labels that correspond to the current state of the modifier keys.
- * The layer shown depends on both the physical modifier state and the osk modifier state.
+ * get the modifier flags that represent the combined state of the physical and osk modifiers
  */
-- (void)displayKeyLabelsForLayer {
-  os_log_debug([KMELogs oskLog], "OSKView displayKeyLabelsForLayer, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
-  
+- (WORD) getCombinedModifierFlags {
   BOOL shift = self.physicalShiftState | self.oskShiftState;
   BOOL option = self.physicalOptionState | self.oskOptionState;
   BOOL control = self.physicalControlState | self.oskControlState;
-  
-  [self resetKeyLabels];
-  NSMutableArray *mKeys = [[self keyTags] mutableCopy];
-  NSArray *nkeys = [self.kvk keys];
-  if (nkeys == nil)
-    nkeys = self.oskDefaultNKeys;
-  
+    
   WORD flags = 0;
   if (shift) {
     flags |= KVKS_SHIFT;
@@ -566,6 +557,24 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (control) {
     flags |= KVKS_RCTRL;
   }
+  
+  return flags;
+}
+
+/**
+ * Display the key labels that correspond to the current state of the modifier keys.
+ * The layer shown depends on both the physical modifier state and the osk modifier state.
+ */
+- (void)updateKeyLabelsForState {
+  os_log_debug([KMELogs oskLog], "OSKView updateKeyLabelsForState, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
+  
+  [self resetKeyLabels];
+  NSMutableArray *mKeys = [[self keyTags] mutableCopy];
+  NSArray *nkeys = [self.kvk keys];
+  if (nkeys == nil)
+    nkeys = self.oskDefaultNKeys;
+  
+  WORD flags = [self getCombinedModifierFlags];
   
   NSString *ansiFont = [self ansiFont];
   NSString *unicodeFont = [self unicodeFont];
@@ -645,8 +654,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     _oskShiftState = NO;
     
     os_log_debug([KMELogs oskLog], "hardware shift key released");
-    [self displayKeyLabelsForLayer];
-    [self displayShiftKeysState];
+    [self updateKeyLabelsForState];
+    [self updateShiftKeysForState];
   }
 }
 
@@ -655,13 +664,13 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     _oskShiftState = state;
     if (state) {
       os_log_debug([KMELogs oskLog], "OSK shift key selected");
-      [self displayKeyLabelsForLayer];
-      [self displayShiftKeysState];
+      [self updateKeyLabelsForState];
+      [self updateShiftKeysForState];
     }
     else if (!self.physicalShiftState) {
       os_log_debug([KMELogs oskLog], "OSK shift key de-selected");
-      [self displayKeyLabelsForLayer];
-      [self displayShiftKeysState];
+      [self updateKeyLabelsForState];
+      [self updateShiftKeysForState];
     }
   }
 }
@@ -675,8 +684,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskOptionState = NO;
-    [self displayKeyLabelsForLayer];
-    [self displayOptionKeysState];
+    [self updateKeyLabelsForState];
+    [self updateOptionKeysForState];
   }
 }
 
@@ -684,12 +693,12 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (_oskOptionState != state && !self.physicalOptionState) {
     _oskOptionState = state;
     if (state) {
-      [self displayKeyLabelsForLayer];
-      [self displayOptionKeysState];
+      [self updateKeyLabelsForState];
+      [self updateOptionKeysForState];
     }
     else if (!self.physicalOptionState) {
-      [self displayKeyLabelsForLayer];
-      [self displayOptionKeysState];
+      [self updateKeyLabelsForState];
+      [self updateOptionKeysForState];
     }
   }
 }
@@ -703,8 +712,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskControlState = NO;
-    [self displayKeyLabelsForLayer];
-    [self displayControlKeysState];
+    [self updateKeyLabelsForState];
+    [self updateControlKeysForState];
   }
 }
 
@@ -712,23 +721,23 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (_oskControlState != state && !self.physicalControlState) {
     _oskControlState = state;
     if (state) {
-      [self displayKeyLabelsForLayer];
-      [self displayControlKeysState];
+      [self updateKeyLabelsForState];
+      [self updateControlKeysForState];
     }
     else if (!self.physicalControlState) {
-      [self displayKeyLabelsForLayer];
-      [self displayControlKeysState];
+      [self updateKeyLabelsForState];
+      [self updateControlKeysForState];
     }
   }
 }
 
-- (void)displayModifierKeysState {
-  [self displayShiftKeysState];
-  [self displayOptionKeysState];
-  [self displayControlKeysState];
+- (void)updateModifierKeysForState {
+  [self updateShiftKeysForState];
+  [self updateOptionKeysForState];
+  [self updateControlKeysForState];
 }
 
-- (void)displayShiftKeysState {
+- (void)updateShiftKeysForState {
   BOOL pressed = self.oskShiftState || self.physicalShiftState;
   KeyView *leftShiftKey = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
   KeyView *rightShiftKey = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
@@ -736,7 +745,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   [rightShiftKey setKeyPressed:pressed];
 }
 
-- (void)displayOptionKeysState {
+- (void)updateOptionKeysForState{
   BOOL pressed = self.oskOptionState || self.physicalOptionState;
   KeyView *leftOptionKey = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
   KeyView *rightOptionKey = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
@@ -744,7 +753,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   [rightOptionKey setKeyPressed:pressed];
 }
 
-- (void)displayControlKeysState {
+- (void)updateControlKeysForState {
   BOOL pressed = self.oskControlState || self.physicalControlState;
   KeyView *leftControlKey = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
   KeyView *rightControlKey = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
