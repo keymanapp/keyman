@@ -499,6 +499,14 @@ table tr
   padding: 1px 0 1px 10px;
 }
 
+.grid_container_update {
+  display: grid;
+  position: relative;
+  grid-template-columns: 50px 1fr 1fr 1fr;
+  padding: 10px 50px 10px 64px;
+  border: grey 1px;
+}
+
 .grid_container.grid_disabled
 {
   opacity: 0.5;
@@ -1093,9 +1101,42 @@ th
   height: 16px;
 }
 
+.update_title
+{
+  background: url('keyman-title.png') 96px 13px no-repeat;
+  height: 60px;
+}
+
+.update_title img
+{
+  margin: 13px 0 0 10px;
+}
+
+.update_edition
+{
+  float: left;
+  font-size: 16px;
+  margin-left: 64px;
+}
+
+#update_status
+{
+  font-size: 13px;
+  margin-left: 64px;
+  margin-top: 30px;
+}
+
 #update_content {
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px 5px 10px;
+}
+
+.update_controls
+{
+  margin-left: 64px;
 }
 
 /* QRCodes */
