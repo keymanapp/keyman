@@ -512,9 +512,6 @@ export class KeylayoutToKmnConverter {
    */
   public convert(data_ukelele: convert_object): convert_object {
 
-
-
-
     const data_VK_from_keylayout: (string | number)[][] = [];
 
     for (let i = 0; i < data_ukelele.ArrayOf_Element_KeyOutput[0].length; i++) {
@@ -538,21 +535,7 @@ export class KeylayoutToKmnConverter {
    */
   //TODO need to use export const USVirtualKeyCodes here
   public write(data_ukelele: convert_object): boolean {
-    console.log("start write")
-    console.log("SizeOf elements: "
-      , "\n ArrayOf_Element_Layouts", data_ukelele.ArrayOf_Element_Layouts.length
-      , "\n ArrayOf_ALL_Element_ModifierMaps", data_ukelele.ArrayOf_Element_ALL_ModifierMaps.length
-      , "\n ArrayOf_Element_KeyAction", data_ukelele.ArrayOf_Element_KeyAction.length
-      , "\n ArrayOf_Element_KeyOutput", data_ukelele.ArrayOf_Element_KeyOutput.length
-      , "\n ArrayOf_Element_Terminators", data_ukelele.ArrayOf_Element_Terminators.length
-      , "\n ArrayOf_Element_ModifierMaps_ALLKeyMapSelect", data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length
-      , "\n ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1]", data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1].length
-
-      , "\n ArrayOf_processed_VK_from_keylayout", data_ukelele.ArrayOf_processed_VK_from_keylayout.length
-      , "\n ArrayOf_processed_deadkeyables", data_ukelele.ArrayOf_processed_deadkeyables.length
-      , "\n ArrayOf_processed_deadkeyedChar", data_ukelele.ArrayOf_processed_deadkeyedChar.length
-      , "\n ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk.length
-    )
+    console.log("start write")   
 
     //  *************************************************************
     //  **** write stores *******************************************
@@ -711,116 +694,7 @@ export class KeylayoutToKmnConverter {
     }
 
 
-    // all 109 keys with action a9
-    /*   for (let i = 0; i < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; i++) {
-       // loop through keyMapSelect (8)
-       for (let ii = 0; ii < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; ii++) {
-         //for (let ii = 0; ii < 8; ii++) {
-         // loop through modifiers
-         //for (let j = 0; j < data_ukelele.ArrayOf_Element_KeyAction.length; j++) {
-         // 8 behaviors
-       //  for (let j = 0; j < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][ii].length; j++) {
- if (data_ukelele.ArrayOf_Element_ALL_ModifierMaps[i][ii] !== "") {
- 
-          console.log("start write 3A", i,ii,data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][ii] )
- 
-         const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[i][ii], isCAPSused)
-         console.log("label_modifier", label_modifier )
-           // get the modifier for the layer
-           //const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[j], isCAPSused)
-         const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[i][ii], isCAPSused)
- 
-           // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
-           //const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[j][i])
-           // wrong since it attempts to convert a9 and not 4 ( the termínator id )
-           const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[i][ii])
- 
-           // therefore get character from ~ <- 4 <- a9
-           //const realChar = this.getCharacterFromActionName(data_ukelele, data_ukelele.ArrayOf_Element_KeyAction[ii][i])
-           //console.log("realChar", realChar,i,ii,j )
-           // console.log("data_ukelele.ArrayOf_Element_KeyAction[ii][i],",
-           //  data_ukelele.ArrayOf_Element_KeyAction[ii][i],
-           //   realChar)
- 
-           if (resulting_character !== "") {
-               console.log("start write 3B+3C", i, ii,  label_modifier, "---", resulting_character)
- 
-             const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
-             const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[i][0])
-             //  console.log("VK", VK, "vk_label", vk_label)
- 
-             //  console.log("start write 3D,data_ukelele.ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk)
-             for (let k = 0; k < data_ukelele.ArrayOf_processed_dk.length; k++) {
-               //    console.log("start write 3E")
-               //    console.log("resulting_character", resulting_character, "data_ukelele.ArrayOf_processed_dk[k][1]", data_ukelele.ArrayOf_processed_dk[k][1])
-              // console.log("data_ukelele.ArrayOf_processed_dk is",data_ukelele.ArrayOf_processed_dk)
-              // console.log("resulting_characte, data_ukelele.ArrayOf_processed_dk is",resulting_character, data_ukelele.ArrayOf_processed_dk[k][2])
-               if ((resulting_character !== "") && (resulting_character === data_ukelele.ArrayOf_processed_dk[k][2])) {
-                 data += '[' + (label_modifier + ' ' + vk_label[0][1]).trim() + '] ' + "> dk(" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[k][1]) + ") " + '\n'
-                 console.log("start write 3D", data)
- 
-               }
-             }
-     //      }
-         
-   }
- 
-       }
-     }}*/
 
-    /* old
-          // all 109 keys with action a9
-          for (let i = 0; i < data_ukelele.ArrayOf_Element_KeyAction[0].length; i++) {
-            // loop through keyMapSelect (8)
-            for (let ii = 0; ii < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; ii++) {
-              //for (let ii = 0; ii < 8; ii++) {
-              // loop through modifiers
-              //for (let j = 0; j < data_ukelele.ArrayOf_Element_KeyAction.length; j++) {
-              // 8 behaviors
-              for (let j = 0; j < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; j++) {
-               console.log("start write 3A", i,ii,j)
-      
-                // get the modifier for the layer
-                //const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[j], isCAPSused)
-                const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[j], isCAPSused)
-      
-                // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
-                //const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[j][i])
-                // wrong since it attempts to convert a9 and not 4 ( the termínator id )
-                const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[ii][i])
-      
-                // therefore get character from ~ <- 4 <- a9
-                //const realChar = this.getCharacterFromActionName(data_ukelele, data_ukelele.ArrayOf_Element_KeyAction[ii][i])
-                //console.log("realChar", realChar,i,ii,j )
-                // console.log("data_ukelele.ArrayOf_Element_KeyAction[ii][i],",
-                //  data_ukelele.ArrayOf_Element_KeyAction[ii][i],
-                //   realChar)
-      
-                if (resulting_character !== "") {
-                    console.log("start write 3B+3C", i, ii, j, label_modifier, "---", resulting_character)
-      
-                  const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
-                  const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[i][0])
-                  //  console.log("VK", VK, "vk_label", vk_label)
-      
-                  //  console.log("start write 3D,data_ukelele.ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk)
-                  for (let k = 0; k < data_ukelele.ArrayOf_processed_dk.length; k++) {
-                    /*    console.log("start write 3E")
-                        console.log("resulting_character", resulting_character, "data_ukelele.ArrayOf_processed_dk[k][1]", data_ukelele.ArrayOf_processed_dk[k][1])
-                    console.log("data_ukelele.ArrayOf_processed_dk is",data_ukelele.ArrayOf_processed_dk)
-                    console.log("resulting_characte, data_ukelele.ArrayOf_processed_dk is",resulting_character, data_ukelele.ArrayOf_processed_dk[k][2])*/
-    /*        if ((resulting_character !== "") && (resulting_character === data_ukelele.ArrayOf_processed_dk[k][2])) {
-              data += '[' + (label_modifier + ' ' + vk_label[0][1]).trim() + '] ' + "> dk(" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[k][1]) + ") " + '\n'
-              console.log("start write 3D", data)
- 
-            }
-          }
-        }
-      }
- 
-    }
-  }
-*/
     // console.log("start write 4")
     data += "\n"
     data += "match > use(deadkeys)\n\n"
@@ -873,6 +747,8 @@ export class KeylayoutToKmnConverter {
       }
     }
 
+
+
     data += '......................................................\n'
     for (let kkk = 0; kkk < data_ukelele.ArrayOf_processed_RuleData.length; kkk++) {
       if (new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][4]) === "isTerminator") {
@@ -913,7 +789,7 @@ export class KeylayoutToKmnConverter {
 
 
     data += " store dk...  : "
-    console.log("array_deadkeyables_unique", array_deadkeyables_unique)
+    //console.log("array_deadkeyables_unique", array_deadkeyables_unique)
 
     for (let i = 0; i < array_deadkeyables_unique.length; i++) {
       data += '\'' + array_deadkeyables_unique[i] + '\' '
@@ -941,41 +817,21 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    /*// remove duplicates  -> array_deadkeyables_unique1 [  'K_A', 'K_E',  'K_Y', 'K_O',  'K_U', 'K_I',  'K_N' ]
-    const array_deadkeyed_unique = deadkeyed_array.filter(function (item, pos, self) {
-      return self.indexOf(item) == pos;
-    })*/
-
     // remove empty 
     const array_deadkeyed_unique = deadkeyed_array.filter(function (arr) {
       return arr.length > 0
     });
 
     data += " store dk...  : "
- //   console.log("array_deadkeyed_unique", counter, array_deadkeyed_unique)
+    //   console.log("array_deadkeyed_unique", counter, array_deadkeyed_unique)
 
     for (let i = 0; i < array_deadkeyed_unique.length; i++) {
       if (array_deadkeyed_unique[i].length !== 0)
         data += '\n\'' + array_deadkeyed_unique[i] + '\' '
-  //    console.log("array_deadkeyed_unique[i][1]", array_deadkeyed_unique[i][1])
-    }
+      //    console.log("array_deadkeyed_unique[i][1]", array_deadkeyed_unique[i][1])
+    }   
 
-    // find all â 
-    const modiArray = array_deadkeyed_unique.filter(function ([A, B, C, D]) {
-      /* 
-      'SHIFT LEFTSHIFT CAPS,K_N,K_N,Ñ' 
-      console.log("A", A)
-       console.log("B", B)
-       console.log("B[1]", B[1])
-       console.log("B[2]", B[2])
-       console.log("A[1]", A[1])
-       console.log("A[2]", A[2])
-       return B == "K_A"*/
-      return D == "â"
-    });
-
-
-    console.log("modiArray", modiArray)
+    // console.log("modiArray", modiArray)
     data += '\'\n'
     data += '\nNOW DEADKEYS ********************************\n\n'
 
@@ -984,166 +840,122 @@ export class KeylayoutToKmnConverter {
     //######################all#####################################################################
 
     const All_array: any[] = []
-    // loop al data rules
+    // loop al data rules and  push  dk rules to array
     for (let kkk = 0; kkk < data_ukelele.ArrayOf_processed_RuleData.length; kkk++) {
-
-      // find dk rules 
-      //   if ((new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][0]) === ("first_modifier_C2"))
-      //    && (data_ukelele.ArrayOf_processed_RuleData[kkk].length === 5)) {
-
       const deadkeyed_array_1D = []
-      //   if (!array_dk_char.includes(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][4]))) {
-      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][0]))
-      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][1]))
-      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][2]))
-      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][3]))
-      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][4]))
-      if (data_ukelele.ArrayOf_processed_RuleData[kkk].length === 5)
-        deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][5]))
+      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][0]))    //modifier
+      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][1]))    //shiftstates
+      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][2]))    //keyname 1
+      deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][3]))    //output character/ keyname 2 /  shiftstate 2    
+      if (data_ukelele.ArrayOf_processed_RuleData[kkk].length === 4)
+        deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][4]))  // --                         / keyname 2
       else
         deadkeyed_array_1D.push("")
       if (data_ukelele.ArrayOf_processed_RuleData[kkk].length === 5)
-        deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][6]))
+        deadkeyed_array_1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][5]))  // --                         / output character
       else
         deadkeyed_array_1D.push("")
-      //   }
-      All_array.push(deadkeyed_array_1D)
+
+      if (deadkeyed_array_1D.length > 0)
+        All_array.push(deadkeyed_array_1D)
       counter++
-      //  }
     }
 
-    // remove empty 
-    const All_array_unique = All_array.filter(function (arr) {
-      return arr.length > 0
-    });
-
-    data += " store dk...  : "
-
-    // all data ; no duplicates [ 'first_modifier_C1', 'NCAPS', 'K_A', 'a', '', '', '' ],
-   // console.log("All_array_unique", counter, All_array_unique)
-
-    //[ 'NCAPS', 'K_A', 'K_EQUAL', 'â' ],
-  //  console.log("deadkeyed_array", deadkeyed_array)
-
-    // find all K_A   [ 'first_modifier_C2', 'NCAPS', 'K_A', 'K_EQUAL', 'â', '', '' ],
-   /* const All_C2 = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
-      return ((A === "first_modifier_C2") && (C === "K_A"))
-    });
-  //  console.log("All_C2", All_C2.length, All_C2)*/
+    //
+    // console.log("All_array", All_array)
+    data += " store dk...  : \n"
 
 
-
-
-
-
-    // find all deadkeys
-    const dk_all = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
-      return ((A === "first_modifier_C2"))
-    });
-   // console.log("dk_all", dk_all.length, dk_all)
-  //  console.log("array_dk_char", array_dk_char.length, array_dk_char)
-    const dk_Array: any[][] = []
-
-
-    for (let ii = 0; ii < dk_all.length; ii++) {
-      for (let kk = 0; kk < array_dk_char.length; kk++) {
-
-        //        console.log("nochmakl dk_all[ii]", dk_all[ii][0], dk_all[ii][1], dk_all[ii][2], dk_all[ii][3])
-        if (dk_all[ii].length > 4) {
-          if (array_dk_char[kk] === (dk_all[ii][4])) {
-            const dk_Array_1D: any[] = []
-            if (dk_all[ii].length > 4) {
-
-
-              dk_Array_1D.push(dk_all[ii][2])
-              dk_Array_1D.push(array_dk_char[kk])
-  //            console.log("dk_all[ii]", dk_all[ii], dk_Array_1D)
-            }
-            if (dk_Array_1D.length > 0)
-              dk_Array.push(dk_Array_1D)
-          }
-        }
-      }
-    }
-  //  console.log("dk_Array", dk_Array.length, dk_Array)
-
-    // find all deadkeyed  [ 'first_modifier_C2', 'CAPS', 'K_A', 'K_EQUAL', 'Â', '', '' ],
-    const modiCaps = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
-      return ((A === "first_modifier_C2") && (B === "CAPS") && (C === "K_A"))
-    });
-    console.log("modiCaps", modiCaps.length, modiCaps)
-
-    // find deadkeyable [ 'first_modifier_C1', 'CAPS', 'K_A', 'A', '', '', '' ]
-    const modiDeadkeyable = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
-      return ((A === "first_modifier_C1") && (B === "CAPS") && (C === "K_A"))
-    });
-
-    console.log("modiDeadkeyable", modiDeadkeyable.length, modiDeadkeyable)
-
-    const nname = this.map_UkeleleKC_To_VK(0)
-    const modiDeadkeyable2 = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
-      return ((A === "first_modifier_C1") && (B === "CAPS") && (C === nname))
-    });
-    console.log("modiDeadkeyable2", data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length, data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1].length, modiDeadkeyable2)
-
-
-    let modiDeadkeyable1
-    let Shift:any
-    const modiDeadkeyable1_all: any[][] = []
+    let All_C1_Shift_Keyname_all
+    let All_C1_Shift_Keyname
+    let Shift: any
     const modiDeadkeyable1_all_lines: any[][] = []
-    //loop through all keys
-    console.log("lenns",data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length,
-      data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1].length
-    )
-    // 8 behaviours
+    const deadkeyables_combi: any[][] = []
+    const deadkeyables_combiAndSS: any[][] = []
+
+    //loop through all behaviours (8)
     for (let j = 0; j < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; j++) {
+
       // for (let j = 0; j < 1; j++) {
-        const modiDeadkeyable1_arr1: any[] = []
-        let allDKables_name_char: any[] = []
-        // 4 modifiers for beha 1
+      let deadkeyables_without_VKspace: any[] = []
+
+      //loop through all modifiers (4) for behaviour
       for (let k = 0; k < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[j].length; k++) {
         const deadkeyables_line: any[] = []
         const modiDeadkeyable1_arr: any[] = []
+        const deadkeyables_combi2: any[][] = []
+        // loop all keys
         for (let i = 0; i < 50; i++) {
           const Keyname = this.map_UkeleleKC_To_VK(i)
-           Shift = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[j][k], isCAPSused)
+          Shift = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[j][k], isCAPSused)
           // const Shift = "CAPS"
           // console.log("Keyname", Keyname, "xxShift", Shift)
 
 
           // find deadkeyable [ 'first_modifier_C1', 'CAPS', 'K_A', 'A', '', '', '' ]
-          modiDeadkeyable1 = All_array_unique.filter(function ([A, B, C, D, E, F, G]) {
+          All_C1_Shift_Keyname_all = All_array.filter(function ([A, B, C, D, E, F, G]) {
             return ((A === "first_modifier_C1") && (B === Shift) && (C === Keyname))
           });
+          //console.log("All_C1_Shift_Keyname_all", All_C1_Shift_Keyname_all.length,All_C1_Shift_Keyname_all)
 
-          //  console.log("modiDeadkeyable1[0]", modiDeadkeyable1[0])
-          modiDeadkeyable1_arr.push(modiDeadkeyable1[0])
+
+
+
+
+          All_C1_Shift_Keyname = All_C1_Shift_Keyname_all
+
+          // console.log("All_C1_Shift_Keyname", All_C1_Shift_Keyname.length, All_C1_Shift_Keyname)
+
+          // in case there are more rules-should not be the case 
+          for (let xi = 0; xi < All_C1_Shift_Keyname.length; xi++) {
+            modiDeadkeyable1_arr.push(All_C1_Shift_Keyname[xi])
+          }
+
         }
-        modiDeadkeyable1_all.push(modiDeadkeyable1_arr1)
 
-       console.log("modiDeadkeyable1_arr", modiDeadkeyable1_arr.length, modiDeadkeyable1_arr, modiDeadkeyable1_arr[0])
+        //console.log("modiDeadkeyable1_arr", modiDeadkeyable1_arr.length, modiDeadkeyable1_arr, modiDeadkeyable1_arr[0])
 
 
-         allDKables_name_char = modiDeadkeyable1_arr.filter(function (mod) {
-          //console.log("mod", mod)
+        deadkeyables_without_VKspace = modiDeadkeyable1_arr.filter(function (mod) {
           return ((mod !== undefined) && (mod[2] !== "K_SPACE"))
         });
-        
-      
-        console.log("allDKables_name_char", allDKables_name_char.length, allDKables_name_char)
+        console.log("deadkeyables_without_VKspace", deadkeyables_without_VKspace.length, deadkeyables_without_VKspace)
 
-        for (let i = 0; i < allDKables_name_char.length; i++) {
-          deadkeyables_line.push(allDKables_name_char[i][3])
+        for (let i = 0; i < deadkeyables_without_VKspace.length; i++) {
+          //deadkeyables_line.push(deadkeyables_without_VKspace[i][2])
+          deadkeyables_line.push(deadkeyables_without_VKspace[i][3])
+
+          const deadkeyables_line_forC: any[] = []
+          for (let zz = 2; zz < 4; zz++) {
+            deadkeyables_line_forC.push(deadkeyables_without_VKspace[i][zz])
+          }
+          deadkeyables_combi.push(deadkeyables_line_forC)
+          deadkeyables_combi2.push(deadkeyables_line_forC)
         }
 
-        console.log("deadkeyables_line with ss ",Shift, deadkeyables_line.length,deadkeyables_line)
-        if(deadkeyables_line.length !=0)
-          modiDeadkeyable1_all_lines.push(deadkeyables_line)
+        // console.log("deadkeyables_combi2[k][1]", deadkeyables_combi2[k], deadkeyables_combi2[j])
 
+        if (deadkeyables_line.length != 0) {
+          modiDeadkeyable1_all_lines.push(deadkeyables_line)
+          data += "Deadkeyables:   " + deadkeyables_line + "\n"
+          data += "dk          :   " + deadkeyables_combi2[k][j] + "\n"
+        }
+
+        deadkeyables_combiAndSS.push(deadkeyables_combi2)
       }
-      
-      console.log("modiDeadkeyable1_all_lines", modiDeadkeyable1_all_lines.length,modiDeadkeyable1_all_lines)
-    } data += '\n'
+      // THIS IS DEADKEYABLES OUTPUT
+      //   console.log("modiDeadkeyable1_all_lines", modiDeadkeyable1_all_lines.length, modiDeadkeyable1_all_lines)
+    }
+    data += '\n'
+
+    // console.log("deadkeyables_combiAndSS", deadkeyables_combiAndSS)
+
+
+
+
+
+    const NEWDATA = this.writeLastPart(data_ukelele, isCAPSused)
+    data += NEWDATA + '\n'
 
     // console.log("start write 5")
     /*writeFileSync("data/MyResult.kmn", data, { flag: "w" })*/
@@ -1519,17 +1331,10 @@ export class KeylayoutToKmnConverter {
     }
 
     data_ukelele.ArrayOf_processed_RuleData = DataArray_U8
-    //console.log("DataArray_U8", DataArray_U8)
+    console.log("DataArray_U8", DataArray_U8)
     return data_ukelele
   }
 
-  /*public lookup_1_KeymapCode__To__keyMapAction(data: any, search: string): string {  
-    for (let kk = 0; kk < data.keyboard.keyMapSet[0].keyMap.length; kk++) {
-      for (let jj = 0; jj < data.keyboard.keyMapSet[0].keyMap[kk].key.length; jj++) {
-        if (data.keyboard.keyMapSet[0].keyMap[kk].key )
-      }
-    }
-   }*/
   // public lookup_2_KeyMapAction__To__ActionAction() { }
   public lookup_3_ActionNone__To__ActionNext(data: any, search: string): string {
     for (let jj = 0; jj < data.keyboard.actions.action.length; jj++) {
@@ -1840,6 +1645,214 @@ export class KeylayoutToKmnConverter {
     if (pos === 49) return "K_SPACE"
     else return ""
   }
+
+  public useElementAsString(u18ArrayElemnent: Uint8Array): string {
+    return new TextDecoder().decode(u18ArrayElemnent)
+  }
+  public useAsString(u18ArrayElemnent: Uint8Array[]): string {
+    let str = ""
+    for (let i = 0; i < u18ArrayElemnent.length; i++) {
+      str = str + " " + new TextDecoder().decode(u18ArrayElemnent[i])
+    }
+    return str
+  }
+  //----------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------------------------------
+
+  public writeLastPart(data_ukelele: convert_object, isCAPSused: boolean): string {
+
+    //°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+    // DEADKEYS °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+    //°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
+    const dk_ss_array: string[][] = []
+
+    // ToDo get data from WorkArray
+    // filter for dk values
+    let data: string = ""
+    data += '\nNOW MY C4 RULES *********** (only to get 02C6 ect) *********************\n\n'
+    for (let kkk = 0; kkk < data_ukelele.ArrayOf_processed_RuleData.length; kkk++) {
+      if (new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][4]) === "isTerminator") {
+        let line: string = ""
+        for (let lll = 0; lll < data_ukelele.ArrayOf_processed_RuleData[kkk].length; lll++) {
+          const dk_ss_array1D: string[] = []
+          const entry = new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][lll])
+          dk_ss_array1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][2]))
+          dk_ss_array1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][3]))
+          dk_ss_array1D.push(new TextDecoder().decode(data_ukelele.ArrayOf_processed_RuleData[kkk][6]))
+          line += " " + entry + "  "
+          dk_ss_array.push(dk_ss_array1D)
+        }
+        line += "\n"
+        data += line + '\n'
+        console.log((data += line), "\n")
+      }
+    }
+
+
+    // remove duplicates
+    const [uniqueDeadkeys] = dk_ss_array.reduce((acc, curr) => {
+      const [uniq, set] = acc;
+      if (!set.has(curr.join(','))) {
+        set.add(curr.join(','));
+        uniq.push(curr);
+      }
+      return acc;
+    }, [[], new Set()],
+    );
+
+    // array ony of dk (array_dk_char [ '¨', 'ˆ', '´', '˜', '`' ])
+    const array_dk_char = [...new Set(data_ukelele.ArrayOf_processed_dk.map(a => a[1]))];
+
+    console.log("data_ukelele.ArrayOf_processed_RuleData", data_ukelele.ArrayOf_processed_RuleData);
+    console.log("dk_ss_array", dk_ss_array);
+    console.log("uniqueDeadkeys", uniqueDeadkeys);
+
+    console.log("array_dk_charN", array_dk_char);
+    //console.log("data_ukelele.ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk);
+    // let data = "\n"
+
+    // create a string array .......................................................
+    const workArray2D: string[][] = []
+    for (let k = 0; k < data_ukelele.ArrayOf_processed_RuleData.length; k++) {
+      const array1D: string[] = []
+      for (let l = 0; l < data_ukelele.ArrayOf_processed_RuleData[k].length; l++) {
+        const u8data = data_ukelele.ArrayOf_processed_RuleData[k][l]
+        array1D.push(this.useElementAsString(u8data))
+      }
+      workArray2D.push(array1D)
+    }
+    console.log("workArray2D", workArray2D)
+    // we have 5 different types: 
+    /*
+    C0: size: 4 [ 'first_modifier_C0',  '33RIGHTSHIFT NCAPS', 'K_S',      'S' ]
+    C1: size: 4 [ 'first_modifier_C1',  'CAPS',               'K_N',      'N' ],
+    C2: size: 5 [ 'first_modifier_C2',   'CAPS',              'K_E',      'K_9',         'È' ],
+        use 2.(K_E)  and 4.('È') to get Name and DEADKEYED
+    C3: size: 6 ['first_modifier_C3',    'NCAPS RALT',        'K_8',      'NCAPS RALT',   'K_U',    'ˆ'  
+    C4: size: 4 ['first_modifier_C4',    'NCAPS 0',           'K_SPACE',  '' ],
+        size: 7 ['first_modifier_C4',    'NCAPS RALT',        'K_N',      '˜',  'isTerminator',      '˜',      '02DC'    ],
+        use 2.(K_N) , 5. (isTerminator) and 6.('02DC') to get Name and DEADKEY in hex
+    
+    Find DEADKEYABLE
+     1) first_modifier_C1   CAPS   K_A   A  
+     2) first_modifier_C2   CAPS   K_A   K_EQUAL   Â  
+     3) first_modifier_C2   CAPS   K_A   K_9   À  
+     - Find C2 rule with Deadkeyed ( n= 5)
+     - get C1 rule with first n=3 entries -> (first_modifier_C1   CAPS   K_A) 
+     - get 4th entry == DEADKEYABLE
+    
+    Find DEADKEY
+    1) look in modifier_C4 (n=7) 
+    2) get 7th entry (=02DC)
+    
+    Find DEADKEYED
+    1)look in modifier_C2
+    2) get 5th entry (='È')
+    2) get 3th entry (='K_E')
+    
+    
+    */
+
+    // create deadkeyables_raw, deadkeyed_raw array .......................................................
+    let deadkeyables_raw: string[][] = []
+    let deadkeyed_raw: string[][] = []
+
+    // find deadkeyable [ 'first_modifier_C1', 'CAPS', 'K_A', 'A', '', '', '' ]
+    deadkeyables_raw = workArray2D.filter(function ([A, B, C, D, E, F, G]) {
+      return ((A === "first_modifier_C1") /*&& (B === shiftstate) && (C === key_name)*/
+        && ((C !== "K_SPACE") && (D !== ""))
+      )
+    });
+    //console.log("deadkeyables_raw", deadkeyables_raw)
+
+    // find deadkeyed [ 'first_modifier_C2', 'CAPS', 'K_A', 'K_N', 'Ã' ]
+    deadkeyed_raw = workArray2D.filter(function ([A, B, C, D, E, F, G]) {
+      return ((A === "first_modifier_C2")/* && (B === shiftstate) && (C === key_name)*/
+        && ((C !== "K_SPACE"))
+
+      )
+    });
+    console.log("deadkeyables_raw", deadkeyables_raw.length, deadkeyables_raw)
+    console.log("deadkeyed_raw", deadkeyed_raw.length, deadkeyed_raw)
+    const dkable_dked_array2D: any[][] = []
+    // loop dedkeyables, take first
+    for (let rr = 0; rr < deadkeyables_raw.length; rr++) {
+      // loop dedkeyed, take first
+      for (let ss = 0; ss < deadkeyed_raw.length; ss++) {
+        const dkable_dked_array: any[] = []
+        //if available ( shifts the same, keyname the same)
+        if ((deadkeyables_raw[rr][1] === deadkeyed_raw[ss][1])
+          && ((deadkeyables_raw[rr][2] === deadkeyed_raw[ss][2]))) {
+          //copy dedkeyables name, deadkeyable
+          //copy dedkeyed Secondname, deadkeyed
+          // dkable_dked_array.push(deadkeyables_raw[rr][1])
+          dkable_dked_array.push(deadkeyables_raw[rr][3])
+          dkable_dked_array.push(deadkeyed_raw[ss][3])
+          dkable_dked_array.push(deadkeyed_raw[ss][4])
+        }
+        // dkable_dked_array2D.push(dkable_dked_array)
+        if (dkable_dked_array.length > 0)
+          dkable_dked_array2D.push(dkable_dked_array)
+      }
+    }
+
+    console.log("dkable_dked_array2D", dkable_dked_array2D.length, dkable_dked_array2D)
+
+    // remove duplicates
+    const [uniqueDeadkeyables] = dkable_dked_array2D.reduce((acc, curr) => {
+      const [uniq, set] = acc;
+      if (!set.has(curr.join(','))) {
+        set.add(curr.join(','));
+        uniq.push(curr);
+      }
+      return acc;
+    }, [[], new Set()],
+    );
+    console.log("uniqueDeadkeyables", uniqueDeadkeyables.length, uniqueDeadkeyables);
+
+
+    const deadkeyedArray:string[][] = Array.from({ length: uniqueDeadkeys.length }, () => new Array(2).fill(''));
+
+    console.log("deadkeyedArray", deadkeyedArray)
+    const deadkeyablesArray:string[][] = Array.from({ length: uniqueDeadkeys.length }, () => new Array(1).fill(''));
+
+    for (let i = 0; i < uniqueDeadkeys.length; i++) {
+      for (let j = 0; j < uniqueDeadkeyables.length; j++) {
+        if (uniqueDeadkeys[i][0] === uniqueDeadkeyables[j][1]) {
+          deadkeyablesArray[i][0] = deadkeyablesArray[i][0] + "\'" + uniqueDeadkeyables[j][0] + "\'  "
+          deadkeyedArray[i][0] = deadkeyedArray[i][0] + "\'" + uniqueDeadkeyables[j][2] + "\'  "
+        }
+      }
+      deadkeyedArray[i][1]=(uniqueDeadkeys[i][2])
+    }
+
+    data += "\n"
+    for (let i = 0; i < deadkeyablesArray.length; i++) {
+
+      data += "\n\ndk: "+ deadkeyedArray[i][1]
+      console.log("dk: ", deadkeyedArray[i][1])
+
+      data += "\ndeadkeyablesArray" + deadkeyablesArray[i][0]
+      console.log("deadkeyablesArray", deadkeyablesArray[i][0])
+
+      data += "\ndeadkeyedArray   "+ deadkeyedArray[i][0]
+      console.log("deadkeyedArray   ", deadkeyedArray[i][0])
+    }
+    return data
+  }
+
+  public writeLines(inArray: string[]): string {
+    let editedLine: string = ""
+    for (let i = 0; i < inArray.length; i++) {
+      if (inArray[i] !== " ")
+        editedLine = editedLine + "\'" + inArray[i] + "\' "
+      else
+        editedLine = editedLine + "    "
+    }
+    return editedLine
+  }
+
+
+
 }
-
-
