@@ -130,6 +130,21 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it.skip('can handle order string that is too short', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        "1 2",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 1),
+        initElemElement(GOTHIC_B, undefined, 2),
+        initElemElement(GOTHIC_C, undefined, 0),
+      ];
+      assert.deepEqual(actual, expected);
+    });
     it('can apply tertiary string', () => {
       const sections = { strs: new Strs() };
       sections.strs.allocString = stubStrsAllocString_Char;
@@ -159,6 +174,22 @@ describe('Test of ElementString', () => {
         initElemElement(GOTHIC_A, undefined, 0, 1),
         initElemElement(GOTHIC_B, undefined, 0, 1),
         initElemElement(GOTHIC_C, undefined, 0, 1),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it.skip('can handle tertiary string that is too short', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        null,
+        "1 2",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 1),
+        initElemElement(GOTHIC_B, undefined, 0, 2),
+        initElemElement(GOTHIC_C, undefined, 0, 0),
       ];
       assert.deepEqual(actual, expected);
     });
@@ -196,6 +227,23 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it('can handle tertiary_base string that is too short', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        "1 0",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
+      ];
+      assert.deepEqual(actual, expected);
+    });
     it('can apply prebase string', () => {
       const sections = { strs: new Strs() };
       sections.strs.allocString = stubStrsAllocString_Char;
@@ -229,6 +277,24 @@ describe('Test of ElementString', () => {
         initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
         initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.prebase),
         initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can handle prebase string that is too short', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        null,
+        "1 0",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
       ];
       assert.deepEqual(actual, expected);
     });
