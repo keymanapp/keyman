@@ -19,25 +19,20 @@ const GOTHIC_B = new StrsItem("𐌱", 0x10331);
 const GOTHIC_C = new StrsItem("𐌲", 0x10332);
 const GOTHIC_PATTERN = "[𐌰-𐍊]";
 const GOTHIC_STRSITEM = new StrsItem(GOTHIC_PATTERN);
-const GOTHIC_USETITEM = new UsetItem(
-  new UnicodeSet(GOTHIC_PATTERN, [[0x10330,0x1034A]]),
-  GOTHIC_STRSITEM
-);
+const GOTHIC_SET = new UnicodeSet(GOTHIC_PATTERN, [[0x10330,0x1034A]]);
+const GOTHIC_USETITEM = new UsetItem(GOTHIC_SET, GOTHIC_STRSITEM);
 const UGARITIC_PATTERN = "[𐎀-𐎟]";
 const UGARITIC_STRSITEM = new StrsItem(UGARITIC_PATTERN);
-const UGARITIC_USETITEM = new UsetItem(
-  new UnicodeSet(UGARITIC_PATTERN, [[0x10380,0x1039F]]),
-  UGARITIC_STRSITEM
-);
+const UGARITIC_SET = new UnicodeSet(UGARITIC_PATTERN, [[0x10380,0x1039F]]);
+const UGARITIC_USETITEM = new UsetItem(UGARITIC_SET, UGARITIC_STRSITEM);
 
 class TestUnicodeSetParser implements UnicodeSetParser {
-  parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => {
-    return new UnicodeSet("[𐌰-𐍊]", [[0x10330,0x1034A]]);
-  };
+  parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => { return GOTHIC_SET; };
   sizeUnicodeSet = (pattern: string) : number => { return 1; }
 };
 
 const origElementParserSegment = ElementParser.segment;
+let sections: DependencySections = null;
 
 describe('Test of ElementString', () => {
   describe('Test of ElemElement', () => {
@@ -77,6 +72,11 @@ describe('Test of ElementString', () => {
   describe('Test of ElementString', () => {
     describe('Test of fromStrings()', () => {
       beforeEach(() => {
+        sections = {
+          strs: new Strs(),
+          uset: new Uset(),
+          usetparser: new TestUnicodeSetParser(),
+        };
         ElementParser.segment = stubElementParserSegment_CodePoint;
       });
       afterEach(() => {
@@ -87,7 +87,6 @@ describe('Test of ElementString', () => {
         assert.deepEqual(es, new ElementString());
       });
       it('can create an ElementString from a string array', () => {
-        const sections = { strs: new Strs() };
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
         const expected = [
@@ -97,267 +96,247 @@ describe('Test of ElementString', () => {
         ];
         assert.deepEqual(actual, expected);
       });
-    });
-    it('can create an ElementString from a string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
-      const expected = [
-        initElemElement(GOTHIC_A),
-        initElemElement(GOTHIC_B),
-        initElemElement(GOTHIC_C),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply order string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        "1 2 3",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 1),
-        initElemElement(GOTHIC_B, undefined, 2),
-        initElemElement(GOTHIC_C, undefined, 3),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply single order to all', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        "1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 1),
-        initElemElement(GOTHIC_B, undefined, 1),
-        initElemElement(GOTHIC_C, undefined, 1),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it.skip('can handle order string that is too short', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        "1 2",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 1),
-        initElemElement(GOTHIC_B, undefined, 2),
-        initElemElement(GOTHIC_C, undefined, 0),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it.skip('can handle non-number in order string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        "1 A 3",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 1),
-        initElemElement(GOTHIC_B, undefined, 0),
-        initElemElement(GOTHIC_C, undefined, 3),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply tertiary string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        "1 2 3",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 1),
-        initElemElement(GOTHIC_B, undefined, 0, 2),
-        initElemElement(GOTHIC_C, undefined, 0, 3),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply single tertiary to all', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        "1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 1),
-        initElemElement(GOTHIC_B, undefined, 0, 1),
-        initElemElement(GOTHIC_C, undefined, 0, 1),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it.skip('can handle tertiary string that is too short', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        "1 2",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 1),
-        initElemElement(GOTHIC_B, undefined, 0, 2),
-        initElemElement(GOTHIC_C, undefined, 0, 0),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it.skip('can handle non-number in tertiary string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        "1 A 3",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 1),
-        initElemElement(GOTHIC_B, undefined, 0, 0),
-        initElemElement(GOTHIC_C, undefined, 0, 3),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply tertiary_base string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        "1 0 1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply single tertiary_base to all', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        "1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.tertiary_base),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can handle tertiary_base string that is too short', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        "1 0",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply prebase string', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        null,
-        "1 0 1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can apply single prebase to all', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        null,
-        "1",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.prebase),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can handle prebase string that is too short', () => {
-      const sections = { strs: new Strs() };
-      sections.strs.allocString = stubStrsAllocString_Char;
-      const actual = ElementString.fromStrings(
-        sections,
-        "𐌰𐌱𐌲",
-        null,
-        null,
-        null,
-        "1 0",
-      );
-      const expected = [
-        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
-        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
-        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
-      ];
-      assert.deepEqual(actual, expected);
-    });
-    it('can create an ElementString from a uset string', () => {
-      ElementParser.segment = origElementParserSegment;
-      const sections = {
-        strs: new Strs(),
-        uset: new Uset(),
-        usetparser: new TestUnicodeSetParser(),
-      };
-      sections.strs.allocString = stubStrsAllocString_Str;
-      sections.uset.allocUset = stubUsetAllocUset;
-      const actual = ElementString.fromStrings(sections, "[𐌰-𐍊]");
-      const expected = [
-        initElemElement(
-          new StrsItem(''),
-          GOTHIC_USETITEM,
-          0,
-          0,
-          constants.elem_flags_type_uset,
-        ),
-      ];
-      assert.deepEqual(actual, expected);
+      it('can create an ElementString from a string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
+        const expected = [
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply order string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          "1 2 3",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 1),
+          initElemElement(GOTHIC_B, undefined, 2),
+          initElemElement(GOTHIC_C, undefined, 3),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply single order to all', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          "1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 1),
+          initElemElement(GOTHIC_B, undefined, 1),
+          initElemElement(GOTHIC_C, undefined, 1),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it.skip('can handle order string that is too short', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          "1 2",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 1),
+          initElemElement(GOTHIC_B, undefined, 2),
+          initElemElement(GOTHIC_C, undefined, 0),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it.skip('can handle non-number in order string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          "1 A 3",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 1),
+          initElemElement(GOTHIC_B, undefined, 0),
+          initElemElement(GOTHIC_C, undefined, 3),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply tertiary string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          "1 2 3",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 1),
+          initElemElement(GOTHIC_B, undefined, 0, 2),
+          initElemElement(GOTHIC_C, undefined, 0, 3),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply single tertiary to all', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          "1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 1),
+          initElemElement(GOTHIC_B, undefined, 0, 1),
+          initElemElement(GOTHIC_C, undefined, 0, 1),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it.skip('can handle tertiary string that is too short', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          "1 2",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 1),
+          initElemElement(GOTHIC_B, undefined, 0, 2),
+          initElemElement(GOTHIC_C, undefined, 0, 0),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it.skip('can handle non-number in tertiary string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          "1 A 3",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 1),
+          initElemElement(GOTHIC_B, undefined, 0, 0),
+          initElemElement(GOTHIC_C, undefined, 0, 3),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply tertiary_base string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          "1 0 1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply single tertiary_base to all', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          "1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.tertiary_base),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can handle tertiary_base string that is too short', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          "1 0",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply prebase string', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          null,
+          "1 0 1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can apply single prebase to all', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          null,
+          "1",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.prebase),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can handle prebase string that is too short', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(
+          sections,
+          "𐌰𐌱𐌲",
+          null,
+          null,
+          null,
+          "1 0",
+        );
+        const expected = [
+          initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+          initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+          initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.none),
+        ];
+        assert.deepEqual(actual, expected);
+      });
+      it('can create an ElementString from a uset string', () => {
+        ElementParser.segment = origElementParserSegment;
+        sections.strs.allocString = stubStrsAllocString_Str;
+        sections.uset.allocUset = stubUsetAllocUset;
+        const actual = ElementString.fromStrings(sections, "[𐌰-𐍊]");
+        const expected = [
+          initElemElement(
+            new StrsItem(''),
+            GOTHIC_USETITEM,
+            0,
+            0,
+            constants.elem_flags_type_uset,
+          ),
+        ];
+        assert.deepEqual(actual, expected);
+      });
     });
   });
 });
