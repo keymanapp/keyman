@@ -9,7 +9,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
-import { StrsItem, UsetItem, Strs } from '../../../src/kmx/kmx-plus/kmx-plus.js';
+import { StrsItem, UsetItem, Strs, StrsOptions, DependencySections, CharStrsItem } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-keyboard/pattern-parser.js';
 
@@ -78,7 +78,9 @@ describe('Test of ElementString', () => {
         assert.deepEqual(es, new ElementString());
       });
       it('can create an ElementString from a string array', () => {
-        const actual = ElementString.fromStrings({ strs: new Strs() }, ["𐌰", "𐌱", "𐌲"]);
+        const sections = { strs: new Strs() };
+        sections.strs.allocString = stubStrsAllocString_Char;
+        const actual = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
         const expected = [
           initElemElement(GOTHIC_A),
           initElemElement(GOTHIC_B),
@@ -88,7 +90,9 @@ describe('Test of ElementString', () => {
       });
     });
     it('can create an ElementString from a string', () => {
-      const actual = ElementString.fromStrings({ strs: new Strs() }, "𐌰𐌱𐌲");
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
       const expected = [
         initElemElement(GOTHIC_A),
         initElemElement(GOTHIC_B),
@@ -97,8 +101,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply order string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         "1 2 3",
       );
@@ -110,8 +116,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply single order to all', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         "1",
       );
@@ -123,8 +131,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply tertiary string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         "1 2 3",
@@ -137,8 +147,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply single tertiary to all', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         "1",
@@ -151,8 +163,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply tertiary_base string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         null,
@@ -166,8 +180,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply single tertiary_base to all', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         null,
@@ -181,8 +197,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply prebase string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         null,
@@ -197,8 +215,10 @@ describe('Test of ElementString', () => {
       assert.deepEqual(actual, expected);
     });
     it('can apply single prebase to all', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
       const actual = ElementString.fromStrings(
-        { strs: new Strs() },
+        sections,
         "𐌰𐌱𐌲",
         null,
         null,
@@ -229,4 +249,9 @@ function initElemElement(
   ee.tertiary = tertiary;
   ee.flags = flags;
   return ee;
-}
+};
+
+function stubStrsAllocString_Char(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
+  return new CharStrsItem(s);
+};
+
