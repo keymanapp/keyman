@@ -322,7 +322,7 @@ describe('Test of ElementString', () => {
         assert.deepEqual(actual, expected);
       });
       it('can create an ElementString from a uset string', () => {
-        ElementParser.segment = origElementParserSegment;
+        ElementParser.segment = stubElementParserSegment_Uset;
         sections.strs.allocString = stubStrsAllocString_Str;
         sections.uset.allocUset = stubUsetAllocUset;
         const actual = ElementString.fromStrings(sections, "[𐌰-𐍊]");
@@ -367,6 +367,10 @@ function stubStrsAllocString_Str(s?: string, opts?: StrsOptions, sections?: Depe
 
 function stubElementParserSegment_CodePoint(str: string): ElementSegment[] {
   return [...str].map(s => new ElementSegment(s, ElementType.codepoint));
+};
+
+function stubElementParserSegment_Uset(str: string): ElementSegment[] {
+  return [new ElementSegment(str, ElementType.uset)];
 };
 
 function stubUsetAllocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
