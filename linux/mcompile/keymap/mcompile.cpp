@@ -418,7 +418,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX
   KMX_GetDeadkeys(dk_Table, deadkey, vec_deadkeys, keymap);  // returns vector of [usvk, ch_out] pairs
 
   int n=0;
-  while (n < (int)vec_deadkeys.size()) {
+  while (n < (int)vec_deadkeys.size() - 2) {
     // Look up the ch
     KMX_DWORD KeyValUnderlying = (KMX_DWORD) KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, vec_deadkeys[n]);
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, vec_deadkeys[n + 1], vec_deadkeys[n + 2]);
