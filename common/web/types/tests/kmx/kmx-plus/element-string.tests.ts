@@ -8,25 +8,36 @@
 
 import 'mocha';
 import { assert } from 'chai';
+import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
-import { StrsItem, UsetItem, Strs, StrsOptions, DependencySections, CharStrsItem } from '../../../src/kmx/kmx-plus/kmx-plus.js';
-import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
+import { StrsItem, UsetItem, Strs, StrsOptions, DependencySections, CharStrsItem, Uset } from '../../../src/kmx/kmx-plus/kmx-plus.js';
+import { UnicodeSet, UnicodeSetParser } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-keyboard/pattern-parser.js';
 
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
 const GOTHIC_B = new StrsItem("𐌱", 0x10331);
 const GOTHIC_C = new StrsItem("𐌲", 0x10332);
-const UGARITIC_A = new StrsItem("𐎀", 0x10380);
-const GOTHIC_SET = new UsetItem(
-  new UnicodeSet("[𐌰-𐍊]", [[0x10330,0x1034A]]),
-  GOTHIC_A
+const GOTHIC_PATTERN = "[𐌰-𐍊]";
+const GOTHIC_STRSITEM = new StrsItem(GOTHIC_PATTERN);
+const GOTHIC_USETITEM = new UsetItem(
+  new UnicodeSet(GOTHIC_PATTERN, [[0x10330,0x1034A]]),
+  GOTHIC_STRSITEM
 );
-const UGARITIC_SET = new UsetItem(
-  new UnicodeSet("[𐎀-𐎟]", [[0x10380,0x1039F]]),
-  UGARITIC_A
+const UGARITIC_PATTERN = "[𐎀-𐎟]";
+const UGARITIC_STRSITEM = new StrsItem(UGARITIC_PATTERN);
+const UGARITIC_USETITEM = new UsetItem(
+  new UnicodeSet(UGARITIC_PATTERN, [[0x10380,0x1039F]]),
+  UGARITIC_STRSITEM
 );
 
-let origElementParserSegment = ElementParser.segment;
+class TestUnicodeSetParser implements UnicodeSetParser {
+  parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => {
+    return new UnicodeSet("[𐌰-𐍊]", [[0x10330,0x1034A]]);
+  };
+  sizeUnicodeSet = (pattern: string) : number => { return 1; }
+};
+
+const origElementParserSegment = ElementParser.segment;
 
 describe('Test of ElementString', () => {
   describe('Test of ElemElement', () => {
@@ -42,23 +53,23 @@ describe('Test of ElementString', () => {
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when order differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0);
-        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 1);
+        const one = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 0);
+        const two = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 1);
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when tertiary differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0);
-        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1);
+        const one = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 0, 0);
+        const two = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 0, 1);
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when flags differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0, ElemElementFlags.none);
-        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0, ElemElementFlags.type);
+        const one = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 0, 0, ElemElementFlags.none);
+        const two = initElemElement(GOTHIC_A, GOTHIC_USETITEM, 0, 0, ElemElementFlags.type);
         assert.isFalse(one.isEqual(two));
       });
       it('returns true even though uset differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET);
-        const two = initElemElement(GOTHIC_A, UGARITIC_SET);
+        const one = initElemElement(GOTHIC_A, GOTHIC_USETITEM);
+        const two = initElemElement(GOTHIC_A, UGARITIC_USETITEM);
         assert.isTrue(one.isEqual(two));
       });
     });
@@ -66,9 +77,7 @@ describe('Test of ElementString', () => {
   describe('Test of ElementString', () => {
     describe('Test of fromStrings()', () => {
       beforeEach(() => {
-        ElementParser.segment = (str: string): ElementSegment[] => {
-          return [...str].map(s => new ElementSegment(s, ElementType.codepoint));
-        }
+        ElementParser.segment = stubElementParserSegment_CodePoint;
       });
       afterEach(() => {
         ElementParser.segment = origElementParserSegment;
@@ -329,6 +338,27 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it('can create an ElementString from a uset string', () => {
+      ElementParser.segment = origElementParserSegment;
+      const sections = {
+        strs: new Strs(),
+        uset: new Uset(),
+        usetparser: new TestUnicodeSetParser(),
+      };
+      sections.strs.allocString = stubStrsAllocString_Str;
+      sections.uset.allocUset = stubUsetAllocUset;
+      const actual = ElementString.fromStrings(sections, "[𐌰-𐍊]");
+      const expected = [
+        initElemElement(
+          new StrsItem(''),
+          GOTHIC_USETITEM,
+          0,
+          0,
+          constants.elem_flags_type_uset,
+        ),
+      ];
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
@@ -350,5 +380,17 @@ function initElemElement(
 
 function stubStrsAllocString_Char(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
   return new CharStrsItem(s);
+};
+
+function stubStrsAllocString_Str(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
+  return new StrsItem(s);
+};
+
+function stubElementParserSegment_CodePoint(str: string): ElementSegment[] {
+  return [...str].map(s => new ElementSegment(s, ElementType.codepoint));
+};
+
+function stubUsetAllocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
+  return new UsetItem(set, new StrsItem(set.pattern));
 };
 
