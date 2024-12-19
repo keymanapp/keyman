@@ -27,8 +27,8 @@ const UGARITIC_SET = new UnicodeSet(UGARITIC_PATTERN, [[0x10380,0x1039F]]);
 const UGARITIC_USETITEM = new UsetItem(UGARITIC_SET, UGARITIC_STRSITEM);
 
 class TestUnicodeSetParser implements UnicodeSetParser {
-  parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => { return GOTHIC_SET; };
-  sizeUnicodeSet = (pattern: string) : number => { return 1; }
+  parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => GOTHIC_SET;
+  sizeUnicodeSet = (pattern: string) : number => 1;
 };
 
 const origElementParserSegment = ElementParser.segment;
@@ -336,6 +336,16 @@ describe('Test of ElementString', () => {
           ),
         ];
         assert.deepEqual(actual, expected);
+      });
+      it('returns null for an invalid unicode set size', () => {
+        ElementParser.segment = stubElementParserSegment_Uset;
+        sections.usetparser.sizeUnicodeSet = (pattern: string) : number => -1;
+        assert.isNull(ElementString.fromStrings(sections, "[𐌰-𐍊]"));
+      });
+      it('returns null if it cannot parse the unicode set', () => {
+        ElementParser.segment = stubElementParserSegment_Uset;
+        sections.usetparser.parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => null;
+        assert.isNull(ElementString.fromStrings(sections, "[𐌰-𐍊]"));
       });
     });
   });
