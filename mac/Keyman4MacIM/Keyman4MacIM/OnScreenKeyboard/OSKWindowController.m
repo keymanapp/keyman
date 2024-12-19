@@ -66,18 +66,16 @@
   [self.oskView resizeOSKLayout];
 }
 
+- (void)prepareToShowOsk {
+  os_log_info([KMLogs oskLog], "OSKWindowController prepareToShowOsk");
+}
+
 - (void)windowWillClose:(NSNotification *)notification {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose");
   [KMSettingsRepository.shared writeShowOskOnActivate:NO];
   
-  // whenever the OSK is closed clear all of its modifier keys
+  // whenever the OSK is closing clear all of its modifier keys
   [self.oskView clearOskModifiers];
-}
-
-- (void) showWindow:(id) sender {
-  [super showWindow:sender];
-
-  os_log_info([KMLogs oskLog], "OSKWindowController showWindow");
 }
 
 - (void)helpAction:(id)sender {
@@ -106,6 +104,16 @@
   }
 }
 
+/**
+ * returns current event flags representing the state of the modifiers on the OSK or zero if OSK is closed
+ */
+- (NSEventModifierFlags)getOskEventModifierFlags {
+  if (self.window.isVisible) {
+    return [self.oskView getOskEventModifierFlags];
+  } else {
+    return 0;
+  }
+}
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
   if (_modFlagsTimer == nil) {
     TimerTarget *timerTarget = [[TimerTarget alloc] init];

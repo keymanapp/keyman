@@ -26,6 +26,7 @@
 - (void)setPhysicalControlState:(BOOL)ctrlState;
 - (void)setOskControlState:(BOOL)oskCtrlState;
 - (void)clearOskModifiers;
+- (NSEventModifierFlags)getOskEventModifierFlags;
 - (void)resetOSK;
 - (void)resizeOSKLayout;
 - (int64_t)createOskEventUserData;

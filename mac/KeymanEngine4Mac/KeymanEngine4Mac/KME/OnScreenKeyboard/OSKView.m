@@ -140,7 +140,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskLayout = nil;
   _oskDefaultNKeys = nil;
   
-  [self updateKeyLabelsForState];
+  [self updateKeyLabelsForCurrentLayer];
 }
 
 - (void)initOSKKeys {
@@ -174,7 +174,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     py += keyHeight;
   }
   
-  [self updateKeyLabelsForState];
+  [self updateKeyLabelsForCurrentLayer];
 }
 
 - (NSArray *)oskLayout {
@@ -436,7 +436,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskOptionState = NO;
   _oskControlState = NO;
   [self updateModifierKeysForState];
-  [self updateKeyLabelsForState];
+  [self updateKeyLabelsForCurrentLayer];
 }
 
 - (void)resetOSK {
@@ -488,6 +488,47 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 }
 
 /**
+ * get the event modifier flags representing the current state of the osk modifiers
+ */
+- (NSEventModifierFlags)getOskEventModifierFlags {
+  return [self getEventModifierFlags:self.oskShiftState optionFlag:self.oskOptionState controlFlag:self.oskControlState];
+}
+
+/**
+ * get the event modifier flags that represent the combined state of the physical and osk modifiers
+ */
+- (NSEventModifierFlags) getCombinedEventModifierFlags {
+  BOOL shift = self.physicalShiftState | self.oskShiftState;
+  BOOL option = self.physicalOptionState | self.oskOptionState;
+  BOOL control = self.physicalControlState | self.oskControlState;
+  
+  return [self getEventModifierFlags:shift optionFlag:option controlFlag:control];
+}
+
+/**
+ * get the NSEventModifierFlags value that corresponds to the specified modifier states
+ */
+- (NSEventModifierFlags)getEventModifierFlags:(BOOL)shift optionFlag:(BOOL)option controlFlag:(BOOL)control {
+  NSEventModifierFlags modifierFlags = 0;
+  
+  if (shift) {
+    modifierFlags = modifierFlags | NSEventModifierFlagShift;
+  }
+  /**
+   * Both left and right option keys on the OSK cause oskOptionState to be true without distinction of left or right.
+   * However, the generated event is a right alt so that it will trigger the right alt rules in the Keyman keyboard.
+   */
+  if (option) {
+    modifierFlags = modifierFlags | MK_RIGHT_ALT_MASK;
+  }
+  if (control) {
+    modifierFlags = modifierFlags | NSEventModifierFlagControl;
+  }
+  
+  return modifierFlags;
+}
+
+/**
  * Create the 64-bit value to pass in the kCGEventSourceUserData field of the generated CGEvent
  * The upper-most bit is set to distinguish it from the default value of zero, and the lower 32 bits
  * store the modifier state of the OSK at the time that the keydown event was generated.
@@ -500,22 +541,9 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (int64_t) createOskEventUserData {
   // set bit to identify this user data as originating from the OSK
   int64_t oskEventData = OSK_EVENT_FLAG;
-  
-  if (self.oskShiftState || self.physicalShiftState) {
-    oskEventData = oskEventData | kCGEventFlagMaskShift;
-  }
-  /**
-   * Both left and right option keys on the OSK cause oskOptionState to be true without distinction of left or right.
-   * However, the generated event is a right alt so that it will trigger the right alt rules in the Keyman keyboard.
-   */
-  if (self.oskOptionState || self.physicalOptionState) {
-    oskEventData = oskEventData | MK_RIGHT_ALT_MASK;
-  }
-  if (self.oskControlState || self.oskControlState) {
-    oskEventData = oskEventData | kCGEventFlagMaskControl;
-  }
-  
-  return oskEventData;
+  NSEventModifierFlags eventModifierFlags = [self getCombinedEventModifierFlags];
+
+  return oskEventData | eventModifierFlags;
 }
 
 - (void)handleKeyEvent:(NSEvent *)event {
@@ -536,13 +564,20 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 }
 
 /**
- * get the modifier flags that represent the combined state of the physical and osk modifiers
+ * get the Keyman modifier flags that represent the combined state of the physical and osk modifiers
  */
-- (WORD) getCombinedModifierFlags {
+- (WORD) getKeymanModifierFlagsForCurrentLayer {
   BOOL shift = self.physicalShiftState | self.oskShiftState;
   BOOL option = self.physicalOptionState | self.oskOptionState;
   BOOL control = self.physicalControlState | self.oskControlState;
-    
+  
+  return [self getKeymanModifierFlags:shift optionFlag:option controlFlag:control];
+}
+
+/**
+ * get Keyman modifier flags for the specified modifier states
+ */
+- (WORD)getKeymanModifierFlags:(BOOL)shift optionFlag:(BOOL)option controlFlag:(BOOL)control {
   WORD flags = 0;
   if (shift) {
     flags |= KVKS_SHIFT;
@@ -565,7 +600,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
  * Display the key labels that correspond to the current state of the modifier keys.
  * The layer shown depends on both the physical modifier state and the osk modifier state.
  */
-- (void)updateKeyLabelsForState {
+- (void)updateKeyLabelsForCurrentLayer {
   os_log_debug([KMELogs oskLog], "OSKView updateKeyLabelsForState, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
   
   [self resetKeyLabels];
@@ -574,13 +609,13 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   if (nkeys == nil)
     nkeys = self.oskDefaultNKeys;
   
-  WORD flags = [self getCombinedModifierFlags];
+  WORD keymanFlagsForCurrentLayer = [self getKeymanModifierFlagsForCurrentLayer];
   
   NSString *ansiFont = [self ansiFont];
   NSString *unicodeFont = [self unicodeFont];
   unsigned short keyCode;
   for (NKey *nkey in nkeys) {
-    if (nkey.modifierFlags == flags) {
+    if (nkey.modifierFlags == keymanFlagsForCurrentLayer) {
       keyCode = [self MacKeyCode:nkey.keyCode];
       os_log_debug([KMELogs keyLog], "keyCode: %d, %x for key: %{public}@", keyCode, keyCode, nkey);
       if (keyCode < USHRT_MAX) {
@@ -654,7 +689,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     _oskShiftState = NO;
     
     os_log_debug([KMELogs oskLog], "hardware shift key released");
-    [self updateKeyLabelsForState];
+    [self updateKeyLabelsForCurrentLayer];
     [self updateShiftKeysForState];
   }
 }
@@ -662,16 +697,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setOskShiftState:(BOOL)state {
   if (_oskShiftState != state && !self.physicalShiftState) {
     _oskShiftState = state;
-    if (state) {
-      os_log_debug([KMELogs oskLog], "OSK shift key selected");
-      [self updateKeyLabelsForState];
-      [self updateShiftKeysForState];
-    }
-    else if (!self.physicalShiftState) {
-      os_log_debug([KMELogs oskLog], "OSK shift key de-selected");
-      [self updateKeyLabelsForState];
-      [self updateShiftKeysForState];
-    }
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateShiftKeysForState];
   }
 }
 
@@ -684,7 +711,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskOptionState = NO;
-    [self updateKeyLabelsForState];
+    [self updateKeyLabelsForCurrentLayer];
     [self updateOptionKeysForState];
   }
 }
@@ -692,14 +719,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setOskOptionState:(BOOL)state {
   if (_oskOptionState != state && !self.physicalOptionState) {
     _oskOptionState = state;
-    if (state) {
-      [self updateKeyLabelsForState];
-      [self updateOptionKeysForState];
-    }
-    else if (!self.physicalOptionState) {
-      [self updateKeyLabelsForState];
-      [self updateOptionKeysForState];
-    }
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateOptionKeysForState];
   }
 }
 
@@ -712,7 +733,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
      * The state of the physical key overrides the modifier key clicked in the OSK.
      */
     _oskControlState = NO;
-    [self updateKeyLabelsForState];
+    [self updateKeyLabelsForCurrentLayer];
     [self updateControlKeysForState];
   }
 }
@@ -720,14 +741,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (void)setOskControlState:(BOOL)state {
   if (_oskControlState != state && !self.physicalControlState) {
     _oskControlState = state;
-    if (state) {
-      [self updateKeyLabelsForState];
-      [self updateControlKeysForState];
-    }
-    else if (!self.physicalControlState) {
-      [self updateKeyLabelsForState];
-      [self updateControlKeysForState];
-    }
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateControlKeysForState];
   }
 }
 
