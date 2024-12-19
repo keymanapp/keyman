@@ -145,6 +145,21 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it.skip('can handle non-number in order string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        "1 A 3",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 1),
+        initElemElement(GOTHIC_B, undefined, 0),
+        initElemElement(GOTHIC_C, undefined, 3),
+      ];
+      assert.deepEqual(actual, expected);
+    });
     it('can apply tertiary string', () => {
       const sections = { strs: new Strs() };
       sections.strs.allocString = stubStrsAllocString_Char;
@@ -190,6 +205,22 @@ describe('Test of ElementString', () => {
         initElemElement(GOTHIC_A, undefined, 0, 1),
         initElemElement(GOTHIC_B, undefined, 0, 2),
         initElemElement(GOTHIC_C, undefined, 0, 0),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it.skip('can handle non-number in tertiary string', () => {
+      const sections = { strs: new Strs() };
+      sections.strs.allocString = stubStrsAllocString_Char;
+      const actual = ElementString.fromStrings(
+        sections,
+        "𐌰𐌱𐌲",
+        null,
+        "1 A 3",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 1),
+        initElemElement(GOTHIC_B, undefined, 0, 0),
+        initElemElement(GOTHIC_C, undefined, 0, 3),
       ];
       assert.deepEqual(actual, expected);
     });
