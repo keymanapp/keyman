@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.162 alpha 2024-12-19
+
+* fix(mac): standardize interaction between OSK and physical keyboard (#12836)
+
 ## 18.0.161 alpha 2024-12-17
 
 * fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
