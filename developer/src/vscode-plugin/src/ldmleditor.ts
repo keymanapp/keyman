@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as crypto from 'crypto';
+import { getLDMLCompilerManager } from './ldmlCompilerManager';
 
 interface LdmlDocumentDelegate {
 	getFileData(): Promise<Uint8Array>;
@@ -68,6 +69,7 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
         throw new Error('Method not implemented.'); // TODO-LDML-EDITOR
     }
     async openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): Promise<LdmlDocument> {
+        console.log(`openCustom ${uri}`);
         const document : LdmlDocument = await LdmlDocument.create(uri, openContext.backupId, {
             getFileData: async() => {
                 return new Uint8Array(); // TODO-LDML-EDITOR
@@ -94,6 +96,9 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 
     }
     async resolveCustomTextEditor(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): Promise<void> {
+        // temporary - testing linkage
+        await (await getLDMLCompilerManager()).init();
+
         webviewPanel.webview.options = {
 			enableScripts: true,
 		};
