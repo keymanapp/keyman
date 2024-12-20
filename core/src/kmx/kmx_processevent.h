@@ -57,7 +57,7 @@ private:
   KMX_BOOL LoadKeyboardFromBlob(PKMX_BYTE buf, size_t sz, LPKEYBOARD* lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
-#ifdef KMX_64BIT
+#if defined(KMX_64BIT) || defined(__EMSCRIPTEN__)
   LPKEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
 #else
   LPKEYBOARD FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base);
