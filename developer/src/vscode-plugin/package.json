@@ -2,6 +2,7 @@
   "name": "@keymanapp/keyman-developer-vscode",
   "displayName": "Keyman Developer for VSCode",
   "description": "Plugin for compiling Keyman projects in VSCode",
+  "version": "18.0.0-ALPHA",
   "engines": {
     "vscode": "^1.93.0"
   },
