@@ -3,10 +3,13 @@
  */
 
 import { LDMLCompilerManager } from "./ldmlCompilerManager.js";
-import { CompilerCallbackOptions, CompilerCallbacks, defaultCompilerOptions } from "@keymanapp/developer-utils";
+import { CompilerCallbackOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader } from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions, LdmlKeyboardCompiler } from "@keymanapp/kmc-ldml";
 import { ExtensionCallbacks } from "./extensionCallbacks.mjs";
 import { KMXPlus } from "@keymanapp/common-types";
+import { fileURLToPath } from 'url';
+import { dirname } from 'node:path';
+
 /**
  * TODO-LDML-EDITOR: should use vscode.workspace.fs.readFile which can read from remote workspaces.
  *
@@ -39,8 +42,8 @@ export class KmcLdmlManager implements LDMLCompilerManager {
         this.compoptions = {
             ...defaultCompilerOptions,
             readerOptions: {
-                // TODO-EPIC-LDML: need to use global path
-                importsPath: "/Users/srl295/src/cldr/keyboards/import/",
+                cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+                localImportsPaths: [ dirname(filename) ], // local dir
             }
         };
         await k.init(this.callbacks, this.compoptions);
