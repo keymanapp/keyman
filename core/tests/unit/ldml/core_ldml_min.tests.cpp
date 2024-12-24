@@ -26,7 +26,7 @@ int main(int argc, const char *argv[]) {
     auto blob = km::tests::load_kmx_file(nowhere);
     status = km_core_keyboard_load_from_blob(nowhere, blob.data(), blob.size(), &test_kb);
 
-    std::cerr << "null km_core_keyboard_load = " << status << std::endl;
+    std::cerr << "null km_core_keyboard_load_from_blob = " << status << std::endl;
     test_assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
     test_assert(test_kb == nullptr);
     km_core_keyboard_dispose(test_kb);

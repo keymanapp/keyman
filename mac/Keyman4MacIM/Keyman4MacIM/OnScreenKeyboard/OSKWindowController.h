@@ -13,6 +13,8 @@
 
 @property (nonatomic, weak) IBOutlet OSKView *oskView;
 
+- (void)prepareToShowOsk;
 - (void)resetOSK;
+- (NSEventModifierFlags)getOskEventModifierFlags;
 
 @end

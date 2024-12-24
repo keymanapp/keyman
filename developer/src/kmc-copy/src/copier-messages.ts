@@ -117,18 +117,7 @@ export class CopierMessages {
     `Dry run requested. No changes have been saved`
   );
 
-  static ERROR_InvalidGitHubSource = SevError | 0x0011;
-  static Error_InvalidGitHubSource = (o:{source: string}) => m(
-    this.ERROR_InvalidGitHubSource,
-    `Source project specification '${def(o.source)}' is not a valid GitHub reference`,
-    `The source project specification for GitHub sources must match the pattern:
-        github:\\<owner/repo>[:\\<branch>]:\\<path>
-    The path must include the .kpj filename and may optionally begin with a forward slash.
-    The following are valid examples:
-        github:keymanapp/keyboards:master:release/k/khmer_angkor/khmer_angkor.kpj
-        github:keymanapp/keyboards:release/k/khmer_angkor/khmer_angkor.kpj
-        github:keymanapp/keyboards:/release/k/khmer_angkor/khmer_angkor.kpj`
-  );
+  // 0x0011 unused
 
   static ERROR_CannotDownloadFolderFromGitHub = SevError | 0x0012;
   static Error_CannotDownloadFolderFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
