@@ -90,12 +90,13 @@
                 android:layout_gravity="center_vertical"
                 android:text="@string/suggestions_radio_2" />
 
-            <com.google.android.material.radiobutton.MaterialRadioButton
+            <!-- Auto-correct disabled for Keyman 18.0 #12767 -->
+            <!--com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/suggestion_radio_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/suggestions_radio_3" />
+                android:text="@string/suggestions_radio_3" /-->
 
         </RadioGroup>
 

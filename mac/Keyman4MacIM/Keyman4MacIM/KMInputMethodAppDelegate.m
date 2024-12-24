@@ -944,6 +944,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showOSK {
+  [self.oskWindow prepareToShowOsk];
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];
@@ -1242,13 +1243,32 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSEventModifierFlags modifierFlags = 0;
   
   if (self.receivedKeyDownFromOsk) {
+    /**
+     * the event was generated from the OSK, so use the oskEventModifiers in effect at time of event generation
+     */
     modifierFlags = self.oskEventModifiers;
     os_log_debug([KMLogs eventsLog], "--- use modifiers from OSK, oskEventModifiers: 0x%lX", (unsigned long)modifierFlags);
     self.oskEventModifiers = 0;
-  } else {
+  } else { 
+    /**
+     * the event originated from the physical keyboard, use the modifiers on kCGEventFlagsChanged events
+     */
     NSEventModifierFlags originalModifiers = self.currentModifiers;
     modifierFlags = [self.modifierMapping adjustModifiers:originalModifiers];
     os_log_debug([KMLogs eventsLog], "--- use adjusted modifiers from current state: 0x%lX", (unsigned long)modifierFlags);
+    
+    /**
+     * If the OSK is open, then we also need to apply its modifiers, if any, to this event originating from the physical keyboard.
+     * If the OSK is closed, its modifiers will be zero.
+     */
+    NSEventModifierFlags oskModifiers = [self.oskWindow getOskEventModifierFlags];
+    if (oskModifiers != 0) {
+      os_log_debug([KMLogs eventsLog], "--- modifiers from OSK to apply to physical keyboard event: 0x%lX", (unsigned long)oskModifiers);
+      
+      // combine osk modifiers with adjusted modifiers
+      modifierFlags = oskModifiers | modifierFlags;
+      os_log_debug([KMLogs eventsLog], "--- combined modifiers to apply to physical keyboard event: 0x%lX", (unsigned long)modifierFlags);
+    }
   }
   
   return modifierFlags;
