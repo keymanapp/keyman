@@ -7,8 +7,10 @@
  * This is abstract because the ES module needs to be loaded asynchronously.
  */
 export interface LDMLCompilerManager {
-    /** validate that everything loaded properly */
+    /** validate that everything loaded properly. idempotent */
     init() : Promise<any>;
+    /** Compile a file. Returns KMXPlus file. */
+    compile(filename: string) : Promise<any>;
 };
 
 /** load concrete instance from module */

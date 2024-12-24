@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as crypto from 'crypto';
-import { getLDMLCompilerManager } from './ldmlCompilerManager';
+import { getLDMLCompilerManager, LDMLCompilerManager } from './ldmlCompilerManager';
 
 interface LdmlDocumentDelegate {
 	getFileData(): Promise<Uint8Array>;
@@ -41,7 +41,16 @@ class LdmlDocument implements vscode.CustomDocument {
 }
 
 export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
+    private compiler? : LDMLCompilerManager;
     private static readonly viewType = 'keyman.ldml'; // sync w/ package.json
+
+    private async getCompiler() : Promise<LDMLCompilerManager> {
+        if (!this.compiler) {
+            this.compiler = await getLDMLCompilerManager();
+        }
+        await this.compiler.init();
+        return this.compiler;
+    }
 
     constructor(private readonly context: vscode.ExtensionContext) { }
 	static register(context: vscode.ExtensionContext): vscode.Disposable {
@@ -96,8 +105,10 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 
     }
     async resolveCustomTextEditor(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): Promise<void> {
+        // make sure we have a compiler
+        const compiler = await this.getCompiler();
         // temporary - testing linkage
-        await (await getLDMLCompilerManager()).init();
+        const kmxPlus = await compiler.compile(document.fileName);
 
         webviewPanel.webview.options = {
 			enableScripts: true,
@@ -142,6 +153,7 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 			webviewPanel.webview.postMessage({
 				type: 'update',
 				text: document.getText(),
+                kmxPlus,
 			});
 		}
 
