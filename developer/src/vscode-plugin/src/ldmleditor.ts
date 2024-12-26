@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import * as crypto from 'crypto';
 import { getLDMLCompilerManager, LDMLCompilerManager } from './ldmlCompilerManager';
+import { fixupIndexHtml } from './indexFixer';
 
 interface LdmlDocumentDelegate {
 	getFileData(): Promise<Uint8Array>;
@@ -116,38 +117,25 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 
         const { webview } = webviewPanel;
 
-        // these are fixed IDs as parcel is set to not do content hashing
-        const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'build', 'index.89a9d63e.css'));
-        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'build', 'index.2f8490e0.js'));
 
-        const nonce = crypto.randomUUID().toString();
+        try {
+            // we read this file, and munge it a bit.
+            const indexUri = vscode.Uri.joinPath(this.context.extensionUri, 'build', 'index.html');
+            // pass this as an argument to fixup URLs
+            const buildUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'build'));
 
-        // TODO-LDML-EDITOR move to React function
-        webview.html = `
-            <!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
+            const nonce = crypto.randomUUID().toString();
 
-				<!--
-				Use a content security policy to only allow loading images from https or from our extension directory,
-				and only allow scripts that have a specific nonce.
-				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-
-                <link href="${styleUri}" rel="stylesheet" />
-
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-                <title>LDML</title>
-            </head>
-            <body>
-                <noscript>JavaScript is required for this application…</noscript>
-                <div id="root"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
-            </body>
-            </html>
-        `.trim();
+            console.dir({indexUri});
+            const indexRaw = await vscode.workspace.fs.readFile(indexUri);
+            const indexText = new TextDecoder('UTF-8').decode(indexRaw);
+            const html = fixupIndexHtml(indexText, buildUri.toString(), nonce, webview.cspSource);
+            console.log(html);
+            webview.html = html;
+        } catch(e) {
+            console.error(e);
+            webview.html = `<i>error: ${e}</i>`;
+        }
 
         function updateWebview() {
 			webviewPanel.webview.postMessage({

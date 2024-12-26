@@ -3,8 +3,10 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Editor</title>
-    <script type="module" src="./index.js"></script>
+    <title>LDML Editor</title>
+    <!-- stylesheet added automatically -->
+    <script type="module" src="./index.js" nonce="@NONCE@"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src @CSPSOURCE@; style-src @CSPSOURCE@; script-src 'nonce-@NONCE@';">
 </head>
 
 <body>

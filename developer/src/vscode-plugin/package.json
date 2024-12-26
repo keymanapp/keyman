@@ -37,14 +37,17 @@
     "lint": "eslint src",
     "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",
     "ui-test": "vscode-test",
-    "build": "parcel build --target=default --cache-dir=.parcel-cache --no-content-hash"
+    "build": "parcel build --target=default --cache-dir=.parcel-cache",
+    "ui-watch": "parcel watch --target=default --cache-dir=.parcel-cache"
   },
   "devDependencies": {
+    "@types/jsdom": "^21.1.7",
     "@types/mocha": "^10.0.0",
     "@types/node": "20.4.1",
     "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
+    "jsdom": "^25.0.1",
     "parcel": "^2.13.2"
   },
   "license": "MIT",
