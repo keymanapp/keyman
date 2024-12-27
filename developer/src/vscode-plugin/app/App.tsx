@@ -7,6 +7,7 @@ import './App.css';
 import { KMXPlus } from '@keymanapp/common-types';
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { Button } from 'antd';
 
 interface LoadedData {
   loaded: boolean;
@@ -27,7 +28,7 @@ function RawSource({ text }) {
   }
   if (!text) return;
   if (!shown) return (
-    <button onClick={() => setShown(true)}>Show Raw Source</button>
+    <Button type="primary" onClick={() => setShown(true)}>Show Raw Source</Button>
   );
   return (
     <div>
