@@ -1,3 +1,49 @@
-.App {
-  text-align: center;
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
+.App pre.code {
+  text-align: left;
+
+}
+
+.Key {
+  margin: 0.25em;
+  display: flow flex-shrink;
+  flex-grow: 1;
+  flex-basis: 3em;
+  white-space-collapse: preserve-spaces;
+}
+
+.chosenKey {
+  background-color: navy;
+  color: white;
+}
+
+/*
+kbd.unchosenKey {
+}
+*/
+
+/* .keyBagContainer {
+  border: 2px solid blue;
+} */
+
+.keyList {
+  border: 1px solid gray;
+  padding: 0.25em;
+  width: 50em;
+  height: 11em;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+}
+
+.selectedLayoutListButton {
+  background-color: navy;
+  color: white;
+}
+
+.layoutList kbd {
+  margin: 0.25em;
 }
