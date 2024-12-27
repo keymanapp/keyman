@@ -7,12 +7,13 @@ import './App.css';
 import { KMXPlus } from '@keymanapp/common-types';
 import KMXPlusFile = KMXPlus.KMXPlusFile;
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { Button } from 'antd';
+import { Button, Input, InputNumber, Checkbox, Card, Segmented, Skeleton, Alert } from 'antd';
 
 interface LoadedData {
   loaded: boolean;
   text?: string;
   kmxPlus?: KMXPlusFile;
+  messages?: string[];
 }
 
 const noKmxPlusFile : KMXPlusFile = undefined as unknown as KMXPlusFile;
@@ -86,14 +87,14 @@ function KeyDetails({ chosenKey } : { chosenKey : string }) {
   const isGap = flags & constants.keys_key_flags_gap;
 
   return (
-    <div>
+    <Card title="Details" bordered={true}>
       <h5>Details</h5>
-      <p>ID: {k.id.value}</p>
-      <p>To: {k.to.value}</p>
-      <p>Width: {k.width}</p>
-      <p>Gap? {isGap ? 'Yes' : 'No'}</p>
+      <b>ID:</b> <Input value={k.id.value} /> <br/>
+      <b>To:</b> <Input value={k.to.value} /> <br/>
+      <b>Width:</b> <InputNumber min={0.1} max={99.0} step={0.1} value={k.width / 10} /> <br/>
+      <Checkbox checked={isGap}>Gap</Checkbox> <br/>
       <p>flags? 0x{k.flags.toString(16)}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -107,7 +108,6 @@ function KeyBag() {
   return (
     <>
       <h4>Key Bag</h4>
-      <h5>Chosen: {chosenKey}</h5>
       <div className="keyListContainer">
         <KeyList keys={keys} chosenKey={chosenKey} setChosenKey={setChosenKey} />
       </div>
@@ -193,6 +193,13 @@ function Layer({layer} : {
   );
 }
 
+function listTitle(list : KMXPlus.LayrList) {
+  const myWidth = touchWidth(list);
+  const isTouch = (list.hardware.value === constants.layr_list_hardware_touch);
+  const title = isTouch ? `Touch>${list.minDeviceWidth}px` : `${list.hardware.value}`;
+  return title;
+}
+
 function LayoutList({curWidth, setCurWidth, list} :
   {
     curWidth: number,
@@ -204,11 +211,8 @@ function LayoutList({curWidth, setCurWidth, list} :
   const myWidth = touchWidth(list);
   const selected = (curWidth === myWidth);
   if (!selected) return; // for now: hide collapsed layouts
-  const isTouch = (list.hardware.value === constants.layr_list_hardware_touch);
-  const title = isTouch ? `Touch>${list.minDeviceWidth}px` : `${list.hardware.value}`;
   return (
     <div className="layoutList">
-      <h5>{title}</h5>
       {list.layers.map((layer)=> (<Layer key={layerTitle(layer)} layer={layer}/>))}
     </div>
   );
@@ -219,12 +223,29 @@ function KeyLayouts() {
   const lists = [...(kmxPlus.kmxplus.layr?.lists || [])]; // copy the list
   const [curWidth, setCurWidth] = React.useState(WIDTH_HARDWARE);
   lists.sort((a,b)=>touchWidth(a)-touchWidth(b)); // sort by width
+  const listWidthAndTitle = lists.map((list) => [listTitle(list),touchWidth(list)]);
+  const listTitles = listWidthAndTitle.map(([t])=>t); // just titles
+  // search listWidthAndTitle for the width
+  function findWidth(title) {
+    return listWidthAndTitle.filter(([t])=>t == title)[0][1];
+  }
   return (
     <div className="keyLayouts">
       <h4>Layouts</h4>
-      {lists.map((list) => (<LayoutListButton key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} list={list}/>))}
+      <Segmented<string>
+          options={listTitles}
+          onChange={(value)=>setCurWidth(findWidth(value))} />
       {lists.map((list) => (<LayoutList key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} list={list}/>))}
     </div>
+  );
+}
+
+function Messages({messages} : {messages: string[]}) {
+  if (!messages) return;
+  return (
+    <ul>
+      {messages.map((msg,key) => (<li key={key}>{msg}</li>))}
+    </ul>
   );
 }
 
@@ -233,6 +254,7 @@ function Keyboard() {
     loaded: false,
     text: undefined,
     kmxPlus: undefined,
+    messages: [],
   };
   const [data, setData] = React.useState(initialData);
 
@@ -240,10 +262,10 @@ function Keyboard() {
     const message = event.data;
     switch (message.type) {
       case 'update':
-        const { kmxPlus, text } = message;
+        const { kmxPlus, text, messages } = message;
         console.log('Got Data');
         const newData: LoadedData = {
-          loaded: true, kmxPlus, text
+          loaded: true, kmxPlus, text, messages
         };
         setData(newData);
         break;
@@ -258,15 +280,24 @@ function Keyboard() {
     return (
       <div>
         <h4>LDML Keyboard</h4>
-        <i>no KMX+ yet</i>
+        <Skeleton/>
       </div>
     );
   }
 
+  if (!data.kmxPlus) {
+    return (
+      <div>
+        <Alert type="error" showIcon message="Could not read keyboard file. Correct these issues and reload the file." />
+        <Messages messages={data.messages}/>
+      </div>
+    )
+  }
+
   return (
     <div>
-      <h4>LDML Keyboard</h4>
-      <KmxPlusContext.Provider value={data.kmxPlus}>
+        <Messages messages={data.messages}/>
+        <KmxPlusContext.Provider value={data.kmxPlus}>
         <KeyBag />
         <KeyLayouts />
       </KmxPlusContext.Provider>
@@ -279,7 +310,7 @@ function Keyboard() {
 function App() {
   return (
     <div className="App">
-      <h4>App</h4>
+      <h4>LDML Editor</h4>
       <Keyboard />
     </div>
   );

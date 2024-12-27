@@ -3,7 +3,7 @@
  */
 
 import { LDMLCompilerManager } from "./ldmlCompilerManager.js";
-import { CompilerCallbackOptions, CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader } from "@keymanapp/developer-utils";
+import { CompilerCallbackOptions, CompilerError, defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader } from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions, LdmlKeyboardCompiler } from "@keymanapp/kmc-ldml";
 import { ExtensionCallbacks } from "./extensionCallbacks.mjs";
 import { KMXPlus } from "@keymanapp/common-types";
@@ -18,7 +18,7 @@ import { dirname } from 'node:path';
 
 export class KmcLdmlManager implements LDMLCompilerManager {
     calloptions?: CompilerCallbackOptions;
-    callbacks?: CompilerCallbacks;
+    callbacks?: ExtensionCallbacks;
     compoptions?: LdmlCompilerOptions;
 
     async init(): Promise<any> {
@@ -38,6 +38,7 @@ export class KmcLdmlManager implements LDMLCompilerManager {
         if (!this.callbacks) {
             throw Error(`Must call init() first.`);
         }
+        this.callbacks.clear(); // clear each time
         const k = new LdmlKeyboardCompiler();
         this.compoptions = {
             ...defaultCompilerOptions,
@@ -58,6 +59,13 @@ export class KmcLdmlManager implements LDMLCompilerManager {
         }
         console.log(`compiled ${filename}`);
         return compiled;
+    }
+
+    getMessages() : string[] {
+        if (!this.callbacks) {
+            throw Error(`Must call init() first.`);
+        }
+        return this.callbacks.messages.map(m => CompilerError.formatEvent(m));
     }
 
 };

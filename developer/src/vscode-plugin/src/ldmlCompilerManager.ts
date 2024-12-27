@@ -11,6 +11,8 @@ export interface LDMLCompilerManager {
     init() : Promise<any>;
     /** Compile a file. Returns KMXPlus file. */
     compile(filename: string) : Promise<any>;
+    /** Return messages as an array of strings */
+    getMessages() : string[];
 };
 
 /** load concrete instance from module */

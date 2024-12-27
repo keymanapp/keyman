@@ -107,8 +107,16 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
     async resolveCustomTextEditor(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel, token: vscode.CancellationToken): Promise<void> {
         // make sure we have a compiler
         const compiler = await this.getCompiler();
-        // temporary - testing linkage
-        const kmxPlus = await compiler.compile(document.fileName);
+        let kmxPlus : any = null;
+
+        try {
+            kmxPlus = await compiler.compile(document.fileName);
+        } catch(e) {
+            console.error(e);
+        }
+
+        // always get the messages- may be hints, etc.
+        const messages = compiler.getMessages();
 
         webviewPanel.webview.options = {
 			enableScripts: true,
@@ -131,7 +139,7 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
             webview.html = html;
         } catch(e) {
             console.error(e);
-            webview.html = `<i>error: ${e}</i>`;
+            webview.html = `<i>error loading editor: ${e}</i>`;
         }
 
         function updateWebview() {
@@ -139,6 +147,7 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 				type: 'update',
 				text: document.getText(),
                 kmxPlus,
+                messages,
 			});
 		}
 
