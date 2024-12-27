@@ -14,6 +14,10 @@ interface LoadedData {
   kmxPlus?: KMXPlusFile;
 }
 
+const noKmxPlusFile : KMXPlusFile = undefined as unknown as KMXPlusFile;
+
+const KmxPlusContext = React.createContext(noKmxPlusFile);
+
 const vsCode = (global as any).acquireVsCodeApi();
 
 function RawSource({ text }) {
@@ -34,9 +38,8 @@ function RawSource({ text }) {
   );
 }
 
-function Key({ k, kmxPlus, chosenKey, setChosenKey }: {
+function Key({ k, chosenKey, setChosenKey }: {
   k: KMXPlus.KeysKeys,
-  kmxPlus: KMXPlusFile,
   chosenKey: string,
   setChosenKey: any, /* setter */
   key: string, /* special prop */
@@ -56,17 +59,18 @@ function Key({ k, kmxPlus, chosenKey, setChosenKey }: {
   );
 }
 
-function KeyList({ keys, kmxPlus, chosenKey, setChosenKey }:
-  { keys: KMXPlus.KeysKeys[], kmxPlus: KMXPlusFile, chosenKey: string, setChosenKey: any /* setter */ }) {
+function KeyList({ keys, chosenKey, setChosenKey }:
+  { keys: KMXPlus.KeysKeys[], chosenKey: string, setChosenKey: any /* setter */ }) {
   return (
     <div className="keyList">
-      {keys?.map((k) => (<Key key={k.id.value} k={k} kmxPlus={kmxPlus} chosenKey={chosenKey} setChosenKey={setChosenKey} />))}
+      {keys?.map((k) => (<Key key={k.id.value} k={k} chosenKey={chosenKey} setChosenKey={setChosenKey} />))}
     </div>
   );
 }
 
 /** detail editor */
-function KeyDetails({ chosenKey, kmxPlus } : { chosenKey : string, kmxPlus : KMXPlusFile}) {
+function KeyDetails({ chosenKey } : { chosenKey : string }) {
+  const kmxPlus = React.useContext(KmxPlusContext);
   if (!chosenKey) return;
   const chosenKeys = kmxPlus.kmxplus.keys?.keys.filter(({id}) => id.value == chosenKey);
   if (!chosenKeys?.length) {
@@ -93,7 +97,8 @@ function KeyDetails({ chosenKey, kmxPlus } : { chosenKey : string, kmxPlus : KMX
 }
 
 /** the main editor for keys */
-function KeyBag({ kmxPlus } : { kmxPlus : KMXPlusFile}) {
+function KeyBag() {
+  const kmxPlus = React.useContext(KmxPlusContext);
   const keys = kmxPlus?.kmxplus?.keys?.keys || [];
   /** string id of selected key */
   const [ chosenKey, setChosenKey ] = React.useState(keys[0]?.id?.value);
@@ -103,9 +108,9 @@ function KeyBag({ kmxPlus } : { kmxPlus : KMXPlusFile}) {
       <h4>Key Bag</h4>
       <h5>Chosen: {chosenKey}</h5>
       <div className="keyListContainer">
-        <KeyList keys={keys} kmxPlus={kmxPlus} chosenKey={chosenKey} setChosenKey={setChosenKey} />
+        <KeyList keys={keys} chosenKey={chosenKey} setChosenKey={setChosenKey} />
       </div>
-      <KeyDetails chosenKey={chosenKey} kmxPlus={kmxPlus}/>
+      <KeyDetails chosenKey={chosenKey}/>
     </>
   );
 }
@@ -122,11 +127,10 @@ function touchWidth( list: KMXPlus.LayrList ) : number {
   }
 }
 
-function LayoutListButton({curWidth, setCurWidth, kmxPlus, list} :
+function LayoutListButton({curWidth, setCurWidth, list} :
   {
     curWidth: number,
     setCurWidth: any,
-    kmxPlus: KMXPlusFile,
     list: KMXPlus.LayrList,
     key: string,
   }
@@ -162,9 +166,8 @@ function layerTitle(layer : KMXPlus.LayrEntry) {
   return modToStr(layer.mod);
 }
 
-function Row({row, kmxPlus} : {
+function Row({row} : {
   row: KMXPlus.LayrRow,
-  kmxPlus: KMXPlusFile,
   key: string,
 }) {
   return (
@@ -177,24 +180,22 @@ function Row({row, kmxPlus} : {
   )
 }
 
-function Layer({layer, kmxPlus} : {
+function Layer({layer} : {
   layer: KMXPlus.LayrEntry,
-  kmxPlus: KMXPlusFile,
   key: string,
 }) {
   return (
     <>
       <h5>{layerTitle(layer)}</h5>
-      {layer.rows.map((row,index)=> (<Row row={row} key={index.toString()} kmxPlus={kmxPlus}/>))}
+      {layer.rows.map((row,index)=> (<Row row={row} key={index.toString()}/>))}
     </>
   );
 }
 
-function LayoutList({curWidth, setCurWidth, kmxPlus, list} :
+function LayoutList({curWidth, setCurWidth, list} :
   {
     curWidth: number,
     setCurWidth: any,
-    kmxPlus: KMXPlusFile,
     list: KMXPlus.LayrList,
     key: string,
   }
@@ -207,20 +208,21 @@ function LayoutList({curWidth, setCurWidth, kmxPlus, list} :
   return (
     <div className="layoutList">
       <h5>{title}</h5>
-      {list.layers.map((layer)=> (<Layer key={layerTitle(layer)} layer={layer} kmxPlus={kmxPlus}/>))}
+      {list.layers.map((layer)=> (<Layer key={layerTitle(layer)} layer={layer}/>))}
     </div>
   );
 }
 
-function KeyLayouts({ kmxPlus} : { kmxPlus : KMXPlusFile}) {
+function KeyLayouts() {
+  const kmxPlus = React.useContext(KmxPlusContext);
   const lists = [...(kmxPlus.kmxplus.layr?.lists || [])]; // copy the list
   const [curWidth, setCurWidth] = React.useState(WIDTH_HARDWARE);
   lists.sort((a,b)=>touchWidth(a)-touchWidth(b)); // sort by width
   return (
     <div className="keyLayouts">
       <h4>Layouts</h4>
-      {lists.map((list) => (<LayoutListButton key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} kmxPlus={kmxPlus} list={list}/>))}
-      {lists.map((list) => (<LayoutList key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} kmxPlus={kmxPlus} list={list}/>))}
+      {lists.map((list) => (<LayoutListButton key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} list={list}/>))}
+      {lists.map((list) => (<LayoutList key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} list={list}/>))}
     </div>
   );
 }
@@ -263,8 +265,10 @@ function Keyboard() {
   return (
     <div>
       <h4>LDML Keyboard</h4>
-      <KeyBag kmxPlus={data.kmxPlus} />
-      <KeyLayouts kmxPlus={data.kmxPlus} />
+      <KmxPlusContext.Provider value={data.kmxPlus}>
+        <KeyBag />
+        <KeyLayouts />
+      </KmxPlusContext.Provider>
       <hr />
       <RawSource text={data?.text} />
     </div>
