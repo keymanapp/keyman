@@ -79,7 +79,6 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
         throw new Error('Method not implemented.'); // TODO-LDML-EDITOR
     }
     async openCustomDocument(uri: vscode.Uri, openContext: vscode.CustomDocumentOpenContext, token: vscode.CancellationToken): Promise<LdmlDocument> {
-        console.log(`openCustom ${uri}`);
         const document : LdmlDocument = await LdmlDocument.create(uri, openContext.backupId, {
             getFileData: async() => {
                 return new Uint8Array(); // TODO-LDML-EDITOR
@@ -126,11 +125,9 @@ export class LdmlEditorProvider implements vscode.CustomTextEditorProvider {
 
             const nonce = crypto.randomUUID().toString();
 
-            console.dir({indexUri});
             const indexRaw = await vscode.workspace.fs.readFile(indexUri);
             const indexText = new TextDecoder('UTF-8').decode(indexRaw);
             const html = fixupIndexHtml(indexText, buildUri.toString(), nonce, webview.cspSource);
-            console.log(html);
             webview.html = html;
         } catch(e) {
             console.error(e);
