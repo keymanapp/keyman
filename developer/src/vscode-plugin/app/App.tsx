@@ -32,7 +32,7 @@ function RawSource({ text }) {
   );
   return (
     <div>
-      <button onClick={() => setShown(false)}>Hide Raw Source</button>
+      <Button type="primary" onClick={() => setShown(false)}>Hide Raw Source</Button>
       <h4>Raw Source</h4>
       <pre className="code">{text}</pre>
     </div>
