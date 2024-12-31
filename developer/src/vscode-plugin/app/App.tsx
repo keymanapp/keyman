@@ -8,47 +8,105 @@ import React from 'react';
 import './App.css';
 import { KMXPlus } from '@keymanapp/common-types';
 import KMXPlusFile = KMXPlus.KMXPlusFile;
-import { Button, Card, Input, InputNumber, Checkbox, Segmented, Skeleton, Alert } from 'antd';
+import { Button, Input, InputNumber, Checkbox, Segmented, Skeleton, Alert, Collapse, TabsProps, Tabs, Spin } from 'antd';
+/** Ant's Card had an import problem, so we use this workaround */
+import { FixedCard as Card } from './FixedCard.js';
 import { isGapKey, layerTitle, listTitle, touchWidth, WIDTH_HARDWARE } from './utils.js';
+import { FakeRepertoire, RepertoireEntry, SAMPLE_REPERTOIRE } from './fakerepertoire.js';
+// import { RawSource } from './RawSource';
+
 /**
  * Used to get the VSCode global. Can only call this once.
  */
 const vsCode = (global as any).acquireVsCodeApi();
 
-/** This is used to track data as it is loaded.  */
-interface LoadedData {
-  /** true if we think we're loaded */
-  loaded: boolean;
-  /** full XML source text */
-  text?: string;
-  /** the entire KMXPlusFile */
-  kmxPlus?: KMXPlusFile;
-  /** messages serialized to strings */
-  messages?: string[];
-}
-
 /** this context will have the KMXPlusFile. We won't use it until the KMXPlusFile is valid. */
 const KmxPlusContext = React.createContext(undefined as unknown as KMXPlusFile)
 
-/** The "show raw source" panel */
-function RawSource({ text }) {
-  const [shown, setShown] = React.useState(false);
-  function show() {
-    setShown(true);
-  }
-  if (!text) return;
-  if (!shown) return (
-    <Card title="Raw XML Source" bordered={true}>
-      <Button type="primary" onClick={() => setShown(true)}>Show</Button>
-    </Card>
-  );
+// -------- repertoire -------------
+
+function RepertoireItem({ item } : { item : RepertoireEntry, key?: any}) {
   return (
-    <Card title="Raw XML Source" bordered={true}>
-      <Button type="primary" onClick={() => setShown(false)}>Hide</Button>
-      <pre className="code">{text}</pre>
-    </Card>
+    <span className="repertoireItem">{item}</span>
   );
 }
+
+function AddCldrSldr() {
+  const [ loading, setLoading ] = React.useState(false);
+
+  return (
+    <>
+      Locale: <Input value="mt"/> <br/>
+      <Button type="primary" onClick={() => setLoading((v) => !v)}>Load</Button>
+      {loading && (<Spin/>)}
+    </>
+  )
+}
+
+function AddUnicodeRange() {
+  return (
+    <>
+      <InputNumber value="U+1A00"/>
+      …
+      <InputNumber value="U+1AFF"/>
+      <br/>
+      <Button type="primary">Add</Button>
+    </>
+  );
+}
+
+function AddRepertoire() {
+  const items : TabsProps['items'] = [
+    {
+      key: 'sldr',
+      label: 'SLDR',
+      children: (<AddCldrSldr/>),
+    },
+    {
+      key: 'cldr',
+      label: 'CLDR',
+      children: (<AddCldrSldr/>),
+    },
+    {
+      key: 'range',
+      label: 'Unicode Range',
+      children: (<AddUnicodeRange/>),
+    },
+    {
+      key: 'corpus',
+      label: 'Corpus',
+      children: (<Skeleton/>),
+    },
+  ];
+  return (<Tabs defaultActiveKey='range' items={items} />);
+}
+
+function Repertoire({ repertoire }: { repertoire : FakeRepertoire}) {
+
+  // the 'add' panel
+  const addItems = ([
+    {
+      key: 'add',
+      label: 'Add…',
+      children: (
+        <AddRepertoire/>
+      ),
+    }
+  ]);
+
+  return (
+    <>
+      <div className="repertoire">
+        {repertoire.map((s, key) => (
+          <RepertoireItem key={key} item={s}/>
+        ))}
+      </div>
+      <Collapse items={addItems} />
+    </>
+  );
+}
+
+// -------- keybag -------------
 
 /** An individual key in the keybag. */
 function Key({ k, chosenKey, setChosenKey }: {
@@ -118,14 +176,17 @@ function KeyBag() {
   const [chosenKey, setChosenKey] = React.useState(keys[0]?.id?.value);
   if (!kmxPlus) return; // get out
   return (
-    <Card title="Key Bag" bordered={true}>
+    <>
       <div className="keyListContainer">
         <KeyList keys={keys} chosenKey={chosenKey} setChosenKey={setChosenKey} />
       </div>
       <KeyDetails chosenKey={chosenKey} />
-    </Card>
+    </>
   );
 }
+
+// -------- layer -------------
+
 
 /** row in the layer list */
 function Row({ row }: {
@@ -188,15 +249,15 @@ function KeyLayouts() {
   }
   return (
     <div className="keyLayouts">
-      <Card title="Layouts" bordered={true}>
         <Segmented<string>
           options={listTitles}
           onChange={(value) => setCurWidth(findWidth(value))} />
         {lists.map((list) => (<LayoutList key={touchWidth(list).toString()} curWidth={curWidth} setCurWidth={setCurWidth} list={list} />))}
-      </Card>
     </div>
   );
 }
+
+// -------- err messages -------------
 
 /** this shows any error or warning messages from the compiler */
 function Messages({ messages }: { messages: string[] }) {
@@ -206,6 +267,20 @@ function Messages({ messages }: { messages: string[] }) {
       {messages.map((msg, key) => (<li key={key}>{msg}</li>))}
     </ul>
   );
+}
+
+// -------- main editor -------------
+
+/** This is used to track data as it is loaded.  */
+interface LoadedData {
+  /** true if we think we're loaded */
+  loaded: boolean;
+  /** full XML source text */
+  text?: string;
+  /** the entire KMXPlusFile */
+  kmxPlus?: KMXPlusFile;
+  /** messages serialized to strings */
+  messages?: string[];
 }
 
 /** This is the main Keyboard File object. */
@@ -240,6 +315,7 @@ function KeyboardFile() {
     return (
       <div>
         <h4>LDML Keyboard</h4>
+        {/* show something while waiting */}
         <Skeleton />
       </div>
     );
@@ -254,20 +330,45 @@ function KeyboardFile() {
     )
   }
 
+  const items = [
+    {
+      key: 'repertoire',
+      label: 'Character Repertoire',
+      children: (<Repertoire repertoire={SAMPLE_REPERTOIRE} />),
+    },
+    {
+      key: 'key',
+      label: 'Key Bag',
+      children: (<KeyBag />),
+    },
+    {
+      key: 'layouts',
+      label: 'Layouts',
+      children: (<KeyLayouts />),
+    },
+  ];
+
   return (
     <>
       <Messages messages={data.messages} />
       <KmxPlusContext.Provider value={data.kmxPlus}>
-        <KeyBag />
-        <KeyLayouts />
+        <Collapse items={items} defaultActiveKey={[
+          // default items visible in the editor
+          'repertoire',
+          // 'key',
+          // 'layouts',
+        ]} />
       </KmxPlusContext.Provider>
-      <hr />
-      <RawSource text={data?.text} />
+      {/*
+        TODO-EPIC-LDML: raw source isn't really needed.
+        Users can use the system editor view if needed.
+        <hr />
+      <RawSource text={data?.text} /> */}
     </>
   );
 }
 
-/** The outer App. TODO-EPIC-LDML this may be  */
+/** The outer App. TODO-EPIC-LDML this may be unneeded */
 function App() {
   return (
     <div className="App">

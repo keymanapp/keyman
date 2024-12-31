@@ -29,7 +29,7 @@ kbd.unchosenKey {
   border: 2px solid blue;
 } */
 
-.keyList {
+.keyList, .repertoire {
   border: 1px solid gray;
   padding: 0.25em;
   width: 50em;
@@ -38,6 +38,21 @@ kbd.unchosenKey {
   flex-wrap: wrap;
   overflow-y: scroll;
 }
+
+.repertoireItem {
+  padding: 1em;
+  background-color: gainsboro;
+  margin: 0.25em;
+  vertical-align: middle;
+  box-shadow: .15em .15em gray;
+  border: 2px solid gray;
+  font-size: large;
+  display: flow flex-shrink;
+  flex-grow: 1;
+  flex-basis: 1em;
+  white-space-collapse: preserve-spaces;
+}
+
 
 .selectedLayoutListButton {
   background-color: navy;
