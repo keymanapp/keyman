@@ -8,7 +8,7 @@ import React from 'react';
 import './App.css';
 import { KMXPlus } from '@keymanapp/common-types';
 import KMXPlusFile = KMXPlus.KMXPlusFile;
-import { Button, Input, InputNumber, Checkbox, Segmented, Skeleton, Alert, Collapse, TabsProps, Tabs, Spin } from 'antd';
+import { Button, Input, InputNumber, Checkbox, Segmented, Skeleton, Alert, Collapse, TabsProps, Tabs, Spin, Space } from 'antd';
 /** Ant's Card had an import problem, so we use this workaround */
 import { FixedCard as Card } from './FixedCard.js';
 import { isGapKey, layerTitle, listTitle, touchWidth, WIDTH_HARDWARE } from './utils.js';
@@ -22,6 +22,73 @@ const vsCode = (global as any).acquireVsCodeApi();
 
 /** this context will have the KMXPlusFile. We won't use it until the KMXPlusFile is valid. */
 const KmxPlusContext = React.createContext(undefined as unknown as KMXPlusFile)
+
+// -------- info -------------
+
+const names = new Intl.DisplayNames(['en'], {type: 'language'});
+
+function langName(l : string) {
+  try {
+    return names.of(l);
+  } catch(e) {
+    return '';
+  }
+}
+
+function LanguageList({ list }: { list: string[] }) {
+  const [langs, setLangs] = React.useState(list);
+  const [addingLang, setAddingLang] = React.useState('');
+  function addLanguage(l : string) {
+    if (!l) return;
+    setLangs((langs) => [...(langs.filter((ll: string) => ll !== l)), l].sort());
+  }
+  function removeLanguage(l : string) {
+    if (!l) return;
+    if (langs.length <= 1) return; // cannot delete last
+    // set the list to all but this one
+    setLangs(langs => langs.filter((lang: string) => lang !== l));
+  }
+  const addInput = <Input onPressEnter={(e) => addLanguage(e.target.value)} onChange={(e) => setAddingLang(e.target.value)} placeholder="locale code" />;
+  return (
+    <>
+      <Space.Compact>
+        { addInput }
+        <Button onClick={() => addLanguage(addingLang)}>Add</Button>
+      </Space.Compact>
+      <ul>
+        {(langs as string[]).map((lang, key) => (
+          <li key={key}>
+            {lang} — {langName(lang)}
+            {(langs.length) && <button onClick={() => removeLanguage(lang)}>×</button>}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function KeyboardInfo() {
+  const kmxPlus = React.useContext(KmxPlusContext) as KMXPlus.KMXPlusFile;
+
+  const { meta, loca } = kmxPlus.kmxplus;
+  // modelled after Keyman Developer
+  return (
+    <>
+      <b>Keyboard Name:</b>
+        <Input value={meta?.name?.value}/>
+        <br/>
+      <b>Author:</b>
+        <Input value={meta?.author?.value}/>
+        <br/>
+      <b>Version:</b>
+        <Input value={meta?.version?.value}/>
+        <br/>
+      <b>Supported Languages:</b>
+        <LanguageList list={[...(loca?.locales || []).map(l => l.value)]}/>
+        <br/>
+    </>
+  );
+}
 
 // -------- repertoire -------------
 
@@ -170,7 +237,7 @@ function KeyDetails({ chosenKey }: { chosenKey: string }) {
 
 /** the main editor for keys */
 function KeyBag() {
-  const kmxPlus = React.useContext(KmxPlusContext);
+  const kmxPlus = React.useContext(KmxPlusContext) as KMXPlus.KMXPlusFile;
   const keys = kmxPlus?.kmxplus?.keys?.keys || [];
   /** string id of selected key */
   const [chosenKey, setChosenKey] = React.useState(keys[0]?.id?.value);
@@ -237,7 +304,7 @@ function LayoutList({ curWidth, setCurWidth, list }:
 
 /** The list of Layouts */
 function KeyLayouts() {
-  const kmxPlus = React.useContext(KmxPlusContext);
+  const kmxPlus = React.useContext(KmxPlusContext) as KMXPlus.KMXPlusFile;
   const lists = [...(kmxPlus.kmxplus.layr?.lists || [])]; // copy the list
   const [curWidth, setCurWidth] = React.useState(WIDTH_HARDWARE);
   lists.sort((a, b) => touchWidth(a) - touchWidth(b)); // sort by width
@@ -332,6 +399,11 @@ function KeyboardFile() {
 
   const items = [
     {
+      key: 'info',
+      label: 'Info',
+      children: (<KeyboardInfo />),
+    },
+    {
       key: 'repertoire',
       label: 'Character Repertoire',
       children: (<Repertoire repertoire={SAMPLE_REPERTOIRE} />),
@@ -354,6 +426,8 @@ function KeyboardFile() {
       <KmxPlusContext.Provider value={data.kmxPlus}>
         <Collapse items={items} defaultActiveKey={[
           // default items visible in the editor
+
+          // 'info',
           'repertoire',
           // 'key',
           // 'layouts',
