@@ -13,6 +13,10 @@
   flex-grow: 1;
   flex-basis: 3em;
   white-space-collapse: preserve-spaces;
+  border: 2px solid gray;
+  border-radius: 0.25em;
+  background-color: azure;
+  padding: 0.25em;
 }
 
 .chosenKey {
@@ -53,12 +57,8 @@ kbd.unchosenKey {
   white-space-collapse: preserve-spaces;
 }
 
-
-.selectedLayoutListButton {
-  background-color: navy;
-  color: white;
+.layoutRow {
+  display: flex;
+  width: fit-content;
 }
 
-.layoutList kbd {
-  margin: 0.25em;
-}

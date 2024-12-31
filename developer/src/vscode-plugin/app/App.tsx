@@ -14,6 +14,15 @@ import { FixedCard as Card } from './FixedCard.js';
 import { isGapKey, layerTitle, listTitle, touchWidth, WIDTH_HARDWARE } from './utils.js';
 import { FakeRepertoire, RepertoireEntry, SAMPLE_REPERTOIRE } from './fakerepertoire.js';
 // import { RawSource } from './RawSource';
+import { useDrag } from 'react-dnd';
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+
+/** items that can be dragged */
+export const DragTypes = {
+  REPERTOIRE_ITEM: 'repertoireItem',
+  KEY_ITEM: 'keyItem',
+}
 
 /**
  * Used to get the VSCode global. Can only call this once.
@@ -92,9 +101,20 @@ function KeyboardInfo() {
 
 // -------- repertoire -------------
 
-function RepertoireItem({ item } : { item : RepertoireEntry, key?: any}) {
+function RepertoireItem({ item, isDragging } : { isDragging?: boolean, item : RepertoireEntry, key?: any}) {
+  const [, dragRef] = useDrag(
+    () => ({
+      type: DragTypes.REPERTOIRE_ITEM,
+      item,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+        // opacity: monitor.isDragging() ? 0.5 : 1
+      })
+    }),
+    []
+  )
   return (
-    <span className="repertoireItem">{item}</span>
+    <span ref={dragRef} className="repertoireItem">{item}</span>
   );
 }
 
@@ -176,23 +196,40 @@ function Repertoire({ repertoire }: { repertoire : FakeRepertoire}) {
 // -------- keybag -------------
 
 /** An individual key in the keybag. */
-function Key({ k, chosenKey, setChosenKey }: {
-  k: KMXPlus.KeysKeys,
-  chosenKey: string,
-  setChosenKey: any, /* setter */
+function Key({ kid, chosenKey, setChosenKey, isDragging }: {
+  kid: string,
+  chosenKey?: string,
+  setChosenKey?: any, /* setter */
   key: string, /* special prop */
+  isDragging?: boolean,
 }) {
-  const id = k.id.value;
+  const id = kid;
+  const kmxPlus = React.useContext(KmxPlusContext) as KMXPlus.KMXPlusFile;
+  // extract the key from the file
+  const foundKey = kmxPlus.kmxplus.keys?.keys.filter(({id}) => id.value === kid)[0];
+  if (!foundKey) return (<i>{kid}</i>); // missing
+  const k : KMXPlus.KeysKeys = foundKey;
   const chosen = (chosenKey == id);
   const className = chosen ? "Key chosenKey" : "Key unchosenKey";
   const clickToChose = chosen ? '' : id;
-  if (k.to.value === '') {
-    return (
-      <i key={id} onClick={() => setChosenKey(clickToChose)} className={className} title={id}>{id}</i>
-    )
-  }
+
+  const [, dragRef] = useDrag(
+    () => ({
+      type: DragTypes.KEY_ITEM,
+      k,
+      chosenKey,
+      setChosenKey,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging(),
+        // opacity: monitor.isDragging() ? 0.5 : 1
+      })
+    }),
+    []
+  )
+  const label = (k.to.value === '') ? id : k.to.value;
+
   return (
-    <kbd key={id} onClick={() => setChosenKey(clickToChose)} className={className} title={id}>{k.to.value}</kbd>
+    <div ref={dragRef} key={id} onClick={() => setChosenKey(clickToChose)} className={className} title={id}>{label}</div>
   );
 }
 
@@ -201,7 +238,7 @@ function KeyList({ keys, chosenKey, setChosenKey }:
   { keys: KMXPlus.KeysKeys[], chosenKey: string, setChosenKey: any /* setter */ }) {
   return (
     <div className="keyList">
-      {keys?.map((k) => (<Key key={k.id.value} k={k} chosenKey={chosenKey} setChosenKey={setChosenKey} />))}
+      {keys?.map((k) => (<Key key={k.id.value} kid={k.id.value} chosenKey={chosenKey} setChosenKey={setChosenKey} />))}
     </div>
   );
 }
@@ -259,13 +296,13 @@ function Row({ row }: {
   row: KMXPlus.LayrRow,
   key: string,
 }) {
+  // TODO-EPIC-LDML: need to have chosen keys here
   return (
-    <>
+    <div className="layoutRow">
       {row.keys.map(({ value }) => (
-        <kbd key={value}>{value}</kbd>
+        <Key key={value} kid={value} chosenKey={''} setChosenKey={()=>{}} />
       ))}
-      <br />
-    </>
+    </div>
   )
 }
 
@@ -445,7 +482,9 @@ function KeyboardFile() {
 function App() {
   return (
     <div className="App">
-      <KeyboardFile />
+				<DndProvider backend={HTML5Backend}>
+          <KeyboardFile />
+        </DndProvider>
     </div>
   );
 }
