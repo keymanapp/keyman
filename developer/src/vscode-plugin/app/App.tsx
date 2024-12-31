@@ -185,15 +185,14 @@ function Key({ k, chosenKey, setChosenKey }: {
   const id = k.id.value;
   const chosen = (chosenKey == id);
   const className = chosen ? "Key chosenKey" : "Key unchosenKey";
-  // const onClick = chosen ? () => setChosenKey(k.id.value) : setChosenKey(id);
-  const onClick = () => { };
+  const clickToChose = chosen ? '' : id;
   if (k.to.value === '') {
     return (
-      <i key={id} onClick={() => setChosenKey(id)} className={className} title={id}>{id}</i>
+      <i key={id} onClick={() => setChosenKey(clickToChose)} className={className} title={id}>{id}</i>
     )
   }
   return (
-    <kbd key={id} onClick={() => setChosenKey(id)} className={className} title={id}>{k.to.value}</kbd>
+    <kbd key={id} onClick={() => setChosenKey(clickToChose)} className={className} title={id}>{k.to.value}</kbd>
   );
 }
 
@@ -240,7 +239,7 @@ function KeyBag() {
   const kmxPlus = React.useContext(KmxPlusContext) as KMXPlus.KMXPlusFile;
   const keys = kmxPlus?.kmxplus?.keys?.keys || [];
   /** string id of selected key */
-  const [chosenKey, setChosenKey] = React.useState(keys[0]?.id?.value);
+  const [chosenKey, setChosenKey] = React.useState('' /*keys[0]?.id?.value*/);
   if (!kmxPlus) return; // get out
   return (
     <>
