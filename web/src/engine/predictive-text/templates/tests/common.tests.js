@@ -185,6 +185,16 @@ describe('Common utility functions', function() {
       let mergedTransform = models.buildMergedTransform(apple, banana);
       assert.deepEqual(mergedTransform, final);
     });
+
+    it('empty second transform', () => { // #12494
+      let apple = {
+        insert: 'apple',
+        deleteLeft: 0
+      };
+
+      let mergedTransform = models.buildMergedTransform(apple, null);
+      assert.deepEqual(mergedTransform, apple);
+    });
   });
 
   describe('transformToSuggestion', function() {

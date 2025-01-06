@@ -43,6 +43,10 @@ export function applyTransform(transform: Transform, context: Context): Context 
 export function buildMergedTransform(first: Transform, second: Transform): Transform {
   // These exist to avoid parameter mutation.
   let mergedFirstInsert: string = first.insert;
+  if (!second) {
+    // can happen if we don't have a distribution or an empty transform
+    return first;
+  }
   let mergedSecondDelete: number = second.deleteLeft;
 
   // The 'fun' case:  the second Transform wants to delete something from the first.
