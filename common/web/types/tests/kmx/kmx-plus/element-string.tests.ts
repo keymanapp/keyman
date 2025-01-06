@@ -41,7 +41,12 @@ describe('Test of ElementString', () => {
     describe('Test of isEqual()', () => {
       it('returns true when elems identical', () => {
         const one = initElemElement();
-        const two = initElemElement()
+        const two = initElemElement();
+        assert.isTrue(one.isEqual(two));
+      });
+      it.skip('returns true when elems are clones', () => {
+        const one = initElemElement(new StrsItem("𐌰", 0x10330));
+        const two = initElemElement(new StrsItem("𐌰", 0x10330));
         assert.isTrue(one.isEqual(two));
       });
       it('returns false when value differs', () => {
@@ -72,18 +77,18 @@ describe('Test of ElementString', () => {
     });
   });
   describe('Test of ElementString', () => {
+    beforeEach(() => {
+      sections = {
+        strs: new Strs(),
+        uset: new Uset(),
+        usetparser: new TestUnicodeSetParser(),
+      };
+      ElementParser.segment = stubElementParserSegment_CodePoint;
+    });
+    afterEach(() => {
+      ElementParser.segment = origElementParserSegment;
+    });
     describe('Test of fromStrings()', () => {
-      beforeEach(() => {
-        sections = {
-          strs: new Strs(),
-          uset: new Uset(),
-          usetparser: new TestUnicodeSetParser(),
-        };
-        ElementParser.segment = stubElementParserSegment_CodePoint;
-      });
-      afterEach(() => {
-        ElementParser.segment = origElementParserSegment;
-      });
       it('returns an empty ElementString if source is null', () => {
         const es = ElementString.fromStrings({}, null);
         assert.deepEqual(es, new ElementString());
@@ -358,6 +363,17 @@ describe('Test of ElementString', () => {
           initElemElement(LO_GOTHIC_A),
         ];
         assert.deepEqual(actual, expected);
+      });
+    });
+    describe('Test of isEqual()', () => {
+      it('returns true when ElementStrings are identical', () => {
+        const es = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        assert.isTrue(es.isEqual(es));
+      });
+      it.skip('returns true when ElementStrings are clones', () => {
+        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        assert.isTrue(one.isEqual(two));
       });
     });
   });
