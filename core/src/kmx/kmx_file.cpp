@@ -68,11 +68,11 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboardFromBlob(
 
   *lpKeyboard = NULL;
 
-#if defined(KMX_64BIT) || defined(__EMSCRIPTEN__)
+#ifdef KMX_REQUIRES_REALIGNMENT
   // allocate enough memory for expanded data structure + original data.
   // Expanded data structure is no more than double the size of data on
-  // disk (8-byte pointers) - on disk the "pointers" are relative to the
-  // beginning of the file.
+  // disk (8-byte pointers for 64-bit architectures) - on disk the
+  // "pointers" are relative to the beginning of the file.
   // We save the original data at the end of buf; we don't copy strings, so
   // those will remain in the location at the end of the buffer.
   buf = new KMX_BYTE[sz * 3];
@@ -84,7 +84,7 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboardFromBlob(
     DebugLog("Not allocmem");
     return FALSE;
   }
-#if defined(KMX_64BIT) || defined(__EMSCRIPTEN__)
+#ifdef KMX_REQUIRES_REALIGNMENT
   filebase = buf + sz * 2;
 #else
   filebase = buf;
@@ -103,7 +103,7 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboardFromBlob(
     return FALSE;
   }
 
-#if defined(KMX_64BIT) || defined(__EMSCRIPTEN__)
+#ifdef KMX_REQUIRES_REALIGNMENT
   kbp = CopyKeyboard(buf, filebase);
 #else
   kbp = FixupKeyboard(buf, filebase);
@@ -132,7 +132,7 @@ PKMX_WCHAR KMX_ProcessEvent::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
   return (PKMX_WCHAR)(base + offset);
 }
 
-#if defined(KMX_64BIT) || defined(__EMSCRIPTEN__)
+#ifdef KMX_REQUIRES_REALIGNMENT
 /**
   CopyKeyboard will copy the data read into bufp from x86-sized structures into
   x64-sized structures starting at `base`
