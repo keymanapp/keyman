@@ -503,8 +503,14 @@ table tr
   display: grid;
   position: relative;
   grid-template-columns: 50px 1fr 1fr 1fr;
-  padding: 10px 50px 10px 64px;
-  border: grey 1px;
+  margin: 10px 50px 10px 64px;
+  /* From https://geary.co/internal-borders-css-grid/ */
+  overflow: hidden;
+  gap: var(--gap);
+  --gap: 2em;
+  --line-offset: calc(var(--gap) / 2);
+  --line-thickness: 1px;
+  --line-color: black;
 }
 
 .grid_container.grid_disabled
@@ -516,9 +522,34 @@ table tr
 {
   position: relative;
   font-size: 12px;
-  margin: 0px;
   padding: 1px;
   margin: 0 0 0 5px;
+}
+
+.grid_item::before,
+.grid_item::after
+{
+  content: '';
+  position: absolute;
+  background-color: var(--line-color);
+  z-index: 1;
+}
+
+/* row borders */
+.grid_item::after
+{
+  inline-size: 100vw;
+  block-size: var(--line-thickness);
+  inset-inline-start: 0;
+  inset-block-start: calc(var(--line-offset) * -1);
+}
+
+/* column borders */
+.grid_item::before
+{
+  inline-size: var(--line-thickness);
+  block-size: 100vh;
+  inset-inline-start: calc(var(--line-offset) * -1);
 }
 
 .grid_item_title{
