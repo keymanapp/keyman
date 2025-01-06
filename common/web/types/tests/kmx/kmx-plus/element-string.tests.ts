@@ -17,6 +17,8 @@ import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-ke
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
 const GOTHIC_B = new StrsItem("𐌱", 0x10331);
 const GOTHIC_C = new StrsItem("𐌲", 0x10332);
+const HI_GOTHIC_A = new StrsItem('\ud800', 0xd800);
+const LO_GOTHIC_A = new StrsItem('\udf30', 0xdf30);
 const GOTHIC_PATTERN = "[𐌰-𐍊]";
 const GOTHIC_STRSITEM = new StrsItem(GOTHIC_PATTERN);
 const GOTHIC_SET = new UnicodeSet(GOTHIC_PATTERN, [[0x10330,0x1034A]]);
@@ -347,6 +349,16 @@ describe('Test of ElementString', () => {
         sections.usetparser.parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => null;
         assert.isNull(ElementString.fromStrings(sections, "[𐌰-𐍊]"));
       });
+      it('can handle quad strings', () => {
+        sections.strs.allocString = stubStrsAllocString_Char;
+        ElementParser.segment = stubElementParserSegment_Escaped;
+        const actual   = ElementString.fromStrings(sections, "\\ud800\\udf30");
+        const expected = [
+          initElemElement(HI_GOTHIC_A),
+          initElemElement(LO_GOTHIC_A),
+        ];
+        assert.deepEqual(actual, expected);
+      });
     });
   });
 });
@@ -381,6 +393,11 @@ function stubElementParserSegment_CodePoint(str: string): ElementSegment[] {
 
 function stubElementParserSegment_Uset(str: string): ElementSegment[] {
   return [new ElementSegment(str, ElementType.uset)];
+};
+
+function stubElementParserSegment_Escaped(str: string): ElementSegment[] {
+  const strs = str.match(/\\u[0-9a-fA-F]{4}/g);
+  return strs.map((s) => new ElementSegment(s, ElementType.escaped));
 };
 
 function stubUsetAllocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
