@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 18.0.162 alpha 2024-12-19
+
+* fix(mac): standardize interaction between OSK and physical keyboard (#12836)
+
+## 18.0.161 alpha 2024-12-17
+
+* fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
+
+## 18.0.160 alpha 2024-12-16
+
+* feat(ios): configurable keyboard height (#12571)
+* chore(common/web): remove .c8rc.json from types and merge exclusions into package.json (#12813)
+* fix(android/engine): Initialize index when resuming KeyboardPicker (#12832)
+
 ## 18.0.159 alpha 2024-12-13
 
 * chore(core): remove meson warnings for wasm builds (#12827)

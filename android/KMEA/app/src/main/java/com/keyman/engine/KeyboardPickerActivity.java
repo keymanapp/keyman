@@ -25,6 +25,7 @@ import com.keyman.engine.util.MapCompat;
 
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -252,8 +253,17 @@ public final class KeyboardPickerActivity extends BaseActivity {
       adapter.notifyDataSetChanged();
     }
 
-    int curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
-    setSelection(curKbPos);
+
+    // Determine the index to the current keyboard position to highlight as the selected keyboard
+    int currentKeyboardIndex; 
+    String currentKeyboardKey = KMKeyboard.currentKeyboard();
+    if (currentKeyboardKey == null) {
+      SharedPreferences prefs = this.getSharedPreferences(this.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      currentKeyboardIndex = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+    } else {
+      currentKeyboardIndex = KeyboardController.getInstance().getKeyboardIndex(currentKeyboardKey);
+    }     
+    setSelection(currentKeyboardIndex);
 
     imeList = getIMEList(this);
     BaseAdapter imeAdapter = (BaseAdapter)imeListAdapter;
