@@ -2,6 +2,8 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:template name="content_update">
+  <xsl:variable name="isNewKeymanVersionAvailable" select="boolean(/Keyman/Updates/Update/Keyman/NewVersion)"/>
+  <xsl:variable name="isNewKeyboardVersionAvailable" select="boolean(/Keyman/Updates/Update/Package/NewVersion)"/>
 
     <div class="header">
       <xsl:call-template name="header_helplinks" />
@@ -19,7 +21,14 @@
           <xsl:value-of select="$locale/string[@name='S_Support_Version']"/>&#160;<xsl:value-of select="/Keyman/version-info/@versionWithTag" />
         </div>
 
-        <div id="update_status">Updates are available which will be applied when Windows is next restarted:<br /></div>
+        <div id="update_status">
+            <xsl:if test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
+                Updates are available which will be applied when Windows is next restarted:
+            </xsl:if>
+            <xsl:if test="not($isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable)">
+                No updates are available.
+            </xsl:if>
+        </div>
 
         <div class="grid_container_update" id="update_details">
             <div class='grid_item'>Select</div>
@@ -32,11 +41,24 @@
         </div>
 
         <div class="update_controls" id="update_controls">
-          <xsl:call-template name="button">
-            <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_ApplyNow']"/></xsl:with-param>
-            <xsl:with-param name="command">keyman:update_applynow</xsl:with-param>
-            <xsl:with-param name="width">220px</xsl:with-param>
-          </xsl:call-template>
+
+          <xsl:choose>
+            <xsl:when test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
+              <xsl:call-template name="button">
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_ApplyNow']"/></xsl:with-param>
+                <xsl:with-param name="command">keyman:update_applynow</xsl:with-param>
+                <xsl:with-param name="width">220px</xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="button">
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_ApplyNow']"/></xsl:with-param>
+                <xsl:with-param name="command"></xsl:with-param>
+                <xsl:with-param name="width">220px</xsl:with-param>
+                <xsl:with-param name="disabled">1</xsl:with-param>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
           <xsl:call-template name="button">
             <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_CheckNow']"/></xsl:with-param>
