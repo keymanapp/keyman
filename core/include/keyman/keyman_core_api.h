@@ -309,6 +309,7 @@ non-zero value is an error).
 
 -->
 // keep in sync with web/src/engine/core-processor/src/core-factory.ts
+// (see https://github.com/emscripten-core/emscripten/issues/18585)
 <!--
 ```c */
 enum km_core_status_codes {

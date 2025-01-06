@@ -22,17 +22,12 @@ export enum KM_CORE_STATUS {
 
 export class CoreFactory {
   public static async createCoreProcessor(baseurl: string): Promise<MainModule> {
-    try {
-      const module = await import(baseurl + '/km-core.js');
-      const createCoreProcessor = module.default;
-      return await createCoreProcessor({
-        locateFile: function (path: string, scriptDirectory: string) {
-          return baseurl + '/' + path;
-        }
-      });
-    } catch (e: any) {
-      console.log('got execption in CoreFactory.createCoreProcessor', e);
-      return null;
-    }
+    const module = await import(baseurl + '/km-core.js');
+    const createCoreProcessor = module.default;
+    return await createCoreProcessor({
+      locateFile: function (path: string, scriptDirectory: string) {
+        return baseurl + '/' + path;
+      }
+    });
   }
 }
