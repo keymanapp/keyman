@@ -249,7 +249,7 @@ public final class KMManager {
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
-  public final static String autoCorrectionPrefSuffix = ".mayAutoCorect";
+  public final static String autoCorrectionPrefSuffix = ".mayAutoCorrect";
 
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
@@ -304,11 +304,6 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
-
-  // DEPRECATED keys
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-  public static final String KMKey_CustomModel = "CustomModel";
-  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
