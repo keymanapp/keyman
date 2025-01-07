@@ -328,8 +328,7 @@ km_core_attr const & ldml_processor::attributes() const {
 }
 
 km_core_keyboard_key  * ldml_processor::get_key_list() const {
-  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
-  return key_list;
+  return keys.get_key_list();
 }
 
 km_core_keyboard_imx  * ldml_processor::get_imx_list() const {

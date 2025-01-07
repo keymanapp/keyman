@@ -38,7 +38,8 @@ export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 export const compilerTestOptions: LdmlCompilerOptions = {
   readerOptions: {
-    importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+    cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+    localImportsPaths: [], // will be fixed up in loadSectionFixture
   }
 };
 
@@ -59,8 +60,14 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
   const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data, `Failed to read file ${inputFilename}`);
 
+  compilerTestOptions.readerOptions.localImportsPaths =  [ path.dirname(inputFilename) ];
+
   const reader = new LDMLKeyboardXMLSourceFileReader(compilerTestOptions.readerOptions, callbacks);
   const source = reader.load(data);
+  if (!source) {
+    // print any callbacks here
+    assert.sameDeepMembers(callbacks.messages, [], `Errors loading ${inputFilename}`);
+  }
   assert.isNotNull(source, `Failed to load XML from ${inputFilename}`);
 
   if (!reader.validate(source)) {

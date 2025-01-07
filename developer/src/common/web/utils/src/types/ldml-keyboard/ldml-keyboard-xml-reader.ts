@@ -19,7 +19,10 @@ interface NameAndProps  {
 };
 
 export class LDMLKeyboardXMLSourceFileReaderOptions {
-  importsPath: string;
+  /** path to the CLDR imports */
+  cldrImportsPath: string;
+  /** ordered list of paths for local imports */
+  localImportsPaths: string[];
 };
 
 export class LDMLKeyboardXMLSourceFileReader {
@@ -31,8 +34,19 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
+    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
+  }
+
+  readLocalImportFile(path: string): Uint8Array {
+    // try each of the local imports paths
+    for (const localPath of this.options.localImportsPaths) {
+      const importPath = this.callbacks.path.join(localPath, path);
+      if(this.callbacks.fs.existsSync(importPath)) {
+        return this.callbacks.loadFile(importPath);
+      }
+    }
+    return null; // was not able to load from any of the paths
   }
 
   /**
@@ -203,16 +217,25 @@ export class LDMLKeyboardXMLSourceFileReader {
    */
   private resolveOneImport(obj: any, subtag: string, asImport: LKImport, implied? : boolean) : boolean {
     const { base, path } = asImport;
-    if (base !== constants.cldr_import_base) {
+    // If base is not an empty string (or null/undefined), then it must be 'cldr'
+    if (base && base !== constants.cldr_import_base) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
       return false;
     }
-    const paths = path.split('/');
-    if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
-      return false;
+    let importData: Uint8Array;
+
+    if (base === constants.cldr_import_base) {
+      // CLDR import
+      const paths = path.split('/');
+      if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
+        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
+        return false;
+      }
+      importData = this.readImportFile(paths[0], paths[1]);
+    } else {
+      // local import
+      importData = this.readLocalImportFile(path);
     }
-    const importData: Uint8Array = this.readImportFile(paths[0], paths[1]);
     if (!importData || !importData.length) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
       return false;
@@ -240,6 +263,9 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (implied) {
         // mark all children as an implied import
         subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
+      }
+      if (base !== constants.cldr_import_base) {
+        subsubval.forEach(o => o[ImportStatus.localImport] = path);
       }
 
       if (!obj[subsubtag]) {

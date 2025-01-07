@@ -1,5 +1,65 @@
 # Keyman Version History
 
+## 18.0.162 alpha 2024-12-19
+
+* fix(mac): standardize interaction between OSK and physical keyboard (#12836)
+
+## 18.0.161 alpha 2024-12-17
+
+* fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
+
+## 18.0.160 alpha 2024-12-16
+
+* feat(ios): configurable keyboard height (#12571)
+* chore(common/web): remove .c8rc.json from types and merge exclusions into package.json (#12813)
+* fix(android/engine): Initialize index when resuming KeyboardPicker (#12832)
+
+## 18.0.159 alpha 2024-12-13
+
+* chore(core): remove meson warnings for wasm builds (#12827)
+* chore(linux): Update debian changelog (#12023)
+
+## 18.0.158 alpha 2024-12-11
+
+* fix(linux): pushing of updated changelog branch (#12818)
+* fix(linux): work around Lintian errors (#12815)
+
+## 18.0.157 alpha 2024-12-10
+
+* test(common/web): unit tests for kvk-file-writer (#12734)
+
+## 18.0.156 alpha 2024-12-09
+
+* fix(developer): remove platforms from kmc-generate LM readme (#12803)
+* test(developer): add test for ERROR_DescriptionIsMissing to kmc-keyboard-info (#12804)
+* chore(developer): verify bundled node version when building installer (#12806)
+* fix(developer): support hint property in displaymap (#12807)
+* fix(common/web): delete replaceExtension in types/src/util/file-types.ts (#12762)
+* chore(developer): add some docs for language examples in kmp.json (#12805)
+* fix(core): implement ldml_processor::get_key_list() (#12644)
+
+## 18.0.155 alpha 2024-12-07
+
+* chore(android,windows): Update crowdin for Czech (#12792)
+
+## 18.0.154 alpha 2024-12-06
+
+* feat(developer,core): local imports (#12750)
+* chore(core): remove `km_core_keyboard_load` API (#12769)
+* chore: rename TestCompilerCallbacks.ts (#12775)
+* chore(mac): update to SIL logo with glyph in About window (#12766)
+* chore(android,windows): Update crowdin for Italian (#12793)
+* change(developer): use full github url in kmc copy parameters (#12773)
+* chore(developer): add baseline tests for bcp47 codes to kmc-package (#12506)
+* chore(core): only install node on Windows if not available (#12772)
+* chore(android): Disable auto-correct UI controls (#12791)
+
+## 18.0.153 alpha 2024-12-05
+
+* feat(developer,common): verify normalization of strings (#12748)
+* chore(core): Add link to Keyman Glossary (#12774)
+* test(common/web/types): unit tests for file-types (#12716)
+
 ## 18.0.152 alpha 2024-12-04
 
 * refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)

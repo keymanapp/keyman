@@ -295,6 +295,10 @@
   <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simulovat AltGr s Ctrl + Alt</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Přidat pravý modifikátor pro zkratky</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Považovat hardwarová mrtvá tlačítka za obyčejná tlačítka</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -418,6 +422,14 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL International. Všechna práva vyhrazena.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">Vytvořeno %1$s</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright ©️ %1$s. Všechna práva vyhrazena.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

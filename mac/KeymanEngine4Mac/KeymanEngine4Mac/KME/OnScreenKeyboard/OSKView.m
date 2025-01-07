@@ -23,12 +23,12 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 @interface OSKView()
 @property (nonatomic, strong) NSArray *oskLayout;
 @property (nonatomic, strong) NSArray *oskDefaultNKeys;
-@property (nonatomic, assign) BOOL shiftState;
+@property (nonatomic, assign) BOOL physicalShiftState;
 @property (nonatomic, assign) BOOL oskShiftState;
-@property (nonatomic, assign) BOOL altState;
-@property (nonatomic, assign) BOOL oskAltState;
-@property (nonatomic, assign) BOOL ctrlState;
-@property (nonatomic, assign) BOOL oskCtrlState;
+@property (nonatomic, assign) BOOL physicalOptionState;
+@property (nonatomic, assign) BOOL oskOptionState;
+@property (nonatomic, assign) BOOL physicalControlState;
+@property (nonatomic, assign) BOOL oskControlState;
 @end
 
 @implementation OSKView
@@ -69,8 +69,8 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 }
 
 - (NSString *)description {
-  NSString *format = @"<shiftState:%d oskShiftState:%d altState:%d oskAltState:%d ctrlState:%d oskCtrlState:%d>";
-  NSString *str = [NSString stringWithFormat:format, _shiftState, _oskShiftState, _altState, _oskAltState, _ctrlState, _oskCtrlState];
+  NSString *format = @"<shiftState:%d oskShiftState:%d optionState:%d oskOptionState:%d controlState:%d oskControlState:%d>";
+  NSString *str = [NSString stringWithFormat:format, _physicalShiftState, _oskShiftState, _physicalOptionState, _oskOptionState, _physicalControlState, _oskControlState];
   return str;
 }
 
@@ -140,7 +140,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   _oskLayout = nil;
   _oskDefaultNKeys = nil;
   
-  [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:self.oskCtrlState];
+  [self updateKeyLabelsForCurrentLayer];
 }
 
 - (void)initOSKKeys {
@@ -166,7 +166,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
       [keyView setTarget:self];
       if (self.oskShiftState && (keyView.key.keyCode == MVK_LEFT_SHIFT || keyView.key.keyCode == MVK_RIGHT_SHIFT))
         [keyView setKeyPressed:YES];
-      else if (self.oskAltState && (keyView.key.keyCode == MVK_LEFT_ALT || keyView.key.keyCode == MVK_RIGHT_ALT))
+      else if (self.oskOptionState && (keyView.key.keyCode == MVK_LEFT_ALT || keyView.key.keyCode == MVK_RIGHT_ALT))
         [keyView setKeyPressed:YES];
       [self addSubview:keyView];
       px += width;
@@ -174,7 +174,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     py += keyHeight;
   }
   
-  [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:self.oskCtrlState];
+  [self updateKeyLabelsForCurrentLayer];
 }
 
 - (NSArray *)oskLayout {
@@ -427,9 +427,21 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   return _oskDefaultNKeys;
 }
 
+/**
+ * called when closing the OSK
+ * when the OSK is not visible then modifier state is determined solely by the physical keyboard
+ */
+- (void)clearOskModifiers {
+  _oskShiftState = NO;
+  _oskOptionState = NO;
+  _oskControlState = NO;
+  [self updateModifierKeysForState];
+  [self updateKeyLabelsForCurrentLayer];
+}
+
 - (void)resetOSK {
   [self setOskShiftState:NO];
-  [self setOskAltState:NO];
+  [self setOskOptionState:NO];
   [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
   [self initOSKKeys];
 }
@@ -467,12 +479,53 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
       [self setOskShiftState:!self.oskShiftState];
     }
     else if (keyCode == MVK_LEFT_ALT || keyCode == MVK_RIGHT_ALT) {
-      [self setOskAltState:!self.oskAltState];
+      [self setOskOptionState:!self.oskOptionState];
     }
     else if (keyCode == MVK_LEFT_CTRL || keyCode == MVK_RIGHT_CTRL) {
-      [self setOskCtrlState:!self.oskCtrlState];
+      [self setOskControlState:!self.oskControlState];
     }
   }
+}
+
+/**
+ * get the event modifier flags representing the current state of the osk modifiers
+ */
+- (NSEventModifierFlags)getOskEventModifierFlags {
+  return [self getEventModifierFlags:self.oskShiftState optionFlag:self.oskOptionState controlFlag:self.oskControlState];
+}
+
+/**
+ * get the event modifier flags that represent the combined state of the physical and osk modifiers
+ */
+- (NSEventModifierFlags) getCombinedEventModifierFlags {
+  BOOL shift = self.physicalShiftState | self.oskShiftState;
+  BOOL option = self.physicalOptionState | self.oskOptionState;
+  BOOL control = self.physicalControlState | self.oskControlState;
+  
+  return [self getEventModifierFlags:shift optionFlag:option controlFlag:control];
+}
+
+/**
+ * get the NSEventModifierFlags value that corresponds to the specified modifier states
+ */
+- (NSEventModifierFlags)getEventModifierFlags:(BOOL)shift optionFlag:(BOOL)option controlFlag:(BOOL)control {
+  NSEventModifierFlags modifierFlags = 0;
+  
+  if (shift) {
+    modifierFlags = modifierFlags | NSEventModifierFlagShift;
+  }
+  /**
+   * Both left and right option keys on the OSK cause oskOptionState to be true without distinction of left or right.
+   * However, the generated event is a right alt so that it will trigger the right alt rules in the Keyman keyboard.
+   */
+  if (option) {
+    modifierFlags = modifierFlags | MK_RIGHT_ALT_MASK;
+  }
+  if (control) {
+    modifierFlags = modifierFlags | NSEventModifierFlagControl;
+  }
+  
+  return modifierFlags;
 }
 
 /**
@@ -488,22 +541,9 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
 - (int64_t) createOskEventUserData {
   // set bit to identify this user data as originating from the OSK
   int64_t oskEventData = OSK_EVENT_FLAG;
-  
-  if (self.oskShiftState || self.shiftState) {
-    oskEventData = oskEventData | kCGEventFlagMaskShift;
-  }
-  /**
-   * Both left and right alt keys on the OSK cause oskAltState to be true without distinction of left or right.
-   * However, the generated event is a right alt so that it will trigger the right alt rules in the Keyman keyboard.
-   */
-  if (self.oskAltState || self.altState) {
-    oskEventData = oskEventData | MK_RIGHT_ALT_MASK;
-  }
-  if (self.oskCtrlState || self.oskCtrlState) {
-    oskEventData = oskEventData | kCGEventFlagMaskControl;
-  }
-  
-  return oskEventData;
+  NSEventModifierFlags eventModifierFlags = [self getCombinedEventModifierFlags];
+
+  return oskEventData | eventModifierFlags;
 }
 
 - (void)handleKeyEvent:(NSEvent *)event {
@@ -523,34 +563,59 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   [keyView setKeyPressed:NO];
 }
 
-- (void)setKeyLabels:(BOOL)shift alt:(BOOL)alt ctrl:(BOOL)ctrl {
-  os_log_debug([KMELogs oskLog], "OSKView setKeyLabels, shift: %d, alt: %d, ctrl: %d", shift, alt, ctrl);
-  [self resetKeyLabels];
-  NSMutableArray *mKeys = [[self keyTags] mutableCopy];
-  NSArray *nkeys = [self.kvk keys];
-  if (nkeys == nil)
-    nkeys = self.oskDefaultNKeys;
+/**
+ * get the Keyman modifier flags that represent the combined state of the physical and osk modifiers
+ */
+- (WORD) getKeymanModifierFlagsForCurrentLayer {
+  BOOL shift = self.physicalShiftState | self.oskShiftState;
+  BOOL option = self.physicalOptionState | self.oskOptionState;
+  BOOL control = self.physicalControlState | self.oskControlState;
   
+  return [self getKeymanModifierFlags:shift optionFlag:option controlFlag:control];
+}
+
+/**
+ * get Keyman modifier flags for the specified modifier states
+ */
+- (WORD)getKeymanModifierFlags:(BOOL)shift optionFlag:(BOOL)option controlFlag:(BOOL)control {
   WORD flags = 0;
   if (shift) {
     flags |= KVKS_SHIFT;
   }
-  if (alt) {
+  if (option) {
     if (self.kvk.containsRightAltKeys) {
       flags |= KVKS_RALT;
     } else if (self.kvk.containsAltKeys) {
       flags |= KVKS_ALT;
     }
   }
-  if (ctrl) {
+  if (control) {
     flags |= KVKS_RCTRL;
   }
+  
+  return flags;
+}
+
+/**
+ * Display the key labels that correspond to the current state of the modifier keys.
+ * The layer shown depends on both the physical modifier state and the osk modifier state.
+ */
+- (void)updateKeyLabelsForCurrentLayer {
+  os_log_debug([KMELogs oskLog], "OSKView updateKeyLabelsForState, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
+  
+  [self resetKeyLabels];
+  NSMutableArray *mKeys = [[self keyTags] mutableCopy];
+  NSArray *nkeys = [self.kvk keys];
+  if (nkeys == nil)
+    nkeys = self.oskDefaultNKeys;
+  
+  WORD keymanFlagsForCurrentLayer = [self getKeymanModifierFlagsForCurrentLayer];
   
   NSString *ansiFont = [self ansiFont];
   NSString *unicodeFont = [self unicodeFont];
   unsigned short keyCode;
   for (NKey *nkey in nkeys) {
-    if (nkey.modifierFlags == flags) {
+    if (nkey.modifierFlags == keymanFlagsForCurrentLayer) {
       keyCode = [self MacKeyCode:nkey.keyCode];
       os_log_debug([KMELogs keyLog], "keyCode: %d, %x for key: %{public}@", keyCode, keyCode, nkey);
       if (keyCode < USHRT_MAX) {
@@ -613,112 +678,102 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   }
 }
 
-- (void)setShiftState:(BOOL)shiftState {
-  if (_shiftState != shiftState) {
-    _shiftState = shiftState;
-    KeyView *shiftKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
-    KeyView *shiftKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
-    if (shiftState) {
-      [self setKeyLabels:YES alt:self.oskAltState ctrl:self.oskCtrlState];
-      [shiftKeyL setKeyPressed:YES];
-      [shiftKeyR setKeyPressed:YES];
-    }
-    else {
-      [self setKeyLabels:NO alt:self.oskAltState ctrl:self.oskCtrlState];
-      [shiftKeyL setKeyPressed:NO];
-      [shiftKeyR setKeyPressed:NO];
-    }
+- (void)setPhysicalShiftState:(BOOL)state {
+  if (_physicalShiftState != state) {
+    _physicalShiftState = state;
+
+    /**
+     * When setting the physical shift state, clear the OSK shift state
+     * The state of the physical key overrides the modifier key clicked in the OSK.
+     */
+    _oskShiftState = NO;
+    
+    os_log_debug([KMELogs oskLog], "hardware shift key released");
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateShiftKeysForState];
   }
 }
 
-- (void)setOskShiftState:(BOOL)oskShiftState {
-  if (_oskShiftState != oskShiftState && !self.shiftState) {
-    _oskShiftState = oskShiftState;
-    KeyView *shiftKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
-    KeyView *shiftKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
-    if (oskShiftState) {
-      [self setKeyLabels:YES alt:self.oskAltState ctrl:self.oskCtrlState];
-      [shiftKeyL setKeyPressed:YES];
-      [shiftKeyR setKeyPressed:YES];
-    }
-    else if (!self.shiftState) {
-      [self setKeyLabels:NO alt:self.oskAltState ctrl:self.oskCtrlState];
-      [shiftKeyL setKeyPressed:NO];
-      [shiftKeyR setKeyPressed:NO];
-    }
+- (void)setOskShiftState:(BOOL)state {
+  if (_oskShiftState != state && !self.physicalShiftState) {
+    _oskShiftState = state;
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateShiftKeysForState];
   }
 }
 
-- (void)setAltState:(BOOL)altState {
-  if (_altState != altState) {
-    _altState = altState;
-    KeyView *altKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
-    KeyView *altKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
-    if (altState) {
-      [self setKeyLabels:self.oskShiftState alt:YES ctrl:self.oskCtrlState];
-      [altKeyL setKeyPressed:YES];
-      [altKeyR setKeyPressed:YES];
-    }
-    else {
-      [self setKeyLabels:self.oskShiftState alt:NO ctrl:self.oskCtrlState];
-      [altKeyL setKeyPressed:NO];
-      [altKeyR setKeyPressed:NO];
-    }
+- (void)setPhysicalOptionState:(BOOL)state {
+  if (_physicalOptionState != state) {
+    _physicalOptionState = state;
+    
+    /**
+     * When setting the physical option state, clear the OSK option state
+     * The state of the physical key overrides the modifier key clicked in the OSK.
+     */
+    _oskOptionState = NO;
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateOptionKeysForState];
   }
 }
 
-- (void)setOskAltState:(BOOL)oskAltState {
-  if (_oskAltState != oskAltState && !self.altState) {
-    _oskAltState = oskAltState;
-    KeyView *altKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
-    KeyView *altKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
-    if (oskAltState) {
-      [self setKeyLabels:self.oskShiftState alt:YES ctrl:self.oskCtrlState];
-      [altKeyL setKeyPressed:YES];
-      [altKeyR setKeyPressed:YES];
-    }
-    else if (!self.altState) {
-      [self setKeyLabels:self.oskShiftState alt:NO ctrl:self.oskCtrlState];
-      [altKeyL setKeyPressed:NO];
-      [altKeyR setKeyPressed:NO];
-    }
+- (void)setOskOptionState:(BOOL)state {
+  if (_oskOptionState != state && !self.physicalOptionState) {
+    _oskOptionState = state;
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateOptionKeysForState];
   }
 }
 
-- (void)setCtrlState:(BOOL)ctrlState {
-  if (_ctrlState != ctrlState) {
-    _ctrlState = ctrlState;
-    KeyView *ctrlKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
-    KeyView *ctrlKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
-    if (ctrlState) {
-      [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:YES];
-      [ctrlKeyL setKeyPressed:YES];
-      [ctrlKeyR setKeyPressed:YES];
-    }
-    else {
-      [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:NO];
-      [ctrlKeyL setKeyPressed:NO];
-      [ctrlKeyR setKeyPressed:NO];
-    }
+- (void)setPhysicalControlState:(BOOL)state {
+  if (_physicalControlState != state) {
+    _physicalControlState = state;
+    
+    /**
+     * When setting the physical control state, clear the OSK control state
+     * The state of the physical key overrides the modifier key clicked in the OSK.
+     */
+    _oskControlState = NO;
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateControlKeysForState];
   }
 }
 
-- (void)setOskCtrlState:(BOOL)oskCtrlState {
-  if (_oskCtrlState != oskCtrlState && !self.ctrlState) {
-    _oskCtrlState = oskCtrlState;
-    KeyView *ctrlKeyL = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
-    KeyView *ctrlKeyR = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
-    if (oskCtrlState) {
-      [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:YES];
-      [ctrlKeyL setKeyPressed:YES];
-      [ctrlKeyR setKeyPressed:YES];
-    }
-    else if (!self.ctrlState) {
-      [self setKeyLabels:self.oskShiftState alt:self.oskAltState ctrl:NO];
-      [ctrlKeyL setKeyPressed:NO];
-      [ctrlKeyR setKeyPressed:NO];
-    }
+- (void)setOskControlState:(BOOL)state {
+  if (_oskControlState != state && !self.physicalControlState) {
+    _oskControlState = state;
+    [self updateKeyLabelsForCurrentLayer];
+    [self updateControlKeysForState];
   }
+}
+
+- (void)updateModifierKeysForState {
+  [self updateShiftKeysForState];
+  [self updateOptionKeysForState];
+  [self updateControlKeysForState];
+}
+
+- (void)updateShiftKeysForState {
+  BOOL pressed = self.oskShiftState || self.physicalShiftState;
+  KeyView *leftShiftKey = (KeyView *)[self viewWithTag:MVK_LEFT_SHIFT|0x1000];
+  KeyView *rightShiftKey = (KeyView *)[self viewWithTag:MVK_RIGHT_SHIFT|0x1000];
+  [leftShiftKey setKeyPressed:pressed];
+  [rightShiftKey setKeyPressed:pressed];
+}
+
+- (void)updateOptionKeysForState{
+  BOOL pressed = self.oskOptionState || self.physicalOptionState;
+  KeyView *leftOptionKey = (KeyView *)[self viewWithTag:MVK_LEFT_ALT|0x1000];
+  KeyView *rightOptionKey = (KeyView *)[self viewWithTag:MVK_RIGHT_ALT|0x1000];
+  [leftOptionKey setKeyPressed:pressed];
+  [rightOptionKey setKeyPressed:pressed];
+}
+
+- (void)updateControlKeysForState {
+  BOOL pressed = self.oskControlState || self.physicalControlState;
+  KeyView *leftControlKey = (KeyView *)[self viewWithTag:MVK_LEFT_CTRL|0x1000];
+  KeyView *rightControlKey = (KeyView *)[self viewWithTag:MVK_RIGHT_CTRL|0x1000];
+  [leftControlKey setKeyPressed:pressed];
+  [rightControlKey setKeyPressed:pressed];
 }
 
 - (NSString *)ansiFont {

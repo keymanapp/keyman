@@ -102,6 +102,7 @@ class KeymanWebViewController: UIViewController {
     // after it has been replaced by KMW's OSK resizing operation.)
 
     keyboardSize = view.bounds.size
+    os_log("KeymanWebViewController viewWillLayoutSubviews to keyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:keyboardSize))
   }
 
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -695,36 +696,100 @@ extension KeymanWebViewController: KeymanWebDelegate {
 // MARK: - Manage views
 extension KeymanWebViewController {
   // MARK: - Sizing
-  public var keyboardHeight: CGFloat {
-    return keyboardSize.height
-  }
   
   @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
     self.delegate?.menuKeyHeld(self)
   }
 
-  func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    return KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
-  }
+  func determineDefaultKeyboardHeight(isPortrait: Bool) -> CGFloat {
+    os_log("determineDefaultKeyboardHeight", log:KeymanEngineLogger.ui, type: .info)
 
-  var keyboardWidth: CGFloat {
-    return keyboardSize.width
+    let keyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? Defaults.unknownDeviceKeyboardHeight
+
+    return keyboardHeight;
   }
 
   func initKeyboardSize() {
-    var width: CGFloat
-    var height: CGFloat
+    let width: CGFloat
     width = UIScreen.main.bounds.width
-
-    if Util.isSystemKeyboard {
-      height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
+    var height: CGFloat
+    
+    // get orientation differently if system or in-app keyboard
+    let portrait = Util.isSystemKeyboard ? InputViewController.isPortrait : UIDevice.current.orientation.isPortrait
+    
+    /**
+     * If keyboard height is saved in UserDefaults, then use it
+     */
+    if let savedHeight = self.readKeyboardHeight(isPortrait: portrait) {
+      height = savedHeight
     } else {
-      height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+      /**
+       * Otherwise,  get default keyboard height for this orientation and write to UserDefaults
+       */
+      height = self.determineDefaultKeyboardHeight(isPortrait: portrait)
+      self.writeKeyboardHeightIfDoesNotExist(isPortrait: portrait, height: height)
+      
+      /**
+       * If we need to write out the keyboard height for one orientation, then we
+       * expect that the other must be written also. 
+       * Write it out now, but only if a value for keyboard height does not already exist.
+       */
+      height = self.determineDefaultKeyboardHeight(isPortrait: !portrait)
+      self.writeKeyboardHeightIfDoesNotExist(isPortrait: !portrait, height: height)
     }
+    
+    /** 
+     * no need to check for Util.isSystemKeyboard because this is shared storage
+     * the UserDefaults are readable and writeable by both system and in-app
+     */
 
-    keyboardSize = CGSize(width: width, height: height)
+    self.keyboardSize = CGSize(width: width, height: height)
+    os_log("KeymanWebViewController initKeyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .default, NSCoder.string(for:keyboardSize))
   }
 
+  /**
+   * reads and returns keyboard height if it is found in UserDefaults, otherwise returns nil
+   */
+  func readKeyboardHeight(isPortrait: Bool) -> CGFloat? {
+    var height: CGFloat? = nil
+
+    if (isPortrait) {
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        height = Storage.active.userDefaults.portraitKeyboardHeight
+     }
+    } else { // landscape
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) != nil) {
+        height = Storage.active.userDefaults.landscapeKeyboardHeight
+      }
+    }
+
+    let message = "readKeyboardHeight, for isPortrait \(isPortrait) value \(String(describing: height))"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+
+    return height;
+  }
+  
+  /**
+   * Write out the keyboard height to the UserDefaults but only if it does not exist there yet.
+   * If it exists, then we assume it was configured by the user and do not want to
+   * overwrite that value with a default value derived for this device.
+   */
+  func writeKeyboardHeightIfDoesNotExist(isPortrait: Bool, height: CGFloat) {
+    let writeMessage = "writeKeyboardHeightIfDoesNotExist, isPortrait: \(isPortrait) height: \(height)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+    if (isPortrait) {
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) == nil) {
+        Storage.active.userDefaults.portraitKeyboardHeight = height
+        os_log("portrait keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+      }
+    } else {
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) == nil) {
+        Storage.active.userDefaults.landscapeKeyboardHeight = height
+        os_log("landscape keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+      }
+    }
+  }
+  
   var keyboardSize: CGSize {
     get {
       if kbSize.equalTo(CGSize.zero) {
@@ -750,15 +815,6 @@ extension KeymanWebViewController {
     }
   }
 
-  @objc func resizeDelay() {
-    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
-    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
-    // should hopefully work on all devices.
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight
-    view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
-  }
-
   // Keyman interaction
   func resizeKeyboard() {
     fixLayout()
@@ -768,6 +824,7 @@ extension KeymanWebViewController {
     // the first time.
     setOskWidth(Int(kbSize.width))
     setOskHeight(Int(kbSize.height))
+    os_log("KeymanWebViewController resizeKeyboard to kbSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:kbSize))
   }
 
   func resetKeyboardState() {
