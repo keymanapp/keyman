@@ -8,6 +8,9 @@
 
 #include "kmx/kmx_plus.h"
 
+#include <test_assert.h>
+#include <test_color.h>
+
 namespace km {
 namespace tests {
 
@@ -92,7 +95,7 @@ public:
   }
 
   bool get_normalization_disabled() const {
-    assert(setup); // make sure set_ was called first
+    test_assert(setup); // make sure set_ was called first
     return normalization_disabled;
   }
 

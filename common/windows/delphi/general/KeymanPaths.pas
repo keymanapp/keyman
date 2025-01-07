@@ -445,12 +445,18 @@ end;
 class function TKeymanPaths.KeymanCoreLibraryPath(const Filename: string): string;
 var
   keyman_root: string;
+  configuration: string;
 begin
   // Look up KEYMAN_ROOT development variable -- if found and executable
   // within that path then use that as source path
   if TKeymanPaths.RunningFromSource(keyman_root) then
   begin
-    Exit(keyman_root + 'core\build\x86\debug\src\' + Filename);
+{$IFDEF DEBUG}
+    configuration := 'debug';
+{$ELSE}
+    configuration := 'release';
+{$ENDIF}
+    Exit(keyman_root + 'core\build\x86\'+configuration+'\src\' + Filename);
   end;
 
   Result := GetDebugPath('KeymanCoreLibraryPath', '');

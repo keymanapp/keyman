@@ -25,18 +25,9 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_test() {
-  eslint .
-  cd test
-  tsc --build
-  cd ..
-  readonly C8_THRESHOLD=70
-  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
-}
-
 builder_run_action clean      rm -rf ./build/
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
-builder_run_action test       do_test
+builder_run_action test       builder_do_typescript_tests 70
 builder_run_action publish    builder_publish_npm

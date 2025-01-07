@@ -9,7 +9,7 @@
       "allowSyntheticDefaultImports": true, // for chai
     },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "./helpers/index.ts",
       "./kmw/util.ts"
   ],

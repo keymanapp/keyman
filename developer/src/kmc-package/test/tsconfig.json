@@ -9,7 +9,7 @@
       "allowSyntheticDefaultImports": true, // for jszip
     },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "helpers/*.ts"
   ],
   "references": [

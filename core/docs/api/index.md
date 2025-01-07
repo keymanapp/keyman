@@ -75,6 +75,7 @@ modifiers such as Windows key are excluded from this set. Some modifiers are
 transient, such as Control, and others have long-lasting state, such as
 Caps Lock.
 
+- __See more in__   [Keyman Glossary](https://github.com/keymanapp/keyman/wiki/Keyman-glossary)
 
 [km_core_cp]: background#km_core_cp "km_core_cp type"
 [km_core_usv]: background#km_core_usv "km_core_usv type"
