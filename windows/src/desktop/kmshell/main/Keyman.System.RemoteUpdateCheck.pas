@@ -56,8 +56,6 @@ type
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
 
-procedure LogMessage(LogMessage: string);
-
 (**
   * This function checks if a week or CheckPeriod time has passed since the last
   * update check.
@@ -73,11 +71,13 @@ uses
   System.Win.Registry,
   Winapi.Windows,
   Winapi.WinINet,
+  Sentry.Client,
 
   GlobalProxySettings,
   KLog,
   keymanapi_TLB,
   KeymanVersion,
+  Keyman.System.KeymanSentryClient,
   Keyman.System.UpdateCheckStorage,
   kmint,
   ErrorControlledRegistry,
@@ -103,7 +103,8 @@ end;
 destructor TRemoteUpdateCheck.Destroy;
 begin
   if (FErrorMessage <> '') and FShowErrors then
-    LogMessage(FErrorMessage);
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      '"+FErrorMessage+"');
 
   KL.Log('TRemoteUpdateCheck.Destroy: FErrorMessage = ' + FErrorMessage);
   KL.Log('TRemoteUpdateCheck.Destroy: FRemoteResult = ' +
@@ -223,13 +224,6 @@ begin
   end;
 end;
 
-// temp wrapper for converting showmessage to logs don't know where
-// if nt using klog
-procedure LogMessage(LogMessage: string);
-begin
-  KL.Log(LogMessage);
-end;
-
 function ConfigCheckContinue: Boolean;
 var
   Registry: TRegistryErrorControlled;
@@ -260,7 +254,8 @@ begin
     on E: ERegistryException do
     begin
       Result := False;
-      LogMessage(E.Message);
+          TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      E.Message);
     end;
   end;
 end;
