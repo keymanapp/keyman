@@ -373,7 +373,7 @@ begin
       on E: ERegistryException do
       begin
         TKeymanSentryClient.ReportHandledException(E,
-          'Failed to write apply now');
+          'Failed to write "apply now"');
       end;
     end;
   finally
