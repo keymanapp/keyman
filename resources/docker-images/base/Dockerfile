@@ -1,9 +1,9 @@
-# Copyright (c) 2024 SIL International. All rights reserved.
+# Copyright (c) 2024 SIL Global. All rights reserved.
 
 ARG UBUNTU_VERSION=latest
 FROM ubuntu:${UBUNTU_VERSION}
 
-LABEL org.opencontainers.image.authors="SIL International."
+LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Build Base Image"
 

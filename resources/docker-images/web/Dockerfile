@@ -1,4 +1,4 @@
-# Copyright (c) 2024 SIL International. All rights reserved.
+# Copyright (c) 2024 SIL Global. All rights reserved.
 # ARGS used in this file:
 # - ARG BASE_VERSION=default
 # - ARG REQUIRED_NODE_VERSION=18
@@ -6,7 +6,7 @@
 ARG BASE_VERSION=default
 FROM keymanapp/keyman-base-ci:${BASE_VERSION}
 
-LABEL org.opencontainers.image.authors="SIL International."
+LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman for Web Build Image"
 
