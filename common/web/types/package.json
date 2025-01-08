@@ -8,9 +8,11 @@
     "unicode"
   ],
   "type": "module",
+  "types": "./build/src/main.d.ts",
   "exports": {
     ".": {
       "es6-bundling": "./src/main.ts",
+      "types": "./build/src/main.d.ts",
       "default": "./build/src/main.js"
     }
   },
@@ -21,7 +23,7 @@
     "build": "tsc -b",
     "build:schema": "ajv compile",
     "lint": "eslint .",
-    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
+    "test": "npm run lint && cd tests && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",
@@ -34,7 +36,6 @@
     "restructure": "3.0.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "ajv": "^8.12.0",
@@ -47,7 +48,7 @@
     "typescript": "^5.4.5"
   },
   "mocha": {
-    "spec": "build/test/**/test-*.js",
+    "spec": "build/tests/**/*.tests.js",
     "require": [
       "source-map-support/register"
     ]
@@ -68,13 +69,20 @@
       "src/kmx/kmx-plus.ts",
       "src/kmx/kmx-builder.ts",
       "src/kmx/element-string.ts",
+      "src/lexical-model-types.ts",
       "src/kmx/string-list.ts",
       "src/ldml-keyboard/ldml-keyboard-testdata-xml.ts",
       "src/ldml-keyboard/unicodeset-parser-api.ts",
       "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
       "src/osk/osk.ts",
       "src/schemas/*",
-      "test/"
+      "tests/",
+      "src/keyboard-object.ts",
+      "src/outputTarget.interface.ts",
+      "src/*.d.ts",
+      "src/main.ts",
+      "src/schema-validators.ts",
+      "src/schemas.ts"
     ]
   },
   "sideEffects": false

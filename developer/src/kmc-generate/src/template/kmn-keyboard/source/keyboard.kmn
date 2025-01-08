@@ -1,0 +1,14 @@
+﻿c keyboard generated from template at $DATE
+c with name "$NAME"
+store(&NAME) '$NAME'
+store(&COPYRIGHT) '$COPYRIGHT'
+store(&VERSION) '10.0'
+store(&KEYBOARDVERSION) '$VERSION'
+store(&TARGETS) '$TARGETS'
+$Icon:store(&BITMAP) '$ID.ico'
+$KVKS:store(&VISUALKEYBOARD) '$ID.kvks'
+$TouchLayout:store(&LAYOUTFILE) '$ID.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys

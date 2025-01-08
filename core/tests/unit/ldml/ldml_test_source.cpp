@@ -40,6 +40,9 @@
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 
+#include "../load_kmx_file.hpp"
+
+#include <test_assert.h>
 #include <test_color.h>
 
 #define assert_or_return(expr) if(!(expr)) { \
@@ -54,8 +57,6 @@
 #define TEST_JSON_SUFFIX "-test.json"
 namespace km {
 namespace tests {
-
-
 
 
 /** string munging */
@@ -126,6 +127,50 @@ bool LdmlTestSource::get_expected_beep() const {
   return false;
 }
 
+int LdmlTestSource::load_kmx_plus(const km::core::path &compiled) {
+    // check and load the KMX (yes, once again)
+  rawdata = km::tests::load_kmx_file(compiled);
+  if(!km::core::ldml_processor::is_handled(rawdata)) {
+    std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
+    return __LINE__;
+  }
+
+  auto comp_keyboard = (const km::core::kmx::COMP_KEYBOARD*)rawdata.data();
+  // initialize the kmxplus object with our copy
+  kmxplus.reset(new km::core::kmx::kmx_plus(comp_keyboard, rawdata.size()));
+
+  if (!kmxplus->is_valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  if (!kmxplus->key2Helper.valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  return 0; // success
+}
+
+bool LdmlTestSource::get_vkey_table(std::set<key_event> &fillin) const {
+  if (!kmxplus || !kmxplus->is_valid()) {
+    return false; // fail
+  }
+
+  // just dump the kmap table
+  for (KMX_DWORD kmapIdx = 0; kmapIdx < kmxplus->key2->kmapCount; kmapIdx++) {
+    const km::core::kmx::COMP_KMXPLUS_KEYS_KMAP *kmap = kmxplus->key2Helper.getKmap(kmapIdx);
+    if (kmap == nullptr) {
+      return false;
+    }
+    if (kmap->vkey > 0xFF) {
+      continue; // synthetic key- skip
+    }
+    fillin.insert(key_event(kmap->vkey, kmap->mod));
+  }
+  return true;
+}
+
 // String trim functions from https://stackoverflow.com/a/217605/1836776
 // trim from start (in place)
 static inline void
@@ -162,20 +207,20 @@ LdmlTestSource::parse_source_string(std::string const &s) {
       p++;
       km_core_usv v;
       bool had_open_curly = false;
-      assert(p != s.end());
+      test_assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
         if (*p == '{') {
           p++;
-          assert(p != s.end());
+          test_assert(p != s.end());
           had_open_curly = true;
         }
         size_t n;
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
-        assert(v >= 0x0001 && v <= 0x10FFFF);
+        test_assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
           t += km_core_cu(v);
@@ -186,13 +231,13 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         if (had_open_curly) {
           p++;
           // close what you opened
-          assert(*p == '}'); // close curly
-          assert(p != s.end());
+          test_assert(*p == '}'); // close curly
+          test_assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
         // TODO, not yet supported
-        assert(false);
+        test_assert(false);
       }
     } else {
       t += *p;
@@ -211,13 +256,13 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
       p++;
       km_core_usv v;
       bool had_open_curly = false;
-      assert(p != s.end());
+      test_assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
         if (*p == '{') {
           p++;
-          assert(p != s.end());
+          test_assert(p != s.end());
           had_open_curly = true;
         }
         size_t n;
@@ -226,7 +271,7 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         std::string s1b = convert<char16_t, char>(s1);
         v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
-        assert(v >= 0x0001 && v <= 0x10FFFF);
+        test_assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
           t += km_core_cu(v);
@@ -237,13 +282,13 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         if (had_open_curly) {
           p++;
           // close what you opened
-          assert(*p == '}'); // close curly
-          assert(p != s.end());
+          test_assert(*p == '}'); // close curly
+          test_assert(p != s.end());
         }
       } else if (*p == 'd') {
         // Deadkey
         // TODO, not yet supported
-        assert(false);
+        test_assert(false);
       }
     } else {
       t += *p;
@@ -263,12 +308,13 @@ LdmlEmbeddedTestSource::is_token(const std::string token, std::string &line) {
 }
 
 int
-LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
+LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core::path &compiled ) {
   const std::string s_keys = "@@keys: ";
   const std::string s_expected = "@@expected: ";
   const std::string s_context = "@@context: ";
   const std::string s_capsLock = "@@capsLock: ";
   const std::string s_expecterror = "@@expect-error: ";
+  const std::string s_keylist = "@@keylist: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected
   // result
@@ -300,6 +346,10 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
       set_caps_lock_on(parse_source_string(line).compare(u"1") == 0);
+    } else if (is_token(s_keylist, line)) {
+      set_keylist(line);
+    } else if (line[0] == '@') {
+      std::cerr << path << " warning, unknown @-command " << line << std::endl;
     }
   }
 
@@ -315,7 +365,13 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     return __LINE__;
   }
 
-  return 0;
+  // and load KMX+ for keylist
+  if (!expected_error) {
+    // don't attempt to load KMX+ on expected error
+    return load_kmx_plus(compiled);
+  } else {
+    return 0;
+  }
 }
 
 km_core_status
@@ -349,20 +405,26 @@ LdmlTestSource::set_caps_lock_on(bool caps_lock_on) {
 
 key_event
 LdmlTestSource::char_to_event(char ch) {
-  assert(ch >= 32);
+  test_assert(ch >= 32);
   return {
       km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
       (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
-LdmlTestSource::get_modifier(std::string const m) {
+LdmlTestSource::get_modifier(std::string const &m) {
   for (int i = 0; km::core::kmx::s_modifier_names[i].name; i++) {
     if (m == km::core::kmx::s_modifier_names[i].name) {
       return km::core::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
+}
+
+std::string key_event::dump() const {
+  std::stringstream f;
+  f  << "Key: {" << km::core::kmx::Debug_VirtualKey(vk) << ", " << km::core::kmx::Debug_ModifierName(modifier_state) << "}";
+  return f.str();
 }
 
 key_event
@@ -383,7 +445,7 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
       if (vk == 0) {
         std::cerr << "Error parsing [" << vk_event << "] - could not find vkey or modifier: " << s << std::endl;
       }
-      assert(vk != 0);
+      test_assert(vk != 0);
       break; // only one vkey allowed
     }
   }
@@ -391,43 +453,46 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
   // The string should be empty at this point
   if (std::getline(f, s, ' ')) {
     std::cerr << "Error parsing vkey ["<<vk_event<<"] - excess string after key: " << s << std::endl;
-    assert(false);
+    test_assert(false);
   }
-  assert(vk != 0);
+  test_assert(vk != 0);
 
   return {vk, modifier_state};
 }
 
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
-  if (is_done || keys.empty()) {
-    // We were already done. return done.
-    fillin.type = LDML_ACTION_DONE;
-    return;
+  if (keys.empty()) {
+    // #3 we are almost done, let's run the key check
+    if (check_keylist) {
+      fillin.type = LDML_ACTION_CHECK_KEYLIST;
+      fillin.string = expected_keylist; // could be empty
+      check_keylist = false;
+    } else {
+      fillin.type = LDML_ACTION_DONE;
+    }
   } else if(keys[0].empty()) {
+    // #2. Then, when we finish a key set, we check the 'expected' at the end of it.
     // Got to the end of a key set. time to check
     fillin.type = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = expected[0]; // copy expected
     expected.pop_front();
     keys.pop_front();
-    if (keys.empty()) {
-      is_done = true; // so we get DONE next time
-    }
   } else {
+    // #1 First, we process each key
     fillin.type = LDML_ACTION_KEY_EVENT;
     fillin.k = next_key();
   }
 }
 
-
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
-  return next_key(keys[0]);
+  return parse_next_key(keys[0]);
 }
 
 key_event
-LdmlEmbeddedTestSource::next_key(std::string &keys) {
+LdmlEmbeddedTestSource::parse_next_key(std::string &keys) {
   // Parse the next element of the string, chop it off, and return it
   // mutates keys
   if (keys.length() == 0)
@@ -439,7 +504,7 @@ LdmlEmbeddedTestSource::next_key(std::string &keys) {
       return char_to_event(ch);
     }
     auto n = keys.find(']');
-    assert(n != std::string::npos);
+    test_assert(n != std::string::npos);
     auto vkey = keys.substr(1, n - 1);
     keys.erase(0, n + 1);
     return vkey_to_event(vkey);
@@ -452,10 +517,10 @@ LdmlEmbeddedTestSource::next_key(std::string &keys) {
 
 class LdmlJsonTestSource : public LdmlTestSource {
 public:
-  LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
+  LdmlJsonTestSource(const std::string &path);
   virtual ~LdmlJsonTestSource();
   virtual const std::u16string &get_context();
-  int load(const nlohmann::json &test);
+  int load(const nlohmann::json &test, const km::core::path &compiled);
   virtual void next_action(ldml_action &fillin);
 private:
   std::string path;
@@ -466,14 +531,14 @@ private:
    * Which action are we on?
   */
   std::size_t action_index = -1;
-  const km::core::kmx::kmx_plus *kmxplus;
   /** @return false if not found */
   bool set_key_from_id(key_event& k, const std::u16string& id);
   bool loaded_context = false;
+  bool check_keys = true;
 };
 
-LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
-:path(path), kmxplus(k) {
+LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path)
+:path(path) {
 
 }
 
@@ -483,11 +548,11 @@ LdmlJsonTestSource::~LdmlJsonTestSource() {
 bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id) {
   k = {0, 0};  // set to a null value at first.
 
-  assert(kmxplus != nullptr);
+  test_assert(kmxplus != nullptr);
   // lookup the id
-  assert(kmxplus->key2 != nullptr);
+  test_assert(kmxplus->key2 != nullptr);
 
-  assert(kmxplus->key2Helper.valid());
+  test_assert(kmxplus->key2Helper.valid());
   // First, find the string
   KMX_DWORD strId = kmxplus->strs->find(id);
   if (strId == 0) {
@@ -504,7 +569,7 @@ bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
   // Now, look for the _first_ candidate vkey match in the kmap.
   for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
     auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
-    assert(kmap != nullptr);
+    test_assert(kmap != nullptr);
     if (kmap->key == keyIndex) {
       k = {(km_core_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
       return true;
@@ -518,6 +583,13 @@ bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 void
 LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if ((action_index+1) >= data["/actions"_json_pointer].size()) {
+    // add check keylist
+    if (check_keys) {
+      fillin.type = LDML_ACTION_CHECK_KEYLIST;
+      fillin.string.clear();
+      check_keys = false;
+      return;
+    }
     // at end, done
     fillin.type = LDML_ACTION_DONE;
     return;
@@ -536,7 +608,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      test_assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "keystroke") {
@@ -551,7 +623,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      test_assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "backspace") {
@@ -578,26 +650,28 @@ LdmlJsonTestSource::get_context() {
     auto startContext = data["/startContext/to"_json_pointer];
     context = LdmlTestSource::parse_u8_source_string(startContext);
     if (!get_normalization_disabled()) {
-      assert(km::core::util::normalize_nfd(context)); // TODO-LDML: should be NFC
+      test_assert(km::core::util::normalize_nfd(context)); // TODO-LDML: should be NFC
     }
   }
   loaded_context = true;
   return context;
 }
 
-int LdmlJsonTestSource::load(const nlohmann::json &data) {
+int LdmlJsonTestSource::load(const nlohmann::json &data, const km::core::path &compiled) {
   this->data        = data;
-  // TODO-LDML: validate here?
-  return 0;
+  // TODO-LDML: validate JSON here?
+
+  // load up the kmx_plus
+  return load_kmx_plus(compiled);
 }
 
 #if defined(HAVE_ICU4C)
 class LdmlJsonRepertoireTestSource : public LdmlTestSource {
 public:
-  LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
+  LdmlJsonRepertoireTestSource(const std::string &path );
   virtual ~LdmlJsonRepertoireTestSource();
   virtual const std::u16string &get_context();
-  int load(const nlohmann::json &test);
+  int load(const nlohmann::json &test, const km::core::path &compiled);
   virtual void next_action(ldml_action &fillin);
 private:
   std::string path;
@@ -609,11 +683,10 @@ private:
   std::unique_ptr<icu::UnicodeSet> uset;
   std::unique_ptr<icu::UnicodeSetIterator> iterator;
   bool need_check = false; // set this after each char
-  const km::core::kmx::kmx_plus *kmxplus;
 };
 
-LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
-:path(path), kmxplus(k){
+LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path)
+:path(path) {
 
 }
 
@@ -649,7 +722,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
   if (!get_normalization_disabled()) {
-    assert(km::core::util::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    test_assert(km::core::util::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   }
   // append to expected
   expected.append(chstr);
@@ -660,14 +733,14 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   // TODO-LDML: no transforms yet.
   // TODO-LDML: looking for an exact single key for now
 
-  assert(kmxplus != nullptr);
+  test_assert(kmxplus != nullptr);
   // lookup the id
-  assert(kmxplus->strs != nullptr);
-  assert(kmxplus->key2 != nullptr);
-  assert(kmxplus->layr != nullptr);
+  test_assert(kmxplus->strs != nullptr);
+  test_assert(kmxplus->key2 != nullptr);
+  test_assert(kmxplus->layr != nullptr);
 
-  assert(kmxplus->key2Helper.valid());
-  assert(kmxplus->layrHelper.valid());
+  test_assert(kmxplus->key2Helper.valid());
+  test_assert(kmxplus->layrHelper.valid());
 
   // First, find the string as an id
   // TODO-LDML: will not work for multi string cases
@@ -684,7 +757,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   // Now, look for the _first_ candidate vkey match in the kmap.
   for (KMX_DWORD kmapIndex = 0; kmapIndex < kmxplus->key2->kmapCount; kmapIndex++) {
     auto *kmap = kmxplus->key2Helper.getKmap(kmapIndex);
-    assert(kmap != nullptr);
+    test_assert(kmap != nullptr);
     if (kmap->key == keyIndex) {
       fillin.k = {(km_core_virtual_key)kmap->vkey, (uint16_t)kmap->mod};
       std::cout << "found vkey " << fillin.k.vk << ":" << fillin.k.modifier_state << std::endl;
@@ -701,7 +774,7 @@ LdmlJsonRepertoireTestSource::get_context() {
   return context; // no context needed
 }
 
-int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
+int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data, const km::core::path &compiled) {
   this->data = data;  // TODO-LDML
   // Need an update to json.hpp to use contains()
   // if (data.contains("/type"_json_pointer)) {
@@ -732,7 +805,7 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
   // }
   // #endif
   iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
-  return 0;
+  return load_kmx_plus(compiled);
 }
 #endif // HAVE_ICU4C
 
@@ -756,25 +829,6 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
     return __LINE__; // empty
   }
 
-  // check and load the KMX (yes, once again)
-  if(!km::core::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
-    std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
-    return __LINE__;
-  }
-
-  auto comp_keyboard = (const km::core::kmx::COMP_KEYBOARD*)rawdata.data();
-  // initialize the kmxplus object with our copy
-  kmxplus.reset(new km::core::kmx::kmx_plus(comp_keyboard, rawdata.size()));
-
-  if (!kmxplus->is_valid()) {
-    std::cerr << "kmx_plus invalid" << std::endl;
-    return __LINE__;
-  }
-
-  if (!kmxplus->key2Helper.valid()) {
-    std::cerr << "kmx_plus invalid" << std::endl;
-    return __LINE__;
-  }
 
   auto conformsTo = data["/keyboardTest3/conformsTo"_json_pointer].get<std::string>();
   assert_or_return(std::string(LDML_CLDR_TEST_VERSION_LATEST) == conformsTo);
@@ -797,8 +851,8 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
       test_path.append(info_name).append("/tests/").append(tests_name).append("/").append(test_name);
       // std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
 
-      std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
-      assert_or_return(subtest->load(test) == 0);
+      std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path));
+      assert_or_return(subtest->load(test, compiled) == 0);
       test_map[test_path] = std::unique_ptr<LdmlTestSource>(subtest.release());
     }
   }
@@ -813,8 +867,8 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
     std::string test_path;
     test_path.append(info_name).append("/repertoire/").append(rep_name);
 
-    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path, kmxplus.get()));
-    assert_or_return(reptest->load(rep) == 0);
+    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path));
+    assert_or_return(reptest->load(rep, compiled) == 0);
     test_map[test_path] = std::unique_ptr<LdmlTestSource>(reptest.release());
   }
 

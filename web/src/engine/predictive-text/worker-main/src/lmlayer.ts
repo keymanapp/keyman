@@ -20,9 +20,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import Configuration = LexicalModelTypes.Configuration;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
+import USVString = LexicalModelTypes.USVString;
 import PromiseStore from "./promise-store.js";
+import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
-/// <reference types="@keymanapp/lm-message-types" />
 /// <reference types="worker-interface.d.ts" />
 
 /**

@@ -239,14 +239,12 @@ typedef enum {
             NSString *s = [line substringFromIndex:kName.length+1];
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             builder.packageName = v1;
           }
           else if ([[line lowercaseString] hasPrefix:[kVersion lowercaseString]]) {
             NSString *s = [line substringFromIndex:kVersion.length+1];
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             builder.packageVersion = v1;
           }
           else if ([[line lowercaseString] hasPrefix:[kAuthor lowercaseString]]) {
@@ -261,14 +259,12 @@ typedef enum {
             NSString *s = [line substringFromIndex:kCopyright.length+1];
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             builder.copyright = v1;
           }
           else if ([[line lowercaseString] hasPrefix:[kWebSite lowercaseString]]) {
             NSString *s = [line substringFromIndex:kWebSite.length+1];
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *v1 = [[vs objectAtIndex:0] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *v2 = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             builder.website = v1;
           }
           
@@ -282,20 +278,17 @@ typedef enum {
           NSString *s = [line substringFromIndex:x+2];
           if ([[s lowercaseString] hasPrefix:[kFile lowercaseString]]) {
             NSArray *vs = [s componentsSeparatedByString:@"\","];
-            NSString *v1 = [[[vs objectAtIndex:0] substringFromIndex:kFile.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             NSString *fileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             [files addObject:fileName];
           }
           else if ([[s lowercaseString] hasPrefix:[kFont lowercaseString]]) {
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *fontName = [[[vs objectAtIndex:0] substringFromIndex:kFont.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *fontFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             [fontArray addObject:fontName];
           }
           else if ([[s lowercaseString] hasPrefix:[kKeyboard lowercaseString]]) {
             NSArray *vs = [s componentsSeparatedByString:@"\","];
             NSString *keyboardName = [[[vs objectAtIndex:0] substringFromIndex:kKeyboard.length+1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
-            NSString *keyboardFileName = [[vs objectAtIndex:1] stringByReplacingOccurrencesOfString:@"\"" withString:@""];
             
             KMKeyboardInfoBuilder *builder = [[KMKeyboardInfoBuilder alloc] init];
             builder.name = keyboardName;

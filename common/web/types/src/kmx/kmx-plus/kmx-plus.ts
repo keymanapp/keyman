@@ -2,8 +2,8 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from '../../ldml-keyboard/string-list.js';
-import { util } from '@keymanapp/common-types';
-import { KMX } from '@keymanapp/common-types';
+import * as util from '../../util/util.js';
+import * as KMX from '../kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '../../ldml-keyboard/unicodeset-parser-api.js';
 import { VariableParser } from '../../ldml-keyboard/pattern-parser.js';
 import { MarkerParser } from '../../ldml-keyboard/pattern-parser.js';
@@ -174,12 +174,7 @@ export class Strs extends Section {
    */
   allocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
     // Run the string processing pipeline
-    s = Strs.processString(s, opts, sections);
-
-    // add to the set, for testing
-    if (s) {
-      this.allProcessedStrings.add(s);
-    }
+    s = this.processString(s, opts, sections);
 
     // if it's a single char, don't push it into the strs table
     if (opts?.singleOk && isOneChar(s)) {
@@ -196,8 +191,8 @@ export class Strs extends Section {
     return result;
   }
 
-  /** process everything according to opts */
-  static processString(s: string, opts: StrsOptions, sections: DependencySections) {
+  /** process everything according to opts, and add the string to this.allProcessedStrings */
+  private processString(s: string, opts: StrsOptions, sections: DependencySections) {
     s = s ?? '';
     // type check everything else
     if (typeof s !== 'string') {
@@ -215,6 +210,12 @@ export class Strs extends Section {
     if (opts?.unescape) {
       s = unescapeString(s);
     }
+
+    if (s) {
+      // add all processed strings here, so that we catch denormalized strings in the input
+      this.allProcessedStrings.add(s);
+    }
+
     // nfd
     if (opts?.nfd) {
       if (!sections?.meta?.normalizationDisabled) {
@@ -291,7 +292,7 @@ export class Vars extends Section {
     });
   }
   findStringVariableValue(id: string): string {
-    return Vars.findVariable(this.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
+    return Vars.findVariable(this.strings, id)?.value?.value ?? null; // Unwrap: Variable, StrsItem
   }
   substituteSetRegex(str: string, sections: DependencySections): string {
     return str.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {

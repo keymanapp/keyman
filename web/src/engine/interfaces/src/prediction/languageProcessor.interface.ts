@@ -1,13 +1,12 @@
-///<reference types="@keymanapp/models-types" />
-
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
 import { OutputTarget } from "keyman/engine/keyboard";
 
 export class ReadySuggestions {
-  suggestions: Suggestion[];
+  suggestions: LexicalModelTypes.Suggestion[];
   transcriptionID: number;
 
-  constructor(suggestions: Suggestion[], id: number) {
+  constructor(suggestions: LexicalModelTypes.Suggestion[], id: number) {
     this.suggestions = suggestions;
     this.transcriptionID = id;
   }
@@ -57,7 +56,7 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
 
   get state(): StateChangeEnum;
 
-  invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]>;
+  invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<LexicalModelTypes.Suggestion[]>;
 
   /**
    *
@@ -67,9 +66,9 @@ export interface LanguageProcessorSpec extends EventEmitter<LanguageProcessorEve
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget, getLayerId: () => string): Promise<Reversion>;
+  applySuggestion(suggestion: LexicalModelTypes.Suggestion, outputTarget: OutputTarget, getLayerId: () => string): Promise<LexicalModelTypes.Reversion>;
 
-  applyReversion(reversion: Reversion, outputTarget: OutputTarget): Promise<Suggestion[]>;
+  applyReversion(reversion: LexicalModelTypes.Reversion, outputTarget: OutputTarget): Promise<LexicalModelTypes.Suggestion[]>;
 
   get wordbreaksAfterSuggestions(): boolean;
 }

@@ -1,10 +1,9 @@
-///<reference types="@keymanapp/models-types" />
-
 import KeyboardProcessor from "./keyboardProcessor.js";
 import { VariableStoreDictionary } from "keyman/engine/keyboard";
 import OutputTarget, { type Transcription } from './outputTarget.js';
 import { Mock } from "./mock.js";
 import { type VariableStore } from "./systemStores.js";
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**
  * Represents the commands and state changes that result from a matched keyboard rule.
@@ -54,7 +53,7 @@ export default class RuleBehavior {
   /**
    * If predictive text is active, contains a Promise returning predictive Suggestions.
    */
-  predictionPromise?: Promise<Suggestion[]>;
+  predictionPromise?: Promise<LexicalModelTypes.Suggestion[]>;
 
   /**
    * In reference to https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852:

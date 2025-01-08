@@ -15,7 +15,7 @@
 
   "references": [
     { "path": "../../../../../common/web/keyman-version" },
-    { "path": "../../../../../common/web/utils/" },
+    { "path": "../../../engine/common/web-utils/" },
     { "path": "../../../engine/predictive-text/types" },
     { "path": "../../../engine/js-processor" },
     { "path": "../../../engine/keyboard" },

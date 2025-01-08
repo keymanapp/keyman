@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * KMSettingsRepository.h
@@ -24,10 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearActiveKeyboards;
 - (NSDictionary *)readOptionsForSelectedKeyboard;
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
-- (BOOL)readAlwaysShowOsk;
-- (void)writeAlwaysShowOsk:(BOOL)alwaysShowOsk;
-- (BOOL)readUseVerboseLogging;
-- (void)writeUseVerboseLogging:(BOOL)verboseLogging;
+- (BOOL)readShowOskOnActivate;
+- (void)writeShowOskOnActivate:(BOOL)show;
+- (BOOL)readForceSentryError;
 @end
 
 NS_ASSUME_NONNULL_END

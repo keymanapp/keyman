@@ -11,11 +11,7 @@ invalid_tests = [
 # Build all keyboards in output folder
 
 foreach kbd : invalid_tests
-  configure_file(
-    input: kbd + '.xml',
-    output: kbd + '.xml',
-    copy: true
-  )
+  fs.copyfile(kbd + '.xml', kbd + '.xml')
 
   configure_file(
     command: hextobin_cmd + ['@INPUT@', '@OUTPUT@'],

@@ -41,6 +41,8 @@ public enum Key {
   static let synchronizeSWLexicalModel = "KeymanSynchronizeSWLexicalModel"
 
   static let migrationLevel = "KeymanEngineMigrationLevel"
+  static let portraitKeyboardHeight = "PortraitKeyboardHeight"
+  static let landscapeKeyboardHeight = "LandscapeKeyboardHeight"
 
   // JSON keys for language REST calls
   static let options = "options"
@@ -93,6 +95,9 @@ public enum Defaults {
   public static let lexicalModel: InstallableLexicalModel = {
     return lexicalModelPackage.findResource(withID: lexicalModelID)!
   }()
+  
+  // default for ancient/unrecognized devices
+  static let unknownDeviceKeyboardHeight: CGFloat = 216.0
 }
 
 public enum Resources {

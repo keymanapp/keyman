@@ -28,7 +28,16 @@
 
 /// <reference types="@keymanapp/lm-message-types" />
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
 import type ModelCompositor from './model-compositor.js';
+import { Token } from '@keymanapp/models-templates';
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.

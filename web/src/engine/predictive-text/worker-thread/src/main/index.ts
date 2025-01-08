@@ -40,6 +40,10 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import { OutgoingMessageKind } from '@keymanapp/lm-message-types';
 
 /**
  * Encapsulates all the state required for the LMLayer's worker thread.

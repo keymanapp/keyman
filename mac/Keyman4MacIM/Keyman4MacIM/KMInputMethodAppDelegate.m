@@ -7,6 +7,7 @@
 //
 
 #import "KMInputMethodAppDelegate.h"
+#import "KMInputMethodLifecycle.h"
 #import "KMSettingsRepository.h"
 #import "KMDataRepository.h"
 #import "KMConfigurationWindowController.h"
@@ -14,7 +15,6 @@
 #import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
-#import "KMKeyboardInfo.h"
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 @import Sentry;
@@ -46,11 +46,14 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 
 @interface KMInputMethodAppDelegate ()
 @property (nonatomic, strong) KMPackageReader *packageReader;
+@property BOOL receivedKeyDownFromOsk;
+@property NSEventModifierFlags oskEventModifiers;
 @end
 
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
 @synthesize kmx = _kmx;
+@synthesize modifierMapping = _modifierMapping;
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
@@ -58,22 +61,12 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize selectedKeyboard = _selectedKeyboard;
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
-@synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
 
 - (id)init {
   self = [super init];
-  if (self) {
-#ifdef DEBUG
-    // If debugging, we'll turn it on by default, regardless of setting. If developer
-    // really wants it off, they can either change this line of code temporarily or
-    // go to the config screen and turn it off explicitly.
-    _debugMode = YES;
-#else
-    _debugMode = self.useVerboseLogging;
-#endif
-    
+  if (self) {    
     // first notify user and request access to Accessibility/PostEvent permissions
     // pass block as completion handler to complete init with initCompletion
     [PrivacyConsent.shared requestPrivacyAccess:^void (void){
@@ -115,6 +108,45 @@ id _lastServerWithOSKShowing = nil;
   
   if (self.runLoopEventSrc && runLoop) {
     CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
+  
+  // register to receive notifications generated from KMInputMethodLifecycle
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodActivated:) name:kInputMethodActivatedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
+
+  // start Input Method lifecycle
+  [KMInputMethodLifecycle.shared startLifecycle];
+}
+
+/**
+ * When the input method is deactivated, hide the OSK and disable the low-level event tap
+ */
+- (void)inputMethodDeactivated:(NSNotification *)notification {
+  if ([self.oskWindow.window isVisible]) {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
+    [self.oskWindow.window setIsVisible:NO];
+  } else {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
+  }
+
+  if (self.lowLevelEventTap) {
+    os_log_debug([KMLogs lifecycleLog], "***inputMethodDeactivated, disabling event tap");
+    CGEventTapEnable(self.lowLevelEventTap, NO);
+  }
+}
+
+/**
+ * When the input method is activated, show the OSK and enable the low-level event tap
+ */
+- (void)inputMethodActivated:(NSNotification *)notification {
+  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
+    os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
+    CGEventTapEnable(self.lowLevelEventTap, YES);
+  }
+
+  if (_kvk != nil && ([KMInputMethodLifecycle.shared shouldShowOskOnActivate])) {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
+    [self showOSK];
   }
 }
 
@@ -222,43 +254,12 @@ id _lastServerWithOSKShowing = nil;
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
--(void) sleepFollowingDeactivationOfServer:(id)lastServer {
-  os_log_debug([KMLogs lifecycleLog], "Keyman no longer active IM.");
-  self.sleeping = YES;
-  if ([self.oskWindow.window isVisible]) {
-    os_log_debug([KMLogs oskLog], "sleepFollowingDeactivationOfServer, Hiding OSK.");
-    // Storing this ensures that if the deactivation is temporary, resulting from dropping down a menu,
-    // the OSK will re-display when that client application re-activates.
-    _lastServerWithOSKShowing = lastServer;
-    [self.oskWindow.window setIsVisible:NO];
-  }
-  if (self.lowLevelEventTap) {
-    os_log_debug([KMLogs lifecycleLog], "sleepFollowingDeactivationOfServer, disabling event tap...");
-    CGEventTapEnable(self.lowLevelEventTap, NO);
-  }
-}
-
--(void) wakeUpWith:(id)newServer {
-  self.sleeping = NO;
-  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
-    os_log_debug([KMLogs lifecycleLog], "wakeUpWith, Keyman is now the active IM. Re-enabling event tap...");
-    CGEventTapEnable(self.lowLevelEventTap, YES);
-  }
-  // See note in sleepFollowingDeactivationOfServer.
-  if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
-    [self showOSK];
-  }
-  
-  _lastServerWithOSKShowing = nil;
-}
-
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
   KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
   if (appDelegate != nil) {
     if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
-      // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
-      // disabled until we get the wake-up call.
-      if (!appDelegate.sleeping) {
+      // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay disabled until we get the wake-up call.
+      if ([KMInputMethodLifecycle.shared shouldEnableEventTap]) {
         // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
         // event is not another disable so we don't end up in an endless cycle.
         os_log([KMLogs eventsLog], "Event tap disabled by %{public}@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
@@ -284,9 +285,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     
     switch (type) {
       case kCGEventFlagsChanged:
-        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
-        appDelegate.currentModifierFlags = sysEvent.modifierFlags;
-        if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
+        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: 0x%X", (int) sysEvent.modifierFlags);
+        appDelegate.currentModifiers = sysEvent.modifierFlags;
+        if (appDelegate.currentModifiers & NSEventModifierFlagCommand) {
           appDelegate.contextChangedByLowLevelEvent = YES;
         }
         break;
@@ -300,7 +301,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         break;
         
       case kCGEventKeyDown:
-        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu", sysEvent.keyCode);
+        appDelegate.receivedKeyDownFromOsk = NO;
+        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization
@@ -314,7 +316,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if(sysEvent.keyCode == 255) {
           os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
-          os_log_debug([KMLogs eventsLog], "*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
+          if ([OSKView isOskKeyDownEvent:event]) {
+            NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
+            appDelegate.receivedKeyDownFromOsk = YES;
+            appDelegate.oskEventModifiers = oskEventModifiers;
+            os_log_debug([KMLogs eventsLog], "*** keydown event received from OSK, modifiers: 0x%lX",(unsigned long)oskEventModifiers);
+          }
         }
         
         switch(sysEvent.keyCode) {
@@ -376,7 +383,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
   if (_kme == nil) {
-    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
+    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
   }
   
   return _kme;
@@ -390,16 +397,24 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _packageReader;
 }
 
-- (void)setKmx:(KMXFile *)kmx {
+- (void)resetKmx {
+  _kmx = nil;
+  _modifierMapping = nil;
+}
+
+- (void)loadKeyboardFromKmxFile:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
+
+  os_log_info([KMLogs keyboardLog], "setKmx loaded keyboard, keyboard info: %{public}@", keyboardInfo);
   
-  NSString *keyboardFileName = [kmx.filePath lastPathComponent];
-   os_log_info([KMLogs keyboardLog], "setKmx to %{public}@", keyboardFileName);
+  _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
+
+  os_log_info([KMLogs keyboardLog], "modifierMapping bothOptionKeysGenerateRightAlt: %d", self.modifierMapping.bothOptionKeysGenerateRightAlt);
 
    // assign custom keyboard tag in Sentry to default keyboard
    [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+       [scope setTagValue:keyboardInfo.keyboardId forKey:@"keyboard"];
    }];
 }
 
@@ -431,29 +446,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [NSString stringWithFormat:@"Keyman"];
   else
     return [NSString stringWithFormat:@"%@ - Keyman", _keyboardName];
-}
-
-- (void)setAlwaysShowOSK:(BOOL)alwaysShowOSK {
-  _alwaysShowOSK = alwaysShowOSK;
-  [[KMSettingsRepository shared] writeAlwaysShowOsk:alwaysShowOSK];
-}
-
-- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
-  os_log_debug([KMLogs configLog], "Turning verbose logging %{public}@", useVerboseLogging ? @"on." : @"off.");
-  _debugMode = useVerboseLogging;
-  if (_kme != nil)
-    [_kme setUseVerboseLogging:useVerboseLogging];
-
-  [[KMSettingsRepository shared] writeUseVerboseLogging:useVerboseLogging];
-}
-
-- (BOOL)alwaysShowOSK {
-  _alwaysShowOSK = [[KMSettingsRepository shared] readAlwaysShowOsk];
-  return _alwaysShowOSK;
-}
-
-- (BOOL)useVerboseLogging {
-  return [[KMSettingsRepository shared] readUseVerboseLogging];
 }
 
 #pragma mark - Keyman Data
@@ -711,7 +703,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [KMDataRepository.shared createDataDirectoryIfNecessary];
   
   if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    BOOL movedData = [KMDataRepository.shared migrateData];
+    [KMDataRepository.shared migrateData];
     [KMSettingsRepository.shared convertSettingsForMigration];
   }
   
@@ -771,9 +763,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString *keyboardMenuName = @"";
   int menuItemIndex = KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX;
   
-  if (self.debugMode) {
-    os_log_info([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
-  }
+  os_log_debug([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
   
   // loop through the active keyboards list and add them to the menu
   for (NSString *path in self.activeKeyboards) {
@@ -813,7 +803,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", keyboardName, fullPath);
   [menuItem setState:NSOnState];
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
   if (kvkFilename != nil) {
@@ -841,7 +831,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString* placeholder = NSLocalizedString(@"no-keyboard-configured-menu-placeholder", nil);
   NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:placeholder action:NULL keyEquivalent:@""];
   [self.menu insertItem:item atIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
-  [self setKmx:nil];
+  [self resetKmx];
   [self setKvk:nil];
   [self setKeyboardName:nil];
   [self setKeyboardIcon:nil];
@@ -870,7 +860,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", path, fullPath);
   
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   KVKFile *kvk = nil;
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
@@ -887,8 +877,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setContextBuffer:nil];
   [self setSelectedKeyboard:path];
   [self applyPersistedOptions];
-  if (kvk != nil && self.alwaysShowOSK)
-    [self showOSK];
 }
 
 - (NSArray *)getKmxFilesInKeyboardsDirectory {
@@ -956,6 +944,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showOSK {
+  [self.oskWindow prepareToShowOsk];
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];
@@ -983,6 +972,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _configWindow;
 }
 
+// TODO: rewrite confusing pattern, multiple methods differing only by underscore
 - (NSWindowController *)aboutWindow_ {
   return _aboutWindow;
 }
@@ -1065,14 +1055,19 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * TODO: this should really be refactored
  */
 
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-  NSButton *button = (NSButton *)[alert.buttons objectAtIndex:0];
-  if (button.tag == -1) {
+- (void)downloadComplete:(NSModalResponse) returnCode {
+  os_log_debug([KMLogs uiLog], "downloadComplete, NSModalResponse returnCode: %ld", (long)returnCode);
+  if (returnCode == NSModalResponseCancel) {
+    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseCancel");
     [_connection cancel];
   }
-  else if (button.tag == 1) {
+  else if (returnCode == NSModalResponseOK) {
+    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseOK");
+
     [_downloadKBWindow close];
+
     if (self.configWindow.window != nil) {
+      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window != nil");
       [self.configWindow.window makeKeyAndOrderFront:nil];
       if (![[self.configWindow.window childWindows] containsObject:self.infoWindow.window]) {
         [self.configWindow.window addChildWindow:self.infoWindow.window ordered:NSWindowAbove];
@@ -1081,6 +1076,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       [self.infoWindow.window makeKeyAndOrderFront:nil];
     }
     else {
+      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window == nil");
       [self.infoWindow.window centerInParent];
       [self.infoWindow.window makeKeyAndOrderFront:nil];
       [self.infoWindow.window setLevel:NSFloatingWindowLevel];
@@ -1098,6 +1094,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSAlert *)downloadInfoView {
+  os_log_debug([KMLogs uiLog], "downloadInfoView");
   if (_downloadInfoView == nil) {
     _downloadInfoView = [[NSAlert alloc] init];
     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
@@ -1111,6 +1108,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSProgressIndicator *)progressIndicator {
+  os_log_debug([KMLogs uiLog], "progressIndicator");
   if (_progressIndicator == nil) {
     _progressIndicator = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0, 0, 300, 20)];
     [_progressIndicator setIndeterminate:NO];
@@ -1130,38 +1128,51 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self downloadKeyboardFromURL:url];
 }
 
+
 - (void)downloadKeyboardFromURL:(NSURL *)url {
   NSURL* downloadUrl = url;
-  
+  os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, url.path: %{public}@", url.path);
+
   if (downloadUrl && _downloadFilename) {
     if (_infoWindow.window != nil)
       [_infoWindow close];
     
     [self.downloadInfoView setInformativeText:self.downloadFilename];
+    
     if (self.configWindow.window != nil) {
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window != nil");
       [self.configWindow.window makeKeyAndOrderFront:nil];
       if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
         [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
       }
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                        modalDelegate:self
-                                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                          contextInfo:nil];
+      
+      /*
+       Open sheet off of config window, not the download window.
+       This is because, if the download is successful,
+       the download window will be closed by the sheet.
+       */
+      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
+        [self downloadComplete:returnCode];
+      }];
     }
     else {
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window == nil");
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
       [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                        modalDelegate:self
-                                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                          contextInfo:nil];
+      /*
+       Open sheet off of config window, same as above.
+       */
+      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
+        [self downloadComplete:returnCode];
+      }];
     }
     
     if (_connection == nil) {
-      [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, _connection == nil, set button title cancel downloading, tag = -1");
+     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
       NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
       [button setTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
       [button setTag:-1];
@@ -1170,7 +1181,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       _receivedData = [[NSMutableData alloc] initWithLength:0];
       _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
     }
-    
   }
 }
 
@@ -1203,6 +1213,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading");
   NSString *filePath = [self.keyboardsPath stringByAppendingPathComponent:self.downloadFilename];
   [self.receivedData writeToFile:filePath atomically:YES];
   [self unzipFile:filePath];
@@ -1210,6 +1221,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   
   [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
   NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
+  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading, set button title download complete, tag = 1");
   [button setTitle:NSLocalizedString(@"button-download-complete", nil)];
   [button setTag:1];
   [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanKeyboardDownloadCompletedNotification
@@ -1225,6 +1237,41 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return;
   
   [_oskWindow.oskView handleKeyEvent:event];
+}
+
+- (NSEventModifierFlags) determineModifiers {
+  NSEventModifierFlags modifierFlags = 0;
+  
+  if (self.receivedKeyDownFromOsk) {
+    /**
+     * the event was generated from the OSK, so use the oskEventModifiers in effect at time of event generation
+     */
+    modifierFlags = self.oskEventModifiers;
+    os_log_debug([KMLogs eventsLog], "--- use modifiers from OSK, oskEventModifiers: 0x%lX", (unsigned long)modifierFlags);
+    self.oskEventModifiers = 0;
+  } else { 
+    /**
+     * the event originated from the physical keyboard, use the modifiers on kCGEventFlagsChanged events
+     */
+    NSEventModifierFlags originalModifiers = self.currentModifiers;
+    modifierFlags = [self.modifierMapping adjustModifiers:originalModifiers];
+    os_log_debug([KMLogs eventsLog], "--- use adjusted modifiers from current state: 0x%lX", (unsigned long)modifierFlags);
+    
+    /**
+     * If the OSK is open, then we also need to apply its modifiers, if any, to this event originating from the physical keyboard.
+     * If the OSK is closed, its modifiers will be zero.
+     */
+    NSEventModifierFlags oskModifiers = [self.oskWindow getOskEventModifierFlags];
+    if (oskModifiers != 0) {
+      os_log_debug([KMLogs eventsLog], "--- modifiers from OSK to apply to physical keyboard event: 0x%lX", (unsigned long)oskModifiers);
+      
+      // combine osk modifiers with adjusted modifiers
+      modifierFlags = oskModifiers | modifierFlags;
+      os_log_debug([KMLogs eventsLog], "--- combined modifiers to apply to physical keyboard event: 0x%lX", (unsigned long)modifierFlags);
+    }
+  }
+  
+  return modifierFlags;
 }
 
 extern const CGKeyCode kProcessPendingBuffer;
@@ -1276,6 +1323,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   NSError *error = nil;
   NSString *fileName = filePath.lastPathComponent;
   NSString *folderName = [fileName stringByDeletingPathExtension];
+
   os_log_debug([KMLogs keyboardLog], "unzipFile, folderName: %{public}@, fileName: %{public}@", folderName, fileName);
 
   // First we unzip into a temp folder, and check kmp.json for the fileVersion

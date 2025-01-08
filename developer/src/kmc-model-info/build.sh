@@ -9,7 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
   "@/common/web/types" \
-  "@/common/models/types" \
   "clean" \
   "configure" \
   "build" \
@@ -28,36 +27,11 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action clean; then
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_finish_action success clean
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action build; then
-  npm run build
-  builder_finish_action success build
-fi
-
-builder_run_action api        api-extractor run --local --verbose
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action test; then
-  eslint .
-  tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines 80 mocha
-  # TODO: remove --lines 80 and improve coverage
-  builder_finish_action success test
-fi
+builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action configure    verify_npm_setup
+builder_run_action build        tsc --build
+builder_run_action api          api-extractor run --local --verbose
+builder_run_action test         builder_do_typescript_tests 80
 
 #-------------------------------------------------------------------------------------------------------------------
 

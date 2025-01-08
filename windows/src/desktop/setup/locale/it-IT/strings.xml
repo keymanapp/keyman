@@ -72,9 +72,7 @@ Riavvia ora?</string>
   <string name="ssDownloadingTitle">Scaricamento di %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Scaricamento di %0:s</string>
-  <string name="ssOffline">$APPNAME L\'impostazione non può connettersi a keyman.com per scaricare risorse aggiuntive.
-
-Verificare di essere online e dare a $APPNAME il permesso di configurazione per accedere a Internet nelle impostazioni del firewall.
-
-Fare clic su Interrompi per uscire dalla configurazione, Riprova a provare e scaricare nuovamente le risorse, oppure Ignora per continuare offline.</string>
+  <string name="ssOffline">$APPNAME L\'impostazione non può connettersi a keyman.com per scaricare risorse aggiuntive.</string>
+  <string name="ssOffline2">Verificare di essere online e dare a $APPNAME il permesso di configurazione per accedere a Internet nelle impostazioni del firewall.</string>
+  <string name="ssOffline3">Fare clic su Interrompi per uscire dalla configurazione, Riprova a provare e scaricare nuovamente le risorse, oppure Ignora per continuare offline.</string>
 </resources>

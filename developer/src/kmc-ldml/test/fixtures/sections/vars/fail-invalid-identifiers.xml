@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-minimal"/>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <string id="invalid-string" value="yes" /> <!-- ERROR_InvalidVariableIdentifer -->
+    <set id="invalid-set" value="A B C D E FF" /> <!-- ERROR_InvalidVariableIdentifer -->
+    <uset id="invalid-uset" value="[कसतनमह]" /> <!-- ERROR_InvalidVariableIdentifier -->
+    <set id="a_marker_name_more_than_32_chars_long" value="Y E S" /> <!-- ERROR_InvalidVariableIdentifier -->
+    <string id="😡" value="UPPERCASE" /> <!-- ERROR_InvalidVariableIdentifier -->
+    <string id="" value="empty id" /> <!-- ERROR_InvalidVariableIdentifier -->
+
+    <!-- bad marker id -->
+    <string id="badmarker1" value="bad\m{my-marker}marker" /> <!-- ERROR_InvalidMarkerIdentifier -->
+    <string id="badmarker2" value="bad\m{oopsForgotTo close it" /> <!-- ERROR_InvalidMarkerIdentifier -->
+  </variables>
+
+</keyboard3>

@@ -1,0 +1,21 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "rootDir": ".",
+    "rootDirs": ["./", "../src/"],
+    "outDir": "../build/tests",
+    "baseUrl": ".",
+    "strictNullChecks": false, // TODO: get rid of this as some point
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "**/*.tests.ts",
+    "./helpers/*.ts",
+  ],
+  "references": [
+    { "path": "../../keyman-version" },
+    { "path": "../../../../core/include/ldml/"},
+    { "path": "../" },
+  ],
+}

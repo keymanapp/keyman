@@ -14,6 +14,7 @@
 		293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3E827140D8100545EED /* KMAboutWindowController.xib */; };
 		293EA3EB27140DEC00545EED /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3ED27140DEC00545EED /* preferences.xib */; };
 		293EA3F427181FDA00545EED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3F627181FDA00545EED /* Localizable.strings */; };
+		296105232C8E91C7007BF6B7 /* KMInputMethodLifecycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 296105222C8E91C7007BF6B7 /* KMInputMethodLifecycle.m */; };
 		296FE2FC275DD21600F46898 /* KMPackageReader.m in Sources */ = {isa = PBXBuildFile; fileRef = 296FE2FB275DD21600F46898 /* KMPackageReader.m */; };
 		297A501728DF4D360074EB1B /* PrivacyWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297A501228DF4D360074EB1B /* PrivacyWindowController.m */; };
 		297A501828DF4D360074EB1B /* PrivacyWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 297A501328DF4D360074EB1B /* PrivacyWindowController.xib */; };
@@ -31,8 +32,10 @@
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		29B4A0D52BF7675A00682049 /* KMLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D32BF7675A00682049 /* KMLogs.m */; };
 		29B6FB732BC39DD60074BF7F /* TextApiComplianceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B6FB722BC39DD60074BF7F /* TextApiComplianceTests.m */; };
+		29BE9D872CA3C21900B67DE7 /* KMModifierMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BE9D862CA3C21900B67DE7 /* KMModifierMapping.m */; };
 		29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = D861B03E2C5747F70003675E /* KMSettingsRepository.m */; };
 		29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
+		29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */ = {isa = PBXBuildFile; fileRef = 29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -82,7 +85,6 @@
 		E213601E2142D7C000A043B7 /* keyman-88.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601D2142D7BF00A043B7 /* keyman-88.png */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E21E645820C04EA8000D6274 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = E21E645720C04EA7000D6274 /* logo.png */; };
-		E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */ = {isa = PBXBuildFile; fileRef = E23380FA21407AA100B90591 /* SILInBlue76.png */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
 		E2585A7F20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */; };
 		E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */; };
@@ -158,6 +160,8 @@
 		293EA3EF27140DFA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/preferences.strings; sourceTree = "<group>"; };
 		293EA3F02714158600545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		293EA3F527181FDA00545EED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		296105212C8E91C7007BF6B7 /* KMInputMethodLifecycle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodLifecycle.h; sourceTree = "<group>"; };
+		296105222C8E91C7007BF6B7 /* KMInputMethodLifecycle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodLifecycle.m; sourceTree = "<group>"; };
 		296FE2FA275DD21600F46898 /* KMPackageReader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackageReader.h; sourceTree = "<group>"; };
 		296FE2FB275DD21600F46898 /* KMPackageReader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackageReader.m; sourceTree = "<group>"; };
 		29781101297FB262007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
@@ -245,6 +249,8 @@
 		29B70A26283CB66B0086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/KMKeyboardHelpWindowController.strings"; sourceTree = "<group>"; };
 		29B70A27283CB66C0086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		29B70A28283CB6900086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29BE9D852CA3C21900B67DE7 /* KMModifierMapping.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMModifierMapping.h; sourceTree = "<group>"; };
+		29BE9D862CA3C21900B67DE7 /* KMModifierMapping.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMModifierMapping.m; sourceTree = "<group>"; };
 		29BFA761282936D4009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29BFA762282936D5009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/preferences.strings; sourceTree = "<group>"; };
 		29BFA763282936D5009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -269,6 +275,7 @@
 		29D470972C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		29D470982C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		29D470992C648D7100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SILAndikaV1RGB.png; sourceTree = "<group>"; };
 		29DD8400276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29DD8401276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/preferences.strings; sourceTree = "<group>"; };
 		29DD8402276C49E30066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -373,7 +380,6 @@
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
 		E21E645720C04EA7000D6274 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Keyman4MacIM/KMConfiguration/logo.png; sourceTree = SOURCE_ROOT; };
-		E23380FA21407AA100B90591 /* SILInBlue76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SILInBlue76.png; path = Keyman4MacIM/Images/SILInBlue76.png; sourceTree = SOURCE_ROOT; };
 		E240F597202DED300000067D /* KMPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackage.h; sourceTree = "<group>"; };
 		E240F598202DED740000067D /* KMPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackage.m; sourceTree = "<group>"; };
 		E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = KMMethodEventHandlerTests.kmx; sourceTree = "<group>"; };
@@ -579,6 +585,10 @@
 				98D6DA7D1A799FF400B09822 /* KMInputController.m */,
 				98A778C21A8C53BF00CF809D /* KMInputMethodAppDelegate.h */,
 				98A778C31A8C53BF00CF809D /* KMInputMethodAppDelegate.m */,
+				29BE9D852CA3C21900B67DE7 /* KMModifierMapping.h */,
+				29BE9D862CA3C21900B67DE7 /* KMModifierMapping.m */,
+				296105212C8E91C7007BF6B7 /* KMInputMethodLifecycle.h */,
+				296105222C8E91C7007BF6B7 /* KMInputMethodLifecycle.m */,
 				E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */,
 				E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */,
 				298D09F62A1F4533006B9DFE /* TextApiCompliance.h */,
@@ -629,7 +639,7 @@
 				98BF92421BF01CBE0002126A /* KMAboutWindowController.m */,
 				293EA3E827140D8100545EED /* KMAboutWindowController.xib */,
 				E213601D2142D7BF00A043B7 /* keyman-88.png */,
-				E23380FA21407AA100B90591 /* SILInBlue76.png */,
+				29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */,
 				98BF92461BF01D890002126A /* image.jpg */,
 				98BF92531BF040A50002126A /* title.png */,
 			);
@@ -836,7 +846,6 @@
 				989C9C131A7876DE00A20425 /* Images.xcassets in Resources */,
 				98E2CEA11A92C39C00AE2455 /* InfoPlist.strings in Resources */,
 				E21E645820C04EA8000D6274 /* logo.png in Resources */,
-				E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */,
 				9874C3211B536847000BB543 /* info.png in Resources */,
 				98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */,
 				37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */,
@@ -852,6 +861,7 @@
 				293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */,
 				37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */,
 				293EA3EB27140DEC00545EED /* preferences.xib in Resources */,
+				29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */,
 				9800EC5A1C02940300BF0FB5 /* keyman-for-mac-os-license.html in Resources */,
 				989C9C161A7876DE00A20425 /* MainMenu.xib in Resources */,
 				29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */,
@@ -993,6 +1003,7 @@
 				29B4A0D52BF7675A00682049 /* KMLogs.m in Sources */,
 				98BF924F1BF02DC20002126A /* KMBarView.m in Sources */,
 				E240F599202DED740000067D /* KMPackage.m in Sources */,
+				296105232C8E91C7007BF6B7 /* KMInputMethodLifecycle.m in Sources */,
 				D861B03F2C5747F70003675E /* KMSettingsRepository.m in Sources */,
 				984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */,
 				9836B3711AE5F11D00780482 /* mztools.c in Sources */,
@@ -1017,6 +1028,7 @@
 				290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */,
 				297A501728DF4D360074EB1B /* PrivacyWindowController.m in Sources */,
 				98BF92521BF03D4D0002126A /* KMAboutBGView.m in Sources */,
+				29BE9D872CA3C21900B67DE7 /* KMModifierMapping.m in Sources */,
 				98BF92571BF0431F0002126A /* KMAboutWindow.m in Sources */,
 				98BCD1F61B4E5998004E1AFD /* NSString+SuppMethods.m in Sources */,
 			);

@@ -19,13 +19,13 @@ Packages are **never** published from a developer's machine.
 * `@keymanapp/kmc-model` -- located at `developer/src/kmc-model`
 * `@keymanapp/kmc-model-info` -- located at `developer/src/kmc-model-info`
 * `@keymanapp/kmc-package` -- located at `developer/src/kmc-package`
-* `@keymanapp/models-types` -- located at `common/models/types`
 
 ### Deprecated npm packages
 
 * `@keymanapp/developer-lexical-model-compiler` -- replaced by `@keymanapp/kmc`
 * `@keymanapp/lexical-model-compiler` -- replaced by `@keymanapp/kmc`
-* `@keymanapp/lexical-model-types` -- replaced by `@keymanapp/models-types`
+* `@keymanapp/lexical-model-types` -- replaced by `@keymanapp/common-types`
+* `@keymanapp/models-types` -- replaced by `@keymanapp/common-types`
 * `@keymanapp/lmlayer-cli` -- replaced by `@keymanapp/kmc`
 * `@keymanapp/models-wordbreakers` -- published accidentally
 
