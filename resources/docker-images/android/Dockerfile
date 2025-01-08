@@ -1,4 +1,4 @@
-# Copyright (c) 2024 SIL Global. All rights reserved.
+# Keyman is copyright (C) SIL Global. MIT License.
 
 ARG BASE_VERSION=default
 FROM keymanapp/keyman-base-ci:${BASE_VERSION}

@@ -1,4 +1,5 @@
-# Copyright (c) 2024 SIL Global. All rights reserved.
+# Keyman is copyright (C) SIL Global. MIT License.
+#
 # ARGS used in this file:
 # - ARG BASE_VERSION=default
 # - ARG REQUIRED_NODE_VERSION=18

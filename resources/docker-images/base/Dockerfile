@@ -1,4 +1,4 @@
-# Copyright (c) 2024 SIL Global. All rights reserved.
+# Keyman is copyright (C) SIL Global. MIT License.
 
 ARG UBUNTU_VERSION=latest
 FROM ubuntu:${UBUNTU_VERSION}
