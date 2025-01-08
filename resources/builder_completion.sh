@@ -8,6 +8,21 @@ _comp_builder() {
     exit 0
   fi
 
+  # Some of the configuration differs when ZSH is the OS's primary terminal; this flag
+  # may be used to tailor this function accordingly.
+  local IS_ZSH=false
+  if [ "${SHELL##*/}" = "zsh" ]; then
+    IS_ZSH=true
+  fi
+
+  # Warning - zsh uses -A, not -a, for array-read operations!
+  # This is 'sourced' by the shell profile script, so macOS zsh terminal
+  # usage must be aware of this and adapt.
+  local READ_ARRAY="-a"
+  if [ $IS_ZSH = true ]; then
+    READ_ARRAY="-A"
+  fi
+
   # Is it actually a builder-script?  If not, abort.  If so, it defines
   # a special option used to provide us with completion-target data.
   local builder_params=`${CMD_PATH} --builder_completion_describe` || exit 0
@@ -17,7 +32,7 @@ _comp_builder() {
 
   local builder_args
   # Does not actually preserve an empty token at the end.
-  read -r -a builder_args <<< "${BUILDER_ARG_STR}"
+  read -r $READ_ARRAY builder_args <<< "${BUILDER_ARG_STR}"
 
   # Determine the current token (given the caret position) and
   # all existing, already-completed actions, targets, and options
@@ -36,9 +51,9 @@ _comp_builder() {
   local action_str target_str option_str
   IFS=";" read -r action_str target_str option_str <<< "$builder_params"
   local actions targets options
-  IFS=" " read -r -a actions <<< "$action_str"
-  IFS=" " read -r -a targets <<< "$target_str"
-  IFS=" " read -r -a options <<< "$option_str"
+  IFS=" " read -r $READ_ARRAY actions <<< "$action_str"
+  IFS=" " read -r $READ_ARRAY targets <<< "$target_str"
+  IFS=" " read -r $READ_ARRAY options <<< "$option_str"
 
   local action target
   if [[ $current_token =~ : ]]; then
@@ -63,12 +78,14 @@ _comp_builder() {
     all="${targets[@]}"
     COMPREPLY=( $(compgen -W "${all[@]}" -- "${current_token}") )
 
-    # bash doesn't handle completion with colons well; we should remove the
-    # colon prefix from each entry.
-    local i
-    for (( i=0; i<${#COMPREPLY[@]}; i++ )); do
-      COMPREPLY[$i]="${COMPREPLY[$i]##*:}"
-    done
+    if [ $IS_ZSH == false ]; then
+      # bash doesn't handle completion with colons well; we should remove the
+      # colon prefix from each entry.  ZSH actually doesn't have this issue.
+      local i
+      for (( i=0; i<${#COMPREPLY[@]}; i++ )); do
+        COMPREPLY[$i]="${COMPREPLY[$i]##*:}"
+      done
+    fi
   elif [[ -z "$target" ]]; then
     # It's an untargeted action or an option.
     all+="${actions[@]}"
@@ -89,12 +106,14 @@ _comp_builder() {
     all+="${actiontargets[@]}"
     COMPREPLY=( $(compgen -W "${all[@]}" -- "${current_token}") )
 
-    # bash doesn't handle completion with colons well; we should remove the
-    # colon prefix from each entry.
-    local i
-    for (( i=0; i<${#COMPREPLY[@]}; i++ )); do
-      COMPREPLY[$i]="${COMPREPLY[$i]##*:}"
-    done
+    if [ $IS_ZSH == false ]; then
+      # bash doesn't handle completion with colons well; we should remove the
+      # colon prefix from each entry.  ZSH actually doesn't have this issue.
+      local i
+      for (( i=0; i<${#COMPREPLY[@]}; i++ )); do
+        COMPREPLY[$i]="${COMPREPLY[$i]##*:}"
+      done
+    fi
   fi
 }
 
