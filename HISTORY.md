@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.164 alpha 2025-01-08
+
+* fix(windows): add language and close button fit inside pop-window (#12855)
+* chore(windows): add bcp47 code and tips to diagnostic (#12843)
+* fix(android/engine): Cleanup KMManager API keys and calls (#12861)
+* docs(developer,mac): add playable video links to the help documentation (#12828)
+
 ## 18.0.163 alpha 2025-01-06
 
 * docs: clarify that sections in KMX file might not be aligned (#12856)
