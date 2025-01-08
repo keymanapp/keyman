@@ -2,7 +2,7 @@
 #
 # ARGS used in this file:
 # - ARG BASE_VERSION=default
-# - ARG REQUIRED_NODE_VERSION=18
+# - ARG REQUIRED_EMSCRIPTEN_VERSION=unset
 
 ARG BASE_VERSION=default
 FROM keymanapp/keyman-base-ci:${BASE_VERSION}
@@ -23,7 +23,7 @@ COPY run-tests.sh /usr/bin/run-tests.sh
 
 # Pre-install emscripten
 USER build
-ARG REQUIRED_EMSCRIPTEN_VERSION=1.0
+ARG REQUIRED_EMSCRIPTEN_VERSION=unset
 RUN echo "Installing emscripten version ${REQUIRED_EMSCRIPTEN_VERSION}" && \
   export EMSDK_KEEP_DOWNLOADS=1 && \
   cd /home/build/ && \

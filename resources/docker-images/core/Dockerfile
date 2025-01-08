@@ -1,8 +1,8 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 #
 # ARGS used in this file:
-# - ARG BASE_VERSION=default
-# - ARG REQUIRED_NODE_VERSION=18
+# - ARG BASE_VERSION
+# - ARG REQUIRED_EMSCRIPTEN_VERSION
 
 ARG BASE_VERSION=default
 FROM keymanapp/keyman-base-ci:${BASE_VERSION}
@@ -17,7 +17,7 @@ RUN apt-get install -qy git jq llvm meson pkgconf \
 
 # Pre-install emscripten
 USER build
-ARG REQUIRED_EMSCRIPTEN_VERSION=1.0
+ARG REQUIRED_EMSCRIPTEN_VERSION=unset
 RUN echo "Installing emscripten version ${REQUIRED_EMSCRIPTEN_VERSION}" && \
   export EMSDK_KEEP_DOWNLOADS=1 && \
   cd /home/build/ && \
