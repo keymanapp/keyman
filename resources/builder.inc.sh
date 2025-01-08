@@ -1511,6 +1511,8 @@ _builder_completion_describe() {
   echo -n "; "
   printf '%s ' "${_builder_targets[@]}"
   echo -n "; "
+  # Remove all '+' suffixes from options; they're a config on the option, not part
+  # of the actual option text itself.
   local _builder_opts=()
   for e in "${!_builder_params[@]}"; do
     if [[ $e =~ ^-- ]]; then
