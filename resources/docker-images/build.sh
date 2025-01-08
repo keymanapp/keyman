@@ -20,8 +20,8 @@ builder_describe \
   ":web" \
   "--ubuntu-version=UBUNTU_VERSION  The Ubuntu version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
-  "build" \
-  "test"
+  "build                            Build docker images" \
+  "test                             Test the docker images by running configure,build,test for all or the specified platforms"
 
 builder_parse "$@"
 
