@@ -1519,6 +1519,12 @@ _builder_completion_describe() {
       _builder_opts+=(${e%+*})
     fi
   done
+
+  # Add default options
+  _builder_opts+=( --verbose --debug --color --no-color --offline --help )
+  if builder_has_dependencies; then
+    _builder_opts+=( --deps --no-deps --force-deps )
+  fi
   printf '%s ' "${_builder_opts[@]}"
 }
 
