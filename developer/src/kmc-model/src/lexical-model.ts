@@ -3,7 +3,10 @@
  * the LMLayer's internal worker code, so we provide those definitions too.
  */
 
-import { CasingFunction, LexicalModelPunctuation, WordBreakingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 
 export interface LexicalModelDeclaration {
   readonly format: 'trie-1.0'|'fst-foma-1.0'|'custom-1.0',

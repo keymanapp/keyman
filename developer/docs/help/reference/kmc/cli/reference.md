@@ -59,6 +59,18 @@ The following parameters are available:
 
 : Rewrites On Screen Keyboard files from source mapping
 
+`kmc generate keyman-keyboard [options] <id>`
+
+: Generate a .kmn keyboard project
+
+`kmc generate ldml-keyboard [options] <id>`
+
+: Generate an LDML .xml keyboard project
+
+`kmc generate lexical-model [options] <id>`
+
+: Generate a wordlist lexical model project
+
 `kmc copy origin -o target`
 
 : Copy and rename a keyboard project
@@ -305,6 +317,164 @@ For more information on the purpose of `analyze osk-char-use` and
 For more information on the purpose of `analyze osk-char-use` and
 `analyze rewrite-osk-from-char-use`, see
 [`&displayMap`](/developer/language/reference/displaymap).
+
+## `kmc generate keyman-keyboard` options
+
+Generates a new keyboard project with .kmn format keyboard. An ID must be
+specified for the output of the project, and an output folder (`-o`). A new
+folder with the keyboard ID as its name will be created under the output folder,
+and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-t, --target <target>`
+
+: Target platforms for the project. Use the values from
+  [`&targets`](/developer/language/reference/targets). Multiple targets may be
+  specified, each prefixed with `-t`, or space-separated, surrounded by
+  quotation marks (e.g. `-t windows -t linux` or `-t "windows linux"`) (default:
+  `any`)
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Keyboard descriptive name, used in the
+  [`&name` store](/developer/language/reference/name) (default: the ID of the
+  project)
+
+`-c, --copyright <copyright-name>`
+
+: [`&copyright`](/developer/language/reference/copyright) holder for the
+  project. Do not include the '(C)' or '&copy;' prefixes (default: the author
+  of the keyboard)
+
+`-v, --version <version-string>`
+
+: [`&version`](/developer/language/reference/version) of the keyboard, (default:
+  "1.0").
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the keyboard is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The tags are referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of keyboard author (default: blank)
+
+`-i, --icon`
+
+: Include a generated icon. The icon will be a 16x16 pixel box with the first
+  letters of the first language tag (default: true, include an icon)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: keyboard name)
+
+## `kmc generate ldml-keyboard` options
+
+Generates a new keyboard project with LDML .xml format keyboard. An ID must be
+specified for the output of the project, and an output folder (`-o`). A new
+folder with the keyboard ID as its name will be created under the output folder,
+and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-t, --target <target>`
+
+: Target platforms for the project. Use the values from
+  [`&targets`](/developer/language/reference/targets). Multiple targets may be
+  specified, each prefixed with `-t`, or space-separated, surrounded by
+  quotation marks (e.g. `-t windows -t linux` or `-t "windows linux"`) (default:
+  `any`)
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Keyboard descriptive name, referenced in the keyboard `<info name` attribute
+  (default: the ID of the project). Do not include generic terms such as
+  'keyboard', 'unicode', or a version number in the name.
+
+`-c, --copyright <copyright-name>`
+
+: Copyright holder for the project. Do not include the '(C)' or '&copy;'
+  prefixes (default: the author of the keyboard)
+
+`-v, --version <version-string>`
+
+: Version of the keyboard, referenced in the keyboard `<version number`
+  attribute, should be in major.minor.patch format (note: full semantic version
+  is not currently supported in Keyman) (defaults to "1.0.0")
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the keyboard is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The first tag is referenced in the keyboard `<keyboard3 locale` attribute,
+  with subsequent tags referenced in `<locale id` attributes. The tags are
+  also referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of keyboard author, referenced in `<info author` attribute (default:
+  blank)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: keyboard name)
+
+## `kmc generate lexical-model` options
+
+Generates a new lexical model project with a TSV wordlist. An ID must be
+specified for the output of the project, and an output folder (`-o`). The ID
+must match the [`author.bcp47.uniq`](/developer/lexical-models) naming pattern.
+A new folder with the model ID as its name will be created under the output
+folder, and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Lexical model descriptive name, referenced in the package metadata (default:
+  the ID of the project)
+
+`-c, --copyright <copyright-name>`
+
+: Copyright holder for the project. Do not include the '(C)' or '&copy;'
+  prefixes (default: the author of the model)
+
+`-v, --version <version-string>`
+
+: Version of the lexical model, referenced in the package metadata (defaults to
+  "1.0")
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the model is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The tags are referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of model author, referenced in package metadata (default: blank)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: lexical model name)
 
 ## `kmc copy` options
 

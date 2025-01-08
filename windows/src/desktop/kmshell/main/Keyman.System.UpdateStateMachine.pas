@@ -148,7 +148,7 @@ type
     procedure Enter; override;
     procedure Exit; override;
     procedure HandleCheck; override;
-    function  HandleKmShell: Integer; override;
+    function HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
@@ -391,7 +391,7 @@ begin
       on E: ERegistryException do
       begin
         TKeymanSentryClient.ReportHandledException(E,
-          'Failed to write apply now');
+          'Failed to write "apply now"');
       end;
     end;
   finally
@@ -500,7 +500,7 @@ var
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  KL.Log('ITUpdateStateMachine.HandleMSIInstallComplete');
+  KL.Log('TUpdateStateMachine.HandleMSIInstallComplete');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
@@ -666,7 +666,7 @@ var
   FResult: Boolean;
   RootPath: string;
 begin
-  // call seperate process
+  // call separate process
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0),
     IncludeTrailingPathDelimiter(RootPath), '-bd');
@@ -775,12 +775,11 @@ begin
 
   if (not DownloadResult) then
   begin
-    // Failed three times in this process return to the
-    // IdleState to wait 7 days before trying again
+    // Failed three times in this process; return to the
+    // IdleState to wait 'CheckPeriod' before trying again
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+    'Error Updates not downloaded after 3 attempts');
     ChangeState(IdleState);
-    // TODO: Future could go to a RetryState which serialized the a retry count
-    // to disk. Then it could try launch the download again on the next
-    // kmshell start event.
   end
   else
   begin
@@ -1017,11 +1016,12 @@ begin
   if not FResult then
   begin
     bucStateContext.HandleMSIInstallComplete;
-    KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall fail');
-    ChangeState(IdleState);
+
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Executing kmshell process to install failed:"' +
       IntToStr(Ord(FResult)) + '"');
+    // TODO: epic-windows-updates Check this is correct to return to idle
+    ChangeState(IdleState);
   end;
 
   Result := FResult;
@@ -1160,50 +1160,7 @@ end;
 procedure InstallingState.HandleFirstRun;
 begin
   bucStateContext.HandleMSIInstallComplete;
-end;
-
-// Private Functions:
-function ConfigCheckContinue: Boolean;
-var
-  Registry: TRegistryErrorControlled;
-begin
-  { Verify that it has been at least CheckPeriod days since last update check }
-  Result := False;
-  try
-    Registry := TRegistryErrorControlled.Create; // I2890
-    try
-      if Registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if Registry.ValueExists(SRegValue_CheckForUpdates) and
-          not Registry.ReadBool(SRegValue_CheckForUpdates) then
-        begin
-          Result := False;
-          Exit;
-        end;
-        if Registry.ValueExists(SRegValue_LastUpdateCheckTime) and
-          (Now - Registry.ReadDateTime(SRegValue_LastUpdateCheckTime) >
-          CheckPeriod) then
-        begin
-          Result := True;
-        end
-        else
-        begin
-          Result := False;
-        end;
-        Exit;
-      end;
-    finally
-      Registry.Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E: Exception do
-    begin
-      Result := False;
-      LogMessage(E.Message);
-      Exit;
-    end;
-  end;
+  // Result := kmShellContinue;
 end;
 
 end.
