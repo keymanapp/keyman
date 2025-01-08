@@ -1,3 +1,7 @@
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 import { applyTransform, type Tokenization } from "@keymanapp/models-templates";
 
 /**

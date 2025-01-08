@@ -48,7 +48,7 @@ MOFILES := $(POFILES:.po=/LC_MESSAGES/keyman-config.mo)
 
 update-template: version
 	xgettext --package-name "keyman" --package-version "$(VERSION)" \
-		--msgid-bugs-address "<support@keyman.com>" --copyright-holder "SIL International" \
+		--msgid-bugs-address "<support@keyman.com>" --copyright-holder "SIL Global" \
 		--language=Python --directory=. --output-dir=locale --output=keyman-config.pot \
 		--add-comments=i18n: --sort-by-file --width=98 \
 		keyman_config/*.py km-*

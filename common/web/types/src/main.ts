@@ -25,7 +25,8 @@ export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
 
 export * as KMXPlus from './kmx/kmx-plus/kmx-plus.js';
-// TODO: these exports are really not well named
-export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
-export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
-export { ElementString } from './kmx/kmx-plus/element-string.js';
+export * as LdmlKeyboardTypes from './main-ldml-keyboard.js';
+
+export * as LexicalModelTypes from './lexical-model-types.js';
+
+export * as KeymanWebKeyboard from './keyboard-object.js';

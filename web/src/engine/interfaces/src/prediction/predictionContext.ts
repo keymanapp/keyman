@@ -1,4 +1,8 @@
 import { EventEmitter } from "eventemitter3";
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Keep = LexicalModelTypes.Keep;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
 import { type OutputTarget } from "keyman/engine/keyboard";
 
@@ -209,7 +213,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     if(!recentAcceptCause && this.selected) {
       this.accept(this.selected);
-      returnObj.shouldSwallow = true;
+      // If there is right-context, DO emit the space instead of swallowing it.
+      // It's not auto-added by the predictive-text worker for such cases.
+      returnObj.shouldSwallow = !this.currentTarget.getTextAfterCaret();
 
       // doTryAccept is the path for keystroke-based auto-acceptance.
       // Overwrite the cause to reflect this.
@@ -229,7 +235,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       // If the model doesn't insert wordbreaks, there's no space to alias, so
       // don't swallow the space.  If it does, we consider that insertion to be
       // the results of the first post-accept space.
-      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions; // can be handed outside
+      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions && !this.currentTarget.getTextAfterCaret();; // can be handed outside
     } else {
       returnObj.shouldSwallow = false;
     }

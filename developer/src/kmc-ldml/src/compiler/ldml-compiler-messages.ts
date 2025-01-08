@@ -187,7 +187,23 @@ export class LdmlCompilerMessages {
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
-  // Available: 0x029
+  static ERROR_InvalidVariableIdentifier = SevError | 0x0029;
+  static Error_InvalidVariableIdentifier = (o: { id: string }) => m(
+    this.ERROR_InvalidVariableIdentifier,
+    `Invalid variable identifier "${def(o.id)}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
+  );
+
+  static ERROR_InvalidMarkerIdentifier = SevError | 0x002A;
+  static Error_InvalidMarkerIdentifier = (o: { id: string }) => m(
+    this.ERROR_InvalidMarkerIdentifier,
+    `Invalid marker identifier "\m{${def(o.id)}}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
+  );
+
+  static WARN_StringDenorm = SevWarn | 0x002B;
+  static Warn_StringDenorm = (o: { s: string }) =>
+  m(this.WARN_StringDenorm, `File contains string "${def(o.s)}" that is neither NFC nor NFD.`);
+
+  // Available: 0x02C-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
@@ -202,9 +218,12 @@ export class LdmlCompilerMessages {
   m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
 
   static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
-  static Error_IllegalTransformDollarsign = (o: { from: string }) =>
-  m(this.ERROR_IllegalTransformDollarsign,  `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
-                                            '**Hint**: Use `\\$` to match a literal dollar-sign.');
+  static Error_IllegalTransformDollarsign = (o: { from: string }) => m(
+    this.ERROR_IllegalTransformDollarsign,
+    `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
+    `**Hint**: Use \`\\$\` to match a literal dollar-sign. If this precedes a variable name, `+
+    `the variable name may not be valid (A-Z, a-z, 0-9, _, 32 character maximum).`
+  );
 
   static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
   static Error_TransformFromMatchesNothing = (o: { from: string }) =>
@@ -219,5 +238,12 @@ export class LdmlCompilerMessages {
   static Error_IllegalTransformAsterisk = (o: { from: string }) =>
   m(this.ERROR_IllegalTransformAsterisk,  `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`,
                                             '**Hint**: Use `\\*` to match a literal asterisk.');
+
+  static ERROR_IllegalTransformToUset = SevErrorTransform | 0x05;
+  static Error_IllegalTransformToUset = (o: { to: string }) => m(
+    this.ERROR_IllegalTransformToUset,
+    `Invalid transform to="${def(o.to)}": Set variable (\\$[…]) cannot be used in 'to=' unless part of a map.`,
+    '**Hint**: If a map was meant, must use the form `<transform from="($[fromSet])" to="$[1:toSet]"/>`.'
+  );
 
 }

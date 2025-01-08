@@ -192,6 +192,35 @@ public final class KMManager {
     DEFAULT,   // Default ENTER action
   }
 
+  // Enum for whether the suggestion banner allows predictions, corrections, auto-corrections
+  public enum SuggestionType {
+    // Suggestion Disabled - No Predictions, No corrections, No auto-corrections
+    SUGGESTIONS_DISABLED,
+
+    // Suggestions Enabled
+    PREDICTIONS_ONLY,              // Predictions with no corrections
+    PREDICTIONS_WITH_CORRECTIONS,  // Predictions with corrections
+    PREDICTIONS_WITH_AUTO_CORRECT; // Predictions with auto-corrections
+
+    public static SuggestionType fromInt(int mode) {
+      switch (mode) {
+        case 0:
+          return SUGGESTIONS_DISABLED;
+        case 1:
+          return PREDICTIONS_ONLY;
+        case 2:
+          return PREDICTIONS_WITH_CORRECTIONS;
+        case 3:
+          return PREDICTIONS_WITH_AUTO_CORRECT;
+      }
+      return SUGGESTIONS_DISABLED;
+    }
+
+    public int toInt() {
+      return this.ordinal();
+    }
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -220,6 +249,7 @@ public final class KMManager {
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
+  public final static String autoCorrectionPrefSuffix = ".mayAutoCorrect";
 
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
@@ -275,11 +305,6 @@ public final class KMManager {
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
 
-  // DEPRECATED keys
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-  public static final String KMKey_CustomModel = "CustomModel";
-  public static final String KMKey_HelpLink = "helpLink";
-
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
 
@@ -310,8 +335,13 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
-  // Default KeymanWeb longpress delay in milliseconds
+  // Default KeymanWeb longpress delay constants in milliseconds
   public static final int KMDefault_LongpressDelay = 500;
+  public static final int KMMinimum_LongpressDelay = 300;
+  public static final int KMMaximum_LongpressDelay = 1500;
+
+  // Default prediction/correction setting
+  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -702,6 +732,10 @@ public final class KMManager {
 
   public static String getLanguageCorrectionPreferenceKey(String langID) {
     return langID + correctionPrefSuffix;
+  }
+
+  public static String getLanguageAutoCorrectionPreferenceKey(String langID) {
+    return langID + autoCorrectionPrefSuffix;
   }
 
   public static void hideSystemKeyboard() {
@@ -1274,17 +1308,13 @@ public final class KMManager {
   /**
    * Sets enterMode which specifies how the System keyboard ENTER key is handled
    *
-   * @param imeOptions EditorInfo.imeOptions
-   * @param inputType  InputType
+   * @param imeOptions EditorInfo.imeOptions used to determine the action
+   * @param inputType  InputType used to determine if the text field is multi-line
    */
   public static void setEnterMode(int imeOptions, int inputType) {
-    if ((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
-      enterMode = EnterModeType.NEWLINE;
-      return;
-    }
-
-    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
     EnterModeType value = EnterModeType.DEFAULT;
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    boolean isMultiLine = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
 
     switch (imeActions) {
       case EditorInfo.IME_ACTION_GO:
@@ -1296,7 +1326,8 @@ public final class KMManager {
         break;
 
       case EditorInfo.IME_ACTION_SEND:
-        value = EnterModeType.SEND;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE :EnterModeType.SEND;
         break;
 
       case EditorInfo.IME_ACTION_NEXT:
@@ -1304,7 +1335,8 @@ public final class KMManager {
         break;
 
       case EditorInfo.IME_ACTION_DONE:
-        value = EnterModeType.DONE;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DONE;
         break;
 
       case EditorInfo.IME_ACTION_PREVIOUS:
@@ -1312,7 +1344,8 @@ public final class KMManager {
         break;
 
       default:
-        value = EnterModeType.DEFAULT;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DEFAULT;
     }
 
     enterMode = value;
@@ -1346,6 +1379,18 @@ public final class KMManager {
    */
   public static boolean getMayPredictOverride() {
     return mayPredictOverride;
+  }
+
+  /**
+   * Store SuggestionType as int in preference
+   * @param languageID as String
+   * @param suggestType SuggestionType
+   */
+  public static void setMaySuggest(String languageID, SuggestionType suggestType) {
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType.toInt());
+    editor.commit();
   }
 
   /**
@@ -1460,24 +1505,23 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    // When entering password field, mayPredict should override to false
+    // When entering password field, maySuggest should override to disabled
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = (mayPredictOverride) ? false :
-      prefs.getBoolean(getLanguagePredictionPreferenceKey(languageID), true);
-    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
+    int maySuggest = mayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+      prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     return true;
   }
@@ -1663,26 +1707,6 @@ public final class KMManager {
     }
 
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
-  }
-
-  // Intend to deprecate in Keyman 15.0
-  public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-    String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-    String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
-    String kmpLink = MapCompat.getOrDefault(keyboardInfo, KMManager.KMKey_KMPLink, "");
-    String font = keyboardInfo.get(KMManager.KMKey_Font);
-    String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    boolean isNewKeyboard = true;
-
-    Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
-          languageID, languageName, version, helpLink, kmpLink,
-      isNewKeyboard, font, oskFont);
-    return addKeyboard(context, k);
   }
 
   public static boolean removeKeyboard(Context context, int position) {
@@ -2098,14 +2122,22 @@ public final class KMManager {
 
   /**
    * Set the longpress delay (in milliseconds) as a stored preference.
+   * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
+   * @return boolean
    */
-  public static void setLongpressDelay(int longpressDelay) {
+  public static boolean setLongpressDelay(int longpressDelay) {
+    if (longpressDelay < KMMinimum_LongpressDelay || longpressDelay > KMMaximum_LongpressDelay) {
+      return false;
+    }
+
     SharedPreferences prefs = appContext.getSharedPreferences(
       appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
+
+    return true;
   }
 
   /**

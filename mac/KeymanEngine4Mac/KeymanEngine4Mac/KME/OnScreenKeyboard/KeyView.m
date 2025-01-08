@@ -41,7 +41,10 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 - (id)initWithFrame:(NSRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    os_log_debug([KMELogs oskLog], "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
+    /*
+     // usually too much logging, uncomment for debugging
+     os_log_debug([KMELogs oskLog], "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
+    */
     self.clipsToBounds = true;
     CGSize size = frame.size;
     CGFloat x = size.width*0.05;
@@ -69,8 +72,17 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
   return self;
 }
 
+- (NSString *)description {
+  NSString *format = @"<keyCode: 0x%lx hasKeyCaption:%d isModifierKey:%d isSpecialKey:%d isCharacterKey:%d label:%@ caption %@>";
+  NSString *str = [NSString stringWithFormat:format, _keyCode, _hasKeyCaption, _isModifierKey, _isSpecialKey, _isCharacterKey, _label.stringValue, _caption.stringValue];
+  return str;
+}
+
 - (void)drawRect:(NSRect)rect {
+  /*
+   // usually too much logging, uncomment for debugging
   os_log_debug([KMELogs uiLog], "KeyView drawRect: %{public}@, bounds: %{public}@, keyCode: 0x%lx, caption: %{public}@, label: %{public}@", NSStringFromRect(rect), NSStringFromRect(self.bounds), self.keyCode, self.caption.stringValue, self.label.stringValue);
+  */
   
   [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
   NSRectFillUsingOperation(rect, NSCompositingOperationSourceOver);
@@ -282,6 +294,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 }
 
 -(void)processKeyClick {
+  os_log_debug([KMELogs oskLog], "KeyView processKeyClick");
   [self.target keyAction:self];
 }
 

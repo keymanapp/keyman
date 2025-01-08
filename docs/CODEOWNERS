@@ -1,19 +1,19 @@
 #
 # Code owners - this lists first the primary dev, then second, the platform advocate for each area
+#             - in addition, it lists additional reviewers
 #
 # @darcywong00 @mcdurdin @ermshiperete @rc-swag @SabineSIL @sgschantz
 
 /android/                         @darcywong00  @sgschantz
 
-/common/                          @mcdurdin     @rc-swag
-/core/                            @mcdurdin     @rc-swag
+/common/                          @mcdurdin     @rc-swag         @srl295
+/core/                            @mcdurdin     @rc-swag         @srl295
 /common/lexical-model-types/      @jahorton     @mcdurdin
-/common/models/                   @jahorton     @mcdurdin
 /common/schemas/                  @mcdurdin     @jahorton
 /common/test/                     @mcdurdin     @ermshiperete
 /common/web/                      @jahorton     @mcdurdin
 
-/developer/                       @mcdurdin     @darcywong00
+/developer/                       @mcdurdin     @darcywong00     @SabineSIL @markcsinclair @srl295
 /docs/                            @mcdurdin     @jahorton
 /ios/                             @sgschantz    @jahorton
 /linux/                           @ermshiperete @darcywong00
@@ -23,7 +23,7 @@
 /oem/firstvoices/common/          @mcdurdin     @rc-swag
 /oem/firstvoices/ios/             @sgschantz    @jahorton
 /oem/firstvoices/windows/         @rc-swag      @ermshiperete
-/resources/                       @mcdurdin     @jahorton
+/resources/                       @mcdurdin     @jahorton         @srl295
 
 # Web is currently shared between Eberhard and Joshua:
 /web/                             @ermshiperete @jahorton

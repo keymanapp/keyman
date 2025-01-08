@@ -502,6 +502,8 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     const fontSource = [].concat(...kmpJsonData.keyboards.map(e => e.displayFont ? [e.displayFont] : []), ...kmpJsonData.keyboards.map(e => e.webDisplayFonts ?? []));
     const oskFontSource = [].concat(...kmpJsonData.keyboards.map(e => e.oskFont ? [e.oskFont] : []), ...kmpJsonData.keyboards.map(e => e.webOskFonts ?? []));
 
+    let commonScript = null;
+
     for(const bcp47 of Object.keys(keyboard_info.languages)) {
       const language = keyboard_info.languages[bcp47];
 
@@ -572,6 +574,15 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
         ` (${language.regionName})` :
         ''
       );
+
+      const resolvedScript = locale.script ?? langtagsByTag[bcp47]?.script ?? langtagsByTag[locale.language]?.script ?? undefined;
+      if(commonScript === null) {
+        commonScript = resolvedScript;
+      } else {
+        if(resolvedScript !== commonScript) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({commonScript, bcp47, script: resolvedScript}))
+        }
+      }
     }
     return true;
   }

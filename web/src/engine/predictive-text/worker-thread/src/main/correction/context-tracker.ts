@@ -5,6 +5,13 @@ import { SearchSpace } from './distance-modeler.js';
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeTransform, tokenizeTransformDistribution } from './transform-tokenization.js';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
+import USVString = LexicalModelTypes.USVString;
 
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];

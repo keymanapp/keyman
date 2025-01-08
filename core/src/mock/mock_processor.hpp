@@ -69,13 +69,21 @@ namespace core
     supports_normalization() const override {
       return true;
     }
+
+    /**
+     * Returns true if the data starts with 'MOCK'
+     *
+     * @param buf   the keyboard blob
+     * @return true if the processor can handle the keyboard, otherwise false.
+     */
+    static bool is_handled(const std::vector<uint8_t>& data);
   };
 
   class null_processor : public mock_processor {
   public:
     null_processor(): mock_processor(path())
     {
-      _attributes = keyboard_attributes(u"null", u"0.0", path(), {});
+      _attributes = keyboard_attributes(u"null", u"0.0", {});
     }
 
     km_core_status validate() const override;

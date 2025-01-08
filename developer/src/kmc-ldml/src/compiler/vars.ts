@@ -1,5 +1,5 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, VariableParser, MarkerParser } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LDMLKeyboard, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
@@ -40,6 +40,14 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
+  private validateIdentifier(id: string) {
+    if(!id.match(LdmlKeyboardTypes.VariableParser.ID)) { // From <string> DTD
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifier({id}));
+      return false;
+    }
+    return true;
+  }
+
   private validateVars(st: Substitutions): boolean {
     let valid = true;
     const variables = this.keyboard3?.variables;
@@ -67,23 +75,39 @@ export class VarsCompiler extends SectionCompiler {
     if (variables) {
       // Strings
       for (const { id, value } of variables.string) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
-        allStrings.add(id);
-        const stringrefs = VariableParser.allStringReferences(value);
+        const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
+        for(const ref of stringrefs) {
+          if(!allStrings.has(ref)) {
+            valid = false;
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({id: ref}));
+            allStrings.add(ref); // avoids multiple reports of same missing variable
+          }
+        }
         st.string.add(SubstitutionUse.variable, stringrefs);
+        allStrings.add(id);
+        st.addMarkers(SubstitutionUse.variable, value);
       }
       // Sets
       for (const { id, value } of variables.set) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
         allSets.add(id);
         // check for illegal references, here.
-        const stringrefs = VariableParser.allStringReferences(value);
+        const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
         st.string.add(SubstitutionUse.variable, stringrefs);
 
         // Now split into spaces.
-        const items: string[] = VariableParser.setSplitter(value);
+        const items: string[] = LdmlKeyboardTypes.VariableParser.setSplitter(value);
         for (const item of items) {
-          const setrefs = VariableParser.allSetReferences(item);
+          const setrefs = LdmlKeyboardTypes.VariableParser.allSetReferences(item);
           if (setrefs.length > 1) {
             // this is the form $[seta]$[setb]
             valid = false;
@@ -96,11 +120,15 @@ export class VarsCompiler extends SectionCompiler {
       }
       // UnicodeSets
       for (const { id, value } of variables.uset) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
         allUnicodeSets.add(id);
-        const stringrefs = VariableParser.allStringReferences(value);
+        const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
         st.string.add(SubstitutionUse.variable, stringrefs);
-        const setrefs = VariableParser.allSetReferences(value);
+        const setrefs = LdmlKeyboardTypes.VariableParser.allSetReferences(value);
         for (const id2 of setrefs) {
           if (!allUnicodeSets.has(id2)) {
             valid = false;
@@ -165,13 +193,13 @@ export class VarsCompiler extends SectionCompiler {
     const matchedNotEmitted : Set<string> = new Set<string>();
     const mt = st.markers;
     for (const m of mt.matched.values()) {
-      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (m === LdmlKeyboardTypes.MarkerParser.ANY_MARKER_ID) continue; // match-all marker
       if (!mt.emitted.has(m)) {
         matchedNotEmitted.add(m);
       }
     }
     for (const m of mt.consumed.values()) {
-      if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
+      if (m === LdmlKeyboardTypes.MarkerParser.ANY_MARKER_ID) continue; // match-all marker
       if (!mt.emitted.has(m)) {
         matchedNotEmitted.add(m);
       }
@@ -186,15 +214,21 @@ export class VarsCompiler extends SectionCompiler {
     // now, validate the variables.
     valid = this.validateVars(st) && valid;
 
+    if (!!st.badMarkers.size) {
+      valid = false;
+      st.badMarkers.forEach(id =>
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidMarkerIdentifier({ id })));
+    }
+
     return valid;
   }
 
   validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
-          st.markers.add(SubstitutionUse.variable, MarkerParser.allReferences(value)));
+          st.markers.add(SubstitutionUse.variable, LdmlKeyboardTypes.MarkerParser.allReferences(value)));
     // get markers mentioned in a set
     keyboard?.variables?.set?.forEach(({ value }) =>
-      VariableParser.setSplitter(value).forEach(v => st.markers.add(SubstitutionUse.match, MarkerParser.allReferences(v))));
+      LdmlKeyboardTypes.VariableParser.setSplitter(value).forEach(v => st.markers.add(SubstitutionUse.match, LdmlKeyboardTypes.MarkerParser.allReferences(v))));
     return true;
   }
 
@@ -220,7 +254,7 @@ export class VarsCompiler extends SectionCompiler {
     const mt = st.markers;
 
     // collect all markers, excluding the match-all
-    const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
+    const allMarkers : string[] = Array.from(mt.all).filter(m => m !== LdmlKeyboardTypes.MarkerParser.ANY_MARKER_ID).sort();
     result.markers = sections.list.allocList(allMarkers, {}, sections);
 
     // sets need to be added late, because they can refer to markers
@@ -246,7 +280,7 @@ export class VarsCompiler extends SectionCompiler {
     // OK to do this as a substitute, because we've already validated the set above.
     value = result.substituteSets(value, sections);
     // raw items - without marker substitution
-    const rawItems: string[] = VariableParser.setSplitter(value);
+    const rawItems: string[] = LdmlKeyboardTypes.VariableParser.setSplitter(value);
     // cooked items - has substutition of markers
     // this is not 'forMatch', all variables are to be assumed as string literals, not regex
     // content.

@@ -5,7 +5,10 @@ interface
 type
   TUtilKeymanOption = (
     // General options
-    koKeyboardHotkeysAreToggle, koAltGrCtrlAlt, koReleaseShiftKeysAfterKeyPress,
+    koKeyboardHotkeysAreToggle,
+    koAltGrCtrlAlt,
+    koRightModifierHK,
+    koReleaseShiftKeysAfterKeyPress,
     koShowHints,   // I1256
     // Startup options
     koTestKeymanFunctioning,

@@ -1,4 +1,4 @@
-import { MarkerParser, VariableParser } from "@keymanapp/common-types";
+import { LdmlKeyboardTypes } from "@keymanapp/common-types";
 
 /**
  * Verb for SubstitutionTracker.add()
@@ -76,7 +76,7 @@ export class SubstitutionTracker {
 /** rollup of several substitution types */
 export class Substitutions {
   addSetAndStringSubtitution(verb: SubstitutionUse, str?: string) {
-    this.set.add(verb, VariableParser.allSetReferences(str));
+    this.set.add(verb, LdmlKeyboardTypes.VariableParser.allSetReferences(str));
     this.addStringAndMarkerSubstitution(verb, str);
   }
   /** add a string that can have string var substitutions or markers */
@@ -85,15 +85,22 @@ export class Substitutions {
     this.addStringSubstitution(verb, str);
   }
   addStringSubstitution(verb: SubstitutionUse, str?: string) {
-    this.string.add(verb, VariableParser.allStringReferences(str));
+    this.string.add(verb, LdmlKeyboardTypes.VariableParser.allStringReferences(str));
   }
   /** add a string that's just markers */
   addMarkers(verb: SubstitutionUse, str?: string) {
-    this.markers.add(verb, MarkerParser.allReferences(str));
+    this.markers.add(verb, LdmlKeyboardTypes.MarkerParser.allReferences(str));
+    LdmlKeyboardTypes.MarkerParser.allBrokenReferences(str).forEach(m => this.badMarkers.add(m));
   }
+  // all valid markers
   markers: SubstitutionTracker;
+  // all invalid markers
+  badMarkers: Set<string>;
+  // all valid set ids
   set: SubstitutionTracker;
+  // all valid string ids
   string: SubstitutionTracker;
+  // all valid uset ids
   uset: SubstitutionTracker;
 
   constructor() {
@@ -101,5 +108,6 @@ export class Substitutions {
     this.set = new SubstitutionTracker();
     this.string = new SubstitutionTracker();
     this.uset = new SubstitutionTracker();
+    this.badMarkers = new Set<string>();
   }
 }

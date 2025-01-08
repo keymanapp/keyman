@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <set>
 
 #include "path.hpp"
 #include "state.hpp"
@@ -35,6 +36,7 @@
 #include "ldml/ldml_markers.hpp"
 
 #include "processor.hpp"
+#include "../load_kmx_file.hpp"
 
 namespace {
 
@@ -82,7 +84,7 @@ apply_action(
     std::vector<km_core_context_item> &test_context) {
   switch (act.type) {
   case KM_CORE_IT_END:
-    assert(false);
+    test_assert(false);
     break;
   case KM_CORE_IT_ALERT:
     g_beep_found = true;
@@ -119,8 +121,8 @@ apply_action(
     km_core_usv ch = 0;
     bool matched_text = false;
     // assume the backspace came from set_action() and there's no further info.
-    assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
-    assert(act.backspace.expected_value == 0);
+    test_assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
+    test_assert(act.backspace.expected_value == 0);
     // It is valid for a backspace to be received with an empty text store
     // as the user can press backspace with no text in the store and Keyman
     // will pass that back to the client, as the client may do additional
@@ -129,7 +131,7 @@ apply_action(
     // additional text in the text store that Keyman can't see.
     // If there's anything in the text store, pop it off.  Two if a pair.
     if (text_store.length() > 0) {
-      assert(!context.empty() && !text_store.empty());
+      test_assert(!context.empty() && !text_store.empty());
       const auto ch1 = text_store.back();
       text_store.pop_back();
       if (text_store.length() > 0 && Uni_IsSurrogate2(ch1)) {
@@ -152,16 +154,16 @@ apply_action(
       auto end = context.rbegin();
       while (end != context.rend()) {
         if (end->type == KM_CORE_CT_CHAR) {
-          assert(!matched_text);
-          assert_equal(end->character, ch); // expect popped char to be same as what's in context
+          test_assert(!matched_text);
+          test_assert_equal(end->character, ch); // expect popped char to be same as what's in context
           matched_text = true;
           context.pop_back();
           break;  // exit on first real char
         }
-        assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+        test_assert(end->type != KM_CORE_CT_END);  // inappropriate here.
         context.pop_back();
       }
-      assert(matched_text);
+      test_assert(matched_text);
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:
@@ -174,7 +176,7 @@ apply_action(
       km_core_context_item* new_context_items = nullptr;
       // We replace the cached context with the current application context
       km_core_status status = context_items_from_utf16(text_store.c_str(), &new_context_items);
-      assert(status == KM_CORE_STATUS_OK);
+      test_assert(status == KM_CORE_STATUS_OK);
       copy_context_items_to_vector(new_context_items, context);
       // also update the test context
       copy_context_items_to_vector(new_context_items, test_context);
@@ -192,7 +194,7 @@ apply_action(
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
-    assert(false);  // NOT SUPPORTED
+    test_assert(false);  // NOT SUPPORTED
     break;
   }
 }
@@ -253,18 +255,75 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
       break;  // success
     }
     // fail if only ONE is at end
-    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+    test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
     // fail if type and marker don't match.
-    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
   km_core_context_items_dispose(citems);
   if (text_store != buf) {
     std::cerr << "text store has diverged from buf" << std::endl;
     std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-    assert(false);
+    test_assert(false);
   }
   delete[] buf;
+}
+
+
+/**
+ * @param actual the list from get_key_list()
+ * @param expected optional list with keys to check, can be empty - not exhaistive
+ * @returns true if passing
+ */
+bool
+verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_event> &expected) {
+  bool equals = true;
+  // error if any bad modifier keys
+  for(const auto &akey : actual) {
+    if (akey.modifier_state > KM_CORE_MODIFIER_MASK_CAPS) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(akey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had key with bad modifier " << akey.modifier_state << ": " << dump << console_color::reset() << std::endl;
+    }
+  }
+  // error if any expected keys missing (note expected may be empty)
+  for(const auto &ekey : expected) {
+    if (actual.count(ekey) == 0) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(ekey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had missing key " << dump << console_color::reset() << std::endl;
+    }
+  }
+  if (equals) {
+      std::wcout << console_color::fg(console_color::GREEN) << " " << actual.size() << " vkeys OK, verified  " << expected.size() << console_color::reset() << std::endl;
+  }
+  return equals;
+}
+
+/**
+ * @param actual_list the list from get_key_list()
+ * @param keylist optional string with keys to check, can be empty
+ * @param test the LDML test source, for additional data
+ * @returns true if passing
+ */
+bool
+verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list, const km::tests::LdmlTestSource &test) {
+  std::set<km::tests::key_event> actual, expected;
+  // convert actual list
+  while (actual_list != nullptr && !(actual_list->key == 0 && actual_list->modifier_flag == 0)) {
+    km::tests::key_event k(actual_list->key, (uint16_t)actual_list->modifier_flag);
+    actual.insert(k);
+    actual_list++; // advance pointer
+  }
+  // parse the expected list
+  std::string keylist = convert<char16_t, char>(expected_list);
+  while (!keylist.empty() && keylist[0] == '[') {
+    const km::tests::key_event k = km::tests::LdmlEmbeddedTestSource::parse_next_key(keylist);
+    if (!k.empty()) {
+      expected.emplace(k);
+    }
+  }
+  return verify_key_list(actual, expected);
 }
 
 int
@@ -273,7 +332,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   km_core_state * test_state = nullptr;
 
   const km_core_status expect_load_status = test_source.get_expected_load_status();
-  assert_equal(km_core_keyboard_load(compiled.c_str(), &test_kb), expect_load_status);
+  auto blob = km::tests::load_kmx_file(compiled.native().c_str());
+  test_assert_equal(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb), expect_load_status);
 
   if (expect_load_status != KM_CORE_STATUS_OK) {
     std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;
@@ -362,7 +422,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
       if (!normalization_disabled) {
-        assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+        test_assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
@@ -371,6 +431,17 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       if (text_store != action.string) {
         errorLine = __LINE__;
       }
+    } break;
+    case km::tests::LDML_ACTION_CHECK_KEYLIST: {
+      std::cout << "- checking keylist" << std::endl;
+      // get keylist from kbd
+      const km_core_keyboard_key* actual_list = test_kb->get_key_list();
+      if (!verify_key_list(actual_list, action.string, test_source)) {
+        errorLine = __LINE__;
+      } else {
+        std::cout << " .. passes." << std::endl;
+      }
+      delete [] actual_list;
     } break;
     case km::tests::LDML_ACTION_FAIL: {
       // test requested failure
@@ -422,7 +493,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
 
   std::vector<std::string> failures; // track failures for summary
 
-  int embedded_result = embedded_test_source.load_source(source);
+  int embedded_result = embedded_test_source.load_source(source, compiled);
 
   if (!filter.empty()) {
     // Always skip the embedded test if there's a filter.
@@ -451,7 +522,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
     const km::tests::JsonTestMap& json_tests = json_factory.get_tests();
 
     size_t skip_count = 0;
-    assert(json_tests.size() > 0);
+    test_assert(json_tests.size() > 0);
     // Loop over all tests
     for (const auto& n : json_tests) {
       const auto test_name = n.first;

@@ -74,28 +74,38 @@ function upload {
 function upload_keyman_help {
   case $platform in
     android)
-      upload android/help products/android/$VERSION_RELEASE
+      upload android/docs/help products/android/$VERSION_RELEASE
+      upload android/docs/engine developer/engine/android/$VERSION_RELEASE
       ;;
     ios)
-      upload ios/help products/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/engine developer/engine/iphone-and-ipad/$VERSION_RELEASE
       ;;
     linux)
       pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
       ./build.sh build
       popd > /dev/null
-      upload linux/help products/linux/$VERSION_RELEASE
+      upload linux/docs/help products/linux/$VERSION_RELEASE
       ;;
     mac)
-      upload mac/help products/mac/$VERSION_RELEASE
+      upload mac/docs/help products/mac/$VERSION_RELEASE
+      ;;
+    web)
+      upload web/docs/engine developer/engine/web/$VERSION_RELEASE
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
+      upload windows/docs/engine developer/engine/windows/$VERSION_RELEASE
       ;;
     developer)
       # Note: `/developer/build.sh api` must be run first - covers both uploads
+      upload developer/docs/help developer/$VERSION_RELEASE
       upload developer/build/docs developer/$VERSION_RELEASE/reference/api
       upload developer/src/kmc/build/messages developer/$VERSION_RELEASE/reference/messages
+      # Note: we publish the core help alongside developer because we don't have
+      # a core CI release build
+      upload core/docs/api developer/core/$VERSION_RELEASE
       ;;
     *)
       display_usage
@@ -116,7 +126,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit 0
       ;;
-    android | ios | linux | mac | windows | developer)
+    android | ios | linux | mac | windows | developer | web)
       platform=$key
       ;;
     *)

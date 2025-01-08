@@ -1,9 +1,6 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * KeySender.m
- * Keyman
- * 
  * Created by Shawn Schantz on 2023-04-17.
  * 
  * Sends keydown events for the provided keycode to the frontmost application.
@@ -56,15 +53,13 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 }
 
 /**
- sendKeymanKeyCodeForEvent sends the kKeymanEventKeyCode to the
- frontmost application to indicate that all the backspaces have been processed
- and we can insert the queuedText to the client
+ * sendKeymanKeyCodeForEvent sends the kKeymanEventKeyCode to the
+ * frontmost application to indicate that all the backspaces have been processed
+ * and we can insert the queuedText to the client
  */
 
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
   os_log_debug([KMLogs keyLog], "KeySender sendKeymanKeyCodeForEvent");
-
-  ProcessSerialNumber psn;
   
   // Returns the frontmost app, which is the app that receives key events.
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;

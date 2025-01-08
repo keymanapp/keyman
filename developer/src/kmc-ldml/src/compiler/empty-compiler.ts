@@ -1,12 +1,12 @@
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
-import { util, KMXPlus, MarkerParser } from "@keymanapp/common-types";
+import { util, KMXPlus, LdmlKeyboardTypes } from "@keymanapp/common-types";
 import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { VarsCompiler } from './vars.js';
 import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 
 /**
- * Compiler for typrs that don't actually consume input XML
+ * Compiler for types that don't actually consume input XML
  */
 export abstract class EmptyCompiler extends SectionCompiler {
   private _id: SectionIdent;
@@ -35,8 +35,12 @@ export class StrsCompiler extends EmptyCompiler {
 
     if (strs) {
       const badStringAnalyzer = new util.BadStringAnalyzer();
-      const CONTAINS_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH);
+      const CONTAINS_MARKER_REGEX = new RegExp(LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH);
       for (let s of strs.allProcessedStrings.values()) {
+        // stop at the first denormalized string
+        if (!util.isNormalized(s)) {
+          this.callbacks.reportMessage(LdmlCompilerMessages.Warn_StringDenorm({s}));
+        }
         // replace all \\uXXXX with the actual code point.
         // this lets us analyze whether there are PUA, unassigned, etc.
         // the results might not be valid regex of course.
@@ -47,7 +51,7 @@ export class StrsCompiler extends EmptyCompiler {
         if (CONTAINS_MARKER_REGEX.test(s)) {
           // it had a marker, take out all marker strings, as the sentinel is illegal
           // need a new regex to match
-          const REPLACE_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH, 'g');
+          const REPLACE_MARKER_REGEX = new RegExp(LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH, 'g');
           s = s.replaceAll(REPLACE_MARKER_REGEX, ''); // remove markers.
         }
         badStringAnalyzer.add(s);

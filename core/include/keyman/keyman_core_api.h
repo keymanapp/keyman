@@ -1007,7 +1007,11 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
+
+  // TODO-web-core: Deprecate this field (#12497)
+  // KMN_DEPRECATED
   km_core_path_name  folder_path;
+
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -1022,7 +1026,7 @@ typedef struct {
 : Keyman keyboard ID string.
 
 `folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources.
+: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.
@@ -1092,29 +1096,35 @@ typedef struct {
 
 -------------------------------------------------------------------------------
 
-# km_core_keyboard_load()
+# km_core_keyboard_load_from_blob()
 
 ## Description
 
-Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
+Parse and load keyboard from the supplied blob and a pointer to the loaded keyboard
 into the out paramter.
 
 ## Specification
 
 ```c */
 KMN_API
-km_core_status
-km_core_keyboard_load(km_core_path_name kb_path,
-                     km_core_keyboard **keyboard);
+km_core_status km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
+                                               const void* blob,
+                                               const size_t blob_size,
+                                               km_core_keyboard** keyboard);
 
 /*
 ```
 
 ## Parameters
 
-`kb_path`
-: On Windows, a UTF-16 string; on other platforms, a C string:
-  contains a valid path to the keyboard file.
+`kb_name`
+: a string with the name of the keyboard.
+
+`blob`
+: a byte array containing the content of a KMX/KMX+ file.
+
+`blob_size`
+: a size_t variable with the size of the blob in bytes.
 
 `keyboard`
 : A pointer to result variable: A pointer to the opaque keyboard
@@ -1133,7 +1143,7 @@ km_core_keyboard_load(km_core_path_name kb_path,
 : In the event the keyboard file is unparseable for any reason
 
 `KM_CORE_STATUS_INVALID_ARGUMENT`
-: In the event the file doesn't exist or is inaccesible or `keyboard` is null.
+: In the event `keyboard` is null.
 
 `KM_CORE_STATUS_OS_ERROR`
 : Bit 31 (high bit) set, bits 0-30 are an OS-specific error code.
@@ -1145,7 +1155,7 @@ km_core_keyboard_load(km_core_path_name kb_path,
 ## Description
 
 Free the allocated memory belonging to an opaque keyboard object previously
-returned by [km_core_keyboard_load].
+returned by [km_core_keyboard_load_from_blob].
 
 ## Specification
 

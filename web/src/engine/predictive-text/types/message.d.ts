@@ -20,7 +20,11 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference types="@keymanapp/models-types" />
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Configuration = LexicalModelTypes.Configuration;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import USVString = LexicalModelTypes.USVString;
 
 /**
  * Tokens are signed 31-bit integers!

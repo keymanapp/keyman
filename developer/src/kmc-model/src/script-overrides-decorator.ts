@@ -1,3 +1,6 @@
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Span = LexicalModelTypes.Span;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 import { OverrideScriptDefaults } from "./lexical-model.js";
 import { ModelCompilerError, ModelCompilerMessages } from "./model-compiler-messages.js";
 

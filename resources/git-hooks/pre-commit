@@ -6,7 +6,7 @@
 
 GIT_ORIGIN="$(git remote get-url origin)"
 
-if [[ ! "$GIT_ORIGIN" =~ github\.com/keymanapp ]]; then
+if [[ ! "$GIT_ORIGIN" =~ github\.com(/|:)keymanapp ]]; then
   # Not a Keyman repository. We have no opinion.
   echo "DEBUG: Not a Keyman repository. We don't care"
   exit 0

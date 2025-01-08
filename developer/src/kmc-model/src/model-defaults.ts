@@ -1,3 +1,7 @@
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import CasingFunction = LexicalModelTypes.CasingFunction;
+
 /**
  * Converts wordforms into an indexable form. It does this by
  * normalizing the letter case of characters INDIVIDUALLY (to disregard
