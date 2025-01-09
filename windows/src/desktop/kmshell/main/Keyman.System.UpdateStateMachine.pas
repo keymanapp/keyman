@@ -203,17 +203,17 @@ type
 
   function DoInstallKeyman: Boolean; overload;
 
-    (**
-   * Installs the Keyman Keyboard files using separate shell.
-   *
-   * @params  SavePath  The path to the downloaded files.
-   *
-   * @returns True  if the installation is successful, False otherwise.
-   *)
+      (**
+     * Installs the Keyman Keyboard files using separate shell.
+     *
+     * @params  SavePath  The path to the downloaded files.
+     *
+     * @returns True  if the installation is successful, False otherwise.
+     *)
 
-  function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
-  function DoInstallPackage(PackageFileName: String): Boolean;
-  procedure LaunchInstallPackageProcess;
+    function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
+    function DoInstallPackage(PackageFileName: String): Boolean;
+    procedure LaunchInstallPackageProcess;
 
   public
     procedure Enter; override;
@@ -450,7 +450,8 @@ begin
   end
   else
   begin
-    // TODO: #10210 Error log for Unable to set state for Value
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Set CurrentState was failed');
   end;
 
 end;
@@ -500,7 +501,9 @@ var
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  KL.Log('TUpdateStateMachine.RemoveCachedFiles');
+  // TODO: epic-windows-updates
+  // remove debug log
+  // KL.Log('TUpdateStateMachine.RemoveCachedFiles');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
@@ -600,11 +603,6 @@ begin
   // ChangeState(UpdateAvailableState);
   // will keep here as there are more PR's #12621
   { #### End of Testing ### };
-
-  { // // TODO-WINDOWS-UPDATES Check how long a check takes then determine
-    if it needs to be broken into a seperate state of WaitngCheck RESP }
-  { if Response not OK stay in the idle state and return }
-
   // Handle_check event force check
   CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
@@ -626,7 +624,7 @@ var
   CheckForUpdates: TRemoteUpdateCheck;
   UpdateCheckResult: TRemoteUpdateCheckResult;
 begin
-  // Remote manages the last check time therfore
+  // Remote manages the last check time therefore
   // we will allow it to return early if it hasn't reached
   // the configured time between checks.
   CheckForUpdates := TRemoteUpdateCheck.Create(False);
@@ -772,12 +770,16 @@ var
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
+
+  // TODO: epic-windows-updates
+  // Remove this test code
   { ##  for testing log that we would download }
-  KL.Log('DownloadingState.Enter test code continue');
-  DownloadResult := True;
+  //KL.Log('DownloadingState.Enter test code continue');
+  //DownloadResult := True;
   { End testing }
+
   RetryCount := 0;
-  //DownloadResult := False;
+  DownloadResult := False;
 
   while (not DownloadResult) and (RetryCount < 3) do
   begin
@@ -837,11 +839,7 @@ end;
 
 procedure DownloadingState.HandleAbort;
 begin
-  // TODO epic-windows-updates
-  // another process  is likely downloading the files
-  // To clean do this would be to set a registry marker
-  // or file in the cached directory then when download is finished
-  // we an check for abort.
+  // To abort during the downloading
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -1056,7 +1054,6 @@ begin
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Executing kmshell process to install failed:"' +
       IntToStr(Ord(FResult)) + '"');
-    // TODO: epic-windows-updates Check this is correct to return to idle
     ChangeState(IdleState);
   end;
 
