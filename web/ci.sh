@@ -190,7 +190,8 @@ function prepare_downloads_keyman_com_action() {
 
   pushd build/publish
   # Zip both the 'debug' and 'release' configurations together.
-  "${COMPRESS_CMD}" ${COMPRESS_ADD} ${ZIP }*
+  # shellcheck disable=SC2086
+  "${COMPRESS_CMD}" ${COMPRESS_ADD} "${ZIP}" ./*
   popd
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
