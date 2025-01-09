@@ -166,7 +166,10 @@ builder_run_child_actions build:engine/attachment
 # Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/keyboard-storage
 
-# Uses engine/interfaces, engine/keyboard-storage, & engine/osk
+# Builds the predictive-text components
+builder_run_child_actions build:engine/predictive-text
+
+# Uses engine/interfaces, engine/keyboard-storage, engine/predictive-text, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers and engine/attachment
