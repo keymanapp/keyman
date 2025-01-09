@@ -18,11 +18,14 @@ source files.
   zeroed. Note that `COMP_KEYBOARD_KMXPLUS` must follow immediately after
   `COMP_KEYBOARD` with no empty space (that is at byte offset 64).
 
-A .kmx file is essentially a 32-bit memory mapped file. In a 32-bit process, the
+A .kmx file is essentially a 32-bit memory mapped file, however there is
+no guarantee that all sections start at a 32-bit boundary.
+In a 32-bit process on architectures that use flexible alignment, the
 file can be loaded into a memory buffer, and (assuming the file is valid), all
 offset values in the file can be rewritten into pointers by adding the base of
-the memory buffer to them. (In a 64-bit process, a fixup is needed to make space
-for 64-bit pointers.)
+the memory buffer to them. (In a 64-bit process or on architectures that
+use strict alignment (like emscripten), a fixup is needed to make space
+for aligned pointers.)
 
 ## `COMP_KEYBOARD`: KMX header
 
