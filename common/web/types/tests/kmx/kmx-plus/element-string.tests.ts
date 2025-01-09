@@ -17,6 +17,7 @@ import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-ke
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
 const GOTHIC_B = new StrsItem("𐌱", 0x10331);
 const GOTHIC_C = new StrsItem("𐌲", 0x10332);
+const GOTHIC_D = new StrsItem("𐌳", 0x10333);
 const HI_GOTHIC_A = new StrsItem('\ud800', 0xd800);
 const LO_GOTHIC_A = new StrsItem('\udf30', 0xdf30);
 const GOTHIC_PATTERN = "[𐌰-𐍊]";
@@ -381,22 +382,49 @@ describe('Test of ElementString file', () => {
     });
     describe('Test of isEqual()', () => {
       it('returns true when ElementStrings are identical', () => {
-        const es = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const es = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ]);
         assert.isTrue(es.isEqual(es));
       });
       it.skip('returns true when ElementStrings are clones', () => {
-        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
-        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const one = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ]); 
+        const two = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ]); 
         assert.isTrue(one.isEqual(two));
       });
       it('returns false when ElementStrings are different lengths', () => {
-        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
-        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱"]);
+        const one = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ]); 
+        const two = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+        ]); 
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when ElementStrings have different ElemElements', () => {
-        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
-        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌳"]);
+        const one = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ]); 
+        const two = initElementString([
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_D),
+        ]); 
         assert.isFalse(one.isEqual(two));
       });
     });
@@ -417,6 +445,12 @@ function initElemElement(
   ee.tertiary = tertiary;
   ee.flags = flags;
   return ee;
+};
+
+function initElementString(elemElements: ElemElement[]): ElementString {
+  const es: ElementString = new ElementString();
+  elemElements.forEach((ee) => {es.push(ee)});
+  return es;
 };
 
 function stubStrsAllocString_Char(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
