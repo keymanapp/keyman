@@ -364,6 +364,20 @@ describe('Test of ElementString', () => {
         ];
         assert.deepEqual(actual, expected);
       });
+      it('can handle ElemElement of string type', () => {
+        sections.strs.allocString = stubStrsAllocString_Str;
+        const actual   = ElementString.fromStrings(sections, ["𐌰𐌱𐌲",]);
+        const expected = [
+          initElemElement(
+            new StrsItem("𐌰𐌱𐌲"),
+            undefined,
+            0,
+            0,
+            constants.elem_flags_type_str,
+          ),
+        ];
+        assert.deepEqual(actual, expected);
+      });
     });
     describe('Test of isEqual()', () => {
       it('returns true when ElementStrings are identical', () => {
