@@ -49,7 +49,9 @@ _add_build_args() {
 _convert_parameters_to_build_args() {
   build_args=()
   build_version=
-  local required_node_version="$(_print_expected_node_version)"
+  local required_node_version
+  # shellcheck disable=SC2034
+  required_node_version="$(_print_expected_node_version)"
 
   _add_build_args UBUNTU_VERSION               KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
   _add_build_args JAVA_VERSION                 KEYMAN_VERSION_JAVA                      java
@@ -82,8 +84,9 @@ build_action() {
     OPTION_NO_CACHE="--no-cache"
   fi
 
+  # shellcheck disable=SC2164
   cd "${platform}"
-  # shellcheck disable=SC2248
+  # shellcheck disable=SC2248,SC2086
   docker build ${OPTION_NO_CACHE:-} --platform amd64 -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
@@ -91,7 +94,8 @@ build_action() {
     builder_echo debug "Setting default tag for ${platform}"
     docker build --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
-  cd - || true
+  # shellcheck disable=SC2164,SC2103
+  cd -
   builder_echo success "Docker image 'keymanapp/keyman-${platform}-ci:${build_version}' built"
 }
 
@@ -99,7 +103,7 @@ test_action() {
   local platform=$1
 
   builder_echo debug "Testing image for ${platform}"
-  ./run.sh ${platform} -- ./build.sh configure,build,test:${platform}
+  ./run.sh "${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
 
 if builder_has_action build; then

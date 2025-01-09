@@ -32,6 +32,7 @@ RUN echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 RUN <<EOF cat > /usr/bin/bashwrapper
 #!/bin/bash
 export KEYMAN_USE_NVM=1
+export DOCKER_RUNNING=true
 EOF
 
 # Install NVM

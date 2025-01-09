@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+if [[ -z "${DOCKER_RUNNING:-}" ]]; then
+  echo "This script is intended to be run inside a docker container."
+  exit 0
+fi
+
 # Start system dbus
 sudo dbus-daemon --system --fork
 

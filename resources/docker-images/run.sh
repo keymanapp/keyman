@@ -21,37 +21,37 @@ builder_describe \
 builder_parse "$@"
 
 run_android() {
-  docker run -it --rm -v ${KEYMAN_ROOT}:/home/build/build \
-    -v ${KEYMAN_ROOT}/core/build/docker-core:/home/build/build/core/build \
+  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
     keymanapp/keyman-android-ci:default \
     "${builder_extra_params[@]}"
 }
 
 run_core() {
-  docker run -it --rm -v ${KEYMAN_ROOT}:/home/build/build \
-    -v ${KEYMAN_ROOT}/core/build/docker-core:/home/build/build/core/build \
+  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
     keymanapp/keyman-core-ci:default \
     "${builder_extra_params[@]}"
 }
 
 run_linux() {
-  mkdir -p ${KEYMAN_ROOT}/linux/build/docker-linux
-  docker run -it --privileged --rm -v ${KEYMAN_ROOT}:/home/build/build \
-    -v ${KEYMAN_ROOT}/core/build/docker-core:/home/build/build/core/build \
-    -v ${KEYMAN_ROOT}/linux/build/docker-linux:/home/build/build/linux/build \
+  mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux"
+  docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
+    -v "${KEYMAN_ROOT}/linux/build/docker-linux":/home/build/build/linux/build \
     -e DESTDIR=/tmp \
     keymanapp/keyman-linux-ci:default \
     "${builder_extra_params[@]}"
 }
 
 run_web() {
-  docker run -it --privileged --rm -v ${KEYMAN_ROOT}:/home/build/build \
-    -v ${KEYMAN_ROOT}/core/build/docker-core:/home/build/build/core/build \
+  docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
     keymanapp/keyman-web-ci:default \
     "${builder_extra_params[@]}"
 }
 
-mkdir -p ${KEYMAN_ROOT}/core/build/docker-core
+mkdir -p "${KEYMAN_ROOT}/core/build/docker-core"
 
 builder_run_action android  run_android
 builder_run_action core     run_core

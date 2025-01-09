@@ -47,6 +47,9 @@ VOLUME /home/build/build
 WORKDIR /home/build/build
 
 # Pre-install gradle. This will put files in ~/.gradle which will speed up builds.
+# Note it would be safer to copy these files directly from our repo rather than
+# getting it over the Internet, but Docker doesn't allow us to copy files
+# from outside the current directory when building the image.
 RUN mkdir -p $HOME/tmp/gradle/wrapper && \
   # KMEA uses gradle-7.6.4-bin
   curl --location --output $HOME/tmp/gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/keymanapp/keyman/master/android/KMEA/gradle/wrapper/gradle-wrapper.jar && \
