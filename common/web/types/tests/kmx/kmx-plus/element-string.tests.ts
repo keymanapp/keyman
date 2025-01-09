@@ -375,6 +375,16 @@ describe('Test of ElementString', () => {
         const two = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
         assert.isTrue(one.isEqual(two));
       });
+      it('returns false when ElementStrings are different lengths', () => {
+        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱"]);
+        assert.isFalse(one.isEqual(two));
+      });
+      it('returns false when ElementStrings have different ElemElements', () => {
+        const one = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const two = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌳"]);
+        assert.isFalse(one.isEqual(two));
+      });
     });
   });
 });
