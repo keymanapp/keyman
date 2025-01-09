@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
 ## 18.0.164 alpha 2025-01-08
 
 * fix(windows): add language and close button fit inside pop-window (#12855)
