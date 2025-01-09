@@ -73,7 +73,7 @@ type
     procedure SetStateOnly(const enumState: TUpdateState);
     function ConvertStateToEnum(const StateClass: TStateClass): TUpdateState;
     function IsCurrentStateAssigned: Boolean;
-    procedure HandleMSIInstallComplete;
+    procedure RemoveCachedFiles;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
     function GetAutomaticUpdates: Boolean;
@@ -148,7 +148,7 @@ type
     procedure Enter; override;
     procedure Exit; override;
     procedure HandleCheck; override;
-    function  HandleKmShell: Integer; override;
+    function HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
@@ -203,17 +203,17 @@ type
 
   function DoInstallKeyman: Boolean; overload;
 
-    (**
-   * Installs the Keyman Keyboard files using separate shell.
-   *
-   * @params  SavePath  The path to the downloaded files.
-   *
-   * @returns True  if the installation is successful, False otherwise.
-   *)
+      (**
+     * Installs the Keyman Keyboard files using separate shell.
+     *
+     * @params  SavePath  The path to the downloaded files.
+     *
+     * @returns True  if the installation is successful, False otherwise.
+     *)
 
-  function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
-  function DoInstallPackage(PackageFileName: String): Boolean;
-  procedure LaunchInstallPackageProcess;
+    function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
+    function DoInstallPackage(PackageFileName: String): Boolean;
+    procedure LaunchInstallPackageProcess;
 
   public
     procedure Enter; override;
@@ -391,7 +391,7 @@ begin
       on E: ERegistryException do
       begin
         TKeymanSentryClient.ReportHandledException(E,
-          'Failed to write apply now');
+          'Failed to write "apply now"');
       end;
     end;
   finally
@@ -450,7 +450,8 @@ begin
   end
   else
   begin
-    // TODO: #10210 Error log for Unable to set state for Value
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Set CurrentState was failed');
   end;
 
 end;
@@ -493,20 +494,21 @@ begin
   end;
 end;
 
-procedure TUpdateStateMachine.HandleMSIInstallComplete;
+procedure TUpdateStateMachine.RemoveCachedFiles;
 var
   SavePath: string;
   FileName: String;
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  KL.Log('ITUpdateStateMachine.HandleMSIInstallComplete');
+  // TODO: epic-windows-updates
+  // remove debug log
+  // KL.Log('TUpdateStateMachine.RemoveCachedFiles');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
     System.SysUtils.DeleteFile(FileName);
   end;
-  CurrentState.ChangeState(IdleState);
 end;
 
 procedure TUpdateStateMachine.HandleCheck;
@@ -574,7 +576,8 @@ begin
   // something is wrong.
   TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
     'Handle first run called in state:"' + Self.ClassName + '"');
-  bucStateContext.HandleMSIInstallComplete;
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 { IdleState }
@@ -600,11 +603,6 @@ begin
   // ChangeState(UpdateAvailableState);
   // will keep here as there are more PR's #12621
   { #### End of Testing ### };
-
-  { // // TODO-WINDOWS-UPDATES Check how long a check takes then determine
-    if it needs to be broken into a seperate state of WaitngCheck RESP }
-  { if Response not OK stay in the idle state and return }
-
   // Handle_check event force check
   CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
@@ -626,7 +624,7 @@ var
   CheckForUpdates: TRemoteUpdateCheck;
   UpdateCheckResult: TRemoteUpdateCheckResult;
 begin
-  // Remote manages the last check time therfore
+  // Remote manages the last check time therefore
   // we will allow it to return early if it hasn't reached
   // the configured time between checks.
   CheckForUpdates := TRemoteUpdateCheck.Create(False);
@@ -650,12 +648,12 @@ end;
 
 procedure IdleState.HandleAbort;
 begin
-
+  // Do Nothing
 end;
 
 procedure IdleState.HandleInstallNow;
 begin
-  bucStateContext.CurrentState.HandleCheck;
+  // Do Nothing
 end;
 
 { UpdateAvailableState }
@@ -665,7 +663,7 @@ var
   FResult: Boolean;
   RootPath: string;
 begin
-  // call seperate process
+  // call separate process
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0),
     IncludeTrailingPathDelimiter(RootPath), '-bd');
@@ -693,8 +691,22 @@ begin
 end;
 
 procedure UpdateAvailableState.HandleCheck;
+var
+  CheckForUpdates: TRemoteUpdateCheck;
+  Result: TRemoteUpdateCheckResult;
 begin
-
+  // Check if new updates while in this state
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  try
+    Result := CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
+  if Result <> wucSuccess then
+    begin
+      KL.Log('UpdateAvailableState.HandleCheck not successful: '+
+      GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
+    end;
 end;
 
 function UpdateAvailableState.HandleKmShell;
@@ -758,12 +770,16 @@ var
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
+
+  // TODO: epic-windows-updates
+  // Remove this test code
   { ##  for testing log that we would download }
-  KL.Log('DownloadingState.Enter test code continue');
-  DownloadResult := True;
+  //KL.Log('DownloadingState.Enter test code continue');
+  //DownloadResult := True;
   { End testing }
+
   RetryCount := 0;
-  //DownloadResult := False;
+  DownloadResult := False;
 
   while (not DownloadResult) and (RetryCount < 3) do
   begin
@@ -774,8 +790,10 @@ begin
 
   if (not DownloadResult) then
   begin
-    // Failed three times in this process return to the
-    // IdleState to wait 7 days before trying again
+    // Failed three times in this process; return to the
+    // IdleState to wait 'CheckPeriod' before trying again
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+    'Error Updates not downloaded after 3 attempts');
     ChangeState(IdleState);
   end
   else
@@ -821,6 +839,7 @@ end;
 
 procedure DownloadingState.HandleAbort;
 begin
+  // To abort during the downloading
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -857,15 +876,29 @@ begin
 end;
 
 procedure WaitingRestartState.HandleCheck;
+var
+  CheckForUpdates: TRemoteUpdateCheck;
+  Result: TRemoteUpdateCheckResult;
 begin
-
+  // Check if new updates while in this state
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  try
+    Result := CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
+  { Response OK and go back to update available so files can be downloaded }
+  if Result = wucSuccess then
+  begin
+    ChangeState(UpdateAvailableState);
+  end;
 end;
 
 function WaitingRestartState.HandleKmShell;
 var
-  SavedPath: String;
-  FileNames: TStringDynArray;
   frmStartInstall: TfrmStartInstall;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstall: Boolean;
 begin
   // Still can't go if keyman has run
   if HasKeymanRun then
@@ -876,17 +909,22 @@ begin
   end
   else
   begin
-    // Check downloaded cache if available then
-    SavedPath := IncludeTrailingPathDelimiter
-      (TKeymanPaths.KeymanUpdateCachePath);
-    GetFileNamesInDirectory(SavedPath, FileNames);
-    if Length(FileNames) = 0 then
+    // Checking the files are available could be seen us redundant here as the
+    // Install state will check anyway, but since we still ask the user if they
+    // want to install lets not bug them if the files are no longer cached.
+    hasPackages := False;
+    hasKeymanInstall := False;
+    if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
+    begin
+      hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
+      hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+    end;
+    if not (hasPackages Or hasKeymanInstall) then
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck; // TODO no event here
       Result := kmShellExit;
-      // Exit; // again exit was not working
     end
     else
     begin
@@ -913,7 +951,7 @@ end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-
+   ChangeState(UpdateAvailableState);
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
@@ -1012,12 +1050,11 @@ begin
 
   if not FResult then
   begin
-    bucStateContext.HandleMSIInstallComplete;
-    KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall fail');
-    ChangeState(IdleState);
+    bucStateContext.RemoveCachedFiles;
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Executing kmshell process to install failed:"' +
       IntToStr(Ord(FResult)) + '"');
+    ChangeState(IdleState);
   end;
 
   Result := FResult;
@@ -1064,8 +1101,6 @@ end;
 
 procedure InstallingState.Enter;
 var
-  SavePath: String;
-  FileNames: TStringDynArray;
   ucr: TUpdateCheckResponse;
   hasPackages, hasKeymanInstall: Boolean;
 begin
@@ -1073,10 +1108,7 @@ begin
   hasPackages := False;
   hasKeymanInstall := False;
   bucStateContext.SetRegistryState(usInstalling);
-  SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  GetFileNamesInDirectory(SavePath, FileNames);
-  // TODO: epic-update-windows
-  // Check if there are also packages to install if so
+
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
@@ -1095,7 +1127,9 @@ begin
     DoInstallKeyman;
     Exit;
   end;
-
+  // unexpected: should have had either packages or a keyman file
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure InstallingState.Exit;
@@ -1123,7 +1157,7 @@ end;
 
 procedure InstallingState.HandleAbort;
 begin
-  ChangeState(IdleState);
+   // To late as MSI is installing
 end;
 
 procedure InstallingState.HandleInstallNow;
@@ -1155,51 +1189,8 @@ end;
 
 procedure InstallingState.HandleFirstRun;
 begin
-  bucStateContext.HandleMSIInstallComplete;
-end;
-
-// Private Functions:
-function ConfigCheckContinue: Boolean;
-var
-  Registry: TRegistryErrorControlled;
-begin
-  { Verify that it has been at least CheckPeriod days since last update check }
-  Result := False;
-  try
-    Registry := TRegistryErrorControlled.Create; // I2890
-    try
-      if Registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if Registry.ValueExists(SRegValue_CheckForUpdates) and
-          not Registry.ReadBool(SRegValue_CheckForUpdates) then
-        begin
-          Result := False;
-          Exit;
-        end;
-        if Registry.ValueExists(SRegValue_LastUpdateCheckTime) and
-          (Now - Registry.ReadDateTime(SRegValue_LastUpdateCheckTime) >
-          CheckPeriod) then
-        begin
-          Result := True;
-        end
-        else
-        begin
-          Result := False;
-        end;
-        Exit;
-      end;
-    finally
-      Registry.Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E: Exception do
-    begin
-      Result := False;
-      LogMessage(E.Message);
-      Exit;
-    end;
-  end;
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 end.

@@ -26,7 +26,6 @@ type
     cmdInstall: TButton;
     cmdLater: TButton;
     lblUpdateMessage: TLabel;
-    lblUpdateNow: TLabel;
   private
   public
   end;
