@@ -73,7 +73,7 @@ type
     procedure SetStateOnly(const enumState: TUpdateState);
     function ConvertStateToEnum(const StateClass: TStateClass): TUpdateState;
     function IsCurrentStateAssigned: Boolean;
-    procedure HandleMSIInstallComplete;
+    procedure RemoveCachedFiles;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
     function GetAutomaticUpdates: Boolean;
@@ -493,20 +493,19 @@ begin
   end;
 end;
 
-procedure TUpdateStateMachine.HandleMSIInstallComplete;
+procedure TUpdateStateMachine.RemoveCachedFiles;
 var
   SavePath: string;
   FileName: String;
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  KL.Log('TUpdateStateMachine.HandleMSIInstallComplete');
+  KL.Log('TUpdateStateMachine.RemoveCachedFiles');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
     System.SysUtils.DeleteFile(FileName);
   end;
-  CurrentState.ChangeState(IdleState);
 end;
 
 procedure TUpdateStateMachine.HandleCheck;
@@ -574,7 +573,8 @@ begin
   // something is wrong.
   TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
     'Handle first run called in state:"' + Self.ClassName + '"');
-  bucStateContext.HandleMSIInstallComplete;
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 { IdleState }
@@ -650,13 +650,12 @@ end;
 
 procedure IdleState.HandleAbort;
 begin
-
+  // Do Nothing
 end;
 
 procedure IdleState.HandleInstallNow;
 begin
-  bucStateContext.CurrentState.HandleCheck;
-  // TODO: How do we notify the command line no update available
+  // Do Nothing
 end;
 
 { UpdateAvailableState }
@@ -694,8 +693,22 @@ begin
 end;
 
 procedure UpdateAvailableState.HandleCheck;
+var
+  CheckForUpdates: TRemoteUpdateCheck;
+  Result: TRemoteUpdateCheckResult;
 begin
-
+  // Check if new updates while in this state
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  try
+    Result := CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
+  if Result <> wucSuccess then
+    begin
+      KL.Log('UpdateAvailableState.HandleCheck not successful: '+
+      GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
+    end;
 end;
 
 function UpdateAvailableState.HandleKmShell;
@@ -824,6 +837,11 @@ end;
 
 procedure DownloadingState.HandleAbort;
 begin
+  // TODO epic-windows-updates
+  // another process  is likely downloading the files
+  // To clean do this would be to set a registry marker
+  // or file in the cached directory then when download is finished
+  // we an check for abort.
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -860,15 +878,29 @@ begin
 end;
 
 procedure WaitingRestartState.HandleCheck;
+var
+  CheckForUpdates: TRemoteUpdateCheck;
+  Result: TRemoteUpdateCheckResult;
 begin
-
+  // Check if new updates while in this state
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  try
+    Result := CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
+  { Response OK and go back to update available so files can be downloaded }
+  if Result = wucSuccess then
+  begin
+    ChangeState(UpdateAvailableState);
+  end;
 end;
 
 function WaitingRestartState.HandleKmShell;
 var
-  SavedPath: String;
-  FileNames: TStringDynArray;
   frmStartInstall: TfrmStartInstall;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstall: Boolean;
 begin
   // Still can't go if keyman has run
   if HasKeymanRun then
@@ -879,17 +911,22 @@ begin
   end
   else
   begin
-    // Check downloaded cache if available then
-    SavedPath := IncludeTrailingPathDelimiter
-      (TKeymanPaths.KeymanUpdateCachePath);
-    GetFileNamesInDirectory(SavedPath, FileNames);
-    if Length(FileNames) = 0 then
+    // Checking the files are available could be seen us redundant here as the
+    // Install state will check anyway, but since we still ask the user if they
+    // want to install lets not bug them if the files are no longer cached.
+    hasPackages := False;
+    hasKeymanInstall := False;
+    if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
+    begin
+      hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
+      hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+    end;
+    if not (hasPackages Or hasKeymanInstall) then
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck; // TODO no event here
       Result := kmShellExit;
-      // Exit; // again exit was not working
     end
     else
     begin
@@ -916,7 +953,7 @@ end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-
+   ChangeState(UpdateAvailableState);
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
@@ -1015,8 +1052,7 @@ begin
 
   if not FResult then
   begin
-    bucStateContext.HandleMSIInstallComplete;
-
+    bucStateContext.RemoveCachedFiles;
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Executing kmshell process to install failed:"' +
       IntToStr(Ord(FResult)) + '"');
@@ -1068,8 +1104,6 @@ end;
 
 procedure InstallingState.Enter;
 var
-  SavePath: String;
-  FileNames: TStringDynArray;
   ucr: TUpdateCheckResponse;
   hasPackages, hasKeymanInstall: Boolean;
 begin
@@ -1077,10 +1111,7 @@ begin
   hasPackages := False;
   hasKeymanInstall := False;
   bucStateContext.SetRegistryState(usInstalling);
-  SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  GetFileNamesInDirectory(SavePath, FileNames);
-  // TODO: epic-update-windows
-  // Check if there are also packages to install if so
+
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
@@ -1099,7 +1130,9 @@ begin
     DoInstallKeyman;
     Exit;
   end;
-
+  // unexpected: should have had either packages or a keyman file
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure InstallingState.Exit;
@@ -1127,7 +1160,7 @@ end;
 
 procedure InstallingState.HandleAbort;
 begin
-  ChangeState(IdleState);
+   // To late as MSI is installing
 end;
 
 procedure InstallingState.HandleInstallNow;
@@ -1159,8 +1192,8 @@ end;
 
 procedure InstallingState.HandleFirstRun;
 begin
-  bucStateContext.HandleMSIInstallComplete;
-  // Result := kmShellContinue;
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 end.
