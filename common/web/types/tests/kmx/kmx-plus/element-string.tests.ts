@@ -45,7 +45,7 @@ describe('Test of ElementString file', () => {
         const two = initElemElement();
         assert.isTrue(one.isEqual(two));
       });
-      it.skip('returns true when elems are clones', () => {
+      it('returns true when elems are clones', () => {
         const one = initElemElement(new StrsItem("𐌰", 0x10330));
         const two = initElemElement(new StrsItem("𐌰", 0x10330));
         assert.isTrue(one.isEqual(two));
@@ -389,7 +389,7 @@ describe('Test of ElementString file', () => {
         ]);
         assert.isTrue(es.isEqual(es));
       });
-      it.skip('returns true when ElementStrings are clones', () => {
+      it('returns true when ElementStrings are clones', () => {
         const one = initElementString([
           initElemElement(GOTHIC_A),
           initElemElement(GOTHIC_B),

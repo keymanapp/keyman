@@ -19,8 +19,8 @@ export class ElemElement {
   order: number; // -128 to +127; used only by reorder element values
   tertiary: number; // -128 to +127; used only by reorder element values
   flags: ElemElementFlags;
-  isEqual(a: ElemElement) {
-    return a.value === this.value &&
+  isEqual(a: ElemElement): boolean {
+    return a.value.isEqual(this.value) &&
       a.order === this.order &&
       a.tertiary === this.tertiary &&
       a.flags === this.flags;
