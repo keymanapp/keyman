@@ -36,7 +36,7 @@ class TestUnicodeSetParser implements UnicodeSetParser {
 const origElementParserSegment = ElementParser.segment;
 let sections: DependencySections = null;
 
-describe('Test of ElementString', () => {
+describe('Test of ElementString file', () => {
   describe('Test of ElemElement', () => {
     describe('Test of isEqual()', () => {
       it('returns true when elems identical', () => {
@@ -76,7 +76,7 @@ describe('Test of ElementString', () => {
       });
     });
   });
-  describe('Test of ElementString', () => {
+  describe('Test of ElementString class', () => {
     beforeEach(() => {
       sections = {
         strs: new Strs(),
