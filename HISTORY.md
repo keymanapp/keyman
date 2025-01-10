@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
 ## 18.0.165 alpha 2025-01-09
 
 * feat(web): add KeymanWeb API for auto-correct (#12857)
