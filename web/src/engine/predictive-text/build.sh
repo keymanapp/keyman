@@ -17,7 +17,7 @@ builder_describe "Builds predictive-text components used within Keyman Engine fo
   "configure" \
   "build" \
   "test" \
-  ":templates                Builds the model templates utlilized by compiled lexical models" \
+  ":templates                Builds the model templates utilized by compiled lexical models" \
   ":wordbreakers             Builds the wordbreakers provided for lexical model use" \
   ":worker-main              Builds the predictive-text worker interface module" \
   ":worker-thread            Builds the predictive-text worker" \
@@ -48,9 +48,6 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 # We can run all clean & configure actions at once without much issue.
 
 builder_run_child_actions clean
-
-## Clean actions
-
 builder_run_child_actions configure
 
 ## Build actions
