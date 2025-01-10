@@ -1115,13 +1115,19 @@ begin
     hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   end;
   KL.Log('InstallingState.Enter before hasPackages');
+  { Notes: The reason packages (keyboards) is installed first is
+  because we are trying to reduce the number of times the user has
+  to be asked to elevate to admin or restart. Keyboard installation always
+  needs elevation, when we do that and execute kmshell as an elevated process
+  we can then launch the Keyman installer and it will not need
+  to ask for elevation. }
   if hasPackages then
   begin
     KL.Log('InstallingState.Enter hasPackages');
     LaunchInstallPackageProcess;
     Exit;
   end;
-  // only reach here if no has packages otherwise it will
+  // If no packages then install Keyman now
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
