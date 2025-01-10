@@ -201,7 +201,7 @@ type
    * @returns True  if the installation is successful, False otherwise.
    *)
 
-  function DoInstallKeyman: Boolean; overload;
+    function DoInstallKeyman: Boolean; overload;
 
       (**
      * Installs the Keyman Keyboard files using separate shell.
@@ -705,7 +705,7 @@ begin
   if Result <> wucSuccess then
     begin
       KL.Log('UpdateAvailableState.HandleCheck not successful: '+
-      GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
+        GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
     end;
 end;
 
@@ -909,7 +909,7 @@ begin
   end
   else
   begin
-    // Checking the files are available could be seen us redundant here as the
+    // Checking the files are available could be seen as redundant here as the
     // Install state will check anyway, but since we still ask the user if they
     // want to install lets not bug them if the files are no longer cached.
     hasPackages := False;
@@ -1171,7 +1171,7 @@ var
 begin
   KL.Log('InstallingState.HandleInstallPackages');
   // This event should only be reached in elevated process if not then
-  // move on to just installing Keyman packages
+  // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
   begin
     KL.Log('InstallingState.HandleInstallPackages Not Admin');
