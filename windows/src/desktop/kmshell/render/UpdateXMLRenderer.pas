@@ -65,8 +65,9 @@ begin
     begin
       n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
       if n >= 0 then
-      pkg := kmcom.Packages[n];
       begin
+        pkg := kmcom.Packages[n];
+
         xml := xml +
           '<Update>'+
             '<index>'+IntToStr(i+1)+'</index>'+
