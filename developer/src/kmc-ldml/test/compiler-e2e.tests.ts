@@ -4,6 +4,8 @@ import hextobin from '@keymanapp/hextobin';
 import { KMXBuilder } from '@keymanapp/developer-utils';
 import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
+import { kmxToXml } from '../src/util/serialize.js';
+import { writeFileSync } from 'node:fs';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -35,6 +37,12 @@ describe('compiler-tests', function() {
     let expected = await hextobin(binaryFilename, undefined, {silent:true});
 
     assert.deepEqual<Uint8Array>(code, expected);
+
+    // now output it again as XML
+    const outputFilename = makePathToFixture('basic-serialized.xml');
+    const asXml = kmxToXml(kmx);
+    writeFileSync(outputFilename, asXml, 'utf-8');
+
   });
 
   it('should handle non existent files', async () => {
