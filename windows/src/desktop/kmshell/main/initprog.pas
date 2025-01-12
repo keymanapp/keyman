@@ -82,6 +82,7 @@ type
                     fmMigrate, fmSplash, fmStart,
                     fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
                     fmOnlineUpdateAdmin, fmTextEditor,
+                    fmInstallKeyboardPackageAdmin,
                     fmBackgroundUpdateCheck,
                     fmBackgroundDownload,
                     fmApplyInstallNow,
@@ -246,6 +247,7 @@ begin
       else if s = '-ukl' then FMode := fmUninstallKeyboardLanguage   // I3624
       else if s = '-up' then  FMode := fmUninstallPackage          { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       else if s = '-ou' then  FMode := fmOnlineUpdateAdmin     { I1730 - Check update of keyboards (admin elevation) }
+      else if s = '-ikp' then  FMode := fmInstallKeyboardPackageAdmin
       else if s = '-a' then   FMode := fmAbout
       else if s = '-ra' then  FMode := fmRegistryAdd
       else if s = '-rr' then  FMode := fmRegistryRemove
@@ -454,6 +456,11 @@ begin
       else if (FMode = fmApplyInstallNow) then
       begin
         BUpdateSM.HandleInstallNow;
+        Exit;
+      end
+      else if (FMode = fmInstallKeyboardPackageAdmin) then
+      begin
+        BUpdateSM.HandleInstallPackages;
         Exit;
       end
       else

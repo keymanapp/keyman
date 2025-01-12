@@ -13,12 +13,15 @@ type
     class function HasUpdates: Boolean; static;
     class function LoadUpdateCacheData(var data: TUpdateCheckResponse): Boolean; static;
     class procedure SaveUpdateCacheData(const data: TUpdateCheckResponse); static;
+    class function HasKeyboardPackages(const data: TUpdateCheckResponse): Boolean; static;
+    class function HasKeymanInstallFile(const data: TUpdateCheckResponse): Boolean; static;
   end;
 
 implementation
 
 uses
   System.SysUtils,
+  System.RegularExpressions,
 
   KeymanPaths,
   KeymanVersion;
@@ -47,6 +50,38 @@ begin
   Result :=
     HasUpdates and
     data.LoadFromFile(MetadataFilename, 'bundle', CKeymanVersionInfo.Version);
+end;
+
+class function TUpdateCheckStorage.HasKeyboardPackages(const data: TUpdateCheckResponse): Boolean;
+var
+  i : Integer;
+  fileName : string;
+  KeyboardRegex: TRegEx;
+begin
+  Result := False;
+  KeyboardRegex := TRegEx.Create('\.k..$');
+  for i := 0 to High(data.Packages) do
+  begin
+    fileName := data.Packages[i].FileName;
+    if KeyboardRegex.IsMatch(fileName) then
+      Result := True;
+  end;
+end;
+
+class function TUpdateCheckStorage.HasKeymanInstallFile(const data: TUpdateCheckResponse): Boolean;
+var
+  i : Integer;
+  fileName : string;
+  f: TSearchRec;
+begin
+  Result := False;
+  for i := 0 to High(data.Packages) do
+  begin
+    fileName := data.Packages[i].FileName;
+    if FindFirst(fileName + '*.exe', 0, f) = 0 then
+      Result := True;
+    System.SysUtils.FindClose(f);
+  end;
 end;
 
 end.
