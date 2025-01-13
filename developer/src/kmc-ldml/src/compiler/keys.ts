@@ -15,8 +15,9 @@ import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 /** reserved name for the special gap key. space is not allowed in key ids. */
 const reserved_gap = "gap (reserved)";
 
-
 export class KeysCompiler extends SectionCompiler {
+  /** keys that are of a reserved type */
+  public static RESERVED_KEY = Symbol('Reserved Key');
   static validateSubstitutions(
     keyboard: LDMLKeyboard.LKKeyboard,
     st: Substitutions
@@ -222,6 +223,19 @@ export class KeysCompiler extends SectionCompiler {
   /** count of reserved keys, for tests */
   public static readonly reserved_count = KeysCompiler.reserved_keys.length;
 
+  /** mark as reserved */
+  private static asReserved(k : KeysKeys) : KeysKeys {
+    const o = k as any;
+    o[KeysCompiler.RESERVED_KEY] = true;
+    return k;
+  }
+
+  /** true if a reserved key */
+  public static isReserved(k : KeysKeys) : boolean {
+    const o = k as any;
+    return !!o[KeysCompiler.RESERVED_KEY];
+  }
+
   /** load up all reserved keys */
   getReservedKeys(sections: KMXPlus.DependencySections) : Map<String, KeysKeys> {
     const r = new Map<String, KeysKeys>();
@@ -231,7 +245,7 @@ export class KeysCompiler extends SectionCompiler {
     const no_list = sections.list.allocList([], {}, sections);
 
     // now add the reserved key(s).
-    r.set(reserved_gap, {
+    r.set(reserved_gap, KeysCompiler.asReserved({
       flags: constants.keys_key_flags_gap | constants.keys_key_flags_extend,
       id: sections.strs.allocString(reserved_gap),
       flicks: '',
@@ -241,7 +255,7 @@ export class KeysCompiler extends SectionCompiler {
       switch: no_string,
       to: no_string,
       width: 10.0, // 10 * .1
-    });
+    }));
 
     if (r.size !== KeysCompiler.reserved_count) {
       throw Error(`Internal Error: KeysCompiler.reserved_count=${KeysCompiler.reserved_count} != ${r.size} actual reserved keys.`);
@@ -357,7 +371,7 @@ export class KeysCompiler extends SectionCompiler {
         flags |= constants.keys_key_flags_extend;
       }
       const width = Math.ceil((key.width || 1) * 10.0); // default, width=1
-      sect.keys.push({
+      sect.keys.push(SectionCompiler.copySymbols({
         flags,
         flicks: flickId,
         id,
@@ -367,7 +381,7 @@ export class KeysCompiler extends SectionCompiler {
         switch: keySwitch, // 'switch' is a reserved word
         to,
         width,
-      });
+      }, key));
     }
   }
 

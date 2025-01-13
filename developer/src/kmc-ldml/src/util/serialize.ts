@@ -3,8 +3,9 @@
  */
 
 import { KMXPlus } from "@keymanapp/common-types";
-import { KeymanXMLWriter } from "@keymanapp/developer-utils";
+import { KeymanXMLWriter, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { KeysCompiler } from "../compiler/keys.js";
 
 export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
     const writer = new KeymanXMLWriter("keyboard3");
@@ -14,7 +15,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
         //    bksp,
         disp,
         //    elem,
-        //    keys,
+           keys,
         //    layr,
         //    list,
         loca,
@@ -32,6 +33,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
             info: getInfo(),
             ...getDisplays(),
             ...getKeys(),
+            ...getFlicks(),
             ...getLayers(),
             ...getVariables(),
             ...getTransforms(),
@@ -44,7 +46,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
         return {
             '$xmlns': `https://schemas.unicode.org/cldr/${constants.cldr_version_latest}/keyboard3`,
             '$locale': kmx.kmxplus.loca.locales[0].value,
-            '$conffiormsTo': constants.cldr_version_latest,
+            '$conformsTo': constants.cldr_version_latest,
         };
     }
 
@@ -107,7 +109,33 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
     }
 
     function getKeys() {
-        return {};
+        if (!keys?.keys?.length) {
+            return {};
+        }
+        return {
+            keys: {
+                key: keys.keys
+                // skip reserved keys (gap)
+                .filter((key: KMXPlus.KeysKeys) =>
+                        !KeysCompiler.isReserved(key) &&
+                        !LDMLKeyboard.ImportStatus.isImpliedImport(key))
+                .map((key: KMXPlus.KeysKeys) => ({
+                    ...stringToAttr('id', key.id),
+                    ...stringToAttr('output', key.to),
+                })),
+            },
+        };
+    }
+
+    function getFlicks() {
+        if (!keys?.flicks?.length) {
+            return {};
+        }
+        return {
+            flicks: {
+                // keys.keu
+            }
+        };
     }
 
     function getLayers() {
