@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
+## 18.0.164 alpha 2025-01-08
+
+* fix(windows): add language and close button fit inside pop-window (#12855)
+* chore(windows): add bcp47 code and tips to diagnostic (#12843)
+* fix(android/engine): Cleanup KMManager API keys and calls (#12861)
+* docs(developer,mac): add playable video links to the help documentation (#12828)
+
+## 18.0.163 alpha 2025-01-06
+
+* docs: clarify that sections in KMX file might not be aligned (#12856)
+
 ## 18.0.162 alpha 2024-12-19
 
 * fix(mac): standardize interaction between OSK and physical keyboard (#12836)
