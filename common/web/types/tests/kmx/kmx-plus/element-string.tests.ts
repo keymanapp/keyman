@@ -428,6 +428,24 @@ describe('Test of ElementString file', () => {
         assert.isFalse(one.isEqual(two));
       });
     });
+    describe('Test of parseIntOrZero()', () => {
+      it('returns a number for a valid string', () => {
+        const num = ElementString['parseIntOrZero']('1');
+        assert.equal(num, 1);
+      });
+      it('returns zero for an invalid string', () => {
+        const num = ElementString['parseIntOrZero']('A');
+        assert.equal(num, 0);
+      });
+      it('returns zero for undefined', () => {
+        const num = ElementString['parseIntOrZero'](undefined);
+        assert.equal(num, 0);
+      });
+      it('returns zero for a null string', () => {
+        const num = ElementString['parseIntOrZero'](null);
+        assert.equal(num, 0);
+      });
+    });
   });
 });
 

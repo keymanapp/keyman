@@ -125,7 +125,7 @@ export class ElementString extends Array<ElemElement> {
     }
     return true;
   }
-  private static parseIntOrZero(str: string) {
+  private static parseIntOrZero(str: string): number {
     const num = parseInt(str, 10);
     return !Number.isNaN(num) ? num : 0;
   }
