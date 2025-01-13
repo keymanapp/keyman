@@ -382,22 +382,24 @@ ID
     required, and a default code will usually be generated automatically
     by Keyman Developer.
 
-    -   `K_xxxx` is used for a standard Keyman for Windows's key name, e.g.
-        `K_W`, `K_ENTER`. You cannot make up your own `K_xxxx` names.
-        Many of the `K_` ids have overloaded output behaviour, for
-        instance, if no rule is matched for `K_W`, Keyman will output
-        'w' when it is touched. The standard key names are listed in
-        [Virtual Keys and Virtual Character Keys](/developer/language/guide/virtual-keys). Typically,
-        you would use only the "common" virtual ID.
-    -   `T_xxxx` is used for any user defined names, e.g. `T_SCHWA`.
-        If you wanted to use it, `T_ENTER` would also be valid. If no
-        rule matches it, the key will have no output behaviour.
-    -   `U_####[_####]` is used as a shortcut for a key that
-        will output those Unicode values, if no rule matches it. This is
-        similar to the overloaded behaviour for `K_` ids. Thus `####`
-        must be valid Unicode characters. E.g. `U_0259` would generate a
-        schwa if no rule matches. It is still valid to have a rule such
-        as `+ [U_0259] > ...`
+-   `K_xxxx` is used for a standard Keyman for Windows's key name, e.g.
+    `K_W`, `K_ENTER`. You cannot make up your own `K_xxxx` names.
+    Many of the `K_` ids have overloaded output behaviour, for
+    instance, if no rule is matched for `K_W`, Keyman will output
+    'w' when it is touched. The standard key names are listed in
+    [Virtual Keys and Virtual Character Keys](/developer/language/guide/virtual-keys). Typically,
+    you would use only the "common" virtual ID.
+-   `T_xxxx` is used for any user defined names, e.g. `T_SCHWA`.
+    If you wanted to use it, `T_ENTER` would also be valid. If no
+    rule matches it, the key will have no output behaviour.
+-   `U_####[_####]` is used as a shortcut for a key that
+    will output those Unicode values, if no rule matches it. This is
+    similar to the overloaded behaviour for `K_` ids. Thus `####`
+    must be valid Unicode characters. 
+    The square bracket characters `[` and `]` indicate an optional portion of the sequence
+    and are not to be included in the shortcut. E.g. `U_0259` would generate a
+    schwa if no rule matches. It is still valid to have a rule such
+    as `+ [U_0259] > ...`
 
 Padding Left
 :   Padding to the left of each key can be adjusted, and specified as a
