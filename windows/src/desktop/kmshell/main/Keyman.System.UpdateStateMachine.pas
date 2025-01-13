@@ -201,7 +201,7 @@ type
    * @returns True  if the installation is successful, False otherwise.
    *)
 
-  function DoInstallKeyman: Boolean; overload;
+    function DoInstallKeyman: Boolean; overload;
 
       (**
      * Installs the Keyman Keyboard files using separate shell.
@@ -705,7 +705,7 @@ begin
   if Result <> wucSuccess then
     begin
       KL.Log('UpdateAvailableState.HandleCheck not successful: '+
-      GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
+        GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
     end;
 end;
 
@@ -909,7 +909,7 @@ begin
   end
   else
   begin
-    // Checking the files are available could be seen us redundant here as the
+    // Checking the files are available could be seen as redundant here as the
     // Install state will check anyway, but since we still ask the user if they
     // want to install lets not bug them if the files are no longer cached.
     hasPackages := False;
@@ -1115,13 +1115,19 @@ begin
     hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   end;
   KL.Log('InstallingState.Enter before hasPackages');
+  { Notes: The reason packages (keyboards) is installed first is
+  because we are trying to reduce the number of times the user has
+  to be asked to elevate to admin or restart. Keyboard installation always
+  needs elevation, when we do that and execute kmshell as an elevated process
+  we can then launch the Keyman installer and it will not need
+  to ask for elevation. }
   if hasPackages then
   begin
     KL.Log('InstallingState.Enter hasPackages');
     LaunchInstallPackageProcess;
     Exit;
   end;
-  // only reach here if no has packages otherwise it will
+  // If no packages then install Keyman now
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
@@ -1171,7 +1177,7 @@ var
 begin
   KL.Log('InstallingState.HandleInstallPackages');
   // This event should only be reached in elevated process if not then
-  // move on to just installing Keyman packages
+  // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
   begin
     KL.Log('InstallingState.HandleInstallPackages Not Admin');
