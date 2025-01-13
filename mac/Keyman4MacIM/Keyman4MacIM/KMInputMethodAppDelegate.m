@@ -48,6 +48,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @property (nonatomic, strong) KMPackageReader *packageReader;
 @property BOOL receivedKeyDownFromOsk;
 @property NSEventModifierFlags oskEventModifiers;
+@property (nonatomic, assign) BOOL sentryTestingEnabled;
 @end
 
 @implementation KMInputMethodAppDelegate
@@ -143,11 +144,18 @@ id _lastServerWithOSKShowing = nil;
     os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
-
+  
   if (_kvk != nil && ([KMInputMethodLifecycle.shared shouldShowOskOnActivate])) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
     [self showOSK];
   }
+
+  SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
+  crumb.level = kSentryLevelInfo;
+  crumb.category = @"startup";
+  //crumb.message = [NSString stringWithFormat:@"Authenticated user %@", user.email];
+  crumb.message = [NSString stringWithFormat:@"inputMethodActivated"];
+  [SentrySDK addBreadcrumb:crumb];
 }
 
 - (KeymanVersionInfo)versionInfo {
@@ -181,6 +189,7 @@ id _lastServerWithOSKShowing = nil;
   [self setDefaultKeymanMenuItems];
   [self updateKeyboardMenuItems];
   [self setPostLaunchKeymanSentryTags];
+  self.sentryTestingEnabled = [KMSettingsRepository.shared readForceSentryError];
   // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
@@ -194,6 +203,29 @@ id _lastServerWithOSKShowing = nil;
     options.environment = keymanVersionInfo.sentryEnvironment;
     //options.debug = YES;
   }];
+}
+
+/**
+ * Determine whether sentry testing is enabled.
+ * When it is enabled, then typing certain characters will cause Sentry events or crashes to occur.
+ *
+ * To enable, set the flag is UserDefaults
+ * `defaults write keyman.inputmethod.Keyman KMForceSentryError 1`
+ * Also, use the SIL Euro Latin keyboard and type in the Stickies app
+ */
+- (BOOL)isSentryTestingEnabled {
+  NSString* const testKeyboardName = @"sil_euro_latin.kmx";
+  NSString* const testClientApplicationId = @"com.apple.Stickies";
+  BOOL testingEnabled = NO;
+
+  if (self.sentryTestingEnabled) {
+    NSString * kmxName = [[self.kmx filePath] lastPathComponent];
+    NSString * applicationId = [KMInputMethodLifecycle.shared clientApplicationId];
+    testingEnabled = [kmxName isEqualToString:testKeyboardName] && [applicationId isEqualToString:testClientApplicationId];
+    os_log_info([KMLogs testLog], "isSentryTestingEnabled, self.sentryTestingEnabled: %{public}@ kmxName: %{public}@ applicationId: %{public}@ testingEnabled: %{public}@", self.sentryTestingEnabled?@"YES":@"NO", kmxName, applicationId, testingEnabled?@"YES":@"NO");
+  }
+    
+  return testingEnabled;
 }
 
 - (void)setPostLaunchKeymanSentryTags {
@@ -825,6 +857,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setSelectedKeyboard:keyboardName inMenuItem:menuItem];
   [self setSelectedKeyboard:keyboardName];
   [self setContextBuffer:nil];
+  
+  SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
+  crumb.level = kSentryLevelInfo;
+  crumb.category = @"startup";
+  crumb.message = [NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName];
+  [SentrySDK addBreadcrumb:crumb];
 }
 
 - (void) addKeyboardPlaceholderMenuItem {

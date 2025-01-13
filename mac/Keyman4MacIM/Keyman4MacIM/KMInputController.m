@@ -25,7 +25,7 @@ KMInputMethodEventHandler* _eventHandler;
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getClientApplicationId]);
+  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getRunningApplicationId]);
 
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
@@ -84,7 +84,7 @@ KMInputMethodEventHandler* _eventHandler;
   if (_eventHandler != nil) {
     [_eventHandler deactivate];
   }
-  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getClientApplicationId] client:self.client];
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getRunningApplicationId] client:self.client];
 
 }
 

@@ -61,7 +61,6 @@ typedef enum {
 
 @property LifecycleState lifecycleState;
 @property NSString *inputSourceId;
-@property NSString *clientApplicationId;
 @end
 
 @implementation KMInputMethodLifecycle
@@ -106,7 +105,7 @@ typedef enum {
 /**
  * Get the bundle ID of the currently active text input client..
  */
-+ (NSString*)getClientApplicationId {
++ (NSString*)getRunningApplicationId {
   NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
   NSString *clientAppId = [currentApp bundleIdentifier];
   return clientAppId;
@@ -156,7 +155,7 @@ typedef enum {
  */
 - (void)performTransition:(id)client {
   NSString *currentInputSource = [KMInputMethodLifecycle getCurrentInputSourceId];
-  NSString *currentClientAppId = [KMInputMethodLifecycle getClientApplicationId];
+  NSString *currentClientAppId = [KMInputMethodLifecycle getRunningApplicationId];
   
   TransitionType transition = [self determineTransition:currentInputSource withAppId:currentClientAppId];
   [self saveNewInputMethodState:currentInputSource withAppId:currentClientAppId];

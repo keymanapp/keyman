@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
 @property BOOL contextChanged;
+@property BOOL sentryTestingEnabled;
 @end
 
 @implementation KMInputMethodEventHandler
@@ -33,9 +34,6 @@ const NSTimeInterval kQueuedTextEventDelayInSeconds = 0.1;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 CGEventSourceRef _sourceForGeneratedEvent = nil;
-NSMutableString* _easterEggForSentry = nil;
-NSString* const kEasterEggText = @"Sentry force now";
-NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
@@ -44,20 +42,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   _generatedBackspaceCount = 0;
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
-  
-  BOOL forceSentryCrash = [KMSettingsRepository.shared readForceSentryError];
-  
-  // In Xcode, if Keyman is the active IM and the settings include the
-  // forceSentryCrash flag and "English plus Spanish" is the current keyboard
-  // and you type "Sentry force now", it will force a simulated crash to
-  // test reporting to sentry.keyman.com
-  if (forceSentryCrash && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    os_log_debug([KMLogs testLog], "initWithClient, preparing to force Sentry crash.");
-    _easterEggForSentry = [[NSMutableString alloc] init];
-  }
-  else
-    _easterEggForSentry = nil;
-  
+
   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
       [scope setTagValue:clientAppId forKey:@"clientAppId"];
   }];
@@ -110,9 +95,15 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput *output = nil;
   
+  if ([self.appDelegate isSentryTestingEnabled]) {
+    if ([self forceSentryEvent:event]) {
+      return NO;
+    }
+  }
+  
   output = [self processEventWithKeymanEngine:event in:sender];
+
   if (output == nil) {
-    [self checkEventForSentryEasterEgg:event];
     return NO;
   }
   
@@ -139,28 +130,26 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   return coreKeyOutput;
 }
 
-- (void)checkEventForSentryEasterEgg:(NSEvent *)event {
-  if (_easterEggForSentry != nil) {
-    NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-    os_log_debug([KMLogs testLog], "Sentry - KMX name: %{public}@", kmxName);
-    if ([kmxName isEqualToString:kEasterEggKmxName]) {
-      NSUInteger len = [_easterEggForSentry length];
-      os_log_debug([KMLogs testLog], "Sentry - Processing character(s): %{public}@", [event characters]);
-      if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-        os_log_debug([KMLogs testLog], "Sentry - Adding character to Easter Egg code string: %{public}@", characterToAdd);
-        [_easterEggForSentry appendString:characterToAdd];
-        if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
-          os_log_debug([KMLogs testLog], "Sentry - Forcing crash now");
-          [SentrySDK crash];
-        }
-      }
-      else if (len > 0) {
-        os_log_debug([KMLogs testLog], "Sentry - Clearing Easter Egg code string.");
-        [_easterEggForSentry setString:@""];
-      }
-    }
+/**
+ * When in the mode to test sentry, this method will force certain Sentry APIs to be called,
+ * such as forcing a crash or capturing a message, depending on the key being typed.
+ */
+- (BOOL)forceSentryEvent:(NSEvent *)event {
+  BOOL forcedEvent = YES;
+  
+  NSString *sentryCommand = event.characters;
+  if ([sentryCommand isEqualToString:@"{"]) {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: forcing crash now");
+    [SentrySDK crash];
+  } else if ([sentryCommand isEqualToString:@"["]) {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: forcing message now");
+    [SentrySDK captureMessage:@"Forced test message"];
+  } else {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: unrecognized command");
+    forcedEvent = NO;
   }
+  
+  return forcedEvent;
 }
 
 /**
