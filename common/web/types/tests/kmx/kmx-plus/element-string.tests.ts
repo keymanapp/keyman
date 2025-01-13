@@ -142,7 +142,7 @@ describe('Test of ElementString file', () => {
         ];
         assert.deepEqual(actual, expected);
       });
-      it.skip('can handle order string that is too short', () => {
+      it('can handle order string that is too short', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
@@ -156,7 +156,7 @@ describe('Test of ElementString file', () => {
         ];
         assert.deepEqual(actual, expected);
       });
-      it.skip('can handle non-number in order string', () => {
+      it('can handle non-number in order string', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
@@ -200,7 +200,7 @@ describe('Test of ElementString file', () => {
         ];
         assert.deepEqual(actual, expected);
       });
-      it.skip('can handle tertiary string that is too short', () => {
+      it('can handle tertiary string that is too short', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
@@ -215,7 +215,7 @@ describe('Test of ElementString file', () => {
         ];
         assert.deepEqual(actual, expected);
       });
-      it.skip('can handle non-number in tertiary string', () => {
+      it('can handle non-number in tertiary string', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
