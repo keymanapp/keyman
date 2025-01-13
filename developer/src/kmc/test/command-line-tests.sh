@@ -49,7 +49,7 @@ function run_kmc() {
     fi
   fi
 
-  DATA=$($KMC "$@") || ACTUAL_EXIT=$?
+  DATA=$($KMC "$@" 2>&1) || ACTUAL_EXIT=$?
   echo "$DATA" | grep -qF "$EXPECTED_MATCH" || MATCH_RESULT=$?
 
   if [[ $ACTUAL_EXIT != $EXPECTED_EXIT ]]; then
