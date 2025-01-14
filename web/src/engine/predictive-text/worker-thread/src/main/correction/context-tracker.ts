@@ -431,15 +431,14 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       }
       const transformDistIndex = i - (lastMatch + 1);
       const tokenDistribution = transformSequenceDistribution.map((entry) => {
-        const transform = entry.sample[transformDistIndex];
-        if(transform) {
-          return {
-            sample: entry.sample[transformDistIndex],
-            p: entry.p
-          };
-        } else {
+        const sample = entry.sample[transformDistIndex];
+        if(!sample) {
           return null;
         }
+        return {
+          sample,
+          p: entry.p
+        };
       });
 
       const incomingToken = tokenizedContext[i - poppedTokenCount];
