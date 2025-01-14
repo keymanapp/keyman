@@ -1407,7 +1407,7 @@ _builder_parse_expanded_parameters() {
           # internal reporting function, ignores all other parameters
           _builder_report_dependencies
           ;;
-        --builder_completion_describe)
+        --builder-completion-describe)
           _builder_completion_describe
           exit 0
           ;;

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# As this script must be sourced by shells to be useful, no practical #shebang is possible.
 
 # Note:  must 'source' this file again in the terminal after any edits!
 _comp_builder() {
@@ -25,7 +25,7 @@ _comp_builder() {
 
   # Is it actually a builder-script?  If not, abort.  If so, it defines
   # a special option used to provide us with completion-target data.
-  local builder_params=`${CMD_PATH} --builder_completion_describe` || exit 0
+  local builder_params=`${CMD_PATH} --builder-completion-describe` || exit 0
 
   local BASE_NAME=$(basename "$CMD_PATH")
   local BUILDER_ARG_STR="${COMP_LINE##*${BASE_NAME} }"
