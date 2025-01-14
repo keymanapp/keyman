@@ -8,6 +8,12 @@ _comp_builder() {
     exit 0
   fi
 
+  # Detect - is this a keyman repo?  If not, exit early; we don't expect repo-external compatibility.
+  local CMD_DIR="$(dirname "${CMD_PATH}")"
+  cd "${CMD_DIR}"
+  # Works correctly even if the directory has no backing repository.
+  git remote get-url origin | grep -q 'github.com/keymanapp' || exit 0
+
   # Some of the configuration differs when ZSH is the OS's primary terminal; this flag
   # may be used to tailor this function accordingly.
   local IS_ZSH=false
