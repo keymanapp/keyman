@@ -191,11 +191,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // globe key - are accessible.
     //
     // The `super` call above initializes `keyboardRequisitioner`, as needed here.
-    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', () => {
+    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', async () => {
       if(!this.contextManager.activeKeyboard?.keyboard) {
         // Autoselects this.keyboardRequisitioner.cache.defaultStub, which will be
         // set to an actual keyboard on mobile devices.
-        this.setActiveKeyboard('', '');
+        await this.setActiveKeyboard('', '');
       }
     });
 

@@ -36,7 +36,7 @@ export class InputProcessor {
   private contextDevice: DeviceSpec;
   private kbdProcessor: KeyboardProcessor;
   private lngProcessor: LanguageProcessor;
-  private km_core: KmCoreModule;
+  private km_core: Promise<KmCoreModule>;
 
   private readonly contextCache = new TranscriptionCache();
 
@@ -54,8 +54,8 @@ export class InputProcessor {
     this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
   }
 
-  public async init(paths: PathConfiguration) {
-    this.km_core = await CoreFactory.createCoreProcessor(paths.basePath);
+  public init(paths: PathConfiguration) {
+    this.km_core = CoreFactory.createCoreProcessor(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -70,7 +70,7 @@ export class InputProcessor {
     return this.keyboardProcessor.keyboardInterface;
   }
 
-  public get keymanCore(): KmCoreModule {
+  public get keymanCore(): Promise<KmCoreModule> {
     return this.km_core;
   }
 
