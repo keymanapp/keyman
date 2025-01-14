@@ -141,7 +141,6 @@ type
 
     procedure Support_Diagnostics;
     procedure Support_Online;
-    procedure Support_UpdateCheck;
     procedure Support_ProxyConfig;
     procedure Support_ContactSupport(params: TStringList);   // I4390
 
@@ -187,7 +186,6 @@ uses
   MessageIdentifierConsts,
   MessageIdentifiers,
   Keyman.System.RemoteUpdateCheck,
-  OnlineUpdateCheck,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
@@ -348,7 +346,6 @@ begin
 
   else if command = 'support_diagnostics' then Support_Diagnostics
   else if command = 'support_online' then Support_Online
-  else if command = 'support_updatecheck' then Support_UpdateCheck
   else if command = 'support_proxyconfig' then Support_ProxyConfig
 
   else if command = 'update_checknow' then Update_CheckNow
@@ -797,32 +794,6 @@ begin
     Free;
   end;
 end;
-// TODO-WINDOWS-UPDATES: #10210 Remove Update
-procedure TfrmMain.Support_UpdateCheck;
-begin
-  with TOnlineUpdateCheck.Create(Self, True, False) do
-  try
-    case Run of
-      oucShutDown:
-        begin
-          try
-            if kmcom.Control.IsKeymanRunning then
-            try
-              kmcom.Control.StopKeyman;
-            except
-              on E:Exception do KL.Log(E.Message);
-            end;
-          except
-            on E:Exception do KL.Log(E.Message);
-          end;
-        end;
-      oucSuccess:
-        DoRefresh;
-    end
-  finally
-    Free;
-  end;
-end;
 
 procedure TfrmMain.Update_CheckNow;
 // TODO: epic-windows-update
@@ -841,7 +812,7 @@ end;
 
 procedure TfrmMain.Update_ApplyNow;
 var
-  ShellPath, s: string;
+  ShellPath : string;
   FResult: Boolean;
 begin
   ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);

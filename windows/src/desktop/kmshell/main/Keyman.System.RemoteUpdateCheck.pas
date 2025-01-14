@@ -13,8 +13,7 @@ uses
   System.SysUtils,
   KeymanPaths,
   httpuploader,
-  Keyman.System.UpdateCheckResponse,
-  OnlineUpdateCheck;
+  Keyman.System.UpdateCheckResponse;
 
 const
   CheckPeriod: Integer = 7; // Days between checking for updates

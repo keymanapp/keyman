@@ -9,8 +9,7 @@ uses
   System.SysUtils,
   httpuploader,
   Keyman.System.UpdateCheckResponse,
-  KeymanPaths,
-  OnlineUpdateCheck;
+  KeymanPaths;
 
 type
   TDownloadUpdateParams = record
