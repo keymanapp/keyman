@@ -103,7 +103,6 @@ type
     function DownloadUpdates: Boolean;
     procedure DoDownloadUpdates(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function DoRun: TOnlineUpdateCheckResult;
-    procedure ShowUpdateForm;
     procedure ShutDown;
     procedure DownloadUpdatesHTTPStatus(Sender: THTTPUploader;
       const Message: string; Position, Total: Int64); // I2855
@@ -157,8 +156,6 @@ uses
   utildir,
   utilexecute,
   OnlineUpdateCheckMessages,
-  UfrmOnlineUpdateIcon,
-  UfrmOnlineUpdateNewVersion,
   utilkmshell,
   utilsystem,
   utiluac,
@@ -393,86 +390,6 @@ begin
   end;
 end;
 
-procedure TOnlineUpdateCheck.ShowUpdateForm;
-var
-  i: Integer;
-  FRequiresAdmin: Boolean;
-  FOwnerHandle: THandle;
-begin
-  if Assigned(FOwner)
-    then FOwnerHandle := FOwner.Handle
-    else FOwnerHandle := Application.Handle;
-
-  { We have an update available }
-  with OnlineUpdateNewVersion(FOwner) do
-  try
-    Params := Self.FParams;
-    if ShowModal <> mrYes then
-    begin
-      Self.FParams.Result := oucUnknown;
-      Self.FErrorMessage := '';
-      Exit;
-    end;
-
-    Self.FParams := Params;
-  finally
-    Free;
-  end;
-
-  if not DownloadUpdates then
-  begin
-    Self.FParams.Result := oucUnknown;  // I2742
-    Exit;
-  end
-  else
-  begin
-    if not kmcom.SystemInfo.IsAdministrator then
-    begin
-      FRequiresAdmin := FParams.Keyman.Install;
-      for i := 0 to High(FParams.Packages) do
-        if FParams.Packages[i].Install then
-        begin
-          FRequiresAdmin := True;
-          Break;
-        end;
-    end
-    else
-      FRequiresAdmin := False;
-
-    if FRequiresAdmin then
-    begin
-      if CanElevate then
-      begin
-        SavePackageUpgradesToDownloadTempPath;
-        if WaitForElevatedConfiguration(FOwnerHandle, '-ou "'+DownloadTempPath+'"', not FParams.Keyman.Install) <> 0 then  // I2513
-          FParams.Result := oucFailure
-        else if FParams.Keyman.Install then
-          FParams.Result := oucShutDown
-        else
-          FParams.Result := oucSuccess;
-      end
-      else
-      begin
-        ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
-        FParams.Result := oucFailure;
-      end;
-    end
-    else
-    begin
-      FParams.Result := oucSuccess;
-      for i := 0 to High(FParams.Packages) do
-        if FParams.Packages[i].Install then
-          if not DoInstallPackage(FParams.Packages[i]) then FParams.Result := oucFailure;
-
-      if FParams.Keyman.Install then
-      begin
-        DoInstallKeyman;
-        FParams.Result := oucShutDown;
-      end;
-    end;
-  end;
-end;
-
 procedure TOnlineUpdateCheck.ShutDown;
 begin
   if Assigned(Application) then
@@ -581,12 +498,8 @@ begin
           end
           else if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
           begin
-            if not FSilent then
-              ShowUpdateForm
-            else
-            begin
-              ShowUpdateIcon;
-            end;
+            // No longer showing user notification through the online update
+            // forms or icon after background windows update see #10038
             Result := FParams.Result;
           end;
         end
