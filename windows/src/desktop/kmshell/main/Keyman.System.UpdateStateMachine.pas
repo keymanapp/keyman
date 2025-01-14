@@ -595,11 +595,6 @@ var
   Result: TRemoteUpdateCheckResult;
 begin
 
-  { ##### For Testing only just advancing to downloading #### }
-  // ChangeState(UpdateAvailableState);
-  // will keep here as there are more PR's #12621
-  { #### End of Testing ### };
-  // Handle_check event force check
   CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
     Result := CheckForUpdates.Run;
