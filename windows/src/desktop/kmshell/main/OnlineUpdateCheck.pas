@@ -489,19 +489,8 @@ begin
         if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
           ResponseToParams(ucr);
-
-          if FCheckOnly then
-          begin
-            // TODO: Refactor this
-            TUpdateCheckStorage.SaveUpdateCacheData(ucr);
-            Result := FParams.Result;
-          end
-          else if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
-          begin
-            // No longer showing user notification through the online update
-            // forms or icon after background windows update see #10038
-            Result := FParams.Result;
-          end;
+          TUpdateCheckStorage.SaveUpdateCacheData(ucr);
+          Result := FParams.Result;
         end
         else
         begin
