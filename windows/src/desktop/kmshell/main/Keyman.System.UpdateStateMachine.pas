@@ -261,8 +261,6 @@ begin
   end;
 
   // TODO: #10210 TODO: epic-windows-update remove debugging comments throughout this Unit.
-  // KL.Log('TUpdateStateMachine.Destroy: FErrorMessage = '+FErrorMessage);
-  // KL.Log('TUpdateStateMachine.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
 
   inherited Destroy;
 end;
@@ -414,7 +412,8 @@ begin
     except
       on E: ERegistryException do
       begin
-        KL.Log('Failed to read registry: ' + E.Message);
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+        'Failed to read registry: ' + E.Message);
         Result := False;
       end;
     end;
@@ -501,9 +500,6 @@ var
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  // TODO: epic-windows-updates
-  // remove debug log
-  // KL.Log('TUpdateStateMachine.RemoveCachedFiles');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
@@ -704,7 +700,7 @@ begin
   end;
   if Result <> wucSuccess then
     begin
-      KL.Log('UpdateAvailableState.HandleCheck not successful: '+
+      KL.Log('UpdateAvailableState.HandleCheck CheckForUpdates not successful: '+
         GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
     end;
 end;
@@ -770,13 +766,6 @@ var
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
-
-  // TODO: epic-windows-updates
-  // Remove this test code
-  { ##  for testing log that we would download }
-  //KL.Log('DownloadingState.Enter test code continue');
-  //DownloadResult := True;
-  { End testing }
 
   RetryCount := 0;
   DownloadResult := False;
@@ -987,10 +976,8 @@ var
 begin
   if not kmcom.SystemInfo.IsAdministrator then
   begin
-    KL.Log('InstallingState.LaunchInstallPackageProcess not IsAdmin');
     if CanElevate then
     begin
-      KL.Log('InstallingState.LaunchInstallPackageProcess CanElevate');
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
@@ -998,21 +985,18 @@ begin
           (Sentry.Client.SENTRY_LEVEL_ERROR,
           'Executing kmshell process to install keyboard packages failed:"' +
           IntToStr(Ord(executeResult)) + '"');
-        KL.Log('InstallingState.LaunchInstallPackageProcess Error elevating');
         ChangeState(IdleState);
       end;
     end
     else
     begin
-      KL.Log('InstallingState.LaunchInstallPackageProcess require user with admin');
       // TODO: epic-windows-updates How do we alert the user that package requires a user with admin rights
       // ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
     end;
   end
   else
   begin
-    KL.Log('InstallingState.LaunchInstallPackageProcess HandlePackages straight away');
-    HandleInstallPackages; // we can install packages straight away
+    HandleInstallPackages; // can install packages straight away
   end;
 end;
 
@@ -1065,7 +1049,6 @@ var
   FPackage: IKeymanPackageFile2;
 begin
   Result := True;
-  KL.Log('InstallingState.DoInstallPackage Entry' + PackageFileName);
   FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
     as IKeymanPackageFile2;
   FPackage.Install2(True);
@@ -1074,7 +1057,7 @@ begin
 
   kmcom.Refresh;
   kmcom.Apply;
-  KL.Log('InstallingState.DoInstallPackage about to delete');
+
   System.SysUtils.DeleteFile(PackageFileName);
 
 end;
@@ -1092,7 +1075,6 @@ begin
     PackageFullPath := SavePath + Params.Packages[i].FileName;
     if not DoInstallPackage(PackageFullPath) then // I2742
     begin
-      // Package did install log or error
       KL.Log('Installing Package failed' + PackageFullPath);
     end;
   end;
@@ -1114,7 +1096,6 @@ begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
     hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   end;
-  KL.Log('InstallingState.Enter before hasPackages');
   { Notes: The reason packages (keyboards) is installed first is
   because we are trying to reduce the number of times the user has
   to be asked to elevate to admin or restart. Keyboard installation always
@@ -1123,7 +1104,6 @@ begin
   to ask for elevation. }
   if hasPackages then
   begin
-    KL.Log('InstallingState.Enter hasPackages');
     LaunchInstallPackageProcess;
     Exit;
   end;
@@ -1175,18 +1155,15 @@ procedure InstallingState.HandleInstallPackages;
 var
   ucr: TUpdateCheckResponse;
 begin
-  KL.Log('InstallingState.HandleInstallPackages');
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
   begin
-    KL.Log('InstallingState.HandleInstallPackages Not Admin');
     DoInstallKeyman;
     Exit;
   end;
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
-    KL.Log('InstallingState.HandleInstallPackages about to call do install packages');
     DoInstallPackages(ucr);
   end;
 
