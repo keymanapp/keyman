@@ -413,7 +413,7 @@ begin
       on E: ERegistryException do
       begin
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'Failed to read registry: ' + E.Message);
+          'Failed to read registry: ' + E.Message);
         Result := False;
       end;
     end;
