@@ -35,6 +35,12 @@ export default {
       }
 
       return next();
+    },
+    function rewriteWasmContentType(context, next) {
+      if (context.url.endsWith('.wasm')) {
+        context.headers['content-type'] = 'application/wasm';
+      }
+      return next();
     }
   ],
   plugins: [

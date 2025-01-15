@@ -92,6 +92,8 @@ export default {
     function rewriteResourcePath(context, next) {
       if(context.url.startsWith('/resources/')) {
         context.url = '/web/src/test/auto' + context.url;
+      } else if (context.url.startsWith('/build/')) {
+        context.url = '/web' + context.url;
       }
 
       return next();
