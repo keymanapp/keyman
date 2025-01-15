@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
 ## 18.0.166 alpha 2025-01-10
 
 * fix(web): numpad + and - with zoom shortcut use (#12865)
