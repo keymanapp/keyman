@@ -85,6 +85,7 @@ uses
   Winapi.Windows,
 
   keymanapi_TLB,
+  Sentry.Client,
   XMLRenderer,
   KeyboardListXMLRenderer,
   UfrmKeymanBase,
@@ -185,12 +186,15 @@ uses
   LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
+  Keyman.System.ExecutionHistory,
+  Keyman.System.KeymanSentryClient,
   Keyman.System.RemoteUpdateCheck,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.Configuration.UI.UfrmStartInstallNow,
   RegistryKeys,
   SupportXMLRenderer,
   UfrmChangeHotkey,
@@ -813,12 +817,32 @@ end;
 procedure TfrmMain.Update_ApplyNow;
 var
   ShellPath : string;
-  FResult: Boolean;
+  FResult, InstallNow: Boolean;
+  frmStartInstallNow: TfrmStartInstallNow;
 begin
-  ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
-  FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
-  if not FResult then
-    KL.Log('TrmfMain: Executing Update_ApplyNow Failed'); // TODO: Make error log
+  InstallNow := True;
+  // Confirm User is ok that this will require a reset
+  if HasKeymanRun then
+  begin
+    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
+    try
+      if frmStartInstallNow.ShowModal = mrOk then
+        InstallNow := True
+      else
+        InstallNow := False;
+    finally
+      frmStartInstallNow.Free;
+    end;
+  end;
+
+  if InstallNow = True then
+  begin
+    ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+    FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
+    if not FResult then
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+  end;
 end;
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);

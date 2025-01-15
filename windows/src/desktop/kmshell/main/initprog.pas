@@ -117,6 +117,7 @@ uses
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.Configuration.UI.UfrmStartInstall,
   Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
@@ -389,6 +390,8 @@ var
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
   BUpdateSM : TUpdateStateMachine;
+  frmStartInstall: TfrmStartInstall;
+  UserCanceled : Boolean;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -460,9 +463,26 @@ begin
       end
       else
       begin
-        if BUpdateSM.HandleKmShell = 1 then
+        // The following logic around the WaitingRestartState should be
+        // encapsulated in the state machine however as we want separation of
+        // UI elements from the state machine we have bring some of logic here.
+        UserCanceled := False;
+        if BUpdateSM.ReadyToInstall and
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout])) then
+        begin
+          frmStartInstall := TfrmStartInstall.Create(nil);
+          try
+            if frmStartInstall.ShowModal = mrOk then
+              UserCanceled := False
+            else
+              UserCanceled := True
+          finally
+            frmStartInstall.Free;
+          end;
+        end;
+        if not UserCanceled and (BUpdateSM.HandleKmShell = 1) then
           Exit;
-      end;
+        end;
     finally
       BUpdateSM.Free;
     end;

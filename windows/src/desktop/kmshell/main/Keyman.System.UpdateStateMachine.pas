@@ -9,16 +9,11 @@ interface
 
 uses
   System.SysUtils,
-  System.UITypes,
-  System.IOUtils,
   System.Types,
   System.TypInfo,
   Sentry.Client,
 
-  httpuploader,
   KeymanPaths,
-  Keyman.Configuration.UI.UfrmStartInstall,
-  Keyman.Configuration.UI.UfrmStartInstallNow,
   Keyman.System.ExecutionHistory,
   Keyman.System.UpdateCheckResponse,
   utilkmshell;
@@ -95,6 +90,15 @@ type
     procedure HandleInstallPackages;
     procedure HandleFirstRun;
     function CurrentStateName: string;
+    (**
+     * Checks if Keyman is the WaitingRestartState and that
+     * Keyman has not run in this Windows session.
+     * The sole purpose is for the calling code then produce
+     * a UI to confirm the user wants to continue install.
+     *
+     * @returns True  if the Keyman is ready to install.
+     *)
+    function ReadyToInstall: Boolean;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState: TUpdateState;
@@ -559,6 +563,18 @@ begin
   Result := CurrentState.ClassName;
 end;
 
+function TUpdateStateMachine.ReadyToInstall: Boolean;
+var
+  ucr: TUpdateCheckResponse;
+begin
+  if not IsCurrentStateAssigned then
+    Exit(False);
+  if (CurrentState.ClassName = 'WaitingRestartState') and not HasKeymanRun then
+    Result := True
+  else
+    Result := False;
+end;
+
 // base implmentation to be overiden
 
 procedure TState.HandleInstallPackages;
@@ -722,34 +738,9 @@ begin
 end;
 
 procedure UpdateAvailableState.HandleInstallNow;
-var
-  frmStartInstallNow: TfrmStartInstallNow;
-  InstallNow: Boolean;
 begin
-
-  InstallNow := True;
-  if HasKeymanRun then
-  begin
-    // TODO: epic-update-windows UI and non-UI units should be split
-    // if the unit launches UI then it should be a .UI. unit
-    // https://github.com/keymanapp/keyman/pull/12375/files#r1751041747
-    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
-    try
-      if frmStartInstallNow.ShowModal = mrOk then
-        InstallNow := True
-      else
-        InstallNow := False;
-    finally
-      frmStartInstallNow.Free;
-    end;
-  end;
-  // If user decides NOT to install now stay in UpdateAvailable State
-  if InstallNow = True then
-  begin
-    bucStateContext.SetApplyNow(True);
-    ChangeState(DownloadingState);
-  end;
-
+  bucStateContext.SetApplyNow(True);
+  ChangeState(DownloadingState);
 end;
 
 { DownloadingState }
@@ -880,7 +871,6 @@ end;
 
 function WaitingRestartState.HandleKmShell;
 var
-  frmStartInstall: TfrmStartInstall;
   ucr: TUpdateCheckResponse;
   hasPackages, hasKeymanInstall: Boolean;
 begin
@@ -888,14 +878,9 @@ begin
   if HasKeymanRun then
   begin
     Result := kmShellContinue;
-    // Exit; // Exit is not wokring for some reason.
-    // this else is only here because the exit is not working.
   end
   else
   begin
-    // Checking the files are available could be seen as redundant here as the
-    // Install state will check anyway, but since we still ask the user if they
-    // want to install lets not bug them if the files are no longer cached.
     hasPackages := False;
     hasKeymanInstall := False;
     if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
@@ -907,23 +892,13 @@ begin
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
-      bucStateContext.CurrentState.HandleCheck; // TODO no event here
+      bucStateContext.CurrentState.HandleCheck;
       Result := kmShellExit;
     end
     else
     begin
-      frmStartInstall := TfrmStartInstall.Create(nil);
-      try
-        if frmStartInstall.ShowModal = mrOk then
-        begin
-          ChangeState(InstallingState);
-          Result := kmShellExit;
-        end
-        else
-          Result := kmShellContinue;
-      finally
-        frmStartInstall.Free;
-      end;
+      ChangeState(InstallingState);
+      Result := kmShellExit;
     end;
   end;
 end;
@@ -939,29 +914,9 @@ begin
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
-// If user decides not to install now stay in WaitingRestart State
-var
-  frmStartInstallNow: TfrmStartInstallNow;
-  InstallNow: Boolean;
 begin
-  InstallNow := True;
-  if HasKeymanRun then
-  begin
-    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
-    try
-      if frmStartInstallNow.ShowModal = mrOk then
-        InstallNow := True
-      else
-        InstallNow := False;
-    finally
-      frmStartInstallNow.Free;
-    end;
-  end;
-  if InstallNow = True then
-  begin
-    bucStateContext.SetApplyNow(True);
-    ChangeState(InstallingState);
-  end;
+  bucStateContext.SetApplyNow(True);
+  ChangeState(InstallingState);
 end;
 
 // Installing packages needs to be elevated
