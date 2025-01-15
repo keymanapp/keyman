@@ -825,6 +825,9 @@ begin
 end;
 
 procedure TfrmMain.Update_CheckNow;
+// TODO: epic-windows-update
+// Get an instance to the state machine and call handle check so the state can change to update
+// available.
 var UpdateCheck : TRemoteUpdateCheck;
 begin
   UpdateCheck := TRemoteUpdateCheck.Create(True);

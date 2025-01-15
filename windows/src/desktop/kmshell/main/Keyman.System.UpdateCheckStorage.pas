@@ -70,18 +70,13 @@ end;
 
 class function TUpdateCheckStorage.HasKeymanInstallFile(const data: TUpdateCheckResponse): Boolean;
 var
-  i : Integer;
-  fileName : string;
-  f: TSearchRec;
+  fileExtension: string;
 begin
-  Result := False;
-  for i := 0 to High(data.Packages) do
-  begin
-    fileName := data.Packages[i].FileName;
-    if FindFirst(fileName + '*.exe', 0, f) = 0 then
-      Result := True;
-    System.SysUtils.FindClose(f);
-  end;
+  fileExtension := LowerCase(ExtractFileExt(data.FileName));
+  if fileExtension = '.exe' then
+    Result := True
+  else
+    Result := False
 end;
 
 end.
