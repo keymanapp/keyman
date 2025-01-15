@@ -564,8 +564,6 @@ begin
 end;
 
 function TUpdateStateMachine.ReadyToInstall: Boolean;
-var
-  ucr: TUpdateCheckResponse;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
