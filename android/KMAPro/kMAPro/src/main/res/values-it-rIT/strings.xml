@@ -68,7 +68,7 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Regola altezza tastiera</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Adjust longpress delay</string>
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Regola ritardo pressione prolungata</string>
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Didascalia barra spaziatrice</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -89,11 +89,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Non mostrare la didascalia sulla barra spaziatrice</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibra durante la digitazione</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Mostra sempre il banner</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">Da attuare</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">Quando è spento, mostrato solo quando il testo predittivo è abilitato</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Consenti l\'invio di segnalazioni di crash attraverso la rete</string>
@@ -126,13 +126,13 @@
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Ripristina impostazioni predefinite</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Delay Time: %1$.1f seconds</string>
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Tempo ritardo: %1$.1f secondi</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_delay_time_up" comment="Make longpress delay longer">Delay time longer</string>
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Tempo ritardo maggiore</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Delay time shorter</string>
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Tempo ritardo minore</string>
   <!-- Context: Adjust Longpress Delay Time menu -->
-  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Longpress delay time slider</string>
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Cursore tempo ritardo pressione prolungata</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Cerca o digita URL</string>
   <!-- Context: Keyman Web Browser -->

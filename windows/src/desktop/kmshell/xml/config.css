@@ -653,6 +653,7 @@ table tr
 {
   display: flex;
   flex-direction: column;
+  height: 200px;
   gap: 4px;
 }
 .list_languages_title
@@ -661,6 +662,11 @@ table tr
 }
 
 /* keyboard languages */
+.keyboard_language_list
+{
+  flex-grow:1
+}
+
 .keyboard_language
 {
   display: flex;
@@ -1263,10 +1269,8 @@ th
 }
 
 .list_languages_add {
-  padding-top: 10px;
-  position: fixed;
-  top: 223px; /* Have to use fixed position can't use flex or grid inside a fixed child */
-  right: 281px;
+  padding-bottom: 10px;
+  align-self: flex-end;
 }
 
 .modify .keyboard_language {

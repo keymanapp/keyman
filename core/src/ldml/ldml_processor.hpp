@@ -34,10 +34,6 @@ class ldml_processor : public abstract_processor {
       const std::vector<uint8_t> & data
     );
 
-    static bool is_kmxplus_file(
-      const std::vector<uint8_t> & data
-    );
-
     km_core_status
     process_event(
       km_core_state *state,

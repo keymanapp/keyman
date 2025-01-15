@@ -96,6 +96,13 @@ export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMa
       for(const row of layer.row) {
         for(const key of row.key) {
           scanKey(key);
+
+          if(key.hint && !key.hint.match(/^\*.+\*$/)) {
+            const hint = remap(key.hint, map);
+            dirty = dirty || hint != key.hint;
+            key.hint = hint;
+          }
+
           let f: keyof TouchLayout.TouchLayoutFlick;
           for(f in key.flick ?? {}) {
             scanKey(key.flick[f]);

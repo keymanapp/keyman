@@ -1,5 +1,97 @@
 # Keyman Version History
 
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
+## 18.0.164 alpha 2025-01-08
+
+* fix(windows): add language and close button fit inside pop-window (#12855)
+* chore(windows): add bcp47 code and tips to diagnostic (#12843)
+* fix(android/engine): Cleanup KMManager API keys and calls (#12861)
+* docs(developer,mac): add playable video links to the help documentation (#12828)
+
+## 18.0.163 alpha 2025-01-06
+
+* docs: clarify that sections in KMX file might not be aligned (#12856)
+
+## 18.0.162 alpha 2024-12-19
+
+* fix(mac): standardize interaction between OSK and physical keyboard (#12836)
+
+## 18.0.161 alpha 2024-12-17
+
+* fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
+
+## 18.0.160 alpha 2024-12-16
+
+* feat(ios): configurable keyboard height (#12571)
+* chore(common/web): remove .c8rc.json from types and merge exclusions into package.json (#12813)
+* fix(android/engine): Initialize index when resuming KeyboardPicker (#12832)
+
+## 18.0.159 alpha 2024-12-13
+
+* chore(core): remove meson warnings for wasm builds (#12827)
+* chore(linux): Update debian changelog (#12023)
+
+## 18.0.158 alpha 2024-12-11
+
+* fix(linux): pushing of updated changelog branch (#12818)
+* fix(linux): work around Lintian errors (#12815)
+
+## 18.0.157 alpha 2024-12-10
+
+* test(common/web): unit tests for kvk-file-writer (#12734)
+
+## 18.0.156 alpha 2024-12-09
+
+* fix(developer): remove platforms from kmc-generate LM readme (#12803)
+* test(developer): add test for ERROR_DescriptionIsMissing to kmc-keyboard-info (#12804)
+* chore(developer): verify bundled node version when building installer (#12806)
+* fix(developer): support hint property in displaymap (#12807)
+* fix(common/web): delete replaceExtension in types/src/util/file-types.ts (#12762)
+* chore(developer): add some docs for language examples in kmp.json (#12805)
+* fix(core): implement ldml_processor::get_key_list() (#12644)
+
+## 18.0.155 alpha 2024-12-07
+
+* chore(android,windows): Update crowdin for Czech (#12792)
+
+## 18.0.154 alpha 2024-12-06
+
+* feat(developer,core): local imports (#12750)
+* chore(core): remove `km_core_keyboard_load` API (#12769)
+* chore: rename TestCompilerCallbacks.ts (#12775)
+* chore(mac): update to SIL logo with glyph in About window (#12766)
+* chore(android,windows): Update crowdin for Italian (#12793)
+* change(developer): use full github url in kmc copy parameters (#12773)
+* chore(developer): add baseline tests for bcp47 codes to kmc-package (#12506)
+* chore(core): only install node on Windows if not available (#12772)
+* chore(android): Disable auto-correct UI controls (#12791)
+
+## 18.0.153 alpha 2024-12-05
+
+* feat(developer,common): verify normalization of strings (#12748)
+* chore(core): Add link to Keyman Glossary (#12774)
+* test(common/web/types): unit tests for file-types (#12716)
+
 ## 18.0.152 alpha 2024-12-04
 
 * refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)

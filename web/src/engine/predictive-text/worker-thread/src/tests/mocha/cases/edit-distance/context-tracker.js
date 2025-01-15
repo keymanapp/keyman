@@ -152,6 +152,29 @@ describe('ContextTracker', function() {
       assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
       assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
     });
+
+    it('rejects hard-to-handle case: tail token is split into three rather than two', function() {
+      let baseContext = models.tokenize(defaultBreaker, {
+        left: "text'"
+      });
+      assert.equal(baseContext.left.length, 1);
+      let baseContextMatch = ContextTracker.modelContextState(baseContext.left);
+
+      // Now the actual check.
+      let newContext = models.tokenize(defaultBreaker, {
+        left: "text'\""
+      });
+      // The reason it's a problem - current internal logic isn't prepared to shift 
+      // from 1 to 3 tokens in a single step.
+      assert.equal(newContext.left.length, 3);
+
+      let transform = {
+        insert: '\"',
+        deleteLeft: 0
+      }
+      let problemContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      assert.isNull(problemContextMatch);
+    });
   });
 
   describe('modelContextState', function() {
