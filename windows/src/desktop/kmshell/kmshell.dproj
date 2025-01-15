@@ -171,9 +171,6 @@
         <DCCReference Include="..\..\global\delphi\general\InterfaceHotkeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="main\UfrmOnlineUpdateNewVersion.pas">
-            <Form>frmOnlineUpdateNewVersion</Form>
-        </DCCReference>
         <DCCReference Include="main\OnlineUpdateCheck.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilxml.pas"/>
         <DCCReference Include="install\UfrmInstallKeyboardFromWeb.pas">
@@ -223,9 +220,6 @@
         <DCCReference Include="util\UILanguages.pas"/>
         <DCCReference Include="main\UfrmKeyboardOptions.pas">
             <Form>frmKeyboardOptions</Form>
-        </DCCReference>
-        <DCCReference Include="main\UfrmOnlineUpdateIcon.pas">
-            <Form>frmOnlineUpdateIcon</Form>
         </DCCReference>
         <DCCReference Include="..\..\engine\keyman\KeymanTrayIcon.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards10.pas"/>
@@ -431,6 +425,12 @@
             <Deployment Version="3">
                 <DeployFile LocalName="bin\Win32\Debug\kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
+                        <RemoteName>kmshell.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -441,9 +441,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

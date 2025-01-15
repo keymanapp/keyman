@@ -7,10 +7,11 @@ interface
 uses
   System.Classes,
   System.SysUtils,
+  Sentry.Client,
   httpuploader,
+  Keyman.System.KeymanSentryClient,
   Keyman.System.UpdateCheckResponse,
-  KeymanPaths,
-  OnlineUpdateCheck;
+  KeymanPaths;
 
 type
   TDownloadUpdateParams = record
@@ -40,7 +41,7 @@ type
 
 
     function DownloadUpdates : Boolean;
-    // TODO-WINDOWS-UPDATES: verify filesizes match the ucr metadata so we know we don't have partial downloades.
+    // TODO: #12888 verify filesizes match the ucr metadata so we know we don't have partial downloads.
     //function VerifyAllFilesDownloaded : Boolean;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
 
@@ -64,12 +65,12 @@ uses
   Upload_Settings,
   utilkmshell;
 
- // TODO-WINDOWS-UPDATES: temp wrapper for converting showmessage to logs don't know where
- // if not using klog
- procedure LogMessage(LogMessage: string);
- begin
-   KL.Log(LogMessage);
- end;
+procedure ErrorLogMessage(ErrorLogMessage: string);
+begin
+  KL.Log(ErrorLogMessage);
+  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+    ErrorLogMessage);
+end;
 
 constructor TDownloadUpdate.Create;
 begin
@@ -125,8 +126,8 @@ var
         on E:EHTTPUploader do
         begin
           if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
-            then LogMessage(S_OnlineUpdate_UnableToContact)
-            else LogMessage(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
+            then ErrorLogMessage(S_OnlineUpdate_UnableToContact)
+            else ErrorLogMessage(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
           Result := False;
         end;
       end;
@@ -157,8 +158,7 @@ begin
   Inc(FDownload.TotalSize, Params.InstallSize);
   if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
   begin
-    // TODO-WINDOWS-UPDATES: #10210  convert to error log.
-    LogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
+    ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
   end
   else
   begin

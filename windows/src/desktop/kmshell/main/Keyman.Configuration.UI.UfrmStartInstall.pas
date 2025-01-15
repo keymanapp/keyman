@@ -1,7 +1,7 @@
 {
   Keyman is copyright (C) SIL Global. MIT License.
-  
-  // TODO-WINDOWS-UPDATES: Localise all the labels and captions.
+
+  // TODO: #12887 Localise all the labels and captions.
 }
 unit Keyman.Configuration.UI.UfrmStartInstall;
 interface

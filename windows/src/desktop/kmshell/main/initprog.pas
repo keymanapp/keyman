@@ -80,8 +80,8 @@ type
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
                     fmMigrate, fmSplash, fmStart,
-                    fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
-                    fmOnlineUpdateAdmin, fmTextEditor,
+                    fmUpgradeKeyboards, // I2548
+                    fmTextEditor,
                     fmInstallKeyboardPackageAdmin,
                     fmBackgroundUpdateCheck,
                     fmBackgroundDownload,
@@ -123,7 +123,6 @@ uses
   kmint,
   KMShellHints,
   KeymanMutex,
-  OnlineUpdateCheck,
   Keyman.System.RemoteUpdateCheck,
   RegistryKeys,
   UfrmBaseKeyboard,
@@ -246,7 +245,6 @@ begin
       else if s = '-uk' then  FMode := fmUninstallKeyboard     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       else if s = '-ukl' then FMode := fmUninstallKeyboardLanguage   // I3624
       else if s = '-up' then  FMode := fmUninstallPackage          { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
-      else if s = '-ou' then  FMode := fmOnlineUpdateAdmin     { I1730 - Check update of keyboards (admin elevation) }
       else if s = '-ikp' then  FMode := fmInstallKeyboardPackageAdmin
       else if s = '-a' then   FMode := fmAbout
       else if s = '-ra' then  FMode := fmRegistryAdd
@@ -255,9 +253,6 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
-      //TODO-WINDOWS-UPDATES: will remove -ouc not used
-      // -buc uses the Statemachine can be used for external scripts to force a check
-      else if s = '-ouc' then FMode := fmOnlineUpdateCheck
       else if s = '-buc' then FMode := fmBackgroundUpdateCheck
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
@@ -513,17 +508,6 @@ begin
       if FirstRun(FQuery, FDisablePackages, FDefaultUILanguage)
         then ExitCode := 0
         else ExitCode := 2;
-
-    fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
-
-    fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
-      try
-        Run;
-      finally
-        Free;
-      end;
 
     fmUpgradeKeyboards:// I2548
       begin
