@@ -1104,20 +1104,26 @@ end;
 procedure InstallingState.HandleInstallPackages;
 var
   ucr: TUpdateCheckResponse;
+  hasKeymanInstall : Boolean;
 begin
+  TUpdateCheckStorage.LoadUpdateCacheData(ucr);
+  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
   begin
-    DoInstallKeyman;
+    if hasKeymanInstall then
+      DoInstallKeyman;
     Exit;
   end;
+
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     DoInstallPackages(ucr);
   end;
 
-  DoInstallKeyman;
+  if hasKeymanInstall then
+    DoInstallKeyman;
 end;
 
 procedure InstallingState.HandleFirstRun;
