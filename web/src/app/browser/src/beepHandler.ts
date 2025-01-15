@@ -1,4 +1,4 @@
-import { type KeyboardInterface } from 'keyman/engine/js-processor';
+import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { DesignIFrame, OutputTarget } from 'keyman/engine/element-wrappers';
 
 // Utility object used to handle beep (keyboard error response) operations.
@@ -17,9 +17,9 @@ class BeepData {
 }
 
 export class BeepHandler {
-  readonly keyboardInterface: KeyboardInterface;
+  readonly keyboardInterface: JSKeyboardInterface;
 
-  constructor(keyboardInterface: KeyboardInterface) {
+  constructor(keyboardInterface: JSKeyboardInterface) {
     this.keyboardInterface = keyboardInterface;
   }
 

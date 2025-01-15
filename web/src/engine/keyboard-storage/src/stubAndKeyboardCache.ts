@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
+import { JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import KeyboardStub from "./keyboardStub.js";
@@ -38,12 +38,12 @@ interface EventMap {
   /**
    * Indicates that the specified Keyboard has just been added to the cache.
    */
-  keyboardadded: (keyboard: Keyboard) => void;
+  keyboardadded: (keyboard: JSKeyboard) => void;
 }
 
 export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
-  private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
+  private keyboardTable: Record<string, JSKeyboard | Promise<JSKeyboard>> = {};
 
   private readonly keyboardLoader: KeyboardLoader;
 
@@ -52,11 +52,11 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.keyboardLoader = keyboardLoader;
   }
 
-  getKeyboardForStub(stub: KeyboardStub): Keyboard {
+  getKeyboardForStub(stub: KeyboardStub): JSKeyboard {
     return stub ? this.getKeyboard(stub.KI) : null;
   }
 
-  getKeyboard(keyboardID: string): Keyboard {
+  getKeyboard(keyboardID: string): JSKeyboard {
     if(!keyboardID) {
       return null;
     }
@@ -112,14 +112,14 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     }
   }
 
-  addKeyboard(keyboard: Keyboard) {
+  addKeyboard(keyboard: JSKeyboard) {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
 
     this.emit('keyboardadded', keyboard);
   }
 
-  fetchKeyboardForStub(stub: KeyboardStub) : Promise<Keyboard> {
+  fetchKeyboardForStub(stub: KeyboardStub) : Promise<JSKeyboard> {
     return this.fetchKeyboard(stub.KI);
   }
 
@@ -134,7 +134,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return cachedEntry instanceof Promise;
   }
 
-  fetchKeyboard(keyboardID: string): Promise<Keyboard> {
+  fetchKeyboard(keyboardID: string): Promise<JSKeyboard> {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");
     }
@@ -146,7 +146,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     keyboardID = prefixed(keyboardID);
 
     const cachedEntry = this.keyboardTable[keyboardID];
-    if(cachedEntry instanceof Keyboard) {
+    if(cachedEntry instanceof JSKeyboard) {
       return Promise.resolve(cachedEntry);
     } else if(cachedEntry instanceof Promise) {
       return cachedEntry;
@@ -189,12 +189,12 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   getStub(keyboardID: string, languageID: string): KeyboardStub;
-  getStub(keyboard: Keyboard, languageID?: string): KeyboardStub;
-  getStub(arg0: string | Keyboard, arg1?: string): KeyboardStub {
+  getStub(keyboard: JSKeyboard, languageID?: string): KeyboardStub;
+  getStub(arg0: string | JSKeyboard, arg1?: string): KeyboardStub {
     let keyboardID: string;
     let languageID = arg1 || '---';
 
-    if(arg0 instanceof Keyboard) {
+    if(arg0 instanceof JSKeyboard) {
       keyboardID = arg0.id;
     } else {
       keyboardID = arg0;
@@ -221,12 +221,12 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   /**
    * Removes all metadata (stubs) associated with a specific keyboard from the cache, optionally
    * removing the cached keyboard as well.
-   * @param keyboard Either the keyboard ID or `Keyboard` instance
-   * @param purge If `true`, will also purge the `Keyboard` instance itself from the cache.
+   * @param keyboard Either the keyboard ID or `JSKeyboard` instance
+   * @param purge If `true`, will also purge the `JSKeyboard` instance itself from the cache.
    *              If `false`, only forgets the metadata (stubs).
    */
-  forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
-    let id: string = (keyboard instanceof Keyboard) ? keyboard.id : prefixed(keyboard);
+  forgetKeyboard(keyboard: string | JSKeyboard, purge: boolean = false) {
+    let id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : prefixed(keyboard);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];

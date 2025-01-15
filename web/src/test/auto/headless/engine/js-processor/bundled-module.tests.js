@@ -46,7 +46,7 @@ describe('Bundled ES Module for js-processor', function() {
 describe('Bundled ES Module for keyboard', function () {
   describe('Keyboard', function () {
     it('should initialize without errors', function () {
-      let kp = new Package2.Keyboard();
+      let kp = new Package2.JSKeyboard();
       assert.isNotNull(kp);
     });
   });

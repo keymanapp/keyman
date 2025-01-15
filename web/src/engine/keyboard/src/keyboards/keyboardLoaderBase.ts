@@ -1,4 +1,4 @@
-import Keyboard from "./keyboard.js";
+import { JSKeyboard } from "./jsKeyboard.js";
 import { KeyboardHarness } from "./keyboardHarness.js";
 import KeyboardProperties from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';
@@ -22,7 +22,7 @@ export abstract class KeyboardLoaderBase {
    * @param uri  The URI of the keyboard to load.
    * @returns    A Promise that resolves to the loaded keyboard.
    */
-  public loadKeyboardFromPath(uri: string): Promise<Keyboard> {
+  public loadKeyboardFromPath(uri: string): Promise<JSKeyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(uri, new UriBasedErrorBuilder(uri));
   }
@@ -33,12 +33,12 @@ export abstract class KeyboardLoaderBase {
    * @param stub  The stub of the keyboard to load.
    * @returns     A Promise that resolves to the loaded keyboard.
    */
-  public async loadKeyboardFromStub(stub: KeyboardStub): Promise<Keyboard> {
+  public async loadKeyboardFromStub(stub: KeyboardStub): Promise<JSKeyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(stub.filename, new StubBasedErrorBuilder(stub));
   }
 
-  private async loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+  private async loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<JSKeyboard> {
     const byteArray = await this.loadKeyboardBlob(uri, errorBuilder);
 
     if (byteArray.slice(0, 4) == Uint8Array.from([0x4b, 0x58, 0x54, 0x53])) { // 'KXTS'
@@ -60,5 +60,5 @@ export abstract class KeyboardLoaderBase {
 
   protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;
 
-  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard>;
+  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<JSKeyboard>;
 }

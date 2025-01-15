@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
@@ -23,7 +23,7 @@ describe('Engine - Unmatched Final Groups', function() {
 
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
     const keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../../common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

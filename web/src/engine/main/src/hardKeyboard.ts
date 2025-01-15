@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { Keyboard, KeyMapping, KeyEvent, Codes } from "keyman/engine/keyboard";
+import { JSKeyboard, KeyMapping, KeyEvent, Codes } from "keyman/engine/keyboard";
 import { type RuleBehavior } from 'keyman/engine/js-processor';
 import { KeyEventSourceInterface } from 'keyman/engine/osk';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
@@ -13,7 +13,7 @@ interface EventMap {
 
 export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
 
-export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboard, baseLayout: string): KeyEvent {
+export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: JSKeyboard, baseLayout: string): KeyEvent {
   // Mnemonic handling.
   if(activeKeyboard && activeKeyboard.isMnemonic) {
     // The following will never set a code corresponding to a modifier key, so it's fine to do this,

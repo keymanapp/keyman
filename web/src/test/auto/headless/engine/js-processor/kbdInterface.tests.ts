@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { DeviceSpec, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 describe('Headless keyboard loading', function () {
@@ -24,7 +24,7 @@ describe('Headless keyboard loading', function () {
   describe('Full harness loading', () => {
     it('successfully loads', async function () {
       // -- START: Standard Recorder-based unit test loading boilerplate --
-      const harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       harness.activeKeyboard = keyboard;
@@ -36,7 +36,7 @@ describe('Headless keyboard loading', function () {
 
     it('can evaluate rules', async function () {
       // -- START: Standard Recorder-based unit test loading boilerplate --
-      const harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       harness.activeKeyboard = keyboard;
@@ -47,7 +47,7 @@ describe('Headless keyboard loading', function () {
     });
 
     it('does not change the active kehboard', async function () {
-      const harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const lao_keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       assert.isNotOk(harness.activeKeyboard);
@@ -67,7 +67,7 @@ describe('Headless keyboard loading', function () {
     it('throws distinct errors', async function () {
       const invalidPath = 'totally_invalid_path.js';
 
-      const harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       const keyboardLoader = new NodeKeyboardLoader(harness);
       let missingError;
       try {

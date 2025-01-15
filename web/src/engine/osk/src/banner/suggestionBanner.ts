@@ -13,7 +13,7 @@ import {
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
-import { DeviceSpec, Keyboard, KeyboardProperties, timedPromise } from 'keyman/engine/keyboard';
+import { DeviceSpec, JSKeyboard, KeyboardProperties, timedPromise } from 'keyman/engine/keyboard';
 import { Banner } from './banner.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
@@ -675,7 +675,7 @@ export class SuggestionBanner extends Banner {
     return result;
   }
 
-  public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) {
+  public configureForKeyboard(keyboard: JSKeyboard, keyboardProperties: KeyboardProperties) {
     const rtl = keyboard.isRTL;
 
     // Removes all previous children.  (.replaceChildren requires Chrome for Android 86.)

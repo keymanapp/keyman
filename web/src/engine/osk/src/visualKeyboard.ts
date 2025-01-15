@@ -5,7 +5,7 @@ import {
   ActiveLayout,
   DeviceSpec,
   type InternalKeyboardFont,
-  Keyboard,
+  JSKeyboard,
   KeyboardProperties,
   KeyDistribution,
   KeyEvent,
@@ -87,7 +87,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
    */
-  keyboard: Keyboard,
+  keyboard: JSKeyboard,
 
   /**
    * Metadata about the keyboard, such as relevant fonts, display name, and language code.
@@ -242,7 +242,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
-  public readonly layoutKeyboard: Keyboard;
+  public readonly layoutKeyboard: JSKeyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
 
   get layerId(): string {
@@ -349,7 +349,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (!this.layoutKeyboard) {
       // May occasionally be null in embedded contexts; have seen this when iOS engine sets
       // keyboard height during change of keyboards.
-      this.layoutKeyboard = new Keyboard(null);
+      this.layoutKeyboard = new JSKeyboard(null);
     }
 
     this.layerGroup = new OSKLayerGroup(this, this.layoutKeyboard, formFactor);
@@ -1424,7 +1424,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * Create copy of the OSK that can be used for embedding in documentation or help
    * The currently active keyboard will be returned if PInternalName is null
    *
-   *  @param  {Keyboard}           PKbd            the keyboard object to be displayed
+   *  @param  {JSKeyboard}           PKbd            the keyboard object to be displayed
    *  @param  {KeyboardProperties} kbdProperties   the metadata stub for the keyboard
    *  @param  {Object}             pathConfig      an OSK path-configuration instance
    *  @param  {string=}            argFormFactor   layout form factor, defaulting to 'desktop'
@@ -1434,7 +1434,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    *  @return {Object}                            DIV object with filled keyboard layer content
    */
   static buildDocumentationKeyboard(
-    PKbd: Keyboard,
+    PKbd: JSKeyboard,
     kbdProperties: KeyboardProperties,
     pathConfig: OSKResourcePathConfiguration,
     argFormFactor: DeviceSpec.FormFactor,

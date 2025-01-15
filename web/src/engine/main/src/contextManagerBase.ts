@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
-import { ManagedPromise, type Keyboard } from 'keyman/engine/keyboard';
-import { type KeyboardInterface, type OutputTarget } from 'keyman/engine/js-processor';
+import { ManagedPromise, type JSKeyboard } from 'keyman/engine/keyboard';
+import { type JSKeyboardInterface, type OutputTarget } from 'keyman/engine/js-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { EngineConfiguration } from './engineConfiguration.js';
@@ -37,7 +37,7 @@ interface EventMap {
    * @param kbd
    * @returns
    */
-  'keyboardchange': (kbd: {keyboard: Keyboard, metadata: KeyboardStub}) => void;
+  'keyboardchange': (kbd: {keyboard: JSKeyboard, metadata: KeyboardStub}) => void;
 }
 
 export interface ContextManagerConfiguration {
@@ -65,7 +65,7 @@ export interface ContextManagerConfiguration {
 
 interface PendingActivation {
   target: OutputTarget,
-  keyboard: Promise<Keyboard>,
+  keyboard: Promise<JSKeyboard>,
   stub: KeyboardStub;
 }
 
@@ -99,7 +99,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.keyboardCache = config.keyboardCache;
   }
 
-  insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: JSKeyboardInterface, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.
     const outputTarget = this.activeTarget;
 
@@ -124,7 +124,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.predictionContext.resetContext();
   }
 
-  abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
+  abstract get activeKeyboard(): {keyboard: JSKeyboard, metadata: KeyboardStub};
 
   /**
    * Determines the 'target' currently used to determine which keyboard should be active.
@@ -143,7 +143,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget): void;
+  protected abstract activateKeyboardForTarget(kbd: {keyboard: JSKeyboard, metadata: KeyboardStub}, target: OutputTarget): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -178,7 +178,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @returns
    */
   protected async deferredKeyboardActivation(
-    kbdPromise: Promise<Keyboard>,
+    kbdPromise: Promise<JSKeyboard>,
     metadata: KeyboardStub,
     target: OutputTarget
   ): Promise<PendingActivation> {
@@ -263,7 +263,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       this.emit('beforekeyboardchange', activatingKeyboard.metadata);
     }
 
-    let kbdStubPair: { keyboard: Keyboard, metadata: KeyboardStub } = null;
+    let kbdStubPair: { keyboard: JSKeyboard, metadata: KeyboardStub } = null;
     if(keyboard) {
       kbdStubPair = {
         keyboard: keyboard,
@@ -298,7 +298,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   protected prepareKeyboardForActivation(
     keyboardId: string,
     languageCode?: string
-  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
+  ): {keyboard: Promise<JSKeyboard>, metadata: KeyboardStub} {
     // Set default language code
     languageCode ||= '';
 
@@ -333,7 +333,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     }
 
     // Determine if the keyboard was previously loaded but is not active; use the cached, pre-loaded version if so.
-    let keyboard: Keyboard;
+    let keyboard: JSKeyboard;
     if(keyboard = this.keyboardCache.getKeyboardForStub(requestedStub)) {
       return {
         keyboard: Promise.resolve(keyboard),
@@ -351,7 +351,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
         this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
 
         let keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
-        let timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
+        let timeoutPromise = new Promise<JSKeyboard>((resolve, reject) => {
           const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
           window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
         });
