@@ -10,6 +10,18 @@ Keyman keyboards now always display a banner above the keyboard for one of the f
 * Display a Keyman-themed banner so popups and gestures for the top row of keys are visible
 * Reserved for future functionality
 
+## Controlling the Keyboard Banner Mode
+
+The banner mode can be controlled by going to Keyman Settings --> (select an installed language)
+
+At the bottom of the language settings menu are three controls for the banner:
+
+![](../android_images/disable-suggestions.png)
+
+* Disable suggestions (Display image banner instead)
+* Predictions only (Suggestion banner displays predictions)
+* Predictions with corrections (Suggestion banner displays predictions and corrections)
+
 ## Using the Suggestion Banner
 
 If a [dictionary is installed](installing-dictionaries) and enabled for the active Keyman keyboard, the banner will display suggestions that can be selected.
