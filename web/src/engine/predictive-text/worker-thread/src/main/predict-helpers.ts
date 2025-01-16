@@ -3,7 +3,7 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
+import { APPLIED_SUGGESTION_COMPONENT, ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -20,6 +20,8 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
+import { deepCopy } from '@keymanapp/web-utils';
+import { LexicalModelPunctuation } from '../../../../../../../common/web/types/src/lexical-model-types.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -85,6 +87,23 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
 
   // Probability distance
   return b.totalProb - a.totalProb;
+}
+
+export function isContextAtAcceptedSuggestionEdge(
+  postContextState: TrackedContextState
+): boolean {
+  if(!postContextState || postContextState.tail.replacements?.length == 0) {
+    return false;
+  }
+
+  // Original suggestion set:  acquired.  But... they're based on a different context...
+  const appliedSuggestion = postContextState.tail.replacement;
+
+  if(appliedSuggestion?.suggestion?.id != APPLIED_SUGGESTION_COMPONENT) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -194,6 +213,14 @@ export async function correctAndEnumerate(
       : null
   );
   const postContextState = contextChangeAnalysis.state;
+
+  if(isContextAtAcceptedSuggestionEdge(postContextState)) {
+    return {
+      postContextState: postContextState,
+      // We're going to ignore whatever we'd generate, so just skip past this phase.
+      rawPredictions: []
+    };
+  }
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -374,6 +401,70 @@ export async function correctAndEnumerate(
     postContextState: postContextState,
     rawPredictions: rawPredictions
   };
+}
+
+/**
+ * Given a previous context state to which a suggestion was applied, regenerate its
+ * suggestions based on the current state of the context, altering the 'keep' suggestion
+ * into a 'revert' suggestion that will restore the original input.
+ * @param postContextState
+ * @param inputTransform 
+ * @param punctuation 
+ * @returns 
+ */
+export function suggestFromPriorContext(
+  postContextState: TrackedContextState,
+  inputTransform: Transform,
+  punctuation: LexicalModelPunctuation
+) {
+  const currentToken = postContextState.tail;
+
+  // Original suggestion set:  acquired.  But... they're based on a different context...
+  const appliedSuggestion = currentToken.replacement;
+
+  // We added a partial, synthetic 'replacement' useful for tracking how much to revert.
+  // It should have a set, distinct ID corresponding to the check below.  This partial
+  // version was never a real suggestion; even if it were, the original is still within our list!
+  const suggestions = currentToken.replacements.filter((entry) => entry != appliedSuggestion).map((entry) => deepCopy(entry));
+
+  // First up:  we can safely use the raw insert string as the needed length to erase.
+  // Also, we need to include whatever backspacing occured to reach that point, as the suggestion
+  // is applied to the context BEFORE the backspace takes effect.
+  const deleteLeft = appliedSuggestion.suggestion.transform.insert.kmwLength() + inputTransform.deleteLeft;
+  suggestions.forEach((entry) => {
+    entry.suggestion.transform.deleteLeft = deleteLeft;
+    if(inputTransform.id) {
+      entry.suggestion.transformId = inputTransform.id;
+    }
+  });
+
+  // oh yeah, make sure we map the input's transform ID...
+
+  const keepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
+  // Convert the original 'keep' suggestion into a REVERT suggestion; this will restore the
+  // original context.
+  keepSuggestion.suggestion.tag = 'revert';
+  if(currentToken.replacementTransformId) {
+    keepSuggestion.suggestion.transformId = -currentToken.replacementTransformId;
+  }
+
+  // Remove any keep-added punctuation; we wish to place the caret immediately after the token,
+  // with no intervening whitespace or similar punctuation insertion.
+  const postSuggestionInsert = punctuation.insertAfterWord;
+  if(postSuggestionInsert) {
+    const keepTransform = keepSuggestion.suggestion.transform;
+    const keepText = keepTransform.insert;
+
+    // Validate that the punctuation matches first.
+    const punct = keepText.slice(keepText.length - postSuggestionInsert.length);
+    if(punct == postSuggestionInsert) {
+      // remove the whitespace-ish punctuation if it was added!
+      keepTransform.insert = keepText.slice(0, keepText.length - postSuggestionInsert.length);
+    }
+  }
+
+  // Bypass the rest of the correction-search; just use these!
+  return suggestions.map((entry) => entry.suggestion);
 }
 
 export function shouldStopSearchingEarly(
