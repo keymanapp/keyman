@@ -344,14 +344,18 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     let editPath = mapping.editPath();
 
-    // When the context has but two tokens, the path algorithm tends to invert
+    // When the context has but three tokens, the path algorithm tends to invert
     // 'insert' and 'substitute' from our preferred ordering for them.
     // Logically, either order makes sense... but logic for other cases is
     // far simpler if we have 'substitute' before 'insert'.
-    if(editPath.length == 2 && editPath[0] == 'insert' && editPath[1] == 'substitute') {
+    if(editPath.length == 3 && editPath[0] == 'insert' && editPath[1] == 'insert' && editPath[2] == 'substitute') {
+      editPath[0] = 'substitute';
+      editPath[2] = 'insert';
+    } else if(editPath.length == 2 && editPath[0] == 'insert' && editPath[1] == 'substitute') {
+      // This path may be reachable for languages without space-based wordbreaking.
       editPath[0] = 'substitute';
       editPath[1] = 'insert';
-    }
+    } 
 
     const firstMatch = editPath.indexOf('match');
     let lastMatch = editPath.lastIndexOf('match');
@@ -377,7 +381,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(firstMatch == 0 && lastMatch == editPath.length - 1) {
-      return { state: matchState, baseState: matchState };
+      return { state: matchState, baseState: matchState};
     }
 
     // If mutations HAVE happened, we have work to do.
@@ -457,8 +461,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       //
       // This may happen if tokenization for pre-existing text changes due to incoming
       // input - refer to #12494 for an example case.
-      if(!primaryInput && incomingToken.text != '') {
-        return null;
+      if(editPath[i] != 'delete') {
+        if(!incomingToken) {
+          return null;
+        } else if(!primaryInput && incomingToken?.text != '') {
+          return null;
+        }
       }
 
       if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
@@ -482,8 +490,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
             state = new TrackedContextState(state);
           }
 
+          const sourceToken = matchState.tokens[i];
+          state.tokens[i - poppedTokenCount] = sourceToken;
           const token = state.tokens[i - poppedTokenCount];
-          const matchToken = matchState.tokens[i];
 
           // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
           // on the tokens, rather than on the overall 'state'.
@@ -521,7 +530,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // transforms.  That said, it's also very low impact.  Best as I can
           // see, this is only really used for debugging info?
           if(state != matchState && !isLastToken) {
-            matchToken.replacementText = incomingToken.text;
+            token.replacementText = incomingToken.text;
           }
 
           break;
@@ -574,21 +583,45 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
             continue;
           }
           // else 'fallthrough' / return null
-        default:
-          // No 'delete' should exist on the trailing edge of context when the
-          // context window slides.  While it can happen due to keystrokes with
-          // `deleteLeft`, we keep a cache of recent contexts - an older one will
-          // likely match sufficiently.
-          // - may see 'delete' followed by 'substitute' in such cases.
+        case 'delete':
+          // While we do keep a cache of recent contexts, logic constraints for handling
+          // multitaps makes it tricky to reliably use in all situations.
+          // It's best to handle `delete` cases directly for this reason.
+          for(let j = i + 1; j < editPath.length; j++) {
+            // If something _other_ than delete follows a 'delete' on the edit path, 
+            // we probably have a context mismatch.
+            //
+            // It's possible to construct cases where this isn't true, but it's likely not
+            // worth trying to handle such rare cases.
+            if(editPath[j] != 'delete') {
+              return null;
+            }
+          }
+
+          // If ALL that remains are deletes, we're good to go.
           //
-          // No 'transform' edits should exist within this section, either.
+          // This may not be the token at the index, but since all that remains are deletes,
+          // we'll have deleted the correct total number from the end once all iterations
+          // are done.
+          if(state == matchState) {
+            state = new TrackedContextState(state);
+          }
+
+          state.tokens.pop();
+          break;
+        default:
+          // No 'transform' edits should exist within this section.
           return null;
       }
 
       priorEdit = editPath[i];
     }
 
-    return { state, baseState: matchState, preservationTransform };
+    return { 
+      state, 
+      baseState: matchState, 
+      preservationTransform
+    };
   }
 
   private static modelContextState(
@@ -643,11 +676,13 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
    * @param model
    * @param context
    * @param transformDistribution
+   * @param preserveMatchState  Set to `true` to avoid any edits to the matched context state when they might normally occur.
    */
   analyzeState(
     model: LexicalModel,
     context: Context,
-    transformDistribution?: Distribution<Transform>
+    transformDistribution?: Distribution<Transform>,
+    preserveMatchState?: boolean
   ): ContextMatchResult {
     if(!model.traverseFromRoot) {
       // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
