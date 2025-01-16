@@ -6,6 +6,5 @@ stateDiagram
     Downloading --> Installing
     Downloading --> WaitingRestart
     WaitingRestart --> Installing
-    Installing --> PostInstall
-    PostInstall --> Idle
+    Installing --> Idle
 ```
