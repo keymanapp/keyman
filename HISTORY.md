@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 17.0.333 stable 2025-01-16
+
+* fix(core): permanently disable logging (#12674)
+* fix(linux): pushing of updated changelog branch (#12819)
+* fix(linux): work around Lintian errors (#12817)
+* fix(core): implement ldml_processor::get_key_list() (#12816)
+* chore(linux): Update debian changelog (#12022)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12875)
+* chore: use GitHub PR titles when writing HISTORY.md (#12908)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12913)
+
 ## 17.0.332 stable 2024-11-06
 
 * fix(developer): create Server config directory before options save (#12609)
