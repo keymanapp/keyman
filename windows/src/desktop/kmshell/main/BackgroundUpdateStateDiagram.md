@@ -9,3 +9,4 @@ stateDiagram
     Installing --> PostInstall
     PostInstall --> Idle
 ```
+State Transition  matrix
