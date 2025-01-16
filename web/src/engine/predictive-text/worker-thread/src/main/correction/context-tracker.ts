@@ -42,8 +42,14 @@ export class TrackedContextToken {
   isWhitespace?: boolean;
 
   transformDistributions: Distribution<Transform>[] = [];
-  replacements: TrackedContextSuggestion[];
+  replacements: TrackedContextSuggestion[] = [];
   activeReplacementId: number = -1;
+
+  constructor();
+  constructor(instance: TrackedContextToken);
+  constructor(instance?: TrackedContextToken) {
+    Object.assign(this, instance);
+  }
 
   get currentText(): string {
     if(this.replacementText === undefined || this.replacementText === null) {
@@ -60,8 +66,9 @@ export class TrackedContextToken {
     });
   }
 
-  revert() {
-    delete this.activeReplacementId;
+  clearReplacements() {
+    this.activeReplacementId = -1;
+    this.replacements = []
   }
 
   /**
@@ -85,7 +92,8 @@ export class TrackedContextToken {
     });
 
     this.raw = tokenText;
-    this.transformDistributions = backspacedTokenContext;
+    this.transformDistributions = backspacedTokenContext;  
+    this.clearReplacements();
   }
 
   update(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
@@ -98,6 +106,7 @@ export class TrackedContextToken {
 
     // Replace old token's raw-text with new token's raw-text.
     this.raw = tokenText;
+    this.clearReplacements();
   }
 }
 
@@ -127,15 +136,7 @@ export class TrackedContextState {
       // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
       this.tokens = source.tokens.map(function(token) {
         let copy = new TrackedContextToken();
-        copy.raw = token.raw;
-        copy.replacements = [].concat(token.replacements);
-        copy.activeReplacementId = token.activeReplacementId;
-        copy.transformDistributions = [].concat(token.transformDistributions);
-
-        if(token.replacementText) {
-          copy.replacementText = token.replacementText;
-        }
-
+        Object.assign(copy, token);
         return copy;
       });
 
