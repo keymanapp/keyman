@@ -12,6 +12,7 @@
 #import "TextApiCompliance.h"
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
@@ -43,9 +44,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
 
-  [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-      [scope setTagValue:clientAppId forKey:@"clientAppId"];
-  }];
+  [KMSentryHelper addClientAppIdTag:clientAppId];
 
   return self;
 }
@@ -95,7 +94,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput *output = nil;
   
-  if ([self.appDelegate isSentryTestingEnabled]) {
+  if ([self.appDelegate canForceSentryEvents]) {
     if ([self forceSentryEvent:event]) {
       return NO;
     }

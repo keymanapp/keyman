@@ -11,6 +11,7 @@
 #import "KMInputMethodLifecycle.h"
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 
 @interface OSKWindowController ()
 @property (nonatomic, strong) NSButton *helpButton;
@@ -76,6 +77,7 @@
   
   // whenever the OSK is closing clear all of its modifier keys
   [self.oskView clearOskModifiers];
+  [KMSentryHelper addOskVisibleTag:@"false"];
 }
 
 - (void)helpAction:(id)sender {

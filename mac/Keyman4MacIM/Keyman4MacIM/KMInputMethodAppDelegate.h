@@ -124,7 +124,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
-- (BOOL)isSentryTestingEnabled;
+- (BOOL)canForceSentryEvents;
 @end
 
 #endif /* KMInputMethodAppDelegate_h */
