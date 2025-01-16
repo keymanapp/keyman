@@ -213,7 +213,7 @@
 
 ## 18.0.134 alpha 2024-11-04
 
-*  (#12606)
+* fix(developer): ldml don't allow a uset as right-hand-side variable (#12606)
 
 ## 18.0.133 alpha 2024-11-01
 
