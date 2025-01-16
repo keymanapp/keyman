@@ -321,6 +321,9 @@ interface ContextMatchResult {
    * (Refer to #12494 for an example case.)
    */
   preservationTransform?: Transform;
+
+  headTokensRemoved: number;
+  tailTokensAdded: number;
 }
 
 export class ContextTracker extends CircularArray<TrackedContextState> {
@@ -381,7 +384,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(firstMatch == 0 && lastMatch == editPath.length - 1) {
-      return { state: matchState, baseState: matchState};
+      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
     }
 
     // If mutations HAVE happened, we have work to do.
@@ -423,6 +426,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // does not land as part of the final token in the resulting context.  This
     // component should be preserved by any suggestions that get applied.
     let preservationTransform: Transform;
+    let pushedTokenCount = 0;
 
     // Now to update the end of the context window.
     for(let i = lastMatch+1; i < editPath.length; i++) {
@@ -573,6 +577,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
           // Auto-replaces the search space to correspond with the new token.
           state.pushTail(pushedToken);
+          pushedTokenCount++;
           break;
         case 'match':
           // The default (Unicode) wordbreaker returns an empty token after whitespace blocks.
@@ -620,7 +625,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     return { 
       state, 
       baseState: matchState, 
-      preservationTransform
+      preservationTransform, 
+      headTokensRemoved: poppedTokenCount, 
+      tailTokensAdded: pushedTokenCount 
     };
   }
 
@@ -763,7 +770,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     let state = ContextTracker.modelContextState(tokenizedContext.left, model);
     state.taggedContext = context;
     this.enqueue(state);
-    return { state, baseState: null };
+    return { state, baseState: null, headTokensRemoved: 0, tailTokensAdded: 0 };
   }
 
   clearCache() {
