@@ -5,7 +5,7 @@ import APPLIED_SUGGESTION_COMPONENT = correction.APPLIED_SUGGESTION_COMPONENT;
 import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
-import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, isContextAtAcceptedSuggestionEdge, predictionAutoSelect, processSimilarity, suggestFromPriorContext, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import CasingForm = LexicalModelTypes.CasingForm;
@@ -132,6 +132,11 @@ export class ModelCompositor {
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
     const { postContextState, rawPredictions } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
+
+    // Check:  did we just reach the tail of a prior token via BKSP?
+    if(isContextAtAcceptedSuggestionEdge(postContextState)) {
+      return suggestFromPriorContext(postContextState, inputTransform, this.punctuation);
+    }
 
     if(this.activeTimer == timer) {
       this.activeTimer = null;
