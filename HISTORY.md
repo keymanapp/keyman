@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.170 alpha 2025-01-17
+
+* chore(linux): update copyright year (#12918)
+* fix(web): patch unit test with execution dependent on autocorrect state (#12940)
+* test(common/web): unit tests for element-string (#12811)
+* chore(linux): Update debian changelog (#12917)
+
 ## 18.0.169 alpha 2025-01-17
 
 * chore(windows): remove `postinstall` state from mermaid diagram (#12923)
