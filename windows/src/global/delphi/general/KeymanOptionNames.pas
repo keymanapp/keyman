@@ -10,6 +10,7 @@ type
     koRightModifierHK,
     koReleaseShiftKeysAfterKeyPress,
     koShowHints,   // I1256
+    koAutomaticUpdate,
     // Startup options
     koTestKeymanFunctioning,
     koStartWithWindows,

@@ -19,15 +19,23 @@ await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
 if(KeymanSentry.isEnabled()) {
   KeymanSentry.init(kmcSentryOptions);
 }
-try {
-  await run();
-} catch(e) {
-  KeymanSentry.captureException(e);
-}
 
-// Ensure any messages reported to Sentry have had time to be uploaded before we
-// exit. In most cases, this will be a no-op so should not affect performance.
-await exitProcess(0);
+run().then(async () => {
+  // Ensure any messages reported to Sentry have had time to be uploaded before we
+  // exit. In most cases, this will be a no-op so should not affect performance.
+  await exitProcess(0);
+}, (reason: any) => {
+  KeymanSentry.captureException(reason);
+  // in local environment, captureException will
+  // return so we want to re-throw; note that this is
+  // a little noisy because it comes from an async function
+  console.error('Aborting due to fatal exception. Local development environment detected, so printing trace.');
+  const report: any = process.report?.getReport(reason);
+  console.log(report?.javascriptStack?.message);
+  console.log(report?.javascriptStack?.stack?.map((s: string) => '   '+s).join('\n'));
+  // This cannot be an async function because otherwise the stack trace gets captured
+  exitProcess(1);
+});
 
 async function run() {
   await loadOptions();
@@ -62,6 +70,5 @@ async function run() {
   declarePublish(program);
   */
 
-  await program.parseAsync(process.argv)
-    .catch(reason => console.error(reason));
+  await program.parseAsync(process.argv);
 }
