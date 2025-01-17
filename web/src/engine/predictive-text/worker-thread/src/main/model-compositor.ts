@@ -1,5 +1,6 @@
 import * as models from '@keymanapp/models-templates';
 import * as correction from './correction/index.js'
+import APPLIED_SUGGESTION_COMPONENT = correction.APPLIED_SUGGESTION_COMPONENT;
 
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
@@ -14,10 +15,11 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import USVString = LexicalModelTypes.USVString;
+import { tokenizeTransform } from './correction/transform-tokenization.js';
 
 export class ModelCompositor {
-  private lexicalModel: LexicalModel;
-  private contextTracker?: correction.ContextTracker;
+  readonly lexicalModel: LexicalModel;
+  readonly contextTracker?: correction.ContextTracker;
 
   static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
@@ -233,8 +235,21 @@ export class ModelCompositor {
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
-      const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
-      revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
+      //
+      // TODO:  should replace the ORIGINAL context (if we've selected a new suggestion after
+      // replacing a previously applied one with no intervening edits).
+      let preCaretToken: models.Token;
+      const leftContext = postContextTokenization.left;
+      for(let i = leftContext.length - 1; i >= 0; i--) {
+        // Applying one suggestion on top of another just-accepted suggestion should result in
+        // reversions that display the originally-replaced context... not the empty-string
+        // that follows any added whitespace from either of the accepted suggestions.
+        if(leftContext[i].text && !leftContext[i].isWhitespace) {
+          preCaretToken = leftContext[i];
+        }
+      }
+      // const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
+      revertedPrefix = preCaretToken.text ?? '';
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0].text : '';
     } else {
       revertedPrefix = this.wordbreak(postContext);
@@ -267,9 +282,58 @@ export class ModelCompositor {
         contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
       }
 
+      // Suggestion IDs at this level are unique.
       contextState.tail.activeReplacementId = suggestion.id;
-      let acceptedContext = models.applyTransform(suggestion.transform, context);
-      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
+      contextState.tail.replacementTransformId = suggestion.transformId;
+      contextState.taggedContext = context;
+      
+      // Need to mark the 'accepted' aspect of this in some way...
+      // We know which state it should match; all there is to do is actually do the bookkeeping.
+      const matchResults = this.contextTracker.analyzeState(
+        this.lexicalModel, 
+        context, 
+        [{
+          sample: suggestion.transform,
+          p: 1.0
+        }],
+        true
+      );
+
+      // If context-tracking handles the applied suggestion properly...
+      if(matchResults?.baseState) {
+        // Get the index of the first token altered by the suggestion being applied.
+        let substitutionTokenIndex = (contextState.tokens.length - 1) - matchResults.headTokensRemoved;
+
+        const tokenizer = determineModelTokenizer(this.lexicalModel)
+        let tokenizedApplication = tokenizeTransform(tokenizer, context, suggestion.transform);
+
+        // We build our suggestions to do whole-word replacement.  Fortunately, that means we already have
+        // the full suggestions!
+        const suggestions = contextState.tail.replacements;
+        if(suggestions && (substitutionTokenIndex + tokenizedApplication.length == matchResults.state.tokens.length)) {
+
+          for(let j = 1; j <= tokenizedApplication.length; j++) { 
+            const replacementPortion: correction.TrackedContextSuggestion = {
+              suggestion: {
+                ...suggestion,
+                id: APPLIED_SUGGESTION_COMPONENT, // Actual suggestions always present non-negative IDs; this can uniquely mark.
+                transformId: suggestion.transformId,
+                // this as a component of an applied suggestion.
+                transform: tokenizedApplication.slice(0, j).reduce((accum, current) => models.buildMergedTransform(accum, current), { insert: '', deleteLeft: 0}),
+              },
+              tokenWidth: j
+            }
+
+            const token = matchResults.state.tokens[substitutionTokenIndex + j - 1];
+            // Attach our fragmented version of the suggestion - the part useful for rewinding it -
+            // as its own suggestion with a distinct, unique ID indicative of this property.
+            token.replacements = [ replacementPortion ].concat(suggestions);
+            token.activeReplacementId = APPLIED_SUGGESTION_COMPONENT; // perhaps give unique ID + overwrite the original suggestion ID.
+            token.replacementTransformId = suggestion.transformId;
+          }
+        }
+        // else: we're not confident we can map the replacement details safely to do reversion later
+      }
     }
 
     return reversion;
