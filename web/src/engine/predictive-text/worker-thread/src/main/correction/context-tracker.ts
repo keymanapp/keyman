@@ -13,6 +13,12 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import USVString = LexicalModelTypes.USVString;
 
+/**
+ * Indicates that the owning token's 'replacement' represents part of an
+ * actually-applied suggestion.
+ */
+export const APPLIED_SUGGESTION_COMPONENT = -2;
+
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
@@ -56,6 +62,7 @@ export class TrackedContextToken {
   transformDistributions: Distribution<Transform>[] = [];
   replacements: TrackedContextSuggestion[] = [];
   activeReplacementId: number = -1;
+  replacementTransformId: number = -1;
 
   constructor();
   constructor(instance: TrackedContextToken);
@@ -86,6 +93,7 @@ export class TrackedContextToken {
   clearReplacements() {
     this.activeReplacementId = -1;
     this.replacements = []
+    this.replacementTransformId = -1;
   }
 
   /**
