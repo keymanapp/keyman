@@ -121,6 +121,8 @@ export async function correctAndEnumerate(
   transformDistribution: Distribution<Transform>,
   context: Context
 ): Promise<{
+  preContextState: TrackedContextState; // TODO:  validate usefulness; remove if we can do without it.
+
   /**
    * For models that support correction-search caching, this provides the
    * cached object corresponding to this method's operation.
@@ -188,6 +190,7 @@ export async function correctAndEnumerate(
     }
 
     return {
+      preContextState: null,
       postContextState: null,
       rawPredictions: rawPredictions
     };
@@ -198,7 +201,7 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let { state: contextState } = contextTracker.analyzeState(
+  const { state: contextState } = contextTracker.analyzeState(
     lexicalModel,
     context,
     null
@@ -216,6 +219,7 @@ export async function correctAndEnumerate(
 
   if(isContextAtAcceptedSuggestionEdge(postContextState)) {
     return {
+      preContextState: contextState,
       postContextState: postContextState,
       // We're going to ignore whatever we'd generate, so just skip past this phase.
       rawPredictions: []
@@ -398,6 +402,7 @@ export async function correctAndEnumerate(
   // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
 
   return {
+    preContextState: contextState,
     postContextState: postContextState,
     rawPredictions: rawPredictions
   };
@@ -414,6 +419,8 @@ export async function correctAndEnumerate(
  */
 export function suggestFromPriorContext(
   postContextState: TrackedContextState,
+  // no priorContextState use?  Looks like it may be very useful for suggestion application layering...
+  // that is, applying an alternate suggestion on top of an applied one.
   inputTransform: Transform,
   punctuation: LexicalModelPunctuation
 ) {
