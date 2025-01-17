@@ -126,7 +126,7 @@ function boxArrays_S(source: any) {
 }
 
 export interface rule_object {
-  type_C: string,             /* rule type C0-C4 */
+  rule_type: string,          /* rule type C0-C4 */
   modifiers_first: string,    /* string of modifiers for the first key (e.g. "NCAPS RALT CTRL") */
   key_first: string,          /* name of the first key (e.g. K_U) */
 
@@ -317,6 +317,7 @@ export class KeylayoutToKmnConverter {
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
     const ObjectArray: any[] = []
     let dk_counter = 0
+    let dk_counter_X = 0
 
     // start Tests v ToDo remove......................................
     const testArray_Ukelele: string[] = []
@@ -402,7 +403,6 @@ export class KeylayoutToKmnConverter {
                   new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
                 )
                 ObjectArray.push(RuleObj)
-                //console.log("RuleObj shtj ",new TextDecoder().decode(RuleObj.deadkeyed_Ch)=== new TextDecoder().decode(RuleObj.deadkeyed_Ch),l, RuleObj.deadkeyed_Ch, RuleObj.deadkeyed_Ch )
               }
             }
           }
@@ -527,7 +527,6 @@ export class KeylayoutToKmnConverter {
           let value_next
           let Key_Block4
           let KeyCode_Block2
-          //let codeIndexPair_Block4: any[][]
           let modifier_Block4_fixed: string[]
 
           // get a9  in behavior/key
@@ -545,39 +544,39 @@ export class KeylayoutToKmnConverter {
               /*  5: state =3  */           value_state = jsonObj.keyboard.actions.action[actionIdIndex].when[l]['@_state']
               /*  5: next  =1  */           value_next = jsonObj.keyboard.actions.action[actionIdIndex].when[l]['@_next']
               /*  5: StateNextID = a16  */  const StateNextID_Block5 = jsonObj.keyboard.actions.action[actionIdIndex]['@_id'] // get actionId of that state/next pair (14,20) e.g. actionId a57   //my a16   NNNRRR 5 
+
               // ........................................................................
 
               // Data of Block Nr 4 ..........................................................
-              /*  4: code = 32   */          Key_Block4 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, StateNextID_Block5) // find keyNr of that actionID a57> code=37   // my 32 ( K_U)
-              /*  4: K_U  */                 //first_key_C3_U8_deadkey = new TextEncoder().encode(this.map_UkeleleKC_To_VK(Number(ContextKeyNr_deadkey)))
-              /*  4: codeIndexPair=[32 3] */ //codeIndexPair_Block4 = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(StateNextID_Block5))
-              /*  4: MapIndex 3 */           //keymapIndexForactionID = this.lookup_14_ActionName__To__MapIndexSingle(jsonObj, String(theContextID))
-              /*     [32 3] FIX Arr[1] */    modifier_Block4_fixed = this.get_dataArray__From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, 1) // !! FIXED VALUE HERE!!!! needs to be loop 
+              /*  4: code = 32   */        Key_Block4 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, StateNextID_Block5) // find keyNr of that actionID a57> code=37   // my 32 ( K_U)
+              /*     [32 3] FIX Arr[1] */   modifier_Block4_fixed = this.get_data_From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, 1) // !! FIXED VALUE HERE!!!! needs to be loop 
+
               // ........................................................................
 
               // Data of Block Nr 3 ..........................................................
               //must be array ???
-              /*  3: actioniD = a17  */      const NoneNextId_Block3 = this.get_ActionID_Id__From__ActionID_next(jsonObj, value_state)
+              /*  3: actioniD = a17  */       const NoneNextId_Block3 = this.get_ActionID_Id__From__ActionID_next(jsonObj, value_state)
               // ........................................................................
 
               // Data of Block Nr 2 ..........................................................
-              /*  2: code = 28  */           KeyCode_Block2 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, NoneNextId_Block3)
-              /*  2: K_8   */                const KeyName_Block2 = this.map_UkeleleKC_To_VK(Number(KeyCode_Block2))
-              /*  2 index=3 */               const modifier_Block2 = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(NoneNextId_Block3))
-              /*  2 RALT   */                const ModifierElementBlock2 = this.get_dataArray__From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, modifier_Block2[0][1])
+              /*  2: code = 28  */            KeyCode_Block2 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, NoneNextId_Block3)
+              /*  2: K_8   */                        const KeyName_Block2 = this.map_UkeleleKC_To_VK(Number(KeyCode_Block2))
+              /*  2 index=3 */                       const modifier_Block2 = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(NoneNextId_Block3))
+              /*  2 RALT   */                        const ModifierElementBlock2 = this.get_data_From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, modifier_Block2[0][1])
               // ........................................................................
 
               // Data of Block Nr 6 ..........................................................
-              /*  6: [ 'a9', '1', 'â' ] */   const state_Block6_all = this.get_ActionID_Output_array__From__ActionID_State(jsonObj, value_next)
-              /*  6: output =  â  FIX */     const output_Block6_fixed = this.get_ActionID_Output__From__ActionID_State(jsonObj, value_next, state_Block6_all[1][0])
+              /*  6: [ 'a9', '1', 'â' ] */    const state_Block6_all = this.get_ActionID_Output_array__From__ActionID_State(jsonObj, value_next)
+              /*  6: output =  â  FIX */             const output_Block6_fixed = this.get_ActionID_Output__From__ActionID_State(jsonObj, value_next, state_Block6_all[1][0])
+
               // ........................................................................
 
               for (let a = 0; a < state_Block6_all.length; a++) {
 
                 // Data of Block Nr 1 ..........................................................
-                // todo get all state1´s
-                /*  2: code = 0  */          const keycode_Block1 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, state_Block6_all[a][0])
-                /*  2: K_A  */               const keyname_Block1 = this.map_UkeleleKC_To_VK(Number(keycode_Block1))
+                /*  2: code = 0  */           const keycode_Block1 = this.get_KeyMap_Code__From__KeyMap_Action(jsonObj, state_Block6_all[a][0])
+                /*  2: K_A  */                       const keyname_Block1 = this.map_UkeleleKC_To_VK(Number(keycode_Block1))
+
                 // ........................................................................
 
                 // a16 has state
@@ -588,7 +587,7 @@ export class KeylayoutToKmnConverter {
 
                   for (let kk = 0; kk < ModifierElementBlock2.length; kk++) {
 
-                    const modifierText = this.get_dataArray__From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, Number(modif[jj][0]))
+                    const modifierText = this.get_data_From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, Number(modif[jj][0]))
                     const modiflat = modifierText.flat()
                     const modi = this.create_kmn_modifier(modiflat[0], isCapsused)
 
@@ -614,6 +613,88 @@ export class KeylayoutToKmnConverter {
                   }
                 }
               }
+
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+
+              // Data of Block Nr 5 ..........................................................
+              /*  eg: state = 3  */                 const b5_value_state = jsonObj.keyboard.actions.action[actionIdIndex].when[l]['@_state']
+              /*  eg: next  = 1  */                 const b5_value_next = jsonObj.keyboard.actions.action[actionIdIndex].when[l]['@_next']
+              /*  eg: StateNextID = a16  */         const b5_actionId = jsonObj.keyboard.actions.action[actionIdIndex]['@_id']
+              // .............................................................................
+
+              // Data of Block Nr 4 ..........................................................
+              /*  eg: [ '6', '31', '32' ]*/         const b4_code_arr = this.get_KeyMap_Code_array__From__KeyMap_Action(jsonObj, b5_actionId)
+              /*  eg: 0 */                          const b4_behaviourId = this.get_KeyMap_Index__From__KeyMap_Action(jsonObj, b5_actionId)
+              /*  eg: ['CAPS', 'RALT'] */           const b4_modifier_arr = this.get_data_From__KeyMap_Modifier_Index(data_ukelele.ArrayOf_Modifiers, b4_behaviourId)
+              // .............................................................................
+
+              // Data of Block Nr 3 ..........................................................
+              /*  eg: actioniD = a17  */            const b3_actionId = this.get_ActionID_Id__From__ActionID_next(jsonObj, b5_value_state)
+              // .............................................................................
+
+              // Data of Block Nr 2 ..........................................................
+              /*  eg: ['K_8', 'K_M]  */             const b2_keyname_arr = this.get_KecCode_arr__From__ActionId(jsonObj, b3_actionId)
+              /*  eg: index=3 */                    const b2_keyBehaviour_arr = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(b3_actionId))
+              /* e.g. [[ '0','1shift? caps?']]*/    const b2_modifier_arr_all = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.ArrayOf_Modifiers, b2_keyBehaviour_arr)
+              // .............................................................................
+
+              // Data of Block Nr 6 ..........................................................
+              /*  eg: [ 'a9','1','â'] */            const b6_actionId_arr = this.get_ActionID_Output_array__From__ActionID_State(jsonObj, b5_value_next)
+              // .............................................................................
+
+              // Data of Block Nr 1 ..........................................................
+              /*  eg: ['49','K_SPACE','a0','0'] */  const b1_keycode_arr = this.get_KeyMap_Code_array__From__KeyMap_Action_array2D(jsonObj, b6_actionId_arr)
+              // .............................................................................
+
+              for (let n1 = 0; n1 < b6_actionId_arr.length; n1++) {
+                for (let n2 = 0; n2 < b1_keycode_arr.length; n2++) {
+                  if (b6_actionId_arr[n1][0] === b1_keycode_arr[n2][2]) {
+                    for (let n3 = 0; n3 < data_ukelele.ArrayOf_Modifiers[Number(b1_keycode_arr[n2][3])].length; n3++) {
+                      for (let n4 = 0; n4 < b4_modifier_arr.length; n4++) {
+                        for (let x5 = 0; x5 < b2_modifier_arr_all.length; x5++) {
+                          for (let n6 = 0; n6 < b2_modifier_arr_all[x5].length; n6++) {
+                            for (let n7 = 0; n7 < b4_code_arr.length; n7++) {
+                              for (let n8 = 0; n8 < b2_keyname_arr.length; n8++) {
+
+                                RuleObj = new Rules(
+                                /* OK rule_type */                 "CX",
+                                /* OK isTerminator */           false,
+
+                                /* OK  modifier_prev_deadkey*/  b2_modifier_arr_all[x5][n6],
+                                /* OK  prev_deadkey */          b2_keyname_arr[n8],
+                                /*     prev_deadkeys_Ch*/       new TextEncoder().encode(""),
+                                /* OK  dk_prev */               dk_counter_X++,
+
+                                /* OK  modifier_deadkey */      b4_modifier_arr[n4],
+                                /* OK  deadkey */               this.map_UkeleleKC_To_VK(Number(b4_code_arr[n7])),
+                                /*     deadkeys_Ch  */          new TextEncoder().encode(""),
+                                /* OK  dk*/                     dk_counter_X++,
+
+                                /* OK modifier_key*/            data_ukelele.ArrayOf_Modifiers[Number(b1_keycode_arr[n2][3])][n3],
+                                /* OK  key */                   b1_keycode_arr[n2][1],
+                                /* OK deadkeyed_Ch */           new TextEncoder().encode(b6_actionId_arr[n1][2])
+                                )
+                                ObjectArray.push(RuleObj)
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
+              // testobject CX for all combin**************************************************************************
             }
           }
           // ......................................................................................................
@@ -671,26 +752,25 @@ export class KeylayoutToKmnConverter {
     let old_counter = 0
     console.log("start check ", ObjectArray.length)
 
-    console.log("ObjectArray ", ObjectArray.length)
     for (let k = 0; k < ObjectArray.length; k++) {
 
-      if (/*(ObjectArray[k].type_C === "C3")||*/(ObjectArray[k].type_C === "C2")) {
+      if (/*(ObjectArray[k].rule_type === "C3")||*/(ObjectArray[k].rule_type === "CX")) {
         old_counter++
-        console.log("Obj: k ", k,
-          "\tType: ", (ObjectArray[k].type_C !== "" ? ObjectArray[k].type_C : "--".padEnd(4, " ")),
+        console.log("2Obj: k ", k,
+          "\tType: ", (ObjectArray[k].rule_type !== "" ? ObjectArray[k].rule_type : "--".padEnd(4, " ")),
 
           /* previous dk*/
-          "| modi_prev_dk: ", (ObjectArray[k].modifier_prev_deadkey !== "" ? ObjectArray[k].modifier_prev_deadkey.padEnd(23, " ") : "--".padEnd(23, " ")),
+          "| modi_prev_dk: ", (ObjectArray[k].modifier_prev_deadkey !== "" ? ObjectArray[k].modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
           "key_prev_dk: ", (ObjectArray[k].prev_deadkey !== "" ? ObjectArray[k].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
           "is_prev dk(): ", (ObjectArray[k].dk_prev !== 0 ? ("dk_p(" + String(ObjectArray[k].dk_prev) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
 
           /* dk*/
-          "| modi_dk: ", (ObjectArray[k].modifier_deadkey !== "" ? ObjectArray[k].modifier_deadkey.padEnd(23, " ") : "--".padEnd(23, " ")),
+          "| modi_dk: ", (ObjectArray[k].modifier_deadkey !== "" ? ObjectArray[k].modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
           "key_dk: ", (ObjectArray[k].deadkey !== "" ? ObjectArray[k].deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
           "is dk(): ", (ObjectArray[k].dk !== 0 ? ("dk(" + String(ObjectArray[k].dk) + ")").padEnd(9, " ") : "--".padEnd(9, " ")),
 
           /* key*/
-          "| modi: ", (ObjectArray[k].modifier_key !== "" ? ObjectArray[k].modifier_key.padEnd(20, " ") : "--".padEnd(20, " ")),
+          "| modi: ", (ObjectArray[k].modifier_key !== "" ? ObjectArray[k].modifier_key.padEnd(40, " ") : "--".padEnd(40, " ")),
           "key: ", (ObjectArray[k].key !== "" ? ObjectArray[k].key.padEnd(8, " ") : "--".padEnd(8, " ")),
           "ch: ", (new TextDecoder().decode(ObjectArray[k].deadkeyed_Ch) !== "" ? new TextDecoder().decode(ObjectArray[k].deadkeyed_Ch).padEnd(10, " ") : "--".padEnd(10, " ")),
 
@@ -766,18 +846,21 @@ export class KeylayoutToKmnConverter {
     }
     return ""
   }
-  public get_ActionID_Id_array__From__ActionID_next(data: any, search: string): string[] {
-    const returnarray: string[] = []
+  public get_ActionID_Id_array__From__ActionID_next(data: any, search: string): string[][] {
+    const returnarray2D: string[][] = []
     if (search !== "none") {
       for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+        const returnarray: string[] = []
         for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
           if (data.keyboard.actions.action[i].when[j]['@_next'] === search) {
             returnarray.push(data.keyboard.actions.action[i]['@_id'])
           }
         }
+        if (returnarray.length > 0)
+          returnarray2D.push(returnarray)
       }
     }
-    return returnarray
+    return returnarray2D
   }
   public get_ActionID_Id__From__ActionID_next(data: any, search: string): string {
     if (search !== "none") {
@@ -885,6 +968,130 @@ export class KeylayoutToKmnConverter {
     }
     return -1
   }
+  public get_KecCode_arr__From__ActionId(data: any, search: string): string[] {
+    const returnarray: string[] = []
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+        }
+      }
+    }
+    return returnarray
+  }
+
+
+
+  public get_KeyMap_Code_array__From__KeyMap_Action(data: any, search: string[]): string[] {
+    const returnarray: string[] = []
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+        }
+      }
+    }
+    return returnarray
+  }
+
+  public get_KeyMap_Code_array__From__KeyMap_Action_array2D(data: any, search: string[][]): string[][] {
+    const returnarray2D: string[][] = []
+    for (let k = 0; k < search.length; k++) {
+      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+          const returnarray: string[] = []
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0]) {
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+          }
+          if (returnarray.length > 0)
+            returnarray2D.push(returnarray)
+        }
+      }
+    }
+    return returnarray2D
+  }
+  public get_ActionID_Output__From__ActionID_IdState(data: any, search_id: string, search_state: string): Uint8Array {
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+        if ((data.keyboard.actions.action[i]['@_id'] === search_id) &&
+          (data.keyboard.actions.action[i].when[j]['@_state'] === search_state)) {
+          return new TextEncoder().encode(data.keyboard.actions.action[i].when[j]['@_output'])
+        }
+      }
+    }
+    return new TextEncoder().encode("")
+  }
+
+
+  public get_ActionID_Keyt__From__ActionID_IdState(data: any, search_id: string, search_state: string): Uint8Array {
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+        if ((data.keyboard.actions.action[i]['@_id'] === search_id) &&
+          (data.keyboard.actions.action[i].when[j]['@_state'] === search_state)) {
+          return new TextEncoder().encode(data.keyboard.actions.action[i].when[j]['@_output'])
+        }
+      }
+    }
+    return new TextEncoder().encode("")
+  }
+
+  public get_KeyMap_Code_array__From__KeyMap_Action_array(data: any, search: string[][]): string[] {
+    const returnarray: string[] = []
+    for (let k = 0; k < search.length; k++) {
+      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0]) {
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+          }
+        }
+      }
+    }
+    return returnarray
+  }
+
+  public get_KeyMap_Keymaparray__From__KeyMap_Code_array(data: any, search: string[]): string[][] {
+    const returnarray: string[][] = []
+    for (let k = 0; k < search.length; k++) {
+      const returnarray1D: string[] = []
+      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] === search[k]) {
+            returnarray1D.push(search[k])
+            returnarray1D.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+          }
+        }
+      }
+      returnarray.push(returnarray1D)
+    }
+    return returnarray
+  }
+  public get_KeyMap_Keymaparray__From__KeyMap_Action(data: any, search: string): string[] {
+    const returnarray: string[] = []
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+        }
+      }
+    }
+    return returnarray
+  }
+
+  public map_UkeleleKC_To_VK_array(search: string[]): string[] {
+    const returnarray: string[] = []
+
+
+    for (let i = 0; i < search.length; i++) {
+      returnarray.push(this.map_UkeleleKC_To_VK(Number(search[i])))
+    }
+
+
+    return returnarray
+  }
+
   public get_ActionID_Id__From__ActionID_Next(data: any, search: string) {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
@@ -911,7 +1118,47 @@ export class KeylayoutToKmnConverter {
     }
     return mapIndexArray_max
   }
+  public get_KeyMap_Modifier_array__From__behaviour_arr(data: any, search: number[][]): string[] {
+    const mapIndexArray_max: string[] = []
+    for (let j = 0; j < search.length; j++) {
+      mapIndexArray_max.push(data[search[j][1]])
+    }
+    return mapIndexArray_max
+  }
+
+
+  public get_Modifier_Text__From__Modifier_Index(data: any, search: string): string[] {
+    const mapIndexArray_max: string[] = []
+    const mapIndexArrayperKey: string[] = []
+    for (let j = 0; j < data[search].length; j++) {
+      mapIndexArrayperKey.push((data[search][j]))
+    }
+    for (let j = 0; j < data[search].length; j++) {
+      mapIndexArray_max.push(data[search][j])
+    }
+    return mapIndexArray_max
+  }
+
+
   public get_KeyMap_Code__From__ActionID_Action(data: any, search: string): number {
+    const mapIndexArray_max: number[][] = []
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+        const mapIndexArrayperKey: number[] = []
+
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+          mapIndexArrayperKey.push(i)
+        }
+        if (mapIndexArrayperKey.length > 0)
+          mapIndexArray_max.push(mapIndexArrayperKey)
+      }
+    }
+    return mapIndexArray_max[0][1]
+  }
+
+
+  public get_KeyMap_Code__From__ActionID_Action2(data: any, search: string): number {
     const mapIndexArray_max: number[][] = []
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
@@ -961,6 +1208,24 @@ export class KeylayoutToKmnConverter {
     }
     return returnarray2D
   }
+  public get_KeyMap_ModiIndex_array__From__KeyMap_Action(data: any, search_code: string, search_action: string): string[][] {
+    const returnarray2D: string[][] = []
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+        const returnarray: string[] = []
+        if ((data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search_action) &&
+          (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] === search_code)) {
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
+        }
+        if (returnarray.length > 0) {
+          returnarray2D.push(returnarray)
+        }
+      }
+    }
+    return returnarray2D
+  }
   public get_ActionID_Output__From__ActionID_State(data: any, search: string, nextval: string): string {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
@@ -971,11 +1236,27 @@ export class KeylayoutToKmnConverter {
     }
     return ""
   }
+
+
+
+
+
+
+
   public get_KeyMap_Modifier_aray__From__KeyMap_Index(data: any, search: number): string[] {
     return data.ArrayOf_Modifiers[search]
   }
-  public get_dataArray__From__KeyMap_Modifier_Index(data: any, search: number): string[] {
+  public get_data_From__KeyMap_Modifier_Index(data: any, search: number): string[] {
     return data[search]
+  }
+
+
+  public get_dataArray2D__From__KeyMap_Modifier_Index(data: any, search: string[]): string[][] {
+    const returnarray: string[][] = []
+    for (let i = 0; i < search.length; i++) {
+      returnarray.push(data[search[i]])
+    }
+    return returnarray
   }
 
   /**
@@ -1145,10 +1426,10 @@ export class KeylayoutToKmnConverter {
 
     // remove duplicates
     const uniqueDeadkeyRules = DeadkeyRules.reduce((unique, o) => {
-      if (!unique.some((obj: { deadkeyed_Ch: any; type_C: any; modifier_key: any; key: any }) =>
+      if (!unique.some((obj: { deadkeyed_Ch: any; rule_type: any; modifier_key: any; key: any }) =>
         new TextDecoder().decode(obj.deadkeyed_Ch) === new TextDecoder().decode(o.deadkeyed_Ch)
         && obj.key === o.key
-        && obj.type_C === o.type_C
+        && obj.rule_type === o.rule_type
         && obj.modifier_key === o.modifier_key)
       ) {
         unique.push(o);
@@ -1164,9 +1445,9 @@ export class KeylayoutToKmnConverter {
     //*************************************************************************************************** */
     /*
     How to create rules from keylayout data from data_ukelele.ArrayOf_processed_RuleData:
- 
+
     There are 6 different types of data entries (C0-C4) in data_ukelele.ArrayOf_processed_RuleData e.g. that contain all data to retrieve deadkeys, deadkeyables and deadkeyed characters: 
- 
+
     C0: (size: 4) ['C0', 'RIGHTSHIFT ', 'K_S',     'S' ]
     C1: (size: 4) ['C1', 'CAPS',        'K_A',     'A' ],
     C2: (size: 5) ['C2', 'CAPS',        'K_A',     'K_N',         'Ã' ],                           use 2.(K_A)  and 4.('Ã') to get name and DEADKEYED
@@ -1177,7 +1458,7 @@ export class KeylayoutToKmnConverter {
     To Find a DEADKEY e.g. ^ 
       1) look in modifier_C4 with 'isTerminator' included (n = 7)
       2) get 7th entry ===> DEADKEY (e.g. 02DC)
- 
+
     To Find a DEADKEYABLE ( a character that can be converted to a deadkey e.g. A (-> Ã) ):
       1) C1    CAPS   K_A   A
       2) C2    CAPS   K_A   K_N   Ã
@@ -1194,7 +1475,7 @@ export class KeylayoutToKmnConverter {
 
     // select only lines for deadkeyables ( entries that contain C1, are not K_SPACE and create chars e.g. from 'C1', 'CAPS', 'K_A',  'A' ])
     const deadkeyables_raw = data_ukelele.ArrayOf_Rules.filter((curr) => {
-      if ((curr.type_C === "C1") && (curr.key !== "K_SPACE") && (new TextDecoder().decode(curr.deadkeyed_Ch) !== "")) {
+      if ((curr.rule_type === "C1") && (curr.key !== "K_SPACE") && (new TextDecoder().decode(curr.deadkeyed_Ch) !== "")) {
         return curr;
       }
       return ""
@@ -1202,9 +1483,9 @@ export class KeylayoutToKmnConverter {
 
     // select only lines for deadkeyed ( entries that contain C2, are not K_SPACE and create a deadkeyed) e.g. from ['C2', 'CAPS', 'K_A', 'K_N', 'Ã' ]
     const deadkeyed_raw_multiple = data_ukelele.ArrayOf_Rules.filter((curr) => {
-      // if ((curr.type_C === "C2") && (curr.key !== "K_SPACE") && (new TextDecoder().decode(curr.deadkeyed_Ch) !== "")) {
-      // if ((curr.type_C === "C2") && (curr.key !== "K_SPACE")) {
-      if ((curr.type_C === "C2")) {
+      // if ((curr.rule_type === "C2") && (curr.key !== "K_SPACE") && (new TextDecoder().decode(curr.deadkeyed_Ch) !== "")) {
+      // if ((curr.rule_type === "C2") && (curr.key !== "K_SPACE")) {
+      if ((curr.rule_type === "C2")) {
         return curr;
       }
       return ""
@@ -1212,10 +1493,10 @@ export class KeylayoutToKmnConverter {
 
     // remove duplicates
     const deadkeyed_raw = deadkeyed_raw_multiple.reduce((unique, o) => {
-      if (!unique.some((obj: { chars: any; type_C: any; modifier_key: any; key: any; deadkeyed_Ch: any }) =>
+      if (!unique.some((obj: { chars: any; rule_type: any; modifier_key: any; key: any; deadkeyed_Ch: any }) =>
         new TextDecoder().decode(obj.deadkeyed_Ch) === new TextDecoder().decode(o.deadkeyed_Ch)
         && obj.key === o.key
-        && obj.type_C === o.type_C
+        && obj.rule_type === o.rule_type
         && obj.modifier_key === o.modifier_key)
       ) {
         unique.push(o);
@@ -1253,37 +1534,6 @@ export class KeylayoutToKmnConverter {
     }, [[], new Set()],
     );
 
-    // print
-    for (let i = 0; i < deadkeyables_raw.length; i++) {
-      console.log("deadkeyables_raw ", i, "\t",
-        deadkeyables_raw[i].type_C, "--",
-        deadkeyables_raw[i].modifier_key.padEnd(28, " "), "--",
-        deadkeyables_raw[i].key.padEnd(10, " "), "--",
-        new TextDecoder().decode(deadkeyables_raw[i].deadkeyed_Ch),
-        "°°",)
-    }
-
-    for (let i = 0; i < deadkeyed_raw.length; i++) {
-      console.log("deadkeyed_raw ", i, "\t",
-        deadkeyed_raw[i].type_C, "--",
-        deadkeyed_raw[i].modifier_key.padEnd(28, " "), "--",
-        deadkeyed_raw[i].key.padEnd(10, " "), "--",
-        new TextDecoder().decode(deadkeyed_raw[i].deadkeyed_Ch).padEnd(5, " "),
-
-        deadkeyed_raw[i].modifier_deadkey.padEnd(28, " "), "--",
-        deadkeyed_raw[i].deadkey.padEnd(10, " "), "--",
-        new TextDecoder().decode(deadkeyed_raw[i].deadkeys_Ch), "--",
-        deadkeyed_raw[i].dk, "--xx",
-
-
-        new TextDecoder().decode(deadkeyed_raw[i].deadkeys).padEnd(5, " "), "--",
-        new TextDecoder().decode(deadkeyed_raw[i].deadkeyables).padEnd(5, " "), "--",
-        new TextDecoder().decode(deadkeyed_raw[i].deadkeyed_Ch).padEnd(5, " "),
-
-        "°°",)
-    }
-    //console.log("dk_array_comlpete ", dk_array_comlpete)
-    //console.log("unique_dk_array_comlpete ", unique_dk_array_comlpete)
 
     const deadkeyedElement: string[][] = Array.from({ length: uniqueDeadkeyRules.length }, () => new Array(2).fill(''));
     const deadkeyablesElement: string[][] = Array.from({ length: uniqueDeadkeyRules.length }, () => new Array(1).fill(''));
@@ -1300,8 +1550,6 @@ export class KeylayoutToKmnConverter {
         deadkeyedElement[i][1] = this.getHexFromChar(new TextDecoder().decode(uniqueDeadkeyRules[i].deadkeyed_Ch))
       }
     }
-    // console.log("deadkeyedElement ", deadkeyedElement)
-    // console.log("deadkeyablesElement ", deadkeyablesElement)
 
 
     /*const newAA: string[][] = []
@@ -1365,12 +1613,11 @@ export class KeylayoutToKmnConverter {
     let data: string = ""
     let keymarker = ""
 
-    //console.log("data_ukelele.ArrayOf_Rules ", data_ukelele.ArrayOf_Rules.length, data_ukelele.ArrayOf_Rules[155].key)
 
     // select only lines that contain C0 or C1 and create an output.
     const data_C0_C1 = data_ukelele.ArrayOf_Rules.filter((curr) => {
       if ((curr.deadkeyed_Ch !== new TextEncoder().encode("") || curr.deadkeyed_Ch !== undefined)
-        && (curr.type_C === "C0") || (curr.type_C === "C1")) {
+        && (curr.rule_type === "C0") || (curr.rule_type === "C1")) {
         return curr;
       }
       else return ""
@@ -1378,10 +1625,10 @@ export class KeylayoutToKmnConverter {
 
     // Also remove duplicates
     const uniqueDeadkeyRules = data_C0_C1.reduce((unique, o) => {
-      if (!unique.some((obj: { deadkeyed_Ch: any; type_C: any; modifier_key: any; key: any }) =>
+      if (!unique.some((obj: { deadkeyed_Ch: any; rule_type: any; modifier_key: any; key: any }) =>
         new TextDecoder().decode(obj.deadkeyed_Ch) === new TextDecoder().decode(o.deadkeyed_Ch)
         && obj.key === o.key
-        && obj.type_C === o.type_C
+        && obj.rule_type === o.rule_type
         && obj.modifier_key === o.modifier_key)
       ) {
         unique.push(o);
@@ -1389,11 +1636,10 @@ export class KeylayoutToKmnConverter {
       return unique;
     }, []);
 
-    // console.log("uniqueDeadkeyRules ", uniqueDeadkeyRules)
 
     const data_C2_C3 = data_ukelele.ArrayOf_Rules.filter((curr) => {
       if ((curr.deadkeyed_Ch !== new TextEncoder().encode("") || curr.deadkeyed_Ch !== undefined)
-        && (curr.type_C === "C2") || (curr.type_C === "C3")) {
+        && (curr.rule_type === "CX") || (curr.rule_type === "CX")) {
         return curr;
       }
       else return ""
@@ -1401,10 +1647,10 @@ export class KeylayoutToKmnConverter {
 
     // Also remove duplicates
     const uniqueDeadkeys_obj_C2_C3 = data_C2_C3.reduce((unique, o) => {
-      if (!unique.some((obj: { deadkeyed_Ch: any; type_C: any; modifier_key: any; key: any }) =>
+      if (!unique.some((obj: { deadkeyed_Ch: any; rule_type: any; modifier_key: any; key: any }) =>
         new TextDecoder().decode(obj.deadkeyed_Ch) === new TextDecoder().decode(o.deadkeyed_Ch)
         && obj.key === o.key
-        && obj.type_C === o.type_C
+        && obj.rule_type === o.rule_type
         && obj.modifier_key === o.modifier_key)
       ) {
         unique.push(o);
@@ -1413,13 +1659,12 @@ export class KeylayoutToKmnConverter {
     }, []);
 
     let old_c = 0
-    //console.log("uniqueDeadkeys_obj_C2_C3 ", uniqueDeadkeys_obj_C2_C3.length, uniqueDeadkeys_obj_C2_C3)
     for (let k = 0; k < uniqueDeadkeys_obj_C2_C3.length; k++) {
 
-      if (/*(ObjectArray[k].type_C === "C3")||*/(uniqueDeadkeys_obj_C2_C3[k].type_C === "C2")) {
+      if (/*(ObjectArray[k].rule_type === "C3")||*/(uniqueDeadkeys_obj_C2_C3[k].rule_type === "CX")) {
         old_c++
-        console.log("Obj: k ", k,
-          "\tType: ", (uniqueDeadkeys_obj_C2_C3[k].type_C !== "" ? uniqueDeadkeys_obj_C2_C3[k].type_C : "--".padEnd(4, " ")),
+        console.log("1Obj: k ", k,
+          "\tType: ", (uniqueDeadkeys_obj_C2_C3[k].rule_type !== "" ? uniqueDeadkeys_obj_C2_C3[k].rule_type : "--".padEnd(4, " ")),
 
           "| modi_prev_dk: ", (uniqueDeadkeys_obj_C2_C3[k].modifier_prev_deadkey !== "" ? uniqueDeadkeys_obj_C2_C3[k].modifier_prev_deadkey.padEnd(23, " ") : "--".padEnd(23, " ")),
           "key_prev_dk: ", (uniqueDeadkeys_obj_C2_C3[k].prev_deadkey !== "" ? uniqueDeadkeys_obj_C2_C3[k].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
@@ -1457,7 +1702,7 @@ export class KeylayoutToKmnConverter {
         data += '\n'
 
       // write rule
-      data += keyNr + "-(modif:" + uniqueDeadkeyRules[i].type_C + "-" + "i" + `) + [` + (uniqueDeadkeyRules[i].modifier_key + ' ' + uniqueDeadkeyRules[i].key).trim() + `] > \'` + new TextDecoder().decode(uniqueDeadkeyRules[i].deadkeyed_Ch) + '\'\n'
+      data += keyNr + "-(modif:" + uniqueDeadkeyRules[i].rule_type + "-" + "i" + `) + [` + (uniqueDeadkeyRules[i].modifier_key + ' ' + uniqueDeadkeyRules[i].key).trim() + `] > \'` + new TextDecoder().decode(uniqueDeadkeyRules[i].deadkeyed_Ch) + '\'\n'
       keymarker = uniqueDeadkeyRules[i].key
     }
 
@@ -1499,7 +1744,7 @@ export class KeylayoutToKmnConverter {
 class Rules {
 
   constructor(
-    public type_C: string,
+    public rule_type: string,
     public isTerminator: boolean,
 
     public modifier_prev_deadkey: string,
