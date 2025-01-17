@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.169 alpha 2025-01-17
+
+* chore(windows): remove `postinstall` state from mermaid diagram (#12923)
+
 ## 18.0.168 alpha 2025-01-16
 
 * chore: update macOS environment-variable shell script (#12878)
