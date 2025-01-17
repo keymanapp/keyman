@@ -13,7 +13,7 @@ import { type KeyElement } from '../keyElement.js';
 import {
   Codes,
   DeviceSpec,
-  Keyboard,
+  JSKeyboard,
   KeyboardProperties,
   ManagedPromise,
   type MinimalCodesInterface
@@ -169,7 +169,7 @@ export default abstract class OSKView
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
   private keyboardData: {
-    keyboard: Keyboard,
+    keyboard: JSKeyboard,
     metadata: KeyboardProperties
   };
 
@@ -533,14 +533,14 @@ export default abstract class OSKView
   }
 
   public get activeKeyboard(): {
-    keyboard: Keyboard,
+    keyboard: JSKeyboard,
     metadata: KeyboardProperties
   } {
     return this.keyboardData;
   }
 
   public set activeKeyboard(keyboardData: {
-    keyboard: Keyboard,
+    keyboard: JSKeyboard,
     metadata: KeyboardProperties
   }) {
     this.keyboardData = keyboardData;
@@ -782,7 +782,7 @@ export default abstract class OSKView
     this.postKeyboardLoad();
   }
 
-  private _GenerateKeyboardView(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
+  private _GenerateKeyboardView(keyboard: JSKeyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
     let device = this.targetDevice;
 
     this._Box.className = "";
@@ -815,7 +815,7 @@ export default abstract class OSKView
    * @param       {Object}      keyboard    The keyboard to visualize
    * Description  Generates the visual keyboard element and attaches it to KMW
    */
-  private _GenerateVisualKeyboard(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
+  private _GenerateVisualKeyboard(keyboard: JSKeyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
     let device = this.targetDevice;
 
     const resourcePath = getResourcePath(this.config);

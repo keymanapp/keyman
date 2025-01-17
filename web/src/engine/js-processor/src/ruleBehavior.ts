@@ -1,4 +1,4 @@
-import KeyboardProcessor from "./keyboardProcessor.js";
+import { JSKeyboardProcessor } from "./jsKeyboardProcessor.js";
 import { VariableStoreDictionary } from "keyman/engine/keyboard";
 import OutputTarget, { type Transcription } from './outputTarget.js';
 import { Mock } from "./mock.js";
@@ -65,7 +65,7 @@ export default class RuleBehavior {
    */
   triggerKeyDefault?: boolean;
 
-  finalize(processor: KeyboardProcessor, outputTarget: OutputTarget, readonly: boolean) {
+  finalize(processor: JSKeyboardProcessor, outputTarget: OutputTarget, readonly: boolean) {
     if(!this.transcription) {
       throw "Cannot finalize a RuleBehavior with no transcription.";
     }

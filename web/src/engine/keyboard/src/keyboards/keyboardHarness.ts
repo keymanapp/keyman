@@ -1,4 +1,4 @@
-import Keyboard from "./keyboard.js";
+import { JSKeyboard } from "./jsKeyboard.js";
 import Codes from "../codes.js";
 import { DeviceSpec } from '@keymanapp/web-utils';
 
@@ -64,7 +64,7 @@ export class KeyboardHarness {
   /**
    * This field serves as the receptacle for a successfully-loaded Keyboard.
    */
-  public loadedKeyboard: Keyboard = null;
+  public loadedKeyboard: JSKeyboard = null;
 
   /**
    * Keyman keyboards register themselves into the Keyman Engine for Web by directly
@@ -84,7 +84,7 @@ export class KeyboardHarness {
     if(this.loadedKeyboard) {
       throw new Error("Unexpected state:  the most-recently loaded keyboard field was not properly reset.");
     }
-    this.loadedKeyboard = new Keyboard(scriptObject);
+    this.loadedKeyboard = new JSKeyboard(scriptObject);
   }
 
   // Is evaluated on script-load for some keyboards using variable stores.

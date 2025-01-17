@@ -3,15 +3,15 @@ import {
 } from 'keyman/engine/keyboard/dom-keyboard-loader';
 
 import {
-  Keyboard,
+  JSKeyboard,
   KeyboardProperties,
   MinimalKeymanGlobal
 } from 'keyman/engine/keyboard';
 
-import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 
-const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
+const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal));
 
 export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);
@@ -21,11 +21,11 @@ export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
   baseDir = baseDir || './';
   const keyboards: {
     [key: string]: {
-      keyboard: Keyboard,
+      keyboard: JSKeyboard,
       metadata: KeyboardStub
     }
   } = {};
-  let priorPromise: Promise<void | Keyboard> = Promise.resolve();
+  let priorPromise: Promise<void | JSKeyboard> = Promise.resolve();
   for(const stub of apiStubs) {
     // We are keeping this strictly sequential because we don't have sandboxed
     // loading yet; lack of sandboxing means that all loading keyboards compete

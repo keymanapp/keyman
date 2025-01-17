@@ -1,4 +1,4 @@
-import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
+import { type KeyEvent, type JSKeyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
 import { OutputTarget, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
@@ -237,6 +237,8 @@ export default class KeymanEngine<
 
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
+
+    this.core.init(config.paths);
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
@@ -552,8 +554,8 @@ export default class KeymanEngine<
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isChiral
    */
-  public isChiral(k0?: string | Keyboard) {
-    let kbd: Keyboard;
+  public isChiral(k0?: string | JSKeyboard) {
+    let kbd: JSKeyboard;
     if(k0) {
       if(typeof k0 == 'string') {
         const kbdObj = this.keyboardRequisitioner.cache.getKeyboard(k0);

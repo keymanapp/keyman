@@ -1,10 +1,10 @@
-import { DeviceSpec, Keyboard, KeyEvent, ManagedPromise } from 'keyman/engine/keyboard';
+import { DeviceSpec, JSKeyboard, KeyEvent, ManagedPromise } from 'keyman/engine/keyboard';
 
 import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 
 export default class PassthroughKeyboard extends HardKeyboard {
   readonly baseDevice: DeviceSpec;
-  public activeKeyboard: Keyboard;
+  public activeKeyboard: JSKeyboard;
 
   constructor(baseDevice: DeviceSpec) {
     super();

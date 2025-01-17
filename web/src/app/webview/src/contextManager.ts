@@ -1,4 +1,4 @@
-import { type Keyboard  } from 'keyman/engine/keyboard';
+import { type JSKeyboard  } from 'keyman/engine/keyboard';
 import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
@@ -116,7 +116,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   // yet to be modularized at this time, though.)
   private _rawContext: ContextHost;
 
-  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
   constructor(engineConfig: WebviewConfiguration) {
     super(engineConfig);
@@ -136,7 +136,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget) {
+  activateKeyboardForTarget(kbd: {keyboard: JSKeyboard, metadata: KeyboardStub}, target: OutputTarget) {
     // `target` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
@@ -192,7 +192,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   protected prepareKeyboardForActivation(
     keyboardId: string,
     languageCode?: string
-  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
+  ): {keyboard: Promise<JSKeyboard>, metadata: KeyboardStub} {
     const originalKeyboard = this.activeKeyboard;
     const activatingKeyboard = super.prepareKeyboardForActivation(keyboardId, languageCode);
 

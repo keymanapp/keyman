@@ -2,15 +2,17 @@
 
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
-import type { ModelSpec }  from "keyman/engine/interfaces";
+import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
-import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
+import { CoreFactory, MainModule as KmCoreModule } from 'keyman/engine/core-processor';
+
+import { Codes, type JSKeyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
   isEmptyTransform,
-  KeyboardInterface,
-  KeyboardProcessor,
+  JSKeyboardInterface,
+  JSKeyboardProcessor,
   Mock,
   type OutputTarget,
   RuleBehavior,
@@ -32,8 +34,9 @@ export class InputProcessor {
    * entry points.
    */
   private contextDevice: DeviceSpec;
-  private kbdProcessor: KeyboardProcessor;
+  private kbdProcessor: JSKeyboardProcessor;
   private lngProcessor: LanguageProcessor;
+  private km_core: Promise<KmCoreModule>;
 
   private readonly contextCache = new TranscriptionCache();
 
@@ -47,27 +50,35 @@ export class InputProcessor {
     }
 
     this.contextDevice = device;
-    this.kbdProcessor = new KeyboardProcessor(device, options);
+    this.kbdProcessor = new JSKeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
+  }
+
+  public init(paths: PathConfiguration) {
+    this.km_core = CoreFactory.createCoreProcessor(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
     return this.lngProcessor;
   }
 
-  public get keyboardProcessor(): KeyboardProcessor {
+  public get keyboardProcessor(): JSKeyboardProcessor {
     return this.kbdProcessor;
   }
 
-  public get keyboardInterface(): KeyboardInterface {
+  public get keyboardInterface(): JSKeyboardInterface {
     return this.keyboardProcessor.keyboardInterface;
   }
 
-  public get activeKeyboard(): Keyboard {
+  public get keymanCore(): Promise<KmCoreModule> {
+    return this.km_core;
+  }
+
+  public get activeKeyboard(): JSKeyboard {
     return this.keyboardInterface.activeKeyboard;
   }
 
-  public set activeKeyboard(keyboard: Keyboard) {
+  public set activeKeyboard(keyboard: JSKeyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
