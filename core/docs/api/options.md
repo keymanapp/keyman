@@ -17,7 +17,7 @@ value.
 
 -------------------------------------------------------------------------------
 
-# km_core_option_scope enum {#km_core_option_scope}
+# km_core_option_scope enum
 
 ## Description
 
@@ -48,7 +48,7 @@ enum km_core_option_scope {
 
 -------------------------------------------------------------------------------
 
-# km_core_option_item struct {#km_core_option_item}
+# km_core_option_item struct
 
 ## Description
 
@@ -78,7 +78,7 @@ struct km_core_option_item {
 
 -------------------------------------------------------------------------------
 
-# km_core_options_list_size() {#km_core_options_list_size}
+# km_core_options_list_size()
 
 ## Description
 Return the length of a terminated [km_core_option_item] array (options
@@ -150,7 +150,7 @@ km_core_state_option_lookup(km_core_state const *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_update() {#km_core_state_options_update}
+# km_core_state_options_update()
 
 ## Description
 
@@ -188,7 +188,7 @@ km_core_state_options_update(km_core_state *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_to_json() {#km_core_state_options_to_json}
+# km_core_state_options_to_json()
 
 ## Description
 

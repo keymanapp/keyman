@@ -35,6 +35,7 @@ type
 
   TUpdateCheckResponse = record
   private
+    FOriginalData: string;
     FInstallSize: Int64;
     FInstallURL: string;
     FNewVersion: string;
@@ -46,8 +47,12 @@ type
     FFileName: string;
     function ParseKeyboards(nodes: TJSONObject): Boolean;
     function ParseLanguages(i: Integer; v: TJSONValue): Boolean;
+    function DoParse(const message, app, currentVersion: string): Boolean;
   public
     function Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
+
+    procedure SaveToFile(const Filename: string);
+    function LoadFromFile(const Filename, app, currentVersion: string): Boolean;
 
     property CurrentVersion: string read FCurrentVersion;
     property NewVersion: string read FNewVersion;
@@ -58,25 +63,32 @@ type
     property ErrorMessage: string read FErrorMessage;
     property Status: TUpdateCheckResponseStatus read FStatus;
     property Packages: TUpdateCheckResponsePackages read FPackages;
+    property OriginalData: string read FOriginalData;
   end;
 
 implementation
 
 uses
+  System.Classes,
   System.Generics.Collections,
   versioninfo;
 
 { TUpdateCheckResponse }
 
 function TUpdateCheckResponse.Parse(const message: AnsiString; const app, currentVersion: string): Boolean;
+begin
+  Result := DoParse(string(UTF8String(message)), app, currentVersion);
+end;
+
+function TUpdateCheckResponse.DoParse(const message, app, currentVersion: string): Boolean;
 var
   node, doc: TJSONObject;
 begin
+  FOriginalData := message;
   FCurrentVersion := currentVersion;
   FStatus := ucrsNoUpdate;
 
-  // TODO: test with UTF8 characters in response
-  doc := TJSONObject.ParseJSONValue(UTF8String(message)) as TJSONObject;
+  doc := TJSONObject.ParseJSONValue(UTF8String(FOriginalData)) as TJSONObject;
   if doc = nil then
   begin
     FErrorMessage := Format('Invalid response:'#13#10'%s', [string(message)]);
@@ -166,6 +178,31 @@ begin
     FPackages[i].Languages[j].displayName := node.Values['displayName'].Value;
   end;
   Result := True;
+end;
+
+function TUpdateCheckResponse.LoadFromFile(const Filename, app, currentVersion: string): Boolean;
+var
+  ss: TStringStream;
+begin
+  ss := TStringStream.Create('', TEncoding.UTF8);
+  try
+    ss.LoadFromFile(Filename);
+    Result := DoParse(ss.DataString, app, currentVersion);
+  finally
+    ss.Free;
+  end;
+end;
+
+procedure TUpdateCheckResponse.SaveToFile(const Filename: string);
+var
+  ss: TStringStream;
+begin
+  ss := TStringStream.Create(FOriginalData, TEncoding.UTF8);
+  try
+    ss.SaveToFile(Filename);
+  finally
+    ss.Free;
+  end;
 end;
 
 end.

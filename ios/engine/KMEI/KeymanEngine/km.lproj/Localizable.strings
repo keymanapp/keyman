@@ -226,6 +226,24 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "ភាសា និងក្ដារចុច";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "កែកម្ពស់ក្ដារចុច";
+
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "កែក្ដារចុច";
+
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "ប្ដូរ​កម្ពស់ក្ដារចុចទៅលំនាំដើម";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "រំកិលព្រួញដើម្បីកែកម្ពស់ក្ដារចុច";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "បង្វិលឧបករណ៍ដើម្បីប្តូរទៅជាផ្ដេក";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "បង្វិលឧបករណ៍ដើម្បីប្តូរទៅជាបញ្ឈរ";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "មិន​អាច​ទាញ​យក​ក្ដារចុច​បាន​ទេ";
 
