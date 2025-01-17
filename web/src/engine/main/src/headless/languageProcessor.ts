@@ -21,7 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
-  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
+  private _mayAutoCorrect: boolean = true;
 
   private _state: StateChangeEnum = 'inactive';
 
