@@ -161,15 +161,21 @@ describe("PredictionContext", () => {
     assert.equal(updateFake.callCount, 3);
     suggestions = updateFake.thirdCall.args[0];
 
+    // Note:  this unit test was originally written with auto-correct on!
+    // #11941 was written 2024-07-25 (added unit test for auto-correction method)
+    // #12169 was written 2024-08-14, which is what added THIS unit test.
+
     // This does re-use the apply-revert oriented mocking.
     // Should skip the (second) "apple", "apply", "apps" round, as it became outdated
     // by its following request before its response could be received.
-    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['“apple”', 'applied']);
-    assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”');
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['applied']); // '“apple”' included with auto-correct enabled.
+    // Is not displayed; we only display it if auto-correct is on, as 'applied' would be automatic then.
+    assert.equal(predictiveContext.keepSuggestion.displayAs, '“apple”');
+    // assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”'); // with auto-correct enabled.
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'applied');
     // Our reused mocking doesn't directly provide the 'keep' suggestion; we
     // need to remove it before testing for set equality.
-    assert.deepEqual(suggestions.splice(1), expected);
+    assert.deepEqual(suggestions /*.splice(1)*/, expected);
   });
 
   it('sendUpdateState retrieves the most recent suggestion set', async function() {
