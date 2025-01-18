@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.171 alpha 2025-01-18
+
+* fix(common/web): add StrsItem.isEqual() method (#12868)
+* fix(common/web): handle invalid order and tertiary arguments to ElementString.fromString() (#12882)
+
 ## 18.0.170 alpha 2025-01-17
 
 * chore(linux): update copyright year (#12918)
