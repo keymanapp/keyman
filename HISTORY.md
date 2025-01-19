@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.172 alpha 2025-01-19
+
+* chore(common): Add 17.0.333 to version history (#12926)
+
 ## 18.0.171 alpha 2025-01-18
 
 * fix(common/web): add StrsItem.isEqual() method (#12868)
