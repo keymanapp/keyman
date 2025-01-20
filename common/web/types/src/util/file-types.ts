@@ -166,19 +166,3 @@ export function filenameIs(filename: string, fileType: Source | Binary) {
   }
   return filename.toLowerCase().endsWith(fileType);
 }
-
-/**
- * Replaces a filename extension with the new extension. Returns `null` if the
- * filename does not end with oldExtension.
- * @param filename
- * @param oldExtension
- * @param newExtension
- * @returns
- */
-export function replaceExtension(filename: string, oldExtension: string, newExtension: string): string {
-  const ext = filename.substring(filename.length - oldExtension.length);
-  if(ext !== oldExtension) {
-    return null;
-  }
-  return filename.substring(0, filename.length - oldExtension.length) + newExtension;
-}

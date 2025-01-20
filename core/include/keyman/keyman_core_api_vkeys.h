@@ -16,6 +16,7 @@
 #pragma once
 
 enum km_core_modifier_state {
+  KM_CORE_MODIFIER_NONE        = 0,
   KM_CORE_MODIFIER_LCTRL       = 1 << 0,
   KM_CORE_MODIFIER_RCTRL       = 1 << 1,
   KM_CORE_MODIFIER_LALT        = 1 << 2,

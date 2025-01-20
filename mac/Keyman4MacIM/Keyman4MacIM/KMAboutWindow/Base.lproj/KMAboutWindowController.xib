@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,7 +20,7 @@
             <windowStyleMask key="styleMask" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="450" height="318"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
             <view key="contentView" id="se5-gp-TjO" customClass="KMAboutBGView">
                 <rect key="frame" x="0.0" y="0.0" width="450" height="318"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -42,8 +42,12 @@
                         </constraints>
                     </customView>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sgd-KC-LbG" userLabel="SIL Image View">
-                        <rect key="frame" x="403" y="263" width="32" height="36"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SILInBlue76" id="0zb-i2-bhN"/>
+                        <rect key="frame" x="366" y="259" width="74" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="74" id="hjC-xL-hLw"/>
+                            <constraint firstAttribute="height" constant="44" id="uhI-gi-EpR"/>
+                        </constraints>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SILAndikaV1RGB" id="0zb-i2-bhN"/>
                     </imageView>
                     <imageView autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="251" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK" userLabel="Keyman Image View">
                         <rect key="frame" x="15" y="252" width="400" height="58"/>
@@ -100,29 +104,29 @@
                             <stackView autoresizesSubviews="NO" orientation="vertical" alignment="trailing" spacing="12" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="500" verticalClippingResistancePriority="500" horizontalHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6P-E8-rqT" userLabel="Button Stack View">
                                 <rect key="frame" x="306" y="0.0" width="120" height="52"/>
                                 <endViews>
-                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xqc-bi-pPI">
-                                        <rect key="frame" x="10" y="25" width="117" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="W0C-Lh-ns5"/>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="l3A-K7-gqm"/>
-                                        </constraints>
+                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xqc-bi-pPI">
+                                        <rect key="frame" x="-7" y="25" width="134" height="32"/>
                                         <buttonCell key="cell" type="push" title="Configuration" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vkh-b5-vO7">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <constraints>
+                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="W0C-Lh-ns5"/>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="l3A-K7-gqm"/>
+                                        </constraints>
                                         <connections>
                                             <action selector="configAction:" target="-2" id="3W6-cm-6P5"/>
                                         </connections>
                                     </button>
                                     <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
                                         <rect key="frame" x="-7" y="-7" width="134" height="32"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="CPF-NR-u5o"/>
-                                        </constraints>
                                         <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kab-Up-fYH">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
+                                        <constraints>
+                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="CPF-NR-u5o"/>
+                                        </constraints>
                                         <connections>
                                             <action selector="closeAction:" target="-2" id="frJ-pm-Iyg"/>
                                         </connections>
@@ -165,7 +169,7 @@
                     <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Wq2-xT-mCh"/>
                     <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" id="ZZw-D6-rjh"/>
                     <constraint firstItem="FYn-ZH-f76" firstAttribute="top" secondItem="wFc-QI-nGq" secondAttribute="bottom" id="kuI-RR-4wa"/>
-                    <constraint firstAttribute="trailing" secondItem="sgd-KC-LbG" secondAttribute="trailing" constant="15" id="xGg-Cj-G34"/>
+                    <constraint firstAttribute="trailing" secondItem="sgd-KC-LbG" secondAttribute="trailing" constant="10" id="xGg-Cj-G34"/>
                 </constraints>
             </view>
             <connections>
@@ -175,7 +179,7 @@
         </window>
     </objects>
     <resources>
-        <image name="SILInBlue76" width="31.799999237060547" height="35.400001525878906"/>
+        <image name="SILAndikaV1RGB" width="17.760000228881836" height="10.560000419616699"/>
         <image name="image" width="1125" height="375"/>
         <image name="keyman-88" width="400" height="140.80000305175781"/>
     </resources>
