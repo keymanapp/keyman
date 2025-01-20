@@ -35,6 +35,7 @@
 		29BE9D872CA3C21900B67DE7 /* KMModifierMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BE9D862CA3C21900B67DE7 /* KMModifierMapping.m */; };
 		29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = D861B03E2C5747F70003675E /* KMSettingsRepository.m */; };
 		29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
+		29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */ = {isa = PBXBuildFile; fileRef = 29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -84,7 +85,6 @@
 		E213601E2142D7C000A043B7 /* keyman-88.png in Resources */ = {isa = PBXBuildFile; fileRef = E213601D2142D7BF00A043B7 /* keyman-88.png */; };
 		E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */; };
 		E21E645820C04EA8000D6274 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = E21E645720C04EA7000D6274 /* logo.png */; };
-		E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */ = {isa = PBXBuildFile; fileRef = E23380FA21407AA100B90591 /* SILInBlue76.png */; };
 		E240F599202DED740000067D /* KMPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = E240F598202DED740000067D /* KMPackage.m */; };
 		E2585A7F20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx in Resources */ = {isa = PBXBuildFile; fileRef = E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */; };
 		E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E2585A8020DD7CF100CBB994 /* TestAppDelegate.m */; };
@@ -275,6 +275,7 @@
 		29D470972C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		29D470982C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		29D470992C648D7100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SILAndikaV1RGB.png; sourceTree = "<group>"; };
 		29DD8400276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29DD8401276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/preferences.strings; sourceTree = "<group>"; };
 		29DD8402276C49E30066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -379,7 +380,6 @@
 		E21799031FC5B74D00F2D66A /* KMInputMethodEventHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMInputMethodEventHandler.h; sourceTree = "<group>"; };
 		E21799041FC5B7BC00F2D66A /* KMInputMethodEventHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMInputMethodEventHandler.m; sourceTree = "<group>"; };
 		E21E645720C04EA7000D6274 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = logo.png; path = Keyman4MacIM/KMConfiguration/logo.png; sourceTree = SOURCE_ROOT; };
-		E23380FA21407AA100B90591 /* SILInBlue76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SILInBlue76.png; path = Keyman4MacIM/Images/SILInBlue76.png; sourceTree = SOURCE_ROOT; };
 		E240F597202DED300000067D /* KMPackage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMPackage.h; sourceTree = "<group>"; };
 		E240F598202DED740000067D /* KMPackage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMPackage.m; sourceTree = "<group>"; };
 		E2585A7E20DD6C3C00CBB994 /* KMMethodEventHandlerTests.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = KMMethodEventHandlerTests.kmx; sourceTree = "<group>"; };
@@ -639,7 +639,7 @@
 				98BF92421BF01CBE0002126A /* KMAboutWindowController.m */,
 				293EA3E827140D8100545EED /* KMAboutWindowController.xib */,
 				E213601D2142D7BF00A043B7 /* keyman-88.png */,
-				E23380FA21407AA100B90591 /* SILInBlue76.png */,
+				29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */,
 				98BF92461BF01D890002126A /* image.jpg */,
 				98BF92531BF040A50002126A /* title.png */,
 			);
@@ -846,7 +846,6 @@
 				989C9C131A7876DE00A20425 /* Images.xcassets in Resources */,
 				98E2CEA11A92C39C00AE2455 /* InfoPlist.strings in Resources */,
 				E21E645820C04EA8000D6274 /* logo.png in Resources */,
-				E23380FB21407AA100B90591 /* SILInBlue76.png in Resources */,
 				9874C3211B536847000BB543 /* info.png in Resources */,
 				98E672A01B532F5E00DBDE2F /* KMDownloadKBWindowController.xib in Resources */,
 				37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */,
@@ -862,6 +861,7 @@
 				293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */,
 				37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */,
 				293EA3EB27140DEC00545EED /* preferences.xib in Resources */,
+				29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */,
 				9800EC5A1C02940300BF0FB5 /* keyman-for-mac-os-license.html in Resources */,
 				989C9C161A7876DE00A20425 /* MainMenu.xib in Resources */,
 				29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */,

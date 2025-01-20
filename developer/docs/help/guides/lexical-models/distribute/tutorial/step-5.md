@@ -38,7 +38,7 @@ recommendations:
     ZIP archive file!) and you won't save much space by recompressing
     it.
 3.  Include a link to the Keyman download page:
-    `http://keyman.com/downloads/`
+    `https://keyman.com/downloads/`
 
 ## Distributing a package by email
 

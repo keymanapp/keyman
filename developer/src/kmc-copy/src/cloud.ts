@@ -3,7 +3,7 @@
  *
  * GitHub and Keyman Cloud interface wrappers
  */
-import { CompilerCallbacks } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, GitHubUrls } from "@keymanapp/developer-utils";
 import { CopierMessages } from "./copier-messages.js";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
@@ -12,17 +12,24 @@ export class GitHubRef {
   public repo: string;
   public branch: string;
   public path: string;
-  constructor(owner: string | GitHubRef, repo?: string, branch?: string, path?: string) {
+  constructor(owner: string | GitHubRef | GitHubUrls.GitHubRegexMatchArray, repo?: string, branch?: string, path?: string) {
     if(typeof owner == 'string') {
       this.owner = owner;
       this.repo = repo;
       this.branch = branch;
       this.path = path;
-    } else {
+    } else if("groups" in owner) {
+      this.owner = owner.groups.owner;
+      this.repo = owner.groups.repo;
+      this.branch = owner.groups.branch;
+      this.path = owner.groups.path;
+    } else if("owner" in owner) {
       this.owner = owner.owner;
       this.repo = owner.repo;
       this.branch = owner.branch;
       this.path = owner.path;
+    } else {
+      throw new Error(`Unrecognized GitHubRef '${owner}'`)
     }
   }
   toString() {

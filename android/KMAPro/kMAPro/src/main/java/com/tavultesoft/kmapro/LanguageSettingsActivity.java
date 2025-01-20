@@ -108,11 +108,11 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     RadioGroup radioGroup = (RadioGroup) findViewById(R.id.suggestion_radio_group);
     radioGroup.clearCheck();
 
+    // Auto-correct disabled for Keyman 18.0 #12767
     int[] RadioButtonArray = {
       R.id.suggestion_radio_0,
       R.id.suggestion_radio_1,
-      R.id.suggestion_radio_2,
-      R.id.suggestion_radio_3};
+      R.id.suggestion_radio_2};
     RadioButton radioButton = (RadioButton)radioGroup.findViewById(RadioButtonArray[maySuggest]);
     radioButton.setChecked(true);
 

@@ -17,7 +17,7 @@ value.
 
 -------------------------------------------------------------------------------
 
-# km_core_option_scope enum {#km_core_option_scope}
+# km_core_option_scope enum
 
 ## Description
 
@@ -48,7 +48,7 @@ enum km_core_option_scope {
 
 -------------------------------------------------------------------------------
 
-# km_core_option_item struct {#km_core_option_item}
+# km_core_option_item struct
 
 ## Description
 
@@ -78,7 +78,7 @@ struct km_core_option_item {
 
 -------------------------------------------------------------------------------
 
-# km_core_options_list_size() {#km_core_options_list_size}
+# km_core_options_list_size()
 
 ## Description
 Return the length of a terminated [km_core_option_item] array (options
@@ -150,7 +150,7 @@ km_core_state_option_lookup(km_core_state const *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_update() {#km_core_state_options_update}
+# km_core_state_options_update()
 
 ## Description
 
@@ -188,7 +188,7 @@ km_core_state_options_update(km_core_state *state,
 
 -------------------------------------------------------------------------------
 
-# km_core_state_options_to_json() {#km_core_state_options_to_json}
+# km_core_state_options_to_json()
 
 ## Description
 
@@ -263,7 +263,7 @@ km_core_state_options_to_json(km_core_state const *state,
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
-[km_core_keyboard_load]: keyboards#km_core_keyboard_load "km_core_keyboard_load function"
+[km_core_keyboard_load_from_blob]: keyboards#km_core_keyboard_load_from_blob "km_core_keyboard_load_from_blob function"
 [km_core_keyboard_dispose]: keyboards#km_core_keyboard_dispose "km_core_keyboard_dispose function"
 [km_core_keyboard_get_attrs]: keyboards#km_core_keyboard_get_attrs "km_core_keyboard_get_attrs function"
 [km_core_keyboard_get_key_list]: keyboards#km_core_keyboard_get_key_list "km_core_keyboard_get_key_list function"
