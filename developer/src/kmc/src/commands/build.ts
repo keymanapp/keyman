@@ -10,7 +10,7 @@ import { CompilerOptions, CompilerFileCallbacks } from '@keymanapp/developer-uti
 import { BaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
-import { buildTestData } from './buildTestData/index.js';
+import { buildTestData, buildLdmlRegressionData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 import { commandOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
 import { exitProcess } from '../util/sysexits.js';
@@ -56,6 +56,12 @@ If no input file is supplied, kmc will build the current folder.`)
     .command('ldml-test-data <infile>')
     .description('Convert LDML keyboard test .xml to .json')
     .action(buildTestData);
+
+  buildCommand
+    .command('ldml-regression-test <regressionDirectory>')
+    .description('Convert all Keyman regression .xml files from a directory to a single .json. The keyboard .xml is required.')
+    .requiredOption('--keyboard <ldmlLKeyboardXml>')
+    .action(buildLdmlRegressionData);
 
   buildCommand
     .command('windows-package-installer <infile>')
