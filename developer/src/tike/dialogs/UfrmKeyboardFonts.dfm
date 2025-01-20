@@ -2,11 +2,11 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Keyboard Fonts'
-  ClientHeight = 291
+  ClientHeight = 322
   ClientWidth = 512
   Position = poScreenCenter
   ExplicitWidth = 518
-  ExplicitHeight = 320
+  ExplicitHeight = 351
   PixelsPerInch = 96
   TextHeight = 13
   object lblDevEnv: TLabel
@@ -147,6 +147,20 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     Height = 13
     Caption = 'em'
   end
+  object lblDisplayMap: TLabel
+    Left = 32
+    Top = 248
+    Width = 109
+    Height = 13
+    Caption = '&displayMap target font'
+  end
+  object Label4: TLabel
+    Left = 463
+    Top = 248
+    Width = 14
+    Height = 13
+    Caption = 'em'
+  end
   object fcbCode: TscFontComboBox
     Left = 176
     Top = 41
@@ -260,23 +274,23 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
   end
   object cmdOK: TButton
     Left = 162
-    Top = 248
+    Top = 280
     Width = 91
     Height = 25
     Caption = 'OK'
     Default = True
-    TabOrder = 12
+    TabOrder = 14
     OnClick = cmdOKClick
   end
   object cmdCancel: TButton
     Left = 259
-    Top = 248
+    Top = 280
     Width = 90
     Height = 25
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 13
+    TabOrder = 15
   end
   object fcbTouchLayoutPhone: TscFontComboBox
     Left = 176
@@ -338,6 +352,36 @@ inherited frmKeyboardFonts: TfrmKeyboardFonts
     ItemHeight = 18
     ParentFont = False
     TabOrder = 10
+    MoveUsedToTop = False
+    ColorUsed = clWindow
+    PreviewWidth = 240
+    PreviewHeight = 60
+    FontTypes = [ftTrueTypeAnsi, ftTrueTypeSymbol]
+    ShowPreview = False
+    ShowPreviewFontName = False
+    ShowPreviewInList = False
+  end
+  object editDisplayMapSize: TEdit
+    Left = 391
+    Top = 245
+    Width = 66
+    Height = 21
+    TabOrder = 13
+  end
+  object fcbDisplayMap: TscFontComboBox
+    Left = 176
+    Top = 245
+    Width = 209
+    Height = 24
+    DropDownCount = 12
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ItemHeight = 18
+    ParentFont = False
+    TabOrder = 12
     MoveUsedToTop = False
     ColorUsed = clWindow
     PreviewWidth = 240
