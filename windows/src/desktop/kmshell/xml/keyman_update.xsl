@@ -31,7 +31,6 @@
         </div>
 
         <div class="grid_container_update" id="update_details">
-            <div class='grid_item'>Select</div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_ComponentHead']"/></div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_OldVersionHead']"/></div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_SizeHead']"/></div>
@@ -74,18 +73,6 @@
   </xsl:template>
 
   <xsl:template match="/Keyman/Updates/Update">
-
-    <div class="UpdateCheckBox grid_item">
-      <input type="checkbox">
-        <xsl:attribute name="onclick">javascript:updateTick("<xsl:value-of select="index" />");</xsl:attribute>
-        <xsl:attribute name="id">Update_<xsl:value-of select="index" /></xsl:attribute>
-        <xsl:if test="not(@DefaultUnchecked)"><xsl:attribute name="checked">checked</xsl:attribute></xsl:if>
-        <xsl:attribute name="name">Update_<xsl:value-of select="index" /></xsl:attribute>
-      </input>
-      <xsl:if test="RequiresAdmin">
-        <span><xsl:attribute name="id">Update_<xsl:value-of select="index" />_RequiresAdmin</xsl:attribute></span>
-      </xsl:if>
-    </div>
     <xsl:choose>
       <xsl:when test="Package/Text != ''">
         <div class='grid_item'>

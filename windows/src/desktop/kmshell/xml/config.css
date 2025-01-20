@@ -502,8 +502,8 @@ table tr
 .grid_container_update {
   display: grid;
   position: relative;
-  grid-template-columns: 50px 1fr 1fr 1fr;
-  margin: 10px 50px 10px 64px;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: 15px 50px 15px 64px;
   /* From https://geary.co/internal-borders-css-grid/ */
   overflow: hidden;
   gap: var(--gap);
