@@ -50,7 +50,7 @@ describe('Engine - Chirality', function() {
         await set.test(proctor);
       });
     } else {
-      it.skip(set.toTestName() + " - modifier state simulation for OSK not yet supported in headless KeyboardProcessor");
+      it.skip(set.toTestName() + " - modifier state simulation for OSK not yet supported in headless JSKeyboardProcessor");
     }
   }
 
