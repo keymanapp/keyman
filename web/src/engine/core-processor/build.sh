@@ -47,7 +47,7 @@ do_configure() {
 copy_deps() {
   mkdir -p "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
-  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.js,.wasm} "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
+  cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/"km-core{.mjs,.wasm} "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/import/core/"
 }
 
 do_build () {

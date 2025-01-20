@@ -22,7 +22,7 @@ export enum KM_CORE_STATUS {
 
 export class CoreFactory {
   public static async createCoreProcessor(baseurl: string): Promise<MainModule> {
-    const module = await import(baseurl + '/km-core.js');
+    const module = await import(baseurl + '/km-core.mjs');
     const createCoreProcessor = module.default;
     return await createCoreProcessor({
       locateFile: function (path: string, scriptDirectory: string) {

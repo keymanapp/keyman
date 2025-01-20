@@ -153,7 +153,7 @@ if cpp_compiler.get_id() == 'emscripten'
     '-sALLOW_MEMORY_GROWTH=1',
     '-sMODULARIZE=1', '-sEXPORT_NAME=createCoreProcessor',
     '-sEXPORT_ES6',
-    '-sENVIRONMENT=web,webview',
+    '-sENVIRONMENT=web,webview,node',
     # '-sERROR_ON_UNDEFINED_SYMBOLS=0'
   ]
 endif
@@ -192,7 +192,8 @@ if cpp_compiler.get_id() == 'emscripten'
     cpp_args: defns + extra_defns,
     include_directories: inc,
     link_args: links + host_links + extra_links,
-    objects: lib.extract_all_objects(recursive: false))
+    objects: lib.extract_all_objects(recursive: false),
+    name_suffix: 'mjs')
 
   if get_option('buildtype') == 'release'
     # TODO: #12888
