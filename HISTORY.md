@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.173 alpha 2025-01-20
+
+* feat(developer): rewrite font data in .kvk from package metadata (#12949)
+* docs(ios): document gestures within iOS app help (#12900)
+* fix(developer): include developer-utils deps in server build (#12951)
+
 ## 18.0.172 alpha 2025-01-19
 
 * chore(common): Add 17.0.333 to version history (#12926)
