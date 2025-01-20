@@ -22,16 +22,21 @@ export class PackageCompilerMessages {
   static Warn_AbsolutePath = (o:{filename: string}) => m(this.WARN_AbsolutePath, `File ${def(o.filename)} has an absolute path, which is not portable.`);
 
   static ERROR_FileDoesNotExist = SevError | 0x0003;
-  static Error_FileDoesNotExist = (o:{filename: string}) => m(this.ERROR_FileDoesNotExist, `File ${def(o.filename)} does not exist.`);
+  static Error_FileDoesNotExist = (o:{filename: string}) => m(
+    this.ERROR_FileDoesNotExist, `File '${def(o.filename)}' does not exist.`
+  );
 
   static ERROR_FileCouldNotBeRead = SevError | 0x0004;
-  static Error_FileCouldNotBeRead = (o:{filename: string; e: any}) => m(this.ERROR_FileCouldNotBeRead,
-    `File ${def(o.filename)} could not be read: ${(o.e ?? 'unknown error').toString()}.`);
+  static Error_FileCouldNotBeRead = (o:{filename: string; e: any}) => m(
+    this.ERROR_FileCouldNotBeRead,
+    `File '${def(o.filename)}' could not be read: ${(o.e ?? 'unknown error').toString()}.`
+  );
 
   static WARN_FileIsNotABinaryKvkFile = SevWarn | 0x0005;
   static Warn_FileIsNotABinaryKvkFile = (o:{filename: string}) => m(this.WARN_FileIsNotABinaryKvkFile,
-    `File ${def(o.filename)} does not appear to be a valid binary .kvk file; this may be an old package that includes an xml-format .kvk file. `+
-    `You must update the package to include the compiled .kvk file in the package.`);
+    `File '${def(o.filename)}' does not appear to be a valid binary .kvk file; this may be an old package that includes an xml-format .kvk file. `+
+    `You must update the package to include the compiled .kvk file in the package.`
+  );
 
   static ERROR_FollowKeyboardVersionNotAllowedForModelPackages = SevError | 0x0006;
   static Error_FollowKeyboardVersionNotAllowedForModelPackages = () => m(this.ERROR_FollowKeyboardVersionNotAllowedForModelPackages,
@@ -43,15 +48,18 @@ export class PackageCompilerMessages {
 
   static ERROR_KeyboardContentFileNotFound = SevError | 0x0008;
   static Error_KeyboardContentFileNotFound = (o:{id:string}) => m(this.ERROR_KeyboardContentFileNotFound,
-    `Keyboard ${def(o.id)} was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`);
+    `Keyboard '${def(o.id)}' was listed in <Keyboards> but a corresponding .kmx file was not found in <Files>`
+  );
 
   static ERROR_KeyboardFileNotValid = SevError | 0x0009;
   static Error_KeyboardFileNotValid = (o:{filename:string, e:any}) => m(this.ERROR_KeyboardFileNotValid,
-    `Keyboard file ${def(o.filename)} is not a valid .kmx file: ${(o.e ?? 'unknown error').toString()}`);
+    `Keyboard file '${def(o.filename)}' is not a valid .kmx file: ${(o.e ?? 'unknown error').toString()}`
+  );
 
   static INFO_KeyboardFileHasNoKeyboardVersion = SevInfo | 0x000A;
   static Info_KeyboardFileHasNoKeyboardVersion = (o:{filename:string}) => m(this.INFO_KeyboardFileHasNoKeyboardVersion,
-    `Keyboard file ${def(o.filename)} has no &KeyboardVersion store, using default '0.0'`);
+    `Keyboard file '${def(o.filename)}' has no &KeyboardVersion store, using default '0.0'`
+  );
 
   static ERROR_PackageCannotContainBothModelsAndKeyboards = SevError | 0x000B;
   static Error_PackageCannotContainBothModelsAndKeyboards = () => m(this.ERROR_PackageCannotContainBothModelsAndKeyboards,
@@ -63,19 +71,22 @@ export class PackageCompilerMessages {
 
   static WARN_PackageNameDoesNotFollowLexicalModelConventions = SevWarn | 0x000D;
   static Warn_PackageNameDoesNotFollowLexicalModelConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowLexicalModelConventions,
-    `The package file ${def(o.filename)} does not follow the recommended model filename conventions. The name should be all lower case, `+
+    `The package file '${def(o.filename)}' does not follow the recommended model filename conventions. The name should be all lower case, `+
     `include only alphanumeric characters and underscore (_), not start with a digit, and should have the structure `+
-    `<author>.<bcp47>.<uniq>.model.kps.`);
+    `<author>.<bcp47>.<uniq>.model.kps.`
+  );
 
   static WARN_PackageNameDoesNotFollowKeyboardConventions = SevWarn | 0x000E;
   static Warn_PackageNameDoesNotFollowKeyboardConventions = (o:{filename: string}) => m(this.WARN_PackageNameDoesNotFollowKeyboardConventions,
-    `The package file ${def(o.filename)} does not follow the recommended keyboard filename conventions. The name should be all lower case, `+
-    `include only alphanumeric characters and underscore (_), and not start with a digit.`);
+    `The package file '${def(o.filename)}' does not follow the recommended keyboard filename conventions. The name should be all lower case, `+
+    `include only alphanumeric characters and underscore (_), and not start with a digit.`
+  );
 
   static WARN_FileInPackageDoesNotFollowFilenameConventions = SevWarn | 0x000F;
   static Warn_FileInPackageDoesNotFollowFilenameConventions = (o:{filename: string}) => m(this.WARN_FileInPackageDoesNotFollowFilenameConventions,
-    `The file ${def(o.filename)} does not follow the recommended filename conventions. The extension should be all lower case, `+
-    `and the filename should include only alphanumeric characters, -, _, + and .`);
+    `The file '${def(o.filename)}' does not follow the recommended filename conventions. The extension should be all lower case, `+
+    `and the filename should include only alphanumeric characters, -, _, + and .`
+  );
 
   static ERROR_PackageNameCannotBeBlank = SevError | 0x0010;
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
@@ -131,7 +142,8 @@ export class PackageCompilerMessages {
 
   static HINT_PackageContainsSourceFile = SevHint | 0x001D;
   static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
-    `The source file ${def(o.filename)} should not be included in the package; instead include the compiled result.`);
+    `The source file '${def(o.filename)}' should not be included in the package; instead include the compiled result.`
+  );
 
   // 0x001E was ERROR_InvalidPackageFile, now CommonTypesMessages.Error_InvalidPackageFile
 
@@ -149,61 +161,66 @@ export class PackageCompilerMessages {
     `Package version is not following keyboard version, but the package version field is blank.`
   );
 
-  static WARN_FloDataCouldNotBeRead = SevWarn | 0x0022;
+  static ERROR_RequiredParameterMissing = SevError | 0x0022;
+  static Error_RequiredParameterMissing = (o:{param: string}) => m(
+    this.ERROR_RequiredParameterMissing, `Source parameter '${def(o.param)}' is required.`
+  );
+
+  static WARN_FloDataCouldNotBeRead = SevWarn | 0x0023;
   static Warn_FloDataCouldNotBeRead = (o:{url: string, e?: any}) => m(
     this.WARN_FloDataCouldNotBeRead,
     `SIL Fonts Server ${def(o.url)} did not return a valid response: ${(o.e ?? 'unknown error').toString()}`,
   );
 
-  static WARN_FloDataIsInvalidFormat = SevWarn | 0x0023;
+  static WARN_FloDataIsInvalidFormat = SevWarn | 0x0024;
   static Warn_FloDataIsInvalidFormat = (o:{url: string}) => m(
     this.WARN_FloDataIsInvalidFormat,
     `SIL Fonts Server ${def(o.url)} should have returned a JSON object but instead returned invalid data`,
   );
 
-  static WARN_FontNotFoundInFlo = SevWarn | 0x0024;
+  static WARN_FontNotFoundInFlo = SevWarn | 0x0025;
   static Warn_FontNotFoundInFlo = (o:{family: string, filename: string}) => m(
     this.WARN_FontNotFoundInFlo,
     `Font family '${def(o.family)}' was not found on SIL Fonts Server fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
-  static WARN_FontFromFloIsNotFreelyDistributable = SevWarn | 0x0025;
+  static WARN_FontFromFloIsNotFreelyDistributable = SevWarn | 0x0026;
   static Warn_FontFromFloIsNotFreelyDistributable = (o:{family: string, filename: string}) => m(
     this.WARN_FontFromFloIsNotFreelyDistributable,
     `Font family '${def(o.family)}' is not marked as freely distributable on fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
-  static WARN_FontInFloDoesNotHaveDefaultTtf = SevWarn | 0x0026;
+  static WARN_FontInFloDoesNotHaveDefaultTtf = SevWarn | 0x0027;
   static Warn_FontInFloDoesNotHaveDefaultTtf = (o:{family: string, filename: string}) => m(
     this.WARN_FontInFloDoesNotHaveDefaultTtf,
     `Font family '${def(o.family)}' in fonts.languagetechnology.org does not have a default .ttf, font for ${def(o.filename)}`,
   );
 
-  static WARN_FontInFloHasBrokenDefaultTtf = SevWarn | 0x0027;
+  static WARN_FontInFloHasBrokenDefaultTtf = SevWarn | 0x0028;
   static Warn_FontInFloHasBrokenDefaultTtf = (o:{family: string, filename: string}) => m(
     this.WARN_FontInFloHasBrokenDefaultTtf,
     `Font family '${def(o.family)}' has an invalid default .ttf font entry. Please report this to fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
-  static WARN_FontInFloHasNoDownloadAvailable = SevWarn | 0x0028;
+  static WARN_FontInFloHasNoDownloadAvailable = SevWarn | 0x0029;
   static Warn_FontInFloHasNoDownloadAvailable = (o:{family: string, filename: string}) => m(
     this.WARN_FontInFloHasNoDownloadAvailable,
     `Font family '${def(o.family)}' does not have URLs to download .ttf font for ${def(o.filename)}`,
   );
 
-  static ERROR_FontFileCouldNotBeDownloaded = SevError | 0x0029;
+  static ERROR_FontFileCouldNotBeDownloaded = SevError | 0x002A;
   static Error_FontFileCouldNotBeDownloaded = (o:{url: string, filename: string, e?: any}) => m(
     this.ERROR_FontFileCouldNotBeDownloaded,
     `Font file at '${def(o.url)}' was not successfully downloaded for ${def(o.filename)}: ${(o.e ?? 'unknown error').toString()}`,
   );
 
-  static HINT_SourceFileHasChanged = SevHint | 0x002A;
+  static HINT_SourceFileHasChanged = SevHint | 0x002B;
   static Hint_SourceFileHasChanged = (o:{source: string, name: string}) => m(
     this.HINT_SourceFileHasChanged,
     `The file source '${def(o.source)}' has changed since it was added to this package. It may need to be updated`,
   );
 
-  static ERROR_InvalidSourceFileReference = SevError | 0x002B;
+  static ERROR_InvalidSourceFileReference = SevError | 0x002C;
   static Error_InvalidSourceFileReference = (o:{source: string, name: string}) => m(
     this.ERROR_InvalidSourceFileReference,
     `The file source '${def(o.source)}' for '${def(o.name)}' is not in a recognized format`,
@@ -218,7 +235,7 @@ export class PackageCompilerMessages {
     `
   );
 
-  static ERROR_FontInFloDoesNotHaveARecognizedGitHubUri = SevError | 0x002C;
+  static ERROR_FontInFloDoesNotHaveARecognizedGitHubUri = SevError | 0x002D;
   static Error_FontInFloDoesNotHaveARecognizedGitHubUri = (o:{filename: string, url: string}) => m(
     this.ERROR_FontInFloDoesNotHaveARecognizedGitHubUri,
     `The URL for font '${def(o.filename)}' from fonts.languagetechnology.org, '${def(o.url)}', was not a recognized GitHub URL format`,
@@ -232,7 +249,7 @@ export class PackageCompilerMessages {
     `
   );
 
-  static ERROR_UriIsNotARecognizedGitHubUri = SevError | 0x002D;
+  static ERROR_UriIsNotARecognizedGitHubUri = SevError | 0x002E;
   static Error_UriIsNotARecognizedGitHubUri = (o:{url: string}) => m(
     this.ERROR_UriIsNotARecognizedGitHubUri,
     `The URL '${def(o.url)}' was not a recognized GitHub URL format`,
@@ -246,25 +263,25 @@ export class PackageCompilerMessages {
     `
   );
 
-  static ERROR_CouldNotRetrieveStableUriFromGitHub = SevError | 0x002E;
+  static ERROR_CouldNotRetrieveStableUriFromGitHub = SevError | 0x002F;
   static Error_CouldNotRetrieveStableUriFromGitHub = (o:{url: string, e?: any}) => m(
     this.ERROR_CouldNotRetrieveStableUriFromGitHub,
     `The URL '${def(o.url)}' was not successfully retrieved from GitHub API: ${(o.e ?? 'unknown error').toString()}`,
   );
 
-  static ERROR_UriIsNotARecognizedStableGitHubUri = SevError | 0x002F;
+  static ERROR_UriIsNotARecognizedStableGitHubUri = SevError | 0x0030;
   static Error_UriIsNotARecognizedStableGitHubUri = (o:{url: string}) => m(
     this.ERROR_UriIsNotARecognizedStableGitHubUri,
     `The URL '${def(o.url)}' is not a recognized stable GitHub URL`,
   );
 
-  static ERROR_SourceCannotBeSetForLocalFiles = SevError | 0x0030;
+  static ERROR_SourceCannotBeSetForLocalFiles = SevError | 0x0031;
   static Error_SourceCannotBeSetForLocalFiles = (o:{filename: string, sourceFilename: string}) => m(
     this.ERROR_SourceCannotBeSetForLocalFiles,
     `The '<Source>' element cannot be set for local file ${o.filename}`,
   );
 
-  static HINT_RemoteReferencesShouldBeVersion18Plus = SevHint | 0x0031;
+  static HINT_RemoteReferencesShouldBeVersion18Plus = SevHint | 0x0032;
   static Hint_RemoteReferencesShouldBeVersion18Plus = (o:{filename: string, kpsVersion: string}) => m(
     this.HINT_RemoteReferencesShouldBeVersion18Plus,
     `The source package includes a reference to URL '${def(o.filename)}' but the package source version is '${def(o.kpsVersion)}'; the package source version should be at least '18.0'`,

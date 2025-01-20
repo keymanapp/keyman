@@ -12,6 +12,7 @@ import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
+import { PackageValidation } from '../src/compiler/package-validation.js';
 import { unitTestEndpoints as getFileDataEndpoints, unitTestEndpoints } from '../src/compiler/get-file-data.js';
 import { env } from 'process';
 
@@ -35,7 +36,7 @@ describe('KmpCompiler', function () {
   });
 
   this.afterEach(function() {
-    if(this.currentTest.state == 'failed') {
+    if(this.currentTest?.isFailed()) {
       callbacks.printMessages();
     }
   });
@@ -266,6 +267,22 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard version metadata`, async function () {
     const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps')) ?? {};
     assert.equal(kmpJsonData.keyboards[0].version, '4.0');  // picks up example.kmx's version
+  });
+
+  it(`should handle a range of valid BCP47 tags`, async function () {
+    const inputFilename = makePathToFixture('bcp47', 'valid_bcp47.kps');
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJsonData);
+    const validation = new PackageValidation(callbacks, {});
+    assert.isTrue(validation.validate(inputFilename, kmpJsonData));
+  });
+
+  it(`should reject an invalid BCP47 tag`, async function () {
+    const inputFilename = makePathToFixture('bcp47', 'invalid_bcp47_1.kps');
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJsonData);
+    const validation = new PackageValidation(callbacks, {});
+    assert.isFalse(validation.validate(inputFilename, kmpJsonData));
   });
 
   it(`should download a file from a GitHub raw url`, async function () {

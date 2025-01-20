@@ -241,11 +241,11 @@ function enableSuggestions(model, suggestionType) {
     [true, true, false],    // 2 = SuggestionType.PREDICTIONS_WITH_CORRECTIONS
     [true, true, true],     // 3 = SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT
   ];
-  const t = suggestionSettings[suggestionType] 
+  const t = suggestionSettings[suggestionType]
     ? suggestionSettings[suggestionType] : suggestionSettings[0];
   keyman.core.languageProcessor.mayPredict = t[0];
   keyman.core.languageProcessor.maySuggest = t[1];
-  // keyman.core.languageProcessor.mayAutoCorrect = t[2];
+  keyman.core.languageProcessor.mayAutoCorrect = t[2];
 
   registerModel(model);
 }

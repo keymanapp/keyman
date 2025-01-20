@@ -1,0 +1,10 @@
+﻿store(&VERSION) '15.0'
+store(&NAME) "error_touch_layout_invalid_identifier"
+store(&COPYRIGHT) '© 2015-2024 SIL Global'
+store(&TARGETS) 'any'
+store(&LAYOUTFILE) 'error_touch_layout_invalid_identifier.keyman-touch-layout'
+store(&KEYBOARDVERSION) '1.3'
+
+begin Unicode > use(main)
+
+group(main) using keys

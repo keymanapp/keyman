@@ -43,16 +43,8 @@ else
 endif
 
 # copy package.json into build dir for test use
-configure_file(
-  copy: true,
-  input: '../../../../package.json',
-  output: 'package.json',
-)
-configure_file(
-  copy: true,
-  input: '../../../../resources/standards-data/unicode-character-database/Blocks.txt',
-  output: 'Blocks.txt',
-)
+fs.copyfile('../../../../package.json', 'package.json')
+fs.copyfile('../../../../resources/standards-data/unicode-character-database/Blocks.txt', 'Blocks.txt')
 
 configure_file(
   command: [node, meson.current_source_dir() / 'write_node_versions.js','@OUTPUT@'],

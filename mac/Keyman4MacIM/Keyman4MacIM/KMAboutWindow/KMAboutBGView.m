@@ -34,6 +34,7 @@
   NSRectFillUsingOperation(topFill, NSCompositingOperationSourceOver);
   [[NSColor windowBackgroundColor] setFill];
   NSRectFillUsingOperation(botFill, NSCompositingOperationSourceOver);
+  
 }
 
 - (BOOL)mouseDownCanMoveWindow {

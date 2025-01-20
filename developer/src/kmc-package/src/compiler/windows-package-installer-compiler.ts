@@ -130,7 +130,15 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     }
 
     // Check existence of required files
-    for(const filename of [sources.licenseFilename, sources.msiFilename, sources.setupExeFilename]) {
+    for(const [param,filename] of [
+      ['licenseFilename',sources.licenseFilename],
+      ['msiFilename',sources.msiFilename],
+      ['setupExeFilename',sources.setupExeFilename]
+    ]) {
+      if(!filename) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_RequiredParameterMissing({param}));
+        return null;
+      }
       if(!this.callbacks.fs.existsSync(filename)) {
         this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename}));
         return null;
