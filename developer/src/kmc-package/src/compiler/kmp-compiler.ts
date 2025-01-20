@@ -18,6 +18,8 @@ import { PackageKeyboardTargetValidator } from './package-keyboard-target-valida
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
 import { PackageValidation } from './package-validation.js';
+import { getFontFamilySync } from "@keymanapp/developer-utils";
+import { setKvkFontData } from './kvk-font-facename.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
@@ -483,35 +485,34 @@ export class KmpCompiler implements KeymanCompiler {
         this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: filename}));
       }
 
+      let memberFileData = this.getMemberFileData(kpsFilename, filename);
+      if(!memberFileData) {
+        failed = true;
+        return;
+      }
       filename = this.callbacks.resolveFilename(kpsFilename, filename);
       const basename = this.callbacks.path.basename(filename);
 
-      if(!this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
-        failed = true;
-        return;
+      if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Binary.VisualKeyboard)) {
+        if(!this.isKvkFileBinary(memberFileData)) {
+          this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+        } else {
+          memberFileData = this.setKvkFontData(kpsFilename, data, filename, memberFileData);
+        }
       }
-
-      let memberFileData;
-      try {
-        memberFileData = this.callbacks.loadFile(filename);
-      } catch(e) {
-        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
-        failed = true;
-        return;
-      }
-
-      this.warnIfKvkFileIsNotBinary(filename, memberFileData);
 
       zip.file(basename, memberFileData);
-
-      // Remove path data from files before JSON save
-      value.name = basename;
     });
 
     if(failed) {
       return null;
     }
+
+    data.files.forEach((value) => {
+      const basename = this.callbacks.path.basename(value.name);
+      // Remove path data from files before JSON save
+      value.name = basename;
+    });
 
     // TODO #9477: transform .md to .htm
 
@@ -557,26 +558,88 @@ export class KmpCompiler implements KeymanCompiler {
     return transcodeToCP1252(s);
   }
 
+  private getMemberFileData(kpsFilename: string, filename: string) {
+    filename = this.callbacks.resolveFilename(kpsFilename, filename);
+
+    if(!this.callbacks.fs.existsSync(filename)) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
+      return null;
+    }
+
+    try {
+      return this.callbacks.loadFile(filename);
+    } catch(e) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+      return null;
+    }
+  }
+
+  private setKvkFontData(kpsFilename: string, data: KmpJsonFile.KmpJsonFile, filename: string, kvk: Uint8Array) {
+    // find the appropriate font to set
+    const kvkId = this.callbacks.path.basename(filename.toLowerCase(), '.kvk');
+    const kbd = data.keyboards.find(k => k.id == kvkId);
+    if(!kbd) {
+      // cannot find a matching keyboard
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_CannotFindMatchingKeyboardForVisualKeyboard({filename}));
+      return kvk;
+    }
+    const fontFilename = kbd.oskFont || kbd.displayFont;
+    if(!fontFilename) {
+      // no font data to set
+      return kvk;
+    }
+
+    // Look up the full font filename
+    const fontFile = data.files.find(file => this.callbacks.path.basename(file.name.toLowerCase()) == fontFilename.toLowerCase());
+    if(!fontFile) {
+      // font cannot be found
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_CannotFindFontForKeyboard({id: kbd.id, fontFilename}));
+      return kvk;
+    }
+
+    // the font is a filename, included in the .kps
+    const fontData = this.getMemberFileData(kpsFilename, fontFile.name);
+    if(!fontData) {
+      // cannot find source font
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_CannotFindFontForKeyboard({id: kbd.id, fontFilename: fontFile.name}));
+      return kvk;
+    }
+
+    const fontFacename = getFontFamilySync(fontData);
+    if(!fontFacename) {
+      // Font facename could not be extracted from ttf
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_CannotReadFont({fontFilename: fontFile.name}));
+      return kvk;
+    }
+
+    const result = setKvkFontData(kvk, fontFacename);
+    if(!result) {
+      // KVK is invalid
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_VisualKeyboardFileIsInvalid({filename}));
+      return kvk;
+    }
+
+    return result;
+  }
+
   /**
    * Legacy .kmp compiler would transform xml-format .kvk files into a binary .kvk file; now
    * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
    * few users who are still doing this
    */
-  private warnIfKvkFileIsNotBinary(filename: string, data: Uint8Array) {
-    if(!KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Binary.VisualKeyboard)) {
-      return;
-    }
-
+  private isKvkFileBinary(data: Uint8Array) {
     if(data.byteLength < 4) {
       // TODO: Not a valid .kvk file; should we be reporting this?
-      return;
+      return false;
     }
 
+    // Must start with 'KVKF'
     if(data[0] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[0] ||
       data[1] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[1] ||
       data[2] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[2] ||
       data[3] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[3]) {
-      this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+      return false;
     }
+    return true;
   }
 }
