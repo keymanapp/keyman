@@ -414,6 +414,8 @@ export function suggestFromPriorContext(
   suggestions.forEach((entry) => {
     entry.suggestion.transform.deleteLeft = deleteLeft;
     if(inputTransform.id) {
+      // TODO: Consider replacing with or annotating with the ORIGINAL ID - the one that prompted the
+      // original suggestion pass.
       entry.suggestion.transformId = inputTransform.id;
     }
   });
