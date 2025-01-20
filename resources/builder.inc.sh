@@ -1407,6 +1407,10 @@ _builder_parse_expanded_parameters() {
           # internal reporting function, ignores all other parameters
           _builder_report_dependencies
           ;;
+        --builder-completion-describe)
+          _builder_completion_describe
+          exit 0
+          ;;
         --offline)
           _builder_offline=--offline
           ;;
@@ -1500,6 +1504,28 @@ _builder_pad() {
   local text2=$3
   local fmt="%-${count}s%s\n"
   printf $fmt "$text1" "$text2"
+}
+
+_builder_completion_describe() {
+  printf '%s ' "${_builder_actions[@]}"
+  echo -n "; "
+  printf '%s ' "${_builder_targets[@]}"
+  echo -n "; "
+  # Remove all '+' suffixes from options; they're a config on the option, not part
+  # of the actual option text itself.
+  local _builder_opts=()
+  for e in "${!_builder_params[@]}"; do
+    if [[ $e =~ ^-- ]]; then
+      _builder_opts+=(${e%+*})
+    fi
+  done
+
+  # Add default options
+  _builder_opts+=( --verbose --debug --color --no-color --offline --help )
+  if builder_has_dependencies; then
+    _builder_opts+=( --deps --no-deps --force-deps )
+  fi
+  printf '%s ' "${_builder_opts[@]}"
 }
 
 builder_display_usage() {

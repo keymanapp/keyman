@@ -340,8 +340,8 @@ describe('processSimilarity', () => {
       prediction: {
         sample: {
           transform: {
-            insert: 'e',
-            deleteLeft: 0
+            insert: 'iphone',
+            deleteLeft: 5
           },
           displayAs: '<iphone>',
           matchesModel: false,

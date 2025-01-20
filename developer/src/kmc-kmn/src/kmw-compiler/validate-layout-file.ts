@@ -46,6 +46,16 @@ function GetKeyIdUnicodeType(value: string): TKeyIdType {
 
 function KeyIdType(FId: string): TKeyIdType {   // I4142
   FId = FId.toUpperCase();
+
+  // Validate key id format:
+  // K_xxxx -- predefined virtual key - restricted character set
+  // T_xxxx -- custom 'touch' virtual key - touch key id
+  // U_ABCD_1234 -- Unicode key id (1+ chars)
+  // x00 -- "ISO" key identifier (not currently supported in touch layout files)
+  if(!/^((K_[A-Z0-9_?]+)|(T_\S+)|(U_[0-9A-F_]+))$/.test(FId)) {
+    // note: |[A-Z][0-9][0-9] -- ISO key identifiers not currently supported
+    return TKeyIdType.Key_Invalid;
+  }
   switch(FId.charAt(0)) {
   case 'T':
     return TKeyIdType.Key_Touch;

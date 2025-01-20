@@ -561,11 +561,13 @@ export function processSimilarity(
     return;
   }
 
-  // Generate a default 'keep' option if one was not otherwise produced.
-
-  // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
-  // for context-tracking otherwise!
-  let keepTransform: Transform = { ...inputTransform };
+  // Generate a full-word 'keep' replacement like other suggestions when one is not otherwise
+  // produced; we want to replace the full token in the same manner used for other suggestions.
+  const basePrefixLength = truePrefix.kmwLength() - inputTransform.insert.kmwLength() + inputTransform.deleteLeft;
+  const keepTransform = {
+    insert: truePrefix,
+    deleteLeft: basePrefixLength
+  };
 
   // 1 is a filler value; goes unused b/c is for a 'keep'.
   let keepSuggestion = models.transformToSuggestion(keepTransform, 1);

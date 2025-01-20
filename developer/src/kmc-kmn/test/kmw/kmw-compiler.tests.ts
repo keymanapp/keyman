@@ -36,7 +36,9 @@ describe('KeymanWeb Compiler', function() {
   });
 
   this.afterEach(function() {
-    callbacks.printMessages();
+    if(this.currentTest?.isFailed() || debug) {
+      callbacks.printMessages();
+    }
     callbacks.clear();
   });
 
@@ -201,6 +203,19 @@ describe('KeymanWeb Compiler', function() {
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel));
+  });
+
+  it('should give error ERROR_TouchLayoutInvalidIdentifier if a virtual key is badly formatted e.g. U_1234[_5678]', async function() {
+    // #12870
+    const filenames = generateTestFilenames('error_touch_layout_invalid_identifier');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNull(result);
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_TouchLayoutInvalidIdentifier));
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_InvalidTouchLayoutFile));
+    assert.lengthOf(callbacks.messages, 2);
   });
 
 });

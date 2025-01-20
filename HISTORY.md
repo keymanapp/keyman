@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 18.0.169 alpha 2025-01-17
+
+* chore(windows): remove `postinstall` state from mermaid diagram (#12923)
+
+## 18.0.168 alpha 2025-01-16
+
+* chore: update macOS environment-variable shell script (#12878)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12871)
+* chore(web): integrates predictive-text builds to top level script, reconnects headless tests (#12866)
+* chore(ios): Update crowdin strings for Khmer (#12910)
+* chore(windows): merge master epic windows updates (#12904)
+* fix(developer): detect invalid key ids in touch layout files (#12895)
+* chore: use GitHub PR titles when writing HISTORY.md (#12907)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12909)
+* change(web): make 'keep' transform pattern match standard suggestion pattern by including the prefix string (#12906)
+* chore: Add docker images for building the different platforms (#11397)
+
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
 ## 18.0.166 alpha 2025-01-10
 
 * fix(web): numpad + and - with zoom shortcut use (#12865)
@@ -202,7 +230,7 @@
 
 ## 18.0.134 alpha 2024-11-04
 
-*  (#12606)
+* fix(developer): ldml don't allow a uset as right-hand-side variable (#12606)
 
 ## 18.0.133 alpha 2024-11-01
 

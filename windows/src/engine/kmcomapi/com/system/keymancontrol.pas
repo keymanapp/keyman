@@ -429,7 +429,7 @@ end;
 
 procedure TKeymanControl.OpenUpdateCheck;
 begin
-  RunKeymanConfiguration('-ouc');
+  RunKeymanConfiguration('-buc');
 end;
 
 procedure TKeymanControl.StartKeyman;

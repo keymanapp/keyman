@@ -40,9 +40,11 @@ uses
   System.Win.Registry,
 
   GetOsVersion,
+  Keyman.System.ExecutionHistory,
   Keyman.System.Security,
   Keyman.Winapi.VersionHelpers,
   KeymanVersion,
+  Klog,
   RegistryKeys,
   UfrmKeyman7Main,
   UserMessages;
@@ -76,8 +78,9 @@ var
   hMutex: Cardinal;
 begin
 
-
   if not ValidateParameters(FCommand) then Exit;
+
+  RecordKeymanStarted;
 
   hProgramMutex := CreateMutex(nil, False, 'KeymanEXE70');
   if hProgramMutex = 0 then

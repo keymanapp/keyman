@@ -80,8 +80,12 @@ type
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
                     fmMigrate, fmSplash, fmStart,
-                    fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
-                    fmOnlineUpdateAdmin, fmTextEditor,
+                    fmUpgradeKeyboards, // I2548
+                    fmTextEditor,
+                    fmInstallKeyboardPackageAdmin,
+                    fmBackgroundUpdateCheck,
+                    fmBackgroundDownload,
+                    fmApplyInstallNow,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
@@ -113,13 +117,14 @@ uses
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.Configuration.UI.UfrmStartInstall,
   Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
   kmint,
   KMShellHints,
   KeymanMutex,
-  OnlineUpdateCheck,
+  Keyman.System.RemoteUpdateCheck,
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,
@@ -141,6 +146,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  Keyman.System.UpdateStateMachine,
 
   KeyboardTIPCheck,
 
@@ -240,7 +246,7 @@ begin
       else if s = '-uk' then  FMode := fmUninstallKeyboard     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       else if s = '-ukl' then FMode := fmUninstallKeyboardLanguage   // I3624
       else if s = '-up' then  FMode := fmUninstallPackage          { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
-      else if s = '-ou' then  FMode := fmOnlineUpdateAdmin     { I1730 - Check update of keyboards (admin elevation) }
+      else if s = '-ikp' then  FMode := fmInstallKeyboardPackageAdmin
       else if s = '-a' then   FMode := fmAbout
       else if s = '-ra' then  FMode := fmRegistryAdd
       else if s = '-rr' then  FMode := fmRegistryRemove
@@ -248,7 +254,9 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
-      else if s = '-ouc' then FMode := fmOnlineUpdateCheck
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
+      else if s = '-bd' then FMode := fmBackgroundDownload
+      else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -381,6 +389,9 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  BUpdateSM : TUpdateStateMachine;
+  frmStartInstall: TfrmStartInstall;
+  UserCanceled : Boolean;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -428,6 +439,55 @@ begin
     Exit;
   end;
 
+  BUpdateSM := TUpdateStateMachine.Create(False);
+    try
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        BUpdateSM.HandleCheck;
+        Exit;
+      end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Exit;
+      end
+      else if (FMode = fmApplyInstallNow) then
+      begin
+        BUpdateSM.HandleInstallNow;
+        Exit;
+      end
+      else if (FMode = fmInstallKeyboardPackageAdmin) then
+      begin
+        BUpdateSM.HandleInstallPackages;
+        Exit;
+      end
+      else
+      begin
+        // The following logic around the WaitingRestartState should be
+        // encapsulated in the state machine however as we want separation of
+        // UI elements from the state machine we have bring some of logic here.
+        UserCanceled := False;
+        if BUpdateSM.ReadyToInstall and
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout])) then
+        begin
+          frmStartInstall := TfrmStartInstall.Create(nil);
+          try
+            if frmStartInstall.ShowModal = mrOk then
+              UserCanceled := False
+            else
+              UserCanceled := True
+          finally
+            frmStartInstall.Free;
+          end;
+        end;
+        if not UserCanceled and (BUpdateSM.HandleKmShell = 1) then
+          Exit;
+        end;
+    finally
+      BUpdateSM.Free;
+    end;
+
+
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin
     // Note: will elevate and re-run if required
@@ -468,17 +528,6 @@ begin
       if FirstRun(FQuery, FDisablePackages, FDefaultUILanguage)
         then ExitCode := 0
         else ExitCode := 2;
-
-    fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
-
-    fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
-      try
-        Run;
-      finally
-        Free;
-      end;
 
     fmUpgradeKeyboards:// I2548
       begin
@@ -619,6 +668,7 @@ begin
       Pos('installdefaults', FQuery) > 0,
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
+      Pos('automaticupdates', FQuery) > 0,
       FDisablePackages,
       FDefaultUILanguage,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
