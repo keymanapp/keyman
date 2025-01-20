@@ -269,20 +269,20 @@ describe('KmpCompiler', function () {
     assert.equal(kmpJsonData.keyboards[0].version, '4.0');  // picks up example.kmx's version
   });
 
-  it(`should handle a range of valid BCP47 tags`, function () {
+  it(`should handle a range of valid BCP47 tags`, async function () {
     const inputFilename = makePathToFixture('bcp47', 'valid_bcp47.kps');
-    const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);
-    assert.isNotNull(kmpJson);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJsonData);
     const validation = new PackageValidation(callbacks, {});
-    assert.isTrue(validation.validate(inputFilename, kmpJson));
+    assert.isTrue(validation.validate(inputFilename, kmpJsonData));
   });
 
-  it(`should reject an invalid BCP47 tag`, function () {
+  it(`should reject an invalid BCP47 tag`, async function () {
     const inputFilename = makePathToFixture('bcp47', 'invalid_bcp47_1.kps');
-    const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);
-    assert.isNotNull(kmpJson);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJsonData);
     const validation = new PackageValidation(callbacks, {});
-    assert.isFalse(validation.validate(inputFilename, kmpJson));
+    assert.isFalse(validation.validate(inputFilename, kmpJsonData));
   });
 
   it(`should download a file from a GitHub raw url`, async function () {
