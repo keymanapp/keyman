@@ -37,6 +37,7 @@
 		29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
 		29DBBF672D35053E00D8E33C /* KMSentryHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DBBF662D35053E00D8E33C /* KMSentryHelper.m */; };
 		29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */ = {isa = PBXBuildFile; fileRef = 29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */; };
+		29E67D042D3E4A86003CDE8F /* KMSentryHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DBBF662D35053E00D8E33C /* KMSentryHelper.m */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -1052,6 +1053,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29E67D042D3E4A86003CDE8F /* KMSentryHelper.m in Sources */,
 				29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */,
 				29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */,
 				2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */,
