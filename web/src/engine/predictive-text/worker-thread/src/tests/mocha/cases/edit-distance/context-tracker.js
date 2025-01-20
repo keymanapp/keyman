@@ -1,13 +1,17 @@
 import { assert } from 'chai';
 
 import { ContextTracker } from '#./correction/context-tracker.js';
+import { tokenizeTransformDistribution } from '#./correction/transform-tokenization.js';
 import ModelCompositor from '#./model-compositor.js';
 import * as models from '#./models/index.js';
+import { determineModelTokenizer } from '#./model-helpers.js';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { deepCopy } from '@keymanapp/web-utils';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+
+const tokenizer = determineModelTokenizer(new models.DummyModel({wordbreaker: defaultBreaker}));
 
 describe('ContextTracker', function() {
   function toWrapperDistribution(transforms) {
@@ -190,6 +194,72 @@ describe('ContextTracker', function() {
       assert.equal(newContextMatch.tailTokensAdded, 2);
     });
 
+    it("properly matches and aligns when initial token is modified AND a 'wordbreak' is added'", function() {
+      let existingContext = models.tokenize(defaultBreaker, {
+        left: "an"
+      });
+      let transform = {
+        insert: 'd ',
+        deleteLeft: 0
+      }
+      let newContext = models.tokenize(defaultBreaker, {
+        left: "and "
+      });
+      let rawTokens = ["and", " ", ""];
+
+      let baseContextMatch = ContextTracker.modelContextState(existingContext.left);
+      let newContextMatch = ContextTracker.attemptMatchContext(
+        newContext.left, 
+        baseContextMatch, 
+        tokenizeTransformDistribution(tokenizer, {left: "an"}, [{sample: transform, p: 1}])
+      );
+      assert.isNotNull(newContextMatch?.state);
+      assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
+      // We want to preserve all text preceding the new token when applying a suggestion.
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0, deleteRight: 0});
+
+      // The 'wordbreak' transform
+      let state = newContextMatch.state;
+      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
+      assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
+
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 2);
+    });
+
+    it("properly matches and aligns when tail token is modified AND a 'wordbreak' is added'", function() {
+      let existingContext = models.tokenize(defaultBreaker, {
+        left: "apple a day keeps the doc"
+      });
+      let transform = {
+        insert: 'tor ',
+        deleteLeft: 0
+      }
+      let newContext = models.tokenize(defaultBreaker, {
+        left: "apple a day keeps the doctor "
+      });
+      let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
+
+      let baseContextMatch = ContextTracker.modelContextState(existingContext.left);
+      let newContextMatch = ContextTracker.attemptMatchContext(
+        newContext.left, 
+        baseContextMatch, 
+        tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc"}, [{sample: transform, p: 1}])
+      );
+      assert.isNotNull(newContextMatch?.state);
+      assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
+      // We want to preserve all text preceding the new token when applying a suggestion.
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0, deleteRight: 0 });
+
+      // The 'wordbreak' transform
+      let state = newContextMatch.state;
+      assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
+      assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
+
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 2);
+    });
+
     it('rejects hard-to-handle case: tail token is split into three rather than two', function() {
       let baseContext = models.tokenize(defaultBreaker, {
         left: "text'"
@@ -209,7 +279,11 @@ describe('ContextTracker', function() {
         insert: '\"',
         deleteLeft: 0
       }
-      let problemContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let problemContextMatch = ContextTracker.attemptMatchContext(
+        newContext.left, 
+        baseContextMatch, 
+        tokenizeTransformDistribution(tokenizer, {left: "text'"}, [{sample: transform, p: 1}])
+      );
       assert.isNull(problemContextMatch);
     });
   });
