@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { JSKeyboard, KeyMapping, KeyEvent, Codes } from "keyman/engine/keyboard";
+import { JSKeyboard, Keyboard, KeyMapping, KeyEvent, Codes } from "keyman/engine/keyboard";
 import { type RuleBehavior } from 'keyman/engine/js-processor';
 import { KeyEventSourceInterface } from 'keyman/engine/osk';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
@@ -13,47 +13,55 @@ interface EventMap {
 
 export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
 
-export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: JSKeyboard, baseLayout: string): KeyEvent {
-  // Mnemonic handling.
-  if(activeKeyboard && activeKeyboard.isMnemonic) {
-    // The following will never set a code corresponding to a modifier key, so it's fine to do this,
-    // which may change the value of Lcode, here.
-
-    s.setMnemonicCode(!!(s.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG), !!(s.Lmodifiers & ModifierKeyConstants.CAPITALFLAG));
+export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboard, baseLayout: string): KeyEvent {
+  if (!activeKeyboard) {
+    return s;
   }
 
-  // Other minor physical-keyboard adjustments
-  if(activeKeyboard && !activeKeyboard.isMnemonic) {
-    // Positional Layout
+  if (activeKeyboard instanceof JSKeyboard) {
+    // Mnemonic handling.
+    if (activeKeyboard.isMnemonic) {
+      // The following will never set a code corresponding to a modifier key, so it's fine to do this,
+      // which may change the value of Lcode, here.
 
-    /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-    var Lbase = KeyMapping.languageMap[baseLayout];
-    if(Lbase && Lbase['k'+s.Lcode]) {
-      s.Lcode=Lbase['k'+s.Lcode];
+      s.setMnemonicCode(!!(s.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG), !!(s.Lmodifiers & ModifierKeyConstants.CAPITALFLAG));
     }
-    /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
+    // Other minor physical-keyboard adjustments
+    if (!activeKeyboard.isMnemonic) {
+      // Positional Layout
 
-    // The second conditional component (re 0x60):  if CTRL or ALT is held down...
-    // Do not remap for legacy keyboard compatibility, do not pass Go, do not collect $200.
-    // This effectively only permits `default` and `shift` for legacy keyboards.
-    //
-    // Third:  DO, however, track direct presses of any main modifier key.  The OSK should
-    // reflect the current modifier state even for legacy keyboards.
-    if(!activeKeyboard.definesPositionalOrMnemonic &&
-       !(s.Lmodifiers & Codes.modifierBitmasks.NON_LEGACY) &&
-       !s.isModifier) {
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      s = new KeyEvent({
-        Lcode: KeyMapping._USKeyCodeToCharCode(s),
-        Lmodifiers: 0,
-        LisVirtualKey: false,
-        vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
-        Lstates: s.Lstates,
-        kName: '',
-        device: s.device,
-        isSynthetic: false
-      });
+      /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
+      const Lbase = KeyMapping.languageMap[baseLayout];
+      if (Lbase && Lbase['k' + s.Lcode]) {
+        s.Lcode = Lbase['k' + s.Lcode];
+      }
+      /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
+
+      // The second conditional component (re 0x60):  if CTRL or ALT is held down...
+      // Do not remap for legacy keyboard compatibility, do not pass Go, do not collect $200.
+      // This effectively only permits `default` and `shift` for legacy keyboards.
+      //
+      // Third:  DO, however, track direct presses of any main modifier key.  The OSK should
+      // reflect the current modifier state even for legacy keyboards.
+      if (!activeKeyboard.definesPositionalOrMnemonic &&
+        !(s.Lmodifiers & Codes.modifierBitmasks.NON_LEGACY) &&
+        !s.isModifier) {
+        // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+        s = new KeyEvent({
+          Lcode: KeyMapping._USKeyCodeToCharCode(s),
+          Lmodifiers: 0,
+          LisVirtualKey: false,
+          vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
+          Lstates: s.Lstates,
+          kName: '',
+          device: s.device,
+          isSynthetic: false
+        });
+      }
     }
+  } else {
+    // KMX keyboard
+    // TODO-web-core: forward to Core
   }
 
   return s;

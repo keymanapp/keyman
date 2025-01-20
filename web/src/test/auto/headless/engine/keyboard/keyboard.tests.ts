@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal, DeviceSpec } from 'keyman/engine/keyboard';
+import { KeyboardHarness, MinimalKeymanGlobal, DeviceSpec, JSKeyboard } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 
@@ -14,7 +14,8 @@ describe('Keyboard tests', function () {
     // -- START: Standard Recorder-based unit test loading boilerplate --
     const harness = new KeyboardHarness({}, MinimalKeymanGlobal);
     const keyboardLoader = new NodeKeyboardLoader(harness);
-    const km_keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
+    const km_keyboard = keyboard as JSKeyboard;
     // --  END:  Standard Recorder-based unit test loading boilerplate --
 
     // `khmer_angkor` - supports longpresses, but not flicks or multitaps.

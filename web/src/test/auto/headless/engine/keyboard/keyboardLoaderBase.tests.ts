@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, DeviceSpec, InvalidKeyboardError } from 'keyman/engine/keyboard';
+import { KeyboardHarness, MinimalKeymanGlobal, KeyboardDownloadError, DeviceSpec, InvalidKeyboardError, JSKeyboard } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { assertThrowsAsync, assertThrows } from 'keyman/tools/testing/test-utils';
@@ -76,14 +76,15 @@ describe('Headless keyboard loading', function() {
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
+      assert.instanceOf(keyboard, JSKeyboard);
       // Runs a blank KeyEvent through the keyboard's rule processing...
       // but via separate harness configured with a different captured global.
       // This shows an important detail: the 'global' object is effectively
       // closure-captured. (Similar constraints may occur when experimenting with
       // 'sandboxed' keyboard loading in the DOM!)
       const ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
-      ruleHarness.activeKeyboard = keyboard;
-      assertThrows(() => ruleHarness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device)), 'k.KKM is not a function');
+      ruleHarness.activeKeyboard = keyboard as JSKeyboard;
+      assertThrows(() => ruleHarness.processKeystroke(new Mock(), (keyboard as JSKeyboard).constructNullKeyEvent(device)), 'k.KKM is not a function');
     });
   });
 });
