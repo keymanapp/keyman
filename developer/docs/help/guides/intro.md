@@ -12,8 +12,9 @@ Linux.
 There are two core applications included in Keyman Developer: the Keyman
 Developer IDE (formerly called TIKE), and the command line compiler kmc.
 
-[Watch a video](https://youtu.be/kwhgx_eX4Es) that highlights some of
-the Keyman Developer features.
+Watch a video that highlights some of the Keyman Developer 14.0 features (57:23)
+
+:<img class="video-thumbnail" data-video="https://www.youtube.com/embed/kwhgx_eX4Es" src="https://img.youtube.com/vi/kwhgx_eX4Es/maxresdefault.jpg" width="600px" alt="Keyman Developer 14.0 Webinar">
 
 ## Keyman Developer IDE
 

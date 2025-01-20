@@ -65,11 +65,7 @@ kmc_cmd = [node, '--enable-source-maps', kmc_root]
 # Build all keyboards in output folder
 
 foreach kbd : tests_needing_copy
-  configure_file(
-    copy: true,
-    input: kbd + '.xml',
-    output: kbd + '.xml'
-  )
+  fs.copyfile(kbd + '.xml', kbd + '.xml')
 
   configure_file(
     command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
@@ -86,13 +82,8 @@ foreach kbd : tests_with_testdata
   )
 endforeach
 
-
 foreach kbd : tests_from_cldr
-  configure_file(
-    copy: true,
-    input: ldml_data / kbd + '.xml',
-    output: kbd + '.xml'
-  )
+  fs.copyfile(ldml_data / kbd + '.xml', kbd + '.xml')
   configure_file(
     command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
     input: join_paths(ldml_data, kbd + '.xml'),

@@ -243,6 +243,12 @@ The `Keyboard` object describes an individual keyboard in the Keyman package. A 
 
   The filename of the font for the OSK
 
+`examples`
+
+: `Array`
+
+  An array of [`Example`](#obj-example) objects linked to the keyboard.
+
 ### The Language object
 
 The `Language` object describes the language that can be typed with the keyboard
@@ -258,6 +264,51 @@ The `Language` object describes the language that can be typed with the keyboard
 : `string`
 
   [BCP 47 language code](../bcp-47)
+
+### The Example object
+
+The `Example` object describes a keying sequence example text for the keyboard.
+This can be the easiest way for a new user to start using a keyboard, and is
+particularly helpful when the keyboard makes use of keying sequences that may
+not be immediately obvious.
+
+`id`
+
+: `string`
+
+  The BCP 47 language code for the example.
+
+`keys`
+
+: `string`
+
+  The key sequence to type the example. The key sequence must list each key
+  combination, separated by space. The actual text for each key is reasonably
+  arbitrary, to allow you to provide examples for touch keyboards as well as
+  desktop keyboards. There are three special kinds of key strings:
+  * Modifier keys may be specified with the `+` character, e.g. `shift+e` or
+    `right-alt+k`. Use lower case keys. The suggested standard modifiers are:
+    `shift`, `ctrl`, `alt`, `left-alt`, `right-alt`, `left-ctrl`, `right-ctrl`,
+    and `option` (mac).
+  * The <kbd>space</kbd> key itself may be specified with `space`.
+  * To avoid confusion with modifier keys, the <kbd>+</kbd> key can be specified
+    with `plus`.
+
+  For example, the key sequence <kbd>x</kbd>, <kbd>j</kbd>, <kbd>m</kbd>,
+  <kbd>Shift</kbd>+<kbd>e</kbd>, <kbd>r</kbd> may be specified as
+  `x j m shift+e r` or `x j m E r`.
+
+`text`
+
+: `string`
+
+  The expected output when the `keys` are typed
+
+`note`
+
+: `string`
+
+  A brief explanation of the example, e.g. "Name of language"
 
 ### The LexicalModel object
 

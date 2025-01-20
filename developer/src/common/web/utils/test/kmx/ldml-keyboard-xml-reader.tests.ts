@@ -119,9 +119,31 @@ describe('ldml keyboard xml reader tests', function () {
         // 'hash' is an import but not implied
         assert.isFalse(ImportStatus.isImpliedImport(k.find(({id}) => id === 'hash')));
         assert.isTrue(ImportStatus.isImport(k.find(({id}) => id === 'hash')));
+        assert.isFalse(ImportStatus.isLocalImport(k.find(({id}) => id === 'hash')));
         // 'zz' is not imported
         assert.isFalse(ImportStatus.isImpliedImport(k.find(({id}) => id === 'zz')));
         assert.isFalse(ImportStatus.isImport(k.find(({id}) => id === 'zz')));
+      },
+    },
+    {
+      subpath: 'import-local.xml',
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['interrobang','snail']);
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
+          { id: 'interrobang', output: '‽' },
+          { id: 'snail', output: '@' },
+        ]);
+        // all of the keys are implied imports here
+        assert.isFalse(ImportStatus.isImpliedImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
+        assert.isTrue(ImportStatus.isImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
+        assert.isTrue(ImportStatus.isLocalImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
       },
     },
     {
@@ -136,11 +158,22 @@ describe('ldml keyboard xml reader tests', function () {
       ],
     },
     {
+      subpath: 'invalid-import-local.xml',
+      loadfail: true,
+      errors: [
+        CommonTypesMessages.Error_ImportReadFail({
+          base: undefined,
+          path: 'keys-Zyyy-DOESNOTEXIST.xml',
+          subtag: 'keys'
+        }),
+      ],
+    },
+    {
       subpath: 'invalid-import-path.xml',
       loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportInvalidPath({
-          base: null,
+          base: 'cldr',
           path: '45/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
           subtag: null,
         }),
@@ -151,7 +184,7 @@ describe('ldml keyboard xml reader tests', function () {
       loadfail: true,
       errors: [
         CommonTypesMessages.Error_ImportReadFail({
-          base: null,
+          base: 'cldr',
           path: '45/none-Zxxx-does-not-exist.xml',
           subtag: null,
         }),

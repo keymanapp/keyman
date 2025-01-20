@@ -92,7 +92,7 @@ function do_test() {
 
   readonly C8_THRESHOLD=60
 
-  # Excludes are defined in .c8rc.json
+  # Excludes are defined in package.json
   c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
