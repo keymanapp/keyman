@@ -277,17 +277,25 @@ verify_npm_setup() {
   popd > /dev/null
 }
 
+_print_expected_node_version() {
+"$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
+}
+
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
 _select_node_version_with_nvm() {
-  local REQUIRED_NODE_VERSION="$("$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json")"
+  local REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
+  local CURRENT_NODE_VERSION
 
   if [[ $BUILDER_OS != win ]]; then
     # launch nvm in a sub process, see _builder_nvm.sh for details
     "$KEYMAN_ROOT/resources/build/_builder_nvm.sh" "$REQUIRED_NODE_VERSION"
   else
-    nvm install "$REQUIRED_NODE_VERSION"
-    nvm use "$REQUIRED_NODE_VERSION"
+    CURRENT_NODE_VERSION="$(node --version)"
+    if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
+      start //wait //b nvm install "$REQUIRED_NODE_VERSION"
+      start //wait //b nvm use "$REQUIRED_NODE_VERSION"
+    fi
   fi
 
   # Now, check that the node version is correct, on all systems
@@ -296,7 +304,7 @@ _select_node_version_with_nvm() {
   # https://github.com/coreybutler/nvm-windows/issues/738
 
   # note the 'v' prefix that node emits (and npm doesn't!)
-  local CURRENT_NODE_VERSION="$(node --version)"
+  CURRENT_NODE_VERSION="$(node --version)"
   if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
     builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
   fi
@@ -306,13 +314,13 @@ check-markdown() {
   node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
 }
 
-# 
+#
 # Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
-# 
+#
 # Usage:
 #   builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
 # Parameters:
-#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests, 
+#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests,
 #                           defaults to 90 (percent)
 #
 # Todo:

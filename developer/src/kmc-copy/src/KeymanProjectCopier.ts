@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -86,6 +86,9 @@ export class KeymanProjectCopier implements KeymanCompiler {
   relocateExternalFiles: boolean = false; // TODO-COPY: support
 
   public async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
+    if(!callbacks || !options) {
+      return false;
+    }
     this.callbacks = callbacks;
     this.options = options;
     this.cloudSource = new KeymanCloudSource(this.callbacks);
@@ -97,7 +100,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * artifacts on success. The files are passed in by name, and the compiler
    * will use callbacks as passed to the {@link KeymanProjectCopier.init}
    * function to read any input files by disk.
-   * @param   source  Source file or folder to copy. Can be a local file or folder, github:repo[:path], or cloud:id
+   * @param   source  Source file or folder to copy. Can be a local file or folder, https://github.com/.../repo[/path], or cloud:id
    * @returns         Binary artifacts on success, null on failure.
    */
   public async run(source: string): Promise<CopierResult> {
@@ -151,10 +154,10 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * @returns  path to .kpj (either local or remote)
    */
   private async getSourceProject(source: string): Promise<string | GitHubRef> {
-    if(source.startsWith('github:')) {
-      // `github:owner/repo:path/to/kpj`, referencing a .kpj file
+    if(source.match(GitHubUrls.GITHUB_URI_OPTIONAL_PROTOCOL) || source.match(GitHubUrls.GITHUB_RAW_URI)) {
+      // `[https://]github.com/owner/repo/[tree|blob|raw]/[refs/...]/branch/path/to/kpj`, referencing a .kpj file
       return await this.getGitHubSourceProject(source);
-    } else if(source.startsWith('cloud:')) {
+    } else if(source.match(CloudUrls.CLOUD_URI) || source.match(CloudUrls.KEYMANCOM_CLOUD_URI)) {
       // `cloud:id`, referencing a Keyman Cloud keyboard
       return await this.getCloudSourceProject(source);
     } else if(this.callbacks.fs.existsSync(source) && source.endsWith(KeymanFileTypes.Source.Project) && !this.callbacks.isDirectory(source)) {
@@ -194,43 +197,44 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
   /**
    * Resolve path to GitHub source, which must be in the following format:
-   *   `github:owner/repo[:branch]:path/to/kpj`
+   *   `[https://]github.com/owner/repo/branch/path/to/kpj`
    * The path must be fully qualified, referencing the .kpj file; it
    * cannot just be the folder where the .kpj is found
    * @param source
    * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
    */
   private async getGitHubSourceProject(source: string): Promise<GitHubRef> {
-    const parts = source.split(':');
-    if(parts.length < 3 || parts.length > 4 || !parts[1].match(/^[a-z0-9-]+\/[a-z0-9._-]+$/i)) {
-      // https://stackoverflow.com/questions/59081778/rules-for-special-characters-in-github-repository-name
-      this.callbacks.reportMessage(CopierMessages.Error_InvalidGitHubSource({source}));
-      return null;
+    const parts: GitHubUrls.GitHubRegexMatchArray =
+      GitHubUrls.GITHUB_URI_OPTIONAL_PROTOCOL.exec(source) ??
+      GitHubUrls.GITHUB_RAW_URI.exec(source);
+    if(!parts) {
+      throw new Error('Expected GITHUB_URI_OPTIONAL_PROTOCOL or GITHUB_RAW_URI to match');
     }
 
-    const origin = parts[1].split('/');
+    const ref: GitHubRef = new GitHubRef(parts);
 
-    const ref: GitHubRef = new GitHubRef({
-      owner: origin[0],
-      repo: origin[1],
-      branch: null,
-      path: null
-    });
-
-    if(parts.length == 4) {
-      ref.branch = parts[2];
-      ref.path = parts[3];
-    } else {
+    if(!ref.branch) {
       ref.branch = await this.cloudSource.getDefaultBranchFromGitHub(ref);
       if(!ref.branch) {
         this.callbacks.reportMessage(CopierMessages.Error_CouldNotFindDefaultBranchOnGitHub({ref: ref.toString()}));
         return null;
       }
-      ref.path = parts[2];
-
+    }
+    if(!ref.path) {
+      ref.path = '/';
     }
     if(!ref.path.startsWith('/')) {
       ref.path = '/' + ref.path;
+    }
+
+    if(ref.path != '/') {
+      if(!ref.path.endsWith('.kpj')) {
+        // Assumption, project filename matches folder name
+        if(ref.path.endsWith('/')) {
+          ref.path = ref.path.substring(0, ref.path.length-1);
+        }
+        ref.path = ref.path + '/' + this.callbacks.path.basename(ref.path) + '.kpj';
+      }
     }
 
     return ref;
@@ -239,19 +243,23 @@ export class KeymanProjectCopier implements KeymanCompiler {
   /**
    * Resolve path to Keyman Cloud source (which is on GitHub), which must be in
    * the following format:
-   *   `cloud:keyboard_id|model_id`
+   *   `cloud:keyboard_id`, or
+   *   `cloud:model_id`, or
+   *   `https://keyman.com/keyboards/keyboard_id`
    * The `keyboard_id` parameter should be a valid id (a-z0-9_), as found at
-   * https://keyman.com/keyboards; alternativel if it is a model_id, it should
+   * https://keyman.com/keyboards; alternatively if it is a model_id, it should
    * have the format author.bcp47.uniq
    * @param source
    * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
    */
   private async getCloudSourceProject(source: string): Promise<GitHubRef> {
-    const parts = source.split(':');
-    const id = parts[1];
+    const parts = CloudUrls.CLOUD_URI.exec(source) ?? CloudUrls.KEYMANCOM_CLOUD_URI.exec(source);
+    if(!parts) {
+      throw new Error('Expected CLOUD_URI or KEYMANCOM_CLOUD_URI to match');
+    }
 
+    const id: string = parts.groups.id;
     const isModel = /^[^.]+\.[^.]+\.[^.]+$/.test(id);
-
     const remote = await this.cloudSource.getSourceFromKeymanCloud(id, isModel);
     if(!remote) {
       return null;
@@ -687,4 +695,11 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
   /* c8 ignore stop */
+
+  /** @internal */
+  public unitTestEndPoints = {
+    getGithubSourceProject: this.getGitHubSourceProject.bind(this),
+    getCloudSourceProject: this.getCloudSourceProject.bind(this)
+  };
+
 }

@@ -102,28 +102,35 @@ typedef struct {
 
 -------------------------------------------------------------------------------
 
-# km_core_keyboard_load() {#km_core_keyboard_load}
+# km_core_keyboard_load_from_blob() {#km_core_keyboard_load_from_blob}
 
 ## Description
 
-Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
-into the out paramter.
+Parse and load a keyboard from the supplied blob and return a pointer to the
+loaded keyboard in the out parameter.
 
 ## Specification
 
 ```c
 KMN_API
 km_core_status
-km_core_keyboard_load(km_core_path_name kb_path,
-                     km_core_keyboard **keyboard);
+km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
+                                const void* blob,
+                                const size_t blob_size,
+                                km_core_keyboard** keyboard);
 
 ```
 
 ## Parameters
 
-`kb_path`
-: On Windows, a UTF-16 string; on other platforms, a C string:
-  contains a valid path to the keyboard file.
+`kb_name`
+: a string with the name of the keyboard.
+
+`blob`
+: a byte array containing the content of a KMX/KMX+ file.
+
+`blob_size`
+: a size_t variable with the size of the blob in bytes.
 
 `keyboard`
 : A pointer to result variable: A pointer to the opaque keyboard
@@ -154,7 +161,7 @@ km_core_keyboard_load(km_core_path_name kb_path,
 ## Description
 
 Free the allocated memory belonging to an opaque keyboard object previously
-returned by [km_core_keyboard_load].
+returned by [km_core_keyboard_load_from_blob].
 
 ## Specification
 
@@ -637,7 +644,7 @@ km_core_state_to_json(km_core_state const *state,
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
-[km_core_keyboard_load]: keyboards#km_core_keyboard_load "km_core_keyboard_load function"
+[km_core_keyboard_load_from_blob]: keyboards#km_core_keyboard_load_from_blob "km_core_keyboard_load_from_blob function"
 [km_core_keyboard_dispose]: keyboards#km_core_keyboard_dispose "km_core_keyboard_dispose function"
 [km_core_keyboard_get_attrs]: keyboards#km_core_keyboard_get_attrs "km_core_keyboard_get_attrs function"
 [km_core_keyboard_get_key_list]: keyboards#km_core_keyboard_get_key_list "km_core_keyboard_get_key_list function"

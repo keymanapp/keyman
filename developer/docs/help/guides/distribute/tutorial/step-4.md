@@ -54,7 +54,7 @@ Website
 
 :   Enter the name of the website where you will have information about
     this keyboard. If you want to host it on keyman.com, you could enter
-    `http://www.keyman.com/`
+    `https://keyman.com/`
 
 Image file
 :   Select the splash image file that you created in Step 2 from the

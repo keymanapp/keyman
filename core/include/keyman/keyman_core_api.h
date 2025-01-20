@@ -1096,58 +1096,6 @@ typedef struct {
 
 -------------------------------------------------------------------------------
 
-# km_core_keyboard_load()
-
-## Description
-
-DEPRECATED: use [km_core_keyboard_load_from_blob] instead.
-
-Parse and load keyboard from the supplied path and a pointer to the loaded keyboard
-into the out parameter.
-
-## Specification
-
-```c */
-// TODO-web-core: Deprecate this function (#12497)
-// KMN_DEPRECATED_API
-KMN_API
-km_core_status
-km_core_keyboard_load(km_core_path_name kb_path,
-                     km_core_keyboard **keyboard);
-
-/*
-```
-
-## Parameters
-
-`kb_path`
-: On Windows, a UTF-16 string; on other platforms, a C string:
-  contains a valid path to the keyboard file.
-
-`keyboard`
-: A pointer to result variable: A pointer to the opaque keyboard
-  object returned by the Processor. This memory must be freed with a
-  call to [km_core_keyboard_dispose].
-
-## Returns
-
-`KM_CORE_STATUS_OK`
-: On success.
-
-`KM_CORE_STATUS_NO_MEM`
-: In the event an internal memory allocation fails.
-
-`KM_CORE_STATUS_IO_ERROR`
-: In the event the keyboard file is unparseable for any reason
-
-`KM_CORE_STATUS_INVALID_ARGUMENT`
-: In the event the file doesn't exist or is inaccesible or `keyboard` is null.
-
-`KM_CORE_STATUS_OS_ERROR`
-: Bit 31 (high bit) set, bits 0-30 are an OS-specific error code.
-
--------------------------------------------------------------------------------
-
 # km_core_keyboard_load_from_blob()
 
 ## Description
@@ -1207,7 +1155,7 @@ km_core_status km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
 ## Description
 
 Free the allocated memory belonging to an opaque keyboard object previously
-returned by [km_core_keyboard_load].
+returned by [km_core_keyboard_load_from_blob].
 
 ## Specification
 
