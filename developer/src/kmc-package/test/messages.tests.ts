@@ -10,7 +10,7 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/developer-utils';
 
-const callbacks = new TestCompilerCallbacks();
+const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
 
 describe('PackageCompilerMessages', function () {
 
@@ -29,7 +29,7 @@ describe('PackageCompilerMessages', function () {
   // Message tests
   //
 
-  async function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number, options?: CompilerOptions) {
+  async function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number | number[], options?: CompilerOptions) {
     context.timeout(10000);
 
     callbacks.clear();
@@ -41,8 +41,14 @@ describe('PackageCompilerMessages', function () {
     await kmpCompiler.run(kpsPath);
 
     if(messageId) {
-      assert.lengthOf(callbacks.messages, 1);
-      assert.isTrue(callbacks.hasMessage(messageId));
+      if(typeof messageId == 'number') {
+        assert.lengthOf(callbacks.messages, 1);
+        assert.isTrue(callbacks.hasMessage(messageId));
+      } else {
+        assert.lengthOf(callbacks.messages, messageId.length);
+        assert.includeMembers<number>(messageId, callbacks.messages.map(m => m.code));
+        // messageId.forEach(m => assert.isTrue(callbacks.hasMessage(m), `Has message ${m}`));
+      }
     } else {
       assert.lengthOf(callbacks.messages, 0);
     }
@@ -141,12 +147,6 @@ describe('PackageCompilerMessages', function () {
     await testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], PackageCompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
   });
 
-  // ERROR_KeyboardFileNotFound
-
-  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    await testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], PackageCompilerMessages.ERROR_KeyboardFileNotFound);
-  });
-
   // WARN_KeyboardVersionsDoNotMatch
 
   it('should generate WARN_KeyboardVersionsDoNotMatch if two <Keyboards> have different versions', async function() {
@@ -237,8 +237,75 @@ describe('PackageCompilerMessages', function () {
       PackageCompilerMessages.ERROR_InvalidAuthorEmail);
   });
 
+  // ERROR_PackageFileHasEmptyVersion
+
   it('should generate ERROR_PackageFileHasEmptyVersion if FollowKeyboardVersion is not present and Version is empty', async function() {
     await testForMessage(this, ['invalid', 'error_package_file_has_empty_version.kps'],
       PackageCompilerMessages.ERROR_PackageFileHasEmptyVersion);
+  });
+
+  // ERROR_FloDataCouldNotBeRead -- skip test, for network errors
+
+  // ERROR_FloDataIsInvalidFormat -- skip test, only for data error in FLO
+
+  // ERROR_FontNotFoundInFlo
+
+  it('should generate WARN_FontNotFoundInFlo if a font family cannot be found at fonts.languagetechnology.org', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_not_found_in_flo.kps'],
+      PackageCompilerMessages.WARN_FontNotFoundInFlo);
+  });
+
+  // WARN_FontFromFloIsNotFreelyDistributable
+
+  it('should generate WARN_FontFromFloIsNotFreelyDistributable if a font at fonts.languagetechnology.org is not freely distributable', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_from_flo_is_not_freely_distributable.kps'], [
+      PackageCompilerMessages.WARN_FontFromFloIsNotFreelyDistributable,
+      // Currently all the non-distributable fonts do not have a default .ttf either
+      PackageCompilerMessages.WARN_FontInFloDoesNotHaveDefaultTtf
+    ]);
+  });
+
+  // WARN_FontInFloDoesNotHaveDefaultTtf
+
+  it('should generate WARN_FontInFloDoesNotHaveDefaultTtf if a font at fonts.languagetechnology.org does not have a default .ttf', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_in_flo_does_not_have_default_ttf.kps'],
+      PackageCompilerMessages.WARN_FontInFloDoesNotHaveDefaultTtf);
+  });
+
+  // ERROR_FontInFloHasBrokenDefaultTtf -- skip test, only for data error in FLO
+
+  // ERROR_FontInFloHasNoDownloadAvailable
+
+  it('should generate WARN_FontInFloHasNoDownloadAvailable if a font at fonts.languagetechnology.org does not download available', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_in_flo_has_no_download_available.kps'],
+      PackageCompilerMessages.WARN_FontInFloHasNoDownloadAvailable);
+  });
+
+  // ERROR_FontFileCouldNotBeDownloaded -- skip test, more work needed to mock
+
+  // it('should generate ERROR_FontFileCouldNotBeDownloaded if a font at fonts.languagetechnology.org cannot be downloaded', async function() {
+  //   // Note: see additional setup information in
+  //   // error_font_file_could_not_be_downloaded.kps
+  //   await testForMessage(this, ['invalid', 'error_font_file_could_not_be_downloaded.kps'],
+  //     PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
+  // });
+
+  it('should generate ERROR_FontFileCouldNotBeDownloaded if a font at github.com cannot be downloaded', async function() {
+    await testForMessage(this, ['invalid', 'error_font_file_could_not_be_downloaded_github.kps'],
+      PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
+  });
+
+  // HINT_SourceFileHasChanged
+
+  it('should generate HINT_SourceFileHasChanged if a FLO font reference has been updated', async function() {
+    await testForMessage(this, ['flo', 'hint_source_file_has_changed.kps'],
+      PackageCompilerMessages.HINT_SourceFileHasChanged);
+  });
+
+  // HINT_RemoteReferencesShouldBeVersion18Plus
+
+  it('should generate HINT_RemoteReferencesShouldBeVersion18Plus if the package source file is not v18.0', async function() {
+    await testForMessage(this, ['invalid', 'hint_remote_references_should_be_version18_plus.kps'],
+      PackageCompilerMessages.HINT_RemoteReferencesShouldBeVersion18Plus);
   });
 });

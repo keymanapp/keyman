@@ -159,7 +159,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       // Errors will have been emitted by KmpCompiler
       return null;
     }
-    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(sources.kpsFilename);
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(sources.kpsFilename) ?? {};
     if(!kmpJsonData) {
       // Errors will have been emitted by KmpCompiler
       return null;
