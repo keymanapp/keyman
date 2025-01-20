@@ -1021,9 +1021,16 @@ begin
   for i := 0 to High(Params.Packages) do
   begin
     PackageFullPath := SavePath + Params.Packages[i].FileName;
+    if not FileExists(PackageFullPath) then
+    begin
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'File does not exist:"' + PackageFullPath + '"');
+      Continue;
+    end;
     if not DoInstallPackage(PackageFullPath) then // I2742
     begin
-      KL.Log('Installing Package failed' + PackageFullPath);
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Installing Package failed"' + PackageFullPath + '"');
     end;
   end;
   Result := True;
