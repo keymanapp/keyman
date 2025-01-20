@@ -77,7 +77,7 @@
   
   // whenever the OSK is closing clear all of its modifier keys
   [self.oskView clearOskModifiers];
-  [KMSentryHelper addOskVisibleTag:@"false"];
+  [KMSentryHelper addOskVisibleTag:NO];
 }
 
 - (void)helpAction:(id)sender {

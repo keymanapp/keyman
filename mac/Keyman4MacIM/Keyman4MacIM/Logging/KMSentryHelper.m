@@ -12,17 +12,23 @@
 @implementation KMSentryHelper
 
 NSString * const kApiComplianceTagName = @"apiCompliance";
+NSString * const kArchitectureTagName = @"architecture";
 NSString * const kOskVisibleTagName = @"oskVisible";
 NSString * const kClientAppIdTagName = @"clientAppId";
 NSString * const kKeyboardTagName = @"keyboard";
 NSString * const kHasAccessibilityTagName = @"accessibilityEnabled";
+NSString * const kActiveKeyboardCountTagName = @"activeKeyboardCount";
 
 + (void)addApiComplianceTag: (NSString *)value {
   [self addCustomTag:kApiComplianceTagName withValue:value];
 }
 
-+ (void)addOskVisibleTag:(NSString *)value {
-  [self addCustomTag:kOskVisibleTagName withValue:value];
++ (void)addArchitectureTag: (NSString *)value {
+  [self addCustomTag:kArchitectureTagName withValue:value];
+}
+
++ (void)addOskVisibleTag:(BOOL)value {
+  [self addCustomTag:kOskVisibleTagName withValue:value?@"true":@"false"];
 }
 
 + (void)addClientAppIdTag:(NSString *)value {
@@ -33,8 +39,12 @@ NSString * const kHasAccessibilityTagName = @"accessibilityEnabled";
   [self addCustomTag:kKeyboardTagName withValue:value];
 }
 
-+ (void)addHasAccessibilityTag:(NSString *)value {
-  [self addCustomTag:kHasAccessibilityTagName withValue:value];
++ (void)addHasAccessibilityTag:(BOOL)value {
+  [self addCustomTag:kHasAccessibilityTagName withValue:value?@"true":@"false"];
+}
+
++ (void)addActiveKeyboardCountTag:(NSUInteger)value {
+  [self addCustomTag:kActiveKeyboardCountTagName withValue:[[NSNumber numberWithUnsignedLong:value] stringValue]];
 }
 
 /**

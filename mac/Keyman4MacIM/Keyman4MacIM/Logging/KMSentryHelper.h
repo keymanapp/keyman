@@ -12,10 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KMSentryHelper : NSObject
 
 + (void)addApiComplianceTag: (NSString *)value;
-+ (void)addOskVisibleTag:(NSString *)value;
++ (void)addArchitectureTag: (NSString *)value;
++ (void)addOskVisibleTag:(BOOL)value;
 + (void)addClientAppIdTag:(NSString *)value;
 + (void)addKeyboardTag:(NSString *)value;
-+ (void)addHasAccessibilityTag:(NSString *)value;
++ (void)addHasAccessibilityTag:(BOOL)value;
++ (void)addActiveKeyboardCountTag:(NSUInteger)value;
 + (void)addBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addDetailedBreadCrumb:(NSString *)category message:(NSString *)messageText data:( NSDictionary *) map;

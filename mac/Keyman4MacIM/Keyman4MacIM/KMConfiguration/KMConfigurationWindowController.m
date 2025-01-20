@@ -361,18 +361,19 @@
 - (void)checkBoxAction:(id)sender {
   NSButton *checkBox = (NSButton *)sender;
   NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
+  NSString * kmxFileName = [kmxFilePath lastPathComponent];
   NSString *partialPath = [KMDataRepository.shared trimToPartialPath:kmxFilePath];
   os_log_debug([KMLogs uiLog], "checkBoxAction, kmxFilePath = %{public}@ for checkBox.tag %li, partialPath = %{public}@", kmxFilePath, checkBox.tag, partialPath);
   if (checkBox.state == NSOnState) {
-    os_log_debug([KMLogs uiLog], "enabling active keyboard: %{public}@", kmxFilePath);
-    NSString *message = [NSString stringWithFormat:@"enabling active keyboard: %@", kmxFilePath];
+    os_log_debug([KMLogs uiLog], "enabling active keyboard: %{public}@", kmxFileName);
+    NSString *message = [NSString stringWithFormat:@"enabling active keyboard: %@", kmxFileName];
     [KMSentryHelper addUserBreadCrumb:@"config" message:message];
     [self.activeKeyboards addObject:partialPath];
     [self saveActiveKeyboards];
   }
   else if (checkBox.state == NSOffState) {
-    os_log_debug([KMLogs uiLog], "disabling active keyboard: %{public}@", kmxFilePath);
-    NSString *message = [NSString stringWithFormat:@"disabling active keyboard: %@", kmxFilePath];
+    os_log_debug([KMLogs uiLog], "disabling active keyboard: %{public}@", kmxFileName);
+    NSString *message = [NSString stringWithFormat:@"disabling active keyboard: %@", kmxFileName];
     [KMSentryHelper addUserBreadCrumb:@"config" message:message];
     [self.activeKeyboards removeObject:partialPath];
     [self saveActiveKeyboards];
@@ -423,21 +424,23 @@
     [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, keyboardName]];
   }
   
-  os_log_debug([KMLogs testLog], "entered removeAction for keyboardName: %{public}@", keyboardName);
+  os_log_debug([KMLogs configLog], "entered removeAction for keyboardName: %{public}@", keyboardName);
 
   [self.deleteAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
     if (returnCode == NSAlertFirstButtonReturn) {
       os_log_debug([KMLogs uiLog], "confirm delete keyboard alert dismissed");
       [self deleteFileAtIndex:[NSNumber numberWithInteger:deleteButton.tag]];
       
-      os_log_debug([KMLogs testLog], "removeAction for keyboardName: %{public}@", keyboardName);
-      [KMSentryHelper addBreadCrumb:@"configure" message:[NSString stringWithFormat:@"remove keyboard: %@", keyboardName]];
+      os_log_debug([KMLogs configLog], "removeAction for keyboardName: %{public}@", keyboardName);
+      [KMSentryHelper addUserBreadCrumb:@"configure" message:[NSString stringWithFormat:@"remove keyboard: %@", keyboardName]];
     }
     self.deleteAlertView = nil;
   }];
 }
 
 - (IBAction)downloadAction:(id)sender {
+  [KMSentryHelper addUserBreadCrumb:@"user" message:@"download keyboard"];
+
   if (self.AppDelegate.infoWindow_.window != nil)
     [self.AppDelegate.infoWindow_ close];
   

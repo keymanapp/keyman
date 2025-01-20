@@ -45,7 +45,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   _queuedText = nil;
 
   [KMSentryHelper addClientAppIdTag:clientAppId];
-
   return self;
 }
 
@@ -139,9 +138,11 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   NSString *sentryCommand = event.characters;
   if ([sentryCommand isEqualToString:@"{"]) {
     os_log_debug([KMLogs testLog], "forceSentryEvent: forcing crash now");
+    NSBeep();
     [SentrySDK crash];
   } else if ([sentryCommand isEqualToString:@"["]) {
     os_log_debug([KMLogs testLog], "forceSentryEvent: forcing message now");
+    NSBeep();
     [SentrySDK captureMessage:@"Forced test message"];
   } else {
     os_log_debug([KMLogs testLog], "forceSentryEvent: unrecognized command");
@@ -162,7 +163,8 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  */
 - (void)handleBackspace:(NSEvent *)event {
   os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
-  
+  [KMSentryHelper addBreadCrumb:@"user" message:@"handle backspace for non-compliant app"];
+
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
     self.lowLevelBackspaceCount++;
@@ -218,6 +220,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   [self handleContextChangedByLowLevelEvent];
   
   if (event.type == NSEventTypeKeyDown) {
+    [KMSentryHelper addBreadCrumb:@"event" message:@"handling keydown event"];
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
@@ -410,6 +413,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     NSString *value = [options objectForKey:key];
     if(key && value) {
       os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
+      [KMSentryHelper addBreadCrumb:@"event" message:@"persist options"];
       [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {
