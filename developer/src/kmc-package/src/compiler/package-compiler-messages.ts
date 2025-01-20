@@ -164,5 +164,25 @@ export class PackageCompilerMessages {
   static Error_RequiredParameterMissing = (o:{param: string}) => m(
     this.ERROR_RequiredParameterMissing, `Source parameter '${def(o.param)}' is required.`
   );
+
+  static WARN_CannotFindMatchingKeyboardForVisualKeyboard = SevWarn | 0x0023;
+  static Warn_CannotFindMatchingKeyboardForVisualKeyboard = (o:{filename: string}) => m(
+    this.WARN_CannotFindMatchingKeyboardForVisualKeyboard, `Cannot find matching keyboard for visual keyboard file '${def(o.filename)}'.`
+  );
+
+  static WARN_CannotFindFontForKeyboard = SevWarn | 0x0024;
+  static Warn_CannotFindFontForKeyboard = (o:{id: string, fontFilename: string}) => m(
+    this.WARN_CannotFindFontForKeyboard, `Cannot find font file '${def(o.fontFilename)}' for keyboard '${def(o.id)}'.`
+  );
+
+  static WARN_CannotReadFont = SevWarn | 0x0025;
+  static Warn_CannotReadFont = (o:{fontFilename: string}) => m(
+    this.WARN_CannotReadFont, `Cannot parse font file '${def(o.fontFilename)}' to get facename.`
+  );
+
+  static WARN_VisualKeyboardFileIsInvalid = SevWarn | 0x0026;
+  static Warn_VisualKeyboardFileIsInvalid = (o:{filename: string}) => m(
+    this.WARN_VisualKeyboardFileIsInvalid, `Visual keyboard file '${def(o.filename)}' is invalid.`
+  );
 }
 

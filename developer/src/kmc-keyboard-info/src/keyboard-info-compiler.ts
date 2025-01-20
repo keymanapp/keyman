@@ -12,7 +12,7 @@ import { CompilerCallbacks, KeymanCompiler, CompilerOptions, KeymanCompilerResul
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
-import { getFontFamily } from "./font-family.js";
+import { getFontFamily } from "@keymanapp/developer-utils";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
