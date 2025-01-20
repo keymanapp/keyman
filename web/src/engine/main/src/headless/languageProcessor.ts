@@ -21,6 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
+  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
 
   private _state: StateChangeEnum = 'inactive';
 
@@ -400,6 +401,14 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public set mayCorrect(flag: boolean) {
     this._mayCorrect = flag;
+  }
+
+  public get mayAutoCorrect() {
+    return this._mayAutoCorrect;
+  }
+
+  public set mayAutoCorrect(flag: boolean) {
+    this._mayAutoCorrect = flag;
   }
 
   public get wordbreaksAfterSuggestions() {

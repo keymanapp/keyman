@@ -131,7 +131,9 @@ Character Keys"). Typically, you would use only the "common" virtual key
 
 - `U_####[_####]` is used as a shortcut for a key that will output those
   Unicode values, if no rule matches it. This is similar to the overloaded
-  behaviour for `K_` ids. Thus `####` must be valid Unicode characters. E.g.
+  behaviour for `K_` ids. Thus `####` must be valid Unicode characters. 
+  The square bracket characters `[` and `]` indicate an optional portion of the sequence
+  and are not to be included in the shortcut. E.g.
   `U_0259` would generate a schwa if no rule matches. It is still valid to
   have a rule such as `+ [U_0259] > ...`
 
