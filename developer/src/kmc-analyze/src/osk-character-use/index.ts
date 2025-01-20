@@ -216,6 +216,9 @@ export class AnalyzeOskCharacterUse {
         for(let row of layer.row) {
           for(let key of row.key) {
             scanKey(key);
+            if(key.hint && !key.hint.match(/^\*.+\*$/)) {
+              strings.push(this.cleanString(key.hint));
+            }
             let f: keyof TouchLayout.TouchLayoutFlick;
             for(f in key.flick ?? {}) {
               scanKey(key.flick[f]);

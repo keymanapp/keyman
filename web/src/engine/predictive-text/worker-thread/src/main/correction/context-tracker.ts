@@ -309,9 +309,15 @@ interface ContextMatchResult {
   /**
    * Indicates the portion of the incoming keystroke data, if any, that applies to
    * tokens before the last pre-caret token and thus should not be replaced by predictions
-   * based upon `state`.
+   * based upon `state`.  If the provided context state + the incoming transform do not 
+   * adequately match the current context, the match attempt will fail with a `null` result.
    *
-   * Should always be non-null if the token before the caret did not previously exist.
+   * Should generally be non-null if the token before the caret did not previously exist.
+   * 
+   * The result may be null if it does not match the prior context state or if bookkeeping 
+   * based upon it is problematic - say, if wordbreaking effects shift due to new input, 
+   * causing a mismatch with the prior state's tokenization.  
+   * (Refer to #12494 for an example case.)
    */
   preservationTransform?: Transform;
 }
@@ -425,17 +431,35 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       }
       const transformDistIndex = i - (lastMatch + 1);
       const tokenDistribution = transformSequenceDistribution.map((entry) => {
+        const sample = entry.sample[transformDistIndex];
+        if(!sample) {
+          return null;
+        }
         return {
-          sample: entry.sample[transformDistIndex],
+          sample,
           p: entry.p
         };
       });
+
+      const incomingToken = tokenizedContext[i - poppedTokenCount];
 
       // If the tokenized part of the input is a completely empty transform,
       // replace it with null.  This can happen with our default wordbreaker
       // immediately after a whitespace.  We don't want to include this
       // transform as part of the input when doing correction-search.
       let primaryInput = hasDistribution ? tokenDistribution[0]?.sample : null;
+
+      // If the incoming token has text but we have no transform to match it with,
+      // abort the matching attempt.  We can't match this case well yet.
+      // These cases are generally infrequent enough to be low-ROI, not worth the
+      // investment to optimize further.  (Doing so isn't the simplest.)
+      //
+      // This may happen if tokenization for pre-existing text changes due to incoming
+      // input - refer to #12494 for an example case.
+      if(!primaryInput && incomingToken.text != '') {
+        return null;
+      }
+
       if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
         primaryInput = null;
       }
@@ -451,7 +475,6 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       }
       const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
 
-      const incomingToken = tokenizedContext[i - poppedTokenCount]
       switch(editPath[i]) {
         case 'substitute':
           if(isLastToken) {

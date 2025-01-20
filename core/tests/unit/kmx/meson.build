@@ -139,7 +139,10 @@ foreach kbd : tests
   cfg.set('CONTENT', content)
 
   kbd_kmn = configure_file(
-    copy: true,
+    # not really a file that needs to be configured, but the `copy` parameter
+    # is deprecated and `fs.copyfile` doesn't work with files that are not in
+    # the source directory
+    configuration: cfg,
     input: kbd_src_path,
     output: kbd + '.kmn'
   )

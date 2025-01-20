@@ -58,7 +58,7 @@ welcome.htm
     > ### Tip
     If you want links to your website to open in the user's preferred
     browser, preface the href link with `link:`, e.g.
-    `<a href="http://keyman.com/">website</a>`  
+    `<a href="https://keyman.com/">website</a>`  
     The `link:` sceheme will open the referred file in the default
     application - that is, a web browser for URLs and links, Notepad for
     .txt files, Adobe Reader for PDFs. You can use `link:` to open any
