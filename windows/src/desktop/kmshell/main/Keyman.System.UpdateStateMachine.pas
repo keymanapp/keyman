@@ -996,17 +996,28 @@ function InstallingState.DoInstallPackage(PackageFileName: String): Boolean;
 var
   FPackage: IKeymanPackageFile2;
 begin
-  Result := True;
-  FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
-    as IKeymanPackageFile2;
-  FPackage.Install2(True);
-  // Force overwrites existing package and leaves most settings for it intact
+  Result := False;
+  try
+    FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
+      as IKeymanPackageFile2;
+      // Force overwrites existing package and leaves most settings for it intact
+    FPackage.Install2(True);
+    Result := True;
+  except
+    on E: Exception do
+      begin
+        TKeymanSentryClient.ReportHandledException(E,
+          'Failed to install keyboard package');
+      end;
+  end;
+
   FPackage := nil;
-
-  kmcom.Refresh;
-  kmcom.Apply;
-
-  System.SysUtils.DeleteFile(PackageFileName);
+  if Result then
+  begin
+    kmcom.Refresh;
+    kmcom.Apply;
+    System.SysUtils.DeleteFile(PackageFileName);
+  end;
 
 end;
 
