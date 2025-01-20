@@ -6,6 +6,9 @@ import { ContextTracker, TrackedContextState } from './correction/context-tracke
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbreakers';
+const searchForProperty = defaultWordbreaker.searchForProperty;
+
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -590,6 +593,35 @@ export function processSimilarity(
   });
 }
 
+/**
+ * This function may be used to prevent auto-selection/auto-correct from applying in
+ * unexpected ways.  For example, when typing numbers in English, we don't expect
+ * '5' to auto-correct to '5th' just because there are no pure-number entries in
+ * the lexicon rooted on '5'.
+ * @param correction 
+ * @returns 
+ */
+export function correctionValidForAutoSelect(correction: string) {
+  let chars = [...correction];
+  
+  // If the _correction_ - the actual, existing text - does not include any letters,
+  // then predictions built upon it should not be considered valid for auto-correction.
+  for(let c of chars) {
+    // Found even one letter?  We'll consider it valid.
+    switch(searchForProperty(c.codePointAt(0))) {
+      case WordBreakProperty.ALetter:
+      case WordBreakProperty.Hebrew_Letter:
+      case WordBreakProperty.Katakana:
+        return true;
+      default:
+    }
+  }
+
+  // Only reached when the correction has nothing that passes as a letter in-context.
+  // (MidLet and MidNumLet only count when there are adjacent letters.)
+  return false;
+}
+
 export function predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
   if(suggestionDistribution.length == 0) {
     return;
@@ -608,6 +640,11 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   suggestionDistribution = suggestionDistribution.slice(1);
 
   if(suggestionDistribution.length == 1) {
+    // Prevent auto-acceptance when the root doesn't meet validation criteria.
+    if(!correctionValidForAutoSelect(suggestionDistribution[0].correction.sample)) {
+      return;
+    }
+
     // Mark for auto-acceptance; there are no alternatives.
     suggestionDistribution[0].prediction.sample.autoAccept = true;
     return;
@@ -648,6 +685,10 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   }, 0);
   const proportionOfBest = bestSuggestion.totalProb / probSum;
   if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
+    return;
+  }
+
+  if(!correctionValidForAutoSelect(bestSuggestion.correction.sample)) {
     return;
   }
 
