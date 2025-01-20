@@ -1,18 +1,21 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, MarkerParser } from '@keymanapp/common-types';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { KMXPlus } from "@keymanapp/common-types";
 
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 
 import DependencySections = KMXPlus.DependencySections;
 import Disp = KMXPlus.Disp;
 import DispItem = KMXPlus.DispItem;
-import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
+import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
-  static validateMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker): boolean {
-    keyboard.displays?.display?.forEach(({ output }) =>
-      mt.add(MarkerUse.match, MarkerParser.allReferences(output)));
+  static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions): boolean {
+    keyboard.displays?.display?.forEach(({ display, output }) => {
+      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output);
+      st.addStringSubstitution(SubstitutionUse.emit, display);
+    });
     // no marker references in 'id'
     return true;
   }
@@ -30,18 +33,18 @@ export class DispCompiler extends SectionCompiler {
     if (this.keyboard3.displays?.display) {
       for (const { output, keyId } of this.keyboard3.displays?.display) {
         if ((output && keyId) || (!output && !keyId)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }));
           return false;
         } else if (output) {
           if (tos.has(output)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ output }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ output }));
             return false;
           } else {
             tos.add(output);
           }
         } else if (keyId) {
           if (ids.has(keyId)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ keyId }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ keyId }));
             return false;
           } else {
             ids.add(keyId);

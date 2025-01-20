@@ -1,11 +1,12 @@
 import { DeviceSpec } from '@keymanapp/web-utils';
-import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
+import type { PredictionContext, StateChangeEnum } from 'keyman/engine/interfaces';
 import { ImageBanner } from './imageBanner.js';
 import { SuggestionBanner } from './suggestionBanner.js';
 import { BannerView } from './bannerView.js';
 import { Banner } from './banner.js';
 import { BlankBanner } from './blankBanner.js';
 import { HTMLBanner } from './htmlBanner.js';
+import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 
 export class BannerController {
   private container: BannerView;
@@ -15,6 +16,9 @@ export class BannerController {
   private readonly hostDevice: DeviceSpec;
 
   private _inactiveBanner: Banner;
+
+  private keyboard: Keyboard;
+  private keyboardStub: KeyboardProperties;
 
   /**
    * Builds a banner for use when predictions are not active, supporting a single image.
@@ -64,8 +68,6 @@ export class BannerController {
    * @param on   Whether prediction is active (`true`) or disabled (`false`).
    */
   public activateBanner(on: boolean) {
-    let banner: Banner;
-
     const oldBanner = this.container.banner;
     if(oldBanner instanceof SuggestionBanner) {
       // Frees all handlers, etc registered previously by the banner.
@@ -75,9 +77,8 @@ export class BannerController {
     if(!on) {
       this.container.banner = this.inactiveBanner;
     } else {
-      let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
+      let suggestBanner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
       suggestBanner.predictionContext = this.predictionContext;
-      suggestBanner.events.on('apply', (selection) => this.predictionContext.accept(selection.suggestion));
 
       // Registers for prediction-engine events & handles its needed connections.
       this.container.banner = suggestBanner;
@@ -92,6 +93,23 @@ export class BannerController {
   selectBanner(state: StateChangeEnum) {
     // Only display a SuggestionBanner when LanguageProcessor states it is active.
     this.activateBanner(state == 'active' || state == 'configured');
+
+    if(this.keyboard) {
+      this.container.banner.configureForKeyboard(this.keyboard, this.keyboardStub);
+    }
+  }
+
+  /**
+   * Allows banners to adapt based on the active keyboard and related properties, such as
+   * associated fonts.
+   * @param keyboard
+   * @param keyboardProperties
+   */
+  public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) {
+    this.keyboard = keyboard;
+    this.keyboardStub = keyboardProperties;
+
+    this.container.banner.configureForKeyboard(keyboard, keyboardProperties);
   }
 
   public shutdown() {

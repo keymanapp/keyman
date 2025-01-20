@@ -112,12 +112,14 @@ public class PackageActivity extends AppCompatActivity implements
 
     // Number of languages associated with the first keyboard in a keyboard package.
     // lexical-model packages will be 0
-    final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
+    final int languageCount = (keyboardCount > 0) ?
+      kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0) : 0;
 
     // Sanity check for keyboard packages
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
-        showErrorToast(getString(R.string.no_new_touch_keyboards_to_install));
+        showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+        return;
       } else if (languageCount == 0) {
         showErrorToast(getString(R.string.no_associated_languages));
       }
@@ -179,6 +181,7 @@ public class PackageActivity extends AppCompatActivity implements
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
   }
@@ -340,7 +343,11 @@ public class PackageActivity extends AppCompatActivity implements
           if (dialog != null) {
             dialog.dismiss();
           }
+          // Setting result to 1 so calling activity will finish too
+          setResult(1);
           cleanup();
+          finish();
+          MainActivity.cleanupPackageInstall();
         }
       });
 

@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import com.keyman.engine.KeyboardEventHandler.EventType;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.data.Keyboard;
 
@@ -90,10 +91,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
         // Revert to default (index 0) or fallback keyboard
         keyboardInfo = KMManager.getKeyboardInfo(context, 0);
         if (keyboardInfo == null) {
-          // Only log SystemKeyboard to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-          if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-          }
+          // Don't log to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
           keyboardInfo = KMManager.getDefaultKeyboard(context);
         }
         if (keyboardInfo != null) {
@@ -167,8 +165,10 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // appContext instead of context?
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       boolean modelPredictionPref = false;
-      if (KMManager.currentLexicalModel != null) {
-        modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
+      if (!KMManager.getMayPredictOverride() && KMManager.currentLexicalModel != null) {
+        modelPredictionPref = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(
+          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion)
+          != SuggestionType.SUGGESTIONS_DISABLED.toInt();
       }
       KMManager.setBannerOptions(modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();

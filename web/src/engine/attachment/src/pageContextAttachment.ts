@@ -1,7 +1,7 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
-import { DeviceSpec, InternalKeyboardFont } from "@keymanapp/keyboard-processor";
-import { nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
+import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
+import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
 import {
   arrayFromNodeList,
   createStyleSheet,
@@ -236,7 +236,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
-      if (x.type == 'text' || x.type == 'search') {
+      if (Input.isSupportedType(x.type)) {
         return true;
       }
     } else if(x instanceof x.ownerDocument.defaultView.HTMLIFrameElement) {
@@ -308,7 +308,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   isKMWDisabled(x: HTMLElement): boolean {
     const c = x.className;
 
-    // Exists for some HTMLElements.
+    // Exists for some HTMLElements, such as HTMLInputElement.
+    // @ts-ignore
     if(x['readOnly']) {
       return true;
     } else if(c && c.indexOf('kmw-disabled') >= 0) {
@@ -733,15 +734,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     let t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
-      switch(t1[i].type) {
-        case 'text':
-        case 'search':
-        case 'email':
-        case 'url':
-          if(t1[i].className.indexOf('kmw-disabled') < 0) {
-            eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
-          }
-          break;
+      if (Input.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
+        eList.push({ip:t1[i], x: getAbsoluteX(t1[i]), y: getAbsoluteY(t1[i])});
       }
     }
 
@@ -924,8 +918,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   };
 
   _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
-    var inputElementAdditions = [];
-    var inputElementRemovals = [];
+    var inputElementAdditions: HTMLElement[] = [];
+    var inputElementRemovals: HTMLElement[] = [];
 
     for(var i=0; i < mutations.length; i++) {
       let mutation = mutations[i];

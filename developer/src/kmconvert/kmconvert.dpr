@@ -68,7 +68,7 @@ uses
   Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas',
   Keyman.Developer.System.ImportKeyboardDLL in 'Keyman.Developer.System.ImportKeyboardDLL.pas',
   ScanCodeMap in '..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in 'Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter in 'Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas',
   OnScreenKeyboardData in '..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
@@ -87,7 +87,9 @@ uses
   Keyman.Developer.System.Project.UrlRenderer in '..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas',
   Keyman.System.LexicalModelUtils in '..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas',
   KeymanDeveloperOptions in '..\tike\main\KeymanDeveloperOptions.pas',
-  Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas';
+  Keyman.Developer.System.KeymanDeveloperPaths in '..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
+  Keyman.Developer.System.LdmlKeyboardProjectTemplate in 'Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas',
+  utilhttp in '..\..\..\common\windows\delphi\general\utilhttp.pas';
 
 {$R icons.RES}
 {$R version.res}

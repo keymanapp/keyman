@@ -33,6 +33,10 @@ EXPORTS
       Keyman_ResetInitialisation
 
   	  Keyman_WriteDebugEvent
+  	  Keyman_WriteDebugEventW
+  	  Keyman_WriteDebugEvent2W
+			Keyman_SendDebugEntry
+			Keyman_SendDebugExit
 
       Keyman_UpdateTouchPanelVisibility
 

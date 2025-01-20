@@ -1,7 +1,6 @@
 #pragma once
 
-#include <keyman/keyman_core_api_bits.h>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf

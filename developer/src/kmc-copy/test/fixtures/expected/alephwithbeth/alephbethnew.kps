@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>17.0.325.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram/>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>../LICENSE.md</LicenseFile>
+    <WelcomeFile>welcome/welcome.htm</WelcomeFile>
+    <MSIFileName/>
+    <MSIOptions/>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder/>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL=""/>
+    <Name URL="">Aleph With Beth</Name>
+    <Copyright URL="">© Cameron Briggs</Copyright>
+    <Author URL="">Cameron Briggs</Author>
+    <WebSite URL="https://freehebrew.online">https://freehebrew.online</WebSite>
+    <Description URL="">alephwithbeth keyboard</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>welcome/welcome.htm</Name>
+      <Description>File welcome.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>../build/alephbethnew.js</Name>
+      <Description>File alephwithbeth.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>../build/alephbethnew.kvk</Name>
+      <Description>File alephwithbeth.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>../build/alephbethnew.kmx</Name>
+      <Description>Keyboard alephwithbeth</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>welcome/KeyboardLayout.png</Name>
+      <Description>File KeyboardLayout.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome/KeyboardLayoutAlt.png</Name>
+      <Description>File KeyboardLayoutAlt.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome/KeyboardLayoutShift.png</Name>
+      <Description>File KeyboardLayoutShift.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>../LICENSE.md</Name>
+      <Description/>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Aleph With Beth</Name>
+      <ID>alephbethnew</ID>
+      <Version>1.0.4</Version>
+      <Languages>
+        <Language ID="he">Hebrew</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

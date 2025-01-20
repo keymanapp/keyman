@@ -1,16 +1,16 @@
-import { isEmptyTransform, RuleBehavior } from "@keymanapp/keyboard-processor";
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { type OnInsertTextFunc } from "./contextManager.js";
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export class WebviewConfiguration extends EngineConfiguration {
   private _embeddingApp: string;
   private _oninserttext: OnInsertTextFunc;
   private _hostInsert: OnInsertTextFunc;
 
-  private pendingInserts: Transform[] = [];
+  private pendingInserts: LexicalModelTypes.Transform[] = [];
 
   initialize(options: Required<WebviewInitOptionSpec>) {
     super.initialize(options);
@@ -57,13 +57,6 @@ export class WebviewConfiguration extends EngineConfiguration {
     baseReport.keymanEngine = 'app/webview';
 
     return baseReport;
-  }
-
-  onRuleFinalization(ruleBehavior: RuleBehavior) {
-    if(!isEmptyTransform(ruleBehavior.transcription?.transform)) {
-      const transform = ruleBehavior.transcription.transform;
-      this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight ?? 0);
-    }
   }
 }
 

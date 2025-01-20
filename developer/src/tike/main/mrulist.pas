@@ -59,6 +59,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Win.ComObj,
   Winapi.ShlWapi,
   Winapi.Windows,
   Xml.XMLDoc,
@@ -66,6 +67,9 @@ uses
 
   ErrorControlledRegistry,
   RegistryKeys;
+
+const HRESULT_FROM_WIN32 = HRESULT($80070000);
+const E_SHARING_VIOLATION: HRESULT = HRESULT(HRESULT_FROM_WIN32 or ERROR_SHARING_VIOLATION);
 
 { TMRUList }
 
@@ -288,7 +292,22 @@ begin
     end;
   end;
 
-  doc.SaveToFile(FileName);
+  try
+    doc.SaveToFile(FileName);
+  except
+    on E:EOleException do
+    begin
+      if E.ErrorCode = E_SHARING_VIOLATION then
+      begin
+        // Another process is also writing the mru list; we'll let it
+        // slide as we'll usually get another chance later
+        Exit;
+      end
+      else
+        // Another error, let's capture it
+        raise;
+    end;
+  end;
 end;
 
 end.

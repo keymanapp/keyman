@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "option.hpp"
 #include "path.hpp"
@@ -26,6 +26,7 @@ namespace core
   {
     std::u16string      _keyboard_id;
     std::u16string      _version_string;
+    // unused and deprecated
     core::path           _folder_path;
     std::vector<option> _default_opts;
 
@@ -33,7 +34,6 @@ namespace core
 
   public:
     using options_store = decltype(_default_opts);
-    using path_type = decltype(_folder_path);
 
     keyboard_attributes()
     : km_core_keyboard_attrs {nullptr, nullptr, nullptr, nullptr} {}
@@ -42,7 +42,6 @@ namespace core
 
     keyboard_attributes(std::u16string const & id,
              std::u16string const & version,
-             path_type const & path,
              options_store const &opts);
 
     keyboard_attributes & operator = (keyboard_attributes const &) = delete;
@@ -52,8 +51,6 @@ namespace core
 
     options_store const &   default_opts_store() const noexcept { return _default_opts; }
     options_store &         default_opts_store() noexcept { return _default_opts; }
-
-    path_type const     &   path() const noexcept { return _folder_path; }
   };
 
   json & operator << (json &, km::core::keyboard_attributes const &);

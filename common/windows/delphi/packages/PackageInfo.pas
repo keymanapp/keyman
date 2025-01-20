@@ -1857,7 +1857,8 @@ begin
   Keyboards.SaveXML(ARoot);
   if LexicalModels.Count > 0 then
     LexicalModels.SaveXML(ARoot);
-  RelatedPackages.SaveXML(ARoot);
+  if RelatedPackages.Count > 0 then
+    RelatedPackages.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -2742,6 +2743,9 @@ var
   j: Integer;
   AExample: IXMLNode;
 begin
+  if Count = 0 then
+    Exit;
+
   AExamples := ARoot.AddChild(SXML_PackageKeyboard_Examples);
   for j := 0 to Count - 1 do
   begin

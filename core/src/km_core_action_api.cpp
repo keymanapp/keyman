@@ -9,8 +9,10 @@
 #include <cassert>
 #include <algorithm>
 #include <sstream>
+#include <cstring>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "jsonpp.hpp"
 
 #include "processor.hpp"
@@ -27,36 +29,42 @@ km_core_actions const * km_core_state_get_actions(
     return nullptr;
   }
 
-  auto action_items = km_core_state_action_items(state, nullptr);
-  if(!action_items) {
-    return nullptr;
-  }
-
-  return action_item_list_to_actions_object(action_items);
+  return static_cast<km_core_actions *>(&(const_cast<km_core_state *>(state)->action_struct()));
 }
 
-km_core_status km_core_actions_dispose(
-  km_core_actions const * actions
+void km::core::actions_dispose(
+  km_core_actions const & actions
 ) {
-  if(actions == nullptr) {
-    return KM_CORE_STATUS_OK;
+  if(actions.output) {
+    delete[] actions.output;
   }
 
-  if(actions->output) {
-    delete[] actions->output;
+  if(actions.deleted_context) {
+    delete[] actions.deleted_context;
   }
 
-  if(actions->persist_options) {
-    for(auto option = actions->persist_options; option->scope; option++) {
+  if(actions.persist_options) {
+    for(auto option = actions.persist_options; option->scope; option++) {
       delete[] option->key;
       delete[] option->value;
     }
-    delete[] actions->persist_options;
+    delete[] actions.persist_options;
   }
 
-  delete actions;
-
-  return KM_CORE_STATUS_OK;
+  memset(const_cast<km_core_actions*>(&actions), 0, sizeof(km_core_actions));
 }
 
+km_core_usv const *km::core::get_deleted_context(context const &app_context, unsigned int code_points_to_delete) {
+  auto p = app_context.end();
+  for(size_t i = code_points_to_delete; i > 0; i--, p--) {
+    assert(p != app_context.begin());
+  }
 
+  auto deleted_context = new km_core_usv[code_points_to_delete + 1];
+  for(size_t i = 0; i < code_points_to_delete; i++) {
+    deleted_context[i] = p->character;
+    p++;
+  }
+  deleted_context[code_points_to_delete] = 0;
+  return deleted_context;
+}

@@ -5,6 +5,9 @@ import { defaultApplyCasing,
 
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { LexicalModelSource, WordformToKeySpec } from "./lexical-model.js";
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import CasingFunction = LexicalModelTypes.CasingFunction;
 
 /**
  * Processes certain defined model behaviors in such a way that the needed closures

@@ -2,7 +2,7 @@ KeymanWeb.KR(new Keyboard_longpress());
 
 function Keyboard_longpress() {
     this.KI = "Keyboard_longpress";
-    this.KN = "longpress";
+    this.KN = "longpress '\"\\|5% +";
     this.KV = null;
     this.KH = '';
     this.KM = 0;

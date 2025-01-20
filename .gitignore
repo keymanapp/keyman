@@ -3,7 +3,6 @@
 /windows/debug/
 /windows/lib/
 /windows/release/
-/windows/src/PathDefines.mak
 /windows/src/**/*.err
 /windows/src/**/*.Build.CppClean.log
 /windows/src/**/*.dproj.local
@@ -185,3 +184,5 @@ lcov.info
 /keyman*.changes
 /keyman*.tar.?z
 
+# flag file for build script
+.configured

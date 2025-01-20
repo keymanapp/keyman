@@ -1,18 +1,26 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerFileCallbacks, CompilerCallbacks } from '@keymanapp/developer-utils';
+import { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType } from '@keymanapp/developer-utils';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
+import { getOption } from '@keymanapp/developer-utils';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
   public get sourceExtension(): KeymanFileTypes.Source { return KeymanFileTypes.Source.Project; }
   public get compiledExtension(): KeymanFileTypes.Binary { return null; }
   public get description(): string  { return 'Build a keyboard or lexical model project'; }
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+    if(outfile) {
+      callbacks.reportMessage(InfrastructureMessages.Error_OutFileNotValidForProjects());
+      return false;
+    }
+
     let builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
@@ -31,19 +39,16 @@ class ProjectBuilder {
   }
 
   async run(): Promise<boolean> {
-    if(this.options.outFile) {
-      this.callbacks.reportMessage(InfrastructureMessages.Error_OutFileNotValidForProjects());
-      return false;
-    }
-
-    this.project = loadProject(this.infile, this.callbacks);
+    this.project = await loadProject(this.infile, this.callbacks);
     if(!this.project) {
       return false;
     }
 
     // Give a hint if the project is v1.0
     if(this.project.options.version != '2.0') {
-      this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
+      if(getOption("prompt to upgrade projects", true)) {
+        this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
+      }
     }
 
     // Go through the various file types and build them
@@ -102,7 +107,7 @@ class ProjectBuilder {
 
   async buildTarget(file: KeymanDeveloperProjectFile, activity: BuildActivity): Promise<boolean> {
     const options = {...this.options};
-    options.outFile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
+    const outfile = this.project.resolveOutputFilePath(file, activity.sourceExtension, activity.compiledExtension);
     options.checkFilenameConventions = this.project.options.checkFilenameConventions ?? this.options.checkFilenameConventions;
     const infile = this.project.resolveInputFilePath(file);
 
@@ -110,9 +115,9 @@ class ProjectBuilder {
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
 
-    fs.mkdirSync(path.dirname(options.outFile), {recursive:true});
+    fs.mkdirSync(path.dirname(outfile), {recursive:true});
 
-    let result = await activity.build(infile, callbacks, options);
+    let result = await activity.build(infile, outfile, callbacks, options);
 
     // check if we had a message that causes the build to be a failure
     // note: command line option here, if set, overrides project setting

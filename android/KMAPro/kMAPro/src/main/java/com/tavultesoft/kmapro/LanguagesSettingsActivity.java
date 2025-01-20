@@ -152,6 +152,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 
@@ -202,7 +203,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
       }
 
       holder.textLang.setText(data.name);
-      holder.img.setImageResource(R.drawable.ic_arrow_forward);
+      holder.img.setImageResource(R.drawable.ic_action_forward);
 
       holder.textCount.setText(getContext().getResources().getQuantityString(R.plurals.keyboard_count, data.keyboards.size(), data.keyboards.size()));
 

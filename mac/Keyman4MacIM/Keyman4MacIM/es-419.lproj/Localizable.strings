@@ -69,3 +69,6 @@
 
 /* message displayed to alert user to need grant accessibility permission */
 "privacy-alert-text" = "Para funcionar correctamente, Keyman requiere funciones de accesibilidad:\n\nPermitir el acceso en Preferencias del Sistema, Seguridad y Privacidad.\nReinicie el sistema.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(No hay ningún teclado configurado)";

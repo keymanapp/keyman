@@ -14,21 +14,21 @@ typedef uint32_t DWORD;
 //typedef wchar_t* PWSTR;
 
 struct COMP_KEYBOARD {
-    DWORD dwIdentifier;     // 0000 Keyman compiled keyboard id
-    DWORD dwFileVersion;    // 0004 Version of the file - Keyman 4.0 is 0x0400
-    DWORD dwCheckSum;       // 0008 As stored in keyboard. DEPRECATED as of 16.0
-    DWORD KeyboardID;       // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
-    DWORD IsRegistered;     // 0010
-    DWORD version;          // 0014 keyboard version
-    DWORD cxStoreArray;     // 0018 in array entries
-    DWORD cxGroupArray;     // 001C in array entries
-    DWORD dpStoreArray;     // 0020 [LPCOMP_STORE] address of first item in store array
-    DWORD dpGroupArray;     // 0024 [LPCOMP_GROUP] address of first item in group array
-    DWORD StartGroup[2];    // 0028 index of starting groups [2 of them]
-    DWORD dwFlags;          // 0030 Flags for the keyboard file
-    DWORD dwHotKey;         // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
-    DWORD dpBitmapOffset;   // 0038 offset of the bitmaps in the file
-    DWORD dwBitmapSize;     // 003C size in bytes of the bitmaps
+  DWORD dwIdentifier;     // 0000 Keyman compiled keyboard id
+  DWORD dwFileVersion;    // 0004 Version of the file - Keyman 4.0 is 0x0400
+  DWORD dwCheckSum;       // 0008 As stored in keyboard. DEPRECATED as of 16.0
+  DWORD KeyboardID;       // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  DWORD IsRegistered;     // 0010
+  DWORD version;          // 0014 keyboard version
+  DWORD cxStoreArray;     // 0018 in array entries
+  DWORD cxGroupArray;     // 001C in array entries
+  DWORD dpStoreArray;     // 0020 [LPCOMP_STORE] address of first item in store array
+  DWORD dpGroupArray;     // 0024 [LPCOMP_GROUP] address of first item in group array
+  DWORD StartGroup[2];    // 0028 index of starting groups [2 of them]
+  DWORD dwFlags;          // 0030 Flags for the keyboard file
+  DWORD dwHotKey;         // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+  DWORD dpBitmapOffset;   // 0038 offset of the bitmaps in the file
+  DWORD dwBitmapSize;     // 003C size in bytes of the bitmaps
 };
 
 #define VERSION_30  0x00000300
@@ -50,18 +50,18 @@ struct COMP_KEYBOARD {
 #define VERSION_MAX VERSION_170
 
 struct COMP_GROUP {
-    DWORD dpName;           // string (only debug)
-    DWORD dpKeyArray;       // [LPCOMP_KEY] address of first item in key array
-    DWORD dpMatch;          // extended string
-    DWORD dpNoMatch;        // extended string
-    DWORD cxKeyArray;       // in array entries
-    BOOL  fUsingKeys;       // group(xx) [using keys] <-- specified or not
+  DWORD dpName;           // string (only debug)
+  DWORD dpKeyArray;       // [LPCOMP_KEY] address of first item in key array
+  DWORD dpMatch;          // extended string
+  DWORD dpNoMatch;        // extended string
+  DWORD cxKeyArray;       // in array entries
+  BOOL  fUsingKeys;       // group(xx) [using keys] <-- specified or not
 };
 
 struct COMP_STORE {
-    DWORD dwSystemID;
-    DWORD dpName;           // string (only debug)
-    DWORD dpString;         // extended string
+  DWORD dwSystemID;
+  DWORD dpName;           // string (only debug)
+  DWORD dpString;         // extended string
 };
 
 // dwSystemID definitions
@@ -134,9 +134,9 @@ struct COMP_STORE {
 #define K_CTRLFLAG      0x0020      // Either ctrl flag
 #define K_ALTFLAG       0x0040      // Either alt flag
 //#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
-                                // Used internally (currently, only by KMW) to ensure Meta-key
-                                // shortcuts safely bypass rules
-                                // Meta key = Command key on macOS, Windows key on Windows
+// Used internally (currently, only by KMW) to ensure Meta-key
+// shortcuts safely bypass rules
+// Meta key = Command key on macOS, Windows key on Windows
 #define CAPITALFLAG     0x0100      // Caps lock on
 #define NOTCAPITALFLAG  0x0200      // Caps lock NOT on
 #define NUMLOCKFLAG     0x0400      // Num lock on
@@ -149,11 +149,11 @@ struct COMP_STORE {
 #define K_CAPITALMASK (CAPITALFLAG|NOTCAPITALFLAG)
 
 struct COMP_KEY {
-    WORD Key;  // Windows VK code or character value (VIRTUALCHARKEY, ISVIRTUALKEY)
-    DWORD Line;
-    DWORD ShiftFlags;
-    DWORD dpOutput;   // extended string
-    DWORD dpContext;  // extended string
+  WORD Key;  // Windows VK code or character value (VIRTUALCHARKEY, ISVIRTUALKEY)
+  DWORD Line;
+  DWORD ShiftFlags;
+  DWORD dpOutput;   // extended string
+  DWORD dpContext;  // extended string
 };
 
 #define UC_SENTINEL             0xFFFF
@@ -209,7 +209,7 @@ struct COMP_KEY {
 #define KVKK_BITMAP             0x01
 #define KVKK_UNICODE            0x02
 
-// KVK shift flags
+// KVK modifier flags
 #define KVKS_NORMAL             0x00
 #define KVKS_SHIFT              0x01
 #define KVKS_CTRL               0x02

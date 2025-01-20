@@ -105,7 +105,6 @@ type
     actProjectAddCurrentEditorFile: TAction;
     actProjectAddFiles: TFileOpen;
     actProjectSettings: TAction;
-    actToolsCustomise: TAction;
     actToolsOptions: TAction;
     actToolsVirtualKeyIdentifier: TAction;
     actHelpAbout: TAction;
@@ -299,31 +298,38 @@ uses
 procedure TmodActionsMain.actFileNewExecute(Sender: TObject);
 var
   FEditor: TfrmTikeEditor;
+  frmNew: TfrmNew;
 begin
-  with TfrmNew.Create(frmKeymanDeveloper) do
+  frmNew := TfrmNew.Create(frmKeymanDeveloper);
   try
-    if ShowModal = mrOk then
+    frmNew.CanAddToProject := FGlobalProject.Options.Version = pv10;
+    if frmNew.ShowModal = mrOk then
     begin
-      case FileType of
-        ftKeymanSource:    FEditor := TfrmKeymanWizard.Create(frmKeymanDeveloper);
-        ftPackageSource:   FEditor := TfrmPackageEditor.Create(frmKeymanDeveloper);
-        ftBitmap:          FEditor := TfrmBitmapEditor.Create(frmKeymanDeveloper);
-        ftVisualKeyboard:  FEditor := TfrmOSKEditor.Create(frmKeymanDeveloper);
-        ftTextFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efText; end;
-        ftXMLFile:         begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efXML; end;
-        ftHTMLFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efHTML; end;
-      else
-        FEditor := TfrmEditor.Create(frmKeymanDeveloper);
-      end;
-      if FileName <> '' then
+      if SameFileName(ExtractFilePath(FGlobalProject.FileName), ExtractFilePath(frmNew.FileName)) or
+        SameFileName(FGlobalProject.ResolveProjectPath(FGlobalProject.Options.SourcePath), ExtractFilePath(frmNew.FileName)) then
       begin
-        if AddToProject then
-          FEditor.ProjectFile := CreateProjectFile(FGlobalProject, FileName, nil);
-        FEditor.OpenFile(FileName);
+        // File belongs to the project
+        case frmNew.FileType of
+          ftKeymanSource:    FEditor := TfrmKeymanWizard.Create(frmKeymanDeveloper);
+          ftPackageSource:   FEditor := TfrmPackageEditor.Create(frmKeymanDeveloper);
+          ftBitmap:          FEditor := TfrmBitmapEditor.Create(frmKeymanDeveloper);
+          ftVisualKeyboard:  FEditor := TfrmOSKEditor.Create(frmKeymanDeveloper);
+          ftTextFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efText; end;
+          ftXMLFile:         begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efXML; end;
+          ftHTMLFile:        begin FEditor := TfrmEditor.Create(frmKeymanDeveloper); (FEditor as TfrmEditor).EditorFormat := efHTML; end;
+        else
+          FEditor := TfrmEditor.Create(frmKeymanDeveloper);
+        end;
+        FEditor.ProjectFile := CreateProjectFile(FGlobalProject, frmNew.FileName, nil);
+        FEditor.OpenFile(frmNew.FileName);
+      end
+      else
+      begin
+        frmKeymanDeveloper.OpenFilesInProject([frmNew.FileName]);
       end;
     end;
   finally
-    Free;
+    frmNew.Free;
   end;
 end;
 

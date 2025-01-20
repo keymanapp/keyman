@@ -121,7 +121,16 @@ table.io th {
   font: bold 8pt "Segoe UI"
 }
 
-.pages { overflow-y: auto; padding-top: 12px; width: 100%; height: 100% }
+.pages {
+  overflow-y: auto;
+  padding-top: 12px;
+  width: 100%;
+  height: 100%;
+}
+
+#globalwelcome .pages {
+  max-height: calc(100% - 213px); /* 213px is height of the pageheader 201px + 12px padding-top; TODO: rework as grid */
+}
 
 .checkbox { background-image: url("chk_checkbox.gif");}
 .checked { background-image: url("chk_checked.gif"); }
@@ -249,6 +258,7 @@ k\:menuitem.down {
   background: #6D6C6F;
   border: none;
   color: #dadddc;
+  height: 201px;
 }
 
 #globalwelcome #pageheader a {
@@ -271,7 +281,8 @@ k\:menuitem.down {
 
 #header-sil img {
   vertical-align: top;
-  margin-left: 4px;
+  margin-left: -6px;
+  margin-top: 7px;
 }
 
 #header-sil > div {

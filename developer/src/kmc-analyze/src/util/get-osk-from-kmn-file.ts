@@ -1,4 +1,5 @@
-import { CompilerCallbacks, KMX, KmxFileReader } from "@keymanapp/common-types";
+import { KMX, KmxFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KmnCompiler } from "@keymanapp/kmc-kmn";
 
 export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: string): Promise<{
@@ -9,15 +10,15 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
   let touchLayoutFilename: string;
 
   const kmnCompiler = new KmnCompiler();
-  if(!await kmnCompiler.init(callbacks)) {
+  if(!await kmnCompiler.init(callbacks, {
+    shouldAddCompilerVersion: false,
+    saveDebug: false,
+  })) {
     // kmnCompiler will report errors
     return null;
   }
 
-  let result = kmnCompiler.runCompiler(filename, {
-    shouldAddCompilerVersion: false,
-    saveDebug: false,
-  });
+  let result = await kmnCompiler.run(filename, null);
 
   if(!result) {
     // kmnCompiler will report any errors
@@ -29,7 +30,7 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
   }
 
   const reader = new KmxFileReader();
-  const keyboard: KMX.KEYBOARD = reader.read(result.kmx.data);
+  const keyboard: KMX.KEYBOARD = reader.read(result.artifacts.kmx.data);
   const touchLayoutStore = keyboard.stores.find(store => store.dwSystemID == KMX.KMXFile.TSS_LAYOUTFILE);
 
   if(touchLayoutStore) {

@@ -5,7 +5,9 @@ test_files = [
   '../src/KeymanSystemServiceClient.cpp',
 ]
 
-keymancore_tests_lib = cc.find_library(
+common_test_files = [ meson.global_source_root() / '../../common/include/test_color.cpp' ]
+
+keymancore_tests_lib = c_compiler.find_library(
   'keymancore-tests', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'tests/kmx_test_source' ]
 )
@@ -27,7 +29,7 @@ test_include_dirs = [
 
 test_exe = executable(
   'ibus-keyman-tests',
-  test_files, util_files,
+  test_files, util_files, common_test_files,
   dependencies: test_deps,
   include_directories: test_include_dirs,
 )

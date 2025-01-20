@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "kmx/kmx_processevent.h"
 #include "keyboard.hpp"
 #include "processor.hpp"
@@ -29,7 +29,7 @@ namespace core
       );
 
   public:
-    kmx_processor(path);
+    kmx_processor(std::u16string const& kb_name, const std::vector<uint8_t>& data);
 
     km_core_status
     process_event(
@@ -80,6 +80,12 @@ namespace core
 
     km_core_keyboard_imx * get_imx_list() const override;
 
+    bool
+    supports_normalization() const override {
+      return false;
+    }
+
+    static bool is_handled(const std::vector<uint8_t>& buf);
   };
 
 } // namespace core

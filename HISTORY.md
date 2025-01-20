@@ -1,5 +1,1994 @@
 # Keyman Version History
 
+## 18.0.172 alpha 2025-01-19
+
+* chore(common): Add 17.0.333 to version history (#12926)
+
+## 18.0.171 alpha 2025-01-18
+
+* fix(common/web): add StrsItem.isEqual() method (#12868)
+* fix(common/web): handle invalid order and tertiary arguments to ElementString.fromString() (#12882)
+
+## 18.0.170 alpha 2025-01-17
+
+* chore(linux): update copyright year (#12918)
+* fix(web): patch unit test with execution dependent on autocorrect state (#12940)
+* test(common/web): unit tests for element-string (#12811)
+* chore(linux): Update debian changelog (#12917)
+
+## 18.0.169 alpha 2025-01-17
+
+* chore(windows): remove `postinstall` state from mermaid diagram (#12923)
+
+## 18.0.168 alpha 2025-01-16
+
+* chore: update macOS environment-variable shell script (#12878)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12871)
+* chore(web): integrates predictive-text builds to top level script, reconnects headless tests (#12866)
+* chore(ios): Update crowdin strings for Khmer (#12910)
+* chore(windows): merge master epic windows updates (#12904)
+* fix(developer): detect invalid key ids in touch layout files (#12895)
+* chore: use GitHub PR titles when writing HISTORY.md (#12907)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12909)
+* change(web): make 'keep' transform pattern match standard suggestion pattern by including the prefix string (#12906)
+* chore: Add docker images for building the different platforms (#11397)
+
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
+## 18.0.164 alpha 2025-01-08
+
+* fix(windows): add language and close button fit inside pop-window (#12855)
+* chore(windows): add bcp47 code and tips to diagnostic (#12843)
+* fix(android/engine): Cleanup KMManager API keys and calls (#12861)
+* docs(developer,mac): add playable video links to the help documentation (#12828)
+
+## 18.0.163 alpha 2025-01-06
+
+* docs: clarify that sections in KMX file might not be aligned (#12856)
+
+## 18.0.162 alpha 2024-12-19
+
+* fix(mac): standardize interaction between OSK and physical keyboard (#12836)
+
+## 18.0.161 alpha 2024-12-17
+
+* fix(mac): OSK layers displayed consistently for hardware and OSK modifiers (#12829)
+
+## 18.0.160 alpha 2024-12-16
+
+* feat(ios): configurable keyboard height (#12571)
+* chore(common/web): remove .c8rc.json from types and merge exclusions into package.json (#12813)
+* fix(android/engine): Initialize index when resuming KeyboardPicker (#12832)
+
+## 18.0.159 alpha 2024-12-13
+
+* chore(core): remove meson warnings for wasm builds (#12827)
+* chore(linux): Update debian changelog (#12023)
+
+## 18.0.158 alpha 2024-12-11
+
+* fix(linux): pushing of updated changelog branch (#12818)
+* fix(linux): work around Lintian errors (#12815)
+
+## 18.0.157 alpha 2024-12-10
+
+* test(common/web): unit tests for kvk-file-writer (#12734)
+
+## 18.0.156 alpha 2024-12-09
+
+* fix(developer): remove platforms from kmc-generate LM readme (#12803)
+* test(developer): add test for ERROR_DescriptionIsMissing to kmc-keyboard-info (#12804)
+* chore(developer): verify bundled node version when building installer (#12806)
+* fix(developer): support hint property in displaymap (#12807)
+* fix(common/web): delete replaceExtension in types/src/util/file-types.ts (#12762)
+* chore(developer): add some docs for language examples in kmp.json (#12805)
+* fix(core): implement ldml_processor::get_key_list() (#12644)
+
+## 18.0.155 alpha 2024-12-07
+
+* chore(android,windows): Update crowdin for Czech (#12792)
+
+## 18.0.154 alpha 2024-12-06
+
+* feat(developer,core): local imports (#12750)
+* chore(core): remove `km_core_keyboard_load` API (#12769)
+* chore: rename TestCompilerCallbacks.ts (#12775)
+* chore(mac): update to SIL logo with glyph in About window (#12766)
+* chore(android,windows): Update crowdin for Italian (#12793)
+* change(developer): use full github url in kmc copy parameters (#12773)
+* chore(developer): add baseline tests for bcp47 codes to kmc-package (#12506)
+* chore(core): only install node on Windows if not available (#12772)
+* chore(android): Disable auto-correct UI controls (#12791)
+
+## 18.0.153 alpha 2024-12-05
+
+* feat(developer,common): verify normalization of strings (#12748)
+* chore(core): Add link to Keyman Glossary (#12774)
+* test(common/web/types): unit tests for file-types (#12716)
+
+## 18.0.152 alpha 2024-12-04
+
+* refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)
+* fix(developer): honour provided script when checking for matching scripts (#12768)
+* chore(common): rename test files (#12709)
+* fix(common): rename test file (#12770)
+
+## 18.0.151 alpha 2024-12-03
+
+* feat(android): Enhance how ENTER key is handled for FV and KMSample2 (#12745)
+* feat(developer): report on mismatching lang tag scripts when building keyboard-info (#12753)
+
+## 18.0.150 alpha 2024-12-02
+
+* fix(core,developer): use `NDEBUG` flag to disable assertions in release build (#12715)
+
+## 18.0.149 alpha 2024-12-01
+
+* refactor(developer): unify test action (#12736)
+
+## 18.0.148 alpha 2024-11-29
+
+* test(common/web/types): unit tests for unicodeset-parser-api (#12714)
+* chore(developer): rename test files (#12707)
+* feat(core,linux,developer,windows): implement loading KMX from blob (#12721)
+* chore(common): add offline support for emscripten (#12740)
+
+## 18.0.147 alpha 2024-11-28
+
+* docs(android): Add android/docs/internal/README (#12717)
+* test(common/web/types): unit tests for string-list (#12702)
+* docs(common): linux and macOS emscripten setup (#12701)
+* refactor(developer): output number of tests when running on TC (#12710)
+* refactor(common): output number of tests when running on TC (#12719)
+* chore(web): rename file missed in #12704 (#12720)
+* fix(core): permanently disable logging (#12724)
+* fix(linux): disable assertions in release builds of ibus-keyman (#12725)
+* chore(common): improve offline builds (#12739)
+
+## 18.0.146 alpha 2024-11-27
+
+* test(developer): kmcmplib compiler unit tests 5 (#12612)
+* refactor(common): move all lexical model types into `LexicalModelTypes` container (#12712)
+* refactor(common): move remaining LDML keyboard types into `LdmlKeyboardTypes` (#12713)
+* chore(web): rename test files and folders (#12704)
+* chore(core): rename test files (#12705)
+* chore(linux): rename test files (#12706)
+
+## 18.0.145 alpha 2024-11-26
+
+* docs(windows): update emscripten bash setup (#12700)
+* chore(common): Add link to onboarding doc to `CONTRIBUTING.md` (#12697)
+
+## 18.0.144 alpha 2024-11-25
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#12687)
+* chore(developer): make package subfile description fully optional (#12665)
+* fix(developer): box package compiler info fields (#12666)
+* fix(developer): correct whitespace handling in virtual keys and remove partially implemented virtual key series in kmcmplib compiler (#12604)
+
+## 18.0.143 alpha 2024-11-22
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
+
+## 18.0.142 alpha 2024-11-20
+
+* chore(common): Update CODEOWNERS (#12680)
+
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
+## 18.0.139 alpha 2024-11-12
+
+* fix(windows): help links updated (#12646)
+
+## 18.0.138 alpha 2024-11-08
+
+* fix(common): check for invalid markers (#12613)
+* chore: update minimum versions (#12632)
+* fix(windows): correct path to output file in publish step for fv keyboards (#12637)
+* chore(core): move API docs from help.keyman.com (#12642)
+* feat(developer): kmc generate (#11014)
+* feat(developer): kmc-copy (#12555)
+* feat(developer): add GitHub and Cloud support to kmc-copy (#12586)
+
+## 18.0.137 alpha 2024-11-07
+
+* fix(windows): correct engine help source path for upload (#12625)
+* fix(developer): use 'N' for nomatch store debug strings (regression in #12107) (#12629)
+* chore(developer): skip masaram_gondi in kmcmplib full test (#12630)
+* feat(developer): analyze osk-char-use merge with existing mapping file (#12622)
+* feat(developer): Report key 'address' in validation failures in layout compiler (#12588)
+
+## 18.0.136 alpha 2024-11-06
+
+* fix(developer): handle merge commits when checking git log date (#12627)
+
+## 18.0.135 alpha 2024-11-05
+
+* fix(developer): handle paste of TSV into Wordlist grid (#12594)
+* fix(developer): handle missing files in kmc-kmn (#12595)
+* fix(developer): handle missing files in kmc-model (#12596)
+* refactor(android): move Android Engine help in-repo (#12598)
+* refactor(ios): move ios Engine help in-repo (#12599)
+* refactor(windows): move windows Engine help in-repo (#12600)
+* refactor(web): move web engine help to app repo (#12601)
+* docs: Update websites readme with debug info (#12602)
+* fix(developer): create Server config directory before options save (#12608)
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12614)
+* fix(linux): properly check for missing dependencies (#12615)
+* fix(linux): set environment variable for rendering of downloads dialog (#12616)
+
+## 18.0.134 alpha 2024-11-04
+
+* fix(developer): ldml don't allow a uset as right-hand-side variable (#12606)
+
+## 18.0.133 alpha 2024-11-01
+
+* test(developer): kmcmplib compiler unit tests 4 (#12489)
+
+## 18.0.132 alpha 2024-10-30
+
+* feat(windows): kmdevlink app (#12552)
+
+## 18.0.131 alpha 2024-10-25
+
+* chore(android,windows): Update Crowdin strings for Khmer (#12574)
+* refactor(developer): add kps-file-reader and kps-file-writer (#12545)
+* fix(mac): make modifiers operational in OSK (#12556)
+* fix(mac): support missing alt layers in OSK (#12565)
+
+## 18.0.130 alpha 2024-10-24
+
+* fix(android/engine): Increase robustness when checking package kmp.json languages (#12567)
+* chore(ios): support xcode 16 build (#12570)
+
+## 18.0.129 alpha 2024-10-21
+
+* chore(mac): support Xcode 16 build (#12554)
+
+## 18.0.128 alpha 2024-10-14
+
+* docs(developer): add refs to Keyman MIME types (#12540)
+
+## 18.0.127 alpha 2024-10-12
+
+* fix(developer): use TextDecoder to convert Uint8Array to string (#12537)
+
+## 18.0.126 alpha 2024-10-11
+
+* test(common): add markdown link check test for product documentation (#12472)
+* chore(linux): improve output if `dpkg-gensymbols` fails and run other tests (#12527)
+
+## 18.0.125 alpha 2024-10-10
+
+* chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
+* chore(linux): Improve output of API Verification (#12522)
+* chore(linux): allow to skip API change (#12519)
+* fix(linux): fix problem with API checks with merge commits (#12520)
+* refactor(web): move `KeyboardObject` type to `common/web/types` (#12514)
+
+## 18.0.124 alpha 2024-10-09
+
+* chore(common): fix links in minimum-versions.md (#12507)
+* fix(developer): use richedit in debug memo to support Egyptian cartouches (#12464)
+* feat(android): Add controls for auto-correct (#12443)
+
+## 18.0.123 alpha 2024-10-08
+
+* chore(developer,common): deps: replace xml2js with fast-xml-parser (#12502)
+* chore(ios): renew certificate (#12512)
+
+## 18.0.122 alpha 2024-10-07
+
+* feat(mac): both option keys generate right alt if no left alt mapping (#12458)
+* chore(common): improve configuration detection for hextobin (#12481)
+
+## 18.0.121 alpha 2024-10-03
+
+* docs(developer): Fix image links in help (#12488)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp 13.1 (#12486)
+* feat(common): unified XML parser/writer (#12482)
+
+## 18.0.120 alpha 2024-10-02
+
+* chore(common): Add note on troubleshooting website errors (#12487)
+* docs(common): mention `KEYMAN_USE_NVM` in minimum versions doc (#12490)
+* docs(web): fix paths to several help pages (#12491)
+* docs(web): fix structure of test document (#12492)
+
+## 18.0.119 alpha 2024-09-28
+
+* refactor(developer): copy dev 17.0 help into repo (#12427)
+* fix(developer): warn before importing over touch layout (#12478)
+* chore(linux): display branch name with API verification (#12480)
+* docs(core): Update kmx-plus-file-format.md (#12479)
+
+## 18.0.118 alpha 2024-09-26
+
+* chore(developer): add context/options (#11566)
+* chore(deps-dev): bump rollup from 4.16.4 to 4.22.4 (#12462)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12468)
+* refactor(common): move help into common prod/docs/help folders (#12424)
+* fix(developer): publish developer-utils package during build (#12471)
+* fix(linux): ignore additional C++ symbol in API check (#12474)
+
+## 18.0.117 alpha 2024-09-25
+
+* docs(common): Document how to skip generating CDN on websites (#12446)
+* fix(android): Remove toggle for "Always Show Banner" (#12430)
+* fix(android): Hide suggestion banner on password fields (#12442)
+* fix(developer): prevent invalid string ids (#12465)
+
+## 18.0.116 alpha 2024-09-20
+
+* change(mac): remove verbose logging option (#12431)
+* chore(common): Allow to build offline (#12439)
+
+## 18.0.115 alpha 2024-09-19
+
+* chore(common): detect ssh remotes in git hooks (#12437)
+* fix(common): add proper configure output for hextobin (#12440)
+* fix(core): add missing dependency for core (#12438)
+* chore(developer): remove .js output from LDML compiler (#12432)
+
+## 18.0.114 alpha 2024-09-17
+
+* fix(developer): rewrite ldml visual keyboard compiler (#12402)
+* fix(developer): check vars string usage before definition (#12404)
+* change(mac): remove 'Always show OSK' option (#12355)
+
+## 18.0.113 alpha 2024-09-16
+
+* test(developer): kmcmplib compiler unit tests 3 (#11990)
+
+## 18.0.112 alpha 2024-09-14
+
+* chore(deps): bump express from 4.19.2 to 4.20.0 (#12396)
+
+## 18.0.111 alpha 2024-09-13
+
+* chore(common): Update crowdin strings for Italian (#12408)
+* fix(common): correct offsets in KMX+ spec (#12350)
+* fix(android): Add gating to setLongpressDelay() (#12410)
+
+## 18.0.110 alpha 2024-09-12
+
+* chore(common): Update to Unicode 16.0 (#12393)
+* refactor(web): move `common/web/es-bundling` → `web/src/tools/es-bundling` (#12389)
+* refactor(web): move `common/web/eslint` → `common/tools/eslint` (#12390)
+* refactor(web): move sentry-manager → `web/src/engine/sentry-manager` (#12397)
+* refactor(web): merge `device-detect` with `web/src/engine/main` (#12399)
+* chore(web): allow to run unit tests in vscode test explorer (#12400)
+* fix(developer): index() requires comma between parameters in kmcmplib compiler (#12328)
+
+## 18.0.109 alpha 2024-09-11
+
+* chore(common): Update history with 17.0.329 stable (#12394)
+* refactor(web): move `model/templates` to `web/src/engine/predictive/text` (#12382)
+* refactor(web): move `common/models` to `web/src/engine/predictive-text` (#12383)
+* refactor(web): move `common/web/utils` to `web/src/engine/common/web-utils/` (#12384)
+
+## 18.0.108 alpha 2024-09-10
+
+* docs(android): Update help docs (#12367)
+* fix(developer): fix building with Ubuntu 24.04 (#12379)
+* refactor(android): Move build-publish.sh to builder script (#12351)
+* fix(android): Separate `publishSentry` Gradle task to publish symbols to Sentry (#12358)
+* refactor(web): move `model/types` to `web/types` (#12370)
+
+## 18.0.107 alpha 2024-09-09
+
+* fix(android): Update Text Size menu icons for RTL support (#12290)
+
+## 18.0.106 alpha 2024-09-06
+
+* feat(windows): add right modifier included in hotkey optional functionality (#12259)
+* fix(android): Skip language counts for lexical-model packages (#12361)
+* docs(web): fix link to documentation page (#12369)
+
+## 18.0.105 alpha 2024-09-05
+
+* chore(common): Fix missing entries in HISTORY.md (#12352)
+* docs(android): Add in-app help for adjusting longpress delay (#12359)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12354)
+* chore(oem/fv): Update to fv_all 13.0 (#12362)
+* feat(windows): Add two new strings for SIL Global name instead of SIL International (#12327)
+
+## 18.0.104 alpha 2024-09-03
+
+* fix(mac): display package info after keyboard installation (#12326)
+
+## 18.0.103 alpha 2024-09-02
+
+* feat(windows): Remove hotkey related feature flags (#12252)
+* feat(windows): update SIL logo for Windows UI (#12250)
+
+## 18.0.102 alpha 2024-08-30
+
+* docs(web): add documentation comments for touch layout interfaces (#12314)
+* change(mac): store data in Library directory instead of Documents (#12106)
+* change(mac): store partial path in UserDefaults (#12144)
+
+## 18.0.101 alpha 2024-08-29
+
+* refactor(web): move `gesture-recognizer` → `gesture-processor` (#12194)
+* docs(core): fix a typo in the KMX+ doc (#12302)
+* chore(web): remove obsolete comment (#12304)
+* chore(android,ios): Update FirstVoices keyboards to fv_all.kmp 12.15 (#12300)
+* fix(developer): make LDML import path consistent for all bundlings of kmc (#12280)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12281)
+* chore(windows): fix typo in environment.inc.sh (#12286)
+* fix(android): Check in material-stepper as internal Maven dependency (#12267)
+* docs(core): improve formatting of KMX+ doc (#12303)
+* fix(android): Prioritize certain actions over multi-line for ENTER key (#12315)
+* fix(linux): add `keymanFacename` to .ldml file (#12277)
+* chore(common): Update crowdin strings for Czech (#12316)
+* fix(web): prevent unintuitive space-output blocking for mid-context suggestions (#12313)
+
+## 18.0.100 alpha 2024-08-28
+
+* fix(windows): check IM window will be in a visible location (#11967)
+
+## 18.0.99 alpha 2024-08-27
+
+* feat(web): import the generator for the pred-text wordbreaker's Unicode-property data-table (#10690)
+* feat(web): optimize the wordbreaker data table for filesize and ease of first-load parsing (#10692)
+* fix(web): fixes wordbreaker test import path (#12297)
+* feat(web): enable utf8 charset encoding for the build artifacts (#12115)
+
+## 18.0.98 alpha 2024-08-26
+
+* change(ios): defer registration of fonts past initialization (#12190)
+* refactor(ios): optimize font registration (#12210)
+* test(mac): add unit tests to validate first calls to compliance check (#11724)
+* fix(mac): limit short bundle version string to x.y.z format in info.plist (#12233)
+* chore(developer): extend timeouts for lm compiler tests to 5 secs (#12273)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12278)
+* chore(android): Cleanup stray debug statements in console (#12287)
+* fix(developer): ensure call() detects invalid store in kmcmplib compiler (#12263)
+
+## 18.0.97 alpha 2024-08-24
+
+* refactor(linux): cleanup API of kvk2ldml.py (#12276)
+* chore(common): adjust build settings for windows clean builds (#12264)
+* chore(windows): remove remaining unused Makefiles (#12274)
+* docs(developer): update build documentation to refer to build.sh (#12272)
+
+## 18.0.96 alpha 2024-08-23
+
+* fix(android): Fix navigation arrows in Info Activity for RTL (#12244)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12232)
+* fix(android): Use increment and decrement arrows on longpress delay menu (#12242)
+* fix(android): Add RTL assets for adjusting keyboard height menu (#12261)
+* chore(common): use `npm install` in emsdk update (#12269)
+* docs: refresh windows.md (#12248)
+
+## 18.0.95 alpha 2024-08-22
+
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12243)
+
+## 18.0.94 alpha 2024-08-21
+
+* fix(core): look for `emcc` instead of `emcc.py` (#12235)
+* fix(web): improve tokenization output when wordbreaker breaks spec for span properties in output (#12229)
+* chore(android): Use RTL-aware alignment and padding for layouts (#12225)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12220)
+* fix(android): Auto-mirror back and forward arrows for RTL support (#12227)
+* feat(android): Add localization for Arabic (#12228)
+* fix(android): Auto-mirror increment and decrement arrows for RTL support (#12230)
+
+## 18.0.93 alpha 2024-08-20
+
+* refactor(web): remove engine/interfaces dependency on engine/js-processor (#12188)
+* fix(web): fix malformed reversion display strings (#12201)
+* feat(android): Add menu to specify long-press delay (#12170)
+* feat(android): Pass longpress delay to KeymanWeb (#12185)
+* fix(core): set mac build version for meson cli build to 10.13 (#12223)
+
+## 18.0.92 alpha 2024-08-19
+
+* chore(deps-dev): bump @75lb/deep-merge from 1.1.1 to 1.1.2 (#12118)
+* chore(deps): bump semver from 7.5.4 to 7.6.0 (#12119)
+* fix(windows): "Keyman" is not localized in UI strings (#12162)
+* feat(android): Enhance how ENTER key is handled in apps (#12125)
+* refactor(web): move `lm-worker` → `worker-thread` (#12150)
+* fix(developer): remove redundant check in LdmlKeyboardCompiler.validate() (#11858)
+
+## 18.0.91 alpha 2024-08-16
+
+* refactor(web): move `predictive-text` → `worker-main` (#12146)
+* fix(web): restore flick functionality (#12187)
+* refactor(web): move `lm-message-types` → `predictive-text/types` (#12149)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12204)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12205)
+
+## 18.0.90 alpha 2024-08-15
+
+* refactor(web): move parts of `keyboard-processor` → `js-processor` (#12111)
+* fix(web): allow `lm-worker` to build on Linux (#12181)
+* refactor(web): move remaining parts of `keyboard-processor` → `keyboard` (#12131)
+* docs: update .kmx documentation around bitmaps, modifier state (#12183)
+* refactor(web): rename `package-cache` → `keyboard-storage` (#12135)
+
+## 18.0.89 alpha 2024-08-14
+
+* feat(web): test skipped prediction round handling (#12169)
+* fix(web): support live configuration of longpress delay (#12175)
+* feat(web): add osk.gestureParams for better gesture-config persistence (#12176)
+* refactor(core): move utfcodec to common (#12171)
+* refactor: move kmx_u16 to common and rename to km_u16 (#12177)
+* refactor(developer): use npm or local source for server addons instead of github references (#12090)
+* fix(developer): fix crash with Windows Clipboard by ignoring zero scan code in debugger (#12166)
+* chore(developer): update SIL logo (#12168)
+
+## 18.0.88 alpha 2024-08-13
+
+* docs: add .kmx specification (#12163)
+
+## 18.0.87 alpha 2024-08-12
+
+* chore(web): drop flaky auto-test component (#12155)
+* fix(common): show description even if child projects specifies path (#12145)
+
+## 18.0.86 alpha 2024-08-09
+
+* chore(android): Update splash screen with SIL Tai Heritage Pro logo (#12127)
+* chore(common): Update localization for Greek Polytonic (#12112)
+* chore(common): add support for build target platform exclusions (#12113)
+* feat(common): add top-level build.sh (#12114)
+* chore(developer): start building Developer on linux,mac (#12117)
+* refactor(web): Move `common/web/recorder` → `web/src/tools/testing/recorder-core` (#12092)
+
+## 18.0.85 alpha 2024-08-08
+
+* fix(developer): update date for last git commit date fixture (#12122)
+* refactor(android/engine): Parse keyboards.json for FirstVoices app (#11943)
+
+## 18.0.84 alpha 2024-08-07
+
+* refactor(common): move kpj-related files into developer-utils (#11531)
+* refactor(common): move kps-file.ts to @keymanapp/developer-utils (#11763)
+* refactor(common): move kvks-file to @keymanapp/developer-utils (#11764)
+* refactor(common): move .keyman-touch-layout reader/writer to @keymanapp/developer-utils (#11765)
+* refactor(common): move LDML keyboard .xml reader/writer and kmx-plus builder to @keymanapp/developer-utils (#12081)
+* refactor(common): move compiler-interfaces to @keymanapp/developer-utils (#12088)
+* refactor(common): move xml2js and related deps to @keymanapp/developer-utils (#12101)
+
+## 18.0.83 alpha 2024-08-06
+
+* chore(common): Update history from 17.0.328 (#12093)
+* change(common/models): change model tokenization to also tokenize whitespace (#11975)
+* feat(web): support transform tokenization when given a root context (#11998)
+* change(web): track whitespace-aware tokenization for context + correction-search caching (#11979)
+* change(web): leverage tokenization to preserve punctuation and whitespace when predicting (#11997)
+* fix(web): patch up worker build to provide artifacts for its tests (#12082)
+* chore(web): move `web/src/engine/paths/` → `web/src/engine/interfaces/` (#12064)
+* chore(web): move `common/web/input-processor/` → `web/src/engine/main/` (#12066)
+* refactor(web): refactor and harmonize constants (#12072)
+* chore(common): add data versions to minimum-versions.inc.sh (#12103)
+* fix(web): fix lm-worker test broken by botched merge conflict resolution (#12104)
+
+## 18.0.82 alpha 2024-08-05
+
+* chore(windows): remove QIT_VSHIFTDOWN QIT _VSHIFTUP (#11973)
+* chore(developer): add language/reference (#11799)
+
+## 18.0.81 alpha 2024-08-03
+
+* chore(developer): Revert "chore(developer): remove redundant references from tsconfig.json" (#12076)
+* chore(common): use nvm in builds to select a node version automatically (#12069)
+* refactor(developer): move functions and variables into CompilerErrors.cpp (#12030)
+* refactor(developer): improve the callbacks for kmcmplib (#12031)
+* refactor(developer): align kmcmplib error codes and names with kmc-kmn (#12044)
+* refactor(developer): move error reporting to error site in kmcmplib (part 1) (#12045)
+* refactor(developer): move error reporting inside `GetCompileTargetsFromTargetsStore` and `ProcessGroupFinish` (#12048)
+* refactor(developer): move kmcmplib message construction to kmc-kmn (#12059)
+* refactor(developer): rename compiler error reporting functions in kmcmplib (#12060)
+* chore(developer): support filename field in kmcmplib compiler messages (#12061)
+* refactor(developer): replace `VERIFY_KEYBOARD_VERSION()` calls with `VerifyKeyboardVersion()` (#12063)
+
+## 18.0.80 alpha 2024-07-31
+
+* chore(developer): remove redundant references from tsconfig.json (#12037)
+* fix(web): add nullish test in setOsk (#12039)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12049)
+* test(developer): check correct use of u16chr when second parameter could be null (#11894)
+* change(web): remove support for es5 (#11881)
+
+## 18.0.79 alpha 2024-07-30
+
+* change(mac): add custom tags in sentry to better identify errors (#11947)
+* feat(web): add unit tests for case-detection & handling (#11950)
+* refactor(web): spin off method for correction-search probability-thresholding check (#11952)
+
+## 18.0.78 alpha 2024-07-29
+
+* chore(common): Update history from 17.0.327 and add missing descriptions (#12021)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12015)
+* feat(web): add unit testing for finalization of generated suggestions (#11946)
+* feat(web): add unit tests for prediction lookup component (#11949)
+
+## 18.0.77 alpha 2024-07-27
+
+* refactor(windows): clean up logging (#11921)
+* chore(developer): rename to analyzer-messages.ts (#12017)
+* fix(developer): remove `paths` from tsconfig.json (#12028)
+* chore(developer): api doc refresh (#12029)
+
+## 18.0.76 alpha 2024-07-26
+
+* change(linux): improve changelog PRs after upload to debian (#12024)
+* test(developer): kmcmplib compiler unit tests 2 (#11663)
+* fix(linux): set local directory if not specified (#12032)
+
+## 18.0.75 alpha 2024-07-25
+
+* chore(windows): remove the posting WM_KEYUP/DOWN events to IM (#12002)
+* feat(web): check for low-probability exact + exact-key correction matches (#11876)
+* refactor(web): extract suggestion-finalization block into its own function (#11899)
+* chore(developer): remove `CompilerMessages` stub and use `KmnCompilerMessages` (#11986)
+* chore(developer): rename kmc-ldml `CompilerMessages`, `LdmlKeyboardCompilerMessages` to `LdmlCompilerMessages` (#11988)
+* chore(developer): rename kmc-package `CompilerMessages` to `PackageCompilerMessages` (#11989)
+* fix(developer): handle errors parsing .kps file when loading project (#12008)
+* chore(common): updated stats script to support end date/sprint (#12009)
+* fix(windows): align engine.sln platforms and configurations (#12011)
+* refactor(web): spin off deduplication, suggestion-similarity sections (#11900)
+* refactor(web): extract the correct-and-raw-predict blocks into their own method (#11888)
+* refactor(web): convert internal prediction methods to stateless format (#11940)
+* feat(web): add unit tests for predict auto-selection method (#11941)
+* feat(web): extend unit-test oriented dummy model (#11948)
+* feat(web): add unit tests for suggestion-similarity detection (#11944)
+* feat(web): add unit testing for suggestion deduplication (#11945)
+* feat(developer): add hint when index() store is longer than any() store (#12000)
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#11889)
+
+## 18.0.74 alpha 2024-07-24
+
+* fix(developer): correct handling of trailing spaces by GetDelimitedString() in kmcmplib compiler (#11938)
+* chore(linux): remove Ubuntu Mantic, add Oracular (#12003)
+
+## 18.0.73 alpha 2024-07-23
+
+* fix(windows): add text selected bool emit backspace key when text selected in TSF (#11884)
+* fix(developer): prevent buffer overrun in `u16tok` (#11910)
+* fix(developer): prevent invalid values in targets store (#11918)
+* feat(developer): automatically detect version for `U_xxxx_yyyy` ids (#11957)
+* feat(developer): handle automatic versioning of chiral modifiers (#11965)
+* test(developer): Add tests for automatic versioning of notany() with context() (#11980)
+* feat(developer): handle automatic versioning of special key caps on normal keys (#11981)
+* feat(developer): automatically upgrade version when gestures are found in the touch layout (#11982)
+* refactor(developer): rename `verifyMinimumKeymanVersion` (#11983)
+* feat(developer): add searching for message identifiers to `kmc message` (#11984)
+* fix(developer): kmc-keyboard-info: use default version 1.0 if version information missing (#11985)
+* fix(web): present a "keep" option when a context-altering suggestion is auto-selected (#11969)
+* fix(web): prevents auto-accept immediately after reversion (#11970)
+
+## 18.0.72 alpha 2024-07-22
+
+* fix(web): remedy unit-test stability issues (#11933)
+* refactor(web): fix TypeScript errors and warnings (#11911)
+
+## 18.0.71 alpha 2024-07-18
+
+* chore(windows): add comments for _WIN64 tests (#11929)
+* chore(common): Update Crowdin strings for Portuguese (#11974)
+
+## 18.0.70 alpha 2024-07-08
+
+* feat(web): provide lexicon probabilities directly on the search path (#11868)
+* feat(common/models): support direct-child access for Trie node iteration (#11869)
+* change(common/models/templates): rework Trie predict method to utilize traversals (#11870)
+* change(web): track the base correction for generated predictions (#11875)
+* feat(web): add and enable auto-correction (#11866)
+
+## 18.0.69 alpha 2024-07-05
+
+* fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
+* chore(windows): correct output file for 64-bit build of keyman32 in build.sh (#11930)
+* chore(android,ios): Add Crowdin localization for Polytonic Greek (#11877)
+
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
+## 18.0.67 alpha 2024-07-03
+
+* refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
+
+## 18.0.66 alpha 2024-07-02
+
+* fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)
+
+## 18.0.65 alpha 2024-07-01
+
+* fix(developer): prevent non-BMP characters in key part of rule (#11806)
+* chore(linux): remove unused building with pbuilder (#11862)
+
+## 18.0.64 alpha 2024-06-28
+
+* fix(web): use fat-finger data with simple keypresses (#11854)
+
+## 18.0.63 alpha 2024-06-26
+
+* feat(linux): implement Linux side of SimulateAltGr option (#11852)
+
+## 18.0.62 alpha 2024-06-25
+
+* chore(common): update C/C++ formatting options (#11836)
+* chore(linux): use shared meson config (#11863)
+* fix(linux): ignore exceptions trying to install cache (#11861)
+
+## 18.0.61 alpha 2024-06-24
+
+* feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
+* fix(android): clear globe highlight when displaying keyboard picker (#11826)
+* refactor(linux): add KeymanOption class for options (#11850)
+* refactor(linux): rename methods that deal with keyboard options (#11851)
+
+## 18.0.60 alpha 2024-06-21
+
+* chore(web): define common timeout variable for automated testing (#11839)
+* feat(developer): warn on empty keycaps (#11810)
+* change(web): optimization for keyboard-layout preprocessing (#11263)
+* feat(web): optimization via lazy construction of OSK layers (#11264)
+* fix(developer): layr: fix modifier err message on layer w/o id (#11843)
+
+## 18.0.59 alpha 2024-06-19
+
+* chore(deps-dev): bump braces from 3.0.2 to 3.0.3 (#11756)
+* chore(developer): clarify project upgrade messages about file locations (#11819)
+* chore(deps): bump ws from 8.16.0 to 8.17.1 (#11822)
+* chore(common): update base-package node-engine setting (#11798)
+* change(web): change after-word whitespace check to be more selective (#11800)
+* chore: Revert "chore(common): update base-package node-engine setting" (#11829)
+* change(web): drop correction batching (#11768)
+* chore(web): move correction-search execution timer to its own file (#11757)
+* refactor(web): overhaul predictive-text engine's timer to better detect paused time (#11758)
+* feat(web): improve predictive-text responsiveness when typing rapidly (#11784)
+* feat(linux): re-create missing files at run-time (#11789)
+
+## 18.0.58 alpha 2024-06-18
+
+* test(core): Add a minimal test that exercises the core API (#11781)
+* fix(developer): check HISTORY.md to get last modified date for keyboard_info and model_info (#11805)
+* docs(developer): extra context help for keyboard-editor (does not exist in Keyman Developer 17.0) (#11771)
+
+## 18.0.57 alpha 2024-06-17
+
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11783)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11786)
+* fix(core): serialize tests for core/wasm on mac agents (#11795)
+* fix(developer): refactor kmcmplib compiler messages to use map (#11738)
+* fix(developer): make native compilation of kmcmplib under Linux possible (#11779)
+* feat(core): devolve regex to javascript (#11777)
+* feat(core): remove ICU from core under wasm (#11778)
+* fix(linux): restart ibus after manual integration test run (#11775)
+
+## 18.0.56 alpha 2024-06-14
+
+* feat(core): devolve normalization to js (#11541)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11759)
+* docs(developer): context help in package-editor and put the existing context help in their own tab comments (#11760)
+* docs(developer): context help in keyboard-editor section (#11754)
+* docs(developer): context help in new-project section (#11767)
+* docs(developer): context help for new-project-parameters in keyman developer (#11769)
+* docs(developer): context help for Select BCP 47 tag in Keyman Developer (#11770)
+* change(common): update esbuild to 0.18.9 (#11693)
+* change(web): more prep for better async prediction handling (#10347)
+* fix(web): set new-context rules' device to match that of the active OSK (#11743)
+* chore(linux): Update debian changelog (#11671)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11732)
+
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
+## 18.0.52 alpha 2024-06-08
+
+* fix(developer): prevent two touch layout editors opening for the same file (#11717)
+* chore(common): cleanup meson deprecations and warnings (#11523)
+* feat(developer): support language reference in context help (#11737)
+* test(developer): kmcmplib compiler unit tests (#11378)
+
+## 18.0.51 alpha 2024-06-07
+
+* fix(web): fix osk touch-focus tracking (#11705)
+* fix(web): defer keyboard activation requests made during engine initialization (#11713)
+* chore(developer): add context/character-map (#11656)
+* chore(developer): add context/wordlist-editor (#11658)
+* chore(developer): add context/new-model-project-parameters (#11677)
+* fix(common): remove allowJs from web's tsconfig.base.json (#11718)
+* change(web): precompile all TS-based tests (#11723)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11707)
+* chore: add cherry-pick information in commit messages (#11708)
+* fix(developer): handle encoding errors when loading wordlists (#11711)
+* chore(ios): remove dead Swift-side keyboard gesture code (#11672)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11730)
+* refactor(web): Replace deprecated substr with substring (#11637)
+
+## 18.0.50 alpha 2024-06-06
+
+* chore(common): adds retry mechanism for build script npm ci calls (#11451)
+* fix(web): get row-height for flick constraints after performing layout (#11691)
+* chore(ios): enable webview debugging (#11229)
+* fix(android): handle `IllegalArgumentException` when initializing `CloudDownloadMgr`, add logging to check for unhandled side-effects (#11626)
+* chore: replace git dep on restructure with 3.0.1 in npm (#11657)
+* chore: move xml2js into the repo to eliminate npm git dependency (#11660)
+* chore(common): move CLDR import copy into build step for common/web/types (#11690)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11587)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11698)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11701)
+
+## 18.0.49 alpha 2024-06-05
+
+* fix(web): revert #11598 to eliminate use of `finalInput` which caused crash after moving caret (#11685)
+* fix(common): correctly display result of multiple option parameters in builder (#11679)
+* fix(linux): specify path with package name (#11694)
+* fix(linux): remove debug output and re-enable failures (#11695)
+
+## 18.0.48 alpha 2024-06-04
+
+* fix(linux): add debug output (#11668)
+* chore(windows): add debug log messages for modifier key press processing (#11665)
+* test(core): clarify output of test_unicode (#11572)
+* fix(linux): add more debug output (#11680)
+* fix(linux): try a different way (#11681)
+
+## 18.0.47 alpha 2024-06-03
+
+* fix(developer): save touch layout editor selection when loading state (#11575)
+* chore: Update history from 17.0.326 (#11649)
+* refactor(web): refactor keyboard-layout preprocessing property transplantation (#11601)
+* fix(web): fix keyboard-processing bugs uncovered by stricter TS settings (#11603)
+* fix(web): Don't apply suggestion unless fully configured (#11594)
+* chore(web): clean up remaining low-level Web .tsconfig settings (#11424)
+* chore(web): correct cases of implicit-any in web/ (#11462)
+* chore(web): enforce strict function types in web/ (#11463)
+* chore(web): finalize web/ project parity with base-repo TS config settings (aside from JS version target) (#11464)
+* fix(android): include DOMRect polyfill for older ES6-supporting devices (#11653)
+* fix(linux): move environment to separate job and checkout to separate subdirectory (#11659)
+* fix(linux): paths in `uses:` can't use variables (#11661)
+* fix(linux): restore of artifacts still needs to be in same job (#11662)
+* fix(linux): include api version as part of package filename (#11664)
+* fix(linux): don't escape wildcard for package filename (#11666)
+* fix(linux): match digit in package filename (#11667)
+
+## 18.0.46 alpha 2024-06-01
+
+* chore(linux): More debugging of API verification (#11639)
+
+## 18.0.45 alpha 2024-05-31
+
+* change(mac): adopt unified logging APIs (#11515)
+* chore(common): update labels to include change, style (#11527)
+* chore(linux): run deb-package sourcepackage job on Ubuntu 24.04 (#11565)
+* test(core): verify Unicode and ICU versions cross-platform (#11418)
+* chore(linux): Debugging API verification (#11536)
+* refactor(core): prepare normalization code to call into JS under WASM (#11519)
+* feat(core): change normalize_nfd() to use JS native call instead of ICU on wasm (#11520)
+* fix(linux): Restore artifacts for API verification in the correct job (#11571)
+* fix(linux): Don't clean workdir after checkout in API verification (#11592)
+* fix(developer): test existence of ngrok.exe before atttempting to start (#11543)
+* fix(developer): handle unsupported `return` statement in `match` and `nomatch` in web compiler (#11546)
+* fix(developer): handle invalid project file when scanning for owner project (#11558)
+* fix(developer): ensure folder for MRU list is always created (#11552)
+* fix(web): fixes error on tab, enter when only a single input element is on the page (#11470)
+* fix(web): correctly handle cross-origin stylesheets when calculating keyboard size and key cap font size (#11472)
+* fix(web): pre-init keyboard activation awaits init before proceeding (#11505)
+* fix(android): host-page banner initialization (#11508)
+* fix(web): add null guard for missing debug info when reporting to Sentry (#11579)
+* chore(web): updates TypeScript version to 5.4.5 (#11414)
+* fix(ios): remove incorrect cast in log statement to prevent crash (#11569)
+* fix(web): headless recorder unhandled paths, invalid test-sequence references (#11596)
+* fix(web): remove dead code-branches (#11597)
+* chore(web): fixes implicit-this cases (#11459)
+* fix(web): use intended source for prediction-to-context matching (#11598)
+* fix(web): explicitly terminate banner gesture-handling when banner is swapped (#11599)
+* chore(web): removes unused locals, imports, and private fields (#11460)
+* fix(web): use correct parameter name in button UI OSK `hide` event (#11600)
+* chore(mac): rework of main build script (#11444)
+* fix(ios): do not write to shared storage from system keyboard (#11613)
+* fix(developer): handle invalid default project path in options (#11555)
+* fix(developer): handle missing data in .kps `<Keyboard>` (#11563)
+* fix(developer): use correct variable when fixing up flick and multitap in Layer Properties dialog (#11577)
+* fix(developer): correct the inference of default hint from flicks (#11582)
+* fix(developer): make top row of Character Map 1 pixel to avoid DIV/0 in gestures (#11590)
+* chore: increase kmc-kmn build test timeout (#11608)
+* chore(windows): support port in THTTPUploader (#11611)
+* change(common): add extra commit message hints (#11585)
+* chore(developer): add context/debug (#11629)
+
+## 18.0.44 alpha 2024-05-24
+
+* fix(linux): Pass artifacts key to API verification GHA (#11517)
+* fix(web): properly pass test-runner verbose-logging flag (#11509)
+* chore(developer): add context/key-test (#11512)
+* fix(android/engine): Ignore updating invalid selections (#11510)
+* docs(common): update min emscripten version in docs to 3.1.46 (#11530)
+* fix(linux): Properly use and pass run_id (#11533)
+
+## 18.0.43 alpha 2024-05-24
+
+* fix(android): Revert Sentry version for FV Android (#11522)
+* chore(windows): remove schedule task clean up introduced in 15.0 Alpha (#11521)
+* fix(windows): add FirstVoices Keyboards build to Windows release build (#11524)
+
+## 18.0.42 alpha 2024-05-23
+
+* chore(web): conversion of Web's browser-integration auto-tests for @web/test-runner use (#11455)
+* chore(web): conversion of Web's end-to-end style auto-tests for @web/test-runner use (#11456)
+* chore(web): finalization for replacement of Karma with Web Test Runner (#11300)
+* fix(android): Delete sentry-cli-2.31.1.exe during CI builds (#11493)
+* change(common): remove `is:open` from issue templates (#11492)
+* chore(developer): build.sh for developer (#11421)
+* chore(windows): move from Makefile to build.sh (#11461)
+* fix(linux): Add missing variable to API verification GHA (#11511)
+* chore(common): Update standards data (#11003)
+
+## 18.0.41 alpha 2024-05-22
+
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11488)
+* chore(linux): Trigger GHA packaging for stable builds (#11495)
+* chore(android,mac,windows): Update crowdin strings for DE (#11497)
+* feat(web): custom infrastructure for @web/test-runner use (#11403)
+* chore(web): conversion of lm-worker browser-test for @web/test-runner use (#11404)
+* chore(web): conversion of lm-layer browser-tests for @web/test-runner use (#11452)
+* chore(web): conversion of Web keyboard-loading browser-tests for @web/test-runner use (#11453)
+* chore(web): conversion of Web gesture-engine browser-tests for @web/test-runner use (#11454)
+
+## 18.0.40 alpha 2024-05-21
+
+* refactor(common): move `enabled` declaration into test_color.cpp (#11483)
+* test(developer) kmn compiler messages unit tests (#11284)
+* chore(linux): Move API verification to separate action (#10637)
+
+## 18.0.39 alpha 2024-05-20
+
+* chore(mac): change indentation of source code to equal standard two spaces (#11432)
+* fix(common): calculate already-build dependency targets correctly (#11477)
+* fix(common): properly quote `builder_run_action` call (#11478)
+* fix(android/app): Verify extracted text is not null (#11481)
+
+## 18.0.38 alpha 2024-05-17
+
+* chore(common): Auto-generate minimum-versions.md from min-ver.sh (#11399)
+* fix(android): Replace deprecated APIs for Display, Size, Metrics (#11436)
+* chore(common): Clear whatsnew help files (#11469)
+
+## 18.0.37 alpha 2024-05-16
+
+* chore(android): update Gradle wrapper version (#11437)
+* fix(android/engine): Handle globe key on lock screen (#11458)
+* chore(oem/fv/ios): Remove build_keyboards.sh script (#11438)
+
+## 18.0.36 alpha 2024-05-15
+
+* chore: merge beta into master, final (#11445)
+* chore(web): updates chai, @types/chai dependencies (#11318)
+* chore(web): updates most @types/node dependencies, makes them consistent (#11319)
+* chore(web): adds '@web/test-runner' and related packages (#11323)
+* chore(web): EventEmitter3, sinon dependency updates (#11402)
+
+## 18.0.35 alpha 2024-05-14
+
+* chore(core): update core to C++17 (#11340)
+
+## 18.0.34 alpha 2024-05-13
+
+* feat(windows): Don't install desktop shortcut for Keyman for windows on installation (#11401)
+* feat(common): improve builder parameter passing for child and dep builds (#11410)
+* chore: merge 17.0 beta into master A17S2 (#11431)
+* chore(android): Update dependencies (#11393)
+
+## 18.0.33 alpha 2024-05-10
+
+* chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
+
+## 18.0.32 alpha 2024-05-09
+
+* chore(common): Add `minimum-versions.inc.sh` (#11380)
+* chore(core): km_core_cp -> km_core_cu (#11341)
+
+## 18.0.31 alpha 2024-05-08
+
+* fix(windows): "Keyboard" should be lower case in UI string for font helper tool (#11392)
+
+## 18.0.30 alpha 2024-05-07
+
+* chore(web): Improve dependencies (#11377)
+* test(developer) keyboard info compiler unit tests 3 (#11255)
+
+## 18.0.29 alpha 2024-05-06
+
+* chore(web): Improve web/test.sh script (#11355)
+* chore(linux): Fix typo (#11356)
+
+## 18.0.28 alpha 2024-05-04
+
+* chore(common): maintenance on build scripts - cd (#11329)
+
+## 18.0.27 alpha 2024-05-03
+
+* chore(linux): Adjust distros for GHA (#11333)
+* fix(common): Fix colorization of help output of builder script (#11336)
+
+## 18.0.26 alpha 2024-05-02
+
+* chore: merge beta into master A18S1 (#11332)
+
+## 18.0.25 alpha 2024-04-30
+
+* fix(linux): Improve detection of Gnome environment (#11292)
+
+## 18.0.24 alpha 2024-04-29
+
+* fix(common): Retry curl downloads up to 5 times (#11314)
+
+## 18.0.23 alpha 2024-04-26
+
+* chore(common): Merge beta to master for Sprint B17S6 (part 2) (#11305)
+* fix(web): Fix layout for subkey menus with unusually-sized keys (#11266)
+
+## 18.0.22 alpha 2024-04-25
+
+* chore(linux): Install python3-dev (#11296)
+
+## 18.0.21 alpha 2024-04-24
+
+* chore: merge beta into master B17S6 (#11291)
+
+## 18.0.20 alpha 2024-04-19
+
+* chore(deps): bump tar from 6.1.13 to 6.2.1 (#11211)
+
+## 18.0.19 alpha 2024-04-15
+
+* chore(linux): Fix wrong merge (#11224)
+
+## 18.0.18 alpha 2024-04-12
+
+* chore(common): Merge beta to master for Sprint B17S5 (#11217)
+
+## 18.0.17 alpha 2024-04-05
+
+* chore(linux): Show failed job for next Ubuntu version as failed (#11168)
+
+## 18.0.16 alpha 2024-04-04
+
+* chore(linux): Revert "Ignore failed package builds differently" (#11157)
+* chore(linux): Sign packages even if build for next Ubuntu fails (#11163)
+
+## 18.0.15 alpha 2024-04-03
+
+* chore(linux): Build packages for next Ubuntu version separately (#11145)
+* chore(linux): Fix typo in path of `build-binary-packages` action (#11154)
+* chore(linux): More fixes for workaround for failing linux builds (#11156)
+
+## 18.0.14 alpha 2024-04-02
+
+* chore(linux): Update debian changelog (#11097)
+
+## 18.0.13 alpha 2024-03-29
+
+* chore(deps): bump express from 4.17.3 to 4.19.2 (#11103)
+
+## 18.0.12 alpha 2024-03-28
+
+* chore(common): Merge beta to master for Sprint B17S4 (#11105)
+
+## 18.0.11 alpha 2024-03-20
+
+* chore(deps-dev): bump follow-redirects from 1.15.4 to 1.15.6 (#11010)
+
+## 18.0.10 alpha 2024-03-16
+
+* chore: Merge beta to master for Sprint B17S3 (#11008)
+
+## 18.0.9 alpha 2024-03-05
+
+* chore: B17S2 merge beta to master (#10909)
+
+## 18.0.8 alpha 2024-03-04
+
+* chore(linux): Update debian changelog (#10898)
+
+## 18.0.7 alpha 2024-02-29
+
+* chore: Merge 17.0.270 beta back to master (#10886)
+
+## 18.0.6 alpha 2024-02-27
+
+* chore(linux): Temporarily disable autopkgtests gha (#10853)
+* chore(linux): Update debian changelog (#10827)
+
+## 18.0.5 alpha 2024-02-26
+
+* fix(linux): Dynamically get package name (#10826)
+* chore(linux): Add running autopkgtests on GHA (#10823)
+* fix(linux): Fix autopkgtest gha (#10849)
+
+## 18.0.4 alpha 2024-02-23
+
+* chore(linux): Update debian changelog (#10786)
+
+## 18.0.3 alpha 2024-02-21
+
+* chore(deps): bump ip from 2.0.0 to 2.0.1 (#10792)
+
+## 18.0.2 alpha 2024-02-20
+
+* chore(linux): Add testbuild info to workflow title (#10771)
+
+## 18.0.1 alpha 2024-02-15
+
+* chore(common): move to 18.0 alpha (#10713)
+* chore: move to 18.0 alpha
+
+## 17.0.333 stable 2025-01-16
+
+* fix(core): permanently disable logging (#12674)
+* fix(linux): pushing of updated changelog branch (#12819)
+* fix(linux): work around Lintian errors (#12817)
+* fix(core): implement ldml_processor::get_key_list() (#12816)
+* chore(linux): Update debian changelog (#12022)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12875)
+* chore: use GitHub PR titles when writing HISTORY.md (#12908)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12913)
+
+## 17.0.332 stable 2024-11-06
+
+* fix(developer): create Server config directory before options save (#12609)
+* fix(developer): handle merge commits when checking git log date (#12628)
+* fix(linux): set environment variable for rendering of downloads dialog (#12617)
+
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
+
+## 17.0.329 stable 2024-09-09
+
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12040)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12058)
+* chore(common): use `nvm` to select version of node for builds (#12074)
+* fix(developer): ignore scan code if zero in debugger (#12182)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12206)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12207)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12226)
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12245)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12240)
+* fix(core): set mac build version for meson cli build to 10.13 (#12246)
+* change(ios): defer registration of fonts past initialization (#12241)
+* chore(android,ios): Update FirstVoices keyboards to 12.15 (#12301)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12285)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12284)
+* fix(android): check in material-stepper as internal Maven dependency (#12324)
+* fix(linux): add `keymanFacename` to .ldml file (#12283)
+* chore(oem/fv): Update to fv_all 13.0 (#12363)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12364)
+* fix(android): skip language counts for lexical-model packages (#12368)
+
+## 17.0.328 stable 2024-07-27
+
+* fix(web): add nullish test in setOsk (#12041)
+
+## 17.0.327 stable 2024-07-25
+
+* fix(android): include DOMRect polyfill for older ES6-supporting devices (#11654)
+* fix(web): Don't apply suggestion unless fully configured (#11636)
+* fix(mac): handle command keys without crashing (#11675)
+* fix(web): get row-height for flick constraints after performing layout (#11692)
+* fix(android): handle IllegalArgumentException when initializing CloudDownloadMgr, add logging to check for unhandled side-effects (#11628)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11588)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11699)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11703)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11709)
+* fix(developer): handle encoding errors when loading wordlists (#11712)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11731)
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11721)
+* fix(developer): prevent two touch layout editors opening for the same file (#11727)
+* fix(android): check current orientation, fix keyboard size after system keyboard rotations and resumes (#11747)
+* chore(linux): Update debian changelog (#11670)
+* feat(developer): support language reference in context help (#11741)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11766)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11733)
+* fix(web): set new-context rules' device to match that of the active OSK (#11744)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11787)
+* fix(windows): add -k parameter for keyboards build.sh (#11811)
+* fix(core): serialize tests for core/wasm on mac agents (#11809)
+* chore(developer): clarify project upgrade messages about file locations (#11820)
+* fix(developer): check HISTORY.md to get last modified date for keyboard_info and model_info (#11808)
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11797)
+* change(web): change after-word whitespace check to be more selective (#11824)
+* fix(android): clear globe highlight when displaying keyboard picker (#11827)
+* fix(web): use fat-finger data with simple keypresses (#11871)
+* fix(developer): prevent non-BMP characters in key part of rule (#11807)
+* fix(linux): ignore exceptions trying to install cache (#11885)
+* chore(common): Update Crowdin strings for Portuguese (#11976)
+* chore(linux): remove Ubuntu 23.10 Mantic (#12004)
+
+## 17.0.326 stable 2024-06-02
+
+* cherrypick(android/engine): Handle globe key on lock screen (#11468)
+* fix(android/app): Verify extracted text is not null (#11482)
+* chore(linux): Trigger GHA packaging for stable builds (#11494)
+* chore(android,mac,windows): Update crowdin strings for DE (#11498)
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11489)
+* fix(developer): test existence of ngrok.exe before atttempting to start (#11544)
+* fix(developer): handle unsupported `return` statement in `match` and `nomatch` in web compiler (#11547)
+* fix(developer): ensure folder for MRU list is always created (#11553)
+* fix(developer): handle invalid project file when scanning for owner project (#11559)
+* fix(ios): remove incorrect cast in log statement to prevent crash (#11570)
+* fix(ios): do not write to shared storage from system keyboard (#11622)
+* fix(android): Ignore updating invalid selections (#11529)
+* fix(developer): handle invalid default project path in options (#11556)
+* fix(developer): handle missing data in .kps `<Keyboard>` (#11564)
+* fix(developer): save touch layout editor selection when loading state (#11576)
+* fix(developer): use correct variable when fixing up flick and multitap in Layer Properties dialog (#11578)
+* fix(developer): correct the inference of default hint from flicks (#11583)
+* fix(developer): make top row of Character Map 1 pixel to avoid DIV/0 in gestures (#11591)
+* fix(web): fixes error on tab, enter when only a single input element is on the page (#11615)
+* fix(web): correctly handle cross-origin stylesheets when calculating keyboard size and key cap font size (#11616)
+* fix(web): pre-init keyboard activation awaits init before proceeding (#11617)
+* fix(web): add null guard for missing debug info when reporting to Sentry (#11619)
+* fix(android): host-page banner initialization (#11618)
+* fix(developer): support Windows and Unicode names in .ttf (#11634)
+
+## 17.0.325 stable 2024-05-15
+
+* chore: update history for stable (#11448)
+
+## 17.0.324 stable 2024-05-15
+
+* chore(android): 17.0 stable release
+* chore(ios): 17.0 stable release
+* chore(linux): 17.0 stable release
+* chore(mac): 17.0 stable release
+* chore(web): 17.0 stable release
+* chore(windows): 17.0 stable release
+* chore(developer): 17.0 stable release
+
+## 17.0.323 beta 2024-05-13
+
+* chore(windows): Update crowdin string for Khmer (#11409)
+* fix(android): disable Sentry session tracking (#11419)
+* fix(mac): restore OSK keys that became invisible in mac OS 14 Sonoma (#11388)
+* chore(android,ios): Add fv_nlakapamuxcheen (#11405)
+
+## 17.0.322 beta 2024-05-10
+
+* fix(web): fixes illegal KMW event state - can't focus a null element (#11385)
+
+## 17.0.321 beta 2024-05-09
+
+* fix(android/engine): Skip updating selection range if invalid (#11384)
+* refactor(android/engine): Refactor updateSelection (#11389)
+
+## 17.0.320 beta 2024-05-07
+
+* fix(android): prevents mid-keystroke desynchronization when deleting selected text (#11367)
+* fix(web): support SVG elements when checking className (#11365)
+* fix(developer): define `lastSelLength` variable (#11366)
+
+## 17.0.319 beta 2024-05-04
+
+* fix(android): inverting a selection range would crash Keyman (#11345)
+* fix(developer): handle missing Name element for File element in package compiler (#11352)
+* fix(developer): handle missing Description element for File element in package compiler (#11354)
+
+## 17.0.318 beta 2024-05-02
+
+* fix(web): longpress shortcut activation should only consider northward part (#11306)
+* chore(ios,mac): support build on Apple Silicon using Xcode 15.3 (#11302)
+
+## 17.0.317 beta 2024-05-01
+
+* chore(web): remove old reference-doc from alpha that has completed its purpose (#11322)
+* fix(web): gesture-model initial-state, callback failure handling (#11321)
+* fix(linux): Fix icon for .kmp files (#11295)
+
+## 17.0.316 beta 2024-04-30
+
+* fix(windows): check font count display none found (#11282)
+
+## 17.0.315 beta 2024-04-26
+
+* fix(web): osk-view hidden by default on construction (#11258)
+* fix(android): fixes kbd text zoom to prevent accessibility cross-effects (#11281)
+* fix(developer): support export of visual keyboard when Keyman for Windows not installed (#11244)
+* chore(linux): Prepare for stable release (#11301)
+* fix(core): reset on frame keys (#11172)
+* fix(core): ldml backspace processing should delete all markers (#11254)
+
+## 17.0.314 beta 2024-04-25
+
+* fix(android/engine): URIEncode strings passed to Javascript (#11206)
+* fix(android/app): Update storage permissions for Android 12.0+ (#11299)
+* test(developer): keyboard info compiler messages unit tests 2 (#11253)
+
+## 17.0.313 beta 2024-04-23
+
+* chore(common): Set fetch-latest-cldr.sh executable (#11289)
+* chore(common): Fix missing entries in HISTORY.md (#11290)
+* fix(developer): report missing help to sentry instead of local xml (#11271)
+* fix(developer): "use strict" for downlevel browsers in Server (#11276)
+
+## 17.0.312 beta 2024-04-22
+
+* fix(developer): emit JSON strings as characters, not surrogate pairs (#11243)
+* fix(developer): prevent xmlns for LDML keyboard template child elements (#11251)
+* fix(developer): test that MRU project exists before attempting to reference on startup (#11252)
+* fix(developer): handle invalid Unicode values in touch layout builder (#11270)
+* fix(developer): handle multiple instances of Server starting (#11272)
+* fix(developer): lazy initialization of test window (#11275)
+* chore(web): drops redundant builder-dependency from early gesture dev (#11278)
+* feat(web): add recent-history log to gesture engine (#11277)
+* test(developer): keyboard info compiler unit tests 2 (#11130)
+* fix(web): fixes pred-text unit test instability (#11283)
+* fix(developer): keep escaped plus-sign escaped (#11269)
+* chore(resources): sync up with CLDR v45 release (#11004)
+
+## 17.0.311 beta 2024-04-19
+
+* fix(web): default parse of length styling for empty string (#11235)
+* change(web): initializes OSK with keyboard if available during init (#11174)
+* fix(ios): prevents post-restore kbd issues by refreshing kbd (#10952)
+* fix(mac): handle text replacement cases during compliance detection (#11190)
+
+## 17.0.310 beta 2024-04-18
+
+* fix(web): now auto-scrolls if target element would be hidden after device rotation (#11210)
+* fix(ios): deletion of selected text (#11179)
+* fix(common): update emoji stripping for Unicode 15.1 (#11242)
+* change(web): adjusts multitap timings (#11246)
+* fix(web): prevents dropping of input during rapid multitouch typing (#11245)
+
+## 17.0.309 beta 2024-04-17
+
+* fix(ios): sample build script --debug detection (#10953)
+* chore(web): simple layout reflow polish (#11237)
+* chore(android): enables debugging and inspection of mobile app internal webviews (#11215)
+* fix(web): prevents selection-clear for pure layer-switching multitaps (#11232)
+* change(web): drops need for closures to optimize layout-reflow (#11238)
+
+## 17.0.308 beta 2024-04-13
+
+* chore(developer): use keyboard3 tag rather than DTD to identify LDML keyboard xml files (#11214)
+
+## 17.0.307 beta 2024-04-12
+
+* fix(common): specify title explicitly when opening PR with hub (#11173)
+* refactor(web): better centralizes OSK layout internals to prepare for optimization efforts  (#11176)
+* feat(web): VisualKeyboard layout-reflow optimization  (#11177)
+* change(web):  OSK optimization, improved responsiveness  (#11140)
+* fix(web): fixes up-flick shortcut issue for longpress when keys support downflicks (#11216)
+
+## 17.0.306 beta 2024-04-11
+
+* docs(ios): updates iOS app help for 17.0 banner changes (#11200)
+* chore(oem/fv): Add fv sguuxs and update keyboard versions (#11198)
+
+## 17.0.305 beta 2024-04-10
+
+* fix(core): skip leading trail surrogate char in km_core_state_context_set_if_needed() (#11169)
+* change(web): merges split async method in gesture engine  (#11142)
+* fix(web): blocks nextLayer for keys quickly typed when multitapping to new layer when final tap is held (#11189)
+* refactor(web): OSK spacebar-label updates now managed by layer object  (#11175)
+
+## 17.0.304 beta 2024-04-09
+
+* fix(android): atomically updates selection with text (#11188)
+* fix(web): fix crash in nearest-key row lookup when touch moves out-of-bounds (#11178)
+
+## 17.0.303 beta 2024-04-05
+
+* fix(windows): decode uri for Package ID and filename (#11152)
+* fix(common/models): suggestion stability after multiple whitespaces (#11164)
+
+## 17.0.302 beta 2024-04-04
+
+* fix(mac): load only 80 characters from context when processing keystrokes (#11141)
+
+## 17.0.301 beta 2024-04-03
+
+* feat(core): support modifiers=other (#11118)
+* chore(core): dx better err message on embedded test vkeys (#11119)
+* fix(web): key preview stickiness  (#10778)
+* fix(web): early gesture-match abort when unable to extend existing gestures  (#10836)
+* fix(web): infinite model-match replacement looping  (#10838)
+* fix(web): proper gesture-match sequencing  (#10840)
+* change(web): input-event sequentialization  (#10843)
+* fix(web): proper linkage of sources to events  (#10960)
+* fix(developer): handle buffer boundaries in four cases (#11137)
+* chore(linux): Build packages for next Ubuntu version separately (#11153)
+* fix(common): upgrade sentry-cli to 2.31.0 (#11151)
+* fix(android/app): Track previous device orientation for SystemKeyboard (#11134)
+* change(web): reworks nearest-key detection to avoid layout reflow (#11129)
+
+## 17.0.300 beta 2024-04-02
+
+* change(web): keyboard swaps keep original keyboards active until fully ready (#11108)
+* fix(android/engine): Swap selection range if reversed (#11127)
+* test(developer): keyboard info compiler unit tests (#11000)
+
+## 17.0.299 beta 2024-04-01
+
+* fix(ios):  address crash by reading full code point rather than code unit when trimming initial directional-mark (#11113)
+* fix(mac): delete correct number of characters from current context when processing BMP or SMP deletes (#11086)
+* feat(developer): disallow stray dollarsign in from pattern (#11117)
+
+## 17.0.298 beta 2024-03-29
+
+* chore(linux): Update debian changelog (#11096)
+* fix(web): prevent layer switch key from erasing selection (#11032)
+* fix(developer): prevent error when scrolling touch layout editor with no selected key (#11109)
+* fix(common): make `isEmptyTransform` return true if passed a nullish transform (#11110)
+
+## 17.0.297 beta 2024-03-28
+
+* fix(common): properly handle illegal UnicodeSets to prevent crash in kmc-ldml compiler (#11065)
+* fix(core,developer): variable/marker substitution in sets and strings (#11059)
+* fix(developer):  in ldml compiler, generate compiler error if `from=` regex matches empty string (#11070)
+* fix(core): calculate offset correctly when replacing marker in transform (fixes crash) (#11071)
+* feat(developer): support comma in modifiers (#11075)
+* fix(core): actions_normalize() length and dead store fix (#11100)
+* chore(core): optimize ldml_event_state::emit_difference() when no diff (#11094)
+* fix(ios): bad initial in-app layout, delayed banner, deprecated banner toggle (#10929)
+* feat(developer/compilers): better unit test for suggestion accessibility (#11085)
+* fix(core): fix pointer math in actions_normalize() (#11101)
+
+
+## 17.0.296 beta 2024-03-27
+
+* fix(developer): in model compiler, give correct key to shorter prefix words when a longer, higher-frequency word is also present (#11074)
+* fix(oem/fv/android): Only add default keyboard if no keyboards exist (#11080)
+* fix(core): correct typo in LDML test DTD reference (#11068)
+* chore(android): Update crowdin strings for Mon (#11089)
+* chore(android): Update crowdin strings for Khmer (#11090)
+
+## 17.0.295 beta 2024-03-26
+
+* docs(developer): add help site links (#10939)
+* chore(common): Update keymanweb-osk.ttf to 4.1 (#11035)
+* feat(linux): Start dbus if not running (#10863)
+
+## 17.0.294 beta 2024-03-25
+
+* chore(android,windows): Update crowdin strings for French (#11063)
+* chore(common): Fix missing entries in HISTORY.md (#11064)
+* fix(developer): catch sharing violation when saving mru (#11047)
+* fix(developer): capture alt shortcuts in LDML keyboard debugger (#11049)
+* fix(developer): correct path for kmc sourcemaps in sentry upload (#11051)
+
+## 17.0.293 beta 2024-03-22
+
+* chore(oem/fv): Update keyboard versions in keyboards.csv (#11013)
+* fix(developer): suppress emission of new empty fields in package editor (#11009)
+* fix(developer): return after calling await exitProcess (#11016)
+* chore(core): refresh API docs for 17.0 (#10986)
+
+## 17.0.292 beta 2024-03-21
+
+* fix(developer): remove unused keyboard info compiler messages (#10991)
+* fix(developer): font file meta data is invalid error (#10995)
+
+## 17.0.291 beta 2024-03-20
+
+* chore(mac): clean up code obsoleted by core (#10877)
+* fix(linux): Replace deprecated `pkg_resources` module with `packaging.version` (#10860)
+
+## 17.0.290 beta 2024-03-19
+
+* fix(ios): Sync selection range for long contexts (#10956)
+
+## 17.0.289 beta 2024-03-16
+
+* fix(common): add unit test for --debug flag for builder (#10974)
+
+## 17.0.288 beta 2024-03-13
+
+* test(developer): kmc keyboard info compiler messages unit tests (#10848)
+* fix(developer): getFontFamily now returns null if ttfMeta.promise errors (#10983)
+* docs(android/app): Add data privacy policy page (#10985)
+* fix(developer): min Keyman version for LDML is 17.0 (#10977)
+
+## 17.0.287 beta 2024-03-12
+
+* chore(developer): resolve excessive-fatal-exception issue (#10949)
+* fix(linux): Remove `ibus-keyman.post{inst,rm}` and verify that `ibus-daemon` is running when we start km-config (#10788)
+
+## 17.0.286 beta 2024-03-11
+
+* chore(web): improve the clarity of hints on OSK for Android (#10971)
+
+## 17.0.285 beta 2024-03-08
+
+* fix(windows): GetKeyboardLanguage exits early on an invalid keyboard ID (#10936)
+
+## 17.0.284 beta 2024-03-07
+
+* fix(web): globe key highlighting (#10932)
+* chore(web): updates mtnt model used by test page (#10935)
+* fix(developer): kmc keyboard info compiler no kmp error (#10893)
+* fix(developer): Treat Right Shift as Shift in debugger (#10919)
+* docs(developer): kmc-model api documentation (#10921)
+* docs(developer): kmc-model-info api documentation (#10922)
+* docs(developer): kmc-keyboard-info api documentation (#10923)
+* docs(developer): kmc-package api documentation (#10924)
+* fix(developer): normalize all input paths in .kps compiler (#10950)
+
+## 17.0.283 beta 2024-03-06
+
+* fix(android): fixes context-change detection for repeated-char cases (#10873)
+* fix(developer): search-term quote replacement was not global (#10934)
+* chore(common): Update ldml out of techpreview (#10913)
+* fix(developer): fix for errant \uXXXX error (#10946)
+* fix(developer): suppport loose match for CompilerEvents (#10948)
+* refactor(oem/fv/android): Install fallback keyboard (#10907)
+* refactor(android/app): Move storage permission checks (#10904)
+* fix(common): missing script exec bit (#10951)
+
+## 17.0.282 beta 2024-03-05
+
+* fix(developer): move osk.ts from developer-utils to kmc-kmn (#10903)
+* fix(developer): hint text special characters (#10927)
+* docs(developer): kmc-ldml api documentation (#10917)
+* chore(developer): consolidate external links in Developer messages (#10918)
+* fix(developer): message export filename was title case (#10941)
+
+## 17.0.281 beta 2024-03-04
+
+* chore(linux): Update debian changelog (#10897)
+* fix(ios): cross-paragraph keyboard rules (#10905)
+* chore(developer): deploy compiler messages to help site (#10906)
+
+## 17.0.280 beta 2024-03-01
+
+* fix(developer): make sure scroll bar appears when needed in global welcome (#10818)
+* chore(common): loosen .keyman-touch-layout schema layer id requirements (#10819)
+* docs(developer): kmc-kmn api documentation and some message documentation (#10856)
+* refactor(developer): cleanup kmn compiler message namespaces (#10867)
+* refactor(developer): reorganize messages for adding details (#10878)
+* fix(ios): context-initial diacritic handling (#10589)
+* feat(developer): adds kmc message command (#10888)
+* test(developer): kmc unit test infrastructure messages (#10825)
+* fix(android): handle surrogate pairs in selection range indexing (#10885)
+* feat(windows): move the code kmshell.dpr to unit so that only the includes are in dpr (#10871)
+
+## 17.0.279 beta 2024-02-29
+
+* fix(linux): Fix libkeymancore-dev dependencies (#10880)
+* chore(resources): update to latest ldml: xmlns, uset (#10865)
+
+## 17.0.278 beta 2024-02-28
+
+* docs(linux): Updated whatsnew for Keyman for Linux 17 (#10858)
+* fix(web): Save context state on reset (#10869)
+* chore(android/engine): Reduce toast notifications after installations (#10868)
+* fix(android/engine): Check selection indexes (#10857)
+
+## 17.0.277 beta 2024-02-27
+
+* fix(developer): exit kmc test data if any failure messages occurred (#10805)
+* docs(windows): add whats new Keyman for Windows  17.0 (#10783)
+* feat(developer): add api-extractor and api-documenter, config, and build integration (#10839)
+* feat(developer): publish api documentation to help.keyman.com (#10841)
+* docs(developer): npm package readme files (#10842)
+* refactor(developer): move osk module from common-types to developer-utils (#10845)
+* chore(linux): Update debian changelog (#10828)
+* fix(developer): repeated options in kmc must now be fully specified (#10821)
+* docs(developer): add documentation for kmc-analyze (#10854)
+
+## 17.0.276 beta 2024-02-26
+
+* chore(linux): Fix autopkg tests (#10824)
+
+## 17.0.275 beta 2024-02-23
+
+* chore(core): Update sample ldml keyboard (#10791)
+* fix(developer): publish keymancore-1.dll symbols (#10797)
+* fix(developer): improve uploading of sourcemaps to sentry (#10798)
+* fix(android/engine): Fix how keyboard picker menu exits (#10806)
+* chore(linux): Fix `upload-to-debian.sh` script for beta releases (#10784)
+* chore(linux): Fix API verification after adding SONAME (#10813)
+* chore(linux): Address comments from Debian mailing list (#10800)
+* docs(linux): Update how to build binary package with docker (#10814)
+* chore(linux): Update debian changelog (#10785)
+
+## 17.0.274 beta 2024-02-22
+
+* fix(android/engine): Remove logs for uninitialized default keyboard (#10782)
+* refactor(android/app): Allow SystemKeyboard to install default keyboard and dictionary (#10794)
+* chore(android/app): Remove logging for install referrer details (#10795)
+* docs(android/app): Update tablet screenshots (again) (#10796)
+* docs(android): Update screenshots for help (#10808)
+* chore(web): proper reporting of errors from es5 KMW (#10807)
+* fix(android): first keystroke when context is empty (#10809)
+* chore(linux): Update Debian `control` file (#10787)
+
+## 17.0.273 beta 2024-02-21
+
+* fix(developer): match kmc console formatting for messages in IDE (#10775)
+* fix(developer): ensure fatal errors report message or made non-fatal (#10777)
+* chore(developer): add LDML specific text to Project view (#10779)
+* fix(developer): reset debugger after ldml keyboard compile (#10780)
+* fix(developer): crash opening invalid project (#10781)
+* docs(ios): document gestures (#10763)
+
+## 17.0.272 beta 2024-02-20
+
+* fix(core): fix output append logic in any_group::apply_transform (#10758)
+* fix(android): Match phone suggestion banner styling on tablet (#10760)
+* docs(mac): Document What's New for version 17.0 (#10764)
+* fix(developer): Rename missing variables in tests (#10773)
+* chore(developer): reduce WARN_TouchLayoutUsesUnsupportedGesturesDownlevel to HINT (#10766)
+* fix(developer): prevent renaming of new project types in New Project dialog (#10767)
+* fix(developer): return an error code if build-test-data fails (#10765)
+* fix(developer): allow more parameters in kmc.cmd (#10759)
+* chore(linux): Ignore missing .symbols file in stable branch (#10674)
+* chore(linux): Update symbols file with current version (#10575)
+* docs(linux): Update screenshots and FAQ (#10768)
+* chore(linux): Fix `debian.sh` by removing quotes (#10772)
+
+## 17.0.271 beta 2024-02-19
+
+* chore(developer): add infrastructure messages tests (#10756)
+* chore(windows): Update more PT strings (#10718)
+* docs(android/app): Update tablet screenshots (#10726)
+* fix(web): sticky special-key highlighting (#10729)
+* fix(web): disables modipress for layer-switch keys with subkeys (#10745)
+* fix(web): missing null-guard for hardware keystrokes without active Keyman keyboard (#10740)
+* docs(ios): add what's new in 17.0 (#10748)
+* fix(web): handling of page-elements focused before engine initialization (#10744)
+* fix(ios): multitap consistency after new-lines (#10728)
+* docs(common): Update website README (#10738)
+
+## 17.0.270 beta 2024-02-17
+
+* fix(core): Update more tests and fix ldml_transforms (#10735)
+
+## 17.0.269 beta 2024-02-15
+
+* docs(android): Document using gestures on touch, and remove references to Browser (#10686)
+* docs(android/app): Add help page on using the banner (#10691)
+* fix(web): corrects Android over-deletion of selected text, other context diffs involving selected text (#10662)
+* fix(web): disables banner interaction when suggestions are absent (#10695)
+* fix(web): longpress validation by base key, not current location (#10707)
+
+## 17.0.268 beta 2024-02-15
+
+* chore: move to beta
+
+## 17.0.267 alpha 2024-02-14
+
+* fix(linux): Use temp dir if we can't create cache dir (#10681)
+* feat(developer): errs on unparseable regex (#10689)
+* feat(developer): errs on \uXXXX escapes (#10701)
+* docs(common): Fill in missing HISTORY.md entries (#10704)
+
+## 17.0.266 alpha 2024-02-13
+
+* chore(windows): add const to argument definition (#10677)
+* feat(windows): update windows engine unit tests to match removal of engine cached context (#10184)
+* fix(web): prevent invalid longpress shortcut triggers (#10641)
+
+## 17.0.265 alpha 2024-02-12
+
+* fix(developer): keyboard that targets only web can cause crashes and other problems (#10664)
+* fix(android/engine): Download multiple dictionaries (#10680)
+
+## 17.0.264 alpha 2024-02-09
+
+* chore(linux): Don't set VERSION_TAG to …-local in .deb packages (#10675)
+* fix(web): banner robustness when touched 2+ times at once (#10672)
+
+## 17.0.263 alpha 2024-02-08
+
+* fix(linux): Ignore keys with IBUS_MOD4_MASK set (#10668)
+
+## 17.0.262 alpha 2024-02-07
+
+* refactor(windows): Use km_core_actions struct instead of queue (#10557)
+* chore(core): move action apis into keyman_core_api_actions.h (#10569)
+* feat(core,developer): support normalization=disabled (#10586)
+* feat(developer): range warning for non-NFD chars (#10614)
+* fix(core): make `km_core_state_get_actions()` idempotent (#10585)
+* fix(core): strip markers in `actions_update_app_context_nfu()` (#10607)
+* fix(core): surrogate handling, markers in app context, and memory leak (#10618)
+* fix(windows): support unicode strings properly in logs (#10650)
+* fix(developer): ensure project populate files actually adds files (#10651)
+* fix(linux): Use raw string for regex (#10652)
+* fix(windows): `wstrtostr` should use `WideCharToMultiByte` (#10660)
+* chore(windows): rename actionItem to outputString for clarity (#10661)
+* fix(web): handling of backspaces when left-context is empty (#10584)
+* fix(ios): long-held backspace handling (#10633)
+* fix(web): banner scroll positioning after reversions (#10643)
+* chore(web): removes unused banner events (#10644)
+
+## 17.0.261 alpha 2024-02-06
+
+* fix(web): app/webview sourcemap inlining (#10631)
+* fix(android/app): Cleanup AndroidManifest handling of *.kmp (#10624)
+
+## 17.0.260 alpha 2024-02-03
+
+* chore(oem/fv): Update versions in keyboards.csv (#10606)
+* fix(linux): Fix path to artifacts when uploading to llso (#10609)
+* docs(linux): Update sample settings (#10610)
+* chore(linux): Fix API check if lines got removed in .symbols file (#10612)
+
+## 17.0.259 alpha 2024-02-02
+
+* feat(developer):  double markers once again (#10541)
+* feat(core): ldml double marker, C++ side (#10563)
+* feat(core,developer): simplify markers (#10565)
+* chore(common): cancel earlier builds when new test builds triggered (#10593)
+* chore(linux): Use correct format specifier for `g_utf8_strlen` (#10599)
+* fix(linux): Fix version comparison (#10576)
+* chore(common): Add entries from 16.0.145 HISTORY.md (#10603)
+* chore(common): history missing message fixup (#10601)
+* chore(linux): Update debian changelog (#10596)
+
+## 17.0.258 alpha 2024-02-01
+
+* chore(developer): add unicode-license.txt for ldml keyboards data (#10568)
+* feat(core): ldml reorder marker processing (#10539)
+* chore(developer): kmc ldml build - call c8 directly for tests (#10522)
+* fix(web): app/webview control flow for initial layer (#10571)
+* chore(linux): Upgrade artifacts to v4 (#10577)
+* chore(linux): Fix the path of downloaded artifacts (#10594)
+
+## 17.0.257 alpha 2024-01-31
+
+* epic: Keyman Core normalization (#10390)
+* fix(web): OSK resource-loading promise's font-wait (#10506)
+* fix(web): documentation-keyboard font size, font scaling (#10507)
+* feat(web): testing page for font-load / key-scale interactions (#10534)
+* fix(web): proper await for special-osk font, use of it in key scaling (#10535)
+* fix(web): ensure use of actual key-cap / label font in key-scale ops (#10555)
+* docs: Update websites README.md (#10566)
+* fix(developer): kmc exit needs to wait for Sentry (#10558)
+* fix(developer): make sourcePath calculation for kmc-keyboard-info more lenient (#10559)
+* chore(developer): disable .js output for LDML keyboard compiler for 17.0 (#10560)
+* chore(linux): Replace Lunar with Noble (#10561)
+* chore(linux): Adjust test expectations for ICU >= 73 (#10573)
+
+## 17.0.256 alpha 2024-01-30
+
+* fix(linux): packaging on Ubuntu and Debian servers should give message instead of warning because we don't have patched ibus there (#10537)
+* feat(developer): turn on developer side normalization (#10528)
+
+## 17.0.255 alpha 2024-01-29
+
+* chore(ios): eliminate xcglogger dependency (#10446)
+* feat(developer): ldml marker normalization fix (#10527)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10483)
+
+## 17.0.254 alpha 2024-01-27
+
+* feat(core): ldml marker normalization fix (#10517)
+
+## 17.0.253 alpha 2024-01-26
+
+* feat(web): keystroke pre-processing unit tests (#10464)
+* feat(web): key-event rule processing unit tests for mnemonic, KMW 1.0 keyboards (#10475)
+* fix(web): touch-layout fontsize property use (#10504)
+
+## 17.0.252 alpha 2024-01-25
+
+* fix(common): ldml: fix typo in kmc error message (#10484)
+* chore(developer): `--enable-source-maps` parameter for kmc wrapper (#10496)
+* fix(android/engine): Fix OSK widths (#10442)
+* fix(web): banner suggestion resizing after device rotation (#10508)
+
+## 17.0.251 alpha 2024-01-24
+
+* chore(developer): upgrade ngrok to v3 (#10359)
+
+## 17.0.250 alpha 2024-01-23
+
+* fix(android/engine): Add RECEIVER_EXPORTED flag for broadcast receiver (#10463)
+* fix(web): osk responsiveness to held modifiers on legacy kbds (#10437)
+* fix(android/engine): Skip final globe key action (#10465)
+* feat(developer): marker normalization in .ts (#10443)
+* fix(android): hardware keystrokes now include mnemonic processing (#10445)
+
+## 17.0.249 alpha 2024-01-22
+
+* feat(web): suggestion banner UI enhancements - suggestion expanding + scrollable banner (#7934)
+* chore(web): worker sourcemap cleanup, mobile app webview sourcemap compat (#10413)
+
+## 17.0.248 alpha 2024-01-19
+
+* chore(android): Update targetSdkVersion to 34 (#10393)
+* fix(web): cancels active gestures on globe-key use (#10352)
+* fix(web): keyboard-documentation rendering mode (#10417)
+* fix(ios): multiple keyboard slide-in animations on app start (#10362)
+* fix(web): U_ key id -> text for all subkeys; is now preprocessed (#10434)
+* chore(android/app): Update whatsnew for 17.0 (#10395)
+* fix(web): bulk renderer interface for recent-version targeting keyboards (#10427)
+* feat(core): cross-segment markers (#10394)
+
+## 17.0.247 alpha 2024-01-18
+
+* fix(ios): banner image management (#10337)
+* feat(core): unescape u (#10356)
+* chore(developer,core): change sample and test files to use \u{…} (#10391)
+
+## 17.0.246 alpha 2024-01-17
+
+* fix(web): Add null check for changing the keyboard during typing (#10346)
+* chore(common): Update crowdin strings for Khmer (#10411)
+* docs(common): Update website README.md (#10399)
+* docs(linux): Add documentation for Core API verification (#10409)
+* fix(web): right-flick gesture-preview positioning (#10406)
+
+## 17.0.245 alpha 2024-01-16
+
+* chore(core): Ignore C++ symbols (#10386)
+* fix(android): Fix OSK rotation issues (#10373)
+* feat(developer): add `-m` parameter to kmc to control message severity (#10258)
+
+## 17.0.244 alpha 2024-01-15
+
+* refactor(core): Move `km_core_state_context_*` tests to separate file (#10375)
+* feat(developer): warn on gesture support for downlevel (#10364)
+* fix(web): use KMW OSK font for "**" special-text in key hints (#10371)
+* docs(linux): Update sample settings (#10374)
+
+## 17.0.243 alpha 2024-01-12
+
+* chore(core): split out some files (#10327)
+* chore(common): Update crowdin strings for French, German, Spanish (Latin America) (#10368)
+* fix(web): prediction time-limiter issues, performance (#10330)
+* fix(developer): test-page model loading (#10328)
+* fix(ios): use safe area to position Keyman menu correctly (#10339)
+* chore(linux): fix GHA packaging (#10366)
+* refactor(linux): Use `km_core_state_context_set_if_needed` (#10354)
+
+## 17.0.242 alpha 2024-01-11
+
+* fix(windows): serve images for readme files in Keyboard Install (#10312)
+* fix(developer): remove unused tools/customise menu (#10321)
+* fix(developer): cleanly handle filling a new osk file from layout (#10322)
+* fix(developer): new file support for project 2.0 (#10323)
+* chore(common): builder action launch typos (#10361)
+* feat(core): support stacked markers, prep for marker segments (#10326)
+
+## 17.0.241 alpha 2024-01-10
+
+* chore(deps-dev): bump follow-redirects from 1.14.9 to 1.15.4 (#10340)
+* Update character-map.md (#10345)
+* chore(linux): Output dput exit code after upload to llso (#10349)
+* fix(android/engine): Use fallback keyboard if keyboard index undefined (#10342)
+* fix(android): Use alert dialog when package is missing touch keyboards (#10335)
+* chore: cleanup recent history entries without PR title (#10298)
+* chore(web): better logging for gesture-recognizer tools build script (#10329)
+
+## 17.0.240 alpha 2024-01-09
+
+* chore(linux): Retry llso upload (#10331)
+
+## 17.0.239 alpha 2024-01-08
+
+* fix(mac): write persisted options returned from Core (#10275)
+* chore(web): remove lm-worker `Array.from` polyfill and make `Symbol` polyfill conditional (#10255)
+* change(web): lm-worker bundling + wrapper script rework (#10264)
+* refactor(web): transformation of build-bundler into a common es-bundling command (#10265)
+* change(web): KeymanWeb bundler-script centralization (#10267)
+* feat(web): alternate artifact - es6-bundled Web (#10257)
+* feat(web): es6 artifact for app/webview (#10274)
+* fix(web): adds null-guard for longpress-key validation (#10299)
+* fix(web): special key highlighting when pressed (#10296)
+
+## 17.0.238 alpha 2024-01-03
+
+* fix(developer): quell internal error when  a section fails (#10300)
+* fix(core): ldml fixes for normalization between transform groups (#10290)
+* feat(core): more regex testing (#10304)
+* chore(core): better reporting in ldml tests (#10305)
+* feat(developer): escape bad markers (#10306)
+
+## 17.0.237 alpha 2024-01-02
+
+* feat(developer): Consolidate public APIs for kmc modules (#10208)
+* chore(developer): honor prompt to upgrade in kmc (#10218)
+
+## 17.0.236 alpha 2023-12-22
+
+* fix(oem/fv): Add fv_kwadacha_tsekene (#10292)
+* fix(common): give warning if emcc.py is present but not executable (#10289)
+
+## 17.0.235 alpha 2023-12-21
+
+* feat(developer): ldml: more improvement for key-not-found (#10236)
+
+## 17.0.234 alpha 2023-12-20
+
+* fix(mac): Improve detection of non-compliant apps (#10282)
+* fix(web): default multitap logic for shift-layer shift multitaps (#10281)
+* fix(web): keyboard functionality on Android 5.0 / Chrome 35 (#10284)
+
+## 17.0.233 alpha 2023-12-19
+
+* fix(web): unbreak some ts paths (#10279)
+* fix(core): clear core context on invalidate cache (#10230)
+* fix(oem/fv): Add fv_hulquminum_combine (#10269)
+
+## 17.0.232 alpha 2023-12-18
+
+* feat(web): adds highlighting to BKSP while held (#10270)
+
+## 17.0.231 alpha 2023-12-15
+
+* chore(web): Better match directory structure for headless engine tests (#10232)
+* fix(web): Fix types that listInputs and isKMWInput accept (#10233)
+* chore(web): Add unit tests for `pageContextAttachment` (#10250)
+
+## 17.0.230 alpha 2023-12-14
+
+* fix(core): ldml: fix bad usage of unique_ptr (#10252)
+* chore(linux): docker: fix Node.js install, make customizable (#10251)
+* fix(web): unit test for null-null keyboard switch event from #10245 (#10253)
+* fix(web): fixes android-webview emulation Web test page (#10238)
+* epic: new gesture engine (#7324)
+* fix(mac): improve code signing robustness (#10243)
+* chore(mac): use core actions struct (#10066)
+* chore(common): Add entries from 16.0.144 HISTORY.md (#10260)
+* chore(web): Remove dead code (#10231)
+
 ## 17.0.229 alpha 2023-12-13
 
 * chore(ios): FV certificate key (#10228)
@@ -242,8 +2231,8 @@
 ## 17.0.196 alpha 2023-10-20
 
 * fix(mac): move keyboard menu items to main Input Menu from submenu (#9777)
-*  (#9728)
-*  (#9759)
+* feat(core): initial normalization (#9728)
+* chore(core): dx: ldml test improvement, backspace test (#9759)
 * docs(common): macos build update (#9809)
 * fix(web): enhances integrated test stability (#9718)
 * chore(linux): Update packaging GHA  ️ (#9812)
@@ -307,7 +2296,7 @@
 * chore(common): keyman-version now generates only es module (#9680)
 * chore(common): cleanup final Typescript non-ESM metadata (#9681)
 * chore(ios): renew certificate (#9697)
-*  (#9687)
+* feat(core): match any marker (#9687)
 * feat(developer): ldml fix all remaining TODOs around markers and variables (#9688)
 * fix(windows): re-enable signature check (#9695)
 * fix(common): fix schema fixer (#9727)
@@ -382,7 +2371,7 @@
 
 * chore(oem/fv/android): Update Gradle to 7.4 (#9590)
 * refactor(linux): Rename defines to clarify purpose  ️ (#9584)
-*  (#9560)
+* feat(core): drop \u1234 format (#9560)
 
 ## 17.0.175 alpha 2023-09-18
 
@@ -441,13 +2430,13 @@
 
 ## 17.0.162 alpha 2023-08-18
 
-*  (#9483)
+* fix(common): marker test (#9483)
 * fix(windows): allow QR share box to grow to edge of default configuration parent window (#9472)
 * chore(resources):  update CLDR to post-PRI (#9482)
 
 ## 17.0.161 alpha 2023-08-16
 
-*  (#9440)
+* feat(core) actual regex (#9440)
 
 ## 17.0.160 alpha 2023-08-14
 
@@ -455,7 +2444,7 @@
 
 ## 17.0.159 alpha 2023-08-11
 
-*  (#9405)
+* feat(core): marker implementation (#9405)
 
 ## 17.0.158 alpha 2023-08-09
 
@@ -544,7 +2533,7 @@
 
 ## 17.0.143 alpha 2023-07-19
 
-*  (#9292)
+* spec(core): minor fix to tran spec (#9292)
 * docs(linux): Update man page and remove do-nothing option (#9291)
 * docs(linux): Update documentation (#9277)
 
@@ -560,11 +2549,11 @@
 
 ## 17.0.140 alpha 2023-07-14
 
-*  (#9008)
+* chore(common): add engine clause to package.json (#9008)
 
 ## 17.0.139 alpha 2023-07-13
 
-*  (#9259)
+* fix(common): set variables need to serialize elementstring (#9259)
 * chore(linux): Add unit tests for dconf_util.py (#9215)
 * refactor(linux): Refactor image loading (#9245)
 
@@ -584,11 +2573,11 @@
 * chore(common): Update crowdin strings for Kibaku (#9214)
 * feat(core): kmxplus uset implementation in core (#9197)
 * chore(linux): Add support for `--no-integration` flag to build files (#9212)
-*  (#9196)
+* spec(core): marker spec (#9196)
 
 ## 17.0.135 alpha 2023-07-06
 
-*  (#9195)
+* chore(common): improve coverage, fix todos (#9195)
 * chore(ios): minor build-script cleanup (#9201)
 * chore(linux): Allow to run tests without integration tests (#9192)
 * fix(web): sentry sourcemapping round 2 - yesterday's 'fix' unfortunately doesn't upload the maps (#9199)
@@ -647,7 +2636,7 @@
 
 ## 17.0.128 alpha 2023-06-22
 
-*  (#9061)
+* fix(windows): testhost improve error message (#9061)
 * docs(windows): add more steps for clarity (#9063)
 
 ## 17.0.127 alpha 2023-06-21
@@ -685,7 +2674,7 @@
 * fix(linux): Fix disabling of buttons (#8946)
 * chore(developer): check for nodejs deps in kmc-kmn (#8961)
 * spec(core): spec/impl for transform and vars (#8695)
-*  (#8967)
+* feat(developer): improve tran/bksp tests, other improvements (#8967)
 
 ## 17.0.120 alpha 2023-06-07
 
@@ -814,8 +2803,8 @@
 
 ## 17.0.100 alpha 2023-05-04
 
-*  (#8690)
-*  (#8691)
+* fix(developer): warning fixes in kmcmplib (#8690)
+* feat(developer): add uset api in kmcmplib (#8691)
 
 ## 17.0.99 alpha 2023-05-03
 
@@ -828,7 +2817,7 @@
 ## 17.0.97 alpha 2023-04-28
 
 * docs(windows): Add verify vs build tools (#8676)
-*  (#8686)
+* feat(developer): groundwork for support new transform, developer side (#8686)
 
 ## 17.0.96 alpha 2023-04-27
 
@@ -1006,13 +2995,13 @@
 * chore(common): add common test build configurations (#8431)
 * fix(common): fix broken common/web/types cases (#8426)
 * fix(developer/compilers): locks esbuild target detection for kmc building (#8437)
-*  (#8412)
-*  (#8436)
+* chore(developer): ldml March 2023 update to tech-preview (#8412)
+* fix(core): ldml more TODO-LDML fixes (#8436)
 * chore(linux): Use dependency on core in ibus-keyman/build.sh (#8423)
 
 ## 17.0.67 alpha 2023-03-14
 
-* (developer):Update copyright period in License.rtf (#8425)
+* chore(developer): Update copyright period in License.rtf (#8425)
 * chore(common): support shorthand for build.sh (#8415)
 * chore(common): build script performance improvements (#8416)
 * chore(common): TS updates to non-sync'd packages, feature-esmodule merge conflict prevention (#8429)
@@ -1389,6 +3378,29 @@
 * chore: move to 17.0-alpha (#7577)
 * chore: Move to 17.0 alpha
 
+## 16.0.145 stable 2024-02-01
+
+* chore(linux): Add support for loong64 architecture (#10108)
+* chore(linux): Update debian changelog (#10122)
+* fix(web): Fix null error with legacy keyboards (#10177)
+* chore(ios): FV certificate key (#10229)
+* fix(oem/fv): Add fv_hulquminum_combine and fv_kwadacha_tsekene (#10285)
+* chore(developer): upgrade ngrok to v3 (#10360)
+* chore(linux): Build with webkitgtk 4.1 instead of 4.0 (#10574)
+
+## 16.0.144 stable 2023-11-30
+
+* chore(linux): Update debian changelog (#10046)
+* fix(android/app) Disable in-app Browser (#10077)
+
+## 16.0.143 stable 2023-11-22
+
+* chore(android): Update targetSdkVersion from 31 to 33 (#9823)
+* chore(linux): Exclude environment.sh from build (#9814)
+* chore(mac): move from altool to notarytool (#9896)
+* fix(web): fixes doc-kbd display of default layer when it's not defined first (#9892)
+* fix(ios): fv: replace Zip framework to prevent crash on startup (#9958)
+
 ## 16.0.142 stable 2023-10-20
 
 * chore(linux): Update debian changelog (#9326)
@@ -1420,8 +3432,8 @@
 * fix(developer): package editor no longer loses RTL flag for LMs (#8607)
 * chore(common): use mac /usr/bin/stat rather than homebrew version (#8925)
 * chore(ios): replace fv cert (#8923)
-* fix(core): Fix compilation if hotdoc is installed :cherries: (#8929)
-* chore(linux): Move some files to keyman-config :cherries: (#8930)
+* fix(core): Fix compilation if hotdoc is installed  (#8929)
+* chore(linux): Move some files to keyman-config  (#8930)
 * fix(core): Fix compiling with GCC 13 (#8932)
 
 ## 16.0.139 stable 2023-03-16
@@ -1658,7 +3670,7 @@
 * fix(developer): URL parameters should be UTF-8 (#7631)
 * fix(android/engine): Use IME package name if query permission denied (#7668)
 * fix(linux): Fix keyboard icon in system tray (#7678)
-* chore(linux): Update debian changelog :cherries: (#7682)
+* chore(linux): Update debian changelog  (#7682)
 * chore(linux): Update Debian standards version (#7683)
 
 ## 16.0.100 beta 2022-11-10
@@ -1872,7 +3884,7 @@
 ## 16.0.70 alpha 2022-09-26
 
 * fix(android): Add language name when installing default lexical-model (#7347)
-* chore(common): Add 15.0 stable entries to HISTORY.md :cherries: (#7350)
+* chore(common): Add 15.0 stable entries to HISTORY.md  (#7350)
 
 ## 16.0.69 alpha 2022-09-21
 
@@ -2062,7 +4074,7 @@
 ## 16.0.37 alpha 2022-07-22
 
 * fix(linux): Catch PermissionError exception (#6968)
-* chore(linux): Update Debian changelog :cherries: (#6973)
+* chore(linux): Update Debian changelog  (#6973)
 * chore(linux): Add support for Ubuntu 22.10 "Kinetic Kudu" (#6975)
 * fix(developer): reduce timeouts if server shut down (#6943)
 * fix(linux): Implement refresh after keyboard installation (#6956)
@@ -2255,12 +4267,12 @@
 ## 15.0.269 stable 2022-08-29
 
 * chore(linux): Update debian changelog (#7040)
-* feat(linux): Replace deprecated distutils :cherries: (#7052)
+* feat(linux): Replace deprecated distutils  (#7052)
 * fix(developer): compiler emitting garbage for readonly groups (#7014)
 * chore: Change platform advocates per discussion (#7114)
 * fix(windows): remove saving and restoring context kbd options (#7107)
 * fix(windows): Add invalidate context action to non-updatable parse (#7108)
-* fix(android/engine): :cherries: Lower the max height for landscape orientation (#7128)
+* fix(android/engine):  Lower the max height for landscape orientation (#7128)
 
 ## 15.0.268 stable 2022-08-04
 
@@ -2277,10 +4289,10 @@
 * fix(ios): ignore CFBundleShortVersionString (#6935)
 * fix(web): context-only rule effects, set(&layer) from physical keystrokes  ️ (#6949)
 * chore(web): remove invalid warning msg (#6951)
-* fix(common): Fix `delete` :cherries: (#6966)
-* fix(linux): Another attempt at fixing postinst script :cherries: (#6961)
-* fix(linux): Fix uninstallation when using fcitx5 :cherries: (#6964)
-* fix(linux): Catch PermissionError exception :cherries: (#6969)
+* fix(common): Fix `delete`  (#6966)
+* fix(linux): Another attempt at fixing postinst script  (#6961)
+* fix(linux): Fix uninstallation when using fcitx5  (#6964)
+* fix(linux): Catch PermissionError exception  (#6969)
 * chore(linux): Update Debian changelog (#6972)
 * fix(developer): kmdecomp virtual character key output (#6945)
 * fix(developer): crash on exit when checking for updates (#6946)
@@ -2292,7 +4304,7 @@
 
 ## 15.0.266 stable 2022-07-08
 
-* fix(linux): Fix post-install script :cherries: (#6895)
+* fix(linux): Fix post-install script  (#6895)
 * fix(web): improve `console.error()` reporting (#6904)
 * fix(web): ncaps rules not matching on touch (#6913)
 
@@ -2742,7 +4754,7 @@
 
 ## 15.0.183 alpha 2022-01-21
 
-* chore(linux): Update changelogs for 14.0.284 :cherries: (#6132)
+* chore(linux): Update changelogs for 14.0.284  (#6132)
 * chore(linux): Revert workaround for Python bug (#6133)
 
 ## 15.0.182 alpha 2022-01-21
@@ -2861,12 +4873,12 @@
 
 ## 15.0.162 alpha 2021-12-05
 
-* chore(linux): Update changelogs for 14.0.283 :package:  :cherries: (#6008)
+* chore(linux): Update changelogs for 14.0.283    (#6008)
 
 ## 15.0.161 alpha 2021-12-04
 
-* chore(linux): Allow to specify debian revision :package:  :cherries: (#5999)
-* chore(linux): Remove lintian warning :package:  :cherries: (#6000)
+* chore(linux): Allow to specify debian revision    (#5999)
+* chore(linux): Remove lintian warning    (#6000)
 
 ## 15.0.160 alpha 2021-12-03
 
@@ -3052,7 +5064,7 @@
 * fix(android/engine): Remove unnecessary permissions from Manifest (#5752)
 * feat(developer): touch layout testing (#5723)
 * fix(web): popup positioning (#5742)
-* chore(linux): Update changelog files for 14.0.282 :cherries: (#5794)
+* chore(linux): Update changelog files for 14.0.282  (#5794)
 
 ## 15.0.124 alpha 2021-10-04
 
@@ -3868,8 +5880,8 @@
 
 ## 14.0.285 stable 2022-01-20
 
-* fix(linux): Fix lintian errors :cherries: (#6107)
-* fix(linux): Add workaround for Python bug :cherries: (#6125)
+* fix(linux): Fix lintian errors  (#6107)
+* fix(linux): Add workaround for Python bug  (#6125)
 * fix(web): Use regex to determine display layer and functional layers (#6123)
 
 ## 14.0.284 stable 2022-01-11
@@ -3880,12 +5892,12 @@
 * fix(android/engine): Fix font paths (#5990)
 * chore(linux): Remove lintian warning (#5993)
 * chore(linux): Allow to specify debian revision (#5998)
-* chore(linux): Update changelogs for 14.0.283 :package: (#6007)
-* fix(linux): fix release version number for Sentry reporting :cherries: (#6053)
+* chore(linux): Update changelogs for 14.0.283  (#6007)
+* fix(linux): fix release version number for Sentry reporting  (#6053)
 * chore(common): Check in crowdin strings for Spanish (Latin America) (#6060)
-* fix(linux): fix release version number for Sentry reporting :cherries: (#6069)
+* fix(linux): fix release version number for Sentry reporting  (#6069)
 * chore(android/samples): Add -no-daemon flag to KMSample2 build script (#6083)
-* fix(linux): Fix attribute error :cherries: (#6087)
+* fix(linux): Fix attribute error  (#6087)
 
 ## 14.0.283 stable 2021-11-17
 
@@ -3893,7 +5905,7 @@
 * chore(linux): copy Keyman for Linux 15 reference to 14 (#5764)
 * fix(linux): Fix debian package script (#5772)
 * chore(common): Enhance cherry-pick labeling (#5773)
-* fix(common): Fix cherry-pick labeling (:cherries:) (#5783)
+* fix(common): Fix cherry-pick labeling () (#5783)
 * fix(linux): Don't crash displaying keyboard details (#5757)
 * chore(linux): Update changelog files for 14.0.282 (#5793)
 * fix(linux): Don't crash with non-keyboard package file (#5754)
@@ -5412,7 +7424,7 @@
 
 ## 14.0.81 alpha 2020-05-27
 
-* refactor(resources): convert gosh into npm package 🙃 (#3159)
+* refactor(resources): convert gosh into npm package  (#3159)
 * chore(common,web): use consistent TypeScript dep on all packages (#3158)
 * chore(common/resources): add `common/models` to build trigger definitions (#3144)
 * fix(common/resources): adds package-lock.json for gosh package (#3171)

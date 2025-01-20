@@ -3,17 +3,34 @@ unit UfrmHelp;
 interface
 
 uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, AppEvnts, StdCtrls, ActnList,
-  UfrmTike,
-  Xml.XMLDoc,
-  Xml.XMLIntf,
+  System.Actions,
+  System.Classes,
+  System.SysUtils,
+  System.Variants,
+  Vcl.ActnList,
+  Vcl.AppEvnts,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+
+  JvComponentBase,
+  JvDockControlForm,
+  uCEFWindowParent,
+  uCEFInterfaces,
+  uCEFTypes,
+  uCEFChromiumWindow,
 
   Keyman.UI.UframeCEFHost,
-  TempFileManager, UfrmTikeDock,
-  System.Actions, JvComponentBase, JvDockControlForm, uCEFWindowParent,
-  uCEFInterfaces, uCEFTypes,
-  uCEFChromiumWindow, Vcl.ExtCtrls;
+  sentry,
+  Sentry.Client,
+  TempFileManager,
+  UfrmTike,
+  UfrmTikeDock;
 
 type
   TfrmHelp = class(TTIKEDockForm) // I2721
@@ -26,13 +43,9 @@ type
     FRefreshQueued: Boolean;
     FHelpControl: TWinControl;
     FDocumentLoaded: Boolean;
-    FHelpMissingFile: IXMLDocument;
-    FHelpFileName: string;
-    FHMFRoot: IXMLNode;
     FTempFile: TTempFile;
     cef: TframeCEFHost;
     procedure AddUnmatchedContext(FormName, ControlName: string);
-    procedure DeleteMatchedContext(FormName, ControlName: string);
     procedure cefLoadEnd(Sender: TObject);
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
@@ -55,52 +68,35 @@ uses
   System.Types,
   Winapi.ShlObj,
 
-  Keyman.Developer.System.HelpTopics,
+  uCEFApplication,
 
+  Keyman.Developer.System.HelpTopics,
+  KeymanDeveloperOptions,
+  Keyman.System.KeymanSentryClient,
   RedistFiles,
   RegistryKeys,
-  uCEFApplication,
   UframeTextEditor,
   UfrmMain,
   UmodWebHTTPServer,
   utilsystem;
 
 procedure TfrmHelp.AddUnmatchedContext(FormName, ControlName: string);
-var
-  i: Integer;
-  n: IXMLNode;
 begin
-  for i := 0 to FHMFRoot.ChildNodes.Count - 1 do
-    if (FHMFRoot.ChildNodes[i].Attributes['FormName'] = FormName) and
-      (FHMFRoot.ChildNodes[i].Attributes['ControlName'] = ControlName) then
-    begin
-      FHMFRoot.ChildNodes[i].Attributes['LastVisited'] := Now;
-      if FHMFRoot.ChildNodes[i].AttributeNodes.IndexOf('VisitCount') < 0 then
-        FHMFRoot.ChildNodes[i].Attributes['VisitCount'] := 1
-      else
-        FHMFRoot.ChildNodes[i].Attributes['VisitCount'] := FHMFRoot.ChildNodes
-          [i].Attributes['VisitCount'] + 1;
-      Exit;
-    end;
+  if not FKeymanDeveloperOptions.ReportUsage then Exit;
+  if TKeymanSentryClient.Instance = nil then Exit;
+  if TKeymanSentryClient.Instance.Client = nil then Exit;
 
-  n := FHMFRoot.AddChild('MissingTopic');
-  n.Attributes['FormName'] := FormName;
-  n.Attributes['ControlName'] := ControlName;
-  n.Attributes['LastVisited'] := Now;
-  n.Attributes['VisitCount'] := 1;
-end;
+  if FormName = '' then FormName := '<empty>';
+  if ControlName = '' then ControlName := '<empty>';
 
-procedure TfrmHelp.DeleteMatchedContext(FormName, ControlName: string);
-var
-  i: Integer;
-begin
-  for i := 0 to FHMFRoot.ChildNodes.Count - 1 do
-    if (FHMFRoot.ChildNodes[i].Attributes['FormName'] = FormName) and
-      (FHMFRoot.ChildNodes[i].Attributes['ControlName'] = ControlName) then
-    begin
-      FHMFRoot.ChildNodes.Delete(i);
-      Exit;
-    end;
+  sentry_set_tag('keyman.help.form', PAnsiChar(UTF8Encode(FormName)));
+  sentry_set_tag('keyman.help.control', PAnsiChar(UTF8Encode(ControlName)));
+
+  TKeymanSentryClient.Instance.Client.MessageEvent(SENTRY_LEVEL_INFO,
+    'Context sensitive help missing', False);
+
+  sentry_remove_tag('keyman.help.form');
+  sentry_remove_tag('keyman.help.control');
 end;
 
 procedure TfrmHelp.actHelpContextRefreshUpdate(Sender: TObject);
@@ -180,24 +176,10 @@ procedure TfrmHelp.FormCreate(Sender: TObject);
 begin
   inherited;
   FTempFile := nil;
-  FHelpFileName := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper +
-    '\helpmissing.xml';
-  ForceDirectories(ExtractFileDir(FHelpFileName));
-  if FileExists(FHelpFileName) then
-  begin
-    FHelpMissingFile := LoadXMLDocument(FHelpFileName);
-    FHMFRoot := FHelpMissingFile.ChildNodes['MissingTopics'];
-  end
-  else
-  begin
-    FHelpMissingFile := NewXMLDocument;
-    FHMFRoot := FHelpMissingFile.AddChild('MissingTopics');
-  end;
 end;
 
 procedure TfrmHelp.FormDestroy(Sender: TObject);
 begin
-  FHelpMissingFile.SaveToFile(FHelpFileName);
   FreeAndNil(FTempFile);
 end;
 
@@ -235,15 +217,6 @@ begin
       if Length(elems) = 2
         then AddUnmatchedContext(elems[1], '')
         else AddUnmatchedContext(elems[1], elems[2]);
-  end
-  else if Url.StartsWith('found:') then
-  begin
-    elems := Url.Split([':']);
-    // expecting to see ['found', form, control]
-    if Length(elems) > 1 then
-      if Length(elems) = 2
-        then DeleteMatchedContext(elems[1], '')
-        else DeleteMatchedContext(elems[1], elems[2]);
   end;
 end;
 

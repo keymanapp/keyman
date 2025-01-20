@@ -9,18 +9,33 @@ import { declareAnalyze } from './commands/analyze.js';
 import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
+import { exitProcess } from './util/sysexits.js';
+import { declareMessage } from './commands/messageCommand.js';
+import { kmcSentryOptions } from './util/kmcSentryOptions.js';
+import { declareGenerate } from './commands/generate.js';
+import { declareCopy } from './commands/copy.js';
 
-await TestKeymanSentry.runTestIfCLRequested();
-KeymanSentry.init();
-try {
-  await run();
-} catch(e) {
-  KeymanSentry.captureException(e);
+await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
+if(KeymanSentry.isEnabled()) {
+  KeymanSentry.init(kmcSentryOptions);
 }
 
-// Ensure any messages reported to Sentry have had time to be uploaded before we
-// exit. In most cases, this will be a no-op so should not affect performance.
-await KeymanSentry.close();
+run().then(async () => {
+  // Ensure any messages reported to Sentry have had time to be uploaded before we
+  // exit. In most cases, this will be a no-op so should not affect performance.
+  await exitProcess(0);
+}, (reason: any) => {
+  KeymanSentry.captureException(reason);
+  // in local environment, captureException will
+  // return so we want to re-throw; note that this is
+  // a little noisy because it comes from an async function
+  console.error('Aborting due to fatal exception. Local development environment detected, so printing trace.');
+  const report: any = process.report?.getReport(reason);
+  console.log(report?.javascriptStack?.message);
+  console.log(report?.javascriptStack?.stack?.map((s: string) => '   '+s).join('\n'));
+  // This cannot be an async function because otherwise the stack trace gets captured
+  exitProcess(1);
+});
 
 async function run() {
   await loadOptions();
@@ -42,23 +57,18 @@ async function run() {
     .addOption(new Option('--no-error-reporting', 'Disable error reporting to keyman.com (overriding user settings)'))
     .addOption(new Option('--error-reporting', 'Enable error reporting to keyman.com (overriding user settings)'));
 
-  if(await KeymanSentry.isEnabled()) {
-    KeymanSentry.init();
-  }
-
   declareBuild(program);
   declareAnalyze(program);
+  declareMessage(program);
+  declareGenerate(program);
+  declareCopy(program);
 
   /* Future commands:
   declareClean(program);
-  declareCopy(program);
-  declareRename(program);
-  declareGenerate(program);
   declareImport(program);
   declareTest(program);
   declarePublish(program);
   */
 
-  await program.parseAsync(process.argv)
-    .catch(reason => console.error(reason));
+  await program.parseAsync(process.argv);
 }

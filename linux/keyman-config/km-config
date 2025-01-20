@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 import sys
 import gi
 
@@ -9,10 +10,10 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 
-from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry
-from keyman_config.handle_install import download_and_install_package
-from keyman_config.ibus_util import verify_ibus_daemon
-from keyman_config.view_installed import ViewInstalledWindow
+from keyman_config import (
+  _, __versionwithtag__, __pkgversion__, add_standard_arguments,
+  are_requirements_missing, initialize_logging, initialize_sentry,
+  verify_dbus_running)
 
 
 if __name__ == '__main__':
@@ -40,6 +41,25 @@ if __name__ == '__main__':
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
+
+    if are_requirements_missing():
+        if args.install or args.url:
+            logging.error('Missing requirements. Please install python3-fonttools.')
+        else:
+            dialog = Gtk.MessageDialog(
+                parent=None, flags=0, message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text=_("Missing requirements. Please install python3-fonttools."))
+            dialog.run()
+            dialog.destroy()
+        sys.exit(1)
+
+    # Add these imports only after the check for missing dependencies!
+    from keyman_config.handle_install import download_and_install_package
+    from keyman_config.ibus_util import verify_ibus_daemon
+    from keyman_config.view_installed import ViewInstalledWindow
+
 
     logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
 
@@ -50,6 +70,10 @@ if __name__ == '__main__':
     elif args.url:
         download_and_install_package(args.url)
     else:
+        # Workaround for bug in webkit2gtk (#12587)
+        if not 'WEBKIT_DISABLE_DMABUF_RENDERER' in os.environ:
+            os.environ['WEBKIT_DISABLE_DMABUF_RENDERER'] = '1'
+
         w = ViewInstalledWindow()
         try:
             w.run()

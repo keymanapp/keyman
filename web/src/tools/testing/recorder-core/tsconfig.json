@@ -1,0 +1,23 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": "./",
+    "outDir": "./build/obj/",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [
+    "src/**/*.ts"
+  ],
+
+  "references": [
+    { "path": "../../../../../common/web/keyman-version" },
+    { "path": "../../../engine/common/web-utils/" },
+    { "path": "../../../engine/predictive-text/types" },
+    { "path": "../../../engine/js-processor" },
+    { "path": "../../../engine/keyboard" },
+  ],
+}

@@ -49,6 +49,9 @@ function triggerTestBuilds() {
   local branch="$2"
   local force="${3:-false}"
 
+  # Cancel any already running builds for this branch
+  node "$THIS_SCRIPT_PATH/ci/cancel-builds/cancel-test-builds.mjs" "$branch" "$TEAMCITY_TOKEN"
+
   for platform in "${platforms[@]}"; do
     echo "# $platform: checking for changes"
     eval test_builds='(${'bc_test_$platform'[@]})'

@@ -16,35 +16,12 @@
 #include <utility>
 #include "debuglog.h"
 
-#if !defined(HAVE_ICU4C)
-#error icu4c is required for this code
-#endif
-
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
-#include "unicode/uniset.h"
-#include "unicode/usetiter.h"
-#include "unicode/unistr.h"
-#include "unicode/regex.h"
-#include "unicode/utext.h"
-#include "unicode/normalizer2.h"
+#include "util_regex.hpp"
 
 namespace km {
 namespace core {
 namespace ldml {
 
-/** @returns true on success */
-inline bool uassert_success(const char *file, int line, const char *function, UErrorCode status) {
-  if (U_FAILURE(status)) {
-    DebugLog2(file, line, function, "U_FAILURE(%s)", u_errorName(status));
-    return false;
-  } else {
-    return true;
-  }
-}
-
-/** the first assert is for debug builds, the second triggers the debuglog and has the return value. */
-#define UASSERT_SUCCESS(status) (assert(U_SUCCESS(status)), uassert_success(__FILE__, __LINE__, __FUNCTION__, status))
 
 using km::core::kmx::SimpleUSet;
 
@@ -116,7 +93,8 @@ public:
       KMX_DWORD mapFrom,
       KMX_DWORD mapTo,
       const kmx::kmx_plus &kplus,
-      bool &valid);
+      bool &valid,
+      bool normalization_disabled);
 
   /**
    * If matching, apply the match to the output string
@@ -129,14 +107,13 @@ public:
 private:
   const std::u32string fFrom;
   const std::u32string fTo;
-  std::unique_ptr<icu::RegexPattern> fFromPattern;
+  km::core::util::km_regex fFromPattern;
 
   const KMX_DWORD fMapFromStrId;
   const KMX_DWORD fMapToStrId;
   std::deque<std::u32string> fMapFromList;
   std::deque<std::u32string> fMapToList;
-  /** Internal function to setup pattern string @returns true on success */
-  bool init();
+  bool normalization_disabled;
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
 public:
@@ -249,6 +226,11 @@ public:
   any_group_type type;  // transform or reorder
   transform_group transform;
   reorder_group reorder;
+  size_t apply(std::u32string &input, std::u32string &output, size_t matched) const;
+
+private:
+  size_t apply_transform(std::u32string &input, std::u32string &output, size_t matched) const;
+  size_t apply_reorder(std::u32string &input, std::u32string &output, size_t matched) const;
 };
 
 /**
@@ -262,9 +244,9 @@ typedef std::deque<any_group> group_list;
 class transforms {
 private:
   group_list transform_groups;
-
+  bool normalization_disabled;
 public:
-  transforms();
+  transforms(bool normalization_disabled);
 
   /**
    * Add a transform group
@@ -297,75 +279,6 @@ public:
        const core::kmx::COMP_KMXPLUS_TRAN *tran,
        const core::kmx::COMP_KMXPLUS_TRAN_Helper &tranHelper);
 };
-
-// string routines
-
-/** indicates that the marker was before the end of text. */
-const char32_t MARKER_BEFORE_EOT = km::core::kmx::Uni_FFFE_NONCHARACTER;
-
-/** map from following-char to marker number. */
-typedef std::map<char32_t, KMX_DWORD> marker_map;
-
-/** Normalize a u32string inplace to NFD. @return false on failure */
-bool normalize_nfd(std::u32string &str);
-/** Normalize a u16string inplace to NFD. @return false on failure */
-bool normalize_nfd(std::u16string &str);
-/** Normalize a u32string inplace to NFD, retaining markers.
- * @param markers will be populated with marker chars
- * @return false on failure
- **/
-bool normalize_nfd_markers(std::u32string &str, marker_map &markers);
-bool normalize_nfd_markers(std::u16string &str, marker_map &markers);
-inline bool normalize_nfd_markers(std::u32string &str);
-inline bool normalize_nfd_markers(std::u16string &str);
-
-/** Normalize a u32string inplace to NFC, retaining markers.
- * @param markers will be populated with marker chars
- * @return false on failure
- **/
-bool normalize_nfc_markers(std::u32string &str, marker_map &markers);
-bool normalize_nfc_markers(std::u16string &str, marker_map &markers);
-inline bool normalize_nfc_markers(std::u32string &str);
-inline bool normalize_nfc_markers(std::u16string &str);
-
-/** Normalize a u32string inplace to NFC. @return false on failure */
-bool normalize_nfc(std::u32string &str);
-/** Normalize a u16string inplace to NFC. @return false on failure */
-bool normalize_nfc(std::u16string &str);
-/** Remove markers and optionally note their glue characters in the map */
-std::u32string remove_markers(const std::u32string &str, marker_map *markers = nullptr);
-/** same but with a reference */
-inline std::u32string remove_markers(const std::u32string &str, marker_map &markers)  {
-  return remove_markers(str, &markers);
-}
-
-/** prepend the marker string in UC_SENTINEL format to the str */
-inline static void prepend_marker(std::u32string &str, KMX_DWORD marker);
-
-void
-prepend_marker(std::u32string &str, KMX_DWORD marker) {
-  km_core_usv triple[] = {LDML_UC_SENTINEL, LDML_MARKER_CODE, marker};
-  str.insert(0, triple, 3);
-}
-
-bool normalize_nfd_markers(std::u16string &str) {
-  marker_map m;
-  return normalize_nfd_markers(str, m);
-}
-
-bool normalize_nfc_markers(std::u16string &str) {
-  marker_map m;
-  return normalize_nfc_markers(str, m);
-}
-bool normalize_nfd_markers(std::u32string &str) {
-  marker_map m;
-  return normalize_nfd_markers(str, m);
-}
-
-bool normalize_nfc_markers(std::u32string &str) {
-  marker_map m;
-  return normalize_nfc_markers(str, m);
-}
 
 
 }  // namespace ldml

@@ -53,23 +53,56 @@ sudo mk-build-deps --install linux/debian/control
 
 #### Node.js
 
-Node.js v18 is required for Core builds, Web builds, and Developer command line tool builds and usage.
+Node.js is required for Core builds, Web builds, and Developer command line tool builds and usage.
 
-Follow the instructions on the [NodeSource Distributions](https://github.com/nodesource/distributions#table-of-contents) page.
+Our recommended way to install node.js is with
+[nvm](https://github.com/nvm-sh/nvm). This makes it easy to switch between
+versions of node.js.
+
+See [node.md](node.md) for more information.
 
 #### Emscripten
 
-You'll also have to install `emscripten` (version 3.1.44 is known to work):
+You'll also have to install `emscripten`:
 
 ```shell
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install 3.1.44
-./emsdk activate 3.1.44
-export EMSCRIPTEN_BASE=$(pwd)/upstream/emscripten
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
+export EMSCRIPTEN_BASE="$(pwd)"
+echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
 ```
 
-**NOTE:** Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
+If you are updating an existing install of Emscripten:
+
+```bash
+cd emsdk
+git pull
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
+```
+
+> ![WARNING]
+> Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
+>
+> Emscripten very unhelpfully overwrites `JAVA_HOME`, and adds its own
+> versions of Python, Node and Java to the `PATH`. For best results, restart
+> your shell after installing Emscripten so that you don't end up with the
+> wrong versions.
+
+**Optional environment variables**:
+
+To let the Keyman build scripts control the version of Emscripten installed on
+your computer:
+
+```shell
+export KEYMAN_USE_EMSDK=1
+```
 
 ## Keyman Core
 
@@ -205,83 +238,25 @@ Android projects. `JAVA_HOME_11` is mostly used by CI.
 ## Docker Builder
 
 The Docker builder allows you to perform a build from anywhere Docker is supported.
-
-To build the docker image:
-
-```shell
-cd linux
-docker pull ubuntu:latest # (to make sure you have an up-to-date image)
-docker build . -t keymanapp/keyman-linux-builder:latest
-```
-
-Once the image is built, it may be used to build parts of Keyman.
-
-**Note** that it's not yet possible to run tests in the Docker container.
-
-- core
-
-  ```shell
-  # build 'Keyman Core' in docker
-  # keep linux build artifacts separate
-  mkdir -p $(git rev-parse --show-toplevel)/core/build/linux
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    -v $(git rev-parse --show-toplevel)/core/build/linux:/home/build/build/core/build \
-    keymanapp/keyman-linux-builder:latest \
-    core/build.sh --debug
-  ```
-
-- linux
-
-  ```shell
-  # build 'Keyman for Linux' installation in docker
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    --entrypoint /bin/bash keymanapp/keyman-linux-builder:latest \
-    -c 'DESTDIR=/home/build /usr/bin/bashwrapper linux/build.sh --debug build install'
-  ```
-
-- Keyman Web
-
-  ```shell
-  # build 'Keyman Web' in docker
-  docker run --privileged -it --rm \
-    -v $(git rev-parse --show-toplevel):/home/build/build \
-    keymanapp/keyman-linux-builder:latest \
-    web/build.sh --debug
-  ```
-
-- Keyman for Android
-
-  ```shell
-  # build 'Keyman for Android' in docker
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    keymanapp/keyman-linux-builder:latest \
-    android/build.sh --debug
-  ```
-
-### Customizing the builder
-
-You can use Docker [build args](https://docs.docker.com/build/guide/build-args/) to customize the image build. As an example, the following will build an image explicitly with Ubuntu 23.04 and Node.js 20. Check the [Dockerfile](../../linux/Dockerfile) for `ARG` entries.
-
-```shell
-cd linux
-docker pull ubuntu:23.04 # (to make sure you have an up-to-date image)
-docker build . -t keymanapp/keyman-linux-builder:u23.04-node20 --build-arg OS_VERSION=23.04 --build-arg NODE_MAJOR=20
-````
+See [this README.md](../../resources/docker-images/README.md) for details.
 
 ### Using the builder with VSCode [Dev Containers](https://code.visualstudio.com/docs/devcontainers/tutorial)
 
-1. Save the following as `.devcontainer/devcontainer.json`, updating the `image` to match the Docker image built above.
+1. Save the following as `.devcontainer/devcontainer.json`, updating the `image`
+   to match the Docker image built above.
 
-```json
-// file: .devcontainer/devcontainer.json
-{
-        "name": "Keyman Ubuntu 23.04",
-        "image": "keymanapp/keyman-linux-builder:u23.04-node18"
-}
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
-```
+   ```json
+   // file: .devcontainer/devcontainer.json
+   {
+           "name": "Keyman Ubuntu 23.04",
+           "image": "keymanapp/keyman-linux-builder:u23.04-node18"
+   }
+   // For format details, see https://aka.ms/devcontainer.json. For config options,
+   // see the README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+   ```
 
-2. in VSCode, use the "Dev Containers: Open Folder In Container…" option and choose the Keyman directory.
+2. in VSCode, use the "Dev Containers: Open Folder In Container…" option and
+   choose the Keyman directory.
 
-3. You will be given a window which is running VSCode inside this builder image, regardless of your host OS.
+3. You will be given a window which is running VSCode inside this builder
+   image, regardless of your host OS.

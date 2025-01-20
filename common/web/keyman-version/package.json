@@ -2,7 +2,10 @@
   "name": "@keymanapp/keyman-version",
   "description": "Keyman global version data",
   "exports": {
-    ".": "./build/version.inc.js"
+    ".": {
+      "es6-bundling": "./version.inc.ts",
+      "default": "./build/version.inc.js"
+    }
   },
   "files": [
     "/build/"
@@ -10,6 +13,6 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   }
 }

@@ -4,7 +4,7 @@
  * Copyright (C) 2008-2013 Peng Huang <shawn.p.huang@gmail.com>
  * Copyright (C) 2015-2022 Takao Fujiwara <takao.fujiwara1@gmail.com>
  * Copyright (C) 2008-2022 Red Hat, Inc.
- * Copyright (C) 2021-2022 SIL International
+ * Copyright (C) 2021-2022 SIL Global
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,15 @@
 #include <config.h>
 
 #ifndef IBUS_HAS_PREFILTER
+#ifdef KEYMAN_PKG_BUILD
+// When building packages on Ubuntu and Debian servers we probably don't have
+// a patched ibus available and additionally treat warnings as errors, but
+// still want to build packages.
+#pragma message "Compiling against ibus version that does not include prefilter mask patch\n(https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled."
+#else
 #warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#endif
+
 #define IBUS_PREFILTER_MASK (1 << 23)
 #endif
 

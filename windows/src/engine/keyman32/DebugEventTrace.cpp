@@ -30,7 +30,22 @@ int GetActualShiftState() {   // I4843
 }
 
 extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, int line, PWCHAR msg) {
-  if (file == NULL || msg == NULL) {
+  // This function exists solely to provide a stable transition between versions
+  // of Keyman, so that things don't crash if an older version of kmtip.dll
+  // happens to call this function in a newer installation. It is not used in
+  // current versions of Keyman. This change came in around 17.0.260-alpha
+  PWCHAR fileW = strtowstr(file);
+  Keyman_WriteDebugEvent2W(fileW, line, L"", msg);
+  delete[] fileW;
+}
+
+extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEventW(PWCHAR file, int line, PWCHAR msg) {
+  // This function is deprecated, see comment on Keyman_WriteDebugEvent
+  Keyman_WriteDebugEvent2W(file, line, L"", msg);
+}
+
+extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent2W(PWCHAR file, int line, PWCHAR function, PWCHAR msg) {
+  if (file == NULL || function == NULL || msg == NULL) {
     return;
   }
 
@@ -77,7 +92,8 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       L"%x" TAB  //"FocusHWND" TAB
       L"%8x" TAB //"ActiveHKL" TAB
       L"%hs:%d" TAB  //"SourceFile" TAB
-      L"%ls\n",     //"Message"
+      L"%ls" TAB    // "function" TAB
+      L"%ls\n",     // "Message"
       sProcessName,                    //"Process" TAB
       (unsigned int) pid,                             //"PID" TAB
       (unsigned int) tid,                             //"TID" TAB
@@ -87,6 +103,7 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
       PtrToInt(gti.hwndFocus),                   //"FocusHWND" TAB
       PtrToInt(activeHKL),                       //"ActiveHKL" TAB
       file, line,                      //"SourceFile" TAB
+      function,                        //"function" TAB
       msg);                            //"Message"
 
     OutputDebugStringW(windowinfo);
@@ -102,8 +119,6 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     DWORD platform = 1;
 #endif
 
-    // TODO Convert to Unicode
-    PWCHAR fileW = strtowstr(file);
 
     // These must match the manifest template in keyman-debug-etw.man
     EventDataDescCreate(&Descriptors[0], &platform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >
@@ -115,15 +130,27 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char *file, i
     EventDataDescCreate(&Descriptors[6], &tickCount, sizeof(DWORD)); //  <data name = "TickCount" inType = "win:UInt32" / >
     EventDataDescCreate(&Descriptors[7], (PDWORD)&gti.hwndFocus, sizeof(DWORD)); //  <data name = "FocusHWND" inType = "win:UInt32" / >
     EventDataDescCreate(&Descriptors[8], (PDWORD)&activeHKL, sizeof(DWORD)); //  <data name = "ActiveHKL" inType = "win:UInt32" / >
-    EventDataDescCreate(&Descriptors[9], fileW, (ULONG)(wcslen(fileW) + 1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
+    EventDataDescCreate(&Descriptors[9], file, (ULONG)(wcslen(file) + 1) * sizeof(WCHAR)); //  <data name = "SourceFile" inType = "win:UnicodeString" / >
     EventDataDescCreate(&Descriptors[10], (PDWORD)&line, sizeof(DWORD)); //  <data name = "SourceLine" inType = "win:UInt32" / >
-    EventDataDescCreate(&Descriptors[11], msg, (ULONG)(wcslen(msg) + 1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
+
+    // Nested function call presentation
+    size_t funcmsglen = wcslen(function) + 2 + wcslen(msg) + _td->debug_Depth * 2 + 1;
+    PWCHAR funcmsg = new WCHAR[funcmsglen];
+    for(int i = 0; i < _td->debug_Depth * 2; i++) {
+      funcmsg[i] = L' ';
+    }
+    funcmsg[_td->debug_Depth * 2] = 0;
+    wcscat_s(funcmsg, funcmsglen, function);
+    wcscat_s(funcmsg, funcmsglen, L": ");
+    wcscat_s(funcmsg, funcmsglen, msg);
+
+    EventDataDescCreate(&Descriptors[11], funcmsg, (ULONG)(wcslen(funcmsg) + 1) * sizeof(WCHAR)); //  <data name = "Message" inType = "win:UnicodeString" / >
 
     DWORD dwErr = EventWrite(_td->etwRegHandle, &DebugEvent, (ULONG)MAX_DESCRIPTORS, &Descriptors[0]);
     if (dwErr != ERROR_SUCCESS) {
       OutputDebugString("Keyman k32_dbg: Failed to call EventWrite");
     }
 
-    delete fileW;
+    delete[] funcmsg;
   }
 }

@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
 # Build FirstVoices for Android app
 
-# set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -32,8 +25,8 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
-  "--ci             Don't start the Gradle daemon. For CI" \
-  "--upload-sentry  Upload to sentry"
+  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
+  "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -43,7 +36,7 @@ if builder_is_debug_build; then
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
-fi  
+fi
 
 ARTIFACT="firstvoices-$VERSION.apk"
 
@@ -61,26 +54,17 @@ fi
 
 #### Build action definitions ####
 
-function makeLocalSentryRelease() {
-  echo "Placeholder for uploading symbols to Sentry"
-}
-
-#### Build action definitions ####
-
 # Check about cleaning artifact paths
 if builder_start_action clean; then
   rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs"
+  rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/tmp"
   builder_finish_action success clean
 fi
 
 if builder_start_action configure; then
-  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
-  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
-
   KEYBOARD_PACKAGE_ID="fv_all"
   KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 
-  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   builder_finish_action success configure
@@ -102,3 +86,6 @@ if builder_start_action test; then
 
   builder_finish_action success test
 fi
+
+builder_run_action publish    ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
+

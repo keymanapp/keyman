@@ -13,7 +13,6 @@ EXTERN bool kmcmp_CompileKeyboard(
   const void* procContext,
   KMCMP_COMPILER_RESULT& result
 ) {
-
   FILE_KEYBOARD fk;
   fk.extra = new KMCMP_COMPILER_RESULT_EXTRA;
   fk.extra->kmnFilename = pszInfile;
@@ -25,39 +24,38 @@ EXTERN bool kmcmp_CompileKeyboard(
   kmcmp::CompileTarget = options.target;
 
   if (!messageProc || !loadFileProc || !pszInfile) {
-    AddCompileError(CERR_BadCallParams);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_BadCallParams);
     return FALSE;
   }
 
-  msgproc = messageProc;
-  loadfileproc = loadFileProc;
-  msgprocContext = (void*)procContext;
+  kmcmp::messageFilename = pszInfile;
+  kmcmp::msgproc = messageProc;
+  kmcmp::loadfileproc = loadFileProc;
+  kmcmp::msgprocContext = (void*)procContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
   int sz;
-  if(!loadFileProc(pszInfile, "", nullptr, &sz, msgprocContext)) {
-    AddCompileError(CERR_InfileNotExist);
+  std::vector<uint8_t> bufvec = kmcmp::loadfileproc(pszInfile, "");
+  sz = static_cast<int>(bufvec.size());
+  if(!sz) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InfileNotExist);
     return FALSE;
   }
 
   if(sz < 3) {
     // Technically, a 3 byte file can never be a valid .kmn, so we can shortcut
     // here and avoid testing outside memory bounds for looking at BOM
-    AddCompileError(CERR_CannotReadInfile);
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_CannotReadInfile);
     return FALSE;
   }
 
   KMX_BYTE* infile = new KMX_BYTE[sz+1];
   if(!infile) {
-    AddCompileError(CERR_CannotAllocateMemory);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
     return FALSE;
   }
-  if(!loadFileProc(pszInfile, "", infile, &sz, msgprocContext)) {
-    delete[] infile;
-    AddCompileError(CERR_CannotReadInfile);
-    return FALSE;
-  }
+  std::copy(bufvec.begin(), bufvec.end(), infile);
   infile[sz] = 0; // zero-terminate for safety, not technically needed but helps avoid memory bugs
 
   int offset = 0;
@@ -70,7 +68,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     int sz16;
     if(!UTF16TempFromUTF8(infile, sz, &infile16, &sz16)) {
       delete[] infile;
-      AddCompileError(CERR_CannotCreateTempfile);
+      ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile);
       return FALSE;
     }
     delete[] infile;
@@ -96,8 +94,8 @@ EXTERN bool kmcmp_CompileKeyboard(
 
   //TODO: FreeKeyboardPointers(fk);
 
-  if(msg != CERR_None) {
-    AddCompileError(msg);
+  if(msg != STATUS_Success) {
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 

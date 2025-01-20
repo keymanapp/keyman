@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
@@ -32,10 +33,15 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Display;
+import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -173,6 +179,48 @@ public final class KMManager {
     }
   }
 
+  // Enum for how the System Keyboard ENTER key is handled for the EditorInfo action
+  // Reference: https://developer.android.com/reference/android/view/inputmethod/EditorInfo#summary
+  public enum EnterModeType {
+    GO,        // Go action
+    SEARCH,    // Search action
+    SEND,      // Send action
+    NEXT,      // Next action
+    DONE,      // Done action
+    PREVIOUS,  // Previous action
+    NEWLINE,   // Send newline character
+    DEFAULT,   // Default ENTER action
+  }
+
+  // Enum for whether the suggestion banner allows predictions, corrections, auto-corrections
+  public enum SuggestionType {
+    // Suggestion Disabled - No Predictions, No corrections, No auto-corrections
+    SUGGESTIONS_DISABLED,
+
+    // Suggestions Enabled
+    PREDICTIONS_ONLY,              // Predictions with no corrections
+    PREDICTIONS_WITH_CORRECTIONS,  // Predictions with corrections
+    PREDICTIONS_WITH_AUTO_CORRECT; // Predictions with auto-corrections
+
+    public static SuggestionType fromInt(int mode) {
+      switch (mode) {
+        case 0:
+          return SUGGESTIONS_DISABLED;
+        case 1:
+          return PREDICTIONS_ONLY;
+        case 2:
+          return PREDICTIONS_WITH_CORRECTIONS;
+        case 3:
+          return PREDICTIONS_WITH_AUTO_CORRECT;
+      }
+      return SUGGESTIONS_DISABLED;
+    }
+
+    public int toInt() {
+      return this.ordinal();
+    }
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -201,6 +249,7 @@ public final class KMManager {
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
+  public final static String autoCorrectionPrefSuffix = ".mayAutoCorrect";
 
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
@@ -210,6 +259,9 @@ public final class KMManager {
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
   private static boolean mayPredictOverride = false;
+
+  // Determine how system keyboard handles ENTER key
+  public static EnterModeType enterMode = EnterModeType.DEFAULT;
 
   // Boolean for whether a keyboard can send embedded KMW crash reports to Sentry
   // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
@@ -241,6 +293,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
+  public static final String KMKey_LongpressDelay = "longpressDelay";
+
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -250,11 +304,6 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
-
-  // DEPRECATED keys
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-  public static final String KMKey_CustomModel = "CustomModel";
-  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -286,10 +335,17 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
+  // Default KeymanWeb longpress delay constants in milliseconds
+  public static final int KMDefault_LongpressDelay = 500;
+  public static final int KMMinimum_LongpressDelay = 300;
+  public static final int KMMaximum_LongpressDelay = 1500;
+
+  // Default prediction/correction setting
+  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keymanweb-webview.js.map";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -298,6 +354,7 @@ public final class KMManager {
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
   protected static final String KMFilename_JSPolyfill2 = "other-polyfills.js";
+  protected static final String KMFilename_JSPolyfill3 = "map-polyfill.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -677,6 +734,10 @@ public final class KMManager {
     return langID + correctionPrefSuffix;
   }
 
+  public static String getLanguageAutoCorrectionPreferenceKey(String langID) {
+    return langID + autoCorrectionPrefSuffix;
+  }
+
   public static void hideSystemKeyboard() {
     if (SystemKeyboard != null) {
       SystemKeyboard.hideKeyboard();
@@ -848,24 +909,21 @@ public final class KMManager {
 
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
+
     try {
       // Copy KMW files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
+
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
-      if(KMManager.isDebugMode()) {
-        copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
-      }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-      copyAsset(context, KMFilename_JSPolyfill, "", true);
-      copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -961,6 +1019,10 @@ public final class KMManager {
   }
 
   private static int copyAsset(Context context, String filename, String directory, boolean overwrite) {
+    return copyAssetWithRename(context, filename, filename, directory, overwrite);
+  }
+
+  private static int copyAssetWithRename(Context context, String srcName, String destName, String directory, boolean overwrite) {
     int result;
     AssetManager assetManager = context.getAssets();
     try {
@@ -977,9 +1039,9 @@ public final class KMManager {
         dirPath = getResourceRoot();
       }
 
-      File file = new File(dirPath, filename);
+      File file = new File(dirPath, destName);
       if (!file.exists() || overwrite) {
-        InputStream inputStream = assetManager.open(directory + filename);
+        InputStream inputStream = assetManager.open(directory + srcName);
         FileOutputStream outputStream = new FileOutputStream(file);
         FileUtils.copy(inputStream, outputStream);
 
@@ -1244,6 +1306,60 @@ public final class KMManager {
   }
 
   /**
+   * Sets enterMode which specifies how the System keyboard ENTER key is handled
+   *
+   * @param imeOptions EditorInfo.imeOptions used to determine the action
+   * @param inputType  InputType used to determine if the text field is multi-line
+   */
+  public static void setEnterMode(int imeOptions, int inputType) {
+    EnterModeType value = EnterModeType.DEFAULT;
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    boolean isMultiLine = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
+
+    switch (imeActions) {
+      case EditorInfo.IME_ACTION_GO:
+        value = EnterModeType.GO;
+        break;
+
+      case EditorInfo.IME_ACTION_SEARCH:
+        value = EnterModeType.SEARCH;
+        break;
+
+      case EditorInfo.IME_ACTION_SEND:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE :EnterModeType.SEND;
+        break;
+
+      case EditorInfo.IME_ACTION_NEXT:
+        value = EnterModeType.NEXT;
+        break;
+
+      case EditorInfo.IME_ACTION_DONE:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DONE;
+        break;
+
+      case EditorInfo.IME_ACTION_PREVIOUS:
+        value = EnterModeType.PREVIOUS;
+        break;
+
+      default:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DEFAULT;
+    }
+
+    enterMode = value;
+  }
+
+  /**
+   * Get the value of enterMode
+   * @return EnterModeType
+   */
+  public static EnterModeType getEnterMode() {
+    return enterMode;
+  }
+
+  /**
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
@@ -1263,6 +1379,18 @@ public final class KMManager {
    */
   public static boolean getMayPredictOverride() {
     return mayPredictOverride;
+  }
+
+  /**
+   * Store SuggestionType as int in preference
+   * @param languageID as String
+   * @param suggestType SuggestionType
+   */
+  public static void setMaySuggest(String languageID, SuggestionType suggestType) {
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType.toInt());
+    editor.commit();
   }
 
   /**
@@ -1377,24 +1505,23 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    // When entering password field, mayPredict should override to false
+    // When entering password field, maySuggest should override to disabled
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = (mayPredictOverride) ? false :
-      prefs.getBoolean(getLanguagePredictionPreferenceKey(languageID), true);
-    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
+    int maySuggest = mayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+      prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     return true;
   }
@@ -1582,28 +1709,14 @@ public final class KMManager {
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
 
-  // Intend to deprecate in Keyman 15.0
-  public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-    String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-    String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
-    String kmpLink = MapCompat.getOrDefault(keyboardInfo, KMManager.KMKey_KMPLink, "");
-    String font = keyboardInfo.get(KMManager.KMKey_Font);
-    String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    boolean isNewKeyboard = true;
-
-    Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
-          languageID, languageName, version, helpLink, kmpLink,
-      isNewKeyboard, font, oskFont);
-    return addKeyboard(context, k);
-  }
-
   public static boolean removeKeyboard(Context context, int position) {
     return KeyboardPickerActivity.removeKeyboard(context, position);
+  }
+
+  public static boolean isDefaultKey(String key) {
+    return (
+      key != null &&
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
   /**
@@ -1972,6 +2085,77 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
+  public static int getOrientation(Context context) {
+    Display display;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // https://developer.android.com/reference/android/content/Context#getDisplay()
+      try {
+        display = context.getDisplay();
+      } catch (UnsupportedOperationException e) {
+        // if the method is called on an instance that is not associated with any display.
+        return context.getResources().getConfiguration().orientation;
+      }
+    } else {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      // Deprecated in API 30
+      display = wm.getDefaultDisplay();
+    }
+    int rotation = display.getRotation();
+    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+      return Configuration.ORIENTATION_PORTRAIT;
+    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+      return Configuration.ORIENTATION_LANDSCAPE;
+    }
+    return Configuration.ORIENTATION_UNDEFINED;
+  }
+
+  /**
+   * Get the longpress delay (in milliseconds) from stored preference. Defaults to 500ms
+   * @return int - longpress delay in milliseconds
+   */
+  public static int getLongpressDelay() {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
+  }
+
+  /**
+   * Set the longpress delay (in milliseconds) as a stored preference.
+   * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
+   * @param longpressDelay - int longpress delay in milliseconds
+   * @return boolean
+   */
+  public static boolean setLongpressDelay(int longpressDelay) {
+    if (longpressDelay < KMMinimum_LongpressDelay || longpressDelay > KMMaximum_LongpressDelay) {
+      return false;
+    }
+
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMKey_LongpressDelay, longpressDelay);
+    editor.commit();
+
+    return true;
+  }
+
+  /**
+   * Sends options to the KeymanWeb keyboard.
+   * 1. number of milliseconds to trigger a longpress gesture.
+   * This method requires a keyboard to be loaded for the value to take effect.
+   */
+  public static void sendOptionsToKeyboard() {
+    int longpressDelay = getLongpressDelay();
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+  }
+
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
     if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
@@ -1985,7 +2169,8 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context) {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int orientation = context.getResources().getConfiguration().orientation;
+
+    int orientation = getOrientation(context);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2006,6 +2191,34 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Get the size of the area the window would occupy.
+   * API 30+
+   * https://developer.android.com/reference/android/view/WindowManager#getCurrentWindowMetrics()
+   * @param context
+   * @return Point (width, height)
+   */
+  public static Point getWindowSize(Context context) {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
+    }
+
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());
+  }
+
+  public static float getWindowDensity(Context context) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.d(TAG, "KMManager: metrics.density " + metrics.density);
+    return metrics.density;
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
@@ -2054,7 +2267,6 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -2094,17 +2306,40 @@ public final class KMManager {
     return result;
   }
 
+  /**
+   * Updates the active range for selected text.
+   * @deprecated
+   * This method no longer needs the `selStart` and `selEnd` parameters.
+   * <p>Use {@link KMManager#updateSelectionRange(KeyboardType)} instead.</p>
+   *
+   * @param kbType    A value indicating if this request is for the in-app keyboard or the system keyboard
+   * @param selStart  (deprecated) the start index for the range
+   * @param selEnd  (deprecated) the end index for the selected range
+   * @return
+   */
+  @Deprecated
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
+    return updateSelectionRange(kbType);
+  }
+
+  /**
+   * Performs a synchronization check for the active range for selected text,
+   * ensuring it matches the text-editor's current state.
+   * @param kbType  A value indicating if this request is for the in-app or system keyboard.
+   * @return
+   */
+  public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
+
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
-        result = InAppKeyboard.updateSelectionRange(selStart, selEnd);
+        result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
-        result = SystemKeyboard.updateSelectionRange(selStart, selEnd);
+        result = SystemKeyboard.updateSelectionRange();
       }
 
       SystemKeyboard.setShouldIgnoreSelectionChange(false);
@@ -2133,13 +2368,13 @@ public final class KMManager {
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
     if(index < 0) {
-      // As of 15.0-beta and 15.0-stable, this only appears to occur when
-      // #6703 would trigger.  This logging may help us better identify the
-      // root cause.
+      // index can be undefined if user installs Keyman (without launching it)
+      // and then enables Keyaman as a system keyboard from the Android settings menus.
+      // We'll only log if key isn't for fallback keyboard
       String key = KMKeyboard.currentKeyboard();
-      // Even if it's null, it's still a notable error.  This function shouldn't
-      // be reachable in execution (15.0) at a time this variable would be set to `null`.
-      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      if (!isDefaultKey(key)) {
+        KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      }
       return null;
     }
     return KeyboardController.getInstance().getKeyboardInfo(index);
@@ -2282,6 +2517,11 @@ public final class KMManager {
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
+    if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP && !globeKeyDown) {
+      // No globe key action to process
+      return;
+    }
+
     // Update globeKeyState
     if (globeKeyState != GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS) {
       globeKeyState = globeKeyDown ? GlobeKeyState.GLOBE_KEY_STATE_DOWN : GlobeKeyState.GLOBE_KEY_STATE_UP;
@@ -2290,7 +2530,7 @@ public final class KMManager {
     if (KMManager.shouldAllowSetKeyboard()) {
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (isLocked()) {
-        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           doGlobeKeyLockscreenAction(context);
         }
         // clear globeKeyState

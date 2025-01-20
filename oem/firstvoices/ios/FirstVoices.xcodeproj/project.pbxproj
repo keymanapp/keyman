@@ -17,6 +17,8 @@
 		2990208E278FF402004F18CF /* KeyboardTableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990208D278FF402004F18CF /* KeyboardTableController.swift */; };
 		2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2990209027901DD7004F18CF /* KeyboardDetailCell.swift */; };
 		2993F6E62791621D009E1352 /* KeyboardDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2993F6E52791621D009E1352 /* KeyboardDetailController.swift */; };
+		29B30C252B5A8A4800C342A4 /* FVLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C242B5A8A4800C342A4 /* FVLogger.swift */; };
+		29B30C262B5A8A4800C342A4 /* FVLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C242B5A8A4800C342A4 /* FVLogger.swift */; };
 		37C183B922932AD2009F9EFD /* FVKeyboardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C183B822932AD2009F9EFD /* FVKeyboardList.swift */; };
 		37C183BD2293321C009F9EFD /* Instructions in Resources */ = {isa = PBXBuildFile; fileRef = 37C183BC2293321C009F9EFD /* Instructions */; };
 		37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37EA1F22228A1F57003E710C /* FVInputViewController.swift */; };
@@ -52,20 +54,14 @@
 		CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
 		CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD341D2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
-		CEBD341E2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
 		CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
 		CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
-		CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */; };
 		CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */; };
-		CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */; };
 		CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */; };
 		CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */; };
-		CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -76,11 +72,9 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBD34202654D76900EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				CEBD341E2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
 				290FB4642AFB358F00249D58 /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CEBD341B2654D76600EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
 				CEBD34232654D76B00EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
-				CEBD34262654D76C00EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
 				CEBD34032654D41200EB2EA8 /* KeymanEngine.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -108,6 +102,7 @@
 		2990208D278FF402004F18CF /* KeyboardTableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardTableController.swift; sourceTree = "<group>"; };
 		2990209027901DD7004F18CF /* KeyboardDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailCell.swift; sourceTree = "<group>"; };
 		2993F6E52791621D009E1352 /* KeyboardDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDetailController.swift; sourceTree = "<group>"; };
+		29B30C242B5A8A4800C342A4 /* FVLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVLogger.swift; sourceTree = "<group>"; };
 		37C183B822932AD2009F9EFD /* FVKeyboardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVKeyboardList.swift; sourceTree = "<group>"; };
 		37C183BC2293321C009F9EFD /* Instructions */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Instructions; path = FirstVoices/Instructions; sourceTree = "<group>"; };
 		37EA1F22228A1F57003E710C /* FVInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FVInputViewController.swift; sourceTree = "<group>"; };
@@ -145,9 +140,7 @@
 		98C9A9FA1BFC1111009E9A4F /* SWKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SWKeyboard.entitlements; sourceTree = "<group>"; };
 		CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = KeymanEngine.xcframework; sourceTree = "<group>"; };
 		CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
 		CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
-		CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
 		CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -156,13 +149,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CEBD341D2654D76800EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				CEBD341F2654D76900EB2EA8 /* Reachability.xcframework in Frameworks */,
 				290FB4632AFB358F00249D58 /* ZIPFoundation.xcframework in Frameworks */,
 				CEBD34222654D76B00EB2EA8 /* Sentry.xcframework in Frameworks */,
 				CEBD341A2654D76600EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD34022654D41200EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
-				CEBD34252654D76C00EB2EA8 /* XCGLogger.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,11 +162,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEDB327F265C9C58000A2009 /* DeviceKit.xcframework in Frameworks */,
-				CEDB3280265C9C58000A2009 /* ObjcExceptionBridging.xcframework in Frameworks */,
 				290FB4652AFB359A00249D58 /* ZIPFoundation.xcframework in Frameworks */,
 				CEDB3281265C9C58000A2009 /* Reachability.xcframework in Frameworks */,
 				CEDB3282265C9C58000A2009 /* Sentry.xcframework in Frameworks */,
-				CEDB3283265C9C58000A2009 /* XCGLogger.xcframework in Frameworks */,
 				CEBD34472654FF3300EB2EA8 /* KeymanEngine.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -240,6 +229,7 @@
 				9889E8C71BFA9CEC00019560 /* LaunchScreen.storyboard */,
 				9889E8C21BFA9CEC00019560 /* Main.storyboard */,
 				9889E8B91BFA9CEC00019560 /* Supporting Files */,
+				29B30C242B5A8A4800C342A4 /* FVLogger.swift */,
 			);
 			path = FirstVoices;
 			sourceTree = "<group>";
@@ -292,10 +282,8 @@
 			isa = PBXGroup;
 			children = (
 				290FB4622AFB358E00249D58 /* ZIPFoundation.xcframework */,
-				CEBD34082654D5AA00EB2EA8 /* ObjcExceptionBridging.xcframework */,
 				CEBD340C2654D5AB00EB2EA8 /* Reachability.xcframework */,
 				CEBD34092654D5AA00EB2EA8 /* Sentry.xcframework */,
-				CEBD340A2654D5AA00EB2EA8 /* XCGLogger.xcframework */,
 				CEBD34052654D4EB00EB2EA8 /* DeviceKit.xcframework */,
 				CEBD34012654D41200EB2EA8 /* KeymanEngine.xcframework */,
 			);
@@ -313,9 +301,9 @@
 				9889E8B31BFA9CEC00019560 /* Frameworks */,
 				9889E8B41BFA9CEC00019560 /* Resources */,
 				98C9A8C81BFBF23C009E9A4F /* Embed App Extensions */,
-				37DF007C24595F6F00C73128 /* ShellScript */,
-				9800EC5D1C029FCD00BF0FB5 /* ShellScript */,
 				371C855D2288F3A50076612A /* Embed Frameworks */,
+				37DF007C24595F6F00C73128 /* Run Script */,
+				9800EC5D1C029FCD00BF0FB5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -451,11 +439,11 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			shellPath = "/usr/bin/env bash";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		37DF007C24595F6F00C73128 /* ShellScript */ = {
+		37DF007C24595F6F00C73128 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -464,13 +452,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n. \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\n# true:  applies VERSION_WITH_TAG to custom KeymanVersionWithTag plist member used for in-app display\nphaseSetBundleVersions true\n\n# Also updates the version string for Settings\nsetSettingsBundleVersion\n";
+			shellPath = "/usr/bin/env bash";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9800EC5D1C029FCD00BF0FB5 /* ShellScript */ = {
@@ -483,8 +472,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n";
+			shellPath = "/usr/bin/env bash";
+			shellScript = "#verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/FirstVoices/Info.plist\")\n#verstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/FirstVoices/Info.plist\")\n#/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -501,6 +490,7 @@
 				2990209127901DD7004F18CF /* KeyboardDetailCell.swift in Sources */,
 				37EA1F4622921BAD003E710C /* KeyboardInfo.swift in Sources */,
 				296E22E527ED8FA4007BDA12 /* DownloadStatusToolbar.swift in Sources */,
+				29B30C252B5A8A4800C342A4 /* FVLogger.swift in Sources */,
 				294D40E9279FE62600DB37F6 /* KeyboardRepository.swift in Sources */,
 				2990208E278FF402004F18CF /* KeyboardTableController.swift in Sources */,
 				37EA1F31228B7661003E710C /* FVShared.swift in Sources */,
@@ -513,6 +503,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29B30C262B5A8A4800C342A4 /* FVLogger.swift in Sources */,
 				37EA1F32228BCDA7003E710C /* FVShared.swift in Sources */,
 				37EA1F23228A1F57003E710C /* FVInputViewController.swift in Sources */,
 			);

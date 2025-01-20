@@ -141,7 +141,6 @@ export default class TextArea extends OutputTarget<{}> {
   }
 
   protected setTextAfterCaret(s: string) {
-    let c = this.getCaret();
     let direction = this.getSelectionDirection();
 
     this.root.value = this.getTextBeforeCaret() + s;

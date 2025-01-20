@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="nothing-anyone-ever-heard-of"> <!-- invalid -->
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys>
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
+  </keys>
+
+</keyboard3>

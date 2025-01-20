@@ -47,7 +47,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 16.0.47 -->
-  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Add/remove language...</string>
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Přidat/odebrat jazyk...</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
@@ -71,15 +71,15 @@
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Uninstall</string>
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Odinstalovat</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Enable</string>
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Povolit</string>
   <!-- Context: Configuration Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47.0 -->
-  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Disable</string>
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Zakázat</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -191,7 +191,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47 -->
-  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Add/remove language</string>
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Přidat/odebrat jazyk</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -243,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Keyboard options...</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Možnosti klávesnice...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -293,6 +293,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simulovat AltGr s Ctrl + Alt</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Přidat pravý modifikátor pro zkratky</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
@@ -361,7 +365,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(no hotkey)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(žádná klávesová zkratka)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -418,6 +422,14 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL International. Všechna práva vyhrazena.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">Vytvořeno %1$s</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright ©️ %1$s. Všechna práva vyhrazena.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -610,11 +622,14 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="S_Splash_Name" comment="Splash major title">Klíč</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_Splash_Start" comment="Start Keyman button">Počáteční klíč</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0 -->
+  <string name="S_Splash_Start_2" comment="Start {Keyman} button">Spustit %1$s</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
@@ -658,7 +673,6 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKShortApplicationTitle" comment="Product name">Klíč</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
@@ -782,7 +796,6 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Klíč</string>
   <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
@@ -905,6 +918,10 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Vyberte klávesnici klávesnice pro nalezení souvisejících písma.</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0.312.0 -->
+  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">Pro klávesnici %1$s nebyla nalezena žádná písma.</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->

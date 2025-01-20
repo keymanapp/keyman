@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<keyboard3 locale="en" conformsTo="45">
+  <info author="Steven R. Loomis" name="LDML Test"/>
+  <version number="1.0.0"/>
+  <keys>
+    <!-- keep the base items -->
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>
+    <!-- redefine the number keys -->
+    <key id="1" output="1:basic:OK" />
+    <key id="2" output="2:simple_transform:FAIL" />
+    <key id="3" output="3:simple_marker:FAIL\m{marker}" />
+    <key id="4" output="4:simple_reorder:UNTIED" />
+    <key id="5" output="5:simple_vars:${varsok}"/>
+    <key id="6" output="6:map_var:B\m{map1}X\m{map2}"/>
+    <key id="7" output="7:simple_uset:FAIL\m{uset7}" /> <!-- will produce OK-->
+    <key id="shift-7" output="7:simple_uset:OK\m{uset7}" /> <!-- will produce FAIL-->
+    <key id="8" output="\m{8ctxt}8:ctxt:FAIL" />
+    <key id="shift-8" output="𐒷" />
+    <key id="9" output="9:split_marker:FAIL\m{marker1}" />
+    <key id="shift-9" output="\m{marker2}" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>
+      <row keys="q w e r t y u i o p open-square close-square backslash"/>
+      <row keys="a s d f g h j k l semi-colon apos"/>
+      <row keys="z x c v b n m comma period slash"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="shift">
+      <row keys="tilde bang at hash dollar percent caret shift-7 shift-8 shift-9 close-paren underscore plus"/>
+      <row keys="Q W E R T Y U I O P open-curly close-curly pipe"/>
+      <row keys="A S D F G H J K L colon double-quote"/>
+      <row keys="Z X C V B N M open-angle close-angle question"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="caps">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>
+      <row keys="Q W E R T Y U I O P open-square close-square backslash"/>
+      <row keys="A S D F G H J K L semi-colon apos"/>
+      <row keys="Z X C V B N M comma period slash"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="shift caps">
+      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>
+      <row keys="q w e r t y u i o p open-curly close-curly pipe"/>
+      <row keys="a s d f g h j k l colon double-quote"/>
+      <row keys="z x c v b n m open-angle close-angle question"/>
+      <row keys="space"/>
+    </layer>
+  </layers>
+
+  <variables>
+    <string id="varsok" value="OK"/>
+    <!-- 6: first 13 chars and second 13 chars of alphabet -->
+    <set id="alpha1" value="A B C D E F G H I J K L M"/>
+    <set id="alpha2" value="N O P Q R S T U V W X Y Z"/>
+    <!-- 6: regular and rot13 alphabet -->
+    <set id="alpha" value="$[alpha1] $[alpha2]"/>
+    <set id="nycun" value="$[alpha2] $[alpha1]"/> <!-- 'nycun' in rot13 -->
+    <!-- 7: uset -->
+    <uset id="7ok" value="[[A_LIFE]-[E]]" /> <!-- = the chars [FAIL]-->
+    <uset id="7notok" value="[[A-Z]-$[7ok]]"/> <!-- everything not in [FAIL]-->
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!--
+        from to char
+        -    -   -
+        1    1   U
+        2    2   N
+        3    4   T
+        4    3   I
+        5    5   E
+        6    6   D
+      -->
+      <reorder from="U" order="0" />
+      <reorder from="N" order="1" />
+      <reorder from="I" order="2" /> <!-- the 'T' and 'I' will swap places-->
+      <reorder from="T" order="3" />
+      <reorder from="E" order="4" />
+      <reorder from="D" order="5" />
+    </transformGroup>
+    <!-- 6: rot-13 the last char -->
+    <transformGroup>
+        <transform from="($[alpha])\m{map2}" to="$[1:nycun]"/>
+    </transformGroup>
+    <!-- 6: restore the trailing map2 -->
+    <transformGroup>
+        <transform from="\m{map1}($[alpha])" to="\m{map1}$1\m{map2}"/>
+    </transformGroup>
+    <!-- 6: swap chars -->
+    <transformGroup>
+        <transform from="($[alpha])\m{map1}($[alpha])\m{map2}" to="$2\m{map2}$1\m{map1}" />
+    </transformGroup>
+    <!-- 6: rot-13 the last char -->
+    <transformGroup>
+        <transform from="($[alpha])\m{map1}" to="$[1:nycun]"/>
+    </transformGroup>
+    <!-- 6: restore the trailing map1 -->
+    <transformGroup>
+        <transform from="\m{map2}($[alpha])" to="\m{map2}$1\m{map1}"/>
+    </transformGroup>
+    <!-- 6: swap back -->
+    <transformGroup>
+        <transform from="($[alpha])\m{map2}($[alpha])\m{map1}" to="$2\m{map1}$1\m{map2}" />
+        <transform from=":(?:$[7notok]){1,9}\m{uset7}" to=":FAIL" />
+        <transform from=":(?:$[7ok]){1,9}\m{uset7}" to=":OK" />
+    </transformGroup>
+    <transformGroup>
+      <transform from="simple_transform:FAIL" to="simple_transform:OK" />
+      <!-- 3: interpret marker results -->
+      <transform from="FAIL\m{marker}" to="OK" />
+      <transform from="FAIL\m{marker1}\m{marker2}" to="OK" />
+      <!-- 4: interpret reorder results -->
+      <transform from="UNITED" to="OK" />
+      <transform from="UNTIED" to="FAIL" />
+      <!-- 6: if untransformed, BX is a failure. -->
+      <transform from=":B\m{.}X\m{.}" to=":FAIL"/>
+      <transform from="ABC\m{8ctxt}(8:ctxt):FAIL" to="$1:OK" />
+      <transform from="𐓏\m{8ctxt}(8:ctxt):FAIL" to="$1:OK" />
+      <transform from="𐒻𐒷\m{8ctxt}(8:ctxt):FAIL" to="$1:OK" />
+    </transformGroup>
+  </transforms>
+
+</keyboard3>

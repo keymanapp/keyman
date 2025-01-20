@@ -11,10 +11,9 @@
   "include": [ "src/**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/input-processor" },
-    { "path": "../device-detect" },
     { "path": "../osk" },
-    { "path": "../package-cache" },
-    { "path": "../paths" },
+    { "path": "../keyboard-storage" },
+    { "path": "../interfaces" },
+    { "path": "../js-processor" }
   ]
 }

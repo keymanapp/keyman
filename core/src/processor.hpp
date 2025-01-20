@@ -11,7 +11,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "keyboard.hpp"
 
@@ -121,6 +121,9 @@ namespace core
      */
     virtual km_core_keyboard_imx *
     get_imx_list() const = 0;
+
+    virtual bool
+    supports_normalization() const = 0;
 
     friend json & operator << (json &j, abstract_processor const &opts);
   };

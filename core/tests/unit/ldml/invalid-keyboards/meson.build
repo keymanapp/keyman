@@ -8,20 +8,10 @@ invalid_tests = [
   'ik_000_null_invalid'
 ]
 
-if build_machine.system() == 'windows'
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-else
-  copy_cmd = [find_program('cp', required: true)]
-endif
-
 # Build all keyboards in output folder
 
 foreach kbd : invalid_tests
-  configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
-    input: kbd + '.xml',
-    output: kbd + '.xml'
-  )
+  fs.copyfile(kbd + '.xml', kbd + '.xml')
 
   configure_file(
     command: hextobin_cmd + ['@INPUT@', '@OUTPUT@'],

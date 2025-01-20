@@ -12,7 +12,8 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "jsonpp.hpp"
 #include "utfcodec.hpp"
 

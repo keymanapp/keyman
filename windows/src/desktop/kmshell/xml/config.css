@@ -499,6 +499,20 @@ table tr
   padding: 1px 0 1px 10px;
 }
 
+.grid_container_update {
+  display: grid;
+  position: relative;
+  grid-template-columns: 50px 1fr 1fr 1fr;
+  margin: 10px 50px 10px 64px;
+  /* From https://geary.co/internal-borders-css-grid/ */
+  overflow: hidden;
+  gap: var(--gap);
+  --gap: 2em;
+  --line-offset: calc(var(--gap) / 2);
+  --line-thickness: 1px;
+  --line-color: black;
+}
+
 .grid_container.grid_disabled
 {
   opacity: 0.5;
@@ -508,9 +522,34 @@ table tr
 {
   position: relative;
   font-size: 12px;
-  margin: 0px;
   padding: 1px;
   margin: 0 0 0 5px;
+}
+
+.grid_item::before,
+.grid_item::after
+{
+  content: '';
+  position: absolute;
+  background-color: var(--line-color);
+  z-index: 1;
+}
+
+/* row borders */
+.grid_item::after
+{
+  inline-size: 100vw;
+  block-size: var(--line-thickness);
+  inset-inline-start: 0;
+  inset-block-start: calc(var(--line-offset) * -1);
+}
+
+/* column borders */
+.grid_item::before
+{
+  inline-size: var(--line-thickness);
+  block-size: 100vh;
+  inset-inline-start: calc(var(--line-offset) * -1);
 }
 
 .grid_item_title{
@@ -614,6 +653,7 @@ table tr
 {
   display: flex;
   flex-direction: column;
+  height: 200px;
   gap: 4px;
 }
 .list_languages_title
@@ -622,6 +662,11 @@ table tr
 }
 
 /* keyboard languages */
+.keyboard_language_list
+{
+  flex-grow:1
+}
+
 .keyboard_language
 {
   display: flex;
@@ -840,10 +885,10 @@ th
   color: #444;
   position: absolute;
   bottom: 32px;
-  left: 80px;
-  height: 50px;
-  padding-top: 25px;
-  padding-left: 56px;
+  left: 73px;
+  height: 64px;
+  padding-top: 32px;
+  padding-left: 110px;
   box-sizing: border-box;
 }
 
@@ -1093,17 +1138,42 @@ th
   height: 16px;
 }
 
-#keepintouch_content {
-  height: 100%;
-  overflow: hidden;
+.update_title
+{
+  background: url('keyman-title.png') 96px 13px no-repeat;
+  height: 60px;
 }
 
-#keepintouch_frame {
-  box-sizing: border-box;
-  width:100%;
-  height:100%;
-  border:none;
-  user-select: none;
+.update_title img
+{
+  margin: 13px 0 0 10px;
+}
+
+.update_edition
+{
+  float: left;
+  font-size: 16px;
+  margin-left: 64px;
+}
+
+#update_status
+{
+  font-size: 13px;
+  margin-left: 64px;
+  margin-top: 30px;
+}
+
+#update_content {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px 5px 10px;
+}
+
+.update_controls
+{
+  margin-left: 64px;
 }
 
 /* QRCodes */
@@ -1199,10 +1269,8 @@ th
 }
 
 .list_languages_add {
-  padding-top: 10px;
-  position: fixed;
-  top: 223px; /* Have to use fixed position can't use flex or grid inside a fixed child */
-  right: 281px;
+  padding-bottom: 10px;
+  align-self: flex-end;
 }
 
 .modify .keyboard_language {

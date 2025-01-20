@@ -1,6 +1,8 @@
 /**
- * osk-char-use - get list of characters used in on screen keyboard + touch layout
+ * @packageDocumentation
+ * kmc-analyze - keyboard analysis classes, including tools for `&displayMap`.
  */
 
-export { AnalyzeOskCharacterUse } from './osk-character-use/index.js';
+export { AnalyzeOskCharacterUse, AnalyzeOskCharacterUseOptions } from './osk-character-use/index.js';
 export { AnalyzeOskRewritePua } from './osk-rewrite-pua/index.js';
+export { AnalyzerMessages } from './analyzer-messages.js';

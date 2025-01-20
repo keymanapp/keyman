@@ -83,7 +83,7 @@ begin
     ss := TStringStream.Create('', TEncoding.UTF8);
     try
       ss.LoadFromFile(Filename);
-      Result := ss.DataString.IndexOf('ldmlKeyboard3.dtd') > 0;
+      Result := ss.DataString.IndexOf('<keyboard3') > 0;
     finally
       ss.Free;
     end;

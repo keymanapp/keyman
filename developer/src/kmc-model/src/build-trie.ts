@@ -1,4 +1,4 @@
-import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks } from "./compiler-callbacks.js";
 
 // Supports LF or CRLF line terminators.
@@ -169,6 +169,9 @@ class WordListFromFilename {
 
   *lines() {
     const data = callbacks.loadFile(this.name);
+    if(!data) {
+      throw new ModelCompilerError(ModelCompilerMessages.Error_WordlistFileNotFound({filename:this.name}));
+    }
     const contents = new TextDecoder(detectEncoding(data)).decode(data);
     yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
   }
@@ -374,6 +377,11 @@ namespace Trie {
    */
   function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
     let char = item.key[index];
+    // If an internal node is the proper site for item, it belongs under the
+    // corresponding (sentinel, internal-use) child node signifying this.
+    if(char == undefined) {
+      char = INTERNAL_VALUE;
+    }
     if (!node.children[char]) {
       node.children[char] = createRootNode();
       node.values.push(char);

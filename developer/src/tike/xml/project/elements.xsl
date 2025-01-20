@@ -178,6 +178,12 @@
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template name="filetype_xml">
+    <xsl:call-template name="filetype">
+      <xsl:with-param name="icontype">gif</xsl:with-param> <xsl:with-param name="type">xml</xsl:with-param> <xsl:with-param name="title">LDML Keyboard Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
   <xsl:template name="filetype_kmx">
     <xsl:call-template name="filetype">
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kmx</xsl:with-param> <xsl:with-param name="title">Keyman Keyboard File</xsl:with-param>

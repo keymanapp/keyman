@@ -3,14 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-EX_USAGE=64
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-
-cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman Developer Server" \
   @/common/web/keyman-version \
@@ -21,7 +18,7 @@ builder_describe "Build Keyman Developer Server" \
   build \
   test \
   "installer   Prepare for Keyman Developer installer" \
-  "publish     Publish to NPM" \
+  publish \
   ":server     Keyman Developer Server main program" \
   ":addins     Windows addins for GUI integration"
 
@@ -36,6 +33,8 @@ builder_describe_outputs \
   build:addins         /developer/src/server/build/src/win32/trayicon/addon.node
 
 builder_parse "$@"
+
+. "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -88,9 +87,16 @@ function build_server() {
 
   # Post build
   mkdir -p "$THIS_SCRIPT_PATH/build/src/site/"
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/"
   cp -r "$THIS_SCRIPT_PATH/src/site/"** "$THIS_SCRIPT_PATH/build/src/site/"
-  cp -r "$THIS_SCRIPT_PATH/src/win32/"** "$THIS_SCRIPT_PATH/build/src/win32/"
+
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/"
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/console"
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/trayicon"
+  cp "$THIS_SCRIPT_PATH/src/win32/README.md" "$THIS_SCRIPT_PATH/build/src/win32/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
 
   replaceVersionStrings "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in" "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js"
   rm "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in"
@@ -115,10 +121,13 @@ function installer_server() {
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
-  # @keymanapp/keyman-version is required in build/ now but we need to copy it in manually
+  # Dependencies are required in build/ but we need to copy them in manually
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/developer-utils/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/common-types/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/ldml-keyboard-constants/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/eventemitter3/" "$PRODBUILDTEMP/node_modules/"
 
   # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
   rm -rf "$KEYMAN_ROOT/developer/bin/server/"
@@ -132,16 +141,25 @@ function test_server() {
   # eslint .
   tsc --build test
   # c8 --reporter=lcov --reporter=text
-  mocha
+  mocha --recursive build/test
+}
+
+function publish_server() {
+  installer_server
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.x64.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.x64.node"
 }
 
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
-builder_run_action build:server        build_server
 builder_run_action build:addins        build_addins
+builder_run_action build:server        build_server
 builder_run_action test:server         test_server
 # builder_run_action test:addins       # no op
-builder_run_action installer:server    installer_server
+builder_run_action installer:server    installer_server # TODO: rename to install-prep
+builder_run_action publish:server      publish_server
 
 # TODO: consider 'watch'
 # function watch_server() {

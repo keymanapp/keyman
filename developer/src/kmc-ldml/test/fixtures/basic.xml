@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Keyman is copyright (C) SIL International. MIT License. -->
 
 <!--
 @@keys: [K_Q][K_W][K_Q]
 @@expected: \u0127\u1790\u17B6\u0127
 -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <version number="1.0.0" />
 
   <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
@@ -24,7 +24,8 @@
   </keys>
 
   <layers formId="us" minDeviceWidth="123">
-    <layer id="base">
+    <!-- TODO-LDML: unit test for <layers formId="us" with <layer id="base" should be illegal -->
+    <layer modifiers="none">
       <row keys="hmaqtugha that" />
     </layer>
   </layers>
@@ -33,7 +34,7 @@
     <string id="a" value="\m{a}"/>
     <string id="vst" value="abc"/>
     <set id="vse" value="a b c"/>
-    <unicodeSet id="vus" value="[abc]"/>
+    <uset id="vus" value="[abc]"/>
   </variables>
 
   <transforms type="simple">
@@ -48,7 +49,7 @@
 
     <transformGroup>
       <!-- Northern Thai example from spec -->
-      <reorder before="\u{1A6B}" from="\u{1A60}[\u1A75-\u1A79]\u{1A45}" order="10 55 10" />
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10" />
     </transformGroup>
   </transforms>
 

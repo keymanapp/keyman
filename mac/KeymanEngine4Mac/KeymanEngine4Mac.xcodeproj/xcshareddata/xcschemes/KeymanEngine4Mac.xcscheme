@@ -48,9 +48,6 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "KMEngineTests/testArmenianMnemonic_triggerPersistOptions_ReturnsOptions">
-               </Test>
-               <Test
                   Identifier = "KMEngineTests/testCheckPlatform_Browsers_ReturnsNo">
                </Test>
                <Test
@@ -108,6 +105,16 @@
                   Identifier = "KMEngineTests/testsetContextBuffer_EmptyContext_InitializedWithContext">
                </Test>
             </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
+               BuildableName = "KeymanTests.xctest"
+               BlueprintName = "KeymanTests"
+               ReferencedContainer = "container:../Keyman4MacIM/Keyman4MacIM.xcodeproj">
+            </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>

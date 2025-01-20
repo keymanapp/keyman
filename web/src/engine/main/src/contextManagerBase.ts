@@ -1,7 +1,8 @@
-import EventEmitter from 'eventemitter3';
-import { DeviceSpec, ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
-import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/package-cache';
-import { PredictionContext } from '@keymanapp/input-processor';
+import { EventEmitter } from 'eventemitter3';
+import { ManagedPromise, type Keyboard } from 'keyman/engine/keyboard';
+import { type KeyboardInterface, type OutputTarget } from 'keyman/engine/js-processor';
+import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
+import { PredictionContext } from 'keyman/engine/interfaces';
 import { EngineConfiguration } from './engineConfiguration.js';
 
 interface EventMap {
@@ -142,7 +143,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
+  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -199,6 +200,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     } else if(activationAfterAwait) {
       // Restore the popped element; it doesn't match the current activation attempt.
       this.pendingActivations.push(activationAfterAwait);
+      return null;
+    } else {
       return null;
     }
   }
@@ -274,8 +277,6 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // (!wasNull || !!keyboard) - blocks events for `null` -> `null` transitions.
     // (keyman/keymanweb.com#96)
     if(this.currentKeyboardSrcTarget() == originalKeyboardTarget && (!wasNull || !!keyboard)) {
-      // Perform standard context-reset ops, including the processing of new-context events.
-      this.resetContext();
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
       this.emit('keyboardchange', this.activeKeyboard);
     }
@@ -302,7 +303,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     languageCode ||= '';
 
     // Check that the saved keyboard is currently registered
-    let requestedStub = null;
+    let requestedStub: KeyboardStub = null;
     if(keyboardId) {
       requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
     } else {

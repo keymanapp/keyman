@@ -111,7 +111,9 @@ builder_describe \
   ":engine      Thomas, y'know" \
   "--power,-p   Use powerful mode" \
   "--zoom,-z    Use zoom mode" \
-  "--feature=FOO Enable feature foo"
+  "--feature=FOO Enable feature foo" \
+  "--bar=BAR    Enable bar" \
+  "--baz=BAZ    Enable baz"
 
 #----------------------------------------------------------------------
 # Test --options
@@ -132,21 +134,39 @@ else
   builder_die "FAIL: --zoom option not found"
 fi
 
+function verify_option() {
+  local OPTIONNAME=$1
+  local VARIABLE=$2
+  local EXCPECTED=$3
+
+  if builder_has_option ${OPTIONNAME}; then
+    if [[ ${!VARIABLE} == ${EXCPECTED} ]]; then
+      echo "PASS: ${OPTIONNAME} option variable \$${VARIABLE} has expected value '${EXCPECTED}'"
+    else
+      builder_die "FAIL: ${OPTIONNAME} option variable \$${VARIABLE} had value '${!VARIABLE}' but should have had '${EXCPECTED}'"
+    fi
+  else
+    builder_die "FAIL: ${OPTIONNAME} option not found"
+  fi
+}
+
 #----------------------------------------------------------------------
 # Test --feature <foo>
 
 echo -e "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy${COLOR_RESET}"
 builder_parse --feature xyzzy
 
-if builder_has_option --feature; then
-  if [[ $FOO == xyzzy ]]; then
-    echo "PASS: --feature option variable \$FOO has expected value 'xyzzy'"
-  else
-    builder_die "FAIL: --feature option variable \$FOO had value '$FOO' but should have had 'xyzzy'"
-  fi
-else
-  builder_die "FAIL: --feature option not found"
-fi
+verify_option --feature FOO xyzzy
+
+#----------------------------------------------------------------------
+# Test --feature <foo> --bar <bar> --baz <baz>
+
+echo -e "${COLOR_BLUE}## Testing: builder_parse --feature xyzzy --bar abc --baz def test${COLOR_RESET}"
+builder_parse --feature xyzzy --bar abc --baz def test
+
+verify_option --feature FOO xyzzy
+verify_option --bar BAR abc
+verify_option --baz BAZ def
 
 builder_parse -- one two "three four five"
 if [[ ${builder_extra_params[0]} != "one" ]]; then
@@ -157,6 +177,15 @@ if [[ ${builder_extra_params[1]} != "two" ]]; then
 fi
 if [[ ${builder_extra_params[2]} != "three four five" ]]; then
   builder_die "FAIL: -- extra parameter 'three four five' not found"
+fi
+
+#----------------------------------------------------------------------
+# Test output of: --feature <foo> --bar <bar> --baz <baz> (#11676)
+echo -e "${COLOR_BLUE}## Testing output of: builder_parse --feature xyzzy --bar abc --baz def test${COLOR_RESET}"
+parse_output=$(builder_parse --feature xyzzy --bar abc --baz def test)
+expected="$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test>")"
+if [[ "${parse_output[*]}" != "${expected}" ]]; then
+  builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : ${parse_output[*]}\n  Expected: ${expected}"
 fi
 
 # Run tests based in separate scripts to facilitate their operation
@@ -174,6 +203,15 @@ echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 "$THIS_SCRIPT_PATH/builder-deps.test.sh"
 "$THIS_SCRIPT_PATH/dependencies/test.sh"
 "$THIS_SCRIPT_PATH/trees/test.sh"
+"$THIS_SCRIPT_PATH/debug-deps/test.sh"
+"$THIS_SCRIPT_PATH/ignored-flags/test.sh"
+
+echo -e "${COLOR_BLUE}## Test builder.inc.sh platform and tool constraints${COLOR_RESET}"
+"$THIS_SCRIPT_PATH/builder-platform.test.sh"
+
+
+echo -e "${COLOR_BLUE}## Test builder.inc.sh 'builder-style' script${COLOR_RESET}"
+./builder-invalid-script.test.sh || builder_die "FAIL: builder-invalid-script.test.sh returned failure code $?"
 
 echo -e "${COLOR_BLUE}## End external tests${COLOR_RESET}"
 echo
@@ -183,7 +221,7 @@ echo
   # builder_parse calls `exit 0` on a --help run, so running in a subshell
   echo -e "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
   builder_parse --no-color --help
-) || builder_die "FAIL: builder-parse returned failure code $? unexpectedly"
+) || builder_die "FAIL: builder-parse unexpectedly returned failure code $?"
 
 echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"
 echo -e "${COLOR_GREEN}All tests passed successfully${COLOR_RESET}"

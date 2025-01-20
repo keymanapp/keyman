@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 interface EventMap {
   activate: (flag: boolean) => void;
@@ -32,6 +32,10 @@ export default abstract class Activator<ExtraEvents = void> extends EventEmitter
 export class StaticActivator extends Activator {
   get enabled(): boolean {
     return true;
+  }
+
+  set enabled(value: boolean) {
+    // does nothing; it's static.
   }
 
   get activate(): boolean {

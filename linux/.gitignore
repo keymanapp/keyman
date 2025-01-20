@@ -6,7 +6,7 @@ ltmain.sh
 __pycache__
 *.egg-info
 build-*
-deb-*
+./deb-*
 builddebs
 keyman-config/make_deb
 tmp/
@@ -31,7 +31,7 @@ debianpackage/
 *.tar.xz
 *.tar.gz
 *.dsc
-help/reference/
+docs/help/reference/
 
 # Cached/auto-compiled Python bytecode
 *.pyc

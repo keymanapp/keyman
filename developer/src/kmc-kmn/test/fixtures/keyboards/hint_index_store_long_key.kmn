@@ -1,0 +1,11 @@
+store(&NAME) 'hint_index_store_long_key'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(abc) 'abc'
+store(defg) 'defg'
+
++ any(abc) > index(defg, 1)

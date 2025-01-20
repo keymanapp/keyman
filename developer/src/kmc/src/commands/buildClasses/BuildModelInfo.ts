@@ -1,13 +1,15 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -25,14 +27,14 @@ export class BuildModelInfo extends BuildActivity {
    * @param options
    * @returns
    */
-  public async build(infile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
+  public async build(infile: string, _outfile: string, callbacks: CompilerCallbacks, options: ExtendedCompilerOptions): Promise<boolean> {
     if(!KeymanFileTypes.filenameIs(infile, KeymanFileTypes.Source.Project)) {
       // Even if the project file does not exist, we use its name as our reference
       // in order to avoid ambiguity
       throw new Error(`BuildModelInfo called with unexpected file type ${infile}`);
     }
 
-    const project = loadProject(infile, callbacks);
+    const project = await loadProject(infile, callbacks);
     if(!project) {
       // Error messages will be reported by loadProject
       return false;
@@ -50,17 +52,22 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    let kmpCompiler = new KmpCompiler(callbacks);
+    let kmpCompiler = new KmpCompiler();
+    if(!await kmpCompiler.init(callbacks, options)) {
+      // Errors will have been emitted by KmpCompiler
+      return false;
+    }
+
     let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
     if(!kmpJsonData) {
       // Errors will have been emitted by KmpCompiler
       return false;
     }
 
-    const lastCommitDate = getLastGitCommitDate(project.projectPath);
-    const compiler = new ModelInfoCompiler(callbacks);
-    const data = compiler.writeModelMetadataFile({
-      model_id: callbacks.path.basename(project.projectPath, KeymanFileTypes.Source.Project),
+    const historyPath = path.join(project.projectPath, KeymanFileTypes.HISTORY_MD);
+    const lastCommitDate = getLastGitCommitDate(fs.existsSync(historyPath) ? historyPath : project.projectPath);
+    const sources = {
+      model_id: path.basename(project.projectPath, KeymanFileTypes.Source.Project),
       kmpJsonData,
       sourcePath: calculateSourcePath(infile),
       modelFileName: project.resolveOutputFilePath(model, KeymanFileTypes.Source.Model, KeymanFileTypes.Binary.Model),
@@ -68,18 +75,12 @@ export class BuildModelInfo extends BuildActivity {
       kpsFilename: project.resolveInputFilePath(kps),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
-    });
+    };
 
-    if(data == null) {
-      // Error messages have already been emitted by writeModelMetadataFile
-      return false;
-    }
+    // Note: should we always ignore the passed-in output filename for .model_info?
+    const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo);
 
-    fs.writeFileSync(
-      project.getOutputFilePath(KeymanFileTypes.Binary.ModelInfo),
-      data
-    );
-
-    return true;
+    const compiler = new ModelInfoCompiler();
+    return await super.runCompiler(compiler, infile, outputFilename, callbacks, {...options, sources});
   }
 }

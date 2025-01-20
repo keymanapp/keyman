@@ -37,6 +37,8 @@ type
 implementation
 
 uses
+  System.Classes,
+
   KeymanPaths;
 
 { TDebugCore }
@@ -44,6 +46,9 @@ uses
 constructor TDebugCore.Create(const Filename: string; EnableDebug: Boolean);
 var
   status: km_core_status;
+  fs: TFileStream;
+  Buffer: Pointer;
+  BufferSize: NativeInt;
 begin
   inherited Create;
 
@@ -52,7 +57,23 @@ begin
   FKeyboard := nil;
   FState := nil;
 
-  status := km_core_keyboard_load(PChar(FileName), FKeyboard);
+  Buffer := nil;
+  try
+    fs := TFileStream.Create(Filename, fmOpenRead or fmShareDenyWrite);
+    try
+      BufferSize := fs.Size;
+      Buffer := AllocMem(BufferSize);
+      if fs.Read(Buffer^, BufferSize) <> BufferSize then
+        raise EDebugCore.Create('Unable to start debugger -- failed to read file from disk');
+    finally
+      fs.Free;
+    end;
+
+    status := km_core_keyboard_load_from_blob(PChar(FileName), Buffer, BufferSize, FKeyboard);
+  finally
+    FreeMem(Buffer);
+  end;
+
   if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to start debugger -- keyboard load failed with error %x', [Ord(status)]);
 
@@ -98,13 +119,13 @@ end;
 
 function TDebugCore.GetKMXPlatform: string;
 var
-  p: pkm_core_cp;
+  p: pkm_core_cu;
   status: km_core_status;
 begin
   status := km_core_state_option_lookup(
     FState,
     KM_CORE_OPT_ENVIRONMENT,
-    pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM)),
+    pkm_core_cu(PWideChar(KM_CORE_KMX_ENV_PLATFORM)),
     p
   );
   if status <> KM_CORE_STATUS_OK then
@@ -117,8 +138,8 @@ var
   options: array[0..1] of km_core_option_item;
   status: km_core_status;
 begin
-  options[0].key := pkm_core_cp(PWideChar(KM_CORE_KMX_ENV_PLATFORM));
-  options[0].value := pkm_core_cp(PWideChar(Value));
+  options[0].key := pkm_core_cu(PWideChar(KM_CORE_KMX_ENV_PLATFORM));
+  options[0].value := pkm_core_cu(PWideChar(Value));
   options[0].scope := KM_CORE_OPT_ENVIRONMENT;
   options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);
@@ -128,13 +149,13 @@ end;
 
 function TDebugCore.GetOption(const name: string): string;
 var
-  p: pkm_core_cp;
+  p: pkm_core_cu;
   status: km_core_status;
 begin
   status := km_core_state_option_lookup(
     FState,
     KM_CORE_OPT_KEYBOARD,
-    pkm_core_cp(PWideChar(name)),
+    pkm_core_cu(PWideChar(name)),
     p
   );
   if status <> KM_CORE_STATUS_OK then
@@ -147,8 +168,8 @@ var
   options: array[0..1] of km_core_option_item;
   status: km_core_status;
 begin
-  options[0].key := pkm_core_cp(PWideChar(Name));
-  options[0].value := pkm_core_cp(PWideChar(Value));
+  options[0].key := pkm_core_cu(PWideChar(Name));
+  options[0].value := pkm_core_cu(PWideChar(Value));
   options[0].scope := KM_CORE_OPT_KEYBOARD;
   options[1] := KM_CORE_OPTIONS_END;
   status := km_core_state_options_update(FState, @options[0]);

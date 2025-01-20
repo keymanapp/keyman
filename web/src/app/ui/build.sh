@@ -3,15 +3,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/ui
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -47,6 +44,22 @@ do_clean() {
 
 compile_and_copy() {
   compile $SUBPROJECT_NAME
+
+  BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/ui"
+
+  types=(button float toggle toolbar)
+  for type in ${types[@]}
+  do
+    filename="kmwui${type}"
+    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/debug/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
+
+    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/release/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
+      --minify
+  done
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/ui"
   cp -R "$KEYMAN_ROOT/web/src/resources/ui/." "$KEYMAN_ROOT/web/build/app/resources/ui/"

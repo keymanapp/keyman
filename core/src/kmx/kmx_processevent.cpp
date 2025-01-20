@@ -12,7 +12,7 @@ using namespace kmx;
 /* Globals */
 
 KMX_BOOL km::core::kmx::g_debug_ToConsole = FALSE;
-KMX_BOOL km::core::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::core::kmx::g_debug_KeymanLog = FALSE; // workaround for #12661
 KMX_BOOL km::core::kmx::g_silent = FALSE;
 
 /*
@@ -230,10 +230,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         if(kkp->dpContext[0] != 0) break; else continue;
       }
 
-      //if(kkp->Key == m_state.vkey)
-      //SendDebugMessageFormat(m_state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x",
-      //  kkp->Key, kkp->ShiftFlags);
-
       /* Keyman 6.0: support Virtual Characters */
       if(IsEquivalentShift(kkp->ShiftFlags, m_modifiers))
       {
@@ -276,7 +272,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         // If there is now no character in the context, we want to
         // emit the backspace for application to use
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
-          m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
             m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
           }
@@ -301,7 +296,6 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         return FALSE;
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
-        m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
           m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }
@@ -537,8 +531,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
 KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_core_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cu *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_core_cu*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }

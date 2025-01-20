@@ -6,13 +6,13 @@ On Windows, you can build the following projects:
 
 * [Keyman for Android](#keyman-for-android)
 * [Keyman for Windows](#keyman-for-windows)
-* [Keyman Developer](#keyman-developer) (together with Keyman for Windows)
+* [Keyman Developer](#keyman-developer)
 * [KeymanWeb](#keymanweb)
 
 The following libraries can also be built:
 
-* Keyman Core (Windows, wasm targets) (aka core)
-* Common/Web
+* Keyman Core (Windows, wasm targets)
+* Common libraries
 
 The following projects **cannot** be built on Windows:
 
@@ -63,10 +63,6 @@ Dependencies:
 * [Base](#base-dependencies)
 * [Windows Platform](#windows-platform-dependencies)
 
-**Note**: Keyman for Windows is currently built together with Keyman Developer.
-We are working on splitting these projects. For now, you will need the Keyman
-Developer dependencies as well.
-
 Building:
 * [Building Keyman for Windows](../../windows/src/README.md)
 
@@ -75,7 +71,7 @@ Building:
 Dependencies:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
-* [Windows Platform](#windows-platform-dependencies)
+* [Windows Platform](#windows-platform-dependencies) (optional, for Windows-only components)
 
 Building:
 * [Building Keyman Developer](../../windows/src/README.md)
@@ -94,42 +90,19 @@ Building:
 **Dependencies**:
 * [Base](#base-dependencies)
 * [Web](#web-dependencies)
-
-**Additional requirements**:
-* Android SDK
-* Android Studio
-* Ant
-* Gradle
-* Maven
-* Optional: OpenJDK 11 (https://learn.microsoft.com/en-us/java/openjdk/download)
-
-```ps1
-# Elevated PowerShell
-choco install android-sdk android-studio ant gradle maven
-# optionally install sdk images
-sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
-sdkmanager --update
-sdkmanager --licenses
-```
-
-* Run Android Studio once after installation to install additional components
-  such as emulator images and SDK updates.
-
-**Required environment variables**:
-* [`JAVA_HOME`](#java_home)
-
-**Optional environment variables**:
-* [`JAVA_HOME_11`](#java_home)
+* [Android](#android-dependencies)
 
 Building:
 * [Building Keyman for Android](../../android/README.md)
 
-## Prerequisites
+---
+
+## Dependencies and Prerequisites
 
 Many dependencies are only required for specific projects.
 
 We prefer [Chocolatey](https://chocolatey.org/install) at present for
-installation of dependencies. Chocolatey should be run in an elevated
+installation of most dependencies. Chocolatey should be run in an elevated
 PowerShell.
 
 ### Base Dependencies
@@ -150,28 +123,36 @@ PowerShell.
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install git jq python ninja pandoc meson
-refreshenv
 ```
 
 **Environment variables**:
-* [`KEYMAN_ROOT`](#keyman_root)
-* `PATH`: add your Python scripts folder to your path: it will normally be `%appdata%\Python\Python310\Scripts`.
+
+If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by
+default will work without changes. Otherwise, you will need to set an
+environment variable `KEYMAN_ROOT` to the root path of the Keyman repo. For
+example:
 
 ```bat
-SET KEYMAN_ROOT=c:\Projects\keyman\keyman
-SET PATH=%path%;%appdata%\Python\Python310\Scripts
+SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 ```
 
-To check whether environment variables are set, run `SET <variable>` in command
-prompt.
+> [!NOTE]
+> The `SETX` command will set persistent environment variables but they do not
+> impact the current shell environment. Start a new shell to see the variables.
 
-You can use Windows Settings to add these environment variables permanently:
-
-1. In Windows Search, type "environment" and select "Edit System Environment
-   Variables"
-2. Click `Environment Variables...`
-3. You can add or edit variables in either User or System settings, as you
-   prefer.
+> [!TIP]
+>
+> To check whether environment variables are set, run `SET <variable>` in command
+> prompt.
+>
+> You can alternatively use Windows Settings to add these environment variables
+> permanently:
+>
+> 1. In Windows Search, type "environment" and select "Edit System Environment
+>    Variables"
+> 2. Click `Environment Variables...`
+> 3. You can add or edit variables in either User or System settings, as you
+>    prefer.
 
 ### Web Dependencies
 
@@ -181,41 +162,82 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 3.1.40
-* node.js 18+
-* [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
+* Emscripten
+* node.js
 
-```ps1
-# Elevated PowerShell
+#### Emscripten
 
-# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
-$ProgressPreference = 'SilentlyContinue'
+In bash, run the following commands:
 
-choco install emscripten --version 3.1.40
+```bash
+cd /c/Projects/keyman
+git clone https://github.com/emscripten-core/emsdk
+cd emsdk
+emsdk install 3.1.58
+emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
 ```
 
-Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
-versions of Python, Node and Java to the PATH. For best results, go ahead
-and remove those paths from your PATH variable before continuing.
+If you are updating an existing install of Emscripten:
+
+```bash
+cd emsdk
+git pull
+emsdk install 3.1.58
+emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
+```
+
+> ![WARNING]
+> Emscripten very unhelpfully overwrites `JAVA_HOME`, and adds its own
+> versions of Python, Node and Java to the `PATH`. For best results, restart
+> your shell after installing Emscripten so that you don't end up with the
+> wrong versions.
 
 There is no need to add emscripten to the path in order to build Keyman.
-However, you should set the EMSCRIPTEN_BASE variable to the path where `emcc`
-can be found, but always in the upstream\emscripten subdirectory where you
-installed emsdk (most likely %LocalAppData%\emsdk\upstream\emscripten)
+However, you should set the `EMSCRIPTEN_BASE` variable to the path where `emcc`
+can be found, in the `upstream\emscripten` subdirectory of where you installed
+emsdk.
 
 **Environment variables**:
-* `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
 
-After installing emscripten, you'll need to install node.js and openjdk:
-
-```ps1
-# Elevated PowerShell
-
-# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
-$ProgressPreference = 'SilentlyContinue'
-choco install nodejs
-choco install openjdk
+```bat
+SETX EMSCRIPTEN_BASE "<your-emsdk-path>\upstream\emscripten"
 ```
+
+**Optional environment variables**:
+
+To let the Keyman build scripts control the version of Emscripten
+installed on your computer:
+
+```bat
+SETX KEYMAN_USE_EMSDK 1
+```
+
+#### node.js
+
+Our recommended way to install node.js is to use
+[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
+easy to switch between versions of node.js.
+
+```bat
+nvm install 20.16.0
+nvm use 20.16.0
+```
+
+**Optional environment variables**:
+
+To let the Keyman build scripts control the version of node.js installed
+and active on your computer:
+
+```bat
+SETX KEYMAN_USE_NVM 1
+````
+
+See [node.md](node.md) for more information, including automatic selection
+of appropriate node versions during builds.
 
 ### Windows Platform Dependencies
 
@@ -238,8 +260,7 @@ choco install openjdk
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
-  * Note: It is possible to build all components that do _not_ require Delphi by
-    adding the environment variable `NODELPHI=1` before starting the build.
+  * Note: It is possible to build all components that do _not_ require Delphi.
     Currently many components are Delphi-based, but if you are working just in
     Keyman Core, the compiler, or Keyman Engine's C++ components, you may be
     able to get away without building them. In this situation, we recommend
@@ -251,10 +272,12 @@ choco install openjdk
   ```ps1
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
+
   * Verify required build tools are installed
     * Run `Visual Studio Installer`
     * Check the `Individual components` tab
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
+    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed.
+      If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
@@ -262,55 +285,15 @@ choco install openjdk
   3. Change 'Tab size' to 2 and 'Indent size' to 2.
   4. Select 'Insert spaces'.
 
+* Windows SDK (C++ Desktop Development)
+
+  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+
 **Required environment variables**:
 * `PATH`
-  * Add the C:\Projects\keyman\keyman\windows\lib folder in the Keyman
+  * Add the `C:\Projects\keyman\keyman\windows\lib` folder in the Keyman
     repository to your `PATH` environment variable. This is required for
     Keyman's design-time packages to load in Delphi.
-* [`KEYMAN_CEF4DELPHI_ROOT`](#keyman_cef4delphi_root)
-
-**Optional environment variables**:
-* [`GIT_BASH_FOR_KEYMAN`](#git_bash_for_keyman)
-* [`USERDEFINES`](#userdefines)
-
-```bat
-SET KEYMAN_CEF4DELPHI_ROOT=c:\Projects\keyman\CEF4Delphi_Binary
-SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
-```
-
-**Additional requirements for release builds**:
-* [Certificates](#certificates)
-* [7-Zip](http://www.7-zip.org/), used for archiving build files
-* [HTML Help Workshop](http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe) note: Microsoft no longer offer this download...
-* [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
-* [CEF4Delphi_Binary](https://github.com/keymanapp/CEF4Delphi_Binary) repository
-
-```ps1
-# Elevated PowerShell
-choco install 7zip html-help-workshop
-choco install wixtoolset --version=3.11.1
-git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
-```
-
-## Certificates
-
-In order to make a release build, you need to sign all the executables. See
-[windows/src/README.md#Certificates](../../windows/src/README.md#Certificates)
-for details on how to create test code signing certificates or specify your own
-certificates for the build.
-
-## Notes on Environment Variables
-
-### KEYMAN_ROOT
-
-If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by
-default will work without changes. Otherwise, you will need to set an
-environment variable `KEYMAN_ROOT` to the root path of the Keyman repo. For
-example:
-
-```bat
-SET KEYMAN_ROOT=c:\projects\keyman\keyman
-```
 
 ### KEYMAN_CEF4DELPHI_ROOT
 
@@ -327,40 +310,84 @@ release build, the common/windows/cef-checkout.sh script will checkout the corre
 branch of the repository automatically and extract any compressed files found in
 it.
 
-### GIT_BASH_FOR_KEYMAN
-
-This environment variable is optional: the build will run bash in a separate
-window in order to build KeymanWeb if it isn't present, but you'll lose logging
-and have the annoyance of a window popping up halfway through the build. To
-resolve both of those issues, set the environment variable to:
+The [`KEYMAN_CEF4DELPHI_ROOT`](#keyman_cef4delphi_root) variable is
+used to specify the path to the CEF4Delphi binaries.
 
 ```bat
-SET GIT_BASH_FOR_KEYMAN="C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l
+SETX KEYMAN_CEF4DELPHI_ROOT "c:\Projects\keyman\CEF4Delphi_Binary"
 ```
 
-You should verify the install location of Git on your computer as it may vary.
+**Additional requirements for release builds**:
+* [Certificates](#certificates)
+* [7-Zip](http://www.7-zip.org/), used for archiving build files
+* [HTML Help Workshop](http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe) note: Microsoft no longer offer this download...
+* [WiX 3.11.1](https://github.com/wixtoolset/wix3/releases/tag/wix3111rtm)
+* [CEF4Delphi_Binary](https://github.com/keymanapp/CEF4Delphi_Binary) repository
 
-### USERDEFINES
-
-You can specify defines that will not be added to the git repository and will be
-used in the build in the UserDefines.mak file in the root folder. This is used
-mostly for code signing certificates. If not specified, a test certificate will
-be used to sign executables when you build a release.
-
-To include UserDefines.mak in the build, use the command line parameter
-`-DUSERDEFINES`. You can also set an environment variable `USERDEFINES=1` to get
-the same result.
-
-### JAVA_HOME
-
-This environment variable tells Gradle what version of Java to use for building Keyman for Android.
-
-**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and `JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly from command line. But note that you do need to update your `JAVA_HOME` env var to the associated version before opening Android Studio and loading any Android projects. `JAVA_HOME_11` is mostly used by CI.
-
-```bat
-SET JAVA_HOME="path to OpenJDK 8"
-SET JAVA_HOME_11="path to OpenJDK 11"
+```ps1
+# Elevated PowerShell
+choco install 7zip html-help-workshop
+choco install wixtoolset --version=3.11.1
+git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
+
+### Android dependencies
+
+**Projects**:
+* Keyman for Android
+
+**Requirements**:
+* Android SDK
+* Android Studio
+* Ant
+* Gradle
+* Maven
+* JDK 11 (Temurin11)
+
+#### JDK 11
+
+Use Powershell + Chocolatey to install JDK 11:
+
+```ps1
+# Elevated PowerShell
+
+# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
+$ProgressPreference = 'SilentlyContinue'
+choco install temurin11
+```
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+older versions, you can set `JAVA_HOME_11` to the JDK 11 path and
+`JAVA_HOME` to the JDK 8 path. This will build both versions correctly
+from command line. But note that you do need to update your `JAVA_HOME` env
+var to the associated version before opening Android Studio and loading any
+Android projects. `JAVA_HOME_11` is mostly used by CI.
+
+#### Android Studio and friends
+
+```ps1
+# Elevated PowerShell
+choco install androidstudio ant gradle maven android-sdk
+```
+
+Start a new shell to get the new paths and then update Android SDKs:
+
+```ps1
+# optionally install sdk images
+sdkmanager --update
+# sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
+sdkmanager --licenses
+```
+
+* Run Android Studio once after installation to install additional components
+  such as emulator images and SDK updates.
+
+## Certificates
+
+In order to make a release build, you need to sign all the executables. See
+[windows/src/README.md#Certificates](../../windows/src/README.md#Certificates)
+for details on how to create test code signing certificates or specify your own
+certificates for the build.
 
 ## Optional Tools
 

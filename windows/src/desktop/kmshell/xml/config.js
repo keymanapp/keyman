@@ -35,7 +35,7 @@ function windowResize()
     e = _$('subcontent_pro');
     if(e) e.style.height = h;
     _$('subcontent_support').style.height = h;
-    _$('subcontent_keepintouch').style.height = h;
+    _$('subcontent_update').style.height = h;
   }
 }
 

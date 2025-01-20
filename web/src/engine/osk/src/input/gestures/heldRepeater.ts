@@ -1,5 +1,5 @@
 import { GestureSequence } from "@keymanapp/gesture-recognizer";
-import { KeyDistribution } from "@keymanapp/keyboard-processor";
+import { KeyDistribution } from "keyman/engine/keyboard";
 
 import { KeyElement } from "../../keyElement.js";
 import { GestureHandler } from './gestureHandler.js';
@@ -18,13 +18,23 @@ export class HeldRepeater implements GestureHandler {
 
   constructor(source: GestureSequence<KeyElement, string>, closureToRepeat: () => void) {
     this.source = source;
-    this.repeatClosure = closureToRepeat;
+
+    const baseKey = source.stageReports[0].item;
+    baseKey.key.highlight(true);
+
+    this.repeatClosure = () => {
+      closureToRepeat();
+      // The repeat-closure may cancel key highlighting.  This restores it afterward.
+      baseKey.key.highlight(true);
+    }
+
 
     this.timerHandle = window.setTimeout(this.deleteRepeater, HeldRepeater.INITIAL_DELAY);
 
     this.source.on('complete', () => {
       window.clearTimeout(this.timerHandle);
       this.timerHandle = undefined;
+      baseKey.key.highlight(false);
     });
   }
 

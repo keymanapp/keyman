@@ -185,7 +185,6 @@ type
     procedure MRUChange(Sender: TObject);
     procedure UpdateFileParameters;
     function GetUserFileName: string;
-    function ResolveProjectPath(APath: string): string;
     procedure PopulateFolder(const path: string);
     function GetTargetFilename10(ATargetFile, ASourceFile,
       AVersion: string): string;
@@ -208,6 +207,9 @@ type
     function Render: WideString;
 
     function IsDefaultProject(Version: TProjectVersion): Boolean;
+
+    function ResolveProjectPath(APath: string): string;
+    function ResolveSourcePath: string;
 
     function Load: Boolean; virtual;   // I4694
     function Save: Boolean; virtual;   // I4694
@@ -833,6 +835,7 @@ var
   buf: TBytes;  // I3310
   encoding: TEncoding;
 begin
+  encoding := nil;
   FState := psLoading;
   try
     SetLength(buf, 32);
@@ -1024,7 +1027,7 @@ function TProject.CanUpgrade: Boolean;
 var
   i: Integer;
   Path: string;
-  SourcePath: string;
+  SourcePath, SourceFile: string;
 begin
   if FOptions.Version = pv20 then
   begin
@@ -1037,6 +1040,7 @@ begin
   // Things that block upgrade:
   // 1. invalid paths in Options
   // 2. contained file paths outside the project folder (primary files only)
+  // 3. primary source files in different folders
 
   if Options.BuildPath.Contains('$SOURCEPATH') then
   begin
@@ -1050,6 +1054,7 @@ begin
   end;
 
   SourcePath := '?';
+  SourceFile := '';
 
   for i := 0 to Files.Count - 1 do
   begin
@@ -1065,11 +1070,13 @@ begin
     begin
       if SourcePath = '?' then
       begin
-        SourcePath := ExtractFileDir(Path)
+        SourcePath := ExtractFileDir(Path);
+        SourceFile := Path;
       end
       else if not SameFileName(SourcePath, ExtractFileDir(Path)) then
       begin
-        FUpgradeMessages.Add('File '+Files[i].FileName+' is not in the same folder as at least one other source file. All primary source files must be in the same folder.');
+        FUpgradeMessages.Add('File '+Files[i].FileName+' is not in the same folder as '+SourceFile+
+          '. All primary source files must be in the same folder.');
         Result := False;
       end;
     end;
@@ -1080,7 +1087,8 @@ begin
       Continue;
     end;
 
-    FUpgradeMessages.Add('File '+Files[i].FileName+' is outside the project folder. All primary source files must be in the same folder as the project file, or in a subfolder.');
+    FUpgradeMessages.Add('File '+Files[i].FileName+' is outside the project folder ('+ExtractFileDir(Filename)+
+      '). All primary source files must be in the same folder as the project file, or in the same subfolder.');
     Result := False;
   end;
 end;
@@ -1231,6 +1239,13 @@ end;
 function TProject.ResolveProjectPath(APath: string): string;
 begin
   Result := IncludeTrailingPathDelimiter(ReplaceText(APath, '$PROJECTPATH', ExtractFileDir(ExpandFileName(FFileName))));
+end;
+
+function TProject.ResolveSourcePath: string;
+begin
+  if FOptions.Version = pv10
+    then Result := ExtractFilePath(FFileName)
+    else Result := ResolveProjectPath(FOptions.SourcePath);
 end;
 
 function TProject.GetTargetFilename10(ATargetFile, ASourceFile, AVersion: string): string;   // I4688

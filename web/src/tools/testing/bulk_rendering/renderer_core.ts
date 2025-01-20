@@ -1,5 +1,6 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
-import { Device } from 'keyman/engine/device-detect';
+import { DeviceDetector } from 'keyman/engine/main';
+import { type DeviceSpec } from '@keymanapp/web-utils';
 
 import type { KeymanEngine } from 'keyman/app/browser';
 import type { FloatingOSKView } from 'keyman/engine/osk';
@@ -28,7 +29,10 @@ export class BatchRenderer {
           width: screen.width,
           height: screen.height,
           frameRate: 60,
-        }
+        },
+        // Chrome 96+.
+        // https://stackoverflow.com/a/70665376
+        preferCurrentTab: true
       });
     } catch(err) {
       console.error("Error: " + err);
@@ -38,7 +42,7 @@ export class BatchRenderer {
     video.srcObject = captureStream;
     video.play();
 
-    const result = await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       video.onloadedmetadata = function () {
         resolve();
       }
@@ -51,7 +55,7 @@ export class BatchRenderer {
   private filterKeyboards(): KeyboardMap {
     let kbds = keyman.getKeyboards();
 
-    let keyboardMap = {};
+    let keyboardMap: Record<string, ReturnType<typeof keyman['getKeyboards']>[0]> = {};
 
     for(var i = 0; i < kbds.length; i++) {
       let id: string = kbds[i].InternalName;
@@ -95,7 +99,7 @@ export class BatchRenderer {
     return capture();
   }
 
-  createKeyboardHeader(kbd: KeyboardData, loaded: boolean): HTMLDivElement {
+  createKeyboardHeader(kbd: KeyboardData, formFactor: DeviceSpec.FormFactor, loaded: boolean): HTMLDivElement {
     let divHeader = document.createElement('div');
     let eleName = document.createElement('h2');
 
@@ -108,7 +112,20 @@ export class BatchRenderer {
 
       eleDescription.appendChild(document.createTextNode('Name: ' + kbd.Name));
       eleDescription.appendChild(document.createElement('br'));
-      eleDescription.appendChild(document.createTextNode('Font:  ' + keyman.core.activeKeyboard['_legacyLayoutSpec'].F));
+
+      const keyboard = keyman.core.activeKeyboard;
+      // Some keyboards, such as sil_euro_latin and sil_ipa, no longer specify this property.
+      if(keyboard['_legacyLayoutSpec']) {
+        eleDescription.appendChild(document.createTextNode('Font:  ' + keyboard['_legacyLayoutSpec'].F));
+      } else {
+        // They instead specify only the post-KMW-10 touch-layout format.
+        const layout = keyboard.layout(formFactor);
+        if(!layout) {
+          eleDescription.appendChild(document.createTextNode('Keyboard is help-text based'));
+        } else {
+          eleDescription.appendChild(document.createTextNode('Font:  ' + layout.font));
+        }
+      }
 
     } else {
       eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
@@ -121,7 +138,8 @@ export class BatchRenderer {
 
   private processKeyboard(kbd: KeyboardData) {
     let p: Promise<any> = keyman.setActiveKeyboard(kbd.InternalName);
-    let isMobile = keyman.config.hostDevice.formFactor != 'desktop';
+    const formFactor = keyman.config.hostDevice.formFactor;
+    let isMobile = formFactor != 'desktop';
 
     // Establish common keyboard header info.
     let divSummary = document.createElement('div');
@@ -143,30 +161,35 @@ export class BatchRenderer {
       const screenOffsetY = window.outerHeight - window.innerHeight;
       BatchRenderer.boundingRect.y += screenOffsetY;
 
-      divSummary.appendChild(renderer.createKeyboardHeader(kbd, true));
+      divSummary.appendChild(renderer.createKeyboardHeader(kbd, formFactor, true));
 
       let divRenders = document.createElement('div');
       divSummary.appendChild(divRenders);
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
-      var layers;
-      if(isMobile) {
-        layers = keyman.osk.vkbd.layerGroup.layers;
-      } else {
+      let layers: string[];
+      if(!isMobile) {
         // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
         // We instead rely upon the KLS definition to ensure we keep the renders sparse.
         //
         // _legacyLayoutSpec is technically private, but it's what we've been using, so... yeah.
-        layers = keyman.core.activeKeyboard['_legacyLayoutSpec'].KLS;
+        layers = Object.keys(keyman.core.activeKeyboard['_legacyLayoutSpec']?.KLS);
       }
+
+      // If mobile, or if the desktop definition lacks a `_legacyLayoutSpec` entry.
+      // Note:  vkbd will be null for keyboards with desktop help-text, such as sil_euro_latin.
+      layers = layers || Object.keys(keyman.osk.vkbd?.layerGroup.layers);
 
       let renderLayer = function(i: number) {
         return new Promise(function(resolve) {
           // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
           if(keyman.osk.vkbd) {
-            keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
+            keyman.core.keyboardProcessor.layerId = layers[i];
           } else {
-            console.error("Error - keyman.osk.vkbd is undefined!");
+            // Again, occurs for keyboards with desktop help-text.
+            console.error(`Error - keyman.osk.vkbd is undefined for ${kbd.InternalName}!`);
+            // Will otherwise crash the renderer later.
+            return;
           }
           // Make sure the active element's still set!
           renderer.setActiveDummy();
@@ -192,10 +215,11 @@ export class BatchRenderer {
       };
 
       // The resulting Promise will only call it's `.then()` once all of this keyboard's renders have been completed.
-      return renderer.arrayPromiseIteration(renderLayer, Object.keys(layers).length);
-    }).catch(function() {
-      console.log("Failed to load the \"" + kbd.InternalName + "\" keyboard for rendering!");
-      divSummary.appendChild(renderer.createKeyboardHeader(kbd, false));
+      return renderer.arrayPromiseIteration(renderLayer, layers ? Object.keys(layers).length : 0);
+    }).catch(function(err) {
+      console.error("Failed to load the \"" + kbd.InternalName + "\" keyboard for rendering:");
+      console.error(err);
+      divSummary.appendChild(renderer.createKeyboardHeader(kbd, formFactor, false));
       return Promise.resolve();
     });
   }
@@ -219,7 +243,7 @@ export class BatchRenderer {
 
   fillDeviceNotes() {
     let description = document.createElement('p');
-    let device = new Device();
+    let device = new DeviceDetector();
     device.detect();
 
     description.appendChild(document.createTextNode('Browser: ' + device.browser));
@@ -237,10 +261,11 @@ export class BatchRenderer {
     keyman.setActiveElement(BatchRenderer.dummy, true);
   }
 
-  async run(allLayers, filter) {
+  async run(allLayers: boolean, filter: string) {
     BatchRenderer.allLayers = allLayers;
     BatchRenderer.keyboardMatch = new RegExp('^Keyboard_('+filter+')', 'i');
-    if(window['keyman']) {
+
+    if(keyman) {
       let cc = await this.startCapture();
       BatchRenderer.captureStream = cc.captureStream;
       BatchRenderer.video = cc.video;
@@ -269,7 +294,7 @@ export class BatchRenderer {
 
       let renderer = this;
 
-      let keyboardIterator = function(i) {
+      let keyboardIterator = function(i: number) {
         return new Promise(function(resolve) {
           renderer.processKeyboard(kbds[Object.keys(kbds)[i]]).then(function () {
             //console.log("Keyboard " + i + " processed!");
@@ -293,5 +318,8 @@ export class BatchRenderer {
 }
 
 (function(){
+  // BatchRenderer's internal state stuff is static on the class and is not exposed with
+  // the line below.
+  // @ts-ignore
   window['kmw_renderer'] = new BatchRenderer();
 })();

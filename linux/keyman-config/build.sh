@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 ################################ Main script ################################
@@ -22,15 +22,13 @@ builder_describe \
 
 builder_parse "$@"
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe_outputs \
   build "/linux/keyman-config/keyman_config/standards/lang_tags_map.py"
 
 clean_action() {
   rm -rf dist make_deb build ./*.egg-info keyman_config/version.py
   find . \( -name __pycache__ -o -name keyman-config.mo \) -exec rm -rf {} +
-  rm -rf ../help/reference/km-*.md
+  rm -rf ../docs/help/reference/km-*.md
 
   # Don't delete this file during a package build because they are
   # part of the source package. We can't generate it during a package

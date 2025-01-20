@@ -1,10 +1,8 @@
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #endif
 
-#include <cassert>
 #include <algorithm>
 #include <iostream>
 #include "util_filesystem.h"
@@ -14,6 +12,8 @@
 #else
 #include <unistd.h>
 #endif
+
+#include <test_assert.h>
 
 //#define _DEBUG_FOPEN  1
 
@@ -26,13 +26,13 @@ const std::string get_wasm_file_path(const std::string& filename) {
   std::cout << "get_wasm_file_path ENTER (" << filename << ")" << std::endl;
 #endif
 
-  assert(
+  test_assert(
     (filename.length() > 0 && filename.at(0) == '/') ||
     (filename.length() > 1 && filename.at(1) == ':')
   );
 
 #if _DEBUG_FOPEN
-  std::cout << "get_wasm_file_path assert passed " << std::endl;
+  std::cout << "get_wasm_file_path test_assert passed " << std::endl;
 #endif
 
   EM_ASM_({
@@ -117,23 +117,10 @@ FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #endif
 };
 
-FILE* Open_File(const KMX_WCHART* Filename, const KMX_WCHART* mode) {
-#ifdef _MSC_VER
-  std::wstring cpath = Filename; //, cmode = mode;
-  std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  return _wfsopen(cpath.c_str(), mode, _SH_DENYWR);
-#else
-  std::string cpath, cmode;
-  cpath = string_from_wstring(Filename);
-  cmode = string_from_wstring(mode);
-  return fopen_wrapper(cpath.c_str(), cmode.c_str());
-#endif
-};
-
 FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
 #ifdef _MSC_VER
-  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
-  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
+  std::wstring cpath = wstring_from_u16string(Filename);
+  std::wstring cmode = wstring_from_u16string(mode);
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
   return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
 #else

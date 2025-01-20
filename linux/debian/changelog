@@ -1,3 +1,66 @@
+keyman (17.0.333-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 16 Jan 2025 16:29:44 +0100
+
+keyman (17.0.332-1) unstable; urgency=medium
+
+  * set environment variable for rendering of downloads dialog (#12617)
+  * add `keymanFacename` to .ldml file (#12283)
+  * ignore exceptions trying to install cache (#11885)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 11 Dec 2024 15:53:59 +0100
+
+keyman (17.0.326-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 03 Jun 2024 21:58:16 +0200
+
+keyman (17.0.295-1) unstable; urgency=medium
+
+  * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 27 Mar 2024 17:14:32 +0100
+
+keyman (17.0.279-1) unstable; urgency=medium
+
+  * Add libicu-dev dependency to libkeymancore-dev (closes: #1064915)
+  * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 29 Feb 2024 19:17:08 +0100
+
+keyman (17.0.274-1) unstable; urgency=medium
+
+  * Fix autopkg tests
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 23 Feb 2024 15:45:13 +0100
+
+keyman (17.0.272-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 21 Feb 2024 16:36:14 +0100
+
+keyman (16.0.145-1) unstable; urgency=medium
+
+  [Jeremy Bicha]
+  * Build with webkitgtk 4.1 instead of 4.0  (closes: #1061396)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 01 Feb 2024 12:58:00 +0100
+
 keyman (16.0.144-1) unstable; urgency=medium
 
   [Dandan Zhang]

@@ -1,10 +1,10 @@
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
+import { ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
 import { GestureSequence, GestureStageReport } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
+import { distributionFromDistanceMaps } from '../../../corrections.js';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
@@ -56,10 +56,10 @@ export default class Multitap implements GestureHandler {
 
     this.originalLayer = vkbd.layerId;
 
-    const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
+    const tapLookahead = (offset: number) => (this.tapIndex + offset) % this.multitaps.length;
 
     const updatePreview = () => {
-      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)].text, this.multitaps[tapLookahead(1)].text);
+      previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)], this.multitaps[tapLookahead(1)], vkbd);
     }
 
     source.on('complete', () => {

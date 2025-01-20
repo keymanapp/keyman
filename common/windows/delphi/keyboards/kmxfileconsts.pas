@@ -29,7 +29,6 @@ const
   SZMAX_GROUPNAME = 80;
   SZMAX_DEADKEYNAME = 80;
   SZMAX_VKDICTIONARYNAME = 80;  // I3438
-  SZMAX_ERRORTEXT = 512;
 
   SZMAX_LANGUAGENAME = 80;
   SZMAX_KEYBOARDNAME = 80;
@@ -128,6 +127,10 @@ const
   KMX_NOTSCROLLFLAG  = $2000;	// Scroll lock NOT on
   KMX_ISVIRTUALKEY   = $4000;	// It is a Virtual Key Sequence
   KMX_VIRTUALCHARKEY = $8000; // It is a virtual character key sequence - mnemonic layouts
+
+  // Note: KMX_OTHER_MODIFIER = $10000, used by KMX+ for the
+  // other modifier flag in layers, > 16 bit so not available here.
+  // See keys_mod_other in keyman_core_ldml.ts
 
   // Combinations of key masks
   KMX_MASK_MODIFIER_CHIRAL = KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG;

@@ -1,15 +1,38 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, Osk, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { CompilerMessages } from '@keymanapp/kmc-kmn';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { KeymanFileTypes, TouchLayout } from "@keymanapp/common-types";
+import { KmnCompilerMessages, Osk } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, escapeMarkdownChar, KvksFile, KvksFileReader, TouchLayoutFileReader } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
-import { AnalyzerMessages } from "../messages.js";
+import { AnalyzerMessages } from "../analyzer-messages.js";
 
 
 type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
 
+/**
+ * @public
+ * Options for character analysis
+ */
 export interface AnalyzeOskCharacterUseOptions {
+  /**
+   * First character to use in PUA for remapping with &displayMap, defaults to
+   * U+F100
+   */
   puaBase?: number;
+  /**
+   * If true, strips U+25CC from the key cap before further analysis
+   */
   stripDottedCircle?: boolean;
+  /**
+   * If true, reports number of references to each character found in each
+   * source file
+   */
   includeCounts?: boolean;
+  /**
+   * Filename of an existing mapping file to merge the results into
+   */
+  mergeMapFile?: string;
 }
 
 const defaultOptions: AnalyzeOskCharacterUseOptions = {
@@ -18,6 +41,11 @@ const defaultOptions: AnalyzeOskCharacterUseOptions = {
   includeCounts: false,
 }
 
+/**
+ * @public
+ * Analyze the characters used in On Screen Keyboard files (.kvks,
+ * .keyman-touch-layout) for use with `&displayMap`.
+ */
 export class AnalyzeOskCharacterUse {
   private _strings: StringRefUsageMap = {};
   private options: AnalyzeOskCharacterUseOptions;
@@ -26,6 +54,10 @@ export class AnalyzeOskCharacterUse {
     this.options = {...defaultOptions, ...options};
   }
 
+  /**
+   * Clears analysis data collected from previous calls to
+   * {@link AnalyzeOskCharacterUse.analyze}
+   */
   public clear() {
     this._strings = {};
   }
@@ -34,6 +66,19 @@ export class AnalyzeOskCharacterUse {
   // Analyze a single file
   //
 
+  /**
+   * Analyzes a single source file for Unicode character usage. Can parse .kmn,
+   * .kvks, .keyman-touch-layout file formats. Can be called multiple times to
+   * collect results from more than one file. Use
+   * {@link AnalyzeOskCharacterUse.getStrings} to retrieve results.
+   *
+   * Note: `analyze()` collects key cap data, so calling this for a .kmn file
+   * will retrieve the key caps from the .kvks and .keyman-touch-layout files
+   * that it references, rather than key cap data from the .kmn file itself.
+   *
+   * @param   file - relative or absolute path to a Keyman source file
+   * @returns        true if the file is successfully loaded and parsed
+   */
   public async analyze(file: string): Promise<boolean> {
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard: {
@@ -129,13 +174,13 @@ export class AnalyzeOskCharacterUse {
     try {
       source = reader.read(this.callbacks.loadFile(filename));
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
     let invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
     if(!vk) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e:null}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e:null}));
       return null;
     }
     for(let key of vk.keys) {
@@ -171,6 +216,9 @@ export class AnalyzeOskCharacterUse {
         for(let row of layer.row) {
           for(let key of row.key) {
             scanKey(key);
+            if(key.hint && !key.hint.match(/^\*.+\*$/)) {
+              strings.push(this.cleanString(key.hint));
+            }
             let f: keyof TouchLayout.TouchLayoutFlick;
             for(f in key.flick ?? {}) {
               scanKey(key.flick[f]);
@@ -195,23 +243,76 @@ export class AnalyzeOskCharacterUse {
   // Results reporting
   //
 
-  private prepareResults(strings: StringRefUsageMap): Osk.StringResult[] {
-    let result: Osk.StringResult[] = [];
-    let pua = this.options.puaBase;
+  private prepareResults(previousMap: Osk.StringResult[], strings: StringRefUsageMap): Osk.StringResult[] {
+
+    // https://stackoverflow.com/a/1584377/1836776 - because we need to compare
+    // objects, we can't use Set
+    const mergeArrays = (a: any, b: any, predicate = (a:any, b:any) => a === b) => {
+      const c = [...a]; // copy to avoid side effects
+      // add all items from B to copy C if they're not already present
+      b.forEach((bItem: any) => (c.some((cItem) => predicate(bItem, cItem)) ? null : c.push(bItem)))
+      return c;
+    }
+
+    if(!previousMap) {
+      previousMap = [];
+    }
+
+    let result: Osk.StringResult[] = [...previousMap];
+
+    // Note: we are assuming same base as previous runs
+    let pua = Math.max(this.options.puaBase, ...previousMap.map(item => parseInt(item.pua,16) + 1));
+
     for(let str of Object.keys(strings)) {
-      result.push({
-        pua: pua.toString(16).toUpperCase(),
-        str,
-        unicode: AnalyzeOskCharacterUse.stringToUnicodeSequence(str, false),
-        usages: this.options.includeCounts ? strings[str] : strings[str].map(item => item.filename)
-      });
-      pua++;
+      const r = result.find(item => item.str == str);
+      if(!r) {
+        result.push({
+          pua: pua.toString(16).toUpperCase(),
+          str,
+          unicode: AnalyzeOskCharacterUse.stringToUnicodeSequence(str, false),
+          usages: this.options.includeCounts ? strings[str] : strings[str].map(item => item.filename)
+        });
+        pua++;
+      } else {
+        if(this.options.includeCounts) {
+          // merge StringUsageRefs
+          r.usages = mergeArrays(r.usages, strings[str], (a: Osk.StringRefUsage, b: Osk.StringRefUsage) => a.filename === b.filename);
+        } else {
+          // merge strings
+          r.usages = mergeArrays(r.usages, strings[str].map(item => item.filename));
+        }
+      }
     }
     return result;
   }
 
+  /**
+   * Returns the collected results from earlier calls to
+   * {@link AnalyzeOskCharacterUse.analyze}. This generates a mapping from a key
+   * cap (one or more characters) to a PUA code, for use with `&displayMap`.
+   *
+   * Three output formats are supported:
+   *
+   * - .txt: tab-separated string format, with three columns: PUA, Key Cap, and
+   *   plain string. The PUA and Key Cap columns are formatted as Unicode Scalar
+   *   Values, e.g. U+0061, and the plain string is the original key cap string.
+   *
+   * - .md: formatted for documentation purposes. Generates a Markdown table
+   *   (GFM) with PUA, Key Cap, and plain string. The PUA and Key Cap columns
+   *   are formatted as Unicode Scalar Values, e.g. U+0061, and the plain string
+   *   is the original key cap string.
+   *
+   * - .json: returns the final aggregated data as an array of strings, which
+   *   can be joined to form a JSON blob of an object with a single member,
+   *   `map`, which is an array of {@link Osk.StringResult} objects.
+   *
+   * @param    format - file format to return - can be '.txt', '.md', or '.json'
+   * @returns  an array of strings, formatted according to the `format`
+   *           parameter.
+   */
   public getStrings(format?: '.txt'|'.md'|'.json'): string[] {
-    const final = this.prepareResults(this._strings);
+    const previousMap = this.loadPreviousMap(this.options.mergeMapFile);
+    const final = this.prepareResults(previousMap, this._strings);
     switch(format) {
       case '.md':
         return AnalyzeOskCharacterUse.getStringsAsMarkdown(final);
@@ -220,6 +321,49 @@ export class AnalyzeOskCharacterUse {
       }
     return AnalyzeOskCharacterUse.getStringsAsText(final);
   }
+
+  /**
+   * Load a JSON-format result file to merge from
+   * @param filename
+   * @returns
+   */
+  private loadPreviousMap(filename: string): Osk.StringResult[] {
+    if(!filename) {
+      return null;
+    }
+
+    const data = this.callbacks.loadFile(filename);
+    if(!data) {
+      this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoaded({filename}));
+      return null;
+    }
+    let json: any;
+    try {
+      json = JSON.parse(new TextDecoder().decode(data));
+      if(!json || typeof json != 'object' || !Array.isArray(json.map)) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoaded({filename}));
+        return null;
+      }
+    } catch(e) {
+      this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoadedDueToError({filename, e}));
+      return null;
+    }
+
+    const map: Osk.StringResult[] = json.map;
+    const usages = map.find(item => item?.usages?.length).usages;
+    if(usages) {
+      if(typeof usages[0] == 'string' && this.options.includeCounts) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapDidNotIncludeCounts({filename}));
+        this.options.includeCounts = false;
+      } else if(typeof usages[0] != 'string' && !this.options.includeCounts) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapDidIncludeCounts({filename}));
+        this.options.includeCounts = true;
+      }
+    }
+
+    return map;
+  }
+
 
   // Following functions are static so that we can keep them pure
   // and potentially refactor into separate reporting class later
@@ -241,7 +385,7 @@ export class AnalyzeOskCharacterUse {
     lines.push('-------|-------------|---------');
     for(let s of strings) {
       const ux = this.stringToUnicodeSequence(s.str);
-      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + this.escapeMarkdownChar(s.str));
+      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + escapeMarkdownChar(s.str, true));
     }
     return lines;
   }
@@ -250,20 +394,6 @@ export class AnalyzeOskCharacterUse {
     // For future expansion, we wrap the array in a 'map' property
     let map = { "map": strings };
     return JSON.stringify(map, null, 2).split('\n');
-  }
-
-  private static escapeMarkdownChar(s: string) {
-    // note: could replace with a common lib but too much baggage to be worth it for now
-    // commonmark 2.4: all punct can be escaped
-    // const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-    s = s.replace(/[!"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/g, '\\$0');
-    // replace whitepsace
-    s = s.replace(/[\n]/g, '\\n');
-    s = s.replace(/[\r]/g, '\\r');
-    s = s.replace(/[\t]/g, '\\t');
-    s = s.replace(/ /g, '&#x20;');
-    s = s.replace(/\u00a0/g, '&#xa0;');
-    return s;
   }
 
   private static stringToUnicodeSequence(s: string, addUPlusPrefix: boolean = true): string {

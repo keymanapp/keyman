@@ -1,0 +1,696 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "any": {
+      "type": "string"
+    },
+    "display": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "type": "string"
+        },
+        "keyId": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "display"
+      ],
+      "type": "object"
+    },
+    "displayOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "baseCharacter": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "displays": {
+      "additionalProperties": false,
+      "properties": {
+        "display": {
+          "items": {
+            "$ref": "#/definitions/display"
+          },
+          "type": "array"
+        },
+        "displayOptions": {
+          "$ref": "#/definitions/displayOptions"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "flick": {
+      "additionalProperties": false,
+      "properties": {
+        "flickSegment": {
+          "items": {
+            "$ref": "#/definitions/flickSegment"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "flickSegment",
+        "id"
+      ],
+      "type": "object"
+    },
+    "flickSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "directions": {
+          "type": "string"
+        },
+        "keyId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "directions",
+        "keyId"
+      ],
+      "type": "object"
+    },
+    "flicks": {
+      "additionalProperties": false,
+      "properties": {
+        "flick": {
+          "items": {
+            "$ref": "#/definitions/flick"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "form": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "scanCodes": {
+          "items": {
+            "$ref": "#/definitions/scanCodes"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "scanCodes"
+      ],
+      "type": "object"
+    },
+    "forms": {
+      "additionalProperties": false,
+      "properties": {
+        "form": {
+          "items": {
+            "$ref": "#/definitions/form"
+          },
+          "type": "array"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "import": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "enum": [
+            "cldr"
+          ],
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "type": "object"
+    },
+    "info": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "indicator": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "key": {
+      "additionalProperties": false,
+      "properties": {
+        "flickId": {
+          "type": "string"
+        },
+        "gap": {
+          "enum": [
+            "true"
+          ],
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "layerId": {
+          "type": "string"
+        },
+        "longPressDefaultKeyId": {
+          "type": "string"
+        },
+        "longPressKeyIds": {
+          "type": "string"
+        },
+        "multiTapKeyIds": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        },
+        "stretch": {
+          "enum": [
+            "true"
+          ],
+          "type": "string"
+        },
+        "width": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "keys": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "key": {
+          "items": {
+            "$ref": "#/definitions/key"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "layer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "modifiers": {
+          "type": "string"
+        },
+        "row": {
+          "items": {
+            "$ref": "#/definitions/row"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "row"
+      ],
+      "type": "object"
+    },
+    "layers": {
+      "additionalProperties": false,
+      "properties": {
+        "formId": {
+          "type": "string"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "layer": {
+          "items": {
+            "$ref": "#/definitions/layer"
+          },
+          "type": "array"
+        },
+        "minDeviceWidth": {
+          "type": "string"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "formId"
+      ],
+      "type": "object"
+    },
+    "locale": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "locales": {
+      "additionalProperties": false,
+      "properties": {
+        "locale": {
+          "items": {
+            "$ref": "#/definitions/locale"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "reorder": {
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "order": {
+          "type": "string"
+        },
+        "preBase": {
+          "type": "string"
+        },
+        "tertiary": {
+          "type": "string"
+        },
+        "tertiaryBase": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from"
+      ],
+      "type": "object"
+    },
+    "row": {
+      "additionalProperties": false,
+      "properties": {
+        "keys": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keys"
+      ],
+      "type": "object"
+    },
+    "scanCodes": {
+      "additionalProperties": false,
+      "properties": {
+        "codes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "codes"
+      ],
+      "type": "object"
+    },
+    "set": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "settings": {
+      "additionalProperties": false,
+      "properties": {
+        "normalization": {
+          "enum": [
+            "disabled"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "special": {
+      "$ref": "#/definitions/any"
+    },
+    "stringVariable": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "transform": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from"
+      ],
+      "type": "object"
+    },
+    "transformGroup": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "reorder": {
+          "items": {
+            "$ref": "#/definitions/reorder"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "transform": {
+          "items": {
+            "$ref": "#/definitions/transform"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "transforms": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "transformGroup": {
+          "items": {
+            "$ref": "#/definitions/transformGroup"
+          },
+          "type": "array"
+        },
+        "type": {
+          "enum": [
+            "simple",
+            "backspace"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "uset": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "variables": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "set": {
+          "items": {
+            "$ref": "#/definitions/set"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "string": {
+          "items": {
+            "$ref": "#/definitions/stringVariable"
+          },
+          "type": "array"
+        },
+        "uset": {
+          "items": {
+            "$ref": "#/definitions/uset"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "version": {
+      "additionalProperties": false,
+      "properties": {
+        "cldrVersion": {
+          "enum": [
+            "45"
+          ],
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "properties": {
+    "keyboard3": {
+      "additionalProperties": false,
+      "properties": {
+        "conformsTo": {
+          "enum": [
+            "45"
+          ],
+          "type": "string"
+        },
+        "displays": {
+          "$ref": "#/definitions/displays"
+        },
+        "flicks": {
+          "$ref": "#/definitions/flicks"
+        },
+        "forms": {
+          "$ref": "#/definitions/forms"
+        },
+        "import": {
+          "items": {
+            "$ref": "#/definitions/import"
+          },
+          "type": "array"
+        },
+        "info": {
+          "$ref": "#/definitions/info"
+        },
+        "keys": {
+          "$ref": "#/definitions/keys"
+        },
+        "layers": {
+          "items": {
+            "$ref": "#/definitions/layers"
+          },
+          "type": "array"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "locales": {
+          "$ref": "#/definitions/locales"
+        },
+        "settings": {
+          "$ref": "#/definitions/settings"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "transforms": {
+          "items": {
+            "$ref": "#/definitions/transforms"
+          },
+          "type": "array"
+        },
+        "variables": {
+          "$ref": "#/definitions/variables"
+        },
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "xmlns": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "info",
+        "locale",
+        "conformsTo"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "keyboard3"
+  ],
+  "title": "45/dtd/ldmlKeyboard3.xsd",
+  "type": "object"
+}

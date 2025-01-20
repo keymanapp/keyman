@@ -1,7 +1,8 @@
-import {
-  KeyboardInterface as KeyboardInterfaceBase,
-} from "@keymanapp/keyboard-processor";
-import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
+import { KeymanWebKeyboard } from '@keymanapp/common-types';
+import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
+import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/keyboard-storage';
+
+import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
@@ -46,7 +47,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     }
   }
 
-  registerKeyboard(Pk): void {
+  registerKeyboard(Pk: KeyboardObject): void {
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
     const registeredKeyboard = this.loadedKeyboard;
@@ -83,7 +84,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     // Keyman Developer may also use this method directly for its test-host page.
     //
     // It may also be used by documented legacy API:
-    // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
+    // https://help.keyman.com/developer/engine/web/2.0/guide/examples/manual-control
     // (See: referenced laokeys_load.js)
     //
     // The mobile apps typically have fully-preconfigured paths, but Developer's

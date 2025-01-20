@@ -27,7 +27,7 @@
       <FileType>.kvk</FileType>
     </File>
     <File>
-      <Name>../../invalid/basic.kmx</Name>
+      <Name>binary_kvk_file.kmx</Name>
       <Description>Keyboard Basic</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
@@ -36,7 +36,7 @@
   <Keyboards>
     <Keyboard>
       <Name>Basic</Name>
-      <ID>basic</ID>
+      <ID>binary_kvk_file</ID>
       <Version>1.0</Version>
       <Languages>
         <Language ID="KM">Khmer</Language>

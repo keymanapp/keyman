@@ -5,13 +5,15 @@
 
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
-import { CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
-import { ModelInfoCompilerMessages } from "./messages.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
-
-const HelpRoot = 'https://help.keyman.com/model/';
+import { KmpJsonFile } from "@keymanapp/common-types";
+import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
+import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult,KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 
 /* c8 ignore start */
+/**
+ * @public
+ * Description of sources and metadata required to build a .model_info file
+ */
 export class ModelInfoSources {
   /** The identifier for the model */
   model_id: string;
@@ -39,21 +41,90 @@ export class ModelInfoSources {
 };
 /* c8 ignore stop */
 
-export class ModelInfoCompiler {
-  constructor(private callbacks: CompilerCallbacks) {
+/**
+ * @public
+ * Options for the .model_info compiler
+ */
+export interface ModelInfoCompilerOptions extends CompilerOptions {
+  /**
+   * Description of sources and metadata required to build a .model_info file
+   */
+  sources: ModelInfoSources;
+};
+
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
+export interface ModelInfoCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary model info filedata and filename - used by keyman.com
+   */
+  model_info: KeymanCompilerArtifact;
+};
+
+/**
+ * @public
+ * Build artifacts from the .model_info compiler
+ */
+export interface ModelInfoCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link ModelInfoCompiler.write}
+   */
+  artifacts: ModelInfoCompilerArtifacts;
+};
+
+/**
+ * @public
+ * Compiles source data from a lexical model project to a .model_info. The
+ * compiler does not read or write from filesystem or network directly, but
+ * relies on callbacks for all external IO.
+ */
+export class ModelInfoCompiler implements KeymanCompiler {
+  private callbacks: CompilerCallbacks;
+  private options: ModelInfoCompilerOptions;
+
+  constructor() {
   }
 
   /**
-   * Builds .model_info file with metadata from the model and package source file.
-   * This function is intended for use within the lexical-models repository. While many of the
-   * parameters could be deduced from each other, they are specified here to reduce the
-   * number of places the filenames are constructed.
-   *
-   * @param sources                  Details on files from which to extract additional metadata
+   * Initialize the compiler.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
    */
-  writeModelMetadataFile(
-    sources: ModelInfoSources
-  ): Uint8Array {
+  public async init(callbacks: CompilerCallbacks, options: ModelInfoCompilerOptions): Promise<boolean> {
+    this.callbacks = callbacks;
+    this.options = {...options};
+    return true;
+  }
+
+  /**
+   * Builds .model_info file with metadata from the model and package source
+   * file. Returns an object containing binary artifacts on success. The files
+   * are passed in by name, and the compiler will use callbacks as passed to the
+   * {@link ModelInfoCompiler.init} function to read any input files by disk.
+   *
+   * This function is intended for use within the lexical-models repository.
+   * While many of the parameters could be deduced from each other, they are
+   * specified here to reduce the number of places the filenames are
+   * constructed.
+   *
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kpj file, such as .model.ts or
+   *                  .model.kps file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link ModelInfoCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   *
+   * @param sources - Details on files from which to extract additional metadata
+   */
+  public async run(inputFilename: string, outputFilename?: string): Promise<ModelInfoCompilerResult> {
+    const sources = this.options.sources;
 
     /*
       * Model info looks like this:
@@ -121,6 +192,11 @@ export class ModelInfoCompiler {
         return null;
       }
 
+      if(!isValidEmail(match[2])) {
+        this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+        return null;
+      }
+
       model_info.authorEmail = match[2];
     }
 
@@ -128,6 +204,9 @@ export class ModelInfoCompiler {
 
     if(sources.kmpJsonData.info.description?.description) {
       model_info.description = sources.kmpJsonData.info.description.description.trim();
+    } else {
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_DescriptionIsMissing({filename:sources.kpsFilename}));
+      return null;
     }
 
     // isRTL -- this is a little bit of a heuristic from a compiled .js
@@ -164,20 +243,44 @@ export class ModelInfoCompiler {
     model_info.packageIncludes = sources.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
     model_info.version = sources.kmpJsonData.info.version.description;
     model_info.minKeymanVersion = minKeymanVersion;
-    model_info.helpLink = HelpRoot + model_info.id;
+    model_info.helpLink = KeymanUrls.HELP_MODEL(model_info.id);
 
     if(sources.sourcePath) {
       model_info.sourcePath = sources.sourcePath;
     }
 
     const jsonOutput = JSON.stringify(model_info, null, 2);
-    return new TextEncoder().encode(jsonOutput);
+    const data = new TextEncoder().encode(jsonOutput);
+    const result: ModelInfoCompilerResult = {
+      artifacts: {
+        model_info: {
+          data,
+          filename: outputFilename ?? inputFilename.replace(/\.kpj$/, '.model_info')
+        }
+      }
+    };
+
+    return result;
+  }
+
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .model_info file - metadata file used by keyman.com
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
+  public async write(artifacts: ModelInfoCompilerArtifacts): Promise<boolean> {
+    this.callbacks.fs.writeFileSync(artifacts.model_info.filename, artifacts.model_info.data);
+    return true;
   }
 
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 

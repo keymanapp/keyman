@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="fail-bad-reorder"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <reorder before="\u1A6B" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

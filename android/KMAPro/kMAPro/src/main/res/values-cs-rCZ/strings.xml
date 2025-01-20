@@ -33,6 +33,8 @@
   <string name="ic_text_size_up" comment="Make text bigger">Velikost textu nahoru</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Velikost textu dolů</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Posuvník velikosti textu</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nVeškerý text bude vymazán\n</string>
   <!-- Context: Get Started menu -->
@@ -51,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Pro instalaci balíčků klávesnice povolte klávesnici oprávnění ke čtení externího úložiště.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Žádost o oprávnění k úložišti byla zamítnuta. Může selhat instalace balíčku klávesnice</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Žádost o oprávnění k úložišti se nezdařila. Zkuste nastavení Keyman - Instalovat z místního souboru</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Nastavení</string>
   <!-- Context: Keyman Settings menu -->
@@ -66,6 +69,8 @@
   <string name="change_display_language" comment="Menu action to change interface language">Zobrazit jazyk</string>
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Upravit výšku klávesnice</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Upravit zpoždění dlouhého stisknutí</string>
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Titulek mezerníku</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -85,12 +90,12 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Nezobrazovat titulek v mezerníku</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
-  <!-- Context: Keyman Settings menu -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">Při psaní vibrovat</string>
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Vždy zobrazovat banner</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">K provedení</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">Pokud je vypnuto, zobrazí se pouze pokud je povolen prediktivní text</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Povolit odesílání hlášení o pádech přes síť</string>
@@ -122,6 +127,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Otočit zařízení pro nastavení na výšku a na šířku</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Obnovit výchozí nastavení</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Doba zpoždění: %1$.1f sekund</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Prodloužit dobu zpoždění</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Zkrátit dobu zpoždění</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Posuvník doby zpoždění dlouhého stisknutí</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Hledat nebo zadat URL</string>
   <!-- Context: Keyman Web Browser -->
@@ -157,7 +170,7 @@
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Neplatná/chybějící metadata v balíčku</string>
   <!-- Context: KMP Package strings -->
-  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Klávesnice vyžaduje novější verzi Keyman</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Nelze spustit webový prohlížeč</string>
 </resources>

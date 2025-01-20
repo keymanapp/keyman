@@ -8,12 +8,9 @@
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
       "baseUrl": ".",
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-      },
   },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "*.ts",
       "helpers/*.ts",
       "wordbreakers/*.ts"

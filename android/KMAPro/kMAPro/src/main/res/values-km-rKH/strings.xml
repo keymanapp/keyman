@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">ចែក​រំលែក</string>
   <!-- Context: Menu Action -->
@@ -32,6 +33,8 @@
   <string name="ic_text_size_up" comment="Make text bigger">ទំហំអក្សរ​កាន់តែ​ធំ</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">ទំហំ​អក្សរ​កាន់តែ​តូច</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">របារំកិលទំហំអក្សរ</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nអក្សរ​ទាំង​អស់​នឹង​ត្រូវ​លុបចេញ\n</string>
   <!-- Context: Get Started menu -->
@@ -50,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    ដើម្បី​ដំឡើង​កញ្ចប់​ក្ដារ​ចុច សូម​អនុញ្ញាត​ឱ្យ Keyman មាន​សិទ្ធិ​អាន​ឧបករណ៍​ផ្ទុក​ខាង​ក្រៅ។</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បាន​បដិសេធ។ អាច​បរាជ័យ​ក្នុង​ការដំឡើង​កញ្ចប់​ក្ដារចុច</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បានបរាជ័យ។ សូមទៅកាន់ការកំណត់ Keyman - ដំឡើង​ពី​​​ឧបករណ៍នេះ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">ការ​កំណត់</string>
   <!-- Context: Keyman Settings menu -->
@@ -62,6 +66,8 @@
   <string name="change_display_language" comment="Menu action to change interface language">ភាសាបង្ហាញ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">កែកម្ពស់ក្ដារចុច</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">កែសម្រួលការពន្យារពេលរបស់ longpress</string>
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">ពាក្យលើគ្រាប់ចុចដកឃ្លា</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -81,12 +87,12 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">កុំបង្ហាញពាក្យនៅលើគ្រាប់ចុចដកឃ្លា</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
-  <!-- Context: Keyman Settings menu -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">ញ័រពេលវាយអក្សរ​</string>
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">ត្រូវ​អនុវត្ត</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">បើ​បិទ បដា​នឹង​បង្ហាញ​តែ​នៅ​ពេលបើក​ការណែនាំ​ពាក្យស្វ័យប្រវត្តិប៉ុណ្ណោះ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">អនុញ្ញាត​ឱ្យ​ផ្ញើ​របាយការណ៍​អំពី​ការគាំង​តាម​បណ្ដាញ</string>
@@ -118,6 +124,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">បង្វិលឧបករណ៍ដើម្បីកែបញ្ឈ និងផ្ដេក</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ប្ដូរ​កំណត់​ទៅលំនាំដើម</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">រយៈពេលពន្យារ: %1$.1f វិនាទី</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">ពន្យារពេលយូរជាងមុន</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">ពន្យារពេលតិចជាងមុន</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">របារំកិលពន្យារពេល longpress</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">ស្វែងរក ឬវាយ​បញ្ចូល URL</string>
   <!-- Context: Keyman Web Browser -->
@@ -155,5 +169,5 @@
   <!-- Context: KMP Package strings -->
   <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    ក្ដារចុចត្រូវការ Keyman ជំនាន់ថ្មីជាងនេះ</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">មិនអាចដំណើរការកម្មវិធីបើកមើលគេហទំព័រ</string>
 </resources>

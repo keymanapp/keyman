@@ -29,11 +29,19 @@
         </div>
 
         <div class="support_sil">
-          <xsl:value-of select="$locale/string[@name='S_Support_CreatedBySIL']"/>
+          <xsl:variable name="originalText" select="$locale/string[@name='S_Support_CreatedBySILGlobal']"/>
+          <xsl:variable name="replacement" select="'SIL Global'"/>
+          <xsl:variable name="beforePlaceholder" select="substring-before($originalText, '%0:s')"/>
+          <xsl:variable name="afterPlaceholder" select="substring-after($originalText, '%0:s')"/>
+          <xsl:value-of select="concat($beforePlaceholder, $replacement, $afterPlaceholder)"/>
         </div>
 
         <div class="support_copyright">
-          <xsl:value-of select="$locale/string[@name='S_Support_Copyright']"/>
+          <xsl:variable name="originalText" select="$locale/string[@name='S_Support_CopyrightSILGlobal']"/>
+          <xsl:variable name="replacement" select="'SIL Global'"/>
+          <xsl:variable name="beforePlaceholder" select="substring-before($originalText, '%0:s')"/>
+          <xsl:variable name="afterPlaceholder" select="substring-after($originalText, '%0:s')"/>
+          <xsl:value-of select="concat($beforePlaceholder, $replacement, $afterPlaceholder)"/>
         </div>
 
         <div class="support_links">
@@ -41,7 +49,6 @@
           <ul>
             <li><a><xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com"/>/</xsl:attribute>keyman.com</a></li>
             <li><a href="keyman:support_diagnostics"><xsl:value-of select="$locale/string[@name='S_Menu_Diagnostics_Diagnostics']"/></a></li>
-            <li><a href="keyman:support_updatecheck"><xsl:value-of select="$locale/string[@name='S_Button_CheckForUpdates']"/></a></li>
             <li><a>
               <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/support</xsl:attribute
               ><xsl:value-of select="$locale/string[@name='S_Button_OnlineSupport']"/></a></li>

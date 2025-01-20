@@ -16,14 +16,10 @@ extern UInt32 VirtualKeyMap[0x80];
 
 @interface CoreHelper : NSObject
 
-@property (assign, nonatomic) BOOL debugMode;
-
 -(unichar const *) createUnicharStringFromNSString:(NSString *)string;
 -(NSString *) createNSStringFromUnicharString:(unichar const *)string;
 -(unsigned long long) unicharStringLength:(unichar const *)string;
 
--(instancetype)initWithDebugMode:(BOOL)debugMode;
--(void)logDebugMessage:(NSString *)format, ...;
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode;
 -(UTF32Char)macToKeymanModifier:(NSEventModifierFlags)modifiers;
 -(NSString*)utf32ValueToString:(UTF32Char)scalarValue;

@@ -1,4 +1,6 @@
 #
+# Keyman is copyright (C) SIL International. MIT License.
+#
 # basic.txt describes the expected output of running kmc against basic.xml. It is used in
 # the end-to-end test test-compiler-e2e.ts.
 #
@@ -22,7 +24,7 @@
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
-  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+  00 11 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
   00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 deprecated in 16.0, always 0
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
@@ -154,7 +156,7 @@ block(bksp)
   00 00 00 00                       #   KMX_DWORD index = 0
 
   # transforms 0
-  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e
+  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e ## << ??
   index(strNull,strNull,2)          #   KMX_DWORD str to 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapFrom 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapTo 0
@@ -246,14 +248,14 @@ block(endelem)
 block(keys)                         # struct COMP_KMXPLUS_KEYS {
   6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
   sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
-  04 00 00 00                       #   KMX_DWORD keyCount
+  05 00 00 00                       #   KMX_DWORD keyCount
   01 00 00 00                       #   KMX_DWORD flicksCount
   00 00 00 00                       #   KMX_DWORD flickCount
-  02 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap
+  30 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap - #48, one per key
   # keys
   # (#0000) a
   61 00 00 00                       #   'a'
-  00 00 00 00                       #   KMX_DWORD flags = extend
+  00 00 00 00                       #   KMX_DWORD flags = 0
   index(strNull,strA,2)             #   KMXPLUS_STR 'a' (key id)
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
@@ -263,7 +265,7 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #  flicks
   # (#0001) e
   65 00 00 00                       #   'e'
-  00 00 00 00                       #   KMX_DWORD flags = extend
+  00 00 00 00                       #   KMX_DWORD flags = 0
   index(strNull,strElemBkspFrom2,2)  #   KMXPLUS_STR 'e' (key id)
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
@@ -271,7 +273,17 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #  flicks
-  # (#0002) hmaqtugha
+  # (#0002) gap (reserved)
+  00 00 00 00                       #   nothing
+  03 00 00 00                       #   KMX_DWORD flags = extend|gap
+  index(strNull,strGapReserved,2)  #   KMXPLUS_STR 'gap (reserved)' (key id)
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10  (full width)
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
+  00 00 00 00                       #  flicks
+  # (#0003) hmaqtugha
   27 01 00 00                       #   UTF-32    'U+0127'
   00 00 00 00                       #   KMX_DWORD (flags: none)
   index(strNull,strHmaqtugha,2)     #   KMXPLUS_STR 'hmaqtugha'
@@ -281,10 +293,10 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   00 00 00 00                       #   STR longPressDefault
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST multiTap
   00 00 00 00                       #   flicks 0
-  # (#0003) that
-  index(strNull,strKeys,2)          #   KMXPLUS_STR 'U+0127'
+  # (#0004) that
+  index(strNull,strKeys,2)          #   KMXPLUS_STR '...'
   01 00 00 00                       #   KMX_DWORD flags = extend
-  index(strNull,strThat,2)          #   KMXPLUS_STR 'hmaqtugha'
+  index(strNull,strThat,2)          #   KMXPLUS_STR 'that'
   00 00 00 00                       #   KMXPLUS_STR switch
   0A 00 00 00                       #   KMX_DWORD width*10
   00 00 00 00 # TODO: index(listNull,listNull,4)        #   LIST longPress
@@ -305,16 +317,75 @@ block(keys)                         # struct COMP_KMXPLUS_KEYS {
   # kmapdata:
   # note that 'a' and 'e' are omitted, as they aren't on the layers (just from gestures)
 
-  # #0
-  31 00 00 00                        #  KMX_DWORD vkey
-  00 00 00 00                        #  KMX_DWORD modifiers (none)
-  03 00 00 00                        #  KMX_DWORD key index (that)
+  # moving these to 1-liners so they can be sorted! the structure is as follows:
+  ## 31 00 00 00                        #  KMX_DWORD vkey
+  ## 00 00 00 00                        #  KMX_DWORD modifiers (none)
+  ## 04 00 00 00                        #  KMX_DWORD key index (that)
 
-  # #1
-  c0 00 00 00                        #  KMX_DWORD vkey
-  00 00 00 00                        #  KMX_DWORD modifiers (none)
-  02 00 00 00                        #  KMX_DWORD key index (hmaqtugha)
+# following lines generated with this snippet:
+#
+#      /** from scanCodes-implied.xml */
+#      const scans = ("29 02 03 04 05 06 07 08 09 0A 0B 0C 0D" + " 10 11 12 13 14 15 16 17 18 19 1A 1B 2B" + " 1E 1F 20 21 22 23 24 25 26 27 28" + " 2C 2D 2E 2F 30 31 32 33 34 35").split(/ /);
+#
+#      for (let s of scans) {
+#        const n = Number.parseInt(s, 16);
+#        const v = CLDRScanToUSVirtualKeyCodes[n]; // virtual-key-constants.ts
+#        if (!v) {
+#          console.error(`! ${s}`);
+#        } else {
+#          console.log(`  ${Number(v).toString(16)} 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)`);
+#        }
+#      }
 
+#   - vkey -   - modifier -   - key id  -
+  20 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  30 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  31 00 00 00   00 00 00 00   04 00 00 00 # "that"
+  32 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  33 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  34 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  35 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  36 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  37 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  38 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  39 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  41 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  42 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  43 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  44 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  45 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  46 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  47 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  48 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  49 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4b 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4c 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4d 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4e 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  4f 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  50 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  51 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  52 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  53 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  54 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  55 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  56 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  57 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  58 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  59 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  5a 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  ba 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bb 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bc 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bd 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  be 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  bf 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  c0 00 00 00   00 00 00 00   03 00 00 00 # "hmaqtugha"
+  db 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  dc 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  dd 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
+  de 00 00 00   00 00 00 00   02 00 00 00 # gap (reserved)
 
 # ----------------------------------------------------------------------------------------------------
 # layr
@@ -333,7 +404,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   01 00 00 00 # count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
   # layers 0
-  index(strNull,strBase,2)          #   KMXPLUS_STR id;
+  00 00 00 00                       #   KMXPLUS_STR id;
   00 00 00 00                       #   KMX_DWORD mod
   00 00 00 00                       #   KMX_DWORD row index
   01 00 00 00                       #   KMX_DWORD  count
@@ -420,33 +491,33 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 
   diff(strs,strNull)       sizeof(strNull,2)
   diff(strs,strVersion)    sizeof(strVersion,2)
+  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strName)       sizeof(strName,2)
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
   diff(strs,strAmarker)     sizeof(strAmarker,2)
+  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
   diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
   diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
   diff(strs,strElemTranFrom1b) sizeof(strElemTranFrom1b,2)
   diff(strs,strA)   sizeof(strA,2)
   diff(strs,strSet)   sizeof(strSet,2)
   diff(strs,strSet2)   sizeof(strSet2,2)
-  diff(strs,strBase)   sizeof(strBase,2)
+  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
+  diff(strs,strGapReserved) sizeof(strGapReserved,2)
   diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strAuthor)     sizeof(strAuthor,2)
-  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strThat)   sizeof(strThat,2)
   diff(strs,strUs)    sizeof(strUs,2)
   diff(strs,strVse)   sizeof(strVse,2)
   diff(strs,strVst)   sizeof(strVst,2)
   diff(strs,strVus)   sizeof(strVus,2)
-  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
-
 
   # String table -- block(x) is used to store the null u16char at end of each string
   #                 without interfering with sizeof() calculation above
@@ -454,10 +525,12 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #00
   block(strNull)             block(x) 00 00                                             # the zero-length string
   block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
+  block(strConformsTo)       34 00 35 00 block(x) 00 00                         # '45'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
   block(strAmarker)          5C 00 6D 00 7B 00 61 00 7D 00 block(x) 00 00               # '\m{a}'
+  block(strSentinel0001r)    5c 00 75 00 66 00 66 00 66 00 66 00 5c 00 75 00 30 00 30 00 30 00 38 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
   block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
   block(strElemTranFrom1b)   5E 00 65 00 block(x) 00 00                                       # '^e'
@@ -465,27 +538,24 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet)              61 00 20 00 62 00 20 00 63 00 block(x) 00 00               # 'a b c'
 #str #0A
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
-  block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
+  block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
+  block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
   block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
 #str #10
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
   block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 'qwerty'
   block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'
-  block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
-                             69 00 65 00 77 00 block(x) 00 00                         # 'techpreview'
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
   block(strUs)               75 00 73 00 block(x) 00 00                           # 'us' (layout)
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
-  block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
-  block(strSentinel0001)     FF FF 08 00 01 00 block(x) 00 00                   # UC_SENTINEL CODE_DEADKEY U+0001
-
+  block(strSentinel0001)    FF FF 08 00 01 00 block(x) 00 00                         # UC_SENTINEL CODE_DEADKEY U+0001
 
 
 block(endstrs)                      # end of strs block
@@ -527,12 +597,12 @@ block(tran)                         # struct COMP_KMXPLUS_TRAN {
 
   block(tranTransform1)
     index(strNull,strA,2)  #    KMXPLUS_STR from; 'a'
-    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a}
+    index(strNull,strSentinel0001,2)        #    KMXPLUS_STR to; \m{a} (plain form)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo
 
   block(tranTransform2)  # Next group
-    index(strNull,strSentinel0001,2)  #    KMXPLUS_STR from; (\m{a})
+    index(strNull,strSentinel0001r,2)  #    KMXPLUS_STR from; (\m{a}) (regex form)
     index(strNull,strNull,2)        #    KMXPLUS_STR to; (none)
     index(strNull,strNull,2)          # mapFrom
     index(strNull,strNull,2)          # mapTo

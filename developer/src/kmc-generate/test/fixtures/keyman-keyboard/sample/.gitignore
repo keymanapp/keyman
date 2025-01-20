@@ -1,0 +1,4 @@
+# This file lists files which should not be committed into source control
+build/
+*.kpj.user
+node_modules/

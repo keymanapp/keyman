@@ -199,6 +199,13 @@ async function loadSettings() {
   };
 
   context.updateExecutionPoint = function (row) {
+    if(!editor) {
+      // At debugger startup time, it initializes asynchronously at the same
+      // time as the editor, which means that in some circumstances the
+      // debugger will call to SetExecutionPointLine before the editor has
+      // loaded. The safest thing to do here is just exit. #11586
+      return;
+    }
     if(row >= 0) {
       executionPoint = editor.deltaDecorations(
         executionPoint,
@@ -299,7 +306,16 @@ async function loadSettings() {
     if(mode == 'keyman') {
       fontCss.innerHTML = ".mtk20, .mtk8 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
     } else if(mode == 'xml') {
-      fontCss.innerHTML = ".mtk1 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
+      // This is very crude but good enough for now. It is not 100% because we
+      // still have some font styling bleeding into wrong areas, e.g. <element
+      // id="foo"> x </element> will have `"foo">` all as a single span, so the
+      // `>` ends up with our character font.
+      fontCss.innerHTML =
+        ".mtk6 + .mtk1, " + // text on same line as >{mtk6}
+        "div.view-line > span > .mtk1, " + // text on new line
+        ".mtk4 + .mtk1 + .mtk6, " + // xml attributes, id{mtk4} ={mtk1} "value"{mtk6}
+        ".mtk6 + .mtk6" + // long attributes
+        "{ font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
     } else if(mode == 'json') {
       fontCss.innerHTML = ".mtk5 { font-size: " + fonts.charFont.size + "px; font-family: \"" + fonts.charFont.name + "\"; }";
     } else {

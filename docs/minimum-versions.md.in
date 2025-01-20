@@ -1,0 +1,45 @@
+---
+title: Keyman Minimum Versions
+---
+
+Changes in [minimum-versions.inc.sh](minimum-versions.inc.sh) should manually be propagated to the linked help files below:
+
+## Keyman 18.0
+
+Target Operating System and Platform Versions
+
+### Keyman for Windows
+
+Helpfile: [os.md](../windows/docs/help/common/os.md)
+
+### Keyman for macOS
+
+Helpfile: [requirements.md](../mac/docs/help/about/requirements.md)
+
+### Keyman for Linux
+
+Helpfile: [common/index.md](../linux/docs/help/common/index.md#q-what-linux-distros-will-keyman-work-with)
+
+### Keyman iPhone and iPad
+
+Helpfile: [system-requirements.md](../ios/docs/help/about/system-requirements.md)
+
+### Keyman for Android
+
+Helpfile: [system-requirements.md](../android/docs/help/about/system-requirements.md)
+
+----
+
+## Product Build Documentation
+
+[linux-ubuntu.md](../docs/build/linux-ubuntu.md)
+
+[macos.md](../docs/build/macos.md)
+
+[windows.md](../docs/build/windows.md)
+
+## Keyman Engine Documentation
+
+https://help.keyman.com/developer/engine/android/latest-version/
+
+----

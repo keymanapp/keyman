@@ -1,7 +1,6 @@
 import {
   gestures,
   GestureModelDefs,
-  InputSample,
   CumulativePathStats
 } from '@keymanapp/gesture-recognizer';
 
@@ -13,7 +12,7 @@ import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 import {
   ActiveLayout,
   deepCopy
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 
 import { type KeyElement } from '../../keyElement.js';
 
@@ -21,20 +20,18 @@ import { calcLockedDistance, lockedAngleForDir, MAX_TOLERANCE_ANGLE_SKEW, type O
 
 import specs = gestures.specs;
 
-export interface GestureParams<Item = any> {
-  longpress: {
+export interface GestureParams {
+  readonly longpress: {
     /**
-     * Allows enabling or disabling the longpress up-flick shortcut for keyboards that do not
-     * include any defined flick gestures.
-     *
-     * Will be ignored (in favor of `false`) for keyboards that do have defined flicks.
+     * The minimum _net_ distance traveled before a longpress flick-shortcut will cancel any
+     * conflicting flick models.
      */
-    permitsFlick: (item?: Item) => boolean,
+    flickDistStart: number,
 
     /**
      * The minimum _net_ distance traveled before a longpress flick-shortcut will trigger.
      */
-    flickDist: number,
+    flickDistFinal: number,
 
     /**
      * The maximum amount of raw-distance movement allowed for a longpress before it is
@@ -52,7 +49,7 @@ export interface GestureParams<Item = any> {
      */
     waitLength: number
   },
-  multitap: {
+  readonly multitap: {
     /**
      * The duration (in ms) permitted between taps.  Taps with a greater time interval
      * between them will be considered separate.
@@ -65,7 +62,7 @@ export interface GestureParams<Item = any> {
      */
     holdLength: number;
   },
-  flick: {
+  readonly flick: {
     /**
      * The minimum _net_ touch-path distance that must be traversed to "lock in" on
      * a flick gesture.  When keys support both longpresses and flicks, this distance
@@ -89,28 +86,41 @@ export interface GestureParams<Item = any> {
      * Is currently also used as the max radius for valid flick-reset recentering targets.
      */
     dirLockDist: number
+  }
+}
+
+export interface FullGestureParams<Item = any> extends GestureParams {
+  readonly longpress: GestureParams["longpress"] & {
+    /**
+     * Allows enabling or disabling the longpress up-flick shortcut for
+     * keyboards that do not include any defined flick gestures.
+     *
+     * Will be ignored (in favor of `false`) for keyboards that do have defined
+     * flicks.
+     *
+     * Note:  this is automatically overwritten during keyboard initialization
+     * to match the keyboard's properties.
+     */
+    permitsFlick: (item?: Item) => boolean
   },
   /**
    * Indicates whether roaming-touch oriented behaviors should be enabled.
-   *
-   * Note that run-time adjustments to this property after initialization will
-   * not take affect, unlike the other properties of the overall parameter object.
    */
   roamingEnabled?: boolean;
 }
 
 export const DEFAULT_GESTURE_PARAMS: GestureParams = {
   longpress: {
-    permitsFlick: () => true,
     // Note:  actual runtime value is determined at runtime based upon row height.
     // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
-    flickDist: 5,
+    flickDistStart: 8,
+    flickDistFinal: 40,
     waitLength: 500,
     noiseTolerance: 10
   },
   multitap: {
-    waitLength: 500,
-    holdLength: 500
+    waitLength: 300,
+    holdLength: 150
   },
   // Note:  all actual runtime values are determined at runtime based upon row height.
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
@@ -153,8 +163,16 @@ function buildDistFromKeyCentroidFunctor(key: KeyElement) {
 
 export function keySupportsModipress(key: KeyElement) {
   const keySpec = key.key.spec;
+
+  // A key cannot reasonably support both longpresses and modipresses.
+  // It'd be quite ugly to overlay the subkey menu over the new layer during a modipress.
+  if(keySpec.sk) {
+    return false;
+  }
+
   const modifierKeyIds = ['K_SHIFT', 'K_ALT', 'K_CTRL', 'K_NUMERALS', 'K_SYMBOLS', 'K_CURRENCIES'];
   for(const modKeyId of modifierKeyIds) {
+
     if(keySpec.id == modKeyId) {
       return true;
     }
@@ -184,20 +202,20 @@ interface LayoutGestureSupportFlags {
 
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
+// @ts-ignore // so that we don't trigger "unused local" warnings.
 let dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
- * Defines the set of gestures appropriate for use with the specified Keyman keyboard.
+ * Defines the set of gestures appropriate for use with the specified Keyman
+ * keyboard.
  * @param layerGroup  The active keyboard's layer group
- * @param params      A set of tweakable gesture parameters.  It will be closure-captured
- *                    and referred to by reference; changes to its values will take
- *                    immediate effect during gesture processing.
- *
- *                    If params.roamingEnabled is unset, it will be initialized by this
- *                    method based upon layout properties.
+ * @param paramObj    A set of tweakable gesture parameters.  It will be
+ *                    closure-captured and referred to by reference; changes to
+ *                    its values will take immediate effect during gesture
+ *                    processing.
  * @returns
  */
-export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: GestureParams): GestureModelDefs<KeyElement, string> {
+export function gestureSetForLayout(flags: LayoutGestureSupportFlags, paramObj: GestureParams): GestureModelDefs<KeyElement, string> {
   // To be used among the `allowsInitialState` contact-model specifications as needed.
   const gestureKeyFilter = (key: KeyElement, gestureId: string) => {
     if(!key) {
@@ -229,11 +247,33 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     }
   };
 
-  const doRoaming = params.roamingEnabled ||= !flags.hasFlicks;
+  const params = paramObj as FullGestureParams;
+
+  // Override any prior entries for keyboard-specific configuration.
+  params.longpress.permitsFlick = (key) => {
+    const flickSpec = key?.key.spec.flick;
+    return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
+  };
+  const doRoaming = params.roamingEnabled = !flags.hasFlicks;
 
   const _initialTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? initialTapModel(params) : initialTapModelWithReset(params));
   const _simpleTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? simpleTapModel(params) : simpleTapModelWithReset(params));
-  const _longpressModel: GestureModel<KeyElement> = deepCopy(longpressModel(params, true, doRoaming));
+  // Ensure all deep-copy operations for longpress modeling occur before the property-redefining block.
+  const _longpressModel: GestureModel<KeyElement> = withKeySpecFiltering(deepCopy(longpressModel(params, true, doRoaming)), 0);
+  const _multitapStartModel: GestureModel<KeyElement> = withKeySpecFiltering(multitapStartModel(params), 0);
+  const _modipressMultitapStartModel: GestureModel<KeyElement> = withKeySpecFiltering(modipressMultitapStartModel(params), 0);
+
+  // `deepCopy` does not preserve property definitions, instead raw-copying its value.
+  // We need to re-instate the longpress delay property here.
+  Object.defineProperty(_longpressModel.contacts[0].model.timer, 'duration', {
+    get: () => params.longpress.waitLength
+  });
+  Object.defineProperty(_multitapStartModel.sustainTimer, 'duration', {
+    get: () => params.multitap.waitLength
+  });
+  Object.defineProperty(_modipressMultitapStartModel.sustainTimer, 'duration', {
+    get: () => params.multitap.waitLength
+  });
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -266,8 +306,8 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   const specialStartModel = specialKeyStartModel();
   const _modipressStartModel = modipressStartModel();
   const gestureModels: GestureModel<KeyElement>[] = [
-    withKeySpecFiltering(_longpressModel, 0),
-    withKeySpecFiltering(multitapStartModel(params), 0),
+    _longpressModel,
+    _multitapStartModel,
     multitapEndModel(params),
     _initialTapModel,
     _simpleTapModel,
@@ -278,7 +318,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
     modipressHoldModel(params),
     modipressEndModel(),
     modipressMultitapTransitionModel(),
-    withKeySpecFiltering(modipressMultitapStartModel(params), 0),
+    _modipressMultitapStartModel,
     modipressMultitapEndModel(params),
     modipressMultitapLockModel()
   ];
@@ -341,11 +381,34 @@ export function instantContactResolutionModel(): ContactModel {
   };
 }
 
-export function flickStartContactModel(params: GestureParams): ContactModel {
+export function flickStartContactModel(params: FullGestureParams): gestures.specs.ContactModel<KeyElement, any> {
+  const flickParams = params.flick;
+
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
+      evaluate: (path, _, item) => {
+        const stats = path.stats;
+        const keySpec = item?.key.spec;
+
+        if(keySpec && keySpec.sk) {
+          const flickSpec = keySpec.flick;
+          const hasUpFlick = flickSpec.nw || flickSpec.n || flickSpec.ne;
+
+          if(!hasUpFlick) {
+            // Check for possible conflict with the longpress up-flick shortcut;
+            // it's supported on this key, as there is no true northish flick.
+            const baseDistance = stats.netDistance;
+            const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+            const verticalDistance = baseDistance * Math.cos(angle);
+            if(verticalDistance > params.longpress.flickDistStart) {
+              return 'reject';
+            }
+          }
+        }
+
+        return stats.netDistance > flickParams.startDist ? 'resolve' : null;
+      }
     },
     pathResolutionAction: 'resolve',
     pathInheritance: 'partial'
@@ -377,7 +440,7 @@ function determineLockFromStats(pathStats: CumulativePathStats<KeyElement>, base
   }
 }
 
-export function flickMidContactModel(params: GestureParams): gestures.specs.ContactModel<KeyElement, any> {
+export function flickMidContactModel(params: FullGestureParams): gestures.specs.ContactModel<KeyElement, any> {
   return {
     itemPriority: 1,
     pathModel: {
@@ -402,6 +465,8 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
         } else if(path.isComplete) {
           return 'reject';
         }
+
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -410,7 +475,7 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
 }
 
 
-export function flickEndContactModel(params: GestureParams): ContactModel {
+export function flickEndContactModel(params: FullGestureParams): ContactModel {
   return {
     itemPriority: 1,
     pathModel: {
@@ -426,6 +491,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
             return 'reject';
           }
         }
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -433,17 +499,18 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
   }
 }
 
-export function longpressContactModel(params: GestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
+export function longpressContactModel(params: FullGestureParams, enabledFlicks: boolean, resetForRoaming: boolean): ContactModel {
   const spec = params.longpress;
 
   return {
     itemPriority: 0,
     pathResolutionAction: 'resolve',
     timer: {
-      duration: spec.waitLength,
-      expectedResult: true,
-      validateItem: (key: KeyElement) => !!key.key.spec.sk
+      // Needs to be a getter so that it dynamically updates if the backing value is changed.
+      get duration() { return spec.waitLength },
+      expectedResult: true
     },
+    validateItem: (_: KeyElement, baseKey: KeyElement) => !!baseKey?.key.spec.sk,
     pathModel: {
       evaluate: (path) => {
         const stats = path.stats;
@@ -456,7 +523,10 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
          * each side of due N in total.
          */
         if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
-          if(stats.netDistance > spec.flickDist) {
+          const baseDistance = stats.netDistance;
+          const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+          const verticalDistance = baseDistance * Math.cos(angle);
+          if(verticalDistance > spec.flickDistFinal) {
             return 'resolve';
           }
         } else if(resetForRoaming) {
@@ -503,6 +573,7 @@ export function modipressContactHoldModel(): ContactModel {
         if(path.isComplete) {
           return 'reject';
         }
+        return undefined;
       }
     }
   }
@@ -518,12 +589,13 @@ export function modipressContactEndModel(): ContactModel {
         if(path.isComplete) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   };
 }
 
-export function simpleTapContactModel(params: GestureParams, isNotInitial?: boolean): ContactModel {
+export function simpleTapContactModel(params: FullGestureParams, isNotInitial?: boolean): ContactModel {
   // Snapshot at model construction; do not update if changed.
   const roamingEnabled = params?.roamingEnabled ?? true; // ?? true - used by the banner.
 
@@ -539,6 +611,8 @@ export function simpleTapContactModel(params: GestureParams, isNotInitial?: bool
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+
+        return undefined;
       }
     }
   };
@@ -553,6 +627,7 @@ export function subkeySelectContactModel(): ContactModel {
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   }
@@ -589,7 +664,7 @@ export function specialKeyStartModel(): GestureModel<KeyElement> {
   };
 }
 
-export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
+export function specialKeyEndModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'special-key-end',
     resolutionPriority: 0,
@@ -621,10 +696,11 @@ export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
  *                       - the common gesture configuration permits the shortcut where supported
  * @param allowRoaming   Indicates whether "roaming touch" mode should be supported.
  */
-export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
+export function longpressModel(params: FullGestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
-    resolutionPriority: 0,
+    // Needs to beat flick-start priority.
+    resolutionPriority: 4,
     contacts: [
       {
         model: {
@@ -634,7 +710,8 @@ export function longpressModel(params: GestureParams, allowShortcut: boolean, al
         },
         endOnResolve: false
       }, {
-        model: instantContactRejectionModel()
+        model: instantContactRejectionModel(),
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {
@@ -669,7 +746,7 @@ export function longpressModel(params: GestureParams, allowShortcut: boolean, al
 /**
  * For use for transitioning out of roaming-touch.
  */
-export function longpressModelAfterRoaming(params: GestureParams): GestureModel<any> {
+export function longpressModelAfterRoaming(params: FullGestureParams): GestureModel<any> {
   // The longpress-shortcut is always disabled for keys reached by roaming (param 2)
   // Only used when roaming is permitted; continued roaming should be allowed. (param 3)
   const base = longpressModel(params, false, true);
@@ -719,7 +796,7 @@ export function longpressRoamRestoration(): GestureModel<any> {
   }
 }
 
-export function flickStartModel(params: GestureParams): GestureModel<any> {
+export function flickStartModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'flick-start',
     resolutionPriority: 3,
@@ -736,7 +813,7 @@ export function flickStartModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function flickRestartModel(params: GestureParams): GestureModel<KeyElement> {
+export function flickRestartModel(params: FullGestureParams): GestureModel<KeyElement> {
   const base = flickStartModel(params);
   return {
     ...base,
@@ -796,7 +873,7 @@ export function flickRestartModel(params: GestureParams): GestureModel<KeyElemen
   }
 }
 
-export function flickMidModel(params: GestureParams): GestureModel<any> {
+export function flickMidModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'flick-mid',
     resolutionPriority: 0,
@@ -806,7 +883,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
         endOnReject: true,
       }, {
         model: instantContactRejectionModel(),
-        resetOnResolve: true,
+        resetOnInstantFulfill: true,
       }
     ],
     rejectionActions: {
@@ -826,7 +903,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
 }
 
 // Clears existing flick-scrolling & primes the flick-reset recentering mechanism.
-export function flickResetModel(params: GestureParams): GestureModel<any> {
+export function flickResetModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'flick-reset',
     resolutionPriority: 1,
@@ -846,7 +923,7 @@ export function flickResetModel(params: GestureParams): GestureModel<any> {
   };
 }
 
-export function flickResetCenteringModel(params: GestureParams): GestureModel<KeyElement> {
+export function flickResetCenteringModel(params: FullGestureParams): GestureModel<KeyElement> {
   return {
     id: 'flick-reset-centering',
     resolutionPriority: 1,
@@ -865,6 +942,8 @@ export function flickResetCenteringModel(params: GestureParams): GestureModel<Ke
               if(oldDist < newDist) {
                 return 'resolve';
               }
+
+              return undefined;
             },
           },
           itemPriority: 0,
@@ -898,7 +977,7 @@ export function flickResetEndModel(): GestureModel<any> {
   };
 };
 
-export function flickEndModel(params: GestureParams): GestureModel<any> {
+export function flickEndModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'flick-end',
     resolutionPriority: 0,
@@ -908,7 +987,7 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
       },
       {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -925,7 +1004,7 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function multitapStartModel(params: GestureParams): GestureModel<any> {
+export function multitapStartModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'multitap-start',
     resolutionPriority: 2,
@@ -954,7 +1033,7 @@ export function multitapStartModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function multitapEndModel(params: GestureParams): GestureModel<any> {
+export function multitapEndModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'multitap-end',
     resolutionPriority: 2,
@@ -971,7 +1050,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -988,7 +1067,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function initialTapModel(params: GestureParams): GestureModel<any> {
+export function initialTapModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'initial-tap',
     resolutionPriority: 1,
@@ -1006,7 +1085,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1024,7 +1103,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
   }
 }
 
-export function simpleTapModel(params: GestureParams): GestureModel<any> {
+export function simpleTapModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'simple-tap',
     resolutionPriority: 1,
@@ -1037,7 +1116,7 @@ export function simpleTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1048,7 +1127,7 @@ export function simpleTapModel(params: GestureParams): GestureModel<any> {
   };
 }
 
-export function initialTapModelWithReset(params: GestureParams): GestureModel<any> {
+export function initialTapModelWithReset(params: FullGestureParams): GestureModel<any> {
   const base = initialTapModel(params);
   return {
     ...base,
@@ -1062,7 +1141,7 @@ export function initialTapModelWithReset(params: GestureParams): GestureModel<an
   }
 }
 
-export function simpleTapModelWithReset(params: GestureParams): GestureModel<any> {
+export function simpleTapModelWithReset(params: FullGestureParams): GestureModel<any> {
   const simpleModel = simpleTapModel(params);
   return {
     ...simpleModel,
@@ -1124,7 +1203,7 @@ export function modipressStartModel(): GestureModel<KeyElement> {
   }
 }
 
-export function modipressHoldModel(params: GestureParams): GestureModel<any> {
+export function modipressHoldModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'modipress-hold',
     resolutionPriority: 5,
@@ -1151,7 +1230,7 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -1216,7 +1295,7 @@ export function modipressEndModel(): GestureModel<any> {
   }
 }
 
-export function modipressMultitapStartModel(params: GestureParams): GestureModel<KeyElement> {
+export function modipressMultitapStartModel(params: FullGestureParams): GestureModel<KeyElement> {
   return {
     id: 'modipress-multitap-start',
     resolutionPriority: 6,
@@ -1251,7 +1330,7 @@ export function modipressMultitapStartModel(params: GestureParams): GestureModel
   }
 }
 
-export function modipressMultitapEndModel(params: GestureParams): GestureModel<any> {
+export function modipressMultitapEndModel(params: FullGestureParams): GestureModel<any> {
   return {
     id: 'modipress-multitap-end',
     resolutionPriority: 5,
@@ -1275,7 +1354,7 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {

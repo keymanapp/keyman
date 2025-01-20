@@ -16,27 +16,31 @@
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
-  "main": "build/src/index.js",
+  "exports": {
+    ".": "./build/src/index.js"
+  },
   "files": [
     "build/src/"
   ],
   "dependencies": {
     "@keymanapp/common-types": "*",
-    "@keymanapp/kmc-kmn": "*",
-    "commander": "^10.0.0"
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/kmc-kmn": "*"
   },
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
-    "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "chalk": "^2.4.2",
-    "esbuild": "^0.15.8",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/*.tests.js",
+    "require": [
+      "source-map-support/register"
+    ]
   },
   "repository": {
     "type": "git",

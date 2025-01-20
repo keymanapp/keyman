@@ -1,6 +1,8 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
+import { KeyboardProcessor } from 'keyman/engine/js-processor';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
-import { HardKeyboard } from 'keyman/engine/main';
+import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
@@ -96,42 +98,45 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
-  let modifierCodes = Codes.modifierCodes;
   if(e.getModifierState("Control")) {
     curModState |= ((e.location != 0 && ctrlEvent) ?
-      (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
+      (e.location == 1 ? ModifierKeyConstants.LCTRLFLAG : ModifierKeyConstants.RCTRLFLAG) : // Condition 1
       prevModState & 0x0003);                                                       // Condition 2
   }
   if(e.getModifierState("Alt")) {
     curModState |= ((e.location != 0 && altEvent) ?
-      (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
+      (e.location == 1 ? ModifierKeyConstants.LALTFLAG : ModifierKeyConstants.RALTFLAG) :   // Condition 1
       prevModState & 0x000C);                                                       // Condition 2
   }
 
   // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
   let Lstates = 0;
 
-  Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
-  Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+  Lstates |= e.getModifierState('CapsLock') ? ModifierKeyConstants.CAPITALFLAG : ModifierKeyConstants.NOTCAPITALFLAG;
+  Lstates |= e.getModifierState('NumLock') ? ModifierKeyConstants.NUMLOCKFLAG : ModifierKeyConstants.NOTNUMLOCKFLAG;
   Lstates |= (e.getModifierState('ScrollLock'))
-    ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
+    ? ModifierKeyConstants.SCROLLFLAG : ModifierKeyConstants.NOTSCROLLFLAG;
 
   // We need these states to be tracked as well for proper OSK updates.
   curModState |= Lstates;
 
   // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
   const LmodifierChange = keyboardState.modStateFlags != curModState;
+
+  // KeyboardState update:  save our known modifier/state analysis bits.
+  // Note:  `keyboardState` is typically the full-fledged KeyboardProcessor instance.  As a result,
+  // changes here persist across calls (as we only ever make the one instance).
   keyboardState.modStateFlags = curModState;
 
   // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-  let altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
+  let altGrMask = ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.LCTRLFLAG;
   if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
     // We just released AltGr - make sure it's all released.
     curModState &= ~ altGrMask;
   }
   // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-  if(curModState & modifierCodes['RALT']) {
-    curModState &= ~modifierCodes['LCTRL'];
+  if(curModState & ModifierKeyConstants.RALTFLAG) {
+    curModState &= ~ModifierKeyConstants.LCTRLFLAG;
   }
 
   let modifierBitmasks = Codes.modifierBitmasks;
@@ -144,14 +149,14 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     // Note for future - embedding a kill switch here would facilitate disabling AltGr / Right-alt simulation.
     if(activeKeyboard.emulatesAltGr && (Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
       Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
-      Lmodifiers |= modifierCodes['RALT'];
+      Lmodifiers |= ModifierKeyConstants.RALTFLAG;
     }
   } else {
     // No need to sim AltGr here; we don't need chiral ALTs.
     Lmodifiers =
       (curModState & 0x10) | // SHIFT
-      ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) |
-      ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0);
+      ((curModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)) ? 0x20 : 0) |
+      ((curModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG))   ? 0x40 : 0);
   }
 
 
@@ -160,7 +165,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     * because some keyboards specify their own modifierBitmask, which won't include it.
     * We don't currently use that reference in this method, but that may change in the future.
     */
-  Lmodifiers |= (e.metaKey ? modifierCodes['META']: 0);
+  Lmodifiers |= (e.metaKey ? ModifierKeyConstants.K_METAFLAG: 0);
 
   // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
 
@@ -186,42 +191,11 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     isSynthetic: false
   });
 
-  // Mnemonic handling.
-  if(activeKeyboard && activeKeyboard.isMnemonic) {
-    // The following will never set a code corresponding to a modifier key, so it's fine to do this,
-    // which may change the value of Lcode, here.
-
-    s.setMnemonicCode(e.getModifierState("Shift"), e.getModifierState("CapsLock"));
-  }
   // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
   let LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
   s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
-  // Other minor physical-keyboard adjustments
-  if(activeKeyboard && !activeKeyboard.isMnemonic) {
-    // Positional Layout
-
-    /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-    var Lbase = KeyMapping.languageMap[keyboardState.baseLayout];
-    if(Lbase && Lbase['k'+s.Lcode]) {
-      s.Lcode=Lbase['k'+s.Lcode];
-    }
-    /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
-
-    if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      s = new KeyEvent({
-        Lcode: KeyMapping._USKeyCodeToCharCode(s),
-        Lmodifiers: 0,
-        LisVirtualKey: false,
-        vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
-        Lstates: s.Lstates,
-        kName: '',
-        device: device,
-        isSynthetic: false
-      });
-    }
-  }
+  s = processForMnemonicsAndLegacy(s, activeKeyboard, keyboardState.baseLayout);
 
   let processedEvent = new KeyEvent(s);
   processedEvent.source = e;
@@ -283,10 +257,6 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     });
   }
 
-  get activeKeyboard(): Keyboard {
-    return this.contextManager.activeKeyboard.keyboard;
-  }
-
   /**
    * Function     _KeyDown
    * Scope        Private
@@ -306,7 +276,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
     const el = target.getElement();
-    if(el?.className?.indexOf('kmw-disabled') >= 0) {
+    if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
 
@@ -320,7 +290,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
    */
   _KeyPress: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
-    if(!target || this.activeKeyboard == null) {
+    if(!target || this.contextManager.activeKeyboard?.keyboard == null) {
       return true;
     }
 
@@ -433,7 +403,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
     /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-    if(!this.activeKeyboard.isMnemonic) {
+    if(!this.contextManager.activeKeyboard?.keyboard.isMnemonic) {
       if(!this.swallowKeypress) {
         return true;
       }

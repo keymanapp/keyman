@@ -1,6 +1,5 @@
-import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
-import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
-import { DeviceSpec } from "@keymanapp/keyboard-processor";
+import { OSKView } from "keyman/engine/osk";
+import { DeviceSpec } from "keyman/engine/keyboard";
 import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 
 import { GlobeHint } from './osk/globeHint.js';
@@ -12,14 +11,10 @@ export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
       if(typeof engine.showKeyboardList == 'function') { // OSKView event: shouldShowLanguageMenu
         engine.showKeyboardList();                       // Is connected to VisualKeyboard event: globeKey
       }
-    } else if(osk.vkbd) {
-      if(osk.vkbd.menuEvent) {
-        this.highlightKey(osk.vkbd.menuEvent, false);
-      }
+    } else {
       if(typeof(engine.menuKeyUp) == 'function') { // VisualKeyboard event:  globeKey
         engine.menuKeyUp();
       }
-      osk.vkbd.menuEvent = null;
     }
 
     if(osk.vkbd) {

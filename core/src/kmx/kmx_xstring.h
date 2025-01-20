@@ -107,15 +107,18 @@ int xchrcmp(PKMX_WCHAR ch1, PKMX_WCHAR ch2);
 PKMX_CHAR wstrtostr(PKMX_WCHAR in);
 PKMX_WCHAR strtowstr(PKMX_CHAR in);
 
-const km_core_cp *u16chr(const km_core_cp *p, km_core_cp ch);
-const km_core_cp *u16cpy(km_core_cp *dst, const km_core_cp *src);  // TODO: deprecate all usages
-const km_core_cp *u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max);
-size_t u16len(const km_core_cp *p);
-int u16cmp(const km_core_cp *p, const km_core_cp *q);
-int u16icmp(const km_core_cp *p, const km_core_cp *q);
-int u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count);
-km_core_cp *u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx);
-km_core_cp *u16dup(km_core_cp *src);
+const km_core_cu *u16chr(const km_core_cu *p, km_core_cu ch);
+const km_core_cu *u16cpy(km_core_cu *dst, const km_core_cu *src);  // TODO: deprecate all usages
+const km_core_cu *u16ncpy(km_core_cu *dst, const km_core_cu *src, size_t max);
+size_t u16len(const km_core_cu *p);
+int u16cmp(const km_core_cu *p, const km_core_cu *q);
+int u16icmp(const km_core_cu *p, const km_core_cu *q);
+int u16ncmp(const km_core_cu *p, const km_core_cu *q, size_t count);
+km_core_cu *u16tok(km_core_cu *p, km_core_cu ch, km_core_cu **ctx);
+km_core_cu *u16dup(km_core_cu *src);
+
+size_t u32len(const km_core_usv *p);
+km_core_usv *u32dup(const km_core_usv *src);
 
 //KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
 

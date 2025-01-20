@@ -16,23 +16,23 @@
 + (CoreHelper *)helper {
   static CoreHelper *coreHelper = nil;
   if (coreHelper == nil) {
-    coreHelper = [[CoreHelper alloc] initWithDebugMode:YES];
+    coreHelper = [[CoreHelper alloc] init];
   }
   return coreHelper;
 }
 
 + (NSString *)getKmxFilePathTestMacEngine {
   NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:nil];
-    return path;
+  return path;
 }
 
 + (NSString *)getKmxFilePathForPlatformTest {
-    NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"PlatformTest.kmx" ofType:@"NSString"];
+  NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"PlatformTest.kmx" ofType:@"NSString"];
   return path;
 }
 
 + (NSString *)getKmxFilePathForCipherMusicTests {
-    NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"CipherMusicUnicode.kmx" ofType:@"NSString"];
+  NSString *path = [[NSBundle bundleForClass:[CoreTestStaticHelperMethods class]] pathForResource:@"CipherMusicUnicode.kmx" ofType:@"NSString"];
   return path;
 }
 

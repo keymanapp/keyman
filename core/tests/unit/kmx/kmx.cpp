@@ -17,6 +17,8 @@
 #include <string>
 #include <type_traits>
 
+#include "keyman_core.h"
+
 #include <kmx/kmx_processevent.h>
 #include <kmx/kmx_xstring.h>
 
@@ -27,6 +29,7 @@
 #include <test_assert.h>
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 #include "kmx_test_source.hpp"
 
@@ -63,10 +66,12 @@ apply_action(
     std::u16string &text_store,
     std::vector<km_core_context_item> &context,
     km::tests::kmx_options &options,
-    km::tests::KmxTestSource &test_source) {
+    km::tests::KmxTestSource &test_source,
+    bool &context_invalidated
+    ) {
   switch (act.type) {
   case KM_CORE_IT_END:
-    assert(false);
+    test_assert(false);
     break;
   case KM_CORE_IT_ALERT:
     g_beep_found = true;
@@ -105,11 +110,11 @@ apply_action(
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
     if (act.backspace.expected_type == KM_CORE_BT_MARKER) {
-      assert(!context.empty());
-      assert(context.back().type == KM_CORE_CT_MARKER);
+      test_assert(!context.empty());
+      test_assert(context.back().type == KM_CORE_CT_MARKER);
       context.pop_back();
     } else if (text_store.length() > 0) {
-      assert(!context.empty() && !text_store.empty());
+      test_assert(!context.empty() && !text_store.empty());
       km_core_usv ch = text_store.back();
       text_store.pop_back();
       if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
@@ -121,10 +126,10 @@ apply_action(
           text_store.pop_back();
         }
       }
-      assert(ch == act.backspace.expected_value);
+      test_assert(ch == act.backspace.expected_value);
 
-      assert(context.back().type == KM_CORE_CT_CHAR);
-      assert(context.back().character == ch);
+      test_assert(context.back().type == KM_CORE_CT_CHAR);
+      test_assert(context.back().character == ch);
       context.pop_back();
     }
     break;
@@ -147,6 +152,8 @@ apply_action(
     }
   } break;
   case KM_CORE_IT_INVALIDATE_CONTEXT:
+    context.clear();
+    context_invalidated = true;
     std::cout << "action: context invalidated (markers cleared)" << std::endl;
     break;
   case KM_CORE_IT_EMIT_KEYSTROKE:
@@ -157,7 +164,7 @@ apply_action(
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
-    assert(false);  // NOT SUPPORTED
+    test_assert(false);  // NOT SUPPORTED
     break;
   }
 }
@@ -165,13 +172,19 @@ apply_action(
 int
 run_test(const km::core::path &source, const km::core::path &compiled) {
   std::string keys = "";
-  std::u16string expected = u"", context = u"";
+  std::u16string expected = u"", expected_context = u"NOT SUPPLIED", context = u"";
   km::tests::kmx_options options;
   bool expected_beep = false;
   km::tests::KmxTestSource test_source;
 
-  int result = test_source.load_source(source, keys, expected, context, options, expected_beep);
+  int result = test_source.load_source(source, keys, expected, expected_context, context, options, expected_beep);
   if (result != 0) return result;
+
+  // If an expect_context is not provided, default to expected == expect_context
+  std::cout << "expected_context  = " << string_to_hex(expected_context) <<  " [" << expected_context << "]" << std::endl;
+  if (expected_context == u"NOT SUPPLIED") {
+    expected_context = expected;
+  }
 
   std::cout << "source file   = " << source << std::endl
             << "compiled file = " << compiled << std::endl;
@@ -179,7 +192,8 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
 
-  try_status(km_core_keyboard_load(compiled.c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(compiled.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
@@ -195,7 +209,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
 
   // Setup context
   km_core_context_item *citems = nullptr;
-  try_status(km_core_context_items_from_utf16(context.c_str(), &citems));
+  try_status(context_items_from_utf16(context.c_str(), &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
@@ -208,6 +222,8 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
 
   // Setup baseline text store
   std::u16string text_store = context;
+  // used to stop comparing text_store to context if this flag is set
+  bool context_invalidated = false;
 
   // Run through key events, applying output for each event
   for (auto p = test_source.next_key(keys); p.vk != 0; p = test_source.next_key(keys)) {
@@ -223,31 +239,31 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
       try_status(km_core_process_event(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down, KM_CORE_EVENT_FLAG_DEFAULT));
 
       for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
-        apply_action(test_state, *act, text_store, test_context, options, test_source);
+        apply_action(test_state, *act, text_store, test_context, options, test_source, context_invalidated);
       }
     }
 
-    // Compare context and text store at each step - should be identical
+    // Compare context and text store at each step
+    // should be identical unless an action has caused the context to be invalidated
     size_t n = 0;
     try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-    try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
-    km_core_cp *buf = new km_core_cp[n];
-    try_status(km_core_context_items_to_utf16(citems, buf, &n));
+    try_status(context_items_to_utf16(citems, nullptr, &n));
+    km_core_cu *core_context_str = new km_core_cu[n];
+    try_status(context_items_to_utf16(citems, core_context_str, &n));
 
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
     auto ci = citems;
     for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+      test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+      test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
-
     km_core_context_items_dispose(citems);
-    if (text_store != buf) {
-      std::cerr << "text store has diverged from buf" << std::endl;
-      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-      std::cerr << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-      assert(false);
+    if ((!context_invalidated) && (text_store != core_context_str)) {
+      std::cerr << "text store has unexpectedly diverged from core_context" << std::endl;
+      std::cerr << "text store  : " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+      std::cerr << "core context: " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
+     test_assert(false);
     }
   }
 
@@ -258,26 +274,27 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   // Compare final output - retrieve internal context
   size_t n = 0;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-  try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
-  km_core_cp *buf = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(citems, buf, &n));
+  try_status(context_items_to_utf16(citems, nullptr, &n));
+  km_core_cu *core_context_str = new km_core_cu[n];
+  try_status(context_items_to_utf16(citems, core_context_str, &n));
 
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
   auto ci = citems;
   for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+    test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
   km_core_context_items_dispose(citems);
 
-  std::cout << "expected  : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
-  std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+  std::cout << "expected        : " << string_to_hex(expected) << " [" << expected << "]" << std::endl;
+  std::cout << "text store      : " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+  std::cout << "expected context: " << string_to_hex(expected_context) << " [" << expected_context << "]" << std::endl;
+  std::cout << "context         : " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
 
-  // Compare internal context with expected result
-  if (buf != expected) return __LINE__;
+  // Compare internal context with expected context result
+  if (core_context_str != expected_context) return __LINE__;
 
   // Compare text store with expected result
   if (text_store != expected) return __LINE__;
@@ -286,7 +303,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
-      km_core_cp const *value;
+      km_core_cu const *value;
       try_status(km_core_state_option_lookup(test_state, KM_CORE_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;

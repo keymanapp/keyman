@@ -8,9 +8,7 @@ function do_build() {
   cp -Rf "$KEYMAN_ENGINE_FRAMEWORK_SRC" "$KEYMAN_ENGINE_FRAMEWORK_DST"
 
   CODE_SIGN=
-  # `builder_is_debug_build` appears to fail here, while referring to the option does not?
-  # Perhaps it's due to the main build definition being within a function?
-  if builder_has_option --debug; then
+  if builder_is_debug_build; then
     CODE_SIGN=CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS=""
   fi
 
@@ -30,7 +28,6 @@ function execute_sample_build() {
     "clean" \
     "configure" \
     "build" \
-    "--debug          Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
     "--sim-artifact+  Unused by this build at present"
 
   builder_parse "$@"

@@ -18,6 +18,9 @@
 
 #include "kmx_test_source.hpp"
 
+#include <test_assert.h>
+#include <test_color.h>
+
 namespace km {
 namespace tests {
 
@@ -51,7 +54,7 @@ KmxTestSource::parse_source_string(std::string const &s) {
     if (*p == '\\') {
       p++;
       km_core_usv v;
-      assert(p != s.end());
+      test_assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
         p++;
@@ -59,18 +62,18 @@ KmxTestSource::parse_source_string(std::string const &s) {
         std::string s1 = s.substr(p - s.begin(), 8);
         v              = std::stoul(s1, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
-        assert(v >= 0x0001 && v <= 0x10FFFF);
+        test_assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
       } else if (*p == 'd') {
         // Deadkey
         // TODO, not yet supported
-        assert(false);
+        test_assert(false);
       }
     } else {
       t += *p;
@@ -110,11 +113,13 @@ KmxTestSource::load_source(
     const km::core::path &path,
     std::string &keys,
     std::u16string &expected,
+    std::u16string &expected_context,
     std::u16string &context,
     kmx_options &options,
     bool &expected_beep) {
   const std::string s_keys = "c keys: ";
   const std::string s_expected = "c expected: ";
+  const std::string s_expected_context = "c expected context: ";
   const std::string s_context = "c context: ";
   const std::string s_option = "c option: ";
   const std::string s_option_expected = "c expected option: ";
@@ -143,6 +148,8 @@ KmxTestSource::load_source(
       } else {
         expected = parse_source_string(line);
       }
+    } else if (is_token(s_expected_context, line)) {
+      expected_context = parse_source_string(line);
     } else if (is_token(s_context, line)) {
       context = parse_source_string(line);
     } else if (is_token(s_option, line)) {
@@ -187,13 +194,13 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
       keyboard_opts[i].scope = KM_CORE_OPT_KEYBOARD;
     }
 
-    km_core_cp *cp = new km_core_cp[key.length() + 1];
+    km_core_cu *cp = new km_core_cu[key.length() + 1];
     key.copy(cp, key.length());
     cp[key.length()] = 0;
 
     keyboard_opts[i].key = cp;
 
-    cp = new km_core_cp[it->value.length() + 1];
+    cp = new km_core_cu[it->value.length() + 1];
     it->value.copy(cp, it->value.length());
     cp[it->value.length()] = 0;
 
@@ -208,7 +215,7 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
 
 key_event
 KmxTestSource::char_to_event(char ch) {
-  assert(ch >= 32);
+  test_assert(ch >= 32);
   return {
       km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
       (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
@@ -254,8 +261,8 @@ KmxTestSource::vkey_to_event(std::string const &vk_event) {
   }
 
   // The string should be empty at this point
-  assert(!std::getline(f, s, ' '));
-  assert(vk != 0);
+  test_assert(!std::getline(f, s, ' '));
+  test_assert(vk != 0);
 
   return {vk, modifier_state};
 }
@@ -272,7 +279,7 @@ KmxTestSource::next_key(std::string &keys) {
       return char_to_event(ch);
     }
     auto n = keys.find(']');
-    assert(n != std::string::npos);
+    test_assert(n != std::string::npos);
     auto vkey = keys.substr(1, n - 1);
     keys.erase(0, n + 1);
     return vkey_to_event(vkey);

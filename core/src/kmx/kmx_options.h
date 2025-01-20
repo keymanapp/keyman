@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "option.hpp"
 
 #include "kmx_base.h"

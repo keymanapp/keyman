@@ -1,11 +1,12 @@
-import { DefaultRules, DeviceSpec } from '@keymanapp/keyboard-processor'
+import { DeviceSpec, DefaultRules } from 'keyman/engine/keyboard';
+import { RuleBehavior } from 'keyman/engine/js-processor';
 import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
-import { type KeyboardStub, toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
-import ContextManager from './contextManager.js';
+import ContextManager, { ContextHost } from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 
@@ -15,6 +16,11 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
   // be compiled down to an IIFE.
   constructor(worker: Worker, sourceUri: string) {
     const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
+
+    config.onRuleFinalization = (ruleBehavior: RuleBehavior) => {
+      (this.context as ContextHost).updateHost(ruleBehavior.transcription);
+    }
+
     config.stubNamespacer = (stub) => {
       // If the package has not yet been applied as namespacing...
       if(stub.KP && stub.KI.indexOf(`${stub.KP}::`) == -1) {
@@ -60,6 +66,10 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     if(this.beepKeyboard) {
       this.core.keyboardProcessor.beepHandler = this.beepKeyboard;
     }
+
+    this.contextManager.on('keyboardchange', (kbd) => {
+      this.hardKeyboard.activeKeyboard = kbd?.keyboard;
+    });
 
     this.contextManager.initialize();
 

@@ -9,6 +9,7 @@
 import Foundation
 import DeviceKit
 import UIKit
+import os.log
 
 /**
  * Documents the basic size properties of the default system keyboard, _as seen from within a `UIInputView` or its `UIInputViewController`_.
@@ -168,13 +169,12 @@ class KeyboardScaleMap {
    * the largest device smaller than or equal to the detected dimensions.
    */
   private static func getUnknownDeviceMapping(screenSize _screenSize: CGSize = UIScreen.main.bounds.size, asPhone: Bool? = nil) -> Device {
-    // Shouldn't happen, but just in case.
-    if _screenSize == CGSize.zero {
-//      // This would notify us whenever new devices are out that we haven't build a mapping for.
-//      SentryManager.captureAndLog("Cannot detect device dimensions; defaulting to smallest device for form factor.", sentryLevel: .info)
-
-      // We haven't actually updated things here in a while, so we'll just breadcrumb for now.
-      SentryManager.breadcrumbAndLog("Cannot detect device dimensions; defaulting to smallest device for form factor.", sentryLevel: .error)
+      // Shouldn't happen, but just in case.
+      if _screenSize == CGSize.zero {
+      // This would notify us whenever new devices are out that we haven't build a mapping for.
+      let message = "Cannot detect device dimensions; defaulting to smallest device for form factor."
+      os_log("%{public}s", log: KeymanEngineLogger.ui, type: .error, message)
+      SentryManager.capture(message, sentryLevel: .error)
     }
 
     // Convert to CGSize in portrait orientation.
@@ -217,6 +217,8 @@ class KeyboardScaleMap {
                                             screenSize: CGSize = UIScreen.main.bounds.size,
                                             asPhone: Bool? = nil) -> KeyboardSize? {
     if let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: device)] {
+      let kbHeight = (forPortrait ? scaling.portrait : scaling.landscape).keyboardHeight
+      os_log("KeyboardScaleMap getDeviceDefaultKeyboardScale keyboard height: %f", log:KeymanEngineLogger.ui, type: .debug, kbHeight)
       return forPortrait ? scaling.portrait : scaling.landscape
     }
 
@@ -228,7 +230,7 @@ class KeyboardScaleMap {
       default:
         if !isUnknown {
           // We can still perform a mapping, but it's not ideal.
-          log.warning("Keyboard scaling definition missing for device \(device.description)")
+          os_log("Keyboard scaling definition missing for device %{public}s", log: KeymanEngineLogger.ui, type: .default, device.description)
         }
 
         // The expected case:  isUnknown = true.
@@ -239,6 +241,9 @@ class KeyboardScaleMap {
         // As noted in the scalings data-map, devices of the same dimensions tend to have the same
         // keyboard dimensions.  It's not a perfect rule, but should suffice for a stop-gap solution.
         let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: mappedDevice)]!
+
+        let kbHeight = (forPortrait ? scaling.portrait : scaling.landscape).keyboardHeight
+        os_log("KeyboardScaleMap getDeviceDefaultKeyboardScale keyboard height for missing device: %f", log:KeymanEngineLogger.ui, type: .debug, kbHeight)
 
         return forPortrait ? scaling.portrait : scaling.landscape
     }

@@ -30,41 +30,56 @@ cp -a debian ../
 cd ..
 echo "3.0 (native)" > debian/source/format
 dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
-dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
-    --tar-ignore=.gitignore --tar-ignore=experiments --tar-ignore=debian \
-    --tar-ignore=.github --tar-ignore=.vscode --tar-ignore=android \
-    --tar-ignore=.devcontainer \
-    --tar-ignore=artifacts \
+dpkg-source --tar-ignore=*~ \
+    --tar-ignore=./.git \
+    --tar-ignore=./.gitattributes \
+    --tar-ignore=./.gitignore \
+    --tar-ignore=experiments \
+    --tar-ignore=debian \
+    --tar-ignore=./.github \
+    --tar-ignore=./.vscode \
+    --tar-ignore=./android \
+    --tar-ignore=./.devcontainer \
+    --tar-ignore=./artifacts \
     \
-    --tar-ignore=common/models \
-    --tar-ignore=common/predictive-text \
-    --tar-ignore=common/resources \
-    --tar-ignore=common/schemas \
-    --tar-ignore=common/test/keyboards/build.* \
-    --tar-ignore=common/test/predictive-text \
-    --tar-ignore=common/test/resources \
-    --tar-ignore=common/web \
-    --tar-ignore=common/windows \
+    --tar-ignore=./common/models \
+    --tar-ignore=./common/resources \
+    --tar-ignore=./common/schemas \
+    --tar-ignore=./common/test/keyboards/build.* \
+    --tar-ignore=./common/test/resources \
+    --tar-ignore=./common/web \
+    --tar-ignore=./common/windows \
     \
-    --tar-ignore=core/build \
-    --tar-ignore=developer --tar-ignore=docs --tar-ignore=ios \
-    --tar-ignore=linux/keyman-config/keyman_config/version.py \
-    --tar-ignore=linux/keyman-config/buildtools/build-langtags.py --tar-ignore=__pycache__ \
-    --tar-ignore=linux/help \
-    --tar-ignore=mac --tar-ignore=node_modules --tar-ignore=oem \
-    --tar-ignore=linux/build \
-    --tar-ignore=linux/builddebs \
-    --tar-ignore=linux/ibus-keyman/build \
-    --tar-ignore=linux/keyman-system-service/build \
-    --tar-ignore=resources/devbox \
-    --tar-ignore=resources/environment.sh \
-    --tar-ignore=resources/git-hooks \
-    --tar-ignore=resources/scopes \
-    --tar-ignore=resources/build/*.lua --tar-ignore=resources/build/jq* \
-    --tar-ignore=results \
-    --tar-ignore=tmp \
-    --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
-    --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION -Zgzip -b .
+    --tar-ignore=./core/build \
+    --tar-ignore=./developer \
+    --tar-ignore=./docs \
+    --tar-ignore=./ios \
+    --tar-ignore=./linux/keyman-config/keyman_config/version.py \
+    --tar-ignore=./linux/keyman-config/buildtools/build-langtags.py \
+    --tar-ignore=__pycache__ \
+    --tar-ignore=./linux/docs/help \
+    --tar-ignore=./mac \
+    --tar-ignore=node_modules \
+    --tar-ignore=./oem \
+    --tar-ignore=./linux/build \
+    --tar-ignore=./linux/builddebs \
+    --tar-ignore=./linux/ibus-keyman/build \
+    --tar-ignore=./linux/keyman-system-service/build \
+    --tar-ignore=./resources/devbox \
+    --tar-ignore=./resources/environment.sh \
+    --tar-ignore=./resources/git-hooks \
+    --tar-ignore=./resources/scopes \
+    --tar-ignore=./resources/build/*.lua \
+    --tar-ignore=./resources/build/jq* \
+    --tar-ignore=./results \
+    --tar-ignore=./tmp \
+    --tar-ignore=./web \
+    --tar-ignore=./windows \
+    --tar-ignore=keyman_1* \
+    --tar-ignore=dist \
+    --tar-ignore=VERSION \
+    \
+    -Zgzip -b .
 mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
 echo "3.0 (quilt)" > debian/source/format
 cd "$BASEDIR"

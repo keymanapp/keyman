@@ -25,7 +25,8 @@ uses
   utilexecute in '..\..\..\common\windows\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   SFX in '..\..\..\common\windows\delphi\setup\SFX.pas',
-  Keyman.System.UpdateCheckResponse in '..\..\..\common\windows\delphi\general\Keyman.System.UpdateCheckResponse.pas';
+  Keyman.System.UpdateCheckResponse in '..\..\..\common\windows\delphi\general\Keyman.System.UpdateCheckResponse.pas',
+  utilhttp in '..\..\..\common\windows\delphi\general\utilhttp.pas';
 
 {$R icons.res}
 {$R version.res}

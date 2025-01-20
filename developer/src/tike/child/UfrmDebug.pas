@@ -34,6 +34,7 @@ uses
   Keyman.System.Debug.DebugCore,
   Keyman.System.Debug.DebugEvent,
   Keyman.System.Debug.DebugUIStatus,
+  Keyman.System.Debug.DebugUtils,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
   UframeTextEditor,
@@ -189,8 +190,6 @@ type
     property DebugVisible: Boolean read FDebugVisible;
 
     procedure ListBreakpoints;
-
-    function ShortcutDisabled(Key: Word): Boolean;
 
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
 
@@ -373,12 +372,7 @@ function TfrmDebug.SetKeyEventContext: Boolean;
 var
   context: pkm_core_context;
   context_items: TArray<km_core_context_item>;
-  n, i: Integer;
-  ch: Char;
-  dk: TDeadKeyInfo;
 begin
-  context := km_core_state_context(FDebugCore.State);
-
   if memo.SelLength > 0 then
   begin
     // When there is a selection, we'll treat it as
@@ -392,41 +386,22 @@ begin
     // backspace in the case of backspace key, rather
     // than deleting the last character of the selection
     // (Keyman Core is not aware of selection).
-    km_core_context_clear(context);
+    km_core_state_context_clear(FDebugCore.State);
     Exit(True);
   end;
 
-  n := 0;
-  SetLength(context_items, Length(memo.Text)+1);
-  i := 1;
-  while i <= memo.SelStart + memo.SelLength do
-  begin
-    ch := memo.Text[i];
-    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
-      Uni_IsSurrogate2(memo.Text[i+1]) then
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
-      Inc(i);
-    end
-    else if Ord(ch) = $FFFC then
-    begin
-      context_items[n]._type := KM_CORE_CT_MARKER;
-      dk := FDeadkeys.GetFromPosition(i-1);
-      Assert(Assigned(dk));
-      context_items[n].marker := dk.Deadkey.Value;
-    end
-    else
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Ord(ch);
-    end;
-    Inc(i);
-    Inc(n);
-  end;
-
-  context_items[n]._type := KM_CORE_CT_END;
+  // Set the cached context
+  context_items := GetContextFromMemo(memo, FDeadkeys, True);
+  context := km_core_state_context(FDebugCore.State);
   Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+
+  if Result then
+  begin
+    // Set the app context
+    context_items := GetContextFromMemo(memo, FDeadkeys, False);
+    context := km_core_state_app_context(FDebugCore.State);
+    Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+  end;
 end;
 
 function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
@@ -449,14 +424,28 @@ function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
     end;
   end;
 var
-  vkey, modifier: uint16_t;
+  scan, vkey, modifier: uint16_t;
 begin
   Assert(Assigned(FDebugCore));
 
   // We always use the US virtual key code as a basis for our keystroke
   // mapping; the best way to do this is to extract the scan code from
   // the message data and work from that
-  vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
+
+  // Note: if a key event has a zero scan code, it has probably been
+  // injected, so we will do our best with it, using the VK as provided.
+  // See also #11978
+  scan := (Message.LParam and $FF0000) shr 16;
+  if scan = 0
+    then vkey := Message.WParam
+    else vkey := MapScanCodeToUSVK(scan);
+
+  // We don't support the Right Shift modifier in Keyman;
+  // we treat it as Left Shift, even though MapScanCodeToUSVK
+  // recognizes it
+  if vkey = VK_RSHIFT then
+    vkey := VK_SHIFT;
+
   modifier := 0;
 
   if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_CORE_MODIFIER_LCTRL;
@@ -594,10 +583,6 @@ begin
   finally
     FRunning := False;
     EnableUI;
-    UpdateCharacterGrid;
-    // We want to refresh the memo and character grid for rapid typing
-    memo.Update;
-    sgChars.Update;
   end;
 
   if UIStatus <> duiTest then
@@ -723,11 +708,21 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     UpdateDeadkeys;
   end;
 
-  procedure DoBackspace(BackspaceType: km_core_backspace_type);
+  procedure DoBackspace(BackspaceType: km_core_backspace_type; ExpectedValue: NativeUInt);
   var
     m, n: Integer;
     dk: TDeadKeyInfo;
     state: TMemoSelectionState;
+
+    function AssertionMessage: string;
+    begin
+      Result := 'Assertion failed. Extra data: '+
+      'BackspaceType='+IntToStr(Ord(BackspaceType))+'; '+
+      'ExpectedValue=U+'+IntToHex(ExpectedValue, 4)+'; '+
+      'memo.SelStart='+IntToStr(memo.SelStart)+'; '+
+      'memo.SelLength='+IntToStr(memo.SelLength)+'; '+
+      'memo.Text='+Copy(memo.Text, 1, 256);
+    end;
   begin
     // Offset is zero-based, but string is 1-based. Beware!
     state := SaveMemoSelectionState;
@@ -739,7 +734,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       // If the memo has a selection, we have given Core an empty context,
       // which forces it to emit a KM_CORE_BT_UNKNOWN backspace, which is
       // exactly what we want here. We just delete the selection
-      Assert(BackspaceType = KM_CORE_BT_UNKNOWN);
+      Assert(BackspaceType = KM_CORE_BT_UNKNOWN, AssertionMessage);
       memo.SelText := '';
       RealignMemoSelectionState(state);
       Exit;
@@ -748,8 +743,8 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     case BackspaceType of
       KM_CORE_BT_MARKER:
         begin
-          Assert(m >= 1);
-          Assert(memo.Text[m] = #$FFFC);
+          Assert(m >= 1, AssertionMessage);
+          Assert(memo.Text[m] = #$FFFC, AssertionMessage);
           dk := FDeadkeys.GetFromPosition(m-1);
           Assert(Assigned(dk));
           dk.Delete;
@@ -757,8 +752,8 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         end;
       KM_CORE_BT_CHAR:
         begin
-          Assert(m >= 1);
-          Assert(memo.Text[m] <> #$FFFC);
+          Assert(m >= 1, AssertionMessage);
+          Assert(memo.Text[m] <> #$FFFC, AssertionMessage);
           // Delete surrogate pairs
           if (m > 1) and
               Uni_IsSurrogate2(memo.Text[m]) and
@@ -777,7 +772,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
           while (m >= 1) and (memo.Text[m] = #$FFFC) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
-            Assert(Assigned(dk));
+            Assert(Assigned(dk), AssertionMessage);
             dk.Delete;
             Dec(m);
           end;
@@ -794,17 +789,22 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
           while (m >= 1) and (memo.Text[m] = #$FFFC) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
-            Assert(Assigned(dk));
+            Assert(Assigned(dk), AssertionMessage);
             dk.Delete;
             Dec(m);
           end;
         end;
     else
-      Assert(False, 'Unrecognised backspace type');
+      Assert(False, AssertionMessage); // Unrecognised backspace type
     end;
 
-    memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
-    memo.SelStart := m;
+    memo.Lines.BeginUpdate;
+    try
+      memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
+      memo.SelStart := m;
+    finally
+      memo.Lines.EndUpdate;
+    end;
 
     RealignMemoSelectionState(state);
   end;
@@ -922,7 +922,7 @@ begin
       KM_CORE_IT_CHAR:           DoChar(Text);
       KM_CORE_IT_MARKER:         DoDeadkey(dwData);
       KM_CORE_IT_ALERT:          DoBell;
-      KM_CORE_IT_BACK:           DoBackspace(km_core_backspace_type(dwData));
+      KM_CORE_IT_BACK:           DoBackspace(km_core_backspace_type(dwData), nExpectedValue);
       KM_CORE_IT_PERSIST_OPT: ; //TODO
       KM_CORE_IT_CAPSLOCK:    ; //TODO
       KM_CORE_IT_INVALIDATE_CONTEXT: ; // no-op
@@ -1340,23 +1340,6 @@ begin
   memoSelMove(memo);
 end;
 
-{-------------------------------------------------------------------------------
- - Control captions                                                            -
- ------------------------------------------------------------------------------}
-
-function TfrmDebug.ShortcutDisabled(Key: Word): Boolean;
-begin
-  Result := False;
-  if not FUIDisabled then Exit;
-  if Key in [VK_F1..VK_F12] then
-    Result := True
-  else if GetKeyState(VK_CONTROL) < 0 then
-  begin
-    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
-      Result := True;
-  end;
-end;
-
 procedure TfrmDebug.memoSelMove(Sender: TObject);
 begin
   if memo.Focused then
@@ -1364,7 +1347,7 @@ begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly then
+  if not memo.ReadOnly and not memo.SelectionChanging then
   begin
     FSavedSelection := memo.Selection;
     UpdateCharacterGrid;   // I4808
@@ -1372,11 +1355,22 @@ begin
 end;
 
 procedure TfrmDebug.UpdateCharacterGrid;   // I4808
+var
+  start, len: Integer;
 begin
   if csDestroying in ComponentState then
     Exit;
 
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart, memo.SelLength, memo.Selection.Anchor);
+  start := memo.SelStart;
+  len := memo.SelLength;
+  if start + len > Length(memo.Text) then
+  begin
+    // RichEdit has a virtual final character, which is selected when
+    // pressing Ctrl+A, etc.
+    len := Length(memo.Text) - start;
+  end;
+
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len, memo.Selection.Anchor);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 

@@ -11,23 +11,21 @@
 #include <sstream>
 #include <memory>
 
-#include <keyman/keyman_core_api.h>
 
 #include "action.hpp"
 #include "state.hpp"
 #include "option.hpp"
 
-km_core_actions const * km::core::action_item_list_to_actions_object(
-  km_core_action_item const *action_items
+bool km::core::action_item_list_to_actions_object(
+  km_core_action_item const *action_items,
+  km_core_actions *actions
 ) {
   assert(action_items != nullptr);
-  if(action_items == nullptr) {
-    return nullptr;
+  assert(actions != nullptr);
+  if(action_items == nullptr || actions == nullptr) {
+    return false;
   }
 
-  km_core_status status = KM_CORE_STATUS_OK;
-
-  std::unique_ptr<km_core_actions> actions(new km_core_actions);
 
   // Set actions default values
   std::vector<km_core_context_item> output;
@@ -36,6 +34,10 @@ km_core_actions const * km::core::action_item_list_to_actions_object(
   actions->do_alert = KM_CORE_FALSE;
   actions->emit_keystroke = KM_CORE_FALSE;
   actions->new_caps_lock_state = KM_CORE_CAPS_UNCHANGED;
+
+  // deleted_context data will be set in state::apply_actions_and_merge_app_context
+  // because it needs access to the state's app context
+  actions->deleted_context = nullptr;
 
   // Clear output pointers, will be set later once we have sizes
   actions->output = nullptr;
@@ -59,7 +61,9 @@ km_core_actions const * km::core::action_item_list_to_actions_object(
             if(output.empty()) {
               actions->code_points_to_delete++;
             } else {
+#ifndef NDEBUG
               auto last_context_item = output.back();
+#endif
               output.pop_back();
               assert(last_context_item.type == KM_CORE_CT_CHAR);
               assert(last_context_item.character == action_items->backspace.expected_value);
@@ -69,7 +73,9 @@ km_core_actions const * km::core::action_item_list_to_actions_object(
             if(output.empty()) {
               // deleting a marker has no effect on the application
             } else {
+#ifndef NDEBUG
               auto last_context_item = output.back();
+#endif
               output.pop_back();
               assert(last_context_item.type == KM_CORE_CT_MARKER);
               assert(last_context_item.marker == action_items->backspace.expected_value);
@@ -116,14 +122,14 @@ km_core_actions const * km::core::action_item_list_to_actions_object(
 
   size_t buf_size;
 
-  if((status = km_core_context_items_to_utf32(output.data(), nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
-    return nullptr;
+  if(context_items_to_utf32(output.data(), nullptr, &buf_size) != KM_CORE_STATUS_OK) {
+    return false;
   }
 
   std::unique_ptr<km_core_usv[]> output_usv(new km_core_usv[buf_size]);
 
-  if((status = km_core_context_items_to_utf32(output.data(), output_usv.get(), &buf_size)) != KM_CORE_STATUS_OK) {
-    return nullptr;
+  if(context_items_to_utf32(output.data(), output_usv.get(), &buf_size) != KM_CORE_STATUS_OK) {
+    return false;
   }
 
   actions->output = output_usv.release();
@@ -136,7 +142,7 @@ km_core_actions const * km::core::action_item_list_to_actions_object(
 
   // We now have a complete set of actions
 
-  return actions.release();
+  return true;
 }
 
 

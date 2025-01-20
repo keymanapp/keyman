@@ -6,6 +6,8 @@
 
 fs = import('fs')
 
+common_test_files = [ meson.global_source_root() / '../../../common/include/test_color.cpp' ]
+
 tests_links = []
 
 if cpp_compiler.get_id() == 'emscripten'
@@ -15,12 +17,12 @@ endif
 input_path = meson.current_source_dir() / '../../../../common/test/keyboards/baseline'
 output_path = meson.current_build_dir()
 
-kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+kmcompxtest = executable('kmcompxtests', ['kmcompx.tests.cpp','util_filesystem.cpp','util_callbacks.cpp',common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep,
   )
 
@@ -131,24 +133,48 @@ endif
 
 # Test the API endpoints
 
-apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+apitest = executable('api-tests', ['api.tests.cpp','util_filesystem.cpp','util_callbacks.cpp', common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep
   )
 
-test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
+test('api-tests', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
-usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
+usetapitest = executable('uset-api-tests', 'uset-api.tests.cpp', common_test_files,
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep,
   )
 
-test('uset-api-test', usetapitest)
+test('uset-api-tests', usetapitest)
+
+# Google Test
+
+gtestcompilertest = executable('gtest-compiler-tests', 'gtest-compiler.tests.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(recursive: false),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-compiler-tests', gtestcompilertest)
+
+gtest_km_u16_test = executable('gtest-km_u16-tests', 'gtest-km_u16.tests.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(recursive: false),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-km_u16-tests', gtest_km_u16_test)

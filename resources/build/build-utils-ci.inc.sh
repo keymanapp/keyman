@@ -8,6 +8,38 @@
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 #
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test, or as a release build
+#
+builder_is_ci_build() {
+  if builder_is_ci_release_build || builder_is_ci_test_build; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running as a release build in CI
+#
+builder_is_ci_release_build() {
+  if [[ "$VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test
+#
+builder_is_ci_test_build() {
+  if [[ "$VERSION_ENVIRONMENT" == test ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
 # Returns 0 if current build is in CI and triggered from a pull request. If it
 # returns 0, then a call is made to GitHub to get pull request details, and the
 # PR details are added to $builder_pull_title, $builder_pull_number, and
@@ -71,21 +103,25 @@ function builder_pull_has_label() {
 # field will be added to it, and @keymanapp dependency versions will also be
 # modified. This change should not be committed to the repository.
 #
-# builder_publish_to_pack and builder_publish_to_npm are similar:
-#  * builder_publish_to_npm publishes to the public registry
-#  * builder_publish_to_pack creates a local tarball which can be used to test
+# If --npm-publish is set:
+#  * then builder_publish_npm publishes to the public registry
+#  * else builder_publish_npm creates a local tarball which can be used to test
 #
 # Usage:
 # ```bash
-#   builder_publish_to_npm
+#   builder_publish_npm
 # ```
 #
-function builder_publish_to_npm() {
-  _builder_publish_npm_package publish
-}
-
-function builder_publish_to_pack() {
-  _builder_publish_npm_package pack
+function builder_publish_npm() {
+  if builder_has_option --npm-publish; then
+    # Require --dry-run if local or test to avoid accidentally clobbering npm packages
+    if [[ $VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
+      builder_die "publish --npm-publish must use --dry-run flag for local or test builds"
+    fi
+    _builder_publish_npm_package publish
+  else
+    _builder_publish_npm_package pack
+  fi
 }
 
 function _builder_publish_npm_package() {

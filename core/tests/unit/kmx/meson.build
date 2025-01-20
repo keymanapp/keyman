@@ -23,11 +23,11 @@ common_test_keyboards_baseline = source_path / '../../../../common/test/keyboard
 if cpp_compiler.get_id() == 'emscripten'
   # TODO: we will move the tests to ES6 in the future
   # '-sMODULARIZE', '-sEXPORT_ES6',
-  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 kmx = executable('kmx',
-    ['kmx.cpp', '../emscripten_filesystem.cpp'],
+    ['kmx.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
@@ -79,7 +79,8 @@ tests = [
   'k_045___deadkey_and_context',
   'k_046___deadkey_and_contextex',
   'k_047___caps_always_off_initially_on',
-  'k_048___modifier_keys_keep_context'
+  'k_048___modifier_keys_keep_context',
+  'k_049___enter_invalidates_context'
 ]
 
 node = find_program('node', required: true)
@@ -88,10 +89,8 @@ kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src
 kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 if build_machine.system() == 'windows'
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-  cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
+  cat_cmd = [find_program(meson.current_source_dir() / 'cat.bat', required: true)]
 else
-  copy_cmd = [find_program('cp', required: true)]
   cat_cmd = [find_program('cat', required: true)]
 endif
 
@@ -126,7 +125,7 @@ foreach kbd : tests
   kbd_src_path = common_test_keyboards_baseline / kbd + '.kmn'
 
   content = run_command(
-    cat_cmd, files(kbd_src_path),
+    cat_cmd, files(kbd_src_path), check: true,
   ).stdout().strip()
 
   cfg = configuration_data()
@@ -140,7 +139,10 @@ foreach kbd : tests
   cfg.set('CONTENT', content)
 
   kbd_kmn = configure_file(
-    copy: true,
+    # not really a file that needs to be configured, but the `copy` parameter
+    # is deprecated and `fs.copyfile` doesn't work with files that are not in
+    # the source directory
+    configuration: cfg,
     input: kbd_src_path,
     output: kbd + '.kmn'
   )
@@ -175,7 +177,7 @@ subdir('fixtures')
 # should work for Linux, macOS, and WASM.
 test_path = source_path
 
-key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cpp'],
+key_e = executable('key_list_tests', ['kmx_key_list.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -194,7 +196,7 @@ test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 
 # test for imx list
 
-imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
+imx_e = executable('imx_list_tests', ['kmx_imx.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -212,7 +214,7 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
 )
   test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 
-external_e = executable('ext_event', ['kmx_external_event.cpp', '../emscripten_filesystem.cpp'],
+external_e = executable('ext_event_tests', ['kmx_external_event.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,

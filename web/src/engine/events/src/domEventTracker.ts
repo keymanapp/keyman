@@ -1,10 +1,10 @@
 class DomEventTracking {
   Pelem: EventTarget;
   Peventname: string;
-  Phandler: (Object) => boolean;
+  Phandler: (arg0: Object) => boolean;
   PuseCapture?: boolean
 
-  constructor(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean) {
+  constructor(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean) {
     this.Pelem = Pelem;
     this.Peventname = Peventname.toLowerCase();
     this.Phandler = Phandler;
@@ -54,7 +54,7 @@ export class DomEventTracker {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
     // @ts-ignore // Since the trickery unfortunately don't also clear things up for anything we call within.
     // It's possible to fix, but that gets way more complex to spec out completely.
     this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
@@ -92,7 +92,7 @@ export class DomEventTracker {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
     Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
 
     // Since we're detaching, we should drop the tracking data from the old event.

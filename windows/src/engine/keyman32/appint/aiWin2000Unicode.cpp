@@ -74,7 +74,7 @@ BOOL AIWin2000Unicode::IsWindowHandled(HWND ahwnd)
 BOOL AIWin2000Unicode::IsUnicode()
 {
   BOOL Result = IsWindowUnicode(hwnd);
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "IsWindowUnicode=%s", Result ? "Yes" : "No");
+  SendDebugMessageFormat("IsWindowUnicode=%s", Result ? "Yes" : "No");
 	return Result;
 }
 
@@ -82,8 +82,8 @@ BOOL AIWin2000Unicode::IsUnicode()
 
 BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
   UNREFERENCED_PARAMETER(buf);
-  // We cannot read any context from legacy apps, so we return a 
-  // failure here -- telling Core to maintain its own cached 
+  // We cannot read any context from legacy apps, so we return a
+  // failure here -- telling Core to maintain its own cached
   // context.
   return FALSE;
 }
@@ -179,10 +179,6 @@ BOOL AIWin2000Unicode::PostKeys()
       }
 
 		  break;
-	  case QIT_VSHIFTDOWN:
-		  break;
-	  case QIT_VSHIFTUP:
-		  break;
 	  case QIT_CHAR:
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = 0;
@@ -227,9 +223,9 @@ BOOL AIWin2000Unicode::PostKeys()
 
 	QueueSize = 0;
 
-  if(ShouldDebug(sdmAIDefault)) {
+  if(ShouldDebug()) {
     for(int j = 0; j < i; j++ ) {   // I4548
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input [i=%d, input[%d]=vk:%s scan:%x flags:%x", i, j, Debug_VirtualKey(pInputs[j].ki.wVk), pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
+      SendDebugMessageFormat("sending input [i=%d, input[%d]=vk:%s scan:%x flags:%x", i, j, Debug_VirtualKey(pInputs[j].ki.wVk), pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
     }
   }
 
@@ -239,7 +235,7 @@ BOOL AIWin2000Unicode::PostKeys()
     _td->pSerialKeyEventClient->SignalServer(pInputs, i);
   }
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");
+  SendDebugMessageFormat("sending input finished");
 
   delete[] pInputs;
 

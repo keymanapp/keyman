@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman common and resources modules" \
@@ -15,6 +15,11 @@ builder_describe "Keyman common and resources modules" \
   configure \
   build \
   test
+
+builder_describe_platform \
+  :linux    linux \
+  :mac      mac \
+  :windows  win
 
 builder_parse "$@"
 

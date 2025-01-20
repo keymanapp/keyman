@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
 #
+# for github.com/keymanapp repositories only!
+#
+
+GIT_ORIGIN="$(git remote get-url origin)"
+
+if [[ ! "$GIT_ORIGIN" =~ github\.com(/|:)keymanapp ]]; then
+  # Not a Keyman repository. We have no opinion.
+  echo "DEBUG: Not a Keyman repository. We don't care"
+  exit 0
+fi
+
+#
 # We want to make sure that .sh files are executable; however, .inc.sh need not
 # be as they are always source-included in scripts.
 #
@@ -14,6 +26,16 @@ if [ ! -z "$SH_NON_EXECUTABLE" ]; then
   echo "You can mark them as executable with:"
   echo "  git add --chmod=+x"
   exit 1
+fi
+
+#
+# Prevent accidental commits to master, beta, stable-x.y, or staging (for websites)
+#
+branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [[ "$branch" =~ ^(master|beta|stable-\d+\.\d+|staging)$ ]]; then
+  echo "ERROR: You cannot commit to $branch for this repo. Create a branch and open a pull request\n"
+  exit 2
 fi
 
 exit 0

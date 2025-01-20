@@ -1,5 +1,5 @@
-import { OutputTarget as OutputTargetBase } from "@keymanapp/keyboard-processor";
-import EventEmitter from 'eventemitter3';
+import { OutputTarget as OutputTargetBase } from "keyman/engine/js-processor";
+import { EventEmitter } from 'eventemitter3';
 
 export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {
   // JS/TS can't do true multiple inheritance, so we maintain class events on a readonly field.

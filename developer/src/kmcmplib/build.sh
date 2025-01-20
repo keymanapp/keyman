@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$THIS_SCRIPT_PATH/checkout-keyboards.inc.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
-
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -83,7 +79,7 @@ do_action() {
   done
 }
 
-if builder_has_option --full-test; then
+if should_do_full_test; then
   locate_keyboards_repo
 fi
 
@@ -106,7 +102,7 @@ if builder_start_action configure; then
   # We have to checkout the keyboards repo in a 'configure' action because
   # otherwise meson will not get the right list of keyboard source files,
   # even though we only use it in the 'test' action
-  if builder_has_option --full-test; then
+  if should_do_full_test; then
     checkout_keyboards
   fi
 

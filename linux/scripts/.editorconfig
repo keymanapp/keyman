@@ -1,4 +1,4 @@
 # Editor configuration, see https://editorconfig.org
 [*]
 indent_style = space
-indent_size = 4
+indent_size = 2

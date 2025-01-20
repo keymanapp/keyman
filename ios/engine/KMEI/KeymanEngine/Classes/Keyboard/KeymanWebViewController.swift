@@ -10,7 +10,7 @@ import UIKit
 import WebKit
 import AudioToolbox
 import Sentry
-import XCGLogger
+import os.log
 
 private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", bundle: engineBundle, comment: "")
 
@@ -45,8 +45,6 @@ class KeymanWebViewController: UIViewController {
   var webView: KeymanWebView?
   var activeModel: Bool = false
   private var helpBubbleView: PopoverView?
-  private var keyPreviewView: KeyPreviewView?
-  private var subKeysView: SubKeysView?
   private var keyboardMenuView: KeyboardMenuView?
 
   // Arrays
@@ -74,6 +72,14 @@ class KeymanWebViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
 
     _ = view
+
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willEnterForegroundNotification,
+      object: nil,
+      queue: OperationQueue.main
+    ) { _ in
+      self.reloadKeyboard()
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -96,6 +102,7 @@ class KeymanWebViewController: UIViewController {
     // after it has been replaced by KMW's OSK resizing operation.)
 
     keyboardSize = view.bounds.size
+    os_log("KeymanWebViewController viewWillLayoutSubviews to keyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:keyboardSize))
   }
 
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -130,14 +137,22 @@ class KeymanWebViewController: UIViewController {
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
+    
+    if #available(iOSApplicationExtension 16.4, *) {
+      if(Version.current.tier != .stable) {
+        webView!.isInspectable = true
+      }
+    }
+
+    // Disable WKWebView default layout-constraint manipulations. We ensure
+    // safe-area boundaries are respected via InputView / InputViewController
+    // constraints.
+    //
+    // Fixes #10859.
+    // Ref: https://stackoverflow.com/a/63741514
+    webView!.scrollView.contentInsetAdjustmentBehavior = .never
 
     view = webView
-
-    // Set UILongPressGestureRecognizer to show sub keys
-//    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-//    hold.minimumPressDuration = 0.5
-//    hold.delegate = self
-//    view.addGestureRecognizer(hold)
 
     NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
                                            name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -195,7 +210,9 @@ extension KeymanWebViewController {
       let cmd = "executePopupKey(\"\(id)\",\"\(escapedText)\");"
       webView!.evaluateJavaScript(cmd, completionHandler: nil)
     } catch {
-      SentryManager.captureAndLog(error)
+      let message = "\(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .error, message)
+      SentryManager.capture(error, message: message)
       return
     }
   }
@@ -221,32 +238,33 @@ extension KeymanWebViewController {
     setSpacebarText(userData.optSpacebarText)
   }
 
-  func setCursorRange(_ range: NSRange) {
-    if range.location != NSNotFound {
-      webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
-      self.currentCursorRange = range
-    }
-  }
-
-  func setText(_ text: String?) {
-    var text = text ?? ""
-
-    // Remove any system-added LTR/RTL marks.
-    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
-    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
-    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+  func setContext(text: String?, range: NSRange?, doSync: Bool = false) {
+    // Remove any LTR / RTL marks we added within TextView and TextField.
+    let context = trimDirectionalMarkPrefix(text ?? "")
 
     do {
-      let encodingArray = [ text ];
+      let encodingArray = [ context ];
       let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
-      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
-      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
-      let jsonText = jsonString[start..<end]
+      // Must use utf16-mode - default Swift string handling will include a leading U+0300 with the opening double-quote
+      // being removed by the substring op below.
+      let start = jsonString.utf16.index(jsonString.utf16.startIndex, offsetBy: 2)
+      let end = jsonString.utf16.index(jsonString.utf16.endIndex, offsetBy: -2)
+      let jsonText = String(jsonString.utf16[start..<end])!
 
       self.currentText = String(jsonText)
-      webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
+
+      var finalRange = range ?? self.currentCursorRange ?? nil
+      self.currentCursorRange = finalRange
+
+      //
+      if (finalRange?.location ?? NSNotFound) != NSNotFound {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"), \(finalRange!.location), \(finalRange!.length));", completionHandler: nil)
+      } else {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"));", completionHandler: nil)
+      }
     } catch {
-      SentryManager.captureAndLog(error.localizedDescription)
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, error.localizedDescription)
+      SentryManager.capture(error.localizedDescription)
     }
   }
 
@@ -288,12 +306,14 @@ extension KeymanWebViewController {
     // failed to initialize properly.
     guard FileManager.default.fileExists(atPath: fileURL.path) else {
       let event = Sentry.Event(level: .error)
-      event.message = SentryMessage(formatted: "File missing for keyboard")
+      let errorMessage = "File missing for keyboard"
+      event.message = SentryMessage(formatted: errorMessage)
       event.extra = [ "id": keyboard.id, "file": fileURL ]
       if let packageID = keyboard.packageID {
         event.extra?["package"] = packageID
       }
-      SentryManager.captureAndLog(event)
+      SentryManager.capture(event)
+      os_log("%{public}s id: %{public}s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL.absoluteString)
       throw KeyboardError.fileMissing
     }
 
@@ -311,12 +331,14 @@ extension KeymanWebViewController {
       data = try JSONSerialization.data(withJSONObject: stub, options: [])
     } catch {
       let event = Sentry.Event(error: error)
+      let errorMessage = "Failed to serialize keyboard stub:"
       event.message = SentryMessage(formatted: "Failed to serialize keyboard stub: \(error)")
       event.extra = [:]
       event.extra!["id"] = stub["KI"]
       event.extra!["package"] = stub["KP"]
 
-      SentryManager.captureAndLog(event)
+      SentryManager.capture(event)
+      os_log("%{public}s id: %{public}s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL.absoluteString)
       throw KeyboardError.keyboardLoadingError
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
@@ -326,12 +348,13 @@ extension KeymanWebViewController {
       event.extra!["id"] = stub["KI"]
       event.extra!["package"] = stub["KP"]
 
-      SentryManager.captureAndLog(event)
+      os_log("Failed to create keyboard stub string for embedded KMW", log: KeymanEngineLogger.ui, type: .error)
+      SentryManager.capture(event)
       throw KeyboardError.keyboardLoadingError
     }
-
-    SentryManager.breadcrumbAndLog("Keyboard stub built for \(keyboard.id)", logLevel: XCGLogger.Level.none)
-    log.info("Keyboard stub: \(stubString)")
+    let message = "Keyboard stub built for \(keyboard.id)"
+    os_log("%{public}s", log: KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
     webView!.evaluateJavaScript("setKeymanLanguage(\(stubString));", completionHandler: nil)
   }
 
@@ -349,12 +372,15 @@ extension KeymanWebViewController {
 
     guard FileManager.default.fileExists(atPath: fileURL.path) else {
       let event = Sentry.Event(level: .error)
-      event.message = SentryMessage(formatted: "File missing for lexical model")
+      let errorMessage = "File missing for lexical model"
+      event.message = SentryMessage(formatted: errorMessage)
       event.extra = [ "id": lexicalModel.id, "file": fileURL ]
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
       }
-      SentryManager.captureAndLog(event)
+
+      os_log("%{public}s: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, lexicalModel.id)
+      SentryManager.capture(event)
       throw KeyboardError.fileMissing
     }
 
@@ -363,25 +389,30 @@ extension KeymanWebViewController {
       data = try JSONSerialization.data(withJSONObject: stub, options: [])
     } catch {
       let event = Sentry.Event(error: error)
+      let errorMessage = "Failed to serialize lexical model stub:"
       event.message = SentryMessage(formatted: "Failed to serialize lexical model stub: \(error)")
       event.extra = [:]
       event.extra!["id"] = stub["id"]
 
-      SentryManager.captureAndLog(event)
+      os_log("%{public}s: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, error.localizedDescription)
+      SentryManager.capture(event)
       throw KeyboardError.lexicalModelLoadingError
     }
     guard let stubString = String(data: data, encoding: .utf8) else {
       let event = Sentry.Event(level: .error)
-      event.message = SentryMessage(formatted: "Failed to create lexical model stub string for embedded KMW")
+      let errorMessage = "Failed to create lexical model stub string for embedded KMW"
+      event.message = SentryMessage(formatted: errorMessage)
       event.extra = [:]
       event.extra!["id"] = stub["id"]
 
-      SentryManager.captureAndLog(event)
+      os_log("%{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage)
+      SentryManager.capture(event)
       throw KeyboardError.lexicalModelLoadingError
     }
 
-    SentryManager.breadcrumbAndLog("LexicalModel stub built for \(lexicalModel.id)", logLevel: XCGLogger.Level.none)
-    log.info("LexicalModel stub: \(stubString)")
+    let message = "LexicalModel stub built for \(lexicalModel.id)"
+    os_log("%{public}s", log: KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
 
     if lexicalModel.languageID == Manager.shared.currentKeyboardID?.languageID {
       // We're registering a lexical model for the now-current keyboard.
@@ -399,13 +430,6 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
-
-    setBannerHeight(to: Int(InputViewController.topBarHeight))
-  }
-
-  func showBanner(_ display: Bool) {
-    SentryManager.breadcrumbAndLog("Changing banner's alwaysShow property to \(display).", category: "engine", sentryLevel: .debug)
-    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
   }
 
   func setBannerImage(to path: String) {
@@ -416,7 +440,8 @@ extension KeymanWebViewController {
     } else {
       logString = path
     }
-    log.debug("Banner image path: '\(logString).'")
+    let message = "Banner image path: '\(logString).'"
+    os_log("%{public}s", log: KeymanEngineLogger.ui, type: .debug, message)
     webView?.evaluateJavaScript("setBannerImage(\"\(path)\");", completionHandler: nil)
   }
 
@@ -462,79 +487,6 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       let newText = String(s).stringFromUTF16CodeUnits() ?? ""
       insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
       delegate?.insertText(self, numCharsToDelete: numCharsToDelete, newText: newText)
-    } else if fragment.hasPrefix("#showKeyPreview-") {
-      let xKey = fragment.range(of: "+x=")!
-      let yKey = fragment.range(of: "+y=")!
-      let wKey = fragment.range(of: "+w=")!
-      let hKey = fragment.range(of: "+h=")!
-      let tKey = fragment.range(of: "+t=")!
-
-      let x = CGFloat(Float(fragment[xKey.upperBound..<yKey.lowerBound])!)
-      let y = CGFloat(Float(fragment[yKey.upperBound..<wKey.lowerBound])!)
-      let w = CGFloat(Float(fragment[wKey.upperBound..<hKey.lowerBound])!)
-      let h = CGFloat(Float(fragment[hKey.upperBound..<tKey.lowerBound])!)
-      let t = String(fragment[tKey.upperBound...])
-
-      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
-      let preview = t.stringFromUTF16CodeUnits() ?? ""
-      showKeyPreview(self, keyFrame: frame, preview: preview)
-      delegate?.showKeyPreview(self, keyFrame: frame, preview: preview)
-    } else if fragment.hasPrefix("#dismissKeyPreview-") {
-      dismissKeyPreview(self)
-      delegate?.dismissKeyPreview(self)
-    } else if fragment.hasPrefix("#showMore-") {
-      let baseFrameKey = fragment.range(of: "+baseFrame=")!
-      let keysKey = fragment.range(of: "+keys=")!
-      let fontKey = fragment.range(of: "+font=")
-      let baseFrame = fragment[baseFrameKey.upperBound..<keysKey.lowerBound]
-      let keys = fragment[keysKey.upperBound..<(fontKey?.lowerBound ?? fragment.endIndex)]
-      let useSpecialFont = fontKey != nil
-
-      let frameComponents = baseFrame.components(separatedBy: ",")
-      let x = CGFloat(Float(frameComponents[0])!)
-      let y = CGFloat(Float(frameComponents[1])!)
-      let w = CGFloat(Float(frameComponents[2])!)
-      let h = CGFloat(Float(frameComponents[3])!)
-      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
-
-      let keyArray = keys.components(separatedBy: ";")
-      var subkeyIDs: [String] = []
-      var subkeyTexts: [String] = []
-
-      for key in keyArray {
-        let values = key.components(separatedBy: ":")
-        switch values.count {
-        case 1:
-          let id = values[0]
-          subkeyIDs.append(id)
-          // id is in the form layer-keyID. We only process keyIDs with prefix U_.
-          if let index = id.range(of: "-U_", options: .backwards)?.upperBound,
-            let codepoint = UInt32(id[index...], radix: 16),
-            let scalar = Unicode.Scalar(codepoint) {
-            subkeyTexts.append(String(Character(scalar)))
-          } else {
-            subkeyTexts.append("")
-          }
-        case 2:
-          subkeyIDs.append(values[0])
-          subkeyTexts.append(values[1].stringFromUTF16CodeUnits() ?? "")
-        default:
-          log.warning("Unexpected subkey key: \(key)")
-        }
-      }
-
-      showSubkeys(self,
-                  keyFrame: frame,
-                  subkeyIDs: subkeyIDs,
-                  subkeyTexts: subkeyTexts,
-                  useSpecialFont: useSpecialFont)
-      delegate?.showSubkeys(self,
-                            keyFrame: frame,
-                            subkeyIDs: subkeyIDs,
-                            subkeyTexts: subkeyTexts,
-                            useSpecialFont: useSpecialFont)
-
-      self.touchHoldBegan()
     } else if fragment.hasPrefix("#menuKeyDown-") {
       perform(#selector(self.menuKeyHeld), with: self, afterDelay: 0.5)
       menuKeyDown(self)
@@ -552,7 +504,10 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // This may need filtering for proper use with Sentry?
       // Then again, if KMW is logging it... we already have to worry
       // about it showing up in Web-oriented Sentry logs.
-      SentryManager.breadcrumbAndLog("KMW Log: \(message)", category: "engine")
+
+      let logMessage = "KMW Log: \(message)"
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, logMessage)
+      SentryManager.breadcrumb(logMessage)
     } else if fragment.hasPrefix("#beep-") {
       beep(self)
       delegate?.beep(self)
@@ -565,9 +520,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 
       do {
         let cmd = try decoder.decode(SuggestionPopup.self, from: cmdData!)
-        log.verbose("Longpress detected on suggestion: \"\(cmd.suggestion.displayAs)\".")
-      } catch {
-        SentryManager.captureAndLog(error, message: "Unexpected JSON parse error: \(error).")
+        let message = "Longpress detected on suggestion: \"\(cmd.suggestion.displayAs)\"."
+        os_log("%{public}s", log: KeymanEngineLogger.ui, type: .debug, message)
+     } catch {
+       let message = "Unexpected JSON parse error: \(error)."
+       os_log("%{public}s", log:KeymanEngineLogger.engine, type: .error, message)
+       SentryManager.capture(error, message: message)
       }
 
       // Will need processing upon extraction from the resulting object.
@@ -579,7 +537,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
 //      let frame = KeymanWebViewController.keyFrame(x: x, y: y, w: w, h: h)
 
     } else {
-      SentryManager.captureAndLog("Unexpected KMW event: \(fragment)")
+      let message = "Unexpected KMW event: \(fragment)"
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+      SentryManager.capture(message)
     }
   }
 
@@ -636,16 +596,15 @@ extension KeymanWebViewController: KeymanWebDelegate {
     delegate?.keyboardLoaded(keymanWeb)
 
     isLoading = false
-    SentryManager.breadcrumbAndLog("Loaded keyboard.", sentryLevel: .debug, logLevel: .info)
+    let message = "Loaded keyboard."
+    os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+    SentryManager.breadcrumb(message, sentryLevel: .debug)
 
     self.setSentryState()
     resizeKeyboard()
 
     // There may have been attempts to set these values before the keyboard loaded!
-    self.setText(self.currentText)
-    if let cursorRange = self.currentCursorRange {
-      self.setCursorRange(cursorRange)
-    }
+    self.setContext(text: self.currentText, range: self.currentCursorRange)
 
     var newKb = Manager.shared.currentKeyboard
 
@@ -663,7 +622,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
           newKb = userKbs[0]
         }
       }
-      SentryManager.breadcrumbAndLog("Setting initial keyboard.", category: "engine")
+      let message = "Setting initial keyboard."
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+      SentryManager.breadcrumb(message)
 
       // Compare against resetKeyboard & Manager.setKeyboard;
       // setting this to `nil` allows us to force keyboard reloads when needed.
@@ -688,7 +649,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
             _ = Manager.shared.setKeyboard(Defaults.keyboard)
           }
         } catch {
-          SentryManager.captureAndLog("Could not load default keyboard as a fallback for keyboard loading failure", sentryLevel: .fatal)
+          let message = "Could not load default keyboard as a fallback for keyboard loading failure"
+          os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, message)
+          SentryManager.capture(message, sentryLevel: .fatal)
         }
         newKb = Defaults.keyboard
       }
@@ -700,10 +663,11 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     updateSpacebarText()
-    updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
+
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
 
     fixLayout()
 
@@ -718,296 +682,114 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
   }
 
-  func updateShowBannerSetting() {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-    if !Manager.shared.isSystemKeyboard {
-      showBanner(false)
-    } else {
-      showBanner(alwaysShow)
-    }
-  }
-
   func insertText(_ view: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     dismissHelpBubble()
     Manager.shared.isKeymanHelpOn = false
   }
 
-  func showKeyPreview(_ view: KeymanWebViewController, keyFrame: CGRect, preview: String) {
-    if UIDevice.current.userInterfaceIdiom == .pad || isSubKeysMenuVisible {
-      return
-    }
-
-    dismissKeyPreview()
-    clearSubKeyArrays()
-
-    keyPreviewView = KeyPreviewView(frame: keyFrame)
-
-    keyPreviewView!.setLabelText(preview)
-
-    let oskFontName = Manager.shared.oskFontNameForKeyboard(withFullID: Manager.shared.currentKeyboardID!)
-      ?? Manager.shared.fontNameForKeyboard(withFullID: Manager.shared.currentKeyboardID!)
-    keyPreviewView!.setLabelFont(oskFontName)
-    self.view.addSubview(keyPreviewView!)
-  }
-
-  func dismissKeyPreview(_ view: KeymanWebViewController) {
-    if UIDevice.current.userInterfaceIdiom == .pad || keyPreviewView == nil {
-      return
-    }
-
-    let dismissKeyPreview = #selector(self.dismissKeyPreview as () -> Void)
-    NSObject.cancelPreviousPerformRequests(withTarget: self, selector: dismissKeyPreview, object: nil)
-    perform(dismissKeyPreview, with: nil, afterDelay: 0.1)
-    clearSubKeyArrays()
-  }
-
-  func showSubkeys(_ view: KeymanWebViewController,
-                   keyFrame: CGRect,
-                   subkeyIDs: [String],
-                   subkeyTexts: [String],
-                   useSpecialFont: Bool) {
-    dismissHelpBubble()
-    Manager.shared.isKeymanHelpOn = false
-    dismissSubKeys()
-    dismissKeyboardMenu()
-
-    subKeyAnchor = keyFrame
-    subKeyIDs = subkeyIDs
-    subKeyTexts = subkeyTexts
-    self.useSpecialFont = useSpecialFont
-  }
-
-  func menuKeyUp(_ view: KeymanWebViewController) {
-    dismissHelpBubble()
-    Manager.shared.isKeymanHelpOn = false
-    if Util.isSystemKeyboard {
-      let userData = UserDefaults.standard
-      userData.set(true, forKey: Key.keyboardPickerDisplayed)
-      userData.synchronize()
-    }
-  }
-
   func hideKeyboard(_ view: KeymanWebViewController) {
     dismissHelpBubble()
-    dismissSubKeys()
     dismissKeyboardMenu()
-  }
-}
-
-// MARK: - UIGestureRecognizerDelegate
-extension KeymanWebViewController: UIGestureRecognizerDelegate {
-  public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
-                                shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-    return true
-  }
-
-  // An adaptation of holdAction, just for direct taps.
-  @objc func tapAction(_ sender: UITapGestureRecognizer) {
-    switch sender.state {
-    case .ended:
-      // Touch Ended
-      guard let subKeysView = subKeysView else {
-        return
-      }
-
-      let touchPoint = sender.location(in: subKeysView.containerView)
-      var buttonClicked = false
-      for button in subKeys {
-        if button.frame.contains(touchPoint) {
-          button.isEnabled = true
-          button.isHighlighted = true
-          button.backgroundColor = subKeyColorHighlighted
-          button.sendActions(for: .touchUpInside)
-
-          buttonClicked = true
-        } else {
-          button.isHighlighted = false
-          button.isEnabled = false
-          button.backgroundColor = subKeyColor
-        }
-      }
-
-      if !buttonClicked {
-        clearSubKeyArrays()
-      }
-    default:
-      return
-    }
-  }
-
-  @objc func holdAction(_ sender: UILongPressGestureRecognizer) {
-    switch sender.state {
-    case .ended:
-      // Touch Ended
-      if let subKeysView = subKeysView {
-        subKeysView.removeFromSuperview()
-        subKeysView.subviews.forEach { $0.removeFromSuperview() }
-        self.subKeysView = nil
-        setPopupVisible(false)
-      }
-      var buttonClicked = false
-      for button in subKeys where button.isHighlighted {
-        button.isHighlighted = false
-        button.backgroundColor = subKeyColor
-        button.isEnabled = false
-        button.sendActions(for: .touchUpInside)
-        buttonClicked = true
-        break
-      }
-      if !buttonClicked {
-        clearSubKeyArrays()
-      }
-    case .began:
-//      // Touch & Hold Began
-//      let touchPoint = sender.location(in: sender.view)
-//      // Check if touch was for language menu button
-//      languageMenuPosition { keyFrame in
-//        if keyFrame.contains(touchPoint) {
-//          self.delegate?.menuKeyHeld(self)
-//          return
-//        }
-//        self.touchHoldBegan()
-//      }
-      return
-    default:
-      // Hold & Move
-      guard let subKeysView = subKeysView else {
-        return
-      }
-      let touchPoint = sender.location(in: subKeysView.containerView)
-      for button in subKeys {
-        if button.frame.contains(touchPoint) {
-          button.isEnabled = true
-          button.isHighlighted = true
-          button.backgroundColor = subKeyColorHighlighted
-        } else {
-          button.isHighlighted = false
-          button.isEnabled = false
-          button.backgroundColor = subKeyColor
-        }
-      }
-    }
-  }
-
-  private func touchHoldBegan() {
-    // Is also called for banner longpresses.  Will need a way to properly differentiate.
-    let isPad = UIDevice.current.userInterfaceIdiom == .pad
-    let fontSize = isPad ? UIFont.buttonFontSize * 2 : UIFont.buttonFontSize
-
-    let oskFontName = Manager.shared.oskFontNameForKeyboard(withFullID: Manager.shared.currentKeyboardID!)
-      ?? Manager.shared.fontNameForKeyboard(withFullID: Manager.shared.currentKeyboardID!)
-
-    if subKeyIDs.isEmpty {
-      subKeys = []
-      return
-    }
-
-    subKeys = subKeyTexts.enumerated().map { i, subKeyText in
-      let button = UIButton(type: .custom)
-      button.tag = i
-      button.backgroundColor = subKeyColor
-      button.setRoundedBorder(withRadius: 4.0, borderWidth: 1.0, color: .gray)
-      button.setTitleColor(Colors.keyText, for: .disabled)
-      button.setTitleColor(Colors.keyText, for: .highlighted)
-      button.setTitleColor(Colors.keyText, for: .normal)
-
-      if let oskFontName = oskFontName {
-        button.titleLabel?.font = UIFont(name: oskFontName, size: fontSize)
-      } else {
-        button.titleLabel?.font = UIFont.systemFont(ofSize: fontSize)
-      }
-
-      if useSpecialFont{
-        if FontManager.shared.registerFont(at: Storage.active.specialOSKFontURL),
-          let fontName = FontManager.shared.fontName(at: Storage.active.specialOSKFontURL) {
-            button.titleLabel?.font = UIFont(name: fontName, size: fontSize)
-        }
-        button.setTitleColor(.gray, for: .disabled)
-      }
-
-      button.addTarget(self, action: #selector(subKeyButtonClick), for: .touchUpInside)
-
-      // Detect the text width for subkeys.  The 'as Any' silences an inappropriate warning from Swift.
-      let textSize = subKeyText.size(withAttributes: [NSAttributedString.Key.font: button.titleLabel?.font! as Any])
-      var displayText = subKeyText
-
-      if textSize.width <= 0 && subKeyText.count > 0 {
-        // It's probably a diacritic in need of a combining character!
-        // Also check if the language is RTL!
-        if Manager.shared.currentKeyboard?.isRTL ?? false {
-          displayText = "\u{200f}\u{25cc}" + subKeyText
-        } else {
-          displayText = "\u{25cc}" + subKeyText
-        }
-      }
-
-      button.setTitle(displayText, for: .normal)
-      button.tintColor = Colors.popupKeyTint
-      button.isEnabled = false
-      return button
-    }
-
-    dismissKeyPreview()
-    subKeysView = SubKeysView(keyFrame: subKeyAnchor, subKeys: subKeys)
-    view.addSubview(subKeysView!)
-
-    let tap = UITapGestureRecognizer(target: self, action: #selector(self.tapAction))
-    subKeysView!.addGestureRecognizer(tap)
-
-    let hold = UILongPressGestureRecognizer(target: self, action: #selector(self.holdAction))
-    hold.minimumPressDuration = 0.01
-    hold.delegate = self
-    subKeysView!.addGestureRecognizer(hold)
-    setPopupVisible(true)
-  }
-
-  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
-    self.delegate?.menuKeyHeld(self)
-  }
-
-  @objc func subKeyButtonClick(_ sender: UIButton) {
-    let keyIndex = sender.tag
-    if keyIndex < subKeyIDs.count && keyIndex < subKeyTexts.count {
-      let subKeyID = subKeyIDs[keyIndex]
-      let subKeyText = subKeyTexts[keyIndex]
-      executePopupKey(id: subKeyID, text: subKeyText)
-    }
-    subKeys.removeAll()
-    subKeyIDs.removeAll()
-    subKeyTexts.removeAll()
   }
 }
 
 // MARK: - Manage views
 extension KeymanWebViewController {
   // MARK: - Sizing
-  public var keyboardHeight: CGFloat {
-    return keyboardSize.height
+  
+  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    self.delegate?.menuKeyHeld(self)
   }
 
-  func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    return KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
-  }
+  func determineDefaultKeyboardHeight(isPortrait: Bool) -> CGFloat {
+    os_log("determineDefaultKeyboardHeight", log:KeymanEngineLogger.ui, type: .info)
 
-  var keyboardWidth: CGFloat {
-    return keyboardSize.width
+    let keyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? Defaults.unknownDeviceKeyboardHeight
+
+    return keyboardHeight;
   }
 
   func initKeyboardSize() {
-    var width: CGFloat
-    var height: CGFloat
+    let width: CGFloat
     width = UIScreen.main.bounds.width
-
-    if Util.isSystemKeyboard {
-      height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
+    var height: CGFloat
+    
+    // get orientation differently if system or in-app keyboard
+    let portrait = Util.isSystemKeyboard ? InputViewController.isPortrait : UIDevice.current.orientation.isPortrait
+    
+    /**
+     * If keyboard height is saved in UserDefaults, then use it
+     */
+    if let savedHeight = self.readKeyboardHeight(isPortrait: portrait) {
+      height = savedHeight
     } else {
-      height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+      /**
+       * Otherwise,  get default keyboard height for this orientation and write to UserDefaults
+       */
+      height = self.determineDefaultKeyboardHeight(isPortrait: portrait)
+      self.writeKeyboardHeightIfDoesNotExist(isPortrait: portrait, height: height)
+      
+      /**
+       * If we need to write out the keyboard height for one orientation, then we
+       * expect that the other must be written also. 
+       * Write it out now, but only if a value for keyboard height does not already exist.
+       */
+      height = self.determineDefaultKeyboardHeight(isPortrait: !portrait)
+      self.writeKeyboardHeightIfDoesNotExist(isPortrait: !portrait, height: height)
     }
+    
+    /** 
+     * no need to check for Util.isSystemKeyboard because this is shared storage
+     * the UserDefaults are readable and writeable by both system and in-app
+     */
 
-    keyboardSize = CGSize(width: width, height: height)
+    self.keyboardSize = CGSize(width: width, height: height)
+    os_log("KeymanWebViewController initKeyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .default, NSCoder.string(for:keyboardSize))
   }
 
+  /**
+   * reads and returns keyboard height if it is found in UserDefaults, otherwise returns nil
+   */
+  func readKeyboardHeight(isPortrait: Bool) -> CGFloat? {
+    var height: CGFloat? = nil
+
+    if (isPortrait) {
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        height = Storage.active.userDefaults.portraitKeyboardHeight
+     }
+    } else { // landscape
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) != nil) {
+        height = Storage.active.userDefaults.landscapeKeyboardHeight
+      }
+    }
+
+    let message = "readKeyboardHeight, for isPortrait \(isPortrait) value \(String(describing: height))"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+
+    return height;
+  }
+  
+  /**
+   * Write out the keyboard height to the UserDefaults but only if it does not exist there yet.
+   * If it exists, then we assume it was configured by the user and do not want to
+   * overwrite that value with a default value derived for this device.
+   */
+  func writeKeyboardHeightIfDoesNotExist(isPortrait: Bool, height: CGFloat) {
+    let writeMessage = "writeKeyboardHeightIfDoesNotExist, isPortrait: \(isPortrait) height: \(height)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+    if (isPortrait) {
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) == nil) {
+        Storage.active.userDefaults.portraitKeyboardHeight = height
+        os_log("portrait keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+      }
+    } else {
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) == nil) {
+        Storage.active.userDefaults.landscapeKeyboardHeight = height
+        os_log("landscape keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
+      }
+    }
+  }
+  
   var keyboardSize: CGSize {
     get {
       if kbSize.equalTo(CGSize.zero) {
@@ -1033,15 +815,6 @@ extension KeymanWebViewController {
     }
   }
 
-  @objc func resizeDelay() {
-    // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
-    // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
-    // should hopefully work on all devices.
-    let kbWidth = keyboardWidth
-    let kbHeight = keyboardHeight
-    view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
-  }
-
   // Keyman interaction
   func resizeKeyboard() {
     fixLayout()
@@ -1051,11 +824,10 @@ extension KeymanWebViewController {
     // the first time.
     setOskWidth(Int(kbSize.width))
     setOskHeight(Int(kbSize.height))
+    os_log("KeymanWebViewController resizeKeyboard to kbSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:kbSize))
   }
 
   func resetKeyboardState() {
-    dismissSubKeys()
-    dismissKeyPreview()
     dismissKeyboardMenu()
     resizeKeyboard()
   }
@@ -1066,13 +838,19 @@ extension KeymanWebViewController {
     Manager.shared.currentKeyboardID = nil
 
     if let keyboard = keyboard {
-      SentryManager.breadcrumbAndLog("Current keyboard is set.", category: "engine")
+      let message = "Current keyboard is set."
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+      SentryManager.breadcrumb(message)
       _ = Manager.shared.setKeyboard(keyboard)
     } else if let keyboard = Storage.active.userDefaults.userKeyboards?[safe: 0] {
-      SentryManager.breadcrumbAndLog("Using user's default keyboard.", category: "engine")
+      let message = "Using user's default keyboard."
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+      SentryManager.breadcrumb(message)
       _ = Manager.shared.setKeyboard(keyboard)
     } else {
-      SentryManager.breadcrumbAndLog("Using app-default keyboard.", category: "engine")
+      let message = "Using app-default keyboard."
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+      SentryManager.breadcrumb(message)
       _ = Manager.shared.setKeyboard(Defaults.keyboard)
     }
   }
@@ -1083,8 +861,6 @@ extension KeymanWebViewController {
     isLoading = true
 
     updateSpacebarText()
-    // Check for a change of "always show banner" state
-    updateShowBannerSetting()
   }
 
   /*
@@ -1178,33 +954,6 @@ extension KeymanWebViewController {
     helpBubbleView = nil
   }
 
-  @objc func dismissKeyPreview() {
-    keyPreviewView?.removeFromSuperview()
-    keyPreviewView = nil
-  }
-
-  var isSubKeysMenuVisible: Bool {
-    return subKeysView != nil
-  }
-
-  func dismissSubKeys() {
-    if let subKeysView = subKeysView {
-      subKeysView.removeFromSuperview()
-      subKeysView.subviews.forEach { $0.removeFromSuperview() }
-      self.subKeysView = nil
-      setPopupVisible(false)
-    }
-    clearSubKeyArrays()
-  }
-
-  func clearSubKeyArrays() {
-    if subKeysView == nil {
-      subKeys.removeAll()
-      subKeyIDs.removeAll()
-      subKeyTexts.removeAll()
-    }
-  }
-
   func showHelpBubble(afterDelay delay: TimeInterval) {
     helpBubbleView?.removeFromSuperview()
     let showHelpBubble = #selector(self.showHelpBubble as () -> Void)
@@ -1238,8 +987,6 @@ extension KeymanWebViewController {
 // MARK: - Keyboard Notifications
 extension KeymanWebViewController {
   @objc func keyboardWillShow(_ notification: Notification) {
-    dismissSubKeys()
-    dismissKeyPreview()
     resizeKeyboard()
 
     if Manager.shared.isKeymanHelpOn {
@@ -1249,7 +996,5 @@ extension KeymanWebViewController {
 
   @objc func keyboardWillHide(_ notification: Notification) {
     dismissHelpBubble()
-    dismissSubKeys()
-    dismissKeyPreview()
   }
 }

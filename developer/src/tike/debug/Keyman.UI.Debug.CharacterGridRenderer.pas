@@ -22,7 +22,8 @@ type
 
     class procedure Fill(grid: TStringGrid; const text: string;
       deadkeys: TDebugDeadkeyInfoList;
-      SelStart, SelLength, SelAnchor: Integer); static;
+      SelStart, SelLength, SelAnchor: Integer;
+      DeadkeysAreCalledMarkers: Boolean = False); static;
     class procedure Render(grid: TStringGrid; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState; CharFont: TFont); static;
     class procedure Size(grid: TStringGrid; CharFont: TFont); static;
@@ -36,7 +37,8 @@ uses
 
 class procedure TCharacterGridRenderer.Fill(grid: TStringGrid;
   const text: string; deadkeys: TDebugDeadkeyInfoList;
-  SelStart, SelLength, SelAnchor: Integer);
+  SelStart, SelLength, SelAnchor: Integer;
+  DeadkeysAreCalledMarkers: Boolean);
 type
   TCellType = (ctChar, ctDeadkey);
   TCell = record
@@ -87,7 +89,9 @@ type
         if not Assigned(cell.dk)
           then grid.Cells[x, 0] := '???'
           else grid.Cells[x, 0] := cell.dk.Deadkey.Name;
-        grid.Cells[x, 1] := 'Deadkey';
+        if DeadkeysAreCalledMarkers
+          then grid.Cells[x, 1] := 'Marker'
+          else grid.Cells[x, 1] := 'Deadkey';
       end
       else
       begin

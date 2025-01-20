@@ -1,0 +1,66 @@
+{
+  "name": "@keymanapp/models-wordbreakers",
+  "description": "Word breakers bundled in the modeling layer",
+  "keywords": [
+    "lexical model",
+    "models",
+    "word",
+    "breaker",
+    "breaking",
+    "lmlayer"
+  ],
+  "contributors": [
+    "Eddie Antonio Santos <easantos@ualberta.ca>"
+  ],
+  "homepage": "https://github.com/keymanapp/keyman",
+  "license": "MIT",
+  "main": "build/main/obj/index.js",
+  "types": "build/main/obj/index.d.ts",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/main/index.ts",
+      "default": "./build/main/obj/index.js"
+    },
+    "./lib": {
+      "types": "./build/main/lib/index.d.ts"
+    },
+    "./obj/*.js": "./build/main/obj/*.js",
+    "./test-index": {
+      "default": "./build/main/obj/test-index.js"
+    },
+    "./README.md": {
+      "default": "./README.md"
+    }
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "scripts": {
+    "build": "gosh ./build.sh",
+    "test": "gosh ./build.sh test"
+  },
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "devDependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/resources-gosh": "*",
+    "@types/mocha": "^7.0.2",
+    "c8": "^7.12.0",
+    "mocha": "^10.0.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "typescript": "^5.4.5"
+  },
+  "type": "module"
+}

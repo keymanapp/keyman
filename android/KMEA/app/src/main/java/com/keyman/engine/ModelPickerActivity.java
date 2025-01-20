@@ -273,6 +273,7 @@ public final class ModelPickerActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 
@@ -320,7 +321,7 @@ public final class ModelPickerActivity extends BaseActivity {
       //        once it has its own backing Dataset instance.
       // Is this an installed model or not?
 
-      holder.imgDetails.setImageResource(R.drawable.ic_arrow_forward);
+      holder.imgDetails.setImageResource(R.drawable.ic_action_forward);
       if (KeyboardPickerActivity.containsLexicalModel(context, modelKey)) {
         holder.imgInstalled.setImageResource(R.drawable.ic_check);
       } else {

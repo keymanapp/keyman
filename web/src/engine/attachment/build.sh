@@ -3,16 +3,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/attachment
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/web/common.inc.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -36,7 +33,15 @@ builder_parse "$@"
 
 #### Build action definitions ####
 
+do_build () {
+  compile $SUBPROJECT_NAME
+
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}/lib/index.mjs" \
+    --format esm
+}
+
 builder_run_action configure verify_npm_setup
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
-builder_run_action build compile $SUBPROJECT_NAME
-builder_run_action test # No headless tests
+builder_run_action build do_build
+builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"

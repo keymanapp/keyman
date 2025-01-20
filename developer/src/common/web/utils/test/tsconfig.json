@@ -9,12 +9,9 @@
       "moduleResolution": "node16",
       "allowSyntheticDefaultImports": true,
       "baseUrl": ".",
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../test-helpers/index"],
-      },
   },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "helpers/*.ts",
   ],
   "references": [

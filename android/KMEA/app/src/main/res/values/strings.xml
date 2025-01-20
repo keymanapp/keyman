@@ -172,7 +172,7 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">The selected dictionary is already downloading; please try again in a moment!</string>
 
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
 
     <!-- Context: Background download messages -->
@@ -190,7 +190,7 @@
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">One or more resources failed to update!</string>
 
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">Resources successfully updated!</string>
 
     <!-- Context: Model Info -->
@@ -211,11 +211,20 @@
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
 
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Enable corrections</string>
 
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Enable predictions</string>
+
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Disable suggestions</string>
+
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Predictions only</string>
+
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Predictions with corrections</string>
+
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Predictions with auto-corrections</string>
 
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>

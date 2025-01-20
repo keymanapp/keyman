@@ -52,17 +52,19 @@
       };
 
       let shadowfy = function(container) {
-        const docBase = container.children[0];
-        container.removeChild(docBase);
-
         const shadow = container.attachShadow({ mode: "open" });
-        shadow.appendChild(docBase);
+        const docBase = container.children[0];
 
-        const baseOSKStyle = document.createElement('link');
-        baseOSKStyle.href = "../../../../../build/app/resources/osk/kmwosk.css";
-        baseOSKStyle.rel="stylesheet";
-        baseOSKStyle.type="text/css";
-        shadow.appendChild(baseOSKStyle);
+        while(docBase.children.length > 1) {
+          const sheet = docBase.children[1];
+          docBase.removeChild(docBase.children[1]);
+          shadow.appendChild(sheet);
+        }
+
+        // Do this one last - that way, all relevant sheets are in place when the
+        // layout-refresh is triggered.
+        container.removeChild(docBase);
+        shadow.appendChild(docBase);
       }
 
       let documentKeyboard = async function(kbdid, langid, formFactor, layer) {

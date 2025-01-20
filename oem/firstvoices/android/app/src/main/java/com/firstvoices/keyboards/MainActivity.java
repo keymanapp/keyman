@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         context = this;
 
         SentryAndroid.init(context, options -> {
+            options.setEnableAutoSessionTracking(false);
             options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
@@ -48,16 +49,16 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
 
         setContentView(R.layout.activity_main);
 
+        if (BuildConfig.DEBUG) {
+          KMManager.setDebugMode(true);
+        }
+        KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+
         FVShared.getInstance().initialize(this);
 
         FVShared.getInstance().upgradeTo12();
         FVShared.getInstance().upgradeTo14();
         FVShared.getInstance().preloadPackages();
-
-        if (BuildConfig.DEBUG) {
-            KMManager.setDebugMode(true);
-        }
-        KMManager.initialize(getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
         /**
          * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package

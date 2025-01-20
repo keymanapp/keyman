@@ -1,3 +1,7 @@
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import CasingFunction = LexicalModelTypes.CasingFunction;
+
 /**
  * Converts wordforms into an indexable form. It does this by
  * normalizing the letter case of characters INDIVIDUALLY (to disregard
@@ -25,11 +29,9 @@ export function defaultSearchTermToKey(wordform: string): string {
       // Remove any combining diacritics (if input is in NFKD)
       .replace(/[\u0300-\u036F]/g, '')
       // Replace directional quotation marks with plain apostrophes
-      .replace(/‘/, "'")
-      .replace(/’/, "'")
+      .replace(/[‘’]/g, "'")
       // Also double-quote marks.
-      .replace(/“/, '"')
-      .replace(/”/, '"');
+      .replace(/[“”]/g, '"');
 }
 
 /**
@@ -65,11 +67,9 @@ export function defaultCasedSearchTermToKey(wordform: string, applyCasing: Casin
       .map(function(c) { return applyCasing('lower', c)})
       .join('')
       // Replace directional quotation marks with plain apostrophes
-      .replace(/‘/, "'")
-      .replace(/’/, "'")
+      .replace(/[‘’]/g, "'")
       // Also double-quote marks.
-      .replace(/“/, '"')
-      .replace(/”/, '"');
+      .replace(/[“”]/g, '"');
 }
 
 /**

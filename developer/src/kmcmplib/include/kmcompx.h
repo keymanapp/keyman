@@ -3,11 +3,6 @@
 
 // TODO: merge with kmcmplib.h
 
-typedef wchar_t     KMX_WCHART;
-typedef KMX_DWORD * PKMX_DWORD;
-typedef char *      PKMX_STR;
-typedef KMX_WCHAR*  PKMX_WCHAR ;
-
 // TODO: these defines are copied out of unicode.h, because unicode.h still
 //       has windows-specific types. These should be remerged at a future date
 
@@ -29,6 +24,7 @@ typedef KMX_WCHAR*  PKMX_WCHAR ;
 
 #ifndef _MSC_VER
 #include <type_traits>
+#include <cstddef>
 
 template < typename T, size_t N >
 size_t _countof( T ( & /*arr*/ )[ N ] )

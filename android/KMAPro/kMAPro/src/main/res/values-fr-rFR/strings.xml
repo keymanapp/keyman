@@ -26,7 +26,6 @@
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">Commencez à taper ici&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
-  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">Taille du texte : %1$d</string>
@@ -35,7 +34,7 @@
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Diminuer la taille du texte</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_slider" comment="Adjust text size">Text size slider</string>
+  <string name="ic_text_size_slider" comment="Adjust text size">Curseur de taille de texte</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nTout le texte sera effacé\n</string>
   <!-- Context: Get Started menu -->
@@ -54,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Pour installer des packages du clavier, autoriser Keyman à lire le stockage externe.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    La demande de permission de stockage a été refusée. Peut ne pas installer le package clavier</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Storage permission request failed. Try Keyman Settings - Install from local file</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Paramètres</string>
   <!-- Context: Keyman Settings menu -->

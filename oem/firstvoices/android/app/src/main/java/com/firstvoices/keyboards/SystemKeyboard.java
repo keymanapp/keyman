@@ -49,6 +49,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
+                options.setEnableAutoSessionTracking(false);
                 options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
                 options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
             });
@@ -61,6 +62,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         KMManager.setShouldCheckKeyboardUpdates(false);
         KMManager.setKeyboardPickerFont(Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf"));
         KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        DefaultLanguageResource.install(this);
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
@@ -148,6 +150,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             KMManager.setBannerOptions(mayPredict);
           }
         }
+
+        // Determine special handling for ENTER key
+        KMManager.setEnterMode(attribute.imeOptions, inputType);
+
         // User switched to a new input field so we should extract the text from input field
         // and pass it to Keyman Engine together with selection range
         InputConnection ic = getCurrentInputConnection();
@@ -200,13 +206,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         super.onComputeInsets(outInsets);
 
         // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-        WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        if(wm == null) return;
-        Point size = new Point(0, 0);
-        Display display = wm.getDefaultDisplay();
-        if(display == null) return;
-
-        display.getSize(size);
+        Point size = KMManager.getWindowSize(getApplicationContext());
 
         int inputViewHeight = 0;
         if (inputView != null)

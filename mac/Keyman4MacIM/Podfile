@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :osx, '10.10'
+platform :osx, '10.13'
 use_frameworks!
 
 target 'Keyman' do
@@ -7,11 +7,11 @@ target 'Keyman' do
   # use_frameworks!
 
   # Pods for Keyman
-  pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '5.2.1'
+  pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '8.38.0'
   
   target 'KeymanTests' do
     inherit! :search_paths
-    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '5.2.1'
+    pod 'Sentry', :git => 'https://github.com/getsentry/sentry-cocoa.git', :tag => '8.38.0'
     use_frameworks!
     # Pods for testing
   end

@@ -3,10 +3,11 @@ import * as path from 'path';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
-import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/developer-utils';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { BaseOptions } from '../util/baseOptions.js';
 import { runOnFiles } from '../util/projectRunner.js';
+import { exitProcess } from '../util/sysexits.js';
 
 interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ {
   /**
@@ -18,6 +19,7 @@ interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ 
   stripDottedCircle?: boolean;
   includeCounts?: boolean;
   mappingFile?: string;
+  inputMappingFile?: string;
 };
 
 export function declareAnalyze(program: Command) {
@@ -34,8 +36,9 @@ function declareOskCharUse(command: Command) {
     .option('-b, --base', 'First PUA codepoint to use, in hexadecimal (default F100)', 'F100')
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
+    .option('-i, --input-mapping-file <filename>', 'Merge result file with existing mapping file')
     .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
-    .action(async (filenames: string[], _options: any, commander: any) => {
+    .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
       if(!filenames.length) {
         // If there are no filenames provided, then we are building the current
@@ -45,7 +48,7 @@ function declareOskCharUse(command: Command) {
 
       if(!await analyze(analyzeOskCharUse, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        process.exit(1);
+        return await exitProcess(1);
       }
     });
 
@@ -65,8 +68,10 @@ function declareOskRewrite(command: Command) {
 
       if(!await analyze(analyzeOskRewritePua, filenames, options)) {
         // Once a file fails to build, we bail on subsequent builds
-        process.exit(1);
+        return await exitProcess(1);
       }
+
+      return null;
     });
 }
 
@@ -92,6 +97,7 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
     puaBase: parseInt(options.base, 16),
     stripDottedCircle: options.stripDottedCircle,
     includeCounts: options.includeCounts,
+    mergeMapFile: options.inputMappingFile
   });
 
   if(!await runOnFiles(callbacks, filenames, analyzer.analyze.bind(analyzer))) {
@@ -105,7 +111,7 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
 
 async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions) {
   const analyzer = new AnalyzeOskRewritePua(callbacks);
-  const mapping: any = JSON.parse(callbacks.fs.readFileSync(options.mappingFile, 'UTF-8'));
+  const mapping: any = JSON.parse(fs.readFileSync(options.mappingFile, 'utf-8'));
 
   return await runOnFiles(callbacks, filenames, async (filename: string): Promise<boolean> => {
     if(!await analyzer.analyze(filename, mapping)) {
@@ -120,3 +126,10 @@ async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: str
     return true;
   });
 }
+
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const analyzeUnitTestEndpoints = {
+  analyzeOskCharUse
+};

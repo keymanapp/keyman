@@ -4,24 +4,24 @@ Upstream-Contact: Keyman team <support@keyman.com>
 Source: https://github.com/keymanapp/keyman
 
 Files: *
-Copyright: 2018-2023 SIL International
+Copyright: 2018-2025 SIL Global
 License: MIT
 
 Files: linux/ibus-keyman/*
-Copyright: 2004-2023 SIL International
+Copyright: 2004-2025 SIL Global
 License: GPL-2+
 
 Files: linux/ibus-keyman/src/keymanutil.c
        linux/ibus-keyman/src/keymanutil.h
        linux/ibus-keyman/src/kmpdetails.c
        linux/ibus-keyman/src/kmpdetails.h
-Copyright: 2009-2023 SIL International
+Copyright: 2009-2025 SIL Global
 License: GPL-2+ or MIT
 
 Files: linux/ibus-keyman/src/keyman-service.c
        linux/ibus-keyman/src/keyman-service.h
        linux/keyman-config/buildtools/help2md
-Copyright: 2018-2023 SIL International
+Copyright: 2018-2025 SIL Global
 License: GPL-3+
 
 Files: linux/ibus-keyman/tests/ibusimcontext.c
@@ -31,7 +31,7 @@ Copyright: 2008-2010, Peng Huang <shawn.p.huang@gmail.com>
            2008-2013, Peng Huang <shawn.p.huang@gmail.com>
            2008-2021, Red Hat, Inc.
            2015-2021, Takao Fujiwara <takao.fujiwara1@gmail.com>
-           2021-2023, SIL International
+           2021-2025, SIL Global
 License: LGPL-2.1+
 
 Files: linux/keyman-config/buildtools/help2man
@@ -41,7 +41,7 @@ License: GPL-3+
 Files: debian/com.keyman.config.appdata.xml
        debian/com.keyman.ibus_keyman.metainfo.xml
 Copyright: 2019 Daniel Glassey <wdg@debian.org>
-           2022-2023 SIL International
+           2022-2025 SIL Global
 License: MIT
 
 License: MIT

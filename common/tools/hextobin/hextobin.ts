@@ -43,4 +43,16 @@ function exitDueToUsageError(message: string): never  {
   return process.exit(64); // SysExits.EX_USAGE
 }
 
-hextobin(inputFilename, outputFilename, {silent: false});
+hextobin(inputFilename, outputFilename, { silent: false })
+  .then((buffer) => {
+    if (buffer) {
+      process.exit(0); // OK
+    } else {
+      console.error(`${program._name}: Failed.`);
+      process.exit(1); // no buffer - some err.
+    }
+  }, (err) => {
+    console.error(err);
+    console.error(`${program._name}: Failed.`);
+    process.exit(1);
+  });

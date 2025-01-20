@@ -61,8 +61,8 @@ BOOL SelectKeyboard(DWORD KeymanID)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if (!_td) return FALSE;
 
-  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard-------------------------------------------");
-  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ENTER SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+  SendDebugEntry();
+  SendDebugMessageFormat("Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
     GetKeyboardLayout(0),
     _td->ActiveKeymanID,
     _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
@@ -78,7 +78,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
     _td->lpActiveKeyboard = NULL;
     _td->ActiveKeymanID = KEYMANID_NONKEYMAN;
 
-    //SendDebugMessageFormat(hwnd,sdmGlobal,0,"SelectKeyboard: nKeyboards=%d", nKeyboards);
+    //SendDebugMessageFormat("nKeyboards=%d", nKeyboards);
 
     for (i = 0; i < _td->nKeyboards; i++)
     {
@@ -86,14 +86,14 @@ BOOL SelectKeyboard(DWORD KeymanID)
       {
         if (!_td->lpKeyboards[i].lpCoreKeyboard && !LoadlpKeyboard(i))
         {
-          SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Unable to load");
+          SendDebugMessageFormat("Unable to load");
           return TRUE;
         }
 
         _td->lpActiveKeyboard = &_td->lpKeyboards[i];
         _td->ActiveKeymanID = _td->lpActiveKeyboard->KeymanID;
 
-        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: NewKeymanID: %x", _td->ActiveKeymanID);
+        SendDebugMessageFormat("NewKeymanID: %x", _td->ActiveKeymanID);
 
         if (_td->app) _td->app->ResetContext();
         SelectApplicationIntegration();   // I4287
@@ -104,7 +104,7 @@ BOOL SelectKeyboard(DWORD KeymanID)
 
         if (KM_CORE_STATUS_OK !=
             km_core_event(_td->lpActiveKeyboard->lpCoreKeyboardState, KM_CORE_EVENT_KEYBOARD_ACTIVATED, nullptr)) {
-          SendDebugMessageFormat(0, sdmGlobal, 0, "km_core_event Failed Result: %d ", FALSE);
+          SendDebugMessageFormat("km_core_event Failed Result: %d ", FALSE);
         } else {
           ProcessActionsExternalEvent();
         }
@@ -112,57 +112,60 @@ BOOL SelectKeyboard(DWORD KeymanID)
       }
       if (IsFocusedThread())
       {
-        SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SelectKeyboard: Keyboard Not Found");
+        SendDebugMessageFormat("Keyboard Not Found");
       }
     }
   }
 
     __finally
     {
-      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard: Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
+      SendDebugMessageFormat("EXIT Current:(HKL=%x KeymanID=%x %s) New:(ID=%x)", //lpActiveKeyboard=%s ActiveKeymanID: %x sk: %x KeymanID: %d",
         GetKeyboardLayout(0),
         _td->ActiveKeymanID,
         _td->lpActiveKeyboard == NULL ? "NULL" : _td->lpActiveKeyboard->Name,
         KeymanID);
-      SendDebugMessageFormat(hwnd, sdmGlobal, 0, "EXIT SelectKeyboard-------------------------------------------");
+      SendDebugExit();
     }
     return TRUE;
 }
 
 BOOL SelectKeyboardTSF(DWORD dwIdentity, BOOL foreground)   // I3933   // I3949   // I4271
 {
+  SendDebugEntry();
   if (!foreground && IsFocusedThread()) {
-    return FALSE;   // I4277
+    return_SendDebugExit(FALSE);   // I4277
   }
 
   ISharedBufferManager *sbm = GetThreadSharedBufferManager();
   if (!sbm) {
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
   SelectKeyboardBuffer skb;
   if(!sbm->ReadSelectKeyboardBuffer(dwIdentity, &skb)) {
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
   TSFINTERFACES tsf = { NULL };
 
-  if(!OpenTSF(&tsf)) return FALSE;
+  if(!OpenTSF(&tsf)) {
+    return_SendDebugExit(FALSE);
+  }
 
   BOOL bResult = FALSE;
 
-  SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Selecting language identity=%d %x [%d]", dwIdentity, skb.LangID, foreground);
+  SendDebugMessageFormat("Selecting language identity=%d %x [%d]", dwIdentity, skb.LangID, foreground);
   HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(skb.LangID);
   if(SUCCEEDED(hr)) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Activating profile");
+    SendDebugMessageFormat("Activating profile");
     hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_INPUTPROCESSOR, skb.LangID, skb.CLSID, skb.GUIDProfile, NULL, TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE);   // I4714
     bResult = SUCCEEDED(hr);
   }
 
   CloseTSF(&tsf);
 
-  SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardTSF: Exiting with %x", hr);
-  return bResult;
+  SendDebugMessageFormat("Exiting with %x", hr);
+  return_SendDebugExit(bResult);
 }
 
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground) {   // I3933   // I3949   // I4271
@@ -170,18 +173,21 @@ void SelectKeyboardHKL(DWORD hkl, BOOL foreground) {   // I3933   // I3949   // 
     return;   // I4277
   }
 
+  SendDebugEntry();
+
   TSFINTERFACES tsf = { NULL };
   if(OpenTSF(&tsf)) {
     LANGID langid = HKLToLanguageID(ForceKeymanIDToHKL(hkl)); // I3191
-    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating language %x [%d]", langid, foreground);
+    SendDebugMessageFormat("Activating language %x [%d]", langid, foreground);
     HRESULT hr = tsf.pInputProcessorProfiles->ChangeCurrentLanguage(langid);
     if(SUCCEEDED(hr)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Activating keyboard layout %x for %x", hkl, langid);
+      SendDebugMessageFormat("Activating keyboard layout %x for %x", hkl, langid);
       hr = tsf.pInputProcessorProfileMgr->ActivateProfile(TF_PROFILETYPE_KEYBOARDLAYOUT, langid, CLSID_NULL, GUID_NULL, ForceKeymanIDToHKL(hkl), TF_IPPMF_DONTCARECURRENTINPUTLANGUAGE); // I3191   // I4714
     }
-    SendDebugMessageFormat(0, sdmGlobal, 0, "SelectKeyboardHKL: Exiting with %x", hr);
+    SendDebugMessageFormat("Exiting with %x", hr);
     CloseTSF(&tsf);
   }
+  SendDebugExit();
 }
 
 void PrepareLanguageSwitchString(UINT langid, HKL hkl, char *str) {

@@ -9,7 +9,7 @@ then you will need to:
 
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
-    python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli \
+    python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.1 dconf-cli \
     python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
 ```
 
@@ -38,8 +38,7 @@ pip3 install sentry-sdk
 Copy and compile the GSettings schema:
 
 ```bash
-cd keyman_config
-sudo cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas
+sudo cp linux/keyman-config/resources/com.keyman.gschema.xml /usr/share/glib-2.0/schemas
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 ```
 
@@ -201,7 +200,7 @@ LANGUAGE=de ./km-config
   "python.testing.unittestArgs": [
     "-v",
     "-s", "linux/keyman-config/tests",
-    "-p", "test_*.py"
+    "-p", "*_tests.py"
   ],
   "python.testing.unittestEnabled": true,
   ```
