@@ -324,7 +324,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         this.keepSuggestion = s as Keep;
       }
 
-      if(s.autoAccept && !this.selected) {
+      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
         this.selected = s;
       }
     }

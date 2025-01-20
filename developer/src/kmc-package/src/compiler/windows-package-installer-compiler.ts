@@ -130,7 +130,15 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     }
 
     // Check existence of required files
-    for(const filename of [sources.licenseFilename, sources.msiFilename, sources.setupExeFilename]) {
+    for(const [param,filename] of [
+      ['licenseFilename',sources.licenseFilename],
+      ['msiFilename',sources.msiFilename],
+      ['setupExeFilename',sources.setupExeFilename]
+    ]) {
+      if(!filename) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_RequiredParameterMissing({param}));
+        return null;
+      }
       if(!this.callbacks.fs.existsSync(filename)) {
         this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename}));
         return null;
@@ -186,6 +194,11 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
 
   private async buildZip(kps: KpsFile.KpsFile, kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {
     const kmpJson: KmpJsonFile.KmpJsonFile = this.kmpCompiler.transformKpsFileToKmpObject(kpsFilename, kps);
+    if(!kmpJson) {
+      // error will have been reported in transformKpsFileToKmpObject
+      return null;
+    }
+
     if(!kmpJson.info?.name?.description) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageNameCannotBeBlank());
       return null;
@@ -194,6 +207,10 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     const kmpFilename = this.callbacks.path.basename(kpsFilename, KeymanFileTypes.Source.Package) + KeymanFileTypes.Binary.Package;
     const setupInfBuffer = this.buildSetupInf(sources, kmpJson, kmpFilename, kps);
     const kmpBuffer = await this.kmpCompiler.buildKmpFile(kpsFilename, kmpJson);
+    if(!kmpBuffer) {
+      // error will have been reported in buildKmpFile
+      return null;
+    }
 
     // Note that this does not technically generate a "valid" sfx according to
     // the zip spec, because the offsets in the .zip are relative to the start

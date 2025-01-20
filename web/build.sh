@@ -172,6 +172,10 @@ builder_run_child_actions build:engine/attachment
 # Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/keyboard-storage
 
+# Builds the predictive-text components
+builder_run_child_actions build:engine/predictive-text
+
+# Uses engine/interfaces, engine/keyboard-storage, engine/predictive-text, & engine/osk
 builder_run_child_actions build:engine/core-processor
 
 # Uses engine/interfaces, engine/keyboard-storage, & engine/osk
@@ -198,7 +202,7 @@ builder_run_child_actions build:test-pages
 builder_run_action build:_all build_action
 
 # Run tests
-# builder_run_child_actions test
+builder_run_child_actions test
 builder_run_action test:_all test_action
 
 function do_test_help() {

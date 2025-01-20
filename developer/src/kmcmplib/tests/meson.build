@@ -162,7 +162,7 @@ gtestcompilertest = executable('gtest-compiler-tests', 'gtest-compiler.tests.cpp
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 
@@ -173,7 +173,7 @@ gtest_km_u16_test = executable('gtest-km_u16-tests', 'gtest-km_u16.tests.cpp',
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 

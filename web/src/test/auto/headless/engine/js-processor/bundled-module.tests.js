@@ -14,9 +14,9 @@ var toSupplementaryPairString = function(code){
 let u = toSupplementaryPairString;
 
 describe('Bundled ES Module for js-processor', function() {
-  describe('KeyboardProcessor', function () {
+  describe('JSKeyboardProcessor', function () {
     it('should initialize without errors', function () {
-      let kp = new Package.KeyboardProcessor();
+      let kp = new Package.JSKeyboardProcessor();
       assert.isNotNull(kp);
     });
   });
