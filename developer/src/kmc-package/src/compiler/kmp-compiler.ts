@@ -495,6 +495,7 @@ export class KmpCompiler implements KeymanCompiler {
 
       if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Binary.VisualKeyboard)) {
         if(!this.isKvkFileBinary(memberFileData)) {
+          // warn the few users who are still doing this -- non-binary .kvk should not be included in package!
           this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
         } else {
           memberFileData = this.setKvkFontData(kpsFilename, data, filename, memberFileData);
@@ -624,8 +625,7 @@ export class KmpCompiler implements KeymanCompiler {
 
   /**
    * Legacy .kmp compiler would transform xml-format .kvk files into a binary .kvk file; now
-   * we want that to remain the responsibility of the keyboard compiler, so we'll warn the
-   * few users who are still doing this
+   * we want that to remain the responsibility of the keyboard compiler.
    */
   private isKvkFileBinary(data: Uint8Array) {
     if(data.byteLength < 4) {
