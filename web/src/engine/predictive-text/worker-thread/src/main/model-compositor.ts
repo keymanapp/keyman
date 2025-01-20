@@ -16,8 +16,8 @@ import Transform = LexicalModelTypes.Transform;
 import USVString = LexicalModelTypes.USVString;
 
 export class ModelCompositor {
-  private lexicalModel: LexicalModel;
-  private contextTracker?: correction.ContextTracker;
+  readonly lexicalModel: LexicalModel;
+  readonly contextTracker?: correction.ContextTracker;
 
   static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
@@ -208,9 +208,9 @@ export class ModelCompositor {
 
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
     // Step 1:  generate and save the reversion's Transform.
-    let sourceTransform = suggestion.transform;
-    let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let insertedLength = sourceTransform.insert.kmwLength();
+    const sourceTransform = suggestion.transform;
+    const deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    const insertedLength = sourceTransform.insert.kmwLength();
 
     let reversionTransform: Transform = {
       insert: deletedLeftChars,
@@ -233,14 +233,25 @@ export class ModelCompositor {
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
-      const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
-      revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
+      // Also handles display string for reversions applied after previous applications - 
+      // namely, after the whitespace that follows them.
+      let preCaretToken: models.Token;
+      const leftContext = postContextTokenization.left;
+      for(let i = leftContext.length - 1; i >= 0; i--) {
+        // Applying one suggestion on top of another just-accepted suggestion should result in
+        // reversions that display the originally-replaced context... not the empty-string
+        // that follows any added whitespace from either of the accepted suggestions.
+        if(leftContext[i].text && !leftContext[i].isWhitespace) {
+          preCaretToken = leftContext[i];
+        }
+      }
+      revertedPrefix = preCaretToken.text ?? '';
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0].text : '';
     } else {
       revertedPrefix = this.wordbreak(postContext);
     }
 
-    let firstConversion = models.transformToSuggestion(reversionTransform);
+    const firstConversion = models.transformToSuggestion(reversionTransform);
     firstConversion.displayAs = revertedPrefix;
 
     // Build the actual Reversion, which is technically an annotated Suggestion.
