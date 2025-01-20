@@ -62,7 +62,7 @@ describe('StubAndKeyboardCache', function () {
     assert.strictEqual(cache.defaultStub, galaxie_stub);
   });
 
-  it('loads & caches `Keyboard`s, `Keyboard` promise pending resolution', async () => {
+  it('loads & caches `JSKeyboard`s, `JSKeyboard` promise pending resolution', async () => {
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardHarness({}, MinimalKeymanGlobal));
     const cache = new StubAndKeyboardCache(keyboardLoader);
 

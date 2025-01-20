@@ -7,7 +7,7 @@
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, KeyMapping, Keyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
+import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
 import type OutputTarget from './outputTarget.js';
 import { type Deadkey } from './deadkeys.js';
 import { Mock } from "./mock.js";
@@ -165,7 +165,7 @@ class CachedContextEx {
 
 //#endregion
 
-export default class KeyboardInterface extends KeyboardHarness {
+export class JSKeyboardInterface extends KeyboardHarness {
   static readonly GLOBAL_NAME = 'KeymanWeb';
 
   cachedContext: CachedContext = new CachedContext();
@@ -180,7 +180,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
   // Must be accessible to some of the keyboard API methods.
-  activeKeyboard: Keyboard;
+  activeKeyboard: JSKeyboard;
   activeDevice: DeviceSpec;
 
   variableStoreSerializer?: VariableStoreSerializer;
@@ -222,7 +222,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   /**
    * Function     registerKeyboard  KR
    * Scope        Public
-   * @param       {Object}      Pk      Keyboard  object
+   * @param       {Object}      Pk      JSKeyboard  object
    * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
    *
    *              In web-core, this also activates the keyboard; in other modules, this method
@@ -231,7 +231,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   registerKeyboard(Pk: any): void {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
-    let keyboard = new Keyboard(Pk);
+    let keyboard = new JSKeyboard(Pk);
     this.loadedKeyboard = keyboard;
   }
 
@@ -571,7 +571,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
     var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
-    const eventModifiers = KeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
+    const eventModifiers = JSKeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
 
     if(e.vkCode > 255) {
       keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -1101,7 +1101,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   }
 
   /**
-   * Publishes the KeyboardInterface's shorthand API names.  As this assigns the current functions
+   * Publishes the JSKeyboardInterface's shorthand API names.  As this assigns the current functions
    * held by the longform versions, note that this should be called after replacing any of them via
    * JS method extension.
    *
@@ -1112,7 +1112,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     // Keyboard callbacks
     let prototype = this.prototype;
 
-    var exportKBCallback = function(miniName: string, longName: keyof KeyboardInterface) {
+    var exportKBCallback = function(miniName: string, longName: keyof JSKeyboardInterface) {
       if(prototype[longName]) {
         // @ts-ignore
         prototype[miniName] = prototype[longName];
@@ -1151,5 +1151,5 @@ export default class KeyboardInterface extends KeyboardHarness {
 
 (function() {
   // This will be the only call within the keyboard module.
-  KeyboardInterface.__publishShorthandAPI();
+  JSKeyboardInterface.__publishShorthandAPI();
 }());

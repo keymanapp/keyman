@@ -29,8 +29,9 @@ src/test/auto              A Node-driven test suite for automated testing of Key
 
 ## Usage
 
-Open **index.html** or **samples/index.html** in your browser. Be sure to
-compile Keyman Engine for Web before viewing the pages.
+Start the test server by running `./build.sh start`, then open
+your browser to http://localhost:3000. Be sure to compile Keyman Engine
+for Web before viewing the pages.
 
 Refer to the samples for usage details.
 

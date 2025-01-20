@@ -13,7 +13,7 @@ import { type KeyElement } from '../keyElement.js';
 import {
   Codes,
   DeviceSpec,
-  Keyboard,
+  JSKeyboard,
   KeyboardProperties,
   ManagedPromise,
   type MinimalCodesInterface
@@ -58,6 +58,11 @@ export interface LegacyOSKEventMap {
     HiddenByUser?: boolean
   }): void;
 }
+
+export class JSKeyboardData {
+  keyboard: JSKeyboard;
+  metadata: KeyboardProperties;
+};
 
 /**
  * For now, these will serve as undocumented, internal events.  We need a proper
@@ -168,10 +173,7 @@ export default abstract class OSKView
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
-  private keyboardData: {
-    keyboard: Keyboard,
-    metadata: KeyboardProperties
-  };
+  private keyboardData: JSKeyboardData;
 
   /**
    * Provides the current parameterization for timings and distances used by
@@ -532,17 +534,11 @@ export default abstract class OSKView
     }
   }
 
-  public get activeKeyboard(): {
-    keyboard: Keyboard,
-    metadata: KeyboardProperties
-  } {
+  public get activeKeyboard(): JSKeyboardData {
     return this.keyboardData;
   }
 
-  public set activeKeyboard(keyboardData: {
-    keyboard: Keyboard,
-    metadata: KeyboardProperties
-  }) {
+  public set activeKeyboard(keyboardData: JSKeyboardData) {
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 
@@ -782,7 +778,7 @@ export default abstract class OSKView
     this.postKeyboardLoad();
   }
 
-  private _GenerateKeyboardView(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
+  private _GenerateKeyboardView(keyboard: JSKeyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
     let device = this.targetDevice;
 
     this._Box.className = "";
@@ -815,7 +811,7 @@ export default abstract class OSKView
    * @param       {Object}      keyboard    The keyboard to visualize
    * Description  Generates the visual keyboard element and attaches it to KMW
    */
-  private _GenerateVisualKeyboard(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
+  private _GenerateVisualKeyboard(keyboard: JSKeyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
     let device = this.targetDevice;
 
     const resourcePath = getResourcePath(this.config);
