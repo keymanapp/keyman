@@ -117,7 +117,7 @@ function installer_server() {
 
   # #12950: Merge dependencies from @keymanapp/developer-utils and Server; this
   # is a bit messy but will mean we don't lose the needed dependencies.
-  jq -s '.[0] + { dependencies: (.[1].dependencies * .[0].dependencies) }' "$PRODBUILDTEMP/package0.json" \
+  "$JQ" -s '.[0] + { dependencies: (.[1].dependencies * .[0].dependencies) }' "$PRODBUILDTEMP/package0.json" \
    "$KEYMAN_ROOT/developer/src/common/web/utils/package.json" > "$PRODBUILDTEMP/package1.json"
   cat $PRODBUILDTEMP/package1.json | "$JQ" \
     '. | del(.dependencies."@keymanapp/common-types")' \
