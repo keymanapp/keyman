@@ -19,6 +19,8 @@
     { "path": "./developer/src/kmc-copy/test/tsconfig.json" },
     { "path": "./developer/src/kmc-generate/tsconfig.json" },
     { "path": "./developer/src/kmc-generate/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-convert/tsconfig.json" },
+    { "path": "./developer/src/kmc-convert/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/test/tsconfig.json" },
     { "path": "./developer/src/kmc-kmn/tsconfig.json" },
     { "path": "./developer/src/kmc-keyboard-info/test/tsconfig.json" },
