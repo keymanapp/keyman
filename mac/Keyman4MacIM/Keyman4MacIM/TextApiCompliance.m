@@ -36,6 +36,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "KMInputMethodAppDelegate.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 
 // this is the user managed list of non-compliant apps persisted in User Defaults
 NSString *const kKMLegacyApps = @"KMLegacyApps";
@@ -76,6 +77,16 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientApplicationId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
+/**
+ * For Sentry, create a short description as the tag value is limited to 200 characters.
+ * We don't know how long the clientAppId will be, but this should not be well below 200 characters.
+ * If the text were to exceed 200 characters, then Sentry would display an error rather than truncating.
+ */
+-(NSString *)shortSentryTagDescription
+{
+  return [NSString stringWithFormat:@"uncertain: %@, compliant: %@, clientAppId: %@, ", self.complianceUncertain?@"true":@"false", self.hasCompliantSelectionApi?@"true":@"false", _clientApplicationId];
+}
+
 /** test to see if the API selectedRange functions properly for the text input client  */
 -(void) checkCompliance:(id) client {
   // confirm that the API actually exists (this always seems to return true)
@@ -91,6 +102,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     [self checkComplianceUsingInitialSelection];
   }
   os_log_debug([KMLogs complianceLog], "checkCompliance workingSelectionApi for app %{public}@: set to %{public}@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO");
+  [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 
 -(void) checkComplianceUsingInitialSelection {
@@ -135,6 +147,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   }
   
   os_log_info([KMLogs complianceLog], "checkComplianceAfterInsert, self.hasWorkingSelectionApi = %{public}@ for app %{public}@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId);
+  [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 
 - (BOOL)validateNewLocation:(NSUInteger)location delete:(NSString *)textToDelete  {

@@ -10,7 +10,7 @@
  */
 
 /**
- * This class is needed because many activateServer and deactivateServer messages sent from macOS
+ * This class is needed because many activateServer and deactivateServer messages are sent from macOS
  * to KMInputController, but they are not particularly reliable. Keyman receives some messages when it
  * is not active and should not become active. It also receives messages when it is active, but there is no
  * need to change state. For example, when a menu is clicked with Keyman active, macOS will send a
@@ -36,6 +36,7 @@
 #import <AppKit/AppKit.h>
 #import "KMSettingsRepository.h"
 #import <Carbon/Carbon.h>
+#import "KMSentryHelper.h"
 
 NSString *const kInputMethodActivatedNotification = @"kInputMethodActivatedNotification";
 NSString *const kInputMethodDeactivatedNotification = @"kInputMethodDeactivatedNotification";
@@ -61,7 +62,6 @@ typedef enum {
 
 @property LifecycleState lifecycleState;
 @property NSString *inputSourceId;
-@property NSString *clientApplicationId;
 @end
 
 @implementation KMInputMethodLifecycle
@@ -106,7 +106,7 @@ typedef enum {
 /**
  * Get the bundle ID of the currently active text input client..
  */
-+ (NSString*)getClientApplicationId {
++ (NSString*)getRunningApplicationId {
   NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
   NSString *clientAppId = [currentApp bundleIdentifier];
   return clientAppId;
@@ -156,7 +156,7 @@ typedef enum {
  */
 - (void)performTransition:(id)client {
   NSString *currentInputSource = [KMInputMethodLifecycle getCurrentInputSourceId];
-  NSString *currentClientAppId = [KMInputMethodLifecycle getClientApplicationId];
+  NSString *currentClientAppId = [KMInputMethodLifecycle getRunningApplicationId];
   
   TransitionType transition = [self determineTransition:currentInputSource withAppId:currentClientAppId];
   [self saveNewInputMethodState:currentInputSource withAppId:currentClientAppId];
@@ -166,7 +166,8 @@ typedef enum {
       os_log_info([KMLogs lifecycleLog], "performTransition: None, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
      break;
     case Activate:
-      os_log_info([KMLogs lifecycleLog], "performTransition: Activate, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
+      os_log_info([KMLogs lifecycleLog], "performTransition: Activate, new application ID: %{public}@", currentClientAppId);
+      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"activated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
       /**
        * Perform two actions when activating the input method. 
        * Change the client first which prepares the event handler.
@@ -177,10 +178,12 @@ typedef enum {
       break;
     case Deactivate:
       os_log_info([KMLogs lifecycleLog], "performTransition: Deactivate, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
+      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"deactivated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
       [self deactivateInputMethod];
       break;
     case ChangeClients:
       os_log_info([KMLogs lifecycleLog], "performTransition: ChangeClients, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
+      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"change clients for input method '%@' to application ID '%@'", currentInputSource, currentClientAppId]];
       [self changeClient];
       break;
   }

@@ -15,7 +15,8 @@ extern NSString *const kInputMethodClientChangeNotification;
 
 @interface KMInputMethodLifecycle : NSObject
 + (KMInputMethodLifecycle *)shared;
-+ (NSString*)getClientApplicationId;
++ (NSString*)getRunningApplicationId;
+@property NSString *clientApplicationId;
 - (void)startLifecycle;
 - (void)activateClient:(id)client;
 - (void)deactivateClient:(id)client;

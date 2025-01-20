@@ -9,6 +9,7 @@
 #import "KMDownloadKBWindowController.h"
 #import "KMInputMethodAppDelegate.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 
 @interface KMDownloadKBWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *webView;
