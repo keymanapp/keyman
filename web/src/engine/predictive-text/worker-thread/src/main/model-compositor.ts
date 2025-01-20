@@ -238,7 +238,7 @@ export class ModelCompositor {
     }
 
     let revertedPrefix: string;
-    let postContextTokenization = this.tokenize(postContext);
+    const postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
       const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
@@ -254,7 +254,7 @@ export class ModelCompositor {
     // Build the actual Reversion, which is technically an annotated Suggestion.
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
-    let reversion = toAnnotatedSuggestion(this.lexicalModel, firstConversion, 'revert');
+    const reversion = toAnnotatedSuggestion(this.lexicalModel, firstConversion, 'revert');
     if(suggestion.transformId != null) {
       reversion.transformId = -suggestion.transformId;
     }
@@ -281,6 +281,27 @@ export class ModelCompositor {
   }
 
   markAcceptedSuggestion(suggestion: Suggestion, context: Context, contextState: correction.TrackedContextState) {
+    // TODO:  Important - if there's an active replacement already, we may need special handling
+    // for calculating the reversion - we wish to restore the ORIGINAL, not the prior application
+    // when reverting.
+    if(contextState.tail.replacement) {
+      console.log(contextState.tail.replacement);
+      
+      // No trace of the original text (currently) remains (end of day 2025-01-17)
+      //
+      // Or is there one?  I found a tagged 'keep', even if not in the standard position within replacements.
+      // THAT could prove very useful!
+      //
+      // Question, though:  why is index 1 in the tricky case, not 0?  Something's shifting the position...
+      // ... because the applied replacement section gets placed in front!
+      // See `token.replacements = [ replacementPortion ].concat(suggestions);` down below!
+      let baseAppliedToken = contextState.tokens[contextState.tokens.length - contextState.tail.replacement.tokenWidth];
+      console.log(baseAppliedToken);
+
+      let reverterReplacment = baseAppliedToken.replacements.find((repl) => repl.suggestion.tag == 'keep');
+      console.log(reverterReplacment);
+    }
+
     // Suggestion IDs at this level are unique.
     contextState.tail.activeReplacementId = suggestion.id;
     contextState.tail.replacementTransformId = suggestion.transformId;
@@ -299,11 +320,15 @@ export class ModelCompositor {
     );
 
     // If context-tracking handles the applied suggestion properly...
+    //
+    // Edit the post-match state to hold suggestions that apply from the post-match context... wait...
+    // from the post-match context?  Do it from the original if possible; rely on Web-side context-rewind.
     if(matchResults?.baseState) {
       // Get the index of the first token altered by the suggestion being applied.
       let substitutionTokenIndex = (contextState.tokens.length - 1) - matchResults.headTokensRemoved;
 
       const tokenizer = determineModelTokenizer(this.lexicalModel)
+      // TODO:  
       let tokenizedApplication = tokenizeTransform(tokenizer, context, suggestion.transform);
 
       // We build our suggestions to do whole-word replacement.  Fortunately, that means we already have
