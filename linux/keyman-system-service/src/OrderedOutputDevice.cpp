@@ -11,6 +11,12 @@ using namespace std;
 
 #define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL 194  // 0xC2
 
+#ifndef KEYMAN_TESTING
+OrderedOutputDevice* CreateOrderedOutputDevice() {
+  return new OrderedOutputDevice();
+}
+#endif
+
 OrderedOutputDevice::OrderedOutputDevice() {
   uinput_dev = nullptr;
 }
