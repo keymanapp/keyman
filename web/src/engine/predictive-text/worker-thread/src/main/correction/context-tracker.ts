@@ -142,6 +142,7 @@ export class TrackedContextState {
       this.tokens = source.tokens.map(function(token) {
         let copy = new TrackedContextToken();
         Object.assign(copy, token);
+        copy.replacements = copy.replacements.slice();
         return copy;
       });
 
