@@ -1,5 +1,54 @@
 # Keyman Version History
 
+## 18.0.169 alpha 2025-01-17
+
+* chore(windows): remove `postinstall` state from mermaid diagram (#12923)
+
+## 18.0.168 alpha 2025-01-16
+
+* chore: update macOS environment-variable shell script (#12878)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12871)
+* chore(web): integrates predictive-text builds to top level script, reconnects headless tests (#12866)
+* chore(ios): Update crowdin strings for Khmer (#12910)
+* chore(windows): merge master epic windows updates (#12904)
+* fix(developer): detect invalid key ids in touch layout files (#12895)
+* chore: use GitHub PR titles when writing HISTORY.md (#12907)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12909)
+* change(web): make 'keep' transform pattern match standard suggestion pattern by including the prefix string (#12906)
+* chore: Add docker images for building the different platforms (#11397)
+
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
+## 18.0.164 alpha 2025-01-08
+
+* fix(windows): add language and close button fit inside pop-window (#12855)
+* chore(windows): add bcp47 code and tips to diagnostic (#12843)
+* fix(android/engine): Cleanup KMManager API keys and calls (#12861)
+* docs(developer,mac): add playable video links to the help documentation (#12828)
+
+## 18.0.163 alpha 2025-01-06
+
+* docs: clarify that sections in KMX file might not be aligned (#12856)
+
 ## 18.0.162 alpha 2024-12-19
 
 * fix(mac): standardize interaction between OSK and physical keyboard (#12836)
@@ -181,7 +230,7 @@
 
 ## 18.0.134 alpha 2024-11-04
 
-*  (#12606)
+* fix(developer): ldml don't allow a uset as right-hand-side variable (#12606)
 
 ## 18.0.133 alpha 2024-11-01
 
