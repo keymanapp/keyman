@@ -156,6 +156,13 @@ if cpp_compiler.get_id() == 'emscripten'
     '-sENVIRONMENT=web,webview',
     # '-sERROR_ON_UNDEFINED_SYMBOLS=0'
   ]
+  node_links = [
+    '--whole-archive',
+    '-sALLOW_MEMORY_GROWTH=1',
+    '-sMODULARIZE=1', '-sEXPORT_NAME=createCoreProcessor',
+    '-sEXPORT_ES6',
+    '-sENVIRONMENT=node',
+  ]
 endif
 
 lib = library('keymancore',
@@ -187,12 +194,19 @@ pkg.generate(
     libraries: lib)
 
 if cpp_compiler.get_id() == 'emscripten'
-  # Build an executable
+  # Build an executable for web/webview
   host = executable('km-core',
     cpp_args: defns + extra_defns,
     include_directories: inc,
     link_args: links + host_links + extra_links,
     objects: lib.extract_all_objects(recursive: false))
+  # Build an executable for node (used for testing)
+  host = executable('km-core-node',
+    cpp_args: defns + extra_defns,
+    include_directories: inc,
+    link_args: links + node_links + extra_links,
+    objects: lib.extract_all_objects(recursive: false),
+    name_suffix: 'mjs')
 
   if get_option('buildtype') == 'release'
     # TODO: #12888
