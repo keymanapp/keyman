@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.174 alpha 2025-01-21
+
+* chore(developer): validate targets parameter in kmc-generate (#12955)
+* fix(developer): support `&displayMap` font in web debugger (#12929)
+
 ## 18.0.173 alpha 2025-01-20
 
 * feat(developer): rewrite font data in .kvk from package metadata (#12949)
