@@ -45,7 +45,7 @@ function declareGenerateLdmlKeyboard(command: Command) {
     .option('-o, --out-path <path>', 'Output path (may exist)')
     .option('-n, --name <name>', 'Keyboard descriptive name')
     .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-v, --version <version-string>', 'Keyboard version', '1.0.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
     .option('-a, --author <author-name>', 'Name of keyboard author')
