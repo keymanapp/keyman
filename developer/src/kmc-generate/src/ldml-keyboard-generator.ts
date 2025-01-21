@@ -28,7 +28,10 @@ export class LdmlKeyboardGenerator extends BasicGenerator implements KeymanCompi
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
-    this.preGenerate();
+    if(!this.preGenerate()) {
+      // errors will have been reported in preGenerate
+      return null;
+    }
 
     const artifacts: GeneratorArtifacts = this.defaultArtifacts();
     this.templatePath = 'ldml-keyboard';
