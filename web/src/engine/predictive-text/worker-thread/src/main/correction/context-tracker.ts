@@ -48,10 +48,10 @@ export class TrackedContextToken {
   constructor();
   constructor(instance: TrackedContextToken);
   constructor(instance?: TrackedContextToken) {
-    Object.assign(this, instance);
-    // We don't alter the values in replacements, but we do wish to prevent aliasing 
-    // of the array containing them.
     if(instance) {
+      Object.assign(this, instance);
+      // We don't alter the values in replacements, but we do wish to prevent aliasing 
+      // of the array containing them.
       this.replacements = instance.replacements.slice();
     }
   }
