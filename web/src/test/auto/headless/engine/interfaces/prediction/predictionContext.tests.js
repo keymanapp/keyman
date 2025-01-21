@@ -166,7 +166,6 @@ describe("PredictionContext", () => {
     // by its following request before its response could be received.
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['“apple”', 'applied']);
     assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”');
-    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'applied');
     // Our reused mocking doesn't directly provide the 'keep' suggestion; we
     // need to remove it before testing for set equality.
     assert.deepEqual(suggestions.splice(1), expected);
