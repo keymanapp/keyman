@@ -93,7 +93,8 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
     }
   }
 
-  function stringToAttr(attr: string, s?: KMXPlus.StrsItem) {
+  function stringToAttr(attr: string, s?: KMXPlus.StrsItem, override?: string) {
+    if (override) return asAttr(attr, override);
     if (!s || !s?.value?.length) return {};
     return Object.fromEntries([[`\$${attr}`, s.value]]);
   }
@@ -221,16 +222,17 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
         transformGroup: groups.map((group) => {
           if (group.type === constants.tran_group_type_transform) {
             return {
-              transform: group.transforms.map(({from, to}) => ({
-                ...stringToAttr('from', from),
-                ...stringToAttr('to', to),
+              transform: group.transforms.map(({from, to, _from, _to}) => ({
+                ...stringToAttr('from', from, _from),
+                ...stringToAttr('to', to, _to),
               })),
             };
           } else if(group.type === constants.tran_group_type_reorder) {
             return {
-              transform: group.reorders.map(({before, elements}) => ({
-                ...asAttr('before', before.toString()),
-                ...asAttr('from', elements.toString()),
+              reorder: group.reorders.map(({before, elements, _before, _from, _order}) => ({
+                ...asAttr('before', _before || before.toString()),
+                ...asAttr('from', _from || elements.toString()),
+                ...asAttr('order', _order),
               })),
             };
           } else {

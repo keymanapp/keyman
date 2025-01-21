@@ -409,6 +409,8 @@ export class TranTransform {
   to: StrsItem;
   mapFrom: StrsItem; // var name
   mapTo: StrsItem; // var name
+  _from?: string; // for serialization
+  _to?: string; // for serialization
 }
 
 export class TranGroup {
@@ -420,6 +422,9 @@ export class TranGroup {
 export class TranReorder {
   elements: ElementString;
   before: ElementString;
+  _before?: string; // for serializing
+  _from?: string; // for serializing
+  _order?: string; // for serializing
 };
 
 export class Tran extends Section {

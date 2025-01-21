@@ -24,14 +24,14 @@
   </variables>
   <transforms type="simple">
     <transformGroup>
-      <transform from="^a" to="â"/>
-      <transform from="a" to="￿"/>
+      <transform from="^a" to="â"/>
+      <transform from="a" to="\m{a}"/>
     </transformGroup>
     <transformGroup>
-      <transform from="\uffff\u0008\u0001"/>
+      <transform from="\m{a}"/>
     </transformGroup>
     <transformGroup>
-      <transform before="[object Object]" from="[object Object],[object Object],[object Object]"/>
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10"/>
     </transformGroup>
   </transforms>
   <transforms type="backspace">

@@ -62,11 +62,7 @@ describe('compiler-tests', function() {
     const asXml = kmxToXml(kmx);
     writeFileSync(outputFilename, asXml, 'utf-8');
 
-    compareXml(outputFilename, inputFilename, (data) => {
-      // TODO-LDML-EDITOR: serializer doesn't handle transforms
-      delete data.keyboard3.transforms;
-      return data;
-    });
+    compareXml(outputFilename, inputFilename);
   });
 
 
