@@ -7,6 +7,13 @@ import { KeymanXMLWriter, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeysCompiler } from "../compiler/keys.js";
 
+/**
+ * Serialize a KMXPlusFile back to XML
+ * TODO-EPIC-LDML: Does not handle transforms properly (marker strings).
+ * TODO-EPIC-LDML: Does not retain the original XML formatting.
+ * @param kmx input KMXPlusFile
+ * @returns XML String
+ */
 export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
   const writer = new KeymanXMLWriter("keyboard3");
   const { kmxplus } = kmx;
@@ -71,7 +78,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
   }
 
   function getVersion() {
-    return { '$value': kmx.kmxplus.meta.version.value };
+    return { '$number': kmx.kmxplus.meta.version.value };
   }
 
   function getDisplays() {
@@ -132,6 +139,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
           .map((key: KMXPlus.KeysKeys) => ({
             ...stringToAttr('id', key.id),
             ...stringToAttr('output', key.to),
+            ...asAttr('longPressKeyIds', key?.longPress?.join(' ') || undefined),
           })),
       },
     };
