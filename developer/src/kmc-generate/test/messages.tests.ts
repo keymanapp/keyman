@@ -11,6 +11,8 @@ import { GeneratorMessages } from '../src/generator-messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AbstractGenerator, GeneratorOptions } from '../src/abstract-generator.js';
+import { BasicGenerator } from '../src/basic-generator.js';
+import { options } from './shared-options.js';
 
 describe('GeneratorMessages', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -61,5 +63,17 @@ describe('GeneratorMessages', function () {
     }));
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_CannotWriteOutputFile),
       `messageId ERROR_CannotWriteOutputFile not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+  });
+
+  it('should generate ERROR_InvalidTarget if an invalid target is passed in', async function () {
+    const testOptions: GeneratorOptions = { ...options,
+      // @ts-ignore ('invalid' could be passed by a user, even if would be a compile error here)
+      targets: ['invalid']
+    };
+    const bg = new BasicGenerator();
+    const callbacks = new TestCompilerCallbacks();
+    assert(await bg.init(callbacks, testOptions));
+    assert.isFalse(bg.test_preGenerate());
+    assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidTarget));
   });
 });
