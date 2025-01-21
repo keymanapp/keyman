@@ -161,6 +161,7 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
+function ProcessBackroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -389,9 +390,6 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  BUpdateSM : TUpdateStateMachine;
-  frmStartInstall: TfrmStartInstall;
-  UserCanceled : Boolean;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -439,54 +437,10 @@ begin
     Exit;
   end;
 
-  BUpdateSM := TUpdateStateMachine.Create(False);
-    try
-      if (FMode = fmBackgroundUpdateCheck) then
-      begin
-        BUpdateSM.HandleCheck;
-        Exit;
-      end
-      else if (FMode = fmBackgroundDownload) then
-      begin
-        BUpdateSM.HandleDownload;
-        Exit;
-      end
-      else if (FMode = fmApplyInstallNow) then
-      begin
-        BUpdateSM.HandleInstallNow;
-        Exit;
-      end
-      else if (FMode = fmInstallKeyboardPackageAdmin) then
-      begin
-        BUpdateSM.HandleInstallPackages;
-        Exit;
-      end
-      else
-      begin
-        // The following logic around the WaitingRestartState should be
-        // encapsulated in the state machine however as we want separation of
-        // UI elements from the state machine we have bring some of logic here.
-        UserCanceled := False;
-        if BUpdateSM.ReadyToInstall and
-          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout])) then
-        begin
-          frmStartInstall := TfrmStartInstall.Create(nil);
-          try
-            if frmStartInstall.ShowModal = mrOk then
-              UserCanceled := False
-            else
-              UserCanceled := True
-          finally
-            frmStartInstall.Free;
-          end;
-        end;
-        if not UserCanceled and (BUpdateSM.HandleKmShell = 1) then
-          Exit;
-        end;
-    finally
-      BUpdateSM.Free;
-    end;
-
+  if ProcessBackroundUpdate(FMode, FSilent) then
+  begin
+    Exit;
+  end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin
@@ -695,6 +649,77 @@ begin
       PrintKeyboard(kmcom.Keyboards[n]);
     finally
       Free;
+    end;
+end;
+
+function ProcessBackroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
+var
+  BUpdateSM : TUpdateStateMachine;
+  frmStartInstall: TfrmStartInstall;
+  UserCanceled : Boolean;
+  SkipBUpdate : Boolean;
+begin
+  BUpdateSM := TUpdateStateMachine.Create(False);
+  Result := False;
+    try
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        BUpdateSM.HandleCheck;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmApplyInstallNow) then
+      begin
+        BUpdateSM.HandleInstallNow;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmInstallKeyboardPackageAdmin) then
+      begin
+        BUpdateSM.HandleInstallPackages;
+        Result := True;
+        Exit;
+      end
+      else
+      begin
+        // Since Package upgrade and Keyman upgrade share the installing state
+        // the following package related switches are valid in in the installing
+        // state.
+        SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
+        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
+        fmUpgradeMnemonicLayout]));
+        // The following logic around the WaitingRestartState should be
+        // encapsulated in the state machine however as we want separation of
+        // UI elements from the state machine we have bring some of logic here.
+        UserCanceled := False;
+        if BUpdateSM.ReadyToInstall and
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout, fmHelp,
+          fmShowHelp, fmSettings])) then
+        begin
+          frmStartInstall := TfrmStartInstall.Create(nil);
+          try
+            if frmStartInstall.ShowModal = mrOk then
+              UserCanceled := False
+            else
+              UserCanceled := True
+          finally
+            frmStartInstall.Free;
+          end;
+        end;
+        if not UserCanceled and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    finally
+      BUpdateSM.Free;
     end;
 end;
 
