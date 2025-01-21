@@ -26,7 +26,7 @@ describe('predictionAutoSelect', () => {
     const predictions = [
       {
         correction: {
-          sample: 'apple', // can be null / "mocked out"
+          sample: 'apple',
           p: 1
         },
         prediction: {
@@ -52,6 +52,56 @@ describe('predictionAutoSelect', () => {
     assert.isOk(autoselected);
   });
 
+  it(`does not select suggestions if the root correction has no letters`, () => {
+    /**
+     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
+     */
+    const predictions = [
+      {
+        correction: {
+          sample: '5',
+          p: 1
+        },
+        prediction: {
+          sample: {
+            tag: 'keep',
+            transform: {
+              insert: '5',
+              deleteLeft: 0
+            },
+            matchesModel: false
+          },
+          p: 0.01
+        },
+        totalProb: 0.01
+      },
+      {
+        correction: {
+          sample: '5',
+          p: 1
+        },
+        prediction: {
+          sample: {
+            transform: {
+              insert: '5th',
+              deleteLeft: 0
+            },
+            matchesModel: true
+          },
+          p: 0.8
+        },
+        totalProb: 0.8
+      }
+    ];
+
+    const originalPredictions = [].concat(predictions);
+    assert.doesNotThrow(() => predictionAutoSelect(predictions));
+    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+
+    const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
+    assert.isNotOk(autoselected);
+  });
+
   it(`does not select solitary 'keep' suggestion that doesn't match the model`, () => {
     /**
      * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
@@ -59,7 +109,7 @@ describe('predictionAutoSelect', () => {
     const predictions = [
       {
         correction: {
-          sample: 'appl', // can be null / "mocked out"
+          sample: 'appl',
           p: 1
         },
         prediction: {
@@ -91,7 +141,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -110,7 +160,7 @@ describe('predictionAutoSelect', () => {
 
     const highestNonKeepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -133,7 +183,7 @@ describe('predictionAutoSelect', () => {
       highestNonKeepSuggestion,
       {
         correction: {
-          sample: 'thin', // can be null / "mocked out"
+          sample: 'thin',
           p: .8
         },
         prediction: {
@@ -149,7 +199,7 @@ describe('predictionAutoSelect', () => {
       },
       {
         correction: {
-          sample: 'thic', // can be null / "mocked out"
+          sample: 'thic',
           p: .2
         },
         prediction: {
@@ -181,7 +231,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -204,7 +254,7 @@ describe('predictionAutoSelect', () => {
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
     const onlyNonKeepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -246,7 +296,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -269,7 +319,7 @@ describe('predictionAutoSelect', () => {
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
     const highestNonKeepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -292,7 +342,7 @@ describe('predictionAutoSelect', () => {
       highestNonKeepSuggestion,
       {
         correction: {
-          sample: 'thin', // can be null / "mocked out"
+          sample: 'thin',
           p: .8
         },
         prediction: {
@@ -308,7 +358,7 @@ describe('predictionAutoSelect', () => {
       },
       {
         correction: {
-          sample: 'thic', // can be null / "mocked out"
+          sample: 'thic',
           p: .2
         },
         prediction: {
@@ -343,7 +393,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .8
       },
       prediction: {
@@ -362,7 +412,7 @@ describe('predictionAutoSelect', () => {
 
     const highestNonKeepSuggestion = {
       correction: {
-        sample: 'thin', // can be null / "mocked out"
+        sample: 'thin',
         p: .9
       },
       prediction: {
@@ -385,7 +435,7 @@ describe('predictionAutoSelect', () => {
       highestNonKeepSuggestion,
       {
         correction: {
-          sample: 'thin', // can be null / "mocked out"
+          sample: 'thin',
           p: .9
         },
         prediction: {
@@ -401,7 +451,7 @@ describe('predictionAutoSelect', () => {
       },
       {
         correction: {
-          sample: 'thic', // can be null / "mocked out"
+          sample: 'thic',
           p: .1
         },
         prediction: {
@@ -436,7 +486,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'cant', // can be null / "mocked out"
+        sample: 'cant',
         p: 1
       },
       prediction: {
@@ -456,7 +506,7 @@ describe('predictionAutoSelect', () => {
 
     const expectedSuggestion = {
       correction: {
-        sample: 'cant', // can be null / "mocked out"
+        sample: 'cant',
         p: 1
       },
       prediction: {
@@ -480,7 +530,7 @@ describe('predictionAutoSelect', () => {
       expectedSuggestion,
       {
         correction: {
-          sample: 'cant', // can be null / "mocked out"
+          sample: 'cant',
           p: 1
         },
         prediction: {
@@ -515,7 +565,7 @@ describe('predictionAutoSelect', () => {
      */
     const keepSuggestion = {
       correction: {
-        sample: 'thi', // can be null / "mocked out"
+        sample: 'thi',
         p: .7
       },
       prediction: {
@@ -534,7 +584,7 @@ describe('predictionAutoSelect', () => {
 
     const highestCorrectionSuggestion = {
       correction: {
-        sample: 'thi', // can be null / "mocked out"
+        sample: 'thi',
         p: .7
       },
       prediction: {
@@ -551,7 +601,7 @@ describe('predictionAutoSelect', () => {
 
     const highestNonKeepSuggestion = {
       correction: {
-        sample: 'the', // can be null / "mocked out"
+        sample: 'the',
         p: .3
       },
       prediction: {
