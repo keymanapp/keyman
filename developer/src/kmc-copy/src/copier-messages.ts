@@ -211,4 +211,18 @@ export class CopierMessages {
     `Downloading folder '${def(o.path)}' from '${def(o.url)}'`,
   );
 
+  // See also generator-messages.ERROR_InvalidKeymanKeyboardId
+  static ERROR_InvalidKeyboardId = SevError | 0x001E;
+  static Error_InvalidKeyboardId = (o:{id: string}) => m(
+    this.ERROR_InvalidKeyboardId,
+    `The specified keyboard id '${def(o.id)}' contains characters that are not permitted for a keyboard id or filename.`,
+  );
+
+  // See also generator-messages.ERROR_InvalidLexicalModelId
+  static ERROR_InvalidLexicalModelId = SevError | 0x001F;
+  static Error_InvalidLexicalModelId = (o:{id:string}) => m(
+    this.ERROR_InvalidLexicalModelId,
+    `The specified lexical model id '${def(o.id)}' contains characters that are not permitted or does not match the required pattern of 'author.bcp47.uniq'.`,
+  );
+
 };

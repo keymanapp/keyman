@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -120,7 +120,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     this.asyncCallbacks = new CopierAsyncCallbacks(this.callbacks, this.githubRef);
 
-    // TODO-COPY: validate outputId is valid for the project type?
     this.outputId = this.callbacks.path.basename(this.outPath);
     this.sourceId = this.callbacks.path.basename(projectSource, KeymanFileTypes.Source.Project);
 
@@ -129,6 +128,20 @@ export class KeymanProjectCopier implements KeymanCompiler {
     if(!project) {
       // loadProjectFromFile already reported errors
       return null;
+    }
+
+    if(project.isKeyboardProject()) {
+      // LDML and .kmn keyboards have the same id validity requirements, so
+      // we'll just test against .kmn
+      if(!ValidIds.isValidKeymanKeyboardId(this.outputId)) {
+        this.callbacks.reportMessage(CopierMessages.Error_InvalidKeyboardId({id: this.outputId}));
+        return null;
+      }
+    } else if(project.isLexicalModelProject()) {
+      if(!ValidIds.isValidLexicalModelId(this.outputId)) {
+        this.callbacks.reportMessage(CopierMessages.Error_InvalidLexicalModelId({id: this.outputId}));
+        return null;
+      }
     }
 
     const result: CopierResult = { artifacts: {
