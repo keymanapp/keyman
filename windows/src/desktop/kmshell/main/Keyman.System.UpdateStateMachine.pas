@@ -767,6 +767,7 @@ begin
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
     'Error Updates not downloaded after 3 attempts');
+    bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
   else
