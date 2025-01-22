@@ -60,4 +60,22 @@ export class GeneratorMessages {
     this.ERROR_InvalidTarget,
     `The specified target platform '${def(o.target)}' is not a valid target.`
   );
+
+  static ERROR_InvalidKeymanKeyboardId = SevError | 0x0008;
+  static Error_InvalidKeymanKeyboardId = (o:{id:string}) => m(
+    this.ERROR_InvalidKeymanKeyboardId,
+    `The specified keyboard id '${def(o.id)}' contains characters that are not permitted for a .kmn keyboard id or filename.`
+  );
+
+  static ERROR_InvalidLdmlKeyboardId = SevError | 0x0009;
+  static Error_InvalidLdmlKeyboardId = (o:{id:string}) => m(
+    this.ERROR_InvalidLdmlKeyboardId,
+    `The specified keyboard id '${def(o.id)}' contains characters that are not permitted for an LDML .xml keyboard id or filename.`
+  );
+
+  static ERROR_InvalidLexicalModelId = SevError | 0x000A;
+  static Error_InvalidLexicalModelId = (o:{id:string}) => m(
+    this.ERROR_InvalidLexicalModelId,
+    `The specified lexical model id '${def(o.id)}' contains characters that are not permitted or does not match the required pattern of 'author.bcp47.uniq'.`
+  );
 };

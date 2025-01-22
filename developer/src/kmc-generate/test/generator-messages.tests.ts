@@ -2,16 +2,23 @@
  * Keyman is copyright (C) SIL International. MIT License.
  */
 
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+
 import 'mocha';
-import * as path from 'path';
-import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import { assert } from 'chai';
-import { GeneratorMessages } from '../src/generator-messages.js';
+
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
+
+import { GeneratorMessages } from '../src/generator-messages.js';
 import { AbstractGenerator, GeneratorOptions } from '../src/abstract-generator.js';
 import { BasicGenerator } from '../src/basic-generator.js';
+import { KeymanKeyboardGenerator } from '../src/keyman-keyboard-generator.js';
+import { LdmlKeyboardGenerator } from '../src/ldml-keyboard-generator.js';
+import { LexicalModelGenerator } from '../src/lexical-model-generator.js';
+
 import { options } from './shared-options.js';
 
 describe('GeneratorMessages', function () {
@@ -75,5 +82,38 @@ describe('GeneratorMessages', function () {
     assert(await bg.init(callbacks, testOptions));
     assert.isFalse(bg.test_preGenerate());
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidTarget));
+  });
+
+  it('should generate ERROR_InvalidKeymanKeyboardId if an invalid keyboard id is passed in', async function () {
+    const testOptions: GeneratorOptions = { ...options,
+      id: '???invalid',
+    };
+    const kkg = new KeymanKeyboardGenerator();
+    const callbacks = new TestCompilerCallbacks();
+    assert.isTrue(await kkg.init(callbacks, testOptions));
+    assert.isNull(await kkg.run());
+    assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidKeymanKeyboardId));
+  });
+
+  it('should generate ERROR_InvalidLdmlKeyboardId if an invalid keyboard id is passed in', async function () {
+    const testOptions: GeneratorOptions = { ...options,
+      id: '???invalid',
+    };
+    const lkg = new LdmlKeyboardGenerator();
+    const callbacks = new TestCompilerCallbacks();
+    assert.isTrue(await lkg.init(callbacks, testOptions));
+    assert.isNull(await lkg.run());
+    assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidLdmlKeyboardId));
+  });
+
+  it('should generate ERROR_InvalidLexicalModelId if an invalid lexical model id is passed in', async function () {
+    const testOptions: GeneratorOptions = { ...options,
+      id: 'example.???.invalid',
+    };
+    const lmg = new LexicalModelGenerator();
+    const callbacks = new TestCompilerCallbacks();
+    assert.isTrue(await lmg.init(callbacks, testOptions));
+    assert.isNull(await lmg.run());
+    assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidLexicalModelId));
   });
 });
