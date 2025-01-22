@@ -367,10 +367,13 @@ and the files in that folder will follow the
 
 : The name of keyboard author (default: blank)
 
+<!-- TODO-GENERATE: uncomment once supported
+
 `-i, --icon`
 
 : Include a generated icon. The icon will be a 16x16 pixel box with the first
   letters of the first language tag (default: true, include an icon)
+-->
 
 `-d, --description <description>`
 
