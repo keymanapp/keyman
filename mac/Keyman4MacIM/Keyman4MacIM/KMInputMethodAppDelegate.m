@@ -18,7 +18,6 @@
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 #import "KMSentryHelper.h"
-//#include "TargetConditionals.h"
 @import Sentry;
 
 #if TARGET_CPU_ARM64
@@ -198,7 +197,6 @@ id _lastServerWithOSKShowing = nil;
   [self updateKeyboardMenuItems];
   [self setPostLaunchKeymanSentryTags];
   self.sentryTestingEnabled = [KMSettingsRepository.shared readForceSentryError];
-  // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
 - (void)startSentry {
@@ -209,7 +207,6 @@ id _lastServerWithOSKShowing = nil;
     options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
     options.releaseName = releaseName;
     options.environment = keymanVersionInfo.sentryEnvironment;
-    //options.debug = YES;
   }];
 }
 
@@ -244,22 +241,12 @@ id _lastServerWithOSKShowing = nil;
   NSString *keyboardFileName = [self.kmx.filePath lastPathComponent];
    os_log_info([KMLogs keyboardLog], "initial kmx set to %{public}@", keyboardFileName);
 
-  // assign custom keyboard tag in Sentry for accessibility and initial keyboard
+  // assign custom keyboard tags in Sentry
   [KMSentryHelper addKeyboardTag:keyboardFileName];
   [KMSentryHelper addHasAccessibilityTag:[PrivacyConsent.shared checkAccessibility]];
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
   [KMSentryHelper addArchitectureTag:processorType];
-  
 }
-
-#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
-- (BOOL)alertShowHelp:(NSAlert *)alert {
-  os_log_error([KMLogs startupLog], "Sentry - KME: Got call to force crash from engine");
-  [SentrySDK crash];
-  os_log_error([KMLogs startupLog], "Sentry - KME: should not have gotten this far!");
-  return NO;
-}
-#endif
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
   
