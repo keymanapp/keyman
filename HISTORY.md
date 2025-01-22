@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.175 alpha 2025-01-22
+
+* feat(windows): Fixes check now to use SM and LastUpdateCheckTime key on first run. (#12922)
+* chore(developer): validate keyboard and model IDs in kmc-generate (#12958)
+* fix(developer): use correct terms in kmc-generate lexical model help (#12960)
+* fix(developer): use 1.0.0 as default for ldml keyboards in kmc-generate (#12962)
+* chore: adds h1 tags (#12967)
+* fix(web): prevent warning that occurs when multitapping longpressable modifier keys (#12964)
+* chore(developer): add test for basic transform to kmc-generate (#12966)
+* fix(android/engine): Revert how keyboard picker menu launches (#12986)
+
 ## 18.0.174 alpha 2025-01-21
 
 * chore(developer): validate targets parameter in kmc-generate (#12955)
