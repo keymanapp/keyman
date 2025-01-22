@@ -315,7 +315,7 @@ describe('KeymanProjectCopier', function() {
       //
 
       assert.isOk(result);
-      assert.isEmpty(callbacks.messages);
+      assert.isEmpty(callbacks.filteredMessages());
 
       if(TEST_SAVE_ARTIFACTS) {
         assert.isTrue(await copier.write(result.artifacts));
@@ -377,7 +377,7 @@ describe('KeymanProjectCopier', function() {
 
     // We should have no messages and a successful result
     assert.isOk(result);
-    assert.isEmpty(callbacks.messages);
+    assert.isEmpty(callbacks.filteredMessages());
 
     // TODO-COPY: verify outcome using pattern above
 
@@ -404,7 +404,7 @@ describe('KeymanProjectCopier', function() {
 
       // We should have no messages and a successful result
       assert.isOk(result);
-      assert.isEmpty(callbacks.messages);
+      assert.isEmpty(callbacks.filteredMessages());
 
       // TODO-COPY: verify outcome using pattern above
 
