@@ -19,7 +19,6 @@ export function declareCopy(program: Command) {
   command
     .description('Copy a Keyman keyboard or lexical model project')
     .option('-o, --out-path <path>', 'New name and path for project')
-    // TODO-COPY .option('-r, --rename', 'Rename instead of copying project')
     .option('-n, --dry-run', 'Show what would happen, without making changes')
     .action(copyProject)
     .addHelpText('before', `
@@ -36,7 +35,6 @@ export function declareCopy(program: Command) {
 function commanderOptionsToCopierOptions(options: any): CopierOptions {
   const result: CopierOptions = {
     outPath: options.outPath,
-    // TODO-COPY rename: options.rename ?? false,
     dryRun: options.dryRun ?? false,
   };
   return result;

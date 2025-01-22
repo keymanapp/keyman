@@ -306,7 +306,6 @@ describe('KeymanProjectCopier', function() {
       assert.isTrue(await copier.init(callbacks, {
         dryRun: false,
         outPath,
-        // TODO-COPY rename: false,
       }));
 
       const result = await copier.run(fullSource);
@@ -370,7 +369,6 @@ describe('KeymanProjectCopier', function() {
     assert.isTrue(await copier.init(callbacks, {
       dryRun: false,
       outPath,
-      // TODO-COPY rename: false,
     }));
 
     // armenian_mnemonic selected because (a) small, and (b) has v2.0 project, so
@@ -400,7 +398,6 @@ describe('KeymanProjectCopier', function() {
       assert.isTrue(await copier.init(callbacks, {
         dryRun: false,
         outPath,
-        // TODO-COPY rename: false,
       }));
 
       const result = await copier.run('cloud:'+id);

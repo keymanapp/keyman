@@ -29,11 +29,6 @@ export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
    * output path where project folder will be created
    */
   outPath: string;
-  /*
-   * TODO-COPY rename: rename existing files rather than copy
-
-  rename: boolean;
-  */
   /**
    * dryRun: show what would happen
    */
