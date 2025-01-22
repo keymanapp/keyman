@@ -5,9 +5,10 @@
  */
 
 import { KeymanFileTypes, KeymanTargets } from '@keymanapp/common-types';
-import { KeymanCompiler, } from '@keymanapp/developer-utils';
+import { KeymanCompiler, ValidIds, } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
+import { GeneratorMessages } from './generator-messages.js';
 
 /**
  * @public
@@ -39,7 +40,15 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
-    this.preGenerate();
+    if(!ValidIds.isValidKeymanKeyboardId(this.options.id)) {
+      this.callbacks.reportMessage(GeneratorMessages.Error_InvalidKeymanKeyboardId({id:this.options.id}));
+      return null;
+    }
+
+    if(!this.preGenerate()) {
+      // errors will have been reported in preGenerate
+      return null;
+    }
 
     const artifacts: GeneratorArtifacts = this.defaultArtifacts();
 

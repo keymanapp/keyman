@@ -567,7 +567,7 @@ function TUpdateStateMachine.ReadyToInstall: Boolean;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
-  if (CurrentState.ClassName = 'WaitingRestartState') and not HasKeymanRun then
+  if (CurrentState is WaitingRestartState) and not HasKeymanRun then
     Result := True
   else
     Result := False;
