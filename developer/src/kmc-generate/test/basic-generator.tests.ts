@@ -3,6 +3,7 @@
  */
 
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 import 'mocha';
 import { assert } from 'chai';
@@ -54,13 +55,13 @@ describe('BasicGenerator', function () {
     // standard artifacts are listed in AbstractGenerator
     const keys = [].concat(
       'kmc-generate:outputPath',
-      BasicGeneratorTest.files().map(f => f.replaceAll('/', '\\'))
+      BasicGeneratorTest.files().map(f => f.replaceAll('/', path.sep))
     );
 
     assert.hasAllKeys(artifacts, keys);
 
     // pick one file and compare it
-    const filename = BasicGeneratorTest.files()[0].replaceAll('/', '\\'); // welcome.htm
+    const filename = BasicGeneratorTest.files()[0].replaceAll('/', path.sep); // welcome.htm
     assert.equal(artifacts[filename].filename, filename);
     const fixturePath = makePathToFixture('basic', 'welcome.htm');
     const fixture = fs.readFileSync(fixturePath, 'utf-8').replace(/\r\n/g, '\n');
