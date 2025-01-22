@@ -158,7 +158,7 @@ id _lastServerWithOSKShowing = nil;
  
   os_log_debug([KMLogs lifecycleLog], "--- inputMethodActivated, kvk is non-nil: %{public}@ showOskOnActivate: %{public}@", (_kvk!=nil)?@"true":@"false", [KMInputMethodLifecycle.shared shouldShowOskOnActivate]?@"true":@"false");
 
-  if (_kvk != nil && ([KMInputMethodLifecycle.shared shouldShowOskOnActivate])) {
+  if ([KMInputMethodLifecycle.shared shouldShowOskOnActivate]) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
     [KMSentryHelper addBreadCrumb:@"lifecycle" message:@"opening OSK on input method activation"];
     [self showOSK];
