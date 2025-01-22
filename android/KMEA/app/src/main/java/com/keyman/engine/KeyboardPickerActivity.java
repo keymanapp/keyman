@@ -294,7 +294,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
   @Override
   public boolean onSupportNavigateUp() {
-    onBackPressed();
+    super.onBackPressed();
     return true;
   }
 

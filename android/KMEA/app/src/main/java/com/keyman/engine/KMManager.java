@@ -2267,7 +2267,13 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+
+      Context parentContext = context.getApplicationContext();
+      PackageManager manager = context.getPackageManager();
+      if (true) {
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // but closes keyman.com search
+      }
+      Log.d(TAG, "test");
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
