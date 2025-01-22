@@ -1,5 +1,5 @@
 ---
-title: Welcome to Keyman
+title: Welcome to Keyman for macOS
 ---
 
 Thank you for installing Keyman for macOS. Whether you're a new or returning user, 
