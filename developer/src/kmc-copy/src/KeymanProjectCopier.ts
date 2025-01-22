@@ -310,7 +310,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
   };
 
   private async copyFolder(inputPath: string, outputPath: string, ignorePatterns: (string | RegExp)[], result: CopierResult) {
-    // TODO-COPY: watch out for file collisions when copying project files -- after renames
     const files = await this.asyncCallbacks.fsAsync.readdir(inputPath);
     for(const {filename,type} of files) {
       const fullPath = this.normalizePath(this.callbacks.path.join(inputPath, filename));
@@ -320,9 +319,17 @@ export class KeymanProjectCopier implements KeymanCompiler {
       if(type == 'dir') {
         await this.copyFolder(fullPath, this.callbacks.path.join(outputPath, filename), ignorePatterns, result);
       } else if(!result.artifacts[fullPath]) {
+        const filename = this.generateNewFilename(fullPath, outputPath);
+
+        for(const artifact of Object.keys(result.artifacts)) {
+          if(result.artifacts[artifact].filename == filename) {
+            this.callbacks.reportMessage(CopierMessages.Warn_FilenameCollides({filename}));
+          }
+        }
+
         result.artifacts[fullPath] = {
           data: await this.asyncCallbacks.fsAsync.readFile(fullPath),
-          filename: this.generateNewFilename(fullPath, outputPath)
+          filename
         }
       }
     }

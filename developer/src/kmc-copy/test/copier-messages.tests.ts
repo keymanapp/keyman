@@ -44,36 +44,11 @@ describe('CopierMessages', function () {
     assert.isTrue(callbacks.hasMessage(CopierMessages.ERROR_InvalidLexicalModelId));
   });
 
-  // it('should generate ERROR_OutputPathAlreadyExists if output path already exists', async function () {
-  //   const ag = new AbstractGenerator();
-  //   const callbacks = new TestCompilerCallbacks();
-  //   const options: GeneratorOptions = {
-  //     id: 'ERROR_OutputPathAlreadyExists',
-  //     outPath: path.dirname(fileURLToPath(import.meta.url)),
-  //   };
-  //   assert(await ag.init(callbacks, options));
-  //   const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'ERROR_OutputPathAlreadyExists');
-  //   if(!fs.existsSync(dir))
-  //     fs.mkdirSync(dir);
-  //   assert.isFalse(await ag.write({}));
-  //   assert.isTrue(callbacks.hasMessage(CopierMessages.ERROR_OutputPathAlreadyExists),
-  //     `messageId ERROR_OutputPathAlreadyExists not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-
-  //   fs.rmdirSync(dir);
-  // });
-
-  // it('should generate ERROR_CannotWriteOutputFile if it cannot create a folder, e.g. invalid filename', async function () {
-  //   const ag = new AbstractGenerator();
-  //   const callbacks = new TestCompilerCallbacks();
-  //   const options: GeneratorOptions = {
-  //     id: 'ERROR_CannotWriteOutputFile',
-  //     outPath: path.dirname(fileURLToPath(import.meta.url)),
-  //   };
-  //   assert(await ag.init(callbacks, options));
-  //   assert.isFalse(await ag.write({
-  //     '.': {filename: '.', data: new Uint8Array([1,2,3])}
-  //   }));
-  //   assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_CannotWriteOutputFile),
-  //     `messageId ERROR_CannotWriteOutputFile not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-  // });
+  it('should generate WARN_FilenameCollision if a copied file will collide', async function() {
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {dryRun: true, outPath: 'collided'}))
+    const result = await copier.run(makePathToFixture('projects/collision/collision.kpj'));
+    assert.isNotNull(result);
+    assert.isTrue(callbacks.hasMessage(CopierMessages.WARN_FilenameCollides));
+  });
 });

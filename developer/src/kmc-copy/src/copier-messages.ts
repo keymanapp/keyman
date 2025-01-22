@@ -225,4 +225,10 @@ export class CopierMessages {
     `The specified lexical model id '${def(o.id)}' contains characters that are not permitted or does not match the required pattern of 'author.bcp47.uniq'.`,
   );
 
+  static WARN_FilenameCollides = SevWarn | 0x0020;
+  static Warn_FilenameCollides = (o:{filename:string}) => m(
+    this.WARN_FilenameCollides,
+    `The output file '${def(o.filename)}' has two different possible source files.`,
+  );
+
 };
