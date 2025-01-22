@@ -1005,11 +1005,11 @@ begin
     FPackage.Install2(True);
     Result := True;
   except
-    on E: Exception do
-      begin
-        TKeymanSentryClient.ReportHandledException(E,
-          'Failed to install keyboard package');
-      end;
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E,
+        'Failed to install keyboard package');
+    end;
   end;
 
   FPackage := nil;
