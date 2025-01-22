@@ -5,7 +5,7 @@
  */
 
 import { KeymanFileTypes } from '@keymanapp/common-types';
-import { KeymanCompiler, SourceFilenamePatterns } from '@keymanapp/developer-utils';
+import { KeymanCompiler, SourceFilenamePatterns, ValidIds } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
 import { GeneratorMessages } from './generator-messages.js';
@@ -31,7 +31,15 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
    * @returns         Binary artifacts on success, null on failure.
    */
   async run(): Promise<GeneratorResult> {
-    this.preGenerate();
+    if(!ValidIds.isValidLexicalModelId(this.options.id)) {
+      this.callbacks.reportMessage(GeneratorMessages.Error_InvalidLexicalModelId({id:this.options.id}));
+      return null;
+    }
+
+    if(!this.preGenerate()) {
+      // errors will have been reported in preGenerate
+      return null;
+    }
 
     const artifacts: GeneratorArtifacts = this.defaultArtifacts();
 

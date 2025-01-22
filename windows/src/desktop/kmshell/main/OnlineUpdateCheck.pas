@@ -98,11 +98,11 @@ type
 
     FShowErrors: Boolean;
     FDownload: TOnlineUpdateCheckDownloadParams;
+    FCheckOnly: Boolean;
 
     function DownloadUpdates: Boolean;
     procedure DoDownloadUpdates(AOwner: TfrmDownloadProgress; var Result: Boolean);
     function DoRun: TOnlineUpdateCheckResult;
-    procedure ShowUpdateForm;
     procedure ShutDown;
     procedure DownloadUpdatesHTTPStatus(Sender: THTTPUploader;
       const Message: string; Position, Total: Int64); // I2855
@@ -112,7 +112,9 @@ type
   public
 
   public
-    constructor Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
+    function ResponseToParams(const ucr: TUpdateCheckResponse): TOnlineUpdateCheckParams;
+
+    constructor Create(AOwner: TCustomForm; AForce, ASilent: Boolean; ACheckOnly: Boolean = False);
     destructor Destroy; override;
     function Run: TOnlineUpdateCheckResult;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
@@ -146,6 +148,7 @@ uses
   KLog,
   keymanapi_TLB,
   KeymanVersion,
+  Keyman.System.UpdateCheckStorage,
   kmint,
   ErrorControlledRegistry,
   RegistryKeys,
@@ -153,8 +156,6 @@ uses
   utildir,
   utilexecute,
   OnlineUpdateCheckMessages,
-  UfrmOnlineUpdateIcon,
-  UfrmOnlineUpdateNewVersion,
   utilkmshell,
   utilsystem,
   utiluac,
@@ -165,7 +166,7 @@ const
 
 { TOnlineUpdateCheck }
 
-constructor TOnlineUpdateCheck.Create(AOwner: TCustomForm; AForce, ASilent: Boolean);
+constructor TOnlineUpdateCheck.Create(AOwner: TCustomForm; AForce, ASilent: Boolean; ACheckOnly: Boolean);
 begin
   inherited Create;
 
@@ -176,6 +177,7 @@ begin
 
   FSilent := ASilent;
   FForce := AForce;
+  FCheckOnly := ACheckOnly;
 
   KL.Log('TOnlineUpdateCheck.Create');
 end;
@@ -388,86 +390,6 @@ begin
   end;
 end;
 
-procedure TOnlineUpdateCheck.ShowUpdateForm;
-var
-  i: Integer;
-  FRequiresAdmin: Boolean;
-  FOwnerHandle: THandle;
-begin
-  if Assigned(FOwner)
-    then FOwnerHandle := FOwner.Handle
-    else FOwnerHandle := Application.Handle;
-
-  { We have an update available }
-  with OnlineUpdateNewVersion(FOwner) do
-  try
-    Params := Self.FParams;
-    if ShowModal <> mrYes then
-    begin
-      Self.FParams.Result := oucUnknown;
-      Self.FErrorMessage := '';
-      Exit;
-    end;
-
-    Self.FParams := Params;
-  finally
-    Free;
-  end;
-
-  if not DownloadUpdates then
-  begin
-    Self.FParams.Result := oucUnknown;  // I2742
-    Exit;
-  end
-  else
-  begin
-    if not kmcom.SystemInfo.IsAdministrator then
-    begin
-      FRequiresAdmin := FParams.Keyman.Install;
-      for i := 0 to High(FParams.Packages) do
-        if FParams.Packages[i].Install then
-        begin
-          FRequiresAdmin := True;
-          Break;
-        end;
-    end
-    else
-      FRequiresAdmin := False;
-
-    if FRequiresAdmin then
-    begin
-      if CanElevate then
-      begin
-        SavePackageUpgradesToDownloadTempPath;
-        if WaitForElevatedConfiguration(FOwnerHandle, '-ou "'+DownloadTempPath+'"', not FParams.Keyman.Install) <> 0 then  // I2513
-          FParams.Result := oucFailure
-        else if FParams.Keyman.Install then
-          FParams.Result := oucShutDown
-        else
-          FParams.Result := oucSuccess;
-      end
-      else
-      begin
-        ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
-        FParams.Result := oucFailure;
-      end;
-    end
-    else
-    begin
-      FParams.Result := oucSuccess;
-      for i := 0 to High(FParams.Packages) do
-        if FParams.Packages[i].Install then
-          if not DoInstallPackage(FParams.Packages[i]) then FParams.Result := oucFailure;
-
-      if FParams.Keyman.Install then
-      begin
-        DoInstallKeyman;
-        FParams.Result := oucShutDown;
-      end;
-    end;
-  end;
-end;
-
 procedure TOnlineUpdateCheck.ShutDown;
 begin
   if Assigned(Application) then
@@ -477,10 +399,9 @@ end;
 function TOnlineUpdateCheck.DoRun: TOnlineUpdateCheckResult;
 var
   flags: DWord;
-  i, n: Integer;
-  pkg: IKeymanPackage;
-  j: Integer;
+  i: Integer;
   ucr: TUpdateCheckResponse;
+  pkg: IKeymanPackage;
 begin
   {FProxyHost := '';
   FProxyPort := 0;}
@@ -567,54 +488,9 @@ begin
       begin
         if ucr.Parse(Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
-          SetLength(FParams.Packages,0);
-          for i := Low(ucr.Packages) to High(ucr.Packages) do
-          begin
-            n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
-            if n >= 0 then
-            begin
-              pkg := kmcom.Packages[n];
-              j := Length(FParams.Packages);
-              SetLength(FParams.Packages, j+1);
-              FParams.Packages[j].NewID := ucr.Packages[i].NewID;
-              FParams.Packages[j].ID := ucr.Packages[i].ID;
-              FParams.Packages[j].Description := ucr.Packages[i].Name;
-              FParams.Packages[j].OldVersion := pkg.Version;
-              FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
-              FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
-              FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
-              FParams.Packages[j].FileName := ucr.Packages[i].FileName;
-              pkg := nil;
-            end
-            else
-              FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
-          end;
-
-          case ucr.Status of
-            ucrsNoUpdate:
-              begin
-                FErrorMessage := ucr.ErrorMessage;
-              end;
-            ucrsUpdateReady:
-              begin
-                FParams.Keyman.OldVersion := ucr.CurrentVersion;
-                FParams.Keyman.NewVersion := ucr.NewVersion;
-                FParams.Keyman.DownloadURL := ucr.InstallURL;
-                FParams.Keyman.DownloadSize := ucr.InstallSize;
-                FParams.Keyman.FileName := ucr.FileName;
-              end;
-          end;
-
-          if (Length(FParams.Packages) > 0) or (FParams.Keyman.DownloadURL <> '') then
-          begin
-            if not FSilent then
-              ShowUpdateForm
-            else
-            begin
-              ShowUpdateIcon;
-            end;
-            Result := FParams.Result;
-          end;
+          ResponseToParams(ucr);
+          TUpdateCheckStorage.SaveUpdateCacheData(ucr);
+          Result := FParams.Result;
         end
         else
         begin
@@ -649,6 +525,52 @@ begin
   finally
     Free;
   end;
+end;
+
+function TOnlineUpdateCheck.ResponseToParams(const ucr: TUpdateCheckResponse): TOnlineUpdateCheckParams;
+var
+  i, j, n: Integer;
+  pkg: IKeymanPackage;
+begin
+  SetLength(FParams.Packages,0);
+  for i := Low(ucr.Packages) to High(ucr.Packages) do
+  begin
+    n := kmcom.Packages.IndexOf(ucr.Packages[i].ID);
+    if n >= 0 then
+    begin
+      pkg := kmcom.Packages[n];
+      j := Length(FParams.Packages);
+      SetLength(FParams.Packages, j+1);
+      FParams.Packages[j].NewID := ucr.Packages[i].NewID;
+      FParams.Packages[j].ID := ucr.Packages[i].ID;
+      FParams.Packages[j].Description := ucr.Packages[i].Name;
+      FParams.Packages[j].OldVersion := pkg.Version;
+      FParams.Packages[j].NewVersion := ucr.Packages[i].NewVersion;
+      FParams.Packages[j].DownloadSize := ucr.Packages[i].DownloadSize;
+      FParams.Packages[j].DownloadURL := ucr.Packages[i].DownloadURL;
+      FParams.Packages[j].FileName := ucr.Packages[i].FileName;
+      pkg := nil;
+    end
+    else
+      FErrorMessage := 'Unable to find package '+ucr.Packages[i].ID;
+  end;
+
+  case ucr.Status of
+    ucrsNoUpdate:
+      begin
+        FErrorMessage := ucr.ErrorMessage;
+      end;
+    ucrsUpdateReady:
+      begin
+        FParams.Keyman.OldVersion := ucr.CurrentVersion;
+        FParams.Keyman.NewVersion := ucr.NewVersion;
+        FParams.Keyman.DownloadURL := ucr.InstallURL;
+        FParams.Keyman.DownloadSize := ucr.InstallSize;
+        FParams.Keyman.FileName := ucr.FileName;
+      end;
+  end;
+
+  Result := FParams;
 end;
 
 procedure OnlineUpdateAdmin(OwnerForm: TCustomForm; Path: string);

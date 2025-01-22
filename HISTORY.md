@@ -1,5 +1,70 @@
 # Keyman Version History
 
+## 18.0.174 alpha 2025-01-21
+
+* chore(developer): validate targets parameter in kmc-generate (#12955)
+* fix(developer): support `&displayMap` font in web debugger (#12929)
+
+## 18.0.173 alpha 2025-01-20
+
+* feat(developer): rewrite font data in .kvk from package metadata (#12949)
+* docs(ios): document gestures within iOS app help (#12900)
+* fix(developer): include developer-utils deps in server build (#12951)
+
+## 18.0.172 alpha 2025-01-19
+
+* chore(common): Add 17.0.333 to version history (#12926)
+
+## 18.0.171 alpha 2025-01-18
+
+* fix(common/web): add StrsItem.isEqual() method (#12868)
+* fix(common/web): handle invalid order and tertiary arguments to ElementString.fromString() (#12882)
+
+## 18.0.170 alpha 2025-01-17
+
+* chore(linux): update copyright year (#12918)
+* fix(web): patch unit test with execution dependent on autocorrect state (#12940)
+* test(common/web): unit tests for element-string (#12811)
+* chore(linux): Update debian changelog (#12917)
+
+## 18.0.169 alpha 2025-01-17
+
+* chore(windows): remove `postinstall` state from mermaid diagram (#12923)
+
+## 18.0.168 alpha 2025-01-16
+
+* chore: update macOS environment-variable shell script (#12878)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12871)
+* chore(web): integrates predictive-text builds to top level script, reconnects headless tests (#12866)
+* chore(ios): Update crowdin strings for Khmer (#12910)
+* chore(windows): merge master epic windows updates (#12904)
+* fix(developer): detect invalid key ids in touch layout files (#12895)
+* chore: use GitHub PR titles when writing HISTORY.md (#12907)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12909)
+* change(web): make 'keep' transform pattern match standard suggestion pattern by including the prefix string (#12906)
+* chore: Add docker images for building the different platforms (#11397)
+
+## 18.0.167 alpha 2025-01-15
+
+* chore: changes to use https and removes anchor in docs (#12838)
+* fix(developer): ensure license parameter is required and add tests (#12879)
+* fix(web): Improve predictive-text handling of text wordbreaking transitions (#12864)
+* chore(common): Update crowdin strings for Spanish (#12886)
+* docs(developer): Clarify square brackets in `U_####[_####]` shortcut (#12876)
+* feat: add builder tab-completion script (#12296)
+* docs(android): document longpress up-flick to quick-display shortcut (#12899)
+* docs(web): fix `adding-keyboards.md` (#12890)
+
+## 18.0.166 alpha 2025-01-10
+
+* fix(web): numpad + and - with zoom shortcut use (#12865)
+
+## 18.0.165 alpha 2025-01-09
+
+* feat(web): add KeymanWeb API for auto-correct (#12857)
+* chore(web): disable auto-correct (#12858)
+* refactor(web): modernize `web/ci.sh` script (#12862)
+
 ## 18.0.164 alpha 2025-01-08
 
 * fix(windows): add language and close button fit inside pop-window (#12855)
@@ -192,7 +257,7 @@
 
 ## 18.0.134 alpha 2024-11-04
 
-*  (#12606)
+* fix(developer): ldml don't allow a uset as right-hand-side variable (#12606)
 
 ## 18.0.133 alpha 2024-11-01
 
@@ -915,7 +980,7 @@
 ## 18.0.41 alpha 2024-05-22
 
 * fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11488)
-* chore(linux): Trigger GHA packaging for stable builds :cherries: (#11495)
+* chore(linux): Trigger GHA packaging for stable builds (#11495)
 * chore(android,mac,windows): Update crowdin strings for DE (#11497)
 * feat(web): custom infrastructure for @web/test-runner use (#11403)
 * chore(web): conversion of lm-worker browser-test for @web/test-runner use (#11404)
@@ -1110,6 +1175,17 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.333 stable 2025-01-16
+
+* fix(core): permanently disable logging (#12674)
+* fix(linux): pushing of updated changelog branch (#12819)
+* fix(linux): work around Lintian errors (#12817)
+* fix(core): implement ldml_processor::get_key_list() (#12816)
+* chore(linux): Update debian changelog (#12022)
+* fix(android): use main looper to dispatch key events when OSK is hidden (#12875)
+* chore: use GitHub PR titles when writing HISTORY.md (#12908)
+* fix(developer): filter incorrect fonts out of .keyboard_info (#12913)
 
 ## 17.0.332 stable 2024-11-06
 

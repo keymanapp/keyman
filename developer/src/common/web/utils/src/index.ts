@@ -69,3 +69,7 @@ export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js'
 
 export * as GitHubUrls from './github-urls.js';
 export * as CloudUrls from './cloud-urls.js';
+
+export { getFontFamily, getFontFamilySync } from './font-family.js';
+
+export * as ValidIds from './valid-ids.js';
