@@ -318,7 +318,7 @@ export class ModelCompositor {
       this.contextTracker.popNewest();
     }
 
-    this.contextTracker.newest.tail.revert();
+    this.contextTracker.newest.tail.activeReplacementId = -1;
 
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
