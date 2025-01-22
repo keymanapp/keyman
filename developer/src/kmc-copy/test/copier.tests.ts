@@ -489,8 +489,41 @@ describe('KeymanProjectCopier', function() {
     });
   }));
 
+  it('should copy a disorganized project into current structure', async function() {
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {
+      dryRun: false,
+      outPath: 'organized',
+    }));
+
+    const result = await copier.run(makePathToFixture('projects','disorganized','alephwithbeth.kpj'));
+    assert.sameMembers(Object.keys(result.artifacts).map(k => result.artifacts[k].filename), [
+      'organized', // kmc-copy:outputPath
+      'organized/organized.kpj',
+      'organized/HISTORY.md',
+      'organized/LICENSE.md',
+      'organized/README.md',
+      // primary source files get moved to 'source/'
+      'organized/source/organized.kps',
+      'organized/source/organized.kmn',
+      'organized/source/organized.ico',
+      'organized/source/organized.kvks',
+      // files in 'other/' get moved to 'source/other/'
+      'organized/source/other/organized.keyman-touch-layout',
+      'organized/source/other/readme.htm',
+      'organized/source/other/welcome/welcome.htm',
+      'organized/source/other/welcome/KeyboardLayout.png',
+      'organized/source/other/welcome/KeyboardLayoutAlt.png',
+      'organized/source/other/welcome/KeyboardLayoutShift.png',
+      // build artifact files get moved to build/
+      'organized/build/organized.js',
+      'organized/build/organized.kvk',
+      'organized/build/organized.kmx',
+      // 'organized/build/organized.kmp', // TODO-COPY: do we need to copy this file as well?
+    ]);
+  });
+
   // TODO-COPY: additional tests
-  it.skip('should copy a disorganized project into current structure', async function() {});
   it.skip('should copy a standalone .kmn into a new project', async function() {});
   it.skip('should copy a standalone .kmn and .kps into a new project', async function() {});
 });

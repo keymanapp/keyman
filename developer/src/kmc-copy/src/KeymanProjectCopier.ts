@@ -380,7 +380,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private async copyGenericFile(_project: KeymanDeveloperProject, filename: string, outputPath: string, _source: string, result: CopierResult): Promise<boolean> {
+  private async copyGenericFile(project: KeymanDeveloperProject, filename: string, outputPath: string, _source: string, result: CopierResult): Promise<boolean> {
     if(result.artifacts[filename]) {
       return true;
     }
@@ -401,6 +401,10 @@ export class KeymanProjectCopier implements KeymanCompiler {
       }
 
       return false;
+    }
+
+    if(KeymanFileTypes.binaryTypeFromFilename(filename) != null) {
+      outputPath = this.callbacks.path.join(this.outPath, 'build');
     }
 
     result.artifacts[filename] = {
@@ -593,6 +597,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    */
   private generateNewFilename(filename: string, outputPath: string): string {
     const {ext, base} = this.splitFilename(filename);
+
     const newFilename = base == this.sourceId
       ? this.callbacks.path.join(outputPath, this.outputId + ext)
       : this.callbacks.path.join(outputPath, base + ext);
