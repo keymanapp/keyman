@@ -11,6 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMSentryHelper : NSObject
 
++ (void)addLifecycleStateTag: (NSString *)value;
 + (void)addApiComplianceTag: (NSString *)value;
 + (void)addArchitectureTag: (NSString *)value;
 + (void)addOskVisibleTag:(BOOL)value;
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)addHasAccessibilityTag:(BOOL)value;
 + (void)addActiveKeyboardCountTag:(NSUInteger)value;
 + (void)addBreadCrumb:(NSString *)category message:(NSString *)messageText;
++ (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addDetailedBreadCrumb:(NSString *)category message:(NSString *)messageText data:( NSDictionary *) map;
 

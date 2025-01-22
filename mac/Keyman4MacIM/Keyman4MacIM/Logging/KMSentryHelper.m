@@ -18,6 +18,11 @@ NSString * const kClientAppIdTagName = @"clientAppId";
 NSString * const kKeyboardTagName = @"keyboard";
 NSString * const kHasAccessibilityTagName = @"accessibilityEnabled";
 NSString * const kActiveKeyboardCountTagName = @"activeKeyboardCount";
+NSString * const kLifecycleStateTagName = @"lifecycleState";
+
++ (void)addLifecycleStateTag: (NSString *)value {
+  [self addCustomTag:kLifecycleStateTagName withValue:value];
+}
 
 + (void)addApiComplianceTag: (NSString *)value {
   [self addCustomTag:kApiComplianceTagName withValue:value];
@@ -61,7 +66,14 @@ NSString * const kActiveKeyboardCountTagName = @"activeKeyboardCount";
   crumb.level = kSentryLevelInfo;
   crumb.category = category;
   crumb.message = messageText;
-  //crumb.message = [NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName];
+  [SentrySDK addBreadcrumb:crumb];
+}
+
++ (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText {
+  SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
+  crumb.level = kSentryLevelDebug;
+  crumb.category = category;
+  crumb.message = messageText;
   [SentrySDK addBreadcrumb:crumb];
 }
 
@@ -71,7 +83,6 @@ NSString * const kActiveKeyboardCountTagName = @"activeKeyboardCount";
   crumb.level = kSentryLevelInfo;
   crumb.category = category;
   crumb.message = messageText;
-  //crumb.message = [NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName];
   [SentrySDK addBreadcrumb:crumb];
 }
 

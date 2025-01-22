@@ -44,6 +44,10 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
 
+  _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
+  os_log_info([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient, clientAppId: %{public}@", clientAppId);
+  [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
+
   [KMSentryHelper addClientAppIdTag:clientAppId];
   return self;
 }
@@ -184,19 +188,43 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 //MARK: Core-related key processing
 
 - (void)checkTextApiCompliance:(id)client {
-  // If the TextApiCompliance object is nil or the app or the context has changed,
-  // then create a new object for the current application and context.
+  // If the TextApiCompliance object is stale, create a new one for the current application and context.
   // The text api compliance may vary from one text field to another of the same app.
   
-  if ((self.apiCompliance == nil) ||
-      (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId]) ||
-      self.contextChanged) {
+  if ([self textApiComplianceIsStale]) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     os_log_debug([KMLogs complianceLog], "KMInputMethodHandler initWithClient checkTextApiCompliance: %{public}@", _apiCompliance);
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
     [self.apiCompliance checkCompliance:client];
   }
+}
+
+- (BOOL)textApiComplianceIsStale {
+  BOOL stale = false;
+  NSString *complianceAppId = nil;
+  TextApiCompliance *currentApiCompliance = self.apiCompliance;
+  
+  // test for three scenarios in which the api compliance is stale
+  if (currentApiCompliance == nil) { // if we have no previous api compliance object
+    stale = true;
+  } else { // if we have one but for a different client
+    complianceAppId = self.apiCompliance.clientApplicationId;
+    if ([complianceAppId isNotEqualTo:self.clientApplicationId]) {
+      stale = true;
+    } else {
+      stale = false;
+    }
+  }
+  if (self.contextChanged) { // if the context has changed
+    stale = true;
+  }
+
+  NSString *message = [NSString stringWithFormat:@"textApiComplianceIsStale = %@ for appId: %@, apiCompliance: %p, complianceAppId: %@", stale?@"true":@"false", self.clientApplicationId, currentApiCompliance, complianceAppId];
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
+
+  return stale;
 }
 
 - (void) handleContextChangedByLowLevelEvent {
@@ -220,7 +248,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   [self handleContextChangedByLowLevelEvent];
   
   if (event.type == NSEventTypeKeyDown) {
-    [KMSentryHelper addBreadCrumb:@"event" message:@"handling keydown event"];
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:@"handling keydown event"];
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {

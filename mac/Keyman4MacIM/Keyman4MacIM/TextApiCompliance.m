@@ -63,6 +63,10 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     _clientApplicationId = appId;
     _complianceUncertain = YES;
     _initialSelection = NSMakeRange(NSNotFound, NSNotFound);
+
+    NSString *message = [NSString stringWithFormat:@"TextApiCompliance initWithClient, client: %p applicationId: %@", client, appId];
+    [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
+    os_log_debug([KMLogs complianceLog], "%{public}@", message);
     
     // if we do not have hard-coded noncompliance, then test the app
     if (![self applyNoncompliantAppLists:appId]) {

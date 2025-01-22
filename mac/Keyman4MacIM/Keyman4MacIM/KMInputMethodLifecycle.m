@@ -66,6 +66,8 @@ typedef enum {
 
 @implementation KMInputMethodLifecycle
 
+@synthesize lifecycleState = _lifecycleState;
+
 + (KMInputMethodLifecycle *)shared {
   static KMInputMethodLifecycle *shared = nil;
   static dispatch_once_t onceToken;
@@ -86,11 +88,40 @@ typedef enum {
   return self;
 }
 
+- (void)setLifecycleState:(LifecycleState)state {
+  _lifecycleState = state;
+  
+  // whenever the state is changed, update the Sentry tag
+  [self addLifecycleStateSentryTag];
+}
+
+- (void)addLifecycleStateSentryTag {
+  NSString *stateString = @"Unknown";
+  switch (self.lifecycleState) {
+    case Started:
+      stateString = @"Started";
+      break;
+    case Active:
+      stateString = @"Active";
+      break;
+    case Inactive:
+      stateString = @"Inactive";
+      break;
+  }
+  [KMSentryHelper addLifecycleStateTag:stateString];
+  os_log_info([KMLogs lifecycleLog], "setLifecycleState: %{public}@", stateString);
+}
+
+
+- (LifecycleState)lifecycleState {
+  return _lifecycleState;
+}
+
 /**
  * called from Application Delgate during init
  */
 - (void)startLifecycle {
-  _lifecycleState = Started;
+  self.lifecycleState = Started;
 }
 
 /**
@@ -109,6 +140,7 @@ typedef enum {
 + (NSString*)getRunningApplicationId {
   NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
   NSString *clientAppId = [currentApp bundleIdentifier];
+  os_log_debug([KMLogs lifecycleLog], "getRunningApplicationId, frontmost: %{public}@", clientAppId);
   return clientAppId;
 }
 
@@ -217,7 +249,7 @@ typedef enum {
  */
 - (void)activateInputMethod {
   os_log_debug([KMLogs lifecycleLog], "activateInputMethod");
-  _lifecycleState = Active;
+  self.lifecycleState = Active;
   [[NSNotificationCenter defaultCenter] postNotificationName:kInputMethodActivatedNotification object:self];
 }
 
@@ -226,7 +258,7 @@ typedef enum {
  */
 - (void)deactivateInputMethod {
   os_log_debug([KMLogs lifecycleLog], "deactivateInputMethod");
-  _lifecycleState = Inactive;
+  self.lifecycleState = Inactive;
   [[NSNotificationCenter defaultCenter] postNotificationName:kInputMethodDeactivatedNotification object:self];
 }
 
@@ -234,7 +266,7 @@ typedef enum {
  * Does not change lifecycleState, just fires notification so that InputController knows to change the event handler
  */
 - (void)changeClient {
-  os_log_debug([KMLogs lifecycleLog], "changeClient");
+  os_log_debug([KMLogs lifecycleLog], "changeClient, posting kInputMethodClientChangeNotification");
   [[NSNotificationCenter defaultCenter] postNotificationName:kInputMethodClientChangeNotification object:self];
 }
 
