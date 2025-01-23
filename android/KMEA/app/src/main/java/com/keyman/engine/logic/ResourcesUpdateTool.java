@@ -558,14 +558,15 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       // TODO: make it smoother.  Documented as #11097.
       KMManager.clearKeyboardCache();
 
+      Context appContext = currentContext.getApplicationContext();
       if (failedUpdateCount > 0) {
-        BaseActivity.makeToast(currentContext, R.string.update_failed, Toast.LENGTH_SHORT);
+        BaseActivity.makeToast(appContext, R.string.update_failed, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         updateFailed = true;
         checkingUpdates = false;
       } else {
         lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        SharedPreferences prefs = appContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(PREF_KEY_LAST_UPDATE_CHECK, lastUpdateCheck.getTime().getTime());
         editor.commit();
