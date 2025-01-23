@@ -9,7 +9,8 @@ LABEL org.opencontainers.image.title="Keyman Linux Build Image"
 # Install dependencies
 ADD control /tmp/control
 # Answer 'yes' to install questions
-RUN apt-get install -qy python3 python3-setuptools python3-coverage \
+RUN apt-get update && \
+  apt-get install -qy python3 python3-setuptools python3-coverage \
       devscripts equivs libdatetime-perl lcov gcovr xvfb \
       xserver-xephyr metacity mutter dbus-x11 weston xwayland && \
   (yes | mk-build-deps --install /tmp/control) || true && \
