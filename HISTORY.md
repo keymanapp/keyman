@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.176 alpha 2025-01-23
+
+* chore(developer): stub out icon support in kmc-generate (#12971)
+* chore(developer): remove '--rename' option from kmc-copy (#12973)
+* feat(developer): add 'verbose' and 'debug' log levels to kmc (#12976)
+* chore(developer): validate output folder name in kmc-copy (#12979)
+* chore(developer): report on filename collisions in kmc-copy (#12982)
+* feat(developer): support copying disorganized projects in kmc-copy (#12984)
+* chore(linux): docker build: update package index before installing packages in Dockerfiles (#12992)
+* feat(web): allow main manual-test page to load from KMP (#12977)
+* fix(android): Remove access to MEDIA storage permissions (#12999)
+
 ## 18.0.175 alpha 2025-01-22
 
 * feat(windows): Fixes check now to use SM and LastUpdateCheckTime key on first run. (#12922)
