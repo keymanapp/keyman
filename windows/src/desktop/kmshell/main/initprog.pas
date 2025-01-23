@@ -94,6 +94,7 @@ type
                     fmRepair,
                     fmKeepInTouch,
                     fmSettings,
+                    fmBoot,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -232,6 +233,7 @@ begin
         // package installation. See https://superuser.com/a/1395288/521575 and
         // https://github.com/keymanapp/keyman/issues/2467
       else if s = '-f' then FForce := True
+      else if s = '-boot' then   FMode := fmBoot
       else if s = '-c' then   FMode := fmMain
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
