@@ -123,15 +123,39 @@ id _lastServerWithOSKShowing = nil;
   // register to receive notifications generated from KMInputMethodLifecycle
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodActivated:) name:kInputMethodActivatedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
 
   // start Input Method lifecycle
   [KMInputMethodLifecycle.shared startLifecycle];
 }
 
 /**
- * When the input method is deactivated, hide the OSK and disable the low-level event tap
+ * When the input method is activated -- notification from KMInputMethodLifecycle
+ */
+- (void)inputMethodActivated:(NSNotification *)notification {
+  
+  // enable event tap
+  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
+    os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
+    CGEventTapEnable(self.lowLevelEventTap, YES);
+  }
+
+  // show OSK if necessary
+  os_log_debug([KMLogs lifecycleLog], "--- inputMethodActivated, kvk is non-nil: %{public}@ showOskOnActivate: %{public}@", (_kvk!=nil)?@"true":@"false", [KMInputMethodLifecycle.shared shouldShowOskOnActivate]?@"true":@"false");
+
+  if ([KMInputMethodLifecycle.shared shouldShowOskOnActivate]) {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
+    [KMSentryHelper addBreadCrumb:@"lifecycle" message:@"opening OSK on input method activation"];
+    [self showOSK];
+  }
+}
+
+/**
+ * When the input method is deactivated -- notification from KMInputMethodLifecycle
  */
 - (void)inputMethodDeactivated:(NSNotification *)notification {
+  
+  // if the OSK is visible, hide it
   if ([self.oskWindow.window isVisible]) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
     [KMSentryHelper addBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
@@ -141,28 +165,22 @@ id _lastServerWithOSKShowing = nil;
   }
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
 
+  // disable the event tap
   if (self.lowLevelEventTap) {
     os_log_debug([KMLogs lifecycleLog], "***inputMethodDeactivated, disabling event tap");
     CGEventTapEnable(self.lowLevelEventTap, NO);
   }
+  
+  // deactive the text input client
+  [self.inputController deactivateClient];
 }
 
 /**
- * When the input method is activated, show the OSK and enable the low-level event tap
+ * When the user switches to a different text input client -- notification from KMInputMethodLifecycle
  */
-- (void)inputMethodActivated:(NSNotification *)notification {
-  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
-    os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
-    CGEventTapEnable(self.lowLevelEventTap, YES);
-  }
- 
-  os_log_debug([KMLogs lifecycleLog], "--- inputMethodActivated, kvk is non-nil: %{public}@ showOskOnActivate: %{public}@", (_kvk!=nil)?@"true":@"false", [KMInputMethodLifecycle.shared shouldShowOskOnActivate]?@"true":@"false");
-
-  if ([KMInputMethodLifecycle.shared shouldShowOskOnActivate]) {
-    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
-    [KMSentryHelper addBreadCrumb:@"lifecycle" message:@"opening OSK on input method activation"];
-    [self showOSK];
-  }
+- (void)inputMethodChangedClient:(NSNotification *)notification {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodChangedClient");
+  [self.inputController changeClients:[KMInputMethodLifecycle getRunningApplicationId]];
 }
 
 - (KeymanVersionInfo)versionInfo {
