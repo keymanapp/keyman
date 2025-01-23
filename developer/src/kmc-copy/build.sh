@@ -39,6 +39,6 @@ builder_run_action api        api-extractor run --local --verbose
 # note: `export TEST_SAVE_ARTIFACTS=1` to save a copy of artifacts to temp path
 # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/
 # TODO: -skip-full
-builder_run_action test       builder_do_typescript_tests 70
+builder_run_action test       builder_do_typescript_tests 75
 
 builder_run_action publish    builder_publish_npm
