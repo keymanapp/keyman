@@ -566,7 +566,7 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         checkingUpdates = false;
       } else {
         lastUpdateCheck = Calendar.getInstance();
-        SharedPreferences prefs = appContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+        SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putLong(PREF_KEY_LAST_UPDATE_CHECK, lastUpdateCheck.getTime().getTime());
         editor.commit();
