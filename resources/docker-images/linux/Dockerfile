@@ -28,9 +28,12 @@ RUN LCOV_VERSION=$(dpkg -s lcov | grep Version | cut -d' ' -f2) && \
     rm /tmp/lcov.deb ; \
   fi
 
-RUN mkdir -p /var/run/1000 && \
-  chown build:build /var/run/1000 && \
-  echo "export XDG_RUNTIME_DIR=/var/run/1000" >> /usr/bin/bashwrapper
+RUN mkdir -p /run/user/1000 && \
+  chown build:build /run/user/1000 && \
+  chmod 700 /run/user/1000 && \
+  mkdir -p /tmp/.X11-unix && \
+  chmod 1777 /tmp/.X11-unix && \
+  echo "export XDG_RUNTIME_DIR=/run/user/1000" >> /usr/bin/bashwrapper
 
 COPY run-tests.sh /usr/bin/run-tests.sh
 
