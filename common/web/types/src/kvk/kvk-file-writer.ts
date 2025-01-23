@@ -29,33 +29,33 @@ export default class KvkFileWriter {
       header: {
         identifier: BUILDER_KVK_HEADER_IDENTIFIER,
         version: BUILDER_KVK_HEADER_VERSION,
-        associatedKeyboard: {len:0,str:''},
+        associatedKeyboard: {len:1,str:''},
         flags: source.header.flags,
         ansiFont:{
           color: VISUAL_KEYBOARD_TEXT_COLOR,
           size: source.header.ansiFont.size,
-          name: {len:0,str:''}
+          name: {len:1,str:''}
         },
         unicodeFont:{
           color: VISUAL_KEYBOARD_TEXT_COLOR,
           size: source.header.unicodeFont.size,
-          name: {len:0,str:''}
+          name: {len:1,str:''}
         },
       },
       keyCount: source.keys.length,
       keys:[]
     };
 
-    this.setString(binary.header.associatedKeyboard, source.header.associatedKeyboard);
-    this.setString(binary.header.ansiFont.name, source.header.ansiFont.name);
-    this.setString(binary.header.unicodeFont.name, source.header.unicodeFont.name);
+    this.setString(binary.header.associatedKeyboard, source.header.associatedKeyboard || '');
+    this.setString(binary.header.ansiFont.name, source.header.ansiFont.name || '');
+    this.setString(binary.header.unicodeFont.name, source.header.unicodeFont.name || '');
 
     for(let sourceKey of source.keys) {
       const binaryKey: BUILDER_KVK_KEY = {
         flags: sourceKey.flags,
         vkey: sourceKey.vkey,
         shift: sourceKey.shift,
-        text: { len: 0, str: '' },
+        text: { len: 1, str: '' },
         bitmapSize: sourceKey.bitmap ? sourceKey.bitmap.byteLength : 0,
         bitmapData: sourceKey.bitmap ? Array.from(sourceKey.bitmap) : []
       };
