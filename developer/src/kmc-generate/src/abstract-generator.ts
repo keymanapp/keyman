@@ -53,11 +53,14 @@ export interface GeneratorOptions /* not inheriting from CompilerBaseOptions */ 
    * name of the author of the keyboard
    */
   author?: string;
-  /**
+
+  // TODO-GENERATE: icon support
+  /* *
    * set to true to generate an icon for a Keyman keyboard with the first
    * characters of the first specified BCP 47 tag
    */
-  icon?: boolean;
+  // icon?: boolean;
+
   /**
    * description of the keyboard, Markdown permissible
    */
