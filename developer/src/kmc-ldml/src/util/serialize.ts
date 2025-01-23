@@ -1,5 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * This module contains routines for serializing from a KMXPlus file into XML.
  */
 
 import { KMXPlus } from "@keymanapp/common-types";
@@ -8,9 +10,24 @@ import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KeysCompiler } from "../compiler/keys.js";
 
 /**
- * Serialize a KMXPlusFile back to XML
- * TODO-EPIC-LDML: Does not handle transforms properly (marker strings).
- * TODO-EPIC-LDML: Does not retain the original XML formatting.
+ * Serialize a KMXPlusFile back to XML.
+ * This is implemented for the LDML editor to be able to mutate LDML (XML) content by:
+ *  1. reading the original XML
+ *  2. compiling to KMXPlusFile
+ *  3. modifying the KMXPlusFile
+ *  4. serializing back to XML
+ *
+ * There are limitations:
+ *  - TODO-LDML-EDITOR: Transforms would not be serialized properly, due to
+ *    regex munging around markers and such.
+ *
+ *    To work around this, fields with underscores such as _from and _to are added to
+ *    the KMXPlusFile classes. These provide hints as to what the output XML should be,
+ *    and are populated by the tran compiler.
+ *
+ *  - TODO-LDML-EDITOR: Comments, whitespace, etc. are not preserved by this
+ *    approach. Updates to the XML parsing will support this, see #10622.
+ *
  * @param kmx input KMXPlusFile
  * @returns XML String
  */
