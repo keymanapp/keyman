@@ -42,9 +42,15 @@ function init() {
     if(starterStubStr) {
       KeymanWeb.registerStub(JSON.parse(starterStubStr));
     }
+  } catch (err) {
     // If a Java exception triggers during this time... okay, we can't
     // load a keyboard during startup.  Rely on older loading techniques.
-  } catch (err) {}
+    //
+    // Note:  no information about the Java-side error is available here.
+    if(err.message.indexOf("Java exception") < 0) {
+      throw err;
+    }
+  }
 
   keyman.init({
     'embeddingApp':device,
