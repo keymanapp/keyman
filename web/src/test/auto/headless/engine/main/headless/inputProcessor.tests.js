@@ -25,7 +25,7 @@ let device = {
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
@@ -50,7 +50,7 @@ describe('InputProcessor', function() {
 
         // These checks are lifted from the keyboard init checks found in
         // web/src/test/auto/headless/engine/js-processor/basic-init.js.
-        assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
+        assert.equal('us', core.keyboardProcessor.baseLayout, 'JSKeyboardProcessor has unexpected base layout')
         assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
         assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
@@ -181,7 +181,7 @@ describe('InputProcessor', function() {
     let keyboardWithHarness;
     let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
-    // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
+    // rest of the recorder stuff since it uses only JSKeyboardProcessor, not InputProcessor.
     let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext));
 
     before(async function () {
