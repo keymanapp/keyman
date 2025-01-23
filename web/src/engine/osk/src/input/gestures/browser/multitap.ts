@@ -4,11 +4,10 @@ import VisualKeyboard from '../../../visualKeyboard.js';
 import { DeviceSpec, KeyEvent, ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
 import { GestureSequence, GestureStageReport } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
+import { correctionKeyFilter, distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
-import { correctionKeyFilter } from '../../../correctionLayout.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
