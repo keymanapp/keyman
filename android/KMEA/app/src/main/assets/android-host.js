@@ -37,7 +37,14 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  try {
+    let starterStubStr = jsInterface.initialKeyboard();
+    if(starterStubStr) {
+      KeymanWeb.registerStub(JSON.parse(starterStubStr));
+    }
+    // If a Java exception triggers during this time... okay, we can't
+    // load a keyboard during startup.  Rely on older loading techniques.
+  } catch (err) {}
 
   keyman.init({
     'embeddingApp':device,
