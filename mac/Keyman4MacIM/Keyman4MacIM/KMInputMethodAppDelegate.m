@@ -24,7 +24,7 @@
 NSString *processorType = @"ARM";
 #elif TARGET_CPU_X86_64
 NSString *processorType = @"Intel";
-#elif
+#else
 NSString *processorType = @"Unknown";
 #endif
 
