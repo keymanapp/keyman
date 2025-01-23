@@ -249,7 +249,7 @@ public final class KMManager {
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
-  public final static String autoCorrectionPrefSuffix = ".mayAutoCorect";
+  public final static String autoCorrectionPrefSuffix = ".mayAutoCorrect";
 
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
@@ -304,11 +304,6 @@ public final class KMManager {
   public static final String KMKey_LexicalModelName = "lmName";
   public static final String KMKey_LexicalModelVersion = "lmVersion";
   public static final String KMKey_LexicalModelPackageFilename = "kmpPackageFilename";
-
-  // DEPRECATED keys
-  public static final String KMKey_CustomKeyboard = "CustomKeyboard";
-  public static final String KMKey_CustomModel = "CustomModel";
-  public static final String KMKey_HelpLink = "helpLink";
 
   // Keyman internal keys
   protected static final String KMKey_ShouldShowHelpBubble = "ShouldShowHelpBubble";
@@ -1714,26 +1709,6 @@ public final class KMManager {
     return KeyboardPickerActivity.addKeyboard(context, keyboardInfo);
   }
 
-  // Intend to deprecate in Keyman 15.0
-  public static boolean addKeyboard(Context context, HashMap<String, String> keyboardInfo) {
-    String packageID = keyboardInfo.get(KMManager.KMKey_PackageID);
-    String keyboardID =  keyboardInfo.get(KMManager.KMKey_KeyboardID);
-    String keyboardName = keyboardInfo.get(KMManager.KMKey_KeyboardName);
-    String languageID = keyboardInfo.get(KMManager.KMKey_LanguageID);
-    String languageName = keyboardInfo.get(KMManager.KMKey_LanguageName);
-    String version = keyboardInfo.get(KMManager.KMKey_KeyboardVersion);
-    String helpLink = keyboardInfo.get(KMManager.KMKey_CustomHelpLink);
-    String kmpLink = MapCompat.getOrDefault(keyboardInfo, KMManager.KMKey_KMPLink, "");
-    String font = keyboardInfo.get(KMManager.KMKey_Font);
-    String oskFont = keyboardInfo.get(KMManager.KMKey_OskFont);
-    boolean isNewKeyboard = true;
-
-    Keyboard k = new Keyboard(packageID, keyboardID, keyboardName,
-          languageID, languageName, version, helpLink, kmpLink,
-      isNewKeyboard, font, oskFont);
-    return addKeyboard(context, k);
-  }
-
   public static boolean removeKeyboard(Context context, int position) {
     return KeyboardPickerActivity.removeKeyboard(context, position);
   }
@@ -2292,6 +2267,7 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);

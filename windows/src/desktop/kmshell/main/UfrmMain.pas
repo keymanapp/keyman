@@ -85,6 +85,7 @@ uses
   Winapi.Windows,
 
   keymanapi_TLB,
+  Sentry.Client,
   XMLRenderer,
   KeyboardListXMLRenderer,
   UfrmKeymanBase,
@@ -141,13 +142,14 @@ type
 
     procedure Support_Diagnostics;
     procedure Support_Online;
-    procedure Support_UpdateCheck;
     procedure Support_ProxyConfig;
     procedure Support_ContactSupport(params: TStringList);   // I4390
 
     procedure OpenSite(params: TStringList);
     procedure DoApply;
     procedure DoRefresh;
+    procedure Update_CheckNow;
+    procedure Update_ApplyNow;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -184,12 +186,15 @@ uses
   LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
-  OnlineUpdateCheck,
+  Keyman.System.ExecutionHistory,
+  Keyman.System.KeymanSentryClient,
+  Keyman.System.UpdateStateMachine,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.Configuration.UI.UfrmStartInstallNow,
   RegistryKeys,
   SupportXMLRenderer,
   UfrmChangeHotkey,
@@ -202,12 +207,14 @@ uses
   UfrmTextEditor,
   uninstall,
   Upload_Settings,
+  UpdateXMLRenderer,
   utildir,
   utilexecute,
   utilkmshell,
   utilhttp,
   utiluac,
-  utilxml;
+  utilxml,
+  KeymanPaths;
 
 type
   PHKL = ^HKL;
@@ -301,6 +308,7 @@ begin
     FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TUpdateXMLRenderer.Create(FXMLRenderers));
 
     xml := FXMLRenderers.RenderToString(s);
     sharedData.Init(
@@ -342,8 +350,10 @@ begin
 
   else if command = 'support_diagnostics' then Support_Diagnostics
   else if command = 'support_online' then Support_Online
-  else if command = 'support_updatecheck' then Support_UpdateCheck
   else if command = 'support_proxyconfig' then Support_ProxyConfig
+
+  else if command = 'update_checknow' then Update_CheckNow
+  else if command = 'update_applynow' then Update_ApplyNow
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
@@ -789,29 +799,47 @@ begin
   end;
 end;
 
-procedure TfrmMain.Support_UpdateCheck;
+procedure TfrmMain.Update_CheckNow;
+var
+  BUpdateSM : TUpdateStateMachine;
 begin
-  with TOnlineUpdateCheck.Create(Self, True, False) do
+  BUpdateSM := TUpdateStateMachine.Create(False);
   try
-    case Run of
-      oucShutDown:
-        begin
-          try
-            if kmcom.Control.IsKeymanRunning then
-            try
-              kmcom.Control.StopKeyman;
-            except
-              on E:Exception do KL.Log(E.Message);
-            end;
-          except
-            on E:Exception do KL.Log(E.Message);
-          end;
-        end;
-      oucSuccess:
-        DoRefresh;
-    end
+    BUpdateSM.HandleCheck;
   finally
-    Free;
+    BUpdateSM.Free;
+  end;
+  DoRefresh;
+end;
+
+procedure TfrmMain.Update_ApplyNow;
+var
+  ShellPath : string;
+  FResult, InstallNow: Boolean;
+  frmStartInstallNow: TfrmStartInstallNow;
+begin
+  InstallNow := True;
+  // Confirm User is ok that this will require a reset
+  if HasKeymanRun then
+  begin
+    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
+    try
+      if frmStartInstallNow.ShowModal = mrOk then
+        InstallNow := True
+      else
+        InstallNow := False;
+    finally
+      frmStartInstallNow.Free;
+    end;
+  end;
+
+  if InstallNow = True then
+  begin
+    ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+    FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
+    if not FResult then
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+        'TrmfMain: Shell Execute Update_ApplyNow Failed');
   end;
 end;
 

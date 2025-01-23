@@ -1,18 +1,18 @@
 (*
   Name:             UfrmDownloadProgress
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Dec 2006
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Dec 2006 - mcdurdin - Initial version
                     05 Dec 2006 - mcdurdin - Localize caption
                     15 Jan 2007 - mcdurdin - Use font from locale.xml
