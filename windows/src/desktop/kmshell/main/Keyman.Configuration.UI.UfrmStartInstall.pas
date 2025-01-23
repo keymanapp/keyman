@@ -28,12 +28,23 @@ type
     lblInstallUpdate: TLabel;
   private
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 
 implementation
+uses
+  MessageIdentifiers,
+  MessageIdentifierConsts;
 
 {$R *.dfm}
 
+constructor TfrmStartInstall.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  cmdInstall.Caption := MsgFromId(S_Update);
+  cmdLater.Caption := MsgFromId(S_Button_Close);
+  lblInstallUpdate.Caption := 'Keyman Update ready to install.';
+end;
 
 end.
