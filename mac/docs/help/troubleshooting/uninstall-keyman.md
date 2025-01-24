@@ -1,5 +1,5 @@
 ---
-title: Uninstalling Keyman
+title: Uninstalling Keyman for macOS
 ---
 
 To uninstall Keyman for macOS:
