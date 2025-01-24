@@ -229,8 +229,6 @@ BOOL TIPProcessKeyInternal(
 
 }
 
-
-
 extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(
   WPARAM wParam,
   LPARAM lParam,   // I3589   // I3588
