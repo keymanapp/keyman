@@ -85,7 +85,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = keyEntry->get_to_string();
       }
-      keys.add((km_core_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
+      keys.add((km_core_virtual_key)kmapEntry->vkey, kmapEntry->mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
 
@@ -348,8 +348,7 @@ km_core_attr const & ldml_processor::attributes() const {
 }
 
 km_core_keyboard_key  * ldml_processor::get_key_list() const {
-  km_core_keyboard_key* key_list = new km_core_keyboard_key(KM_CORE_KEYBOARD_KEY_LIST_END);
-  return key_list;
+  return keys.get_key_list();
 }
 
 km_core_keyboard_imx  * ldml_processor::get_imx_list() const {

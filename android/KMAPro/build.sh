@@ -14,6 +14,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
+. "$KEYMAN_ROOT/android/KMAPro/build-play-store-notes.inc.sh"
+
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"
 
@@ -32,6 +34,7 @@ builder_describe "Builds Keyman for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
+  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
@@ -115,4 +118,14 @@ if builder_start_action test; then
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
 
   builder_finish_action success test
+fi
+
+if builder_start_action publish; then
+  # Copy Release Notes
+  generateReleaseNotes
+
+  # Publish symbols and Keyman for Android to Play Store
+  ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
+
+  builder_finish_action success publish
 fi

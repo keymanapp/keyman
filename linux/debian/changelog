@@ -1,3 +1,18 @@
+keyman (17.0.333-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 16 Jan 2025 16:29:44 +0100
+
+keyman (17.0.332-1) unstable; urgency=medium
+
+  * set environment variable for rendering of downloads dialog (#12617)
+  * add `keymanFacename` to .ldml file (#12283)
+  * ignore exceptions trying to install cache (#11885)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 11 Dec 2024 15:53:59 +0100
+
 keyman (17.0.326-1) unstable; urgency=medium
 
   * New upstream release

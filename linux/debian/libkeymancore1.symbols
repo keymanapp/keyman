@@ -1,7 +1,8 @@
 libkeymancore.so.1 libkeymancore1 #MINVER#
 * Build-Depends-Package: libkeymancore-dev
 
- (c++|optional)"typeinfo name for std::codecvt_utf8_utf16<char16_t, 1114111ul, (std::codecvt_mode)0>@Base" 17.0.244
+# We only use a C API, so ignore all C++ symbols in the std namespace that bleed through
+ (c++|regex|optional)"std::" 17.0.332
  km_core_context_clear@Base 17.0.195
  km_core_context_get@Base 17.0.195
  km_core_context_item_list_size@Base 17.0.195

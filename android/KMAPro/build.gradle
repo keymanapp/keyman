@@ -2,8 +2,10 @@
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
+        flatDir {
+            dirs "kMAPro/libs/com/stepstone/stepper/material-stepper/4.3.1/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.0'
@@ -11,16 +13,16 @@ buildscript {
         classpath 'io.sentry:sentry-android-gradle-plugin:2.1.2'
         classpath 'name.remal:gradle-plugins:1.5.0'
 
-        // From jcenter() which could be sunset in future
+        // From jcenter() which was deprecated August 2024
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/
-        classpath 'com.stepstone.stepper:material-stepper:4.3.1'
+        classpath 'com.stepstone.stepper:material-stepper:4.3.1@aar'
     }
 }
 
 allprojects {
     repositories {
+        maven { url uri("${projectDir}/libs") }
         google()
-        jcenter()
         mavenCentral()
         maven { url "https://jitpack.io" }
     }

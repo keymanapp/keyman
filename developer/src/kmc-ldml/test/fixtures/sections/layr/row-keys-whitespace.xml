@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys>
+    <key id="grave" output="🪦" />
+    <key id="mistake" output="oops" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys=" grave mistake" />
+      <row keys="   grave   mistake " />
+    </layer>
+  </layers>
+
+</keyboard3>

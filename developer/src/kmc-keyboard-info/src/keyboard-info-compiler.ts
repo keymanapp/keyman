@@ -493,9 +493,6 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       keyboard_info.languages[language] = {};
     }
 
-    const fontSource = [].concat(...kmpJsonData.keyboards.map(e => e.displayFont ? [e.displayFont] : []), ...kmpJsonData.keyboards.map(e => e.webDisplayFonts ?? []));
-    const oskFontSource = [].concat(...kmpJsonData.keyboards.map(e => e.oskFont ? [e.oskFont] : []), ...kmpJsonData.keyboards.map(e => e.webOskFonts ?? []));
-
     for(const bcp47 of Object.keys(keyboard_info.languages)) {
       const language = keyboard_info.languages[bcp47];
 
@@ -519,6 +516,20 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       // optimization, but it's another keyboard_info breaking change so don't want to
       // do it right now.
       //
+
+      // The code below:
+      // 1. Only includes fonts associated with keyboards which support the current bcp47 (filter)
+      // 2. Joins the displayFont and webDisplayFonts data, and removes duplicates (...new Set())
+
+      const supportedKeyboards = kmpJsonData.keyboards.filter(k => k.languages.find(lang => lang.id == bcp47));
+      const fontSource = [...new Set([].concat(
+        ...supportedKeyboards.map(e => e.displayFont ? [e.displayFont] : []),
+        ...supportedKeyboards.map(e => e.webDisplayFonts ?? [])
+      ))];
+      const oskFontSource = [...new Set([].concat(
+        ...supportedKeyboards.map(e => e.oskFont ? [e.oskFont] : []),
+        ...supportedKeyboards.map(e => e.webOskFonts ?? [])
+      ))];
 
       if(fontSource.length) {
         language.font = await this.fontSourceToKeyboardInfoFont(kpsFilename, kmpJsonData, fontSource);

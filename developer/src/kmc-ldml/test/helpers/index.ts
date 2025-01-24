@@ -1,16 +1,17 @@
-/**
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
  * Helpers and utilities for the Mocha tests.
  */
 import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { util, KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
+import { util, KMXPlus, LDMLKeyboardXMLSourceFileReader, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
 import { LdmlCompilerOptions } from '../../src/compiler/ldml-compiler-options.js';
-import { LdmlKeyboardVisualKeyboardCompiler } from '../../src/compiler/visual-keyboard-compiler.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import KMXPlusFile = KMXPlus.KMXPlusFile;
@@ -20,7 +21,6 @@ import Section = KMXPlus.Section;
 import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { VarsCompiler } from '../../src/compiler/vars.js';
-// import Vars = KMXPlus.Vars;
 
 /**
  * Builds a path to the fixture with the given path components.
@@ -47,7 +47,7 @@ beforeEach(function() {
 
 afterEach(function() {
   if (this.currentTest.state !== 'passed') {
-    compilerTestCallbacks.messages.forEach(message => console.log(message.message));
+    compilerTestCallbacks.printMessages();
   }
 });
 
@@ -160,28 +160,7 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
   return kmx;
 }
 
-export async function compileVisualKeyboard(inputFilename: string, options: LdmlCompilerOptions): Promise<VisualKeyboard.VisualKeyboard> {
-  const k = new LdmlKeyboardCompiler();
-  assert.isTrue(await k.init(compilerTestCallbacks, options));
-  const source = k.load(inputFilename);
-  checkMessages();
-  assert.isNotNull(source, 'k.load should not have returned null');
-
-  const valid = await k.validate(source);
-  checkMessages();
-  assert.isTrue(valid, 'k.validate should not have failed');
-
-  const vk = (new LdmlKeyboardVisualKeyboardCompiler(compilerTestCallbacks)).compile(source);
-  checkMessages();
-  assert.isNotNull(vk, 'LdmlKeyboardVisualKeyboardCompiler.compile should not have returned null');
-
-  return vk;
-}
-
 export function checkMessages() {
-  if(compilerTestCallbacks.messages.length > 0) {
-    console.log(compilerTestCallbacks.messages);
-  }
   assert.isEmpty(compilerTestCallbacks.messages, compilerEventFormat(compilerTestCallbacks.messages));
 }
 

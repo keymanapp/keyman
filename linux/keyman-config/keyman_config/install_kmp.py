@@ -177,8 +177,8 @@ class InstallKmp():
                 # Special handling to convert kvk into LDML
                 logging.info("Converting %s to LDML and installing both as as keyman file",
                              f['name'])
-                ldml = convert_kvk_to_ldml(fpath)
                 name, ext = os.path.splitext(f['name'])
+                ldml = convert_kvk_to_ldml(name, fpath)
                 ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
                 output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:

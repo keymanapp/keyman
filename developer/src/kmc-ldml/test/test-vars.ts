@@ -122,6 +122,16 @@ describe('vars', function () {
       ],
     },
     {
+      subpath: 'sections/vars/fail-invalid-identifiers.xml',
+      errors: [
+        CompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-string'}),
+        CompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-set'}),
+        CompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-uset'}),
+        CompilerMessages.Error_InvalidVariableIdentifer({id: 'a_marker_name_more_than_32_chars_long'}),
+        CompilerMessages.Error_InvalidVariableIdentifer({id: '😡'}),
+      ],
+    },
+    {
       subpath: 'sections/vars/fail-uset-props1.xml',
       errors: [
         KmnCompilerMessages.Error_UnicodeSetHasProperties()
@@ -187,7 +197,14 @@ describe('vars', function () {
         CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
-  ], varsDependencies);
+    {
+      subpath: 'sections/vars/fail-badref-7.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: 'usedBeforeDefinition'})
+      ],
+      strictErrors: true
+    },
+], varsDependencies);
   describe('should match some marker constants', () => {
     // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
 
