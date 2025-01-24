@@ -150,7 +150,7 @@ export class StylesheetManager {
       const format = data.substring(formatStartIndex, data.indexOf(';', formatStartIndex));
       s +=`src:url('${data}'), format('${format}');`;
     } else {
-      // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22".
+      // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22" (#13018, #13022)
       if(os == DeviceSpec.OperatingSystem.iOS) {
         if(ttf != '') {
           if(this.doCacheBusting) {
