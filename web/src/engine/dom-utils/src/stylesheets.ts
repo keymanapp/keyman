@@ -133,7 +133,8 @@ export class StylesheetManager {
     }
 
     // Build the font-face definition according to the browser being used
-    // The OSK will similarly remove double-quotes from font-family names. (#13018, #13022)
+    // The OSK will similarly remove double-quotes from font-family names and double-quote
+    // the name itself. (#13018, #13022)
     var s='@font-face {\nfont-family:"'
       + fd.family.replace(/\u0022/g, '') + '";\nfont-style:normal;\nfont-weight:normal;\n';
 
