@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 18.0.177 alpha 2025-01-24
+
+* fix(android): restores DOMRect polyfill for old Chrome support (#13012)
+* fix(developer): produce correct index parameter value for context in kmw compiler (#13003)
+* chore: add platform to what's new titles (#12989)
+* chore: add platforms to welcome titles (#12990)
+* chore: add platforms to version history titles (#13016)
+* chore: add platforms to troubleshooting titles and windows to help homepage (#13019)
+* chore: add platforms to system requirements and download-and-install docs (#13024)
+* chore: add mac platform to titles (#13027)
+* chore: add linux platform to titles (#13028)
+* chore: add ios platform to titles (#13031)
+* fix(developer): escape font facename in touch layout editor (#13020)
+* fix: use correct path for resources/build/version (#13029)
+* fix(developer): don't list .js keyboards for multi-keyboard packages in kmc-keyboard-info (#13034)
+* fix(web): do not simplify nul-prefixed contexts when rule-matching (#12998)
+* feat(android): add breadcrumbing during package install about package file, source (#13021)
+* fix(linux): correct permissions and paths in Linux docker image (#13008)
+
 ## 18.0.176 alpha 2025-01-23
 
 * chore(developer): stub out icon support in kmc-generate (#12971)
