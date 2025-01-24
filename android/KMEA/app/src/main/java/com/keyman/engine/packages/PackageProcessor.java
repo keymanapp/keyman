@@ -447,6 +447,9 @@ public class PackageProcessor {
   public String getPackageTarget(File kmpPath) {
     try {
       File tempPath = unzipKMP(kmpPath);
+      String kmpFilename = kmpPath.getName();
+
+      KMLog.LogBreadcrumb(TAG, "Determining package type for " + kmpFilename, false);
       String target = getPackageTarget(loadPackageInfo(tempPath));
       FileUtils.deleteDirectory(tempPath);
       return target;
