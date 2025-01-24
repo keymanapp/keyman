@@ -148,28 +148,30 @@ export class StylesheetManager {
       const formatStartIndex = 'data:font/'.length;
       const format = data.substring(formatStartIndex, data.indexOf(';', formatStartIndex));
       s +=`src:url('${data}'), format('${format}');`;
-    } else if(os == DeviceSpec.OperatingSystem.iOS) {
-      if(ttf != '') {
-        if(this.doCacheBusting) {
-          ttf = this.cacheBust(ttf);
-        }
-        source = "url('"+encodeURI(ttf)+"') format('truetype')";
-      }
     } else {
-      if(woff != '') {
-        source = "url('"+encodeURI(woff)+"') format('woff')";
+      if(os == DeviceSpec.OperatingSystem.iOS) {
+        if(ttf != '') {
+          if(this.doCacheBusting) {
+            ttf = this.cacheBust(ttf);
+          }
+          source = "url('"+encodeURI(ttf)+"') format('truetype')";
+        }
+      } else {
+        if(woff != '') {
+          source = "url('"+encodeURI(woff)+"') format('woff')";
+        }
+
+        if(ttf != '') {
+          source = "url('"+encodeURI(ttf)+"') format('truetype')";
+        }
       }
 
-      if(ttf != '') {
-        source = "url('"+encodeURI(ttf)+"') format('truetype')";
+      if(!source) {
+        return null;
       }
+  
+      s += 'src:'+source+';';
     }
-
-    if(!source) {
-      return null;
-    }
-
-    s += 'src:'+source+';';
 
     s=s+'\n}\n';
 
