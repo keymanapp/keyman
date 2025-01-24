@@ -1,5 +1,5 @@
 ---
-title: Guide: build a system keyboard app
+title: Guide: build a system keyboard app on iPhone and iPad with Keyman Engine
 ---
 
 In [part 1](../in-app/) of this series, we looked at the steps involved
