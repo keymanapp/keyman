@@ -3,6 +3,7 @@
 
 #include <libevdev/libevdev.h>
 
+// Any keyboard device available on the system
 class KeyboardDevice
 {
   public:
@@ -20,6 +21,8 @@ class KeyboardDevice
     int fd;
     int hasCapsLockLed;
     bool debug;
+
+    void Close();
 };
 
 #endif // __KEYBOARDDEVICE_H__
