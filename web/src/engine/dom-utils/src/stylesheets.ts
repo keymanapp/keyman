@@ -142,7 +142,7 @@ export class StylesheetManager {
 
     // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
 
-    // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22".
+    // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22" (#13018, #13022)
     if(os == DeviceSpec.OperatingSystem.iOS) {
       if(ttf != '') {
         if(this.doCacheBusting) {
