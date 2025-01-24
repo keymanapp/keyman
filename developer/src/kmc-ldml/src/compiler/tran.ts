@@ -138,6 +138,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
     let result = new TranTransform();
+    // setup for serializing
+    result._from = transform.from;
+    result._to = transform.to;
     let cookedFrom = transform.from;
 
     // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
@@ -262,6 +265,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
+    // for serializing
+    result._before = reorder.before;
+    result._from = reorder.from;
+    result._order = reorder.order;
     if (reorder.from && this.checkEscapes(reorder.from) === null) {
       return null; // error'ed
     }
