@@ -381,15 +381,11 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections, rawItems: string[]) {
+  constructor(id: string, value: string[], sections: DependencySections) {
     super(id, value.join(' '), sections);
     this.items = sections.elem.allocElementString(sections, value);
-    this.rawItems = rawItems;
   }
-  // element string array
-  items: ElementString;
-  // like items, but with unprocessed marker strings
-  rawItems: string[];
+  items: ElementString;  // element string array
   valid() : boolean {
     return !!this.items;
   }
@@ -405,10 +401,12 @@ export class StringVarItem extends VarsItem {
 // 'tran'
 
 export class TranTransform {
-  from: StrsItem;
-  to: StrsItem;
-  mapFrom: StrsItem; // var name
-  mapTo: StrsItem; // var name
+  from: StrsItem; // "from" computed regex string
+  to: StrsItem; // "to" (replacement) computed regex string
+  mapFrom: StrsItem; // var name for map
+  mapTo: StrsItem; // var name for map
+  _from?: string; // Not part of binary file: for use in the XML serializer. If present, sets the from= attribute for XML.
+  _to?: string; // Not part of binary file: for use in the XML serializer. If present, sets the to= attribute for XML.
 }
 
 export class TranGroup {
@@ -420,6 +418,9 @@ export class TranGroup {
 export class TranReorder {
   elements: ElementString;
   before: ElementString;
+  _before?: string; // Not part of binary file: for use in the XML serializer. If present, sets the before= attribute for XML.
+  _from?: string; // Not part of binary file: for use in the XML serializer. If present, sets the from= attribute for XML.
+  _order?: string; // Not part of binary file: for use in the XML serializer. If present, sets the order= attribute for XML.
 };
 
 export class Tran extends Section {
