@@ -323,7 +323,7 @@ begin
       if OpenKey('\'+SRegKey_WindowsRun_CU, True) then
       begin
         if FBoolValue then
-          WriteString(SRegValue_WindowsRun_Keyman, '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -s')
+          WriteString(SRegValue_WindowsRun_Keyman, '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -boot')
         else if ValueExists(SRegValue_WindowsRun_Keyman) then
           DeleteValue(SRegValue_WindowsRun_Keyman);
       end;
