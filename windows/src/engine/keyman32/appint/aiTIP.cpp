@@ -114,10 +114,12 @@ void ProcessToggleChange(UINT key) {   // I4793
   }
 }
 
-extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM lParam,   // I3589   // I3588
-	PKEYMANPROCESSOUTPUTFUNC outfunc, PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved) {
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
+BOOL TIPProcessKeyInternal(
+  PKEYMAN64THREADDATA _td,
+  WPARAM wParam,
+  LPARAM lParam,
+  BOOL Updateable,
+  BOOL Preserved) {
   if(!_td) {
     return FALSE;
   }
@@ -202,13 +204,11 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 
   _td->state.charCode = CharFromVK(&_td->state.vkey, Globals::get_ShiftState());   // I4582
 
-	_td->TIPProcessOutput = outfunc;
-	_td->TIPGetContext = ctfunc;
-
   BOOL res = ProcessHook();
 
 	_td->TIPProcessOutput = NULL;
 	_td->TIPGetContext = NULL;
+  _td->TIPGetContextEx = NULL;
 
 	SendDebugMessageFormat("Success, res=%d", res);
 
@@ -226,6 +226,58 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   }
 
 	return_SendDebugExit(res);
+
+}
+
+
+
+extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(
+  WPARAM wParam,
+  LPARAM lParam,   // I3589   // I3588
+	PKEYMANPROCESSOUTPUTFUNC outfunc,
+  PKEYMANGETCONTEXTFUNC ctfunc,
+  BOOL Updateable,
+  BOOL Preserved) {
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if(!_td) {
+    return FALSE;
+  }
+
+  _td->TIPProcessOutput = outfunc;
+	_td->TIPGetContext = ctfunc;
+  BOOL res = TIPProcessKeyInternal(_td, wParam, lParam, Updateable, Preserved);
+  if (res == FALSE) {
+    _td->TIPProcessOutput = NULL;
+	  _td->TIPGetContext = NULL;
+  }
+  return res;
+
+}
+
+// This includes the PKEYMANGETCONTEXTISSELECTEDFUNC to report if text is selected
+extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKeyEx(
+  WPARAM wParam,
+  LPARAM lParam,   // I3589   // I3588
+	PKEYMANPROCESSOUTPUTFUNC outfunc,
+  PKEYMANGETCONTEXTISSELECTEDFUNC ctfunc,
+  BOOL Updateable,
+  BOOL Preserved) {
+
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if(!_td) {
+    return FALSE;
+  }
+
+  _td->TIPProcessOutput = outfunc;
+	_td->TIPGetContextEx = ctfunc;
+  BOOL res = TIPProcessKeyInternal(_td, wParam, lParam, Updateable, Preserved);
+  if (res == FALSE) {
+    _td->TIPProcessOutput = NULL;
+	  _td->TIPGetContextEx = NULL;
+  }
+  return res;
+
 }
 
 /* AI constructor and destructor */
@@ -279,7 +331,13 @@ BOOL AITIP::ReadContext(PWSTR buf) {
     return FALSE;
   }
 
-  if (_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT - 1, buf, &isTextSelected) == S_OK) {  // I3575   // I4262
+  if (_td->TIPGetContextEx && (*_td->TIPGetContextEx)(MAXCONTEXT - 1, buf, &isTextSelected) == S_OK) {  // I3575   // I4262
+    if(ShouldDebug()) {
+      SendDebugMessageFormat("full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
+    }
+    useLegacy = FALSE;   // I3575
+    return TRUE;
+  } else if (_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT - 1, buf) == S_OK) {  // I3575   // I4262
     if(ShouldDebug()) {
       SendDebugMessageFormat("full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
