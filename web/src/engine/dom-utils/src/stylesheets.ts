@@ -133,27 +133,31 @@ export class StylesheetManager {
     }
 
     // Build the font-face definition according to the browser being used
-    var s='@font-face {\nfont-family:'
-      + fd.family + ';\nfont-style:normal;\nfont-weight:normal;\n';
+    // The OSK will similarly remove double-quotes from font-family names and double-quote
+    // the name itself. (#13018, #13022)
+    var s='@font-face {\nfont-family:"'
+      + fd.family.replace(/\u0022/g, '') + '";\nfont-style:normal;\nfont-weight:normal;\n';
 
     // Build the font source string according to the browser,
     // but return without adding the style sheet if the required font type is unavailable
 
     // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
+
+    // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22" (#13018, #13022)
     if(os == DeviceSpec.OperatingSystem.iOS) {
       if(ttf != '') {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);
         }
-        source = "url('"+encodeURI(ttf)+"') format('truetype')";
+        source = "url(\""+encodeURI(ttf)+"\") format('truetype')";
       }
     } else {
       if(woff != '') {
-        source = "url('"+encodeURI(woff)+"') format('woff')";
+        source = "url(\""+encodeURI(woff)+"\"') format('woff')";
       }
 
       if(ttf != '') {
-        source = "url('"+encodeURI(ttf)+"') format('truetype')";
+        source = "url(\""+encodeURI(ttf)+"\") format('truetype')";
       }
     }
 
