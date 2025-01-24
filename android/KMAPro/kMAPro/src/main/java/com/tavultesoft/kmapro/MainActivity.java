@@ -270,7 +270,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         case "file":
           requestPermissionIntentUri = loadingIntentUri;
           if (CheckPermissions.isPermissionOK(this)) {
-            KMLog.LogBreadcrumb(TAG, "Installing local KMP: " + loadingIntentUri, true);
+            KMLog.LogBreadcrumb(TAG, "Installing local KMP: " + link, true);
             useLocalKMP(context, loadingIntentUri);
           } else {
             CheckPermissions.requestPermission(this, context);
