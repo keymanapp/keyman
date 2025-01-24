@@ -149,20 +149,21 @@ export class StylesheetManager {
       const format = data.substring(formatStartIndex, data.indexOf(';', formatStartIndex));
       s +=`src:url('${data}'), format('${format}');`;
     } else {
+      // Note:  encodeURI("'") == "'", but encodeURI('"') == "%22".
       if(os == DeviceSpec.OperatingSystem.iOS) {
         if(ttf != '') {
           if(this.doCacheBusting) {
             ttf = this.cacheBust(ttf);
           }
-          source = "url('"+encodeURI(ttf)+"') format('truetype')";
+          source = "url(\""+encodeURI(ttf)+"\") format('truetype')";
         }
       } else {
         if(woff != '') {
-          source = "url('"+encodeURI(woff)+"') format('woff')";
+          source = "url(\""+encodeURI(woff)+"\"') format('woff')";
         }
 
         if(ttf != '') {
-          source = "url('"+encodeURI(ttf)+"') format('truetype')";
+          source = "url(\""+encodeURI(ttf)+"\") format('truetype')";
         }
       }
 
