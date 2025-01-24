@@ -151,7 +151,8 @@ public:
 /* External interface functions */
 
 typedef HRESULT (WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);
-typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
+typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);
+typedef HRESULT (WINAPI *PKEYMANGETCONTEXTISSELECTEDFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
 typedef BOOL (WINAPI *PTIPCALLBACK)();  // Tells the TIP to update its status (used to be done through 0x88)
 
 typedef BOOL (WINAPI *PKeymanOutputBackspace)(HWND hwnd);
@@ -208,6 +209,7 @@ typedef struct tagKEYMAN64THREADDATA
 
   PKEYMANPROCESSOUTPUTFUNC TIPProcessOutput;
   PKEYMANGETCONTEXTFUNC TIPGetContext;
+  PKEYMANGETCONTEXTISSELECTEDFUNC TIPGetContextEx;
 
   BOOL TIPFUpdateable, TIPFPreserved;   // I4290
 
