@@ -26,9 +26,9 @@ type
     cmdInstall: TButton;
     cmdLater: TButton;
     lblInstallUpdate: TLabel;
+    procedure FormCreate(Sender: TObject);
   private
   public
-    constructor Create(AOwner: TComponent); override;
   end;
 
 
@@ -39,12 +39,12 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmStartInstall.Create(AOwner: TComponent);
+procedure TfrmStartInstall.FormCreate(Sender: TObject);
 begin
-  inherited Create(AOwner);
+  inherited;
   cmdInstall.Caption := MsgFromId(S_Update);
   cmdLater.Caption := MsgFromId(S_Button_Close);
-  lblInstallUpdate.Caption := 'Keyman Update ready to install.';
+  lblInstallUpdate.Caption := MsgFromId(S_Ready_To_Install);
 end;
 
 end.

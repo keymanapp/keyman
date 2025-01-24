@@ -44,7 +44,7 @@ begin
   inherited;
   cmdInstall.Caption := MsgFromId(S_Update);
   cmdLater.Caption := MsgFromId(S_Button_Close);
-  lblUpdateMessage.Caption := 'Updating now will require a computer restart.';
+  lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
 end;
 
 end.
