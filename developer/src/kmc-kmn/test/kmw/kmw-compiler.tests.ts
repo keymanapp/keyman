@@ -235,8 +235,9 @@ describe('KeymanWeb Compiler', function() {
     doMatchKIO('s_a_6');
     doMatchKIO('s_b_7');
 
+    // matches the 4 notany() rules
     const matches = [...data.matchAll(/k\.KCXO\(-1,t,1,1\);/g)];
-    assert.lengthOf(matches, 2);
+    assert.lengthOf(matches, 4);
 
     doMatchKIO('s_e_10');
     doMatchKIO('s_f_11');
