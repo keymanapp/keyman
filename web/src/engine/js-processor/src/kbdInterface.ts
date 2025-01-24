@@ -373,18 +373,6 @@ export default class KeyboardInterface extends KeyboardHarness {
       // Now that we have the cache...
       var subCache = cache;
       subCache.valContext = subCache.valContext.slice(0, ln);
-      for(var i=0; i < subCache.valContext.length; i++) {
-        if(subCache.valContext[i] == '\ufffe') {
-          subCache.valContext.splice(0, 1);
-          subCache.deadContext.splice(0, 1);
-        }
-      }
-
-      if(subCache.valContext.length == 0) {
-        subCache.valContext = ['\ufffe'];
-        subCache.deadContext = [];
-      }
-
       this.cachedContextEx.set(n, ln, subCache);
 
       return subCache;
