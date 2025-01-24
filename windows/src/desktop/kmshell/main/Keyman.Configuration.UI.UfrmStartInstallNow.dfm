@@ -14,14 +14,15 @@ object frmStartInstallNow: TfrmStartInstallNow
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lblUpdateMessage: TLabel
-    Left = 32
-    Top = 48
-    Width = 290
-    Height = 41
-    Caption = 'Your computer will be restarted if you update now.'
+    Left = 16
+    Top = 32
+    Width = 323
+    Height = 19
+    Caption = 'Updating now will require a computer restart.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -35,7 +36,7 @@ object frmStartInstallNow: TfrmStartInstallNow
     Top = 120
     Width = 75
     Height = 25
-    Caption = 'Update now'
+    Caption = 'Update'
     ModalResult = 1
     TabOrder = 0
   end

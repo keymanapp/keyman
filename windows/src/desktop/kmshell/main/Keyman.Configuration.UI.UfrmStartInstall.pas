@@ -26,14 +26,25 @@ type
     cmdInstall: TButton;
     cmdLater: TButton;
     lblInstallUpdate: TLabel;
+    procedure FormCreate(Sender: TObject);
   private
   public
   end;
 
 
 implementation
+uses
+  MessageIdentifiers,
+  MessageIdentifierConsts;
 
 {$R *.dfm}
 
+procedure TfrmStartInstall.FormCreate(Sender: TObject);
+begin
+  inherited;
+  cmdInstall.Caption := MsgFromId(S_Update);
+  cmdLater.Caption := MsgFromId(S_Button_Close);
+  lblInstallUpdate.Caption := MsgFromId(S_Ready_To_Install);
+end;
 
 end.

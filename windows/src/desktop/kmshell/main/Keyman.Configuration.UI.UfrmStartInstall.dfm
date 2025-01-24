@@ -34,7 +34,7 @@ object frmStartInstall: TfrmStartInstall
     Top = 104
     Width = 75
     Height = 25
-    Caption = 'Install'
+    Caption = 'Update'
     ModalResult = 1
     TabOrder = 0
   end
