@@ -61,6 +61,7 @@ export class GeneratorMessages {
     `The specified target platform '${def(o.target)}' is not a valid target.`
   );
 
+  // See also copier-messages.ERROR_InvalidKeyboardId
   static ERROR_InvalidKeymanKeyboardId = SevError | 0x0008;
   static Error_InvalidKeymanKeyboardId = (o:{id:string}) => m(
     this.ERROR_InvalidKeymanKeyboardId,
@@ -73,6 +74,7 @@ export class GeneratorMessages {
     `The specified keyboard id '${def(o.id)}' contains characters that are not permitted for an LDML .xml keyboard id or filename.`
   );
 
+  // See also copier-messages.ERROR_InvalidLexicalModelId
   static ERROR_InvalidLexicalModelId = SevError | 0x000A;
   static Error_InvalidLexicalModelId = (o:{id:string}) => m(
     this.ERROR_InvalidLexicalModelId,

@@ -114,7 +114,7 @@ begin
           state := plsFatal;
           Result := False;
         end
-        else // assume msgType = 'info'
+        else // assume msgType = 'info' (fine also for 'verbose', 'debug')
           state := plsInfo;
         FGlobalProject.Log(state, msgFilename, msgText, msgCode, msgLine);
       end
