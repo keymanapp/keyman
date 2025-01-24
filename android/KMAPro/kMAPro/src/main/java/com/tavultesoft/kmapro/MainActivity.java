@@ -262,6 +262,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     if (loadingIntentUri != null) {
       String scheme = loadingIntentUri.getScheme().toLowerCase();
+      final String link = loadingIntentUri.toString();
       switch (scheme) {
         // content:// Android DownloadManager
         // file:// Chrome downloads and Filebrowsers
@@ -269,6 +270,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         case "file":
           requestPermissionIntentUri = loadingIntentUri;
           if (CheckPermissions.isPermissionOK(this)) {
+            KMLog.LogBreadcrumb(TAG, "Installing local KMP: " + loadingIntentUri, true);
             useLocalKMP(context, loadingIntentUri);
           } else {
             CheckPermissions.requestPermission(this, context);
@@ -277,14 +279,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         case "http" :
         case "https" :
           // Might need to modify link like KMPBrowserActivity
-          String link = loadingIntentUri.toString();
           if (KMPLink.isKeymanInstallLink(link)) {
             loadingIntentUri = KMPLink.getKeyboardDownloadLink(link);
           }
+          // Is usually triggered by KMPBrowserActivity
+          KMLog.LogBreadcrumb(TAG, "Installing via HTTPS intent: " + link, true);
           downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           break;
         case "keyman" :
           // TODO: Only accept download links from Keyman browser activities when universal links work
+          KMLog.LogBreadcrumb(TAG, "Installing via keyman-link intent: " + link, true);
           if (KMPLink.isKeymanDownloadLink(loadingIntentUri.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
@@ -296,7 +300,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             loadingIntentUri = Uri.parse(builder.build().toString());
             downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else if (KMPLink.isLegacyKeymanDownloadLink(loadingIntentUri.toString())) {
-            link = loadingIntentUri.toString();
             loadingIntentUri = KMPLink.getLegacyKeyboardDownloadLink(link);
             downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else {
