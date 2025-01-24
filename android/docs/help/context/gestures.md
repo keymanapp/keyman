@@ -1,5 +1,5 @@
 ---
-title: Gesture Hints and Tips
+title: Gesture Hints and Tips - Keyman for Android
 ---
 
 ## Using Gestures on the Keyboard Keys

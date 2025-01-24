@@ -1,5 +1,5 @@
 ---
-title: Guide: build an in-app keyboard for iPhone and iPad with Keyman Engine
+title: Guide: build an in-app keyboard
 ---
 
 Keyman Engine for iPhone and iPad allows you to use any Keyman touch
