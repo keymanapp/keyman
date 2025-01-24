@@ -1,5 +1,5 @@
 ---
-title: Getting Started
+title: Getting Started on Windows
 ---
 
 * [Getting Started with Keyman](tutorial)

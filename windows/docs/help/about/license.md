@@ -4,7 +4,7 @@ title: End User Licence and Services Agreement
 
 The MIT License
 
-Copyright (c) 2017-2022 SIL International
+Copyright (c) 2017-2025 SIL Global
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

@@ -1,5 +1,5 @@
 ---
-title: Basic Help
+title: Keyman for Windows Basic Help
 ---
 
 * [New Ways to Use Keyman](new-ways-to-use-keyman)
