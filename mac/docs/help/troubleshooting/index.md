@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Keyman for macOS Troubleshooting
 ---
 
 * [Configure macOS security for Keyman](configure-security)
