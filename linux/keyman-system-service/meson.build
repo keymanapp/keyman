@@ -4,7 +4,7 @@ project('keyman-system-service', 'c', 'cpp',
         meson_version: '>=0.61')
 
 evdev    = dependency('libevdev', version: '>= 1.9')
-systemd  = dependency('libsystemd')
+systemd  = dependency('libsystemd', 'libelogind')
 
 subdir('resources')
 subdir('src')
