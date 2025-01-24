@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Keyman for Windows Troubleshooting
 ---
 
 * [How To - Fix Font Issues](font)
