@@ -1,5 +1,5 @@
 ---
-title: Keyman for Linux Common Questions
+title: Common Questions
 ---
 
 See also [Knowledge Base articles](https://help.keyman.com/knowledge-base/).

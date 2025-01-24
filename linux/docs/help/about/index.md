@@ -1,5 +1,5 @@
 ---
-title: About Keyman for Linux
+title: About Keyman
 ---
 
 * [Welcome to Keyman](welcome)
