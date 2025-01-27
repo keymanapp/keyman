@@ -1,5 +1,5 @@
 ---
-title: How To - Enabling Keyman as a System-Wide Keyboard
+title: How To - Enabling Keyman for Android as a System-Wide Keyboard
 ---
 
 ## Enabling System Wide Keyboards

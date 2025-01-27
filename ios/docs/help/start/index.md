@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Keyman for iPhone and iPad
+title: Getting Started
 ---
 
 * [How To - Adding a Keyboard](searching-for-keyboards)
