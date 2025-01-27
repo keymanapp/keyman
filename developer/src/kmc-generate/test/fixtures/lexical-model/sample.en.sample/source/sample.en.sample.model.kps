@@ -36,7 +36,7 @@
       <Name>Sample Project</Name>
       <ID>sample.en.sample</ID>
             <Languages>
-        <Language ID="en">en</Language>
+        <Language ID="en">English</Language>
       </Languages>
     </LexicalModel>
   </LexicalModels>
