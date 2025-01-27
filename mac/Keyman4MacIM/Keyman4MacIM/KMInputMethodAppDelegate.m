@@ -148,7 +148,7 @@ id _lastServerWithOSKShowing = nil;
 }
 
 /**
- * When the input method is activated, show the OSK and enable the low-level event tap
+ * When the input method is activated, enable the low-level event tap and show the OSK 
  */
 - (void)inputMethodActivated:(NSNotification *)notification {
   if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
@@ -966,8 +966,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSWindowController *)oskWindow {
-  if (!_oskWindow)
+  if (!_oskWindow) {
     _oskWindow = [[OSKWindowController alloc] initWithWindowNibName:@"OSKWindowController"];
+    
+    os_log_debug([KMLogs oskLog], "Loaded oskWindow from Nib, isVisible: %{public}@ readShowOskOnActivate: %{public}@", [_oskWindow.window isVisible]?@"true":@"false", [KMSettingsRepository.shared readShowOskOnActivate]?@"true":@"false");
+  }
   
   return _oskWindow;
 }
