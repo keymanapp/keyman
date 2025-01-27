@@ -72,6 +72,10 @@
     <h3>or in this input field:</h3>
     <input class='test' value='' placeholder='or here'/>
 
+    <h3>Trigger stub registration errors:</h3>
+    <input type='button' id='btnStub1' onclick='badStubRequest(1);' value='Request single stub' />
+    <input type='button' id='btnStub2' onclick='badStubRequest(2);' value='Request stubs for two invalid languages' />
+
     <!--  The following elements show how the language menu can be dynamically extended at any time -->
     <h3>Add a keyboard by keyboard name:</h3>
     <input type='input' id='kbd_id1' class='kmw-disabled' onkeypress="clickOnEnter(event,1);"/>
