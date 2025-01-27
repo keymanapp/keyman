@@ -25,7 +25,8 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/langtags": "*"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
