@@ -418,12 +418,10 @@
 
   if ([info objectForKey:@"HeaderTitle"] != nil) {
     keyboardName = [info objectForKey:@"HeaderTitle"];
-    [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, keyboardName]];
   } else {
     keyboardName = [info objectForKey:kKMKeyboardNameKey];
-    [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, keyboardName]];
   }
-  
+  [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, keyboardName]];
   os_log_debug([KMLogs configLog], "entered removeAction for keyboardName: %{public}@", keyboardName);
 
   [self.deleteAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {

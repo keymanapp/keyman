@@ -22,7 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)addInfoBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText;
-+ (void)addDetailedBreadCrumb:(NSString *)category message:(NSString *)messageText data:( NSDictionary *) map;
 
 @end
 
