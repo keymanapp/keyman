@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by Shawn Schantz on 2025-01-13.
  *
@@ -53,7 +53,7 @@ NSString * const kLifecycleStateTagName = @"lifecycleState";
 }
 
 /**
- *assign custom keyboard tag in Sentry to initial keyboard
+ *assign custom keyboard tag in Sentry for the given name and value
  */
 + (void)addCustomTag:(NSString *)tagName withValue:(NSString *)value {
   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
@@ -61,7 +61,10 @@ NSString * const kLifecycleStateTagName = @"lifecycleState";
   }];
 }
 
-+ (void)addBreadCrumb:(NSString *)category message:(NSString *)messageText {
+/**
+ *add a Sentry breadcrumb message of level Info with the specified category
+ */
++ (void)addInfoBreadCrumb:(NSString *)category message:(NSString *)messageText {
   SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
   crumb.level = kSentryLevelInfo;
   crumb.category = category;
@@ -69,6 +72,9 @@ NSString * const kLifecycleStateTagName = @"lifecycleState";
   [SentrySDK addBreadcrumb:crumb];
 }
 
+/**
+ *add a Sentry breadcrumb message of level debug with the specified category
+ */
 + (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText {
   SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
   crumb.level = kSentryLevelDebug;
@@ -77,21 +83,15 @@ NSString * const kLifecycleStateTagName = @"lifecycleState";
   [SentrySDK addBreadcrumb:crumb];
 }
 
+/**
+ *add a Sentry breadcrumb message of type 'user' and level debug with the specified category
+ */
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText {
   SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
   crumb.type = @"user";
   crumb.level = kSentryLevelInfo;
   crumb.category = category;
   crumb.message = messageText;
-  [SentrySDK addBreadcrumb:crumb];
-}
-
-+ (void)addDetailedBreadCrumb:(NSString *)category message:(NSString *)messageText data:( NSDictionary *) map {
-  SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
-  crumb.level = kSentryLevelInfo;
-  crumb.category = category;
-  crumb.message = messageText;
-  crumb.data = map;
   [SentrySDK addBreadcrumb:crumb];
 }
 

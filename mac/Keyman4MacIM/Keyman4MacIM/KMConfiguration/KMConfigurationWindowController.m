@@ -472,7 +472,7 @@
 - (void)installPackageFile:(NSString *)kmpFile {
   // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
   os_log_debug([KMLogs dataLog], "kmpFile - ready to unzip/install Package File: %{public}@", kmpFile);
-  [KMSentryHelper addBreadCrumb:@"configure" message:@"install package file"];
+  [KMSentryHelper addInfoBreadCrumb:@"configure" message:@"install package file"];
 
   BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
   

@@ -46,7 +46,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
   _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
   os_log_info([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient, clientAppId: %{public}@", clientAppId);
-  [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
+  [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
 
   [KMSentryHelper addClientAppIdTag:clientAppId];
   return self;
@@ -167,7 +167,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  */
 - (void)handleBackspace:(NSEvent *)event {
   os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
-  [KMSentryHelper addBreadCrumb:@"user" message:@"handle backspace for non-compliant app"];
+  [KMSentryHelper addInfoBreadCrumb:@"user" message:@"handle backspace for non-compliant app"];
 
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
@@ -441,7 +441,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     NSString *value = [options objectForKey:key];
     if(key && value) {
       os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
-      [KMSentryHelper addBreadCrumb:@"event" message:@"persist options"];
+      [KMSentryHelper addInfoBreadCrumb:@"event" message:@"persist options"];
       [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {
