@@ -338,11 +338,6 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
       return await this.keymanCloudRequest(cmd,false);
     } catch(err) {
       // We don't have keyboard info for this ErrorStub
-      if(err instanceof Error) {
-        console.error(`Error for request command-string ${cmd}: ${err.message}\n  ${err.stack}`);
-      } else {
-        console.error(err);
-      }
       return Promise.reject(err);
     }
   }
