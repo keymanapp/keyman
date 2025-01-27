@@ -1,5 +1,5 @@
 ---
-title: Welcome to Keyman
+title: Welcome to Keyman for Windows
 ---
 
 Thank you for installing Keyman. Whether you're a new or returning user,

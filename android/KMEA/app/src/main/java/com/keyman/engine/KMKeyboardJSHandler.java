@@ -75,7 +75,10 @@ public class KMKeyboardJSHandler {
     Keyboard kbd = Keyboard.getDefaultKeyboard(context);
     int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, -1);
     if (index >= 0) {
-      kbd = KMManager.getKeyboardInfo(this.context, index);
+      // It is possible for this method to return `null` - especially
+      // if the KeyboardController instance hasn't yet been initialized.
+      Keyboard lastKbd = KMManager.getKeyboardInfo(this.context, index);
+      kbd = lastKbd != null ? lastKbd : kbd;
     }
     return kbd.toStub(context);
   }

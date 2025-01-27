@@ -9,6 +9,8 @@ import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader'
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
 
+const NUL = '\uFFFE';
+
 /*
  * ABOUT THIS TEST SUITE
  * ---------------------
@@ -36,20 +38,15 @@ let device = {
   browser: 'native'
 }
 
+/** @type {KeyboardInterface} */
 let keyboardWithHarness;
-
-var toSupplementaryPairString = function(code){
-  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-  var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-  return String.fromCharCode(H, L);
-}
 
 function runEngineRuleSet(ruleSet, defaultNoun) {
   defaultNoun = defaultNoun ? defaultNoun : "Rule";
 
   for(var i = 0; i < ruleSet.length; i++) {
     var ruleDef = ruleSet[i]; // for example, DEADKEY_TEST_1.
+    keyboardWithHarness.resetContextCache();
 
     var matchDefs = [{
         sequence: ruleDef.baseSequence,
@@ -846,6 +843,122 @@ var DEADKEY_STORE_TEST_4 = {
 
 /* Keyman language equivalent:
  *
+ * nul > 'success'
+ */
+var NUL_TEST_1 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{t: 'n'}],
+  // Start of context relative to cursor
+  n: 1,
+  ln: 1,
+  // Resulting context map
+  contextCache: [ NUL ],
+
+  baseSequence: { "output": "", "inputs": []},
+  fullMatchDefs: []
+};
+
+/* Keyman language equivalent:
+ *
+ * nul any(abc) > 'success'
+ */
+var NUL_TEST_2 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{t: 'n'}, {t: 'a', a: ['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 2,
+  ln: 2,
+  // Resulting context map
+  contextCache: [ NUL, 'a' ],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+  ]},
+  fullMatchDefs: []
+};
+
+/* Keyman language equivalent:
+ *
+ * nul nul any(abc) context(3) > 'success'
+ * 
+ * This one may... "stretch" what's actually allowed by Keyman language rules,
+ * but we wish to ensure that the actual context management is capable of
+ * handling this.
+ */
+var NUL_TEST_3 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{t: 'n'}, {t: 'n'}, {t: 'a', a: ['a', 'b', 'c']}, {t: 'c', c: 3}],
+  // Start of context relative to cursor
+  n: 4,
+  ln: 4,
+  // Resulting context map
+  contextCache: [ NUL, NUL, 'a', 'a' ],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+  ]},
+  fullMatchDefs: [
+    {
+      sequence: { "output": "a", "inputs": [
+        {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true} //a
+      ]},
+      result: false,
+      msg: "Rule 2: matched deadkey with nul"
+    }, {
+      sequence: { "output": "a", "inputs": [
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true} //a
+      ]},
+      result: false,
+      msg: "Rule 2: matched character with nul"
+    }
+  ]
+};
+
+/* Keyman language equivalent:
+ *
+ * nul nul dk(1) any(abc) > 'success'
+ * 
+ * This may also "stretch" what's actually allowed by Keyman language rules,
+ * but we wish to ensure that the actual context management is capable of
+ * handling this.
+ */
+var NUL_TEST_4 = {
+  id: 1,
+  // Match condition for rule
+  rule: [{t: 'n'}, {t: 'n'}, {t: 'd', d: 1}, {t: 'a', a: ['a', 'b', 'c']}],
+  // Start of context relative to cursor
+  n: 4,
+  ln: 4,
+  // Resulting context map
+  contextCache: [ NUL, NUL, 1, 'a' ],
+
+  baseSequence: { "output": "a", "inputs": [
+    {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+    {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //a
+  ]},
+  fullMatchDefs: [
+    {
+      sequence: { "output": "a", "inputs": [
+        {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+        {"type":"key","keyCode":50,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true}, //1
+        {"type":"key","keyCode":65,"states":10752,"modifiers":0,"modifierChanged":false,"isVirtualKey":true} //a
+      ]},
+      result: false,
+      msg: "Rule 2: matched extra deadkey with nul"
+    }
+  ]
+};
+
+/* Keyman language equivalent:
+ *
  * store(match) 'abc'
  * notany(match) any(match) > 'success'
  */
@@ -975,10 +1088,12 @@ var ANY_INDEX_RULE_SET = [ ANY_INDEX_TEST_1, ANY_INDEX_TEST_2, ANY_INDEX_TEST_3 
 var DEADKEY_STORE_RULE_SET = [ DEADKEY_STORE_TEST_1, DEADKEY_STORE_TEST_2, DEADKEY_STORE_TEST_3,
    DEADKEY_STORE_TEST_4 ];
 
+var NUL_RULE_SET = [ NUL_TEST_1, NUL_TEST_2, NUL_TEST_3, NUL_TEST_4 ];
+
 var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TEST_3 ];
 
  var FULL_RULE_SET = [].concat(DEADKEY_RULE_SET, ANY_CONTEXT_RULE_SET, ANY_INDEX_RULE_SET,
-   DEADKEY_STORE_RULE_SET, NOTANY_NUL_RULE_SET);
+   DEADKEY_STORE_RULE_SET, NUL_RULE_SET, NOTANY_NUL_RULE_SET);
 
   // -----------
 
@@ -1084,6 +1199,24 @@ describe('Engine - Context Matching', function() {
 
     it('for context matching any on pure deadkey store:  DEADKEY_STORE_TEST_4', function() {
       runEngineRuleSet([DEADKEY_STORE_TEST_4]);
+    });
+  });
+
+  describe('handles interactions with nul in requested context', function() {
+    it('with only a single nul in context range; no text:  NUL_TEST_1', function () {
+      runEngineRuleSet([NUL_TEST_1]);
+    });
+
+    it(`with context [nul, 'a'] in range:  NUL_TEST_2`, function () {
+      runEngineRuleSet([NUL_TEST_2]);
+    });
+
+    it(`with context [nul, 'a', 'a'] in range:  NUL_TEST_3`, function () {
+      runEngineRuleSet([NUL_TEST_3]);
+    });
+
+    it(`with context [nul, dk(1), 'a'] in range:  NUL_TEST_4`, function () {
+      runEngineRuleSet([NUL_TEST_4]);
     });
   });
 
