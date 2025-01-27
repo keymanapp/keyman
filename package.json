@@ -53,6 +53,7 @@
     "common/web/keyman-version",
     "common/web/langtags",
     "common/web/types",
+    "common/tools/sourcemap-path-remapper",
     "common/tools/hextobin",
     "web",
     "web/src/engine/osk/gesture-processor",
