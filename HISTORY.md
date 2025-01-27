@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.178 alpha 2025-01-27
+
+* fix(web): fix handling of data: url fonts, fonts with single quotes in filename (#13032)
+* fix(android): disable early keyboard-loading when not feasible (#13001)
+* fix(web): add null guard for focusing next element via keystroke (#13013)
+* chore: adjust one bookmark link in windows doc (#13050)
+* chore: adjust bookmark links in developer docs (#13049)
+
 ## 18.0.177 alpha 2025-01-24
 
 * fix(android): restores DOMRect polyfill for old Chrome support (#13012)
