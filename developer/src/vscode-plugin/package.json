@@ -2,6 +2,7 @@
   "name": "@keymanapp/keyman-developer-vscode",
   "displayName": "Keyman Developer for VSCode",
   "description": "Plugin for compiling Keyman projects in VSCode",
+  "version": "18.0.0-ALPHA",
   "engines": {
     "vscode": "^1.93.0"
   },
@@ -15,22 +16,40 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "customEditors": [
+      {
+        "viewType": "keyman.ldml",
+        "displayName": "Keyman LDML",
+        "selector": [
+          {
+            "filenamePattern": "*.xml"
+          }
+        ],
+        "priority": "default"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -b ./",
-    "watch": "tsc -watch -b ./",
+    "compile": "tsc -b ./ && npm run build",
+    "watch": "tsc -b ./ --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",
-    "ui-test": "vscode-test"
+    "ui-test": "vscode-test",
+    "build": "parcel build --target=default --cache-dir=.parcel-cache",
+    "ui-watch": "parcel watch --target=default --cache-dir=.parcel-cache"
   },
   "devDependencies": {
+    "@parcel/transformer-typescript-tsc": "^2.13.2",
+    "@types/jsdom": "^21.1.7",
     "@types/mocha": "^10.0.0",
     "@types/node": "20.4.1",
     "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "jsdom": "^25.0.1",
+    "parcel": "^2.13.2"
   },
   "license": "MIT",
   "dependencies": {
@@ -38,6 +57,18 @@
     "@keymanapp/developer-utils": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "antd": "^5.22.7",
+    "process": "^0.11.10",
+    "react": "^19.0.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^19.0.0"
+  },
+  "targets": {
+    "default": {
+      "source": "app/index.html",
+      "distDir": "./build"
+    }
   }
 }
