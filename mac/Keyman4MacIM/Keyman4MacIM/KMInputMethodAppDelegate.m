@@ -984,8 +984,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSWindowController *)oskWindow {
-  if (!_oskWindow)
+  if (!_oskWindow) {
     _oskWindow = [[OSKWindowController alloc] initWithWindowNibName:@"OSKWindowController"];
+    
+    os_log_debug([KMLogs oskLog], "Loaded oskWindow from Nib, isVisible: %{public}@ readShowOskOnActivate: %{public}@", [_oskWindow.window isVisible]?@"true":@"false", [KMSettingsRepository.shared readShowOskOnActivate]?@"true":@"false");
+  }
   
   return _oskWindow;
 }
