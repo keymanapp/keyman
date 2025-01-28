@@ -8,3 +8,4 @@ stateDiagram
     WaitingRestart --> Installing
     Installing --> Idle
 ```
+
