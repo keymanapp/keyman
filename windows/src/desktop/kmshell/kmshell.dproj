@@ -427,9 +427,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -439,15 +439,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>kmshell.rsm</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
