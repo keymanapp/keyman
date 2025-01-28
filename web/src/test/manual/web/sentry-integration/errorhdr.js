@@ -20,7 +20,7 @@ function loadKeyboards() {
     filename:'./missing_file.js' // Intentional error - the file doesn't exist, so the <script> tag will raise an error event.
     });   
   
-// Insert a keyboard that will generate a timing error.  
+  // Insert a keyboard that is unparsable
   kmw.addKeyboards({id:'unparsable',name:'non-parsable',
     languages:{
       id:'lo',name:'debugging',region:'Asia',
