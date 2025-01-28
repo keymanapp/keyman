@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.179 alpha 2025-01-28
+
+* fix(android): improve resource-update tool handling of host Activity's closure (#13004)
+* fix(windows): bool return value of KeymanIsTextSelected (#12841)
+* chore(mac): add breadcrumbs for Sentry (#12939)
+* fix(mac): show and hide OSK consistently for all keyboards (#12988)
+* fix(linux): remove unnecessary files from source tarball (#13053)
+* fix(windows): handle keyboard package not downloaded (#12948)
+
 ## 18.0.178 alpha 2025-01-27
 
 * fix(web): fix handling of data: url fonts, fonts with single quotes in filename (#13032)
