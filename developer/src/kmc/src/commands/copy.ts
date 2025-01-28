@@ -20,6 +20,7 @@ export function declareCopy(program: Command) {
     .description('Copy a Keyman keyboard or lexical model project')
     .option('-o, --out-path <path>', 'New name and path for project')
     .option('-n, --dry-run', 'Show what would happen, without making changes')
+    .option('-r, --relocate-external', 'Copy external files into "external" folder')
     .action(copyProject)
     .addHelpText('before', `
       <project> can be:
@@ -36,6 +37,7 @@ function commanderOptionsToCopierOptions(options: any): CopierOptions {
   const result: CopierOptions = {
     outPath: options.outPath,
     dryRun: options.dryRun ?? false,
+    relocateExternalFiles: options.relocateExternal ?? false,
   };
   return result;
 }

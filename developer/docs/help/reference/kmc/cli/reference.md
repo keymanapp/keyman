@@ -509,6 +509,12 @@ following sources:
 
 : Show what would happen, without making changes
 
+`-r, --relocate-external`
+
+: Copy referenced files that are outside the project folder into an 'external'
+  folder within the new project, rather than just referencing them in their
+  current location.
+
 ### File copying, renaming, and structure rules
 
 The **origin** project folder is the one that contains the .kpj file.  When a

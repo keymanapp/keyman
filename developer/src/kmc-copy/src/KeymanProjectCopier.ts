@@ -33,6 +33,12 @@ export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
    * dryRun: show what would happen
    */
   dryRun: boolean;
+  /**
+   * Copy referenced files that are outside the project folder into an
+   * 'external' folder within the new project, rather than just referencing them
+   * in their current location
+   */
+  relocateExternalFiles?: boolean;
 };
 
 /**
@@ -78,7 +84,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
   isLocalOrigin(): boolean {
     return this.githubRef == undefined;
   }
-  relocateExternalFiles: boolean = false; // TODO-COPY: support
 
   public async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
     if(!callbacks || !options) {
@@ -559,7 +564,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     let subOutputPath: string;
     if(this.callbacks.path.isAbsolute(subFilenameRelative) || subFilenameRelative.startsWith('..')) {
-      if(this.isLocalOrigin() && !this.relocateExternalFiles) {
+      if(this.isLocalOrigin() && !this.options.relocateExternalFiles) {
         // Reference outside the project structure, do not attempt to normalize or copy,
         // but we do need to update references for the new output path
         return this.normalizePath(this.callbacks.path.relative(result.artifacts[parentFilename].filename, subFilenameAbsolute));
@@ -567,7 +572,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
         // Reference outside the project structure, we will copy into a subfolder of the project;
         // should be relative to root of remote repo, e.g. release/k/khmer_angkor references release/shared/fonts/...,
         // so should go external/release/shared/fonts/...
-        subOutputPath = this.normalizePath(this.callbacks.path.join(this.options.outPath, 'external', this.callbacks.path.dirname(subFilenameAbsolute)));
+        const relativePath = this.callbacks.path.dirname(subFilenameRelative).replace(/\.\.[/\\]/g, '');
+        subOutputPath = this.normalizePath(this.callbacks.path.join(this.options.outPath, 'external', relativePath));
       }
     } else {
       subOutputPath = this.normalizePath(this.callbacks.path.join(outputPath, this.callbacks.path.dirname(originalSubfilename)));
