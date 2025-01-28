@@ -17,7 +17,16 @@
 #import "KMPackageInfo.h"
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 @import Sentry;
+
+#if TARGET_CPU_ARM64
+NSString *processorType = @"ARM";
+#elif TARGET_CPU_X86_64
+NSString *processorType = @"Intel";
+#else
+NSString *processorType = @"Unknown";
+#endif
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
@@ -48,6 +57,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @property (nonatomic, strong) KMPackageReader *packageReader;
 @property BOOL receivedKeyDownFromOsk;
 @property NSEventModifierFlags oskEventModifiers;
+@property (nonatomic, assign) BOOL sentryTestingEnabled;
 @end
 
 @implementation KMInputMethodAppDelegate
@@ -124,10 +134,12 @@ id _lastServerWithOSKShowing = nil;
 - (void)inputMethodDeactivated:(NSNotification *)notification {
   if ([self.oskWindow.window isVisible]) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
+    [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
     [self.oskWindow.window setIsVisible:NO];
   } else {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
   }
+  [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
 
   if (self.lowLevelEventTap) {
     os_log_debug([KMLogs lifecycleLog], "***inputMethodDeactivated, disabling event tap");
@@ -143,9 +155,12 @@ id _lastServerWithOSKShowing = nil;
     os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
+ 
+  os_log_debug([KMLogs lifecycleLog], "--- inputMethodActivated, kvk is non-nil: %{public}@ showOskOnActivate: %{public}@", (_kvk!=nil)?@"true":@"false", [KMInputMethodLifecycle.shared shouldShowOskOnActivate]?@"true":@"false");
 
   if (_kvk != nil && ([KMInputMethodLifecycle.shared shouldShowOskOnActivate])) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
+    [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:@"opening OSK on input method activation"];
     [self showOSK];
   }
 }
@@ -181,7 +196,7 @@ id _lastServerWithOSKShowing = nil;
   [self setDefaultKeymanMenuItems];
   [self updateKeyboardMenuItems];
   [self setPostLaunchKeymanSentryTags];
-  // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
+  self.sentryTestingEnabled = [KMSettingsRepository.shared readForceSentryError];
 }
 
 - (void)startSentry {
@@ -192,31 +207,46 @@ id _lastServerWithOSKShowing = nil;
     options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
     options.releaseName = releaseName;
     options.environment = keymanVersionInfo.sentryEnvironment;
-    //options.debug = YES;
   }];
+}
+
+/**
+ * Determine whether to force sentry events.
+ * When true, then typing certain characters will cause Sentry events or crashes to occur.
+ *
+ * To enable, set the flag in UserDefaults
+ * `defaults write keyman.inputmethod.Keyman KMForceSentryError 1`
+ * Also, use the SIL Euro Latin keyboard and type in the Stickies app
+ */
+- (BOOL)canForceSentryEvents {
+  NSString* const testKeyboardName = @"sil_euro_latin.kmx";
+  NSString* const testClientApplicationId = @"com.apple.Stickies";
+  BOOL canForce = NO;
+
+  if (self.sentryTestingEnabled) {
+    NSString * applicationId = [KMInputMethodLifecycle.shared clientApplicationId];
+    NSString * kmxFileName = [self getKmxFileName];
+    canForce = [kmxFileName isEqualToString:testKeyboardName] && [applicationId isEqualToString:testClientApplicationId];
+    os_log_info([KMLogs testLog], "canForceSentryEvents, self.sentryTestingEnabled: %{public}@ kmxName: %{public}@ applicationId: %{public}@ testingEnabled: %{public}@", self.sentryTestingEnabled?@"YES":@"NO", kmxFileName, applicationId, canForce?@"YES":@"NO");
+  }
+    
+  return canForce;
+}
+
+- (NSString*) getKmxFileName {
+  return [[self.kmx filePath] lastPathComponent];
 }
 
 - (void)setPostLaunchKeymanSentryTags {
   NSString *keyboardFileName = [self.kmx.filePath lastPathComponent];
    os_log_info([KMLogs keyboardLog], "initial kmx set to %{public}@", keyboardFileName);
 
-  NSString *hasAccessibility = [PrivacyConsent.shared checkAccessibility]?@"Yes":@"No";
-
-   // assign custom keyboard tag in Sentry to initial keyboard
-   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-      [scope setTagValue:hasAccessibility forKey:@"accessibilityEnabled"];
-      [scope setTagValue:keyboardFileName forKey:@"keyboard"];
-   }];
+  // assign custom keyboard tags in Sentry
+  [KMSentryHelper addKeyboardTag:keyboardFileName];
+  [KMSentryHelper addHasAccessibilityTag:[PrivacyConsent.shared checkAccessibility]];
+  [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
+  [KMSentryHelper addArchitectureTag:processorType];
 }
-
-#ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
-- (BOOL)alertShowHelp:(NSAlert *)alert {
-  os_log_error([KMLogs startupLog], "Sentry - KME: Got call to force crash from engine");
-  [SentrySDK crash];
-  os_log_error([KMLogs startupLog], "Sentry - KME: should not have gotten this far!");
-  return NO;
-}
-#endif
 
 - (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
   
@@ -317,6 +347,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
           os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
           if ([OSKView isOskKeyDownEvent:event]) {
+            [KMSentryHelper addInfoBreadCrumb:@"event" message:@"processing OSK-generated keydown event"];
             NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
             appDelegate.receivedKeyDownFromOsk = YES;
             appDelegate.oskEventModifiers = oskEventModifiers;
@@ -406,22 +437,26 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   _kmx = kmx;
   CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
 
-  os_log_info([KMLogs keyboardLog], "setKmx loaded keyboard, keyboard info: %{public}@", keyboardInfo);
-  
+  os_log_info([KMLogs keyboardLog], "loadKeyboardFromKmxFile, keyboard info: %{public}@", keyboardInfo);
+  [KMSentryHelper addInfoBreadCrumb:@"configure" message:[NSString stringWithFormat:@"loadKeyboardFromKmxFile: %@", [self getKmxFileName]]];
+  [KMSentryHelper addKeyboardTag:[self getKmxFileName]];
+
   _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
 
   os_log_info([KMLogs keyboardLog], "modifierMapping bothOptionKeysGenerateRightAlt: %d", self.modifierMapping.bothOptionKeysGenerateRightAlt);
-
-   // assign custom keyboard tag in Sentry to default keyboard
-   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:keyboardInfo.keyboardId forKey:@"keyboard"];
-   }];
 }
 
 - (void)setKvk:(KVKFile *)kvk {
+  if (kvk != nil) {
+    os_log_info([KMLogs lifecycleLog], "*** setKvk, kvk.associatedKeyboard: %{public}@", kvk.associatedKeyboard);
+  } else {
+    os_log_info([KMLogs lifecycleLog], "*** setKvk, setting to nil");
+  }
   _kvk = kvk;
-  if (_oskWindow != nil)
+  
+  if (_oskWindow != nil) {
     [_oskWindow resetOSK];
+  }
 }
 
 - (void)setKeyboardName:(NSString *)keyboardName {
@@ -616,6 +651,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   if (!_activeKeyboards) {
     os_log_debug([KMLogs dataLog], "initializing activeKeyboards");
     _activeKeyboards = [[KMSettingsRepository.shared readActiveKeyboards] mutableCopy];
+    
+    [KMSentryHelper addActiveKeyboardCountTag:_activeKeyboards.count];
   }
 
   return _activeKeyboards;
@@ -626,6 +663,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [KMSettingsRepository.shared writeActiveKeyboards:_activeKeyboards];
   [self resetActiveKeyboards];
   [self updateKeyboardMenuItems];
+  [KMSentryHelper addActiveKeyboardCountTag:self.activeKeyboards.count];
 }
 
 - (void)clearActiveKeyboards {
@@ -825,6 +863,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setSelectedKeyboard:keyboardName inMenuItem:menuItem];
   [self setSelectedKeyboard:keyboardName];
   [self setContextBuffer:nil];
+  
+  [KMSentryHelper addInfoBreadCrumb:@"startup" message:[NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName]];
 }
 
 - (void) addKeyboardPlaceholderMenuItem {
@@ -948,6 +988,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];
+  [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
 }
 
 - (void)showAboutWindow {
