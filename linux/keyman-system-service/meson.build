@@ -12,7 +12,7 @@ if systemd.found()
   conf.set('DBUS_IMPLEMENTATION', 'SYSTEMD')
 else
   # Gentoo can use libelogind or basu
-  systemd = dependency('basu')
+  systemd = dependency('basu', required: true)
   conf.set('DBUS_IMPLEMENTATION', 'BASU')
 endif
 
