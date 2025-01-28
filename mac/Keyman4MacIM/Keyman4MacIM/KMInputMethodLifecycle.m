@@ -278,11 +278,10 @@ typedef enum {
 }
 
 /**
- * Returns true if lifecycleState is  Active and the Settings require us to show the OSK
+ * Returns true the Settings require us to show the OSK on activation
  */
 - (BOOL)shouldShowOskOnActivate {
-  return [KMSettingsRepository.shared readShowOskOnActivate]
-    && (self.lifecycleState == Active);
+  return [KMSettingsRepository.shared readShowOskOnActivate];
 }
 
 @end
