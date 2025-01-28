@@ -10,7 +10,7 @@
     },
   "include": [
       "**/*.tests.ts",
-      "./helpers/index.ts"
+      "./helpers/*.ts",
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version" },
