@@ -1,5 +1,5 @@
 ---
-title: Keyboard Task - Uninstall a Keyboard
+title: Keyboard Task - Uninstall a Keyman Keyboard on Windows
 ---
 
 Uninstalling a Keyman keyboard removes it from Keyman. If you want to

@@ -1,5 +1,5 @@
 ---
-title: Getting Started with Keyman
+title: Getting Started with Keyman for Windows
 ---
 
 Follow these steps for a basic introduction to Keyman:
