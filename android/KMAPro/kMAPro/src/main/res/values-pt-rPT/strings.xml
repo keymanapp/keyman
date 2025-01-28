@@ -68,6 +68,8 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Ajustar altura do teclado</string>
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Ajustar atraso do toque longo</string>
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Barra de espaço</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Teclado</string>
@@ -87,11 +89,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Não mostrar legenda na barra de espaço</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibrar ao tocar</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Sempre mostrar banner</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">A ser implementado</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">Quando desativado, apenas mostrado quando o texto preditivo é ativado</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Permitir o envio de relatórios de erro pela rede</string>
@@ -123,6 +125,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Gire o dispositivo para ajustar o retrato e a paisagem</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Restaurar padrões</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Tempo de atraso: %1$.1f segundos</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Tempo de atraso maior</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Tempo de atraso menor</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Atraso do tempo com toque longo</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Pesquise ou digite um endereço</string>
   <!-- Context: Keyman Web Browser -->
