@@ -23,10 +23,10 @@
 
         <div id="update_status">
             <xsl:if test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
-                Updates are available which will be applied when Windows is next restarted:
+              <xsl:value-of select="$locale/string[@name='S_Updates_Available']"/>
             </xsl:if>
             <xsl:if test="not($isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable)">
-                No updates are available.
+              <xsl:value-of select="$locale/string[@name='S_No_Updates_Available']"/>
             </xsl:if>
         </div>
 
