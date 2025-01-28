@@ -204,11 +204,6 @@ STDAPI CKeymanEditSession::DoEditSession(TfEditCookie ec)
 
   ExtEditSession = this;
 
-  if (!Keyman32Interface::TIPProcessKey(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContext, _fUpdate, _fPreserved)) {
-    SendDebugMessage(L"TIPProcessKey did not handle the keystroke");
-    _hr = E_FAIL; // TODO: use S_FALSE -> this tells _KeymanProcessKeystroke to pass keystroke on
-  }
-
   if (!Keyman32Interface::TIPProcessKeyEx(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContextIsSelected, _fUpdate, _fPreserved)) {
     SendDebugMessage(L"TIPProcessKeyEx did not handle the keystroke");
     _hr = E_FAIL; // TODO: use S_FALSE -> this tells _KeymanProcessKeystroke to pass keystroke on

@@ -208,7 +208,7 @@ BOOL TIPProcessKeyInternal(
 
 	_td->TIPProcessOutput = NULL;
 	_td->TIPGetContext = NULL;
-  _td->TIPGetContextEx = NULL;
+  _td->TIPGetContextIsSelected = NULL;
 
 	SendDebugMessageFormat("Success, res=%d", res);
 
@@ -268,11 +268,11 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKeyEx(
   }
 
   _td->TIPProcessOutput = outfunc;
-	_td->TIPGetContextEx = ctfunc;
+	_td->TIPGetContextIsSelected = ctfunc;
   BOOL res = TIPProcessKeyInternal(_td, wParam, lParam, Updateable, Preserved);
   if (res == FALSE) {
     _td->TIPProcessOutput = NULL;
-	  _td->TIPGetContextEx = NULL;
+	  _td->TIPGetContextIsSelected = NULL;
   }
   return res;
 
@@ -329,7 +329,7 @@ BOOL AITIP::ReadContext(PWSTR buf) {
     return FALSE;
   }
 
-  if (_td->TIPGetContextEx && (*_td->TIPGetContextEx)(MAXCONTEXT - 1, buf, &isTextSelected) == S_OK) {  // I3575   // I4262
+  if (_td->TIPGetContextIsSelected && (*_td->TIPGetContextIsSelected)(MAXCONTEXT - 1, buf, &isTextSelected) == S_OK) {  // I3575   // I4262
     if(ShouldDebug()) {
       SendDebugMessageFormat("full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
