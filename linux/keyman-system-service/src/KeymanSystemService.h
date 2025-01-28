@@ -3,18 +3,21 @@
 
 #include <list>
 #include <systemd/sd-bus.h>
+#include "OrderedOutputDevice.h"
 #include "KeyboardDevice.h"
 
 using namespace std;
 
 class KeymanSystemService {
 private:
-  std::list<KeyboardDevice *>* kbd_devices = NULL;
-  sd_bus_slot *slot                        = NULL;
-  sd_bus *bus                              = NULL;
-  bool failed                              = false;
+  std::list<KeyboardDevice *>* kbd_devices  = nullptr;
+  OrderedOutputDevice *kbd_ordered_output   = nullptr;
+  sd_bus_slot *slot                         = nullptr;
+  sd_bus *bus                               = nullptr;
+  bool failed                               = false;
 
   void GetKbdDevices();
+  void CreateOrderedOutputDevice();
 
 public:
   KeymanSystemService();
@@ -28,6 +31,7 @@ public:
   int Loop();
   void SetCapsLockIndicatorOnDevices(uint32_t state);
   uint32_t GetCapsLockIndicatorOnDevices();
+  void CallOrderedOutputSentinel();
 };
 
 #endif // __KEYMANSYSTEMSERVICE_H__
