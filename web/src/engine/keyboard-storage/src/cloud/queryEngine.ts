@@ -2,7 +2,7 @@ import { EventEmitter } from 'eventemitter3';
 
 import { PathConfiguration } from 'keyman/engine/interfaces';
 
-import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
+import { default as KeyboardStub, ErrorStub, KeyboardAPISpec } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
 import CloudRequesterInterface from './requesterInterface.js';
 
@@ -310,7 +310,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
    * @param   x  keyboard name string or keyboard metadata JSON object
    * @returns resolved or rejected promise with merged array of stubs.
    */
-  async fetchCloudStubs(cloudList: string[]): Promise<(KeyboardStub|ErrorStub)[]> {
+  async fetchCloudStubs(cloudList: string[]): Promise<(KeyboardStub)[]> {
     // // Ensure keymanweb is initialized before continuing to add keyboards
     // if(!this.keymanweb.initialized) {
     //   await this.deferment;
@@ -328,17 +328,12 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
       comma=',';
     }
 
-    let errorStubs: ErrorStub[] = [];
     // Request keyboard metadata from the Keyman Cloud keyboard metadata server
     try {
-      let result: (KeyboardStub|ErrorStub)[]|Error = await this.keymanCloudRequest(cmd,false);
-      return mergeAndResolveStubPromises(result, errorStubs);
+      return await this.keymanCloudRequest(cmd,false);
     } catch(err) {
       // We don't have keyboard info for this ErrorStub
-      console.error(err);
-      let stub: ErrorStub = {error: err};
-      errorStubs.push(stub);
-      return Promise.reject(errorStubs);
+      return Promise.reject(err);
     }
   }
 }

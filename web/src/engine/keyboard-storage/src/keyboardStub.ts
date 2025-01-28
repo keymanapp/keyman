@@ -205,12 +205,22 @@ export interface ErrorStub {
   error: Error;
 }
 
+export function rejectErrorStubs(errorStubs: ErrorStub[]) {
+  if(errorStubs.length > 1) {
+    const msgs = errorStubs.map((entry) => `${entry.error.message}:\n  ${entry.error.stack ?? ''}`);
+    return Promise.reject(new Error(msgs.join('\n\n')));
+  } else {
+    // The messages for errors we'd return here should already include data about their triggering request.
+    return Promise.reject(errorStubs[0].error);
+  }
+}
+
 export function mergeAndResolveStubPromises(keyboardStubs: (KeyboardStub|ErrorStub)[], errorStubs: ErrorStub[]) :
   Promise<(KeyboardStub|ErrorStub)[]> {
   if (errorStubs.length == 0) {
     return Promise.resolve(keyboardStubs);
   } if (keyboardStubs.length == 0) {
-    return Promise.reject(errorStubs);
+    return rejectErrorStubs(errorStubs);
   } else {
     // Merge this with errorStubs
     let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
