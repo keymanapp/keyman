@@ -2,6 +2,7 @@
 // based on the sd-bus library, see
 // https://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html
 
+#include "config.h"
 #include <cstdint>
 #include <dirent.h>
 #include <errno.h>
@@ -11,7 +12,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <syslog.h>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 #include "KeymanSystemService.h"
 #include "KeyboardDevice.h"
 

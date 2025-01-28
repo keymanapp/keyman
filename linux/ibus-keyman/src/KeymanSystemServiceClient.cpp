@@ -1,5 +1,10 @@
+#include "config.h"
 #include <cassert>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 #include "KeymanSystemServiceClient.h"
 
 #define KEYMAN_BUS_NAME "com.keyman.SystemService1"

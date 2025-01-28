@@ -1,9 +1,14 @@
 // DBus test server. The server will start and listen on a non-standard DBus.
 // It runs until the DBus Exit method gets called.
+#include "config.h"
 #include <fstream>
 #include <gio/gio.h>
 #include <iostream>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 
 #ifndef KEYMAN_TEST_SERVICE_PATH
 #warning KEYMAN_TEST_SERVICE_PATH is undefined
@@ -73,7 +78,10 @@ KmDbusTestServer::~KmDbusTestServer()
 {
   if (bus)  sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
   if (slot) sd_bus_slot_unref(slot);
-  if (bus)  sd_bus_close_unref(bus);
+  if (bus) {
+    sd_bus_close(bus);
+    sd_bus_unref(bus);
+  }
 
   g_test_dbus_down(dbus);
   g_object_unref(dbus);

@@ -1,8 +1,13 @@
 // Call the Exit method on the km-dbus-test-server. Remember to source
 // `/tmp/km-test-server.env` prior to running stop-test-server in order
 // to run on our non-standard DBus.
+#include "config.h"
 #include <iostream>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 
 using namespace std;
 
