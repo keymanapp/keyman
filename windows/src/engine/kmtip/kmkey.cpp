@@ -90,7 +90,7 @@ private:
    * @param[in]   tfSelection     The selection details.
    * @return                      S_OK if successful, otherwise an HRESULT error code.
    */
-  BOOL CKeymanEditSession::KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched, TF_SELECTION tfSelection);
+  BOOL CKeymanEditSession::KeymanIsTextSelected(const HRESULT hrGetSelection, const ULONG cFetched, const TF_SELECTION tfSelection);
 };
 
 #define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
@@ -284,7 +284,7 @@ HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf, BOOL* isTe
 }
 
 BOOL
-CKeymanEditSession::KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched, TF_SELECTION tfSelection) {
+CKeymanEditSession::KeymanIsTextSelected(const HRESULT hrGetSelection, const ULONG cFetched, const TF_SELECTION tfSelection) {
   if (hrGetSelection == TF_E_NOSELECTION || cFetched == 0 || !SUCCEEDED(hrGetSelection) || !tfSelection.range) {
     // No selection is present, or an error occurred trying to get the selection
     return FALSE;
