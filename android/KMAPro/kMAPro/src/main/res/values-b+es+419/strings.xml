@@ -53,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Para instalar los paquetes del teclado, permite que Keyman acceda al almacenamiento externo.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Se ha denegado la solicitud de permiso de almacenamiento. La instalación del paquete de teclado podría fallar</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Falló la solicitud de permiso de almacenamiento. Seleccione Configuración de Keyman - Instalar desde archivo local</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Configuración</string>
   <!-- Context: Keyman Settings menu -->
@@ -66,6 +67,8 @@
   <string name="change_display_language" comment="Menu action to change interface language">Idioma de interfaz</string>
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Ajustar la altura del teclado</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Adjust longpress delay</string>
   <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Leyenda de barra espaciadora</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -86,11 +89,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">No mostrar leyenda en la barra espaciadora</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibrar al escribir</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Mostrar siempre el banner</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">A implementar</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">Cuando está desactivado, solo se muestra cuando el texto predictivo está habilitado</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Permitir el envío de informes de fallas a través de la red</string>
@@ -122,6 +125,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Rota el dispositivo para ajustar el modo vertical y horizontal</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Restaurar valores predeterminados</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Delay Time: %1$.1f seconds</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Delay time longer</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Delay time shorter</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Longpress delay time slider</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Buscar o escribir una dirección web</string>
   <!-- Context: Keyman Web Browser -->
