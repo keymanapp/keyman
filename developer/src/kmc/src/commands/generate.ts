@@ -30,7 +30,8 @@ function declareGenerateKmnKeyboard(command: Command) {
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
     .option('-a, --author <author-name>', 'Name of keyboard author')
-    .option('-i, --icon', 'Include a generated icon', true)
+    // TODO-GENERATE: icon support
+    // .option('-i, --icon', 'Include a generated icon', true)
     .option('-d, --description <description>', 'Short description of the project, Markdown')
     .action(generateKmnKeyboard);
 }
@@ -73,7 +74,8 @@ function declareGenerateLexicalModel(command: Command) {
 
 function commanderOptionsToGeneratorOptions(id: string, options: any): GeneratorOptions {
   const result: GeneratorOptions = {
-    icon: options.icon ?? true,
+    // TODO-GENERATE: icon support
+    // icon: options.icon ?? true,
     id,
     languageTags: options.languageTag ?? [],
     name: options.name ?? id,

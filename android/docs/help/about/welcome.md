@@ -1,5 +1,5 @@
 ---
-title: Welcome to Keyman
+title: Welcome to Keyman for Android
 ---
 
 Thank you for installing Keyman for Android. Whether you're a new or returning user, we believe you will appreciate the significant enhancements in this latest version of Keyman for Android.

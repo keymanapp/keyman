@@ -2,7 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks,
   CompilerError, CompilerNetAsyncCallbacks, DefaultCompilerFileSystemAsyncCallbacks,
-  CompilerFileSystemAsyncCallbacks } from '@keymanapp/developer-utils';
+  CompilerFileSystemAsyncCallbacks,
+  CompilerErrorSeverity} from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
 
 const { TEST_SAVE_FIXTURES } = process.env;
@@ -25,6 +26,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   clear() {
     this.messages = [];
+  }
+
+  filteredMessages(severity: CompilerErrorSeverity = CompilerErrorSeverity.Info) {
+    return this.messages.filter(m => CompilerError.severity(m.code) >= severity);
   }
 
   printMessages() {

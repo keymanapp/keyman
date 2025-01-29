@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by Shawn Schantz on 2025-01-13.
  *
@@ -19,10 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)addKeyboardTag:(NSString *)value;
 + (void)addHasAccessibilityTag:(BOOL)value;
 + (void)addActiveKeyboardCountTag:(NSUInteger)value;
-+ (void)addBreadCrumb:(NSString *)category message:(NSString *)messageText;
++ (void)addInfoBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText;
-+ (void)addDetailedBreadCrumb:(NSString *)category message:(NSString *)messageText data:( NSDictionary *) map;
 
 @end
 

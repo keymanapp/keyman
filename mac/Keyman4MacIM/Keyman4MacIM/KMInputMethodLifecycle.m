@@ -199,7 +199,7 @@ typedef enum {
      break;
     case Activate:
       os_log_info([KMLogs lifecycleLog], "performTransition: Activate, new application ID: %{public}@", currentClientAppId);
-      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"activated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
+      [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"activated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
       /**
        * Perform two actions when activating the input method. 
        * Change the client first which prepares the event handler.
@@ -210,12 +210,12 @@ typedef enum {
       break;
     case Deactivate:
       os_log_info([KMLogs lifecycleLog], "performTransition: Deactivate, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
-      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"deactivated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
+      [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"deactivated input method '%@' for application ID '%@'", currentInputSource, currentClientAppId]];
       [self deactivateInputMethod];
       break;
     case ChangeClients:
       os_log_info([KMLogs lifecycleLog], "performTransition: ChangeClients, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
-      [KMSentryHelper addBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"change clients for input method '%@' to application ID '%@'", currentInputSource, currentClientAppId]];
+      [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"change clients for input method '%@' to application ID '%@'", currentInputSource, currentClientAppId]];
       [self changeClient];
       break;
   }

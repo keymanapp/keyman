@@ -24,7 +24,7 @@
 NSString *processorType = @"ARM";
 #elif TARGET_CPU_X86_64
 NSString *processorType = @"Intel";
-#elif
+#else
 NSString *processorType = @"Unknown";
 #endif
 
@@ -158,7 +158,7 @@ id _lastServerWithOSKShowing = nil;
   // if the OSK is visible, hide it
   if ([self.oskWindow.window isVisible]) {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
-    [KMSentryHelper addBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
+    [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
     [self.oskWindow.window setIsVisible:NO];
   } else {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
@@ -365,7 +365,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
           os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
           if ([OSKView isOskKeyDownEvent:event]) {
-            [KMSentryHelper addBreadCrumb:@"event" message:@"processing OSK-generated keydown event"];
+            [KMSentryHelper addInfoBreadCrumb:@"event" message:@"processing OSK-generated keydown event"];
             NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
             appDelegate.receivedKeyDownFromOsk = YES;
             appDelegate.oskEventModifiers = oskEventModifiers;
@@ -456,7 +456,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
 
   os_log_info([KMLogs keyboardLog], "loadKeyboardFromKmxFile, keyboard info: %{public}@", keyboardInfo);
-  [KMSentryHelper addBreadCrumb:@"configure" message:[NSString stringWithFormat:@"loadKeyboardFromKmxFile: %@", [self getKmxFileName]]];
+  [KMSentryHelper addInfoBreadCrumb:@"configure" message:[NSString stringWithFormat:@"loadKeyboardFromKmxFile: %@", [self getKmxFileName]]];
   [KMSentryHelper addKeyboardTag:[self getKmxFileName]];
 
   _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
@@ -882,7 +882,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setSelectedKeyboard:keyboardName];
   [self setContextBuffer:nil];
   
-  [KMSentryHelper addBreadCrumb:@"startup" message:[NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName]];
+  [KMSentryHelper addInfoBreadCrumb:@"startup" message:[NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName]];
 }
 
 - (void) addKeyboardPlaceholderMenuItem {

@@ -72,9 +72,10 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
         KeymanKeyboardGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.TouchLayout;
     }
 
-    if(this.hasIcon()) {
-      this.includedPrefixes.push('Icon');
-    }
+    // TODO-GENERATE: icon support
+    // if(this.hasIcon()) {
+    //   this.includedPrefixes.push('Icon');
+    // }
 
     if(this.hasKMX()) {
       this.includedPrefixes.push('KMX');
@@ -91,9 +92,9 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
 
     // Special case for creating icon, run after successful creation of other
     // project bits and pieces
-    if(this.hasIcon()) {
-      this.writeIcon(artifacts);
-    }
+    // if(this.hasIcon()) {
+    //   this.writeIcon(artifacts);
+    // }
 
     return {artifacts};
   }
@@ -107,13 +108,13 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
   private readonly hasKMX         = () => this.targetIncludes(KeymanTargets.KMXKeymanTargets);
   private readonly hasTouchLayout = () => this.targetIncludes(KeymanTargets.TouchKeymanTargets);
 
-  // TODO-GENERATE, once writeIcon is implemented:
+  // TODO-GENERATE: icon support
   // hasIcon = () => this.options.icon && this.targetIncludes(KeymanTargets.KMXKeymanTargets);
-  private readonly hasIcon = () => false;
+  // private readonly hasIcon = () => false;
 
-  private writeIcon(artifacts: GeneratorArtifacts) {
-    // TODO-GENERATE: this will require some effort
-    // proposal: generate 16x16 icon with 2-3 letters. Following TKeyboardIconGenerator.GenerateIcon
-    // research for .ico writer in node
-  }
+  // TODO-GENERATE: icon support
+  // private writeIcon(artifacts: GeneratorArtifacts) {
+  //   proposal: generate 16x16 icon with 2-3 letters. Following TKeyboardIconGenerator.GenerateIcon
+  //   research for .ico writer in node
+  // }
 }
