@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.180 alpha 2025-01-29
+
+* chore(common): Update crowdin strings for Portuguese (#13056)
+* chore(common): Update crowdin strings for Spanish (Latin America) (#13044)
+* chore(linux): Update debian changelog (#13063)
+* chore(linux): improve compatibility with Gentoo Linux (#13070)
+
 ## 18.0.179 alpha 2025-01-28
 
 * fix(android): improve resource-update tool handling of host Activity's closure (#13004)
