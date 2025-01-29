@@ -1235,6 +1235,20 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.334 stable 2025-01-27
+
+* chore(linux): update copyright year (#12919)
+* chore(linux): Update debian changelog (#12916)
+* fix(android): Remove access to MEDIA storage permissions (#13005)
+* fix(android): restores DOMRect polyfill for old Chrome support (#13014)
+* fix(web): add null guard for focusing next element via keystroke (#13035)
+* fix: use correct path for resources/build/version (#13030)
+* fix(web): fix handling of fonts with single quotes in filename (#13041)
+* fix(android): disable early keyboard-loading when not feasible (#13039)
+* fix(web): do not simplify nul-prefixed contexts when rule-matching (#13040)
+* feat(android): add breadcrumbing during package install about package file, source (#13038)
+* fix(web): prevent multitap warning that occurs multitapping longpressable modifier keys (#12974)
+
 ## 17.0.333 stable 2025-01-16
 
 * fix(core): permanently disable logging (#12674)
