@@ -161,7 +161,7 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
-function ProcessBackroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -689,7 +689,7 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the following package related switches are valid in in the installing
+        // the following package related switches are valid in the installing
         // state.
         SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
         fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
