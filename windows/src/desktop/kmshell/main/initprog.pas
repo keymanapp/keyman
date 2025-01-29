@@ -437,7 +437,7 @@ begin
     Exit;
   end;
 
-  if ProcessBackroundUpdate(FMode, FSilent) then
+  if ProcessBackgroundUpdate(FMode, FSilent) then
   begin
     Exit;
   end;
@@ -652,7 +652,7 @@ begin
     end;
 end;
 
-function ProcessBackroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
 var
   BUpdateSM : TUpdateStateMachine;
   frmStartInstall: TfrmStartInstall;
