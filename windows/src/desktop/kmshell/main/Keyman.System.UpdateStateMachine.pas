@@ -1091,7 +1091,7 @@ end;
 
 function InstallingState.HandleKmShell;
 begin
-  // Should not be called while in installing state MSI installer may have
+  // Should not be possible while called in InstallingState. The MSI installer may have
   // failed. Clean Up and return to Idle
   bucStateContext.RemoveCachedFiles;
   ChangeState(IdleState);
