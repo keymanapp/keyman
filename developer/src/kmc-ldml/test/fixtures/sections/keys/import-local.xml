@@ -4,7 +4,7 @@
   <info name="keys-minimal"/>
 
   <keys>
-    <import base="" path="keys-Zyyy-morepunctuation.xml"/>
+    <import path="keys-Zyyy-morepunctuation.xml"/>
   </keys>
 
   <layers formId="us">
