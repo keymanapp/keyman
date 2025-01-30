@@ -188,7 +188,7 @@ uses
   MessageIdentifiers,
   Keyman.System.ExecutionHistory,
   Keyman.System.KeymanSentryClient,
-  Keyman.System.RemoteUpdateCheck,
+  Keyman.System.UpdateStateMachine,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
@@ -800,16 +800,14 @@ begin
 end;
 
 procedure TfrmMain.Update_CheckNow;
-// TODO: epic-windows-update
-// Get an instance to the state machine and call handle check so the state can change to update
-// available.
-var UpdateCheck : TRemoteUpdateCheck;
+var
+  BUpdateSM : TUpdateStateMachine;
 begin
-  UpdateCheck := TRemoteUpdateCheck.Create(True);
+  BUpdateSM := TUpdateStateMachine.Create(False);
   try
-    UpdateCheck.Run;
+    BUpdateSM.HandleCheck;
   finally
-    UpdateCheck.Free;
+    BUpdateSM.Free;
   end;
   DoRefresh;
 end;

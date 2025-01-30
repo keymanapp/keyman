@@ -22,6 +22,7 @@ RUN <<EOF
     PKG_SDKMANAGER=sdkmanager
     DIR_SDK=/opt/android-sdk
   fi
+  apt-get update
   apt-get -q -y install gradle maven pandoc $PKG_SDKMANAGER jq openjdk-${JAVA_VERSION}-jdk
   sdkmanager platform-tools
   yes | sdkmanager --licenses

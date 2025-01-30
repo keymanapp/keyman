@@ -10,6 +10,7 @@
 #import "KMDownloadKBWindowController.h"
 #import "KMDataRepository.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 
 @interface KMConfigurationWindowController ()
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
@@ -360,21 +361,27 @@
 - (void)checkBoxAction:(id)sender {
   NSButton *checkBox = (NSButton *)sender;
   NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
+  NSString * kmxFileName = [kmxFilePath lastPathComponent];
   NSString *partialPath = [KMDataRepository.shared trimToPartialPath:kmxFilePath];
   os_log_debug([KMLogs uiLog], "checkBoxAction, kmxFilePath = %{public}@ for checkBox.tag %li, partialPath = %{public}@", kmxFilePath, checkBox.tag, partialPath);
   if (checkBox.state == NSOnState) {
-    os_log_debug([KMLogs uiLog], "Adding active keyboard: %{public}@", kmxFilePath);
+    os_log_debug([KMLogs uiLog], "enabling active keyboard: %{public}@", kmxFileName);
+    NSString *message = [NSString stringWithFormat:@"enabling active keyboard: %@", kmxFileName];
+    [KMSentryHelper addUserBreadCrumb:@"config" message:message];
     [self.activeKeyboards addObject:partialPath];
     [self saveActiveKeyboards];
   }
   else if (checkBox.state == NSOffState) {
-    os_log_debug([KMLogs uiLog], "Disabling active keyboard: %{public}@", kmxFilePath);
+    os_log_debug([KMLogs uiLog], "disabling active keyboard: %{public}@", kmxFileName);
+    NSString *message = [NSString stringWithFormat:@"disabling active keyboard: %@", kmxFileName];
+    [KMSentryHelper addUserBreadCrumb:@"config" message:message];
     [self.activeKeyboards removeObject:partialPath];
     [self saveActiveKeyboards];
   }
 }
 
 - (void)infoAction:(id)sender {
+  [KMSentryHelper addUserBreadCrumb:@"user" message:@"getting package information"];
   NSButton *infoButton = (NSButton *)sender;
   NSString *packagePath = [self packagePathAtIndex:infoButton.tag];
   if (packagePath != nil) {
@@ -389,6 +396,7 @@
 }
 
 - (void)helpAction:(id)sender {
+  [KMSentryHelper addUserBreadCrumb:@"user" message:@"displaying help"];
   NSButton *helpButton = (NSButton *)sender;
   NSString *packagePath = [self packagePathAtIndex:helpButton.tag];
   if (packagePath != nil) {
@@ -406,22 +414,31 @@
   NSButton *deleteButton = (NSButton *)sender;
   NSDictionary *info = [self.tableContents objectAtIndex:deleteButton.tag];
   NSString *deleteKeyboardMessage = NSLocalizedString(@"message-confirm-delete-keyboard", nil);
-  
-  if ([info objectForKey:@"HeaderTitle"] != nil)
-    [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:@"HeaderTitle"]]];
-  else
-    [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:kKMKeyboardNameKey]]];
-  
+  NSString *keyboardName = nil;
+
+  if ([info objectForKey:@"HeaderTitle"] != nil) {
+    keyboardName = [info objectForKey:@"HeaderTitle"];
+  } else {
+    keyboardName = [info objectForKey:kKMKeyboardNameKey];
+  }
+  [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, keyboardName]];
+  os_log_debug([KMLogs configLog], "entered removeAction for keyboardName: %{public}@", keyboardName);
+
   [self.deleteAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
     if (returnCode == NSAlertFirstButtonReturn) {
       os_log_debug([KMLogs uiLog], "confirm delete keyboard alert dismissed");
       [self deleteFileAtIndex:[NSNumber numberWithInteger:deleteButton.tag]];
+      
+      os_log_debug([KMLogs configLog], "removeAction for keyboardName: %{public}@", keyboardName);
+      [KMSentryHelper addUserBreadCrumb:@"configure" message:[NSString stringWithFormat:@"remove keyboard: %@", keyboardName]];
     }
     self.deleteAlertView = nil;
   }];
 }
 
 - (IBAction)downloadAction:(id)sender {
+  [KMSentryHelper addUserBreadCrumb:@"user" message:@"download keyboard"];
+
   if (self.AppDelegate.infoWindow_.window != nil)
     [self.AppDelegate.infoWindow_ close];
   
@@ -453,7 +470,8 @@
 - (void)installPackageFile:(NSString *)kmpFile {
   // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
   os_log_debug([KMLogs dataLog], "kmpFile - ready to unzip/install Package File: %{public}@", kmpFile);
-  
+  [KMSentryHelper addInfoBreadCrumb:@"configure" message:@"install package file"];
+
   BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
   
   if (!didUnzip) {

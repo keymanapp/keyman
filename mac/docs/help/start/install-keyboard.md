@@ -1,5 +1,5 @@
 ---
-title: Install a Keyman Keyboard
+title: Install a Keyman Keyboard on macOS
 ---
 
 You must have a Keyman keyboard installed to type with Keyman for macOS in your language.

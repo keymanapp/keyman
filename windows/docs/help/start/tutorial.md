@@ -16,7 +16,7 @@ it is running you will see the Keyman icon:
 ## Step 2
 
 If the Keyman icon is in the Windows Taskbar near the clock, continue on
-to [Step 5](#step-5-).
+to [Step 5](#toc-step-5).
 
 ![](../desktop_images/start_tray.png)
 
