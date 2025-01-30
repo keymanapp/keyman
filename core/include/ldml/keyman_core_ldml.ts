@@ -564,7 +564,15 @@ class Constants {
   /** maximum count of markers (not including 'any') */
   readonly marker_max_count    = this.marker_max_index - this.marker_min_index + 1;
 
+  /**
+   * List of versions to treat as if they were the 'latest' version.
+   */
+  treatAsLatest(version: string): boolean {
+    return cldrTreatAsLatest.has(version);
+  }
 };
+
+const cldrTreatAsLatest: Set<string> = new Set(['45', '46.1', '47']);
 
 export const constants = new Constants();
 

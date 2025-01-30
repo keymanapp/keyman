@@ -231,6 +231,9 @@ export class LDMLKeyboardXMLSourceFileReader {
         this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
         return false;
       }
+      if (constants.treatAsLatest(paths[0])) {
+        paths[0] = constants.cldr_version_latest;
+      }
       importData = this.readImportFile(paths[0], paths[1]);
     } else {
       // local import
