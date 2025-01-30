@@ -58,6 +58,8 @@ const
   URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app';
   URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app';
 
+  URLPath_KeymanDeveloper_KeyboardSearchForCloneKeymanCloud = '/go/developer/'+SKeymanVersion+'/clone-keyboard';
+
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Privacy_Presentation = '/privacy';
@@ -70,6 +72,10 @@ const
                                // e.g. http://keyman.com.local/keyboards/foo
   UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/go/windows/[^/]+/download-keyboards';
                              // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
+
+  // Cloning keyboards - Keyman Developer
+  URLSubPath_KeymanDeveloper_Clone_Keyboards = '/keyboards/';
+  URLSubPath_KeymanDeveloper_Clone_Keyboards_Custom = '/keyboards/h/';
 
 function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 

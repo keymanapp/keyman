@@ -21,4 +21,25 @@ Creates a keyboard project that matches the folder structure used in the Keyman 
 
 Creates a lexical model project that matches the folder structure used in the Keyman [lexical models repository](https://github.com/keymanapp/lexical-models) and includes all basic files needed for a lexical model project. Clicking OK will open the [New Lexical Model Project Parameters dialog](new-lm-project-parameters).
 
-The **Basic** and **Import Windows Keyboard** modes can also be driven by command line with [KMConvert](kmconvert).
+## Clone local project
+
+Copies a Keyman keyboard or lexical model project on your local filesystem into
+a new folder, giving the project and included files a new name.
+
+## Clone project from Keyman Cloud
+
+Copies a Keyman keyboard or lexical model project from keyman.com into a new
+folder, giving the project and included files a new name.
+
+## Clone project from GitHub
+
+Copies a Keyman keyboard or lexical model project from a GitHub repository into
+a new folder, giving the project and included files a new name.
+
+# Command line access
+
+[`kmc generate`](kmc) can be used to generate new Keyman keyboards, LDML
+keyboards, and Wordlist lexical models from the command line.
+
+[KMConvert](kmconvert) can also be used to import Windows keyboards from the
+command line.
