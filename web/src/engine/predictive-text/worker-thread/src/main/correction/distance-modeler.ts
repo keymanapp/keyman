@@ -251,6 +251,10 @@ export class SearchNode {
 class SearchSpaceTier {
   correctionQueue: PriorityQueue<SearchNode>;
   processed: SearchNode[] = [];
+
+  /**
+   * Indicates the depth searched, in terms of number of inputs, by this tier of the search space.
+   */
   index: number;
 
   constructor(instance: SearchSpaceTier);
@@ -474,6 +478,12 @@ export class SearchSpace {
 
   increaseMaxEditDistance() {
     this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
+  }
+
+  get correctionsEnabled() {
+    // When corrections are disabled, the Web engine will only provide individual Transforms
+    // for an input, not a distribution.  No distributions means we shouldn't do corrections.
+    return !!this.inputSequence.find((distribution) => distribution.length > 1);
   }
 
   addInput(inputDistribution: Distribution<Transform>) {

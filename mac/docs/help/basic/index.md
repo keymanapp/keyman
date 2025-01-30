@@ -1,5 +1,5 @@
 ---
-title: Basic Help
+title: Keyman for macOS Basic Help
 ---
 
 * [Keyman Configuration](config/)

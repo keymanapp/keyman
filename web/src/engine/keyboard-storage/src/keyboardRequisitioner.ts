@@ -18,6 +18,7 @@ import {
   toUnprefixedKeyboardId as unprefixed
  } from "./index.js";
 import { default as CloudRequesterInterface } from "./cloud/requesterInterface.js";
+import { rejectErrorStubs } from "./keyboardStub.js";
 
 class CloudRequestEntry {
   id: string;
@@ -287,7 +288,7 @@ export default class KeyboardRequisitioner {
 
     if(cmd == '') {
       // No command so return errors
-      return Promise.reject(errorStubs);
+      return rejectErrorStubs(errorStubs);
     }
 
     return this.cloudQueryEngine.keymanCloudRequest('&keyboardid='+cmd, false).then(async (result) => {
@@ -305,7 +306,7 @@ export default class KeyboardRequisitioner {
       console.error(err);
       let stub: ErrorStub = {error: err};
       errorStubs.push(stub);
-      return Promise.reject(errorStubs);
+      return rejectErrorStubs(errorStubs);
     });
   }
 

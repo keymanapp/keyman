@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Keyman for iPhone and iPad Troubleshooting
 ---
 
 * [How To - Installing fonts](installing-fonts)

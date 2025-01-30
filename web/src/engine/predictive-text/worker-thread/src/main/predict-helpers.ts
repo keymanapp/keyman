@@ -261,6 +261,29 @@ export async function correctAndEnumerate(
   let bestCorrectionCost: number;
   let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
 
+  // If corrections are not enabled, bypass the correction search aspect entirely.
+  // No need to 'search' - just do a direct lookup.
+  if(!searchSpace.correctionsEnabled) {
+    const predictionRoot = {
+      sample: {
+        insert: wordbreak(postContext),  // insert correction string
+        deleteLeft: deleteLeft,
+        id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+      },
+      p: 1.0
+    };
+
+    let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
+    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+
+    // Only one 'correction' / prediction root is allowed - the actual text.
+    return {
+      postContextState: postContextState,
+      rawPredictions: predictions
+    }
+  }
+
+  // Only run the correction search when corrections are enabled.
   for await(let match of searchSpace.getBestMatches(timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;

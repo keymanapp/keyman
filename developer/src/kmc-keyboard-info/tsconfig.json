@@ -13,7 +13,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/ttfmeta/lib/*.js",
     "src/imports/langtags.js",
   ],
   "references": [

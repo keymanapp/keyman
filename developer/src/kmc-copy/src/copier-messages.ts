@@ -7,6 +7,7 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Copier;
+const SevVerbose = CompilerErrorSeverity.Verbose | Namespace;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
@@ -196,6 +197,38 @@ export class CopierMessages {
     `In most repositories, Keyman binary files such as .kmx, .kmp, .js are not included.
     This is not normally a problem, as the files can be built from the source. Check
     the provided error details for more details.`
+  );
+
+  static VERBOSE_DownloadingFile = SevVerbose | 0x001C;
+  static Verbose_DownloadingFile = (o:{filename: string, url: string}) => m(
+    this.VERBOSE_DownloadingFile,
+    `Downloading '${def(o.filename)}' from '${def(o.url)}'`,
+  );
+
+  static VERBOSE_DownloadingFolder = SevVerbose | 0x001D;
+  static Verbose_DownloadingFolder = (o:{path: string, url: string}) => m(
+    this.VERBOSE_DownloadingFolder,
+    `Downloading folder '${def(o.path)}' from '${def(o.url)}'`,
+  );
+
+  // See also generator-messages.ERROR_InvalidKeymanKeyboardId
+  static ERROR_InvalidKeyboardId = SevError | 0x001E;
+  static Error_InvalidKeyboardId = (o:{id: string}) => m(
+    this.ERROR_InvalidKeyboardId,
+    `The specified keyboard id '${def(o.id)}' contains characters that are not permitted for a keyboard id or filename.`,
+  );
+
+  // See also generator-messages.ERROR_InvalidLexicalModelId
+  static ERROR_InvalidLexicalModelId = SevError | 0x001F;
+  static Error_InvalidLexicalModelId = (o:{id:string}) => m(
+    this.ERROR_InvalidLexicalModelId,
+    `The specified lexical model id '${def(o.id)}' contains characters that are not permitted or does not match the required pattern of 'author.bcp47.uniq'.`,
+  );
+
+  static WARN_FilenameCollides = SevWarn | 0x0020;
+  static Warn_FilenameCollides = (o:{filename:string}) => m(
+    this.WARN_FilenameCollides,
+    `The output file '${def(o.filename)}' has two different possible source files.`,
   );
 
 };
