@@ -173,7 +173,18 @@ extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanProcessOutput(int n, WC
   return res;
 }
 
-extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected)   // I3567
+extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContext(int n, PWSTR buf)   // I3567
+{
+  SendDebugEntry();
+  HRESULT res;
+  BOOL isTextSelectedDummy; // not used
+  if (ExtEditSession) res = ExtEditSession->KeymanGetContext(n, buf, &isTextSelectedDummy);
+  else res = E_FAIL;   // I3567
+  SendDebugExit();
+  return res;
+}
+
+extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContextIsSelected(int n, PWSTR buf, BOOL* isTextSelected)   // I3567
 {
   SendDebugEntry();
   HRESULT res;
@@ -193,8 +204,8 @@ STDAPI CKeymanEditSession::DoEditSession(TfEditCookie ec)
 
   ExtEditSession = this;
 
-  if (!Keyman32Interface::TIPProcessKey(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContext, _fUpdate, _fPreserved)) {
-    SendDebugMessage(L"TIPProcessKey did not handle the keystroke");
+  if (!Keyman32Interface::TIPProcessKeyEx(_wParam, _lParam, ExtKeymanProcessOutput, ExtKeymanGetContextIsSelected, _fUpdate, _fPreserved)) {
+    SendDebugMessage(L"TIPProcessKeyEx did not handle the keystroke");
     _hr = E_FAIL; // TODO: use S_FALSE -> this tells _KeymanProcessKeystroke to pass keystroke on
   }
 
