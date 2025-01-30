@@ -99,6 +99,7 @@ type
      * @returns True  if the Keyman is ready to install.
      *)
     function ReadyToInstall: Boolean;
+    function IsInstallingState: Boolean;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState: TUpdateState;
@@ -571,6 +572,11 @@ begin
     Result := True
   else
     Result := False;
+end;
+
+function TUpdateStateMachine.IsInstallingState: Boolean;
+begin
+  Result := (CurrentState is InstallingState);
 end;
 
 // base implmentation to be overiden
@@ -1096,9 +1102,10 @@ end;
 
 function InstallingState.HandleKmShell;
 begin
-  // Result = exit straight away as we are installing (MSI installer)
-  // need to just do a no-op keyman will it maybe using kmshell to install
-  // packages.
+  // Should not be possible while called in InstallingState. The MSI installer may have
+  // failed. Clean Up and return to Idle
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
   Result := kmShellContinue;
 end;
 
