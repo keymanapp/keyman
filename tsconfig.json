@@ -5,8 +5,8 @@
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/keyman-version" },
-    { "path": "./common/web/types" },
     { "path": "./common/web/langtags" },
+    { "path": "./common/web/types" },
 
     { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
     { "path": "./developer/src/common/web/utils/tsconfig.json" },
