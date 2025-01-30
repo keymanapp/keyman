@@ -326,7 +326,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
             inputEle.form.submit();
           } else {
             const nextElement = this.contextManager.page.findNeighboringInput(inputEle, false);
-            nextElement.focus();
+            nextElement?.focus();
           }
         }
         return true;

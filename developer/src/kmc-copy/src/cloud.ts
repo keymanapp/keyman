@@ -63,9 +63,10 @@ export class KeymanCloudSource {
   }
 
   public async downloadFolderFromGitHub(ref: GitHubRef): Promise<{filename:string,type:'dir'|'file'}[]> {
-    // this.callbacks.reportMessage(CopierMessages.Info_DownloadingFile({ref})); // TODO-COPY: verbose mode support
 
     const url = `https://api.github.com/repos/${ref.owner}/${ref.repo}/contents/${ref.path}?ref=${ref.branch}`;
+    this.callbacks.reportMessage(CopierMessages.Verbose_DownloadingFolder({path:ref.path, url}));
+
     let folder: any;
     try {
       folder = await this.callbacks.net.fetchJSON(url);
@@ -94,6 +95,7 @@ export class KeymanCloudSource {
     }
 
     const url = `https://raw.githubusercontent.com/${ref.owner}/${ref.repo}/refs/heads/${ref.branch}${ref.path}`;
+    this.callbacks.reportMessage(CopierMessages.Verbose_DownloadingFile({filename:this.callbacks.path.basename(ref.path), url}));
 
     try {
       return await this.callbacks.net.fetchBlob(url);

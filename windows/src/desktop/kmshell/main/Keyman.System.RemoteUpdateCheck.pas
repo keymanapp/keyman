@@ -239,9 +239,8 @@ begin
         begin
           Exit;
         end;
-        if Registry.ValueExists(SRegValue_LastUpdateCheckTime) and
-          (Now - Registry.ReadDateTime(SRegValue_LastUpdateCheckTime) >
-          CheckPeriod) then
+        if (not Registry.ValueExists(SRegValue_LastUpdateCheckTime)) or
+          ((Now - Registry.ReadDateTime(SRegValue_LastUpdateCheckTime)) > CheckPeriod) then
         begin
           Result := True;
         end;

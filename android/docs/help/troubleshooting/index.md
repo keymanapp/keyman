@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Keyman for Android Troubleshooting
 ---
 
 * [How To - Getting Keyboard Help](keyboard-help)

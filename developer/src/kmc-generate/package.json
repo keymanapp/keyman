@@ -54,7 +54,8 @@
     "exclude-after-remap": true,
     "exclude": [
       "test/",
-      "src/template/"
+      "src/template/",
+      "src/main.ts"
     ]
   },
   "repository": {

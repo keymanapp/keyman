@@ -348,6 +348,13 @@ $(function() {
     return builder.renameSpecialKey(hint);
   }
 
+  this.escapeFontName = function(fontName) {
+    if(!fontName) {
+      return "";
+    }
+    return JSON.stringify(fontName);
+  }
+
   this.prepareLayer = function () {
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
 
@@ -380,11 +387,11 @@ $(function() {
     }
 
     $('#kbd,#sub-key-groups')
-      .css('font-family', KVKL[builder.lastPlatform].font)
+      .css('font-family', this.escapeFontName(KVKL[builder.lastPlatform].font))
       .css('font-size', KVKL[builder.lastPlatform].fontsize || "1em");
 
     $('#inpKeyCap,#inpSubKeyCap')
-      .css('font-family', KVKL[builder.lastPlatform].font)
+      .css('font-family', this.escapeFontName(KVKL[builder.lastPlatform].font))
       .css('font-size', '18pt');
 
     $('#kbd div').remove();
@@ -421,7 +428,7 @@ $(function() {
           .css('height', (100 * this.yscale) + 'px')
           .css('margin-top', (builder.keyMargin * this.yscale) + 'px')
           .css('margin-left', p + 'px')
-          .css('font-family', key.font)
+          .css('font-family', this.escapeFontName(key.font))
           .css('font-size', key.fontsize);
 
         if(this.specialCharacters[text])

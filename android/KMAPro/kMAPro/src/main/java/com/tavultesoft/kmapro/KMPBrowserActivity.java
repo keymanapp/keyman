@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
+import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMPLink;
 import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.WebViewUtils;
@@ -105,6 +106,7 @@ public class KMPBrowserActivity extends BaseActivity {
           // Create intent with keyboard download link for KMAPro main activity to handle
           Intent intent = new Intent(context, MainActivity.class);
           intent.setData(downloadURI);
+          KMLog.LogBreadcrumb(TAG, "Successful keyboard search now triggering package install", true);
           startActivity(intent);
 
           // Finish activity

@@ -66,6 +66,10 @@ type
     fcbTouchLayoutPhone: TscFontComboBox;
     fcbTouchLayoutTablet: TscFontComboBox;
     fcbTouchLayoutDesktop: TscFontComboBox;
+    lblDisplayMap: TLabel;
+    editDisplayMapSize: TEdit;
+    fcbDisplayMap: TscFontComboBox;
+    Label4: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
   private
@@ -120,6 +124,10 @@ begin
   FControls[kfontTouchLayoutDesktop].CaptionLabel := lblTouchLayoutDesktopFont;
   FControls[kfontTouchLayoutDesktop].NameCombo    := fcbTouchLayoutDesktop;
   FControls[kfontTouchLayoutDesktop].SizeEdit     := editTouchLayoutDesktopSize;
+
+  FControls[kfontDisplayMap].CaptionLabel := lblDisplayMap;
+  FControls[kfontDisplayMap].NameCombo    := fcbDisplayMap;
+  FControls[kfontDisplayMap].SizeEdit     := editDisplayMapSize;
 end;
 
 function TfrmKeyboardFonts.GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;

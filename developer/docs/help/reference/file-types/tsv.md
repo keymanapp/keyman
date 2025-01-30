@@ -16,7 +16,7 @@ Details:
     Spreadsheet programs such as Microsoft Excel and Google Sheets can
     export into TSV format. TSVs can also be programmatically generated
     from other data sources. For advanced users, see [File
-    Format](#file-format) for more details.
+    Format](#toc-file-format) for more details.
 
 Distributed with lexical model:
 :   No. This is a development file and should not be distributed.

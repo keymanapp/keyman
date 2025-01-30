@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { assert } from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers/index.js';
-import { getFontFamily } from '../src/font-family.js';
+import { getFontFamily } from '@keymanapp/developer-utils';
 
 const AFGHAN_TURKMEN_DISPLAY_FONT = makePathToFixture('afghan_turkmen', "Lateef-Regular.ttf");
 const AFGHAN_TURKMEN_OSK_FONT = makePathToFixture('afghan_turkmen', "Lateef-Bold.ttf");

@@ -921,6 +921,9 @@ public final class KMManager {
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
+      
+      // Needed until our minimum version of Chrome is 61.0+.
+      copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
@@ -2267,6 +2270,7 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
