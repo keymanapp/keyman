@@ -4,7 +4,7 @@ import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
-import langtags from "../src/imports/langtags.js";
+import { langtags } from "@keymanapp/langtags";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { CompilerCallbacks } from '@keymanapp/developer-utils';

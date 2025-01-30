@@ -7,7 +7,7 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
 import { KeymanFileTypes, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
-import langtags from "./imports/langtags.js";
+import { langtags } from "@keymanapp/langtags";
 import { CompilerCallbacks, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact, KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
@@ -16,7 +16,7 @@ import { getFontFamily } from "@keymanapp/developer-utils";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
-const langtagsByTag = {};
+const langtagsByTag: any = {};
 
 /**
  * Build a dictionary of language tags from langtags.json
