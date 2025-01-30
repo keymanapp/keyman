@@ -1,8 +1,13 @@
 #ifndef __KEYMANSYSTEMSERVICE_H__
 #define __KEYMANSYSTEMSERVICE_H__
 
+#include "config.h"
 #include <list>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 #include "KeyboardDevice.h"
 
 using namespace std;
