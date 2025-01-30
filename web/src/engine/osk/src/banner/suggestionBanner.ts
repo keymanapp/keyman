@@ -176,7 +176,6 @@ export class BannerSuggestion {
     }
 
     this.currentWidth = this.collapsedWidth;
-    this.highlight(suggestion?.autoAccept);
     this.updateLayout();
   }
 
@@ -557,13 +556,10 @@ export class SuggestionBanner extends Banner {
 
       const autoselection = this._predictionContext.selected;
       this._predictionContext.selected = null;
-      if(autoselection) {
-        this.options.forEach((entry) => {
-          if(entry.suggestion == autoselection) {
-            entry.highlight(false);
-          };
-        });
-      }
+      // Always clear pre-existing selections when a new banner input/gesture starts.
+      this.options.forEach((entry) => {
+          entry.highlight(false);
+      });
 
       this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);
       const suggestion = source.baseItem;
@@ -753,6 +749,9 @@ export class SuggestionBanner extends Banner {
       if(suggestions.length > i) {
         const suggestion = suggestions[i];
         d.update(suggestion, optionFormat);
+        if(this.predictionContext.selected == suggestion) {
+          d.highlight(true);
+        }
       } else {
         d.update(null, optionFormat);
       }
