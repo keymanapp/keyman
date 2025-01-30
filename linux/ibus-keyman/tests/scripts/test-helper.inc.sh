@@ -251,7 +251,7 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  if [[ "${STANDALONE}" == "--standalone" ]]; then
+  if [[ "${STANDALONE}" == "--standalone" ]] && [[ ! "${DOCKER_RUNNING:-false}" ]]; then
     # manual test run
     echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else

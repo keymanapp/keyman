@@ -23,16 +23,16 @@ the specification itself.
 There are three ways - all of them optional - to extend and customize
 the word-breaking rules themselves:
 
-* If you need to prevent splits in very specific scenarios and/or add splits in other specific scenarios, you may specify [context-based rules](#rules) to obtain the desired behavior.
+* If you need to prevent splits in very specific scenarios and/or add splits in other specific scenarios, you may specify [context-based rules](#toc-custom-word-breaking-rules) to obtain the desired behavior.
 * If certain characters are not handled appropriately for their role in
-       your language, you may [map characters](#map) to different
+       your language, you may [map characters](#toc-character-property-remapping) to different
        word-breaking character classes - including custom ones.  This will
        override the default property they are assigned by the default
        implementation, with the new property applying for all word-breaking
        rules.
 * If the default word-breaking classes from the specification are
        too general for certain aspects of your language, it is possible to
-       [define custom character classes](#define) for use in custom
+       [define custom character classes](#toc-defining-and-using-new-word-breaking-properties) for use in custom
        rules.
 
 ## A first example
@@ -183,7 +183,7 @@ the potential boundary.
 ### Word-breaking property names
 The names used in each array must be defined in one of the following places:
 * https://unicode.org/reports/tr29/#Table_Word_Break_Property_Values
-* `customProperties` - your [declaration of any custom property types](#define)
+* `customProperties` - your [declaration of any custom property types](#toc-defining-and-using-new-word-breaking-properties)
 * One of the special property types `"Other"`, `"sot"`, or `"eot"`:
     * `Other`:  a character without an associated word-breaking property value
     * `sot`:  "start of text" - a marker indicating the beginning of the string being word-broken
@@ -277,7 +277,7 @@ As noted at the top of the file:
 
 ### Redefining character properties
 
-Of note from [our first example](#example):
+Of note from [our first example](#toc-a-first-example):
 
 ```typescript
 /*** Character class overrides for specific characters ***/
@@ -324,7 +324,7 @@ words (and/or names) in some languages.  Default word-breaking behavior will spl
 hyphenated words and names apart, but by changing the property of hyphens, it is
 possible to disable this behavior.
 
-Noting [rule WB6](#WB6) and WB7, the `MidLetter` class is designed to prevent
+Noting [rule WB6](#toc-custom-word-breaking-rules) and WB7, the `MidLetter` class is designed to prevent
 word-breaks from occurring when its characters lie directly between letters -
 hence the property name.  Assigning hyphens to this class can provide the
 desired behavior.
@@ -364,7 +364,7 @@ the second example above.  (After all, `can'` could be the end of a quoted
 phrase in English - `'sure you can'` - in which case we might want the split
 to occur.)
 
-Revisiting [an earlier example](#example) and simplifying a little bit:
+Revisiting [an earlier example](#toc-redefining-character-properties) and simplifying a little bit:
 
 ```typescript
 /*** Definition of extra word-breaking rules ***/
@@ -440,7 +440,7 @@ included a couple of extra rules:
 }
 ```
 
-By replicating [WB6](#WB6) and WB7's structure and allowing `Hyphen` to match in the same
+By replicating [WB6](#toc-custom-word-breaking-rules) and WB7's structure and allowing `Hyphen` to match in the same
 position as `MidLetter` in the original rules, we can prevent word-breaking splits
 after additional text has been typed after a `Hyphen`-property character.  This does not
 _replace_ the behavior of WB6 and WB7 - it merely _extends_ it to include the new property.

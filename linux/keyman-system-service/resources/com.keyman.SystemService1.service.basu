@@ -1,0 +1,7 @@
+# /usr/share/dbus-1/system-services/com.keyman.SystemService1.service
+# This version used with elogind and basu (e.g. on Gentoo)
+
+[D-BUS Service]
+Name=com.keyman.SystemService1
+Exec=/usr/libexec/systemd-keyman.service
+User=root
