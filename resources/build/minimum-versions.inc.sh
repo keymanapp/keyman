@@ -27,7 +27,7 @@ KEYMAN_MIN_TARGET_VERSION_WEB_SAFARI=13.0     # iOS 13.0, macOS 10.13.6+
 # Dependency versions
 KEYMAN_MIN_VERSION_NODE_MAJOR=20              # node version source of truth is /package.json:/engines/node; use KEYMAN_USE_NVM to automatically update
 KEYMAN_MIN_VERSION_NPM=10.5.1                 # 10.5.0 has bug, discussed in #10350
-KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.58          # Use KEYMAN_USE_EMSDK to automatically update to this version
+KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.64          # Use KEYMAN_USE_EMSDK to automatically update to this version
 KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019
 KEYMAN_MIN_VERSION_MESON=1.0.0
 

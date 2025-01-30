@@ -302,11 +302,15 @@ typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*
 
 ## Description
 
-An error code mechanism similar to COM’s `HRESULT` scheme (unlike COM, any
+An error code mechanism similar to COM's `HRESULT` scheme (unlike COM, any
 non-zero value is an error).
 
 ## Specification
 
+-->
+// keep in sync with web/src/engine/core-processor/src/core-factory.ts
+// (see https://github.com/emscripten-core/emscripten/issues/18585)
+<!--
 ```c */
 enum km_core_status_codes {
   KM_CORE_STATUS_OK = 0,

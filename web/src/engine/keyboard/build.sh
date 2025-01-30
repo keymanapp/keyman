@@ -22,6 +22,7 @@ builder_describe \
   "@/web/src/tools/testing/recorder-core  test" \
   "@/web/src/tools/es-bundling" \
   "@/web/src/engine/common/web-utils" \
+  "@/web/src/engine/core-processor" \
   configure \
   clean \
   build \
@@ -44,7 +45,7 @@ function do_configure() {
 
 BUILD_DIR="${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
 
-function do_build() {
+do_build() {
   tsc --build "${THIS_SCRIPT_PATH}/tsconfig.all.json"
 
   # Base product - the main keyboard processor
@@ -73,7 +74,12 @@ function do_build() {
   tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/lib/node-keyboard-loader.d.ts" -p src/keyboards/loaders/tsconfig.node.json
 }
 
+do_test() {
+  test-headless "${SUBPROJECT_NAME}" ""
+  test-headless-typescript "${SUBPROJECT_NAME}"
+}
+
 builder_run_action configure  do_configure
 builder_run_action clean      rm -rf "${BUILD_DIR}"
 builder_run_action build      do_build
-builder_run_action test       test-headless "${SUBPROJECT_NAME}" ""
+builder_run_action test       do_test
