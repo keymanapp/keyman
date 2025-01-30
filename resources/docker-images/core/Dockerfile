@@ -12,8 +12,8 @@ LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Core Build Image"
 
 USER root
-RUN apt-get install -qy git jq llvm meson pkgconf \
-  xvfb xserver-xephyr metacity
+RUN apt-get update && \
+  apt-get install -qy git jq llvm meson pkgconf xvfb xserver-xephyr metacity
 
 # Pre-install emscripten
 USER build

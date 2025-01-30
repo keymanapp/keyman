@@ -131,6 +131,10 @@ export class StrsItem {
   get isOneChar() {
     return this.char !== undefined;
   }
+
+  isEqual(a: StrsItem): boolean {
+    return a.value === this.value && a.char === this.char;
+  }
 };
 
 /**

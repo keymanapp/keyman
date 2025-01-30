@@ -218,6 +218,30 @@ describe('KeymanWeb Compiler', function() {
     assert.lengthOf(callbacks.messages, 2);
   });
 
+  it('should generate correct index offsets (#12980) for context and context(n) when building a KMW keyboard', async function() {
+    const filenames = generateTestFilenames('test_index_12980');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
+
+    function doMatchKIO(s: string) {
+      const regex = new RegExp('k\\.KIO\\(-1,this\\.'+s+',(.+?),t\\);');
+      const m = regex.exec(data);
+      assert.isNotNull(m, `Could not find match for ${s}`);
+      assert.equal(m[1], '1', `Expected '${s}' usage to have an index parameter == 1`);
+    }
+
+    doMatchKIO('s_a_6');
+    doMatchKIO('s_b_7');
+
+    // matches the 4 notany() rules
+    const matches = [...data.matchAll(/k\.KCXO\(-1,t,1,1\);/g)];
+    assert.lengthOf(matches, 4);
+
+    doMatchKIO('s_e_10');
+    doMatchKIO('s_f_11');
+  });
 });
 
 async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):

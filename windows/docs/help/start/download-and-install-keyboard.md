@@ -1,5 +1,5 @@
 ---
-title: How To - Download and Install a Keyman Keyboard
+title: How To - Download and Install a Keyman Keyboard on Windows
 ---
 
 You must have a Keyman keyboard installed to type with Keyman in your

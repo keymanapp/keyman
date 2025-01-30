@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -29,11 +29,6 @@ export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
    * output path where project folder will be created
    */
   outPath: string;
-  /*
-   * TODO-COPY rename: rename existing files rather than copy
-
-  rename: boolean;
-  */
   /**
    * dryRun: show what would happen
    */
@@ -125,7 +120,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     this.asyncCallbacks = new CopierAsyncCallbacks(this.callbacks, this.githubRef);
 
-    // TODO-COPY: validate outputId is valid for the project type?
     this.outputId = this.callbacks.path.basename(this.outPath);
     this.sourceId = this.callbacks.path.basename(projectSource, KeymanFileTypes.Source.Project);
 
@@ -134,6 +128,20 @@ export class KeymanProjectCopier implements KeymanCompiler {
     if(!project) {
       // loadProjectFromFile already reported errors
       return null;
+    }
+
+    if(project.isKeyboardProject()) {
+      // LDML and .kmn keyboards have the same id validity requirements, so
+      // we'll just test against .kmn
+      if(!ValidIds.isValidKeymanKeyboardId(this.outputId)) {
+        this.callbacks.reportMessage(CopierMessages.Error_InvalidKeyboardId({id: this.outputId}));
+        return null;
+      }
+    } else if(project.isLexicalModelProject()) {
+      if(!ValidIds.isValidLexicalModelId(this.outputId)) {
+        this.callbacks.reportMessage(CopierMessages.Error_InvalidLexicalModelId({id: this.outputId}));
+        return null;
+      }
     }
 
     const result: CopierResult = { artifacts: {
@@ -302,7 +310,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
   };
 
   private async copyFolder(inputPath: string, outputPath: string, ignorePatterns: (string | RegExp)[], result: CopierResult) {
-    // TODO-COPY: watch out for file collisions when copying project files -- after renames
     const files = await this.asyncCallbacks.fsAsync.readdir(inputPath);
     for(const {filename,type} of files) {
       const fullPath = this.normalizePath(this.callbacks.path.join(inputPath, filename));
@@ -312,9 +319,17 @@ export class KeymanProjectCopier implements KeymanCompiler {
       if(type == 'dir') {
         await this.copyFolder(fullPath, this.callbacks.path.join(outputPath, filename), ignorePatterns, result);
       } else if(!result.artifacts[fullPath]) {
+        const filename = this.generateNewFilename(fullPath, outputPath);
+
+        for(const artifact of Object.keys(result.artifacts)) {
+          if(result.artifacts[artifact].filename == filename) {
+            this.callbacks.reportMessage(CopierMessages.Warn_FilenameCollides({filename}));
+          }
+        }
+
         result.artifacts[fullPath] = {
           data: await this.asyncCallbacks.fsAsync.readFile(fullPath),
-          filename: this.generateNewFilename(fullPath, outputPath)
+          filename
         }
       }
     }
@@ -365,7 +380,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private async copyGenericFile(_project: KeymanDeveloperProject, filename: string, outputPath: string, _source: string, result: CopierResult): Promise<boolean> {
+  private async copyGenericFile(project: KeymanDeveloperProject, filename: string, outputPath: string, _source: string, result: CopierResult): Promise<boolean> {
     if(result.artifacts[filename]) {
       return true;
     }
@@ -386,6 +401,10 @@ export class KeymanProjectCopier implements KeymanCompiler {
       }
 
       return false;
+    }
+
+    if(KeymanFileTypes.binaryTypeFromFilename(filename) != null) {
+      outputPath = this.callbacks.path.join(this.outPath, 'build');
     }
 
     result.artifacts[filename] = {
@@ -578,6 +597,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    */
   private generateNewFilename(filename: string, outputPath: string): string {
     const {ext, base} = this.splitFilename(filename);
+
     const newFilename = base == this.sourceId
       ? this.callbacks.path.join(outputPath, this.outputId + ext)
       : this.callbacks.path.join(outputPath, base + ext);

@@ -6,7 +6,8 @@ import { KeymanTargets } from "@keymanapp/common-types";
 import { GeneratorOptions } from "../src/abstract-generator.js";
 
 export const options: GeneratorOptions = {
-  icon: false,
+  // TODO-GENERATE: icon support
+  // icon: false,
   id: 'sample',
   languageTags: ['en'],
   name: 'Sample Project',
