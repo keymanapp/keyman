@@ -6,20 +6,21 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { LdmlKeyboardGenerator } from '@keymanapp/kmc-generate';
+import { GeneratorOptions, LdmlKeyboardGenerator } from '@keymanapp/kmc-generate';
 
 import { unitTestEndpoints } from '../src/commands/generate.js';
-import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
+import { KeymanTargets } from '@keymanapp/common-types';
 
 
 describe('generateLdmlKeyboard', function() {
-  const keyboardOptions = {
-    icon: true,
+  const keyboardOptions: GeneratorOptions = {
+    // icon: true,
     // id is written by generate functions
+    id: '',
     languageTags: ['en'],
     name: 'Sample Keyboard',
     outPath: '.',
-    targets: 'any',
+    targets: [KeymanTargets.KeymanTarget.any],
     version: '1.0',
     author: 'Keyman',
     copyright: 'Keyman',
@@ -45,32 +46,11 @@ describe('generateLdmlKeyboard', function() {
     outPath = null;
   });
 
-  it('should only allow a single id', async function() {
-    assert.isFalse(await unitTestEndpoints.doGenerate(
-      callbacks,
-      new LdmlKeyboardGenerator(),
-      ['sample1','sample2'],
-      { ...keyboardOptions }
-    ));
-    assert.isTrue(callbacks.hasMessage(InfrastructureMessages.ERROR_GenerateRequiresId));
-  });
-
-  it('should require an id parameter', async function() {
-    assert.isFalse(await unitTestEndpoints.doGenerate(
-      callbacks,
-      new LdmlKeyboardGenerator(),
-      null,
-      { ...keyboardOptions }
-    ));
-    assert.isTrue(callbacks.hasMessage(InfrastructureMessages.ERROR_GenerateRequiresId));
-  });
-
   it('should generate a LDML keyboard project', async function() {
     assert.isTrue(await unitTestEndpoints.doGenerate(
       callbacks,
       new LdmlKeyboardGenerator(),
-      'sample',
-      { ...keyboardOptions, outPath }
+      { ...keyboardOptions, id: 'sample', outPath }
     ));
 
     // Note: we won't test contents of files as this is tested in kmc-generate directly

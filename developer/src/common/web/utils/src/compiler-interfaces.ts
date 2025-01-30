@@ -291,10 +291,8 @@ export interface CompilerMessageOverride {
   level: CompilerErrorSeverityOverride;
 };
 
-export interface CompilerCallbackOptions {
-  logLevel?: CompilerLogLevel;
-  logFormat?: CompilerLogFormat;
-  color?: boolean; // null or undefined == use console default
+export interface CompilerCallbackOptions extends CompilerBaseOptions {
+  // TODO: these overlap with CompilerOptions, should refactor
   compilerWarningsAsErrors?: boolean;
   messageOverrides?: CompilerMessageOverrideMap;
 };

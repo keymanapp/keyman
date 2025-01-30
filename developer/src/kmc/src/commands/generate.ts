@@ -6,6 +6,7 @@ import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 import { GeneratorOptions, KeymanKeyboardGenerator, LdmlKeyboardGenerator, LexicalModelGenerator } from '@keymanapp/kmc-generate';
 import { CompilerCallbacks, KeymanCompiler } from '@keymanapp/developer-utils';
+import { commanderOptionsToBaseOptions } from '../util/extendedCompilerOptions.js';
 
 /* c8 ignore start */
 
@@ -18,7 +19,7 @@ export function declareGenerate(program: Command) {
 
 function declareGenerateKmnKeyboard(command: Command) {
   const subCommand = command.command('keyman-keyboard <id>');
-  BaseOptions.addLogLevel(subCommand);
+  BaseOptions.addAll(subCommand);
   subCommand
     .description('Generate a .kmn keyboard project')
     .option('-t, --target <target>', 'Target platforms',
@@ -38,7 +39,7 @@ function declareGenerateKmnKeyboard(command: Command) {
 
 function declareGenerateLdmlKeyboard(command: Command) {
   const ldmlSubCommand = command.command('ldml-keyboard <id>');
-  BaseOptions.addLogLevel(ldmlSubCommand);
+  BaseOptions.addAll(ldmlSubCommand);
   ldmlSubCommand
     .description('Generate an LDML .xml keyboard project')
     .option('-t, --target <target>', 'Target platforms',
@@ -56,7 +57,7 @@ function declareGenerateLdmlKeyboard(command: Command) {
 
 function declareGenerateLexicalModel(command: Command) {
   const modelSubCommand = command.command('lexical-model <id>');
-  BaseOptions.addLogLevel(modelSubCommand);
+  BaseOptions.addAll(modelSubCommand);
   modelSubCommand
     .description('Generate a wordlist lexical model project')
     .option('-o, --out-path <path>', 'Output path (may exist)')
@@ -74,6 +75,7 @@ function declareGenerateLexicalModel(command: Command) {
 
 function commanderOptionsToGeneratorOptions(id: string, options: any): GeneratorOptions {
   const result: GeneratorOptions = {
+    ...commanderOptionsToBaseOptions(options),
     // TODO-GENERATE: icon support
     // icon: options.icon ?? true,
     id,
@@ -84,7 +86,6 @@ function commanderOptionsToGeneratorOptions(id: string, options: any): Generator
     version: options.version ?? '1.0',
     author: options.author ?? id,
     copyright: options.copyright ?? options.author ?? id,
-    logLevel: options.logLevel ?? 'info',
     description: options.description ?? '',
   };
   return result;
@@ -99,32 +100,35 @@ const generateLexicalModel = async (ids: string | string[], _options: any, comma
 
 async function generate(generator: KeymanCompiler, ids: string | string[], commander: any): Promise<never|void> {
   const commanderOptions = commander.optsWithGlobals();
-  const callbacks = new NodeCompilerCallbacks({logLevel: commanderOptions.logLevel ?? 'info'});
-  if(!await doGenerate(callbacks, generator, ids, commanderOptions)) {
+
+  const id = ids;
+
+  if(!id || typeof id != 'string') {
+    // Note that commander can pass an array for the ids parameter, so we
+    // constrain here; as this is a parameter error before we have parsed
+    // other options, we use a 'default' compiler callback to generate
+    // the error message
+    (new NodeCompilerCallbacks({})).reportMessage(InfrastructureMessages.Error_GenerateRequiresId());
+    return await exitProcess(1);
+  }
+
+  const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
+
+  const callbacks = new NodeCompilerCallbacks(options);
+  if(!await doGenerate(callbacks, generator, commanderOptions)) {
     return await exitProcess(1);
   }
 }
 
 /* c8 ignore stop */
 
-async function doGenerate(callbacks: CompilerCallbacks, generator: KeymanCompiler, ids: string | string[], commanderOptions: any): Promise<boolean> {
-  const id = ids;
-
-  if(!id || typeof id != 'string') {
-    // Note that commander can pass an array for the ids parameter, so we
-    // constrain here
-    callbacks.reportMessage(InfrastructureMessages.Error_GenerateRequiresId());
-    return false;
-  }
-
-  const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
-
+async function doGenerate(callbacks: CompilerCallbacks, generator: KeymanCompiler, options: GeneratorOptions): Promise<boolean> {
   try {
     if(!await generator.init(callbacks, options)) {
       // errors will have been reported by the generator
       return false;
     }
-    const result = await generator.run(id); // note: id is currently ignored here
+    const result = await generator.run(options.id); // note: id is currently ignored here
     if(!result) {
       // errors will have been reported by the generator
       return false;

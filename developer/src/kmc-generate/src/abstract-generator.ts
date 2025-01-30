@@ -4,7 +4,7 @@
  * Base interfaces and classes for generating Keyman Developer source files
  */
 
-import { CompilerCallbacks, CompilerLogLevel, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/developer-utils";
+import { CompilerBaseOptions, CompilerCallbacks, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/developer-utils";
 import { GeneratorMessages } from './generator-messages.js';
 import { KeymanTargets } from "@keymanapp/common-types";
 
@@ -13,12 +13,7 @@ import { KeymanTargets } from "@keymanapp/common-types";
  * @public
  * Options for the Keyman Developer project generator
  */
-export interface GeneratorOptions /* not inheriting from CompilerBaseOptions */ {
-  /**
-   * Reporting level to console, used by NodeCompilerCallbacks (not used in
-   * compiler modules; all messages are still reported to the internal log)
-   */
-  logLevel?: CompilerLogLevel;
+export interface GeneratorOptions extends CompilerBaseOptions {
   /**
    * identifier (basename) of the keyboard or model
    */
