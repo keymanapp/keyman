@@ -43,6 +43,7 @@ builder_describe \
   ":test=test/auto              Various older tests (others in each module)" \
   ":tike                        Keyman Developer IDE" \
   ":inst                        Bundled installers" \
+  ":vscode-plugin               Keyman Developer for VSCode" \
   "--npm-publish+               For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n+                Don't actually publish anything to external endpoints, just dry run"
 
