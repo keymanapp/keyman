@@ -165,6 +165,9 @@ class KeymanWebViewController: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    if #available(iOSApplicationExtension 14.0, *) {
+      self.userContentController.removeAllScriptMessageHandlers()
+    }
     self.userContentController.add(self, name: keymanWebViewName)
   }
 
