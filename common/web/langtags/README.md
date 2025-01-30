@@ -31,3 +31,8 @@ Key documents for further reading (from langtags repository):
 * [Overview of language tags and how this project works with them](https://github.com/silnrsi/langtags/blob/master/doc/tagging.md)
 
 * [How to use langtags.json](https://github.com/silnrsi/langtags/blob/master/doc/langtags.md)
+
+## License
+
+* Copyright ©️ 2025 SIL Global.
+* MIT License ([License text](https://github.com/keymanapp/keyman/tree/master/LICENSE.md))
