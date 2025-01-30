@@ -279,6 +279,10 @@ export enum CompilerErrorNamespace {
    * kmc-copy 0xB000…0xBFFF
    */
   Copier = 0xB000,
+  /**
+   * kmc-convert 0xC000…0xCFFF
+   */
+  Converter = 0xC000,
 };
 
 type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';
