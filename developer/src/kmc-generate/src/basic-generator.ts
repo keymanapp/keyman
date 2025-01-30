@@ -6,6 +6,7 @@
 
 import { KeymanTargets } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { getLangtagByTag } from "@keymanapp/langtags";
 import { AbstractGenerator, GeneratorArtifacts } from "./abstract-generator.js";
 import { GeneratorMessages } from "./generator-messages.js";
 
@@ -72,8 +73,12 @@ export class BasicGenerator extends AbstractGenerator {
   }
 
   private getLanguageName(tag: string) {
-    // TODO-GENERATE: probably need to use langtags.json
-    return new Intl.Locale(tag).language;
+    const langtag = getLangtagByTag(tag);
+    if(!langtag) {
+      // Fallback to Intl.Locale, probably will be undefined
+      return new Intl.Locale(tag).language;
+    }
+    return langtag.name;
   }
 
   private generateLanguageListForPackage(): string {
