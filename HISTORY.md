@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.181 alpha 2025-01-30
+
+* feat(windows): add localized button captions and form labels (#13025)
+* fix(web): disabled correction state should prevent predictive corrections (#13066)
+* fix(web): disabled autoaccept should not autohighlight suggestions (#13068)
+* chore(common): add 17.0.334 to version history (#13065)
+* fix(windows): add api GetContext and TIPProcessKeyEx with IsTextSelected bool (#13023)
+* fix(web): keyboard query error states should always provide informative Error objects, reports (#13048)
+
 ## 18.0.180 alpha 2025-01-29
 
 * chore(common): Update crowdin strings for Portuguese (#13056)
