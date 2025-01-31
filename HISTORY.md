@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 18.0.182 alpha 2025-01-31
+
+* feat(windows): report on processor type in tsysinfo (#13084)
+* fix(common): push branch when creating PR in version history writer (#13082)
+* refactor: move langtags to @keymanapp/langtags npm module (#13046)
+* chore(developer): use langtags.json for kmc-generate language names (#13047)
+* feat(developer): support relocation of external files in kmc-copy (#13061)
+* feat(windows): kmshell switch handling for the installing state (#12956)
+* feat(windows): add boot switch (#12995)
+* docs(web): remove `.md` in help links (#13051)
+* chore: add android platform to titles (#13033)
+* chore: add the windows platform to titles (#13026)
+* fix(mac): properly manage Input Method lifecycle (#13006)
+* chore(developer): handle forward slashes in paths in package editor (#13081)
+* chore(developer,core,resources): LDML v46 update and remove workaround for import base (#13099)
+
 ## 18.0.181 alpha 2025-01-30
 
 * feat(windows): add localized button captions and form labels (#13025)
