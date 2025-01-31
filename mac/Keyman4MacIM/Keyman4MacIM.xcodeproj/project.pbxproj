@@ -35,7 +35,9 @@
 		29BE9D872CA3C21900B67DE7 /* KMModifierMapping.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BE9D862CA3C21900B67DE7 /* KMModifierMapping.m */; };
 		29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = D861B03E2C5747F70003675E /* KMSettingsRepository.m */; };
 		29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
+		29DBBF672D35053E00D8E33C /* KMSentryHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DBBF662D35053E00D8E33C /* KMSentryHelper.m */; };
 		29DD5F442CFEF88000683388 /* SILAndikaV1RGB.png in Resources */ = {isa = PBXBuildFile; fileRef = 29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */; };
+		29E67D042D3E4A86003CDE8F /* KMSentryHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DBBF662D35053E00D8E33C /* KMSentryHelper.m */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -275,6 +277,8 @@
 		29D470972C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		29D470982C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		29D470992C648D7100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29DBBF652D35053E00D8E33C /* KMSentryHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMSentryHelper.h; sourceTree = "<group>"; };
+		29DBBF662D35053E00D8E33C /* KMSentryHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMSentryHelper.m; sourceTree = "<group>"; };
 		29DD5F432CFEF88000683388 /* SILAndikaV1RGB.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SILAndikaV1RGB.png; sourceTree = "<group>"; };
 		29DD8400276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29DD8401276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/preferences.strings; sourceTree = "<group>"; };
@@ -433,6 +437,17 @@
 			path = Privacy;
 			sourceTree = "<group>";
 		};
+		29DBBF642D34FFE000D8E33C /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				29B4A0D42BF7675A00682049 /* KMLogs.h */,
+				29B4A0D32BF7675A00682049 /* KMLogs.m */,
+				29DBBF652D35053E00D8E33C /* KMSentryHelper.h */,
+				29DBBF662D35053E00D8E33C /* KMSentryHelper.m */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
 		2CDC487CDFFBB26D621D73BD /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -564,8 +579,6 @@
 		989C9C0A1A7876DE00A20425 /* Keyman4MacIM */ = {
 			isa = PBXGroup;
 			children = (
-				29B4A0D42BF7675A00682049 /* KMLogs.h */,
-				29B4A0D32BF7675A00682049 /* KMLogs.m */,
 				299ABD6F29ECE75B00AA5948 /* KeySender.m */,
 				299ABD7029ECE75B00AA5948 /* KeySender.h */,
 				D861B03D2C5747F70003675E /* KMSettingsRepository.h */,
@@ -575,6 +588,7 @@
 				297A501128DF4D360074EB1B /* Privacy */,
 				98FE105B1B4DE86300525F54 /* Categories */,
 				98D6DA791A799EE700B09822 /* Frameworks */,
+				29DBBF642D34FFE000D8E33C /* Logging */,
 				989C9C121A7876DE00A20425 /* Images.xcassets */,
 				98BDD3681BC3511200FAC7C4 /* Keyman4MacIM.entitlements */,
 				98BF92401BF01CBE0002126A /* KMAboutWindow */,
@@ -1000,6 +1014,7 @@
 				9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */,
 				989C9C111A7876DE00A20425 /* main.m in Sources */,
 				290BC680274B9DB1005CD1C3 /* KMPackageInfo.m in Sources */,
+				29DBBF672D35053E00D8E33C /* KMSentryHelper.m in Sources */,
 				29B4A0D52BF7675A00682049 /* KMLogs.m in Sources */,
 				98BF924F1BF02DC20002126A /* KMBarView.m in Sources */,
 				E240F599202DED740000067D /* KMPackage.m in Sources */,
@@ -1038,6 +1053,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29E67D042D3E4A86003CDE8F /* KMSentryHelper.m in Sources */,
 				29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */,
 				29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */,
 				2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */,

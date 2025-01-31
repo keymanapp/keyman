@@ -19,8 +19,8 @@ export class ElemElement {
   order: number; // -128 to +127; used only by reorder element values
   tertiary: number; // -128 to +127; used only by reorder element values
   flags: ElemElementFlags;
-  isEqual(a: ElemElement) {
-    return a.value === this.value &&
+  isEqual(a: ElemElement): boolean {
+    return a.value.isEqual(this.value) &&
       a.order === this.order &&
       a.tertiary === this.tertiary &&
       a.flags === this.flags;
@@ -104,8 +104,8 @@ export class ElementString extends Array<ElemElement> {
           typeFlag |= constants.elem_flags_type_str;
         }
       }
-      elem.order = orders.length ? parseInt(orders[i], 10) : 0;
-      elem.tertiary = tertiaries.length ? parseInt(tertiaries[i], 10) : 0;
+      elem.order = orders.length ? this.parseIntOrZero(orders[i]) : 0;
+      elem.tertiary = tertiaries.length ? this.parseIntOrZero(tertiaries[i]) : 0;
       elem.flags = ElemElementFlags.none |
         (ElemElementFlags.type & typeFlag) |
         (tertiary_bases?.[i] == '1' /* TODO-LDML: or 'true'? */ ? ElemElementFlags.tertiary_base : 0) |
@@ -124,6 +124,10 @@ export class ElementString extends Array<ElemElement> {
       }
     }
     return true;
+  }
+  private static parseIntOrZero(str: string): number {
+    const num = parseInt(str, 10);
+    return !Number.isNaN(num) ? num : 0;
   }
 }
 ;

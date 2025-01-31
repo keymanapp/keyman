@@ -20,10 +20,12 @@ const device = {
   browser: 'native'
 }
 
+/** @type {KeyboardInterface} */
 let keyboardWithHarness;
 
 function runEngineRuleSet(ruleSet) {
   for(let ruleDef of ruleSet) {
+    keyboardWithHarness.resetContextCache();
     // Prepare the context!
     const ruleSeq = new RecordedKeystrokeSequence(ruleDef);
     const proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);

@@ -13,9 +13,9 @@ However, in languages written in other scripts — especially East Asian
 scripts like Chinese, Japanese, Khmer, Lao, and Thai — there are no obvious break in between words. For these languages, there must be special rules for determining when words start and stop. This is what a _word breaker function_ is responsible for. It is a little bit of code that looks at some text to determine where the words are.
 
 You can customize the word breaker in three ways:
-- If your language uses its writing system in an unconventional way (e.g., use spaces to separate words in Thai, Lao, Burmese, or Khmer), you can [override the script's default behaviour](#overrides)
-- If the default word breaker creates **too many splits**, you can [choose which strings join words together](#join).
-- If the default word breaker creates **not enough splits**, you must [create your own word breaker function](#custom).
+- If your language uses its writing system in an unconventional way (e.g., use spaces to separate words in Thai, Lao, Burmese, or Khmer), you can [override the script's default behaviour](#toc-overriding-script-defaults)
+- If the default word breaker creates **too many splits**, you can [choose which strings join words together](#toc-customize-joining-rules).
+- If the default word breaker creates **not enough splits**, you must [create your own word breaker function](#toc-writing-a-custom-word-breaker-function).
 - Alternatively, you may choose to [customize and extend the wordbreaker's behavior](./unicode-breaker-extension) by adding extra rules and changing how it treats specific characters.
 
 ## Overriding script defaults

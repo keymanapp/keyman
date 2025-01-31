@@ -38,25 +38,25 @@ The kmp.json file is a base object described as
 
 : `Object`
 
-  [`System`](#obj-system) object.
+  [`System`](#toc-the-system-object) object.
 
 `options`
 
 : `Object`
 
-  An [`Options`](#obj-options) object.
+  An [`Options`](#toc-the-options-object) object.
 
 `startMenu`
 
 : `Object`
 
-  [`Start Menu`](#obj-startMenu) object.
+  [`Start Menu`](#toc-the-start-menu-object) object.
 
 `info`
 
 : `Object`
 
-  [`Info`](#obj-info) object.
+  [`Info`](#toc-the-info-object) object.
 
 `files`
 
@@ -69,13 +69,13 @@ The kmp.json file is a base object described as
 
 : `Object`
 
-  Array of [`Keyboard`](#obj-keyboard) objects.
+  Array of [`Keyboard`](#toc-the-keyboard-object) objects.
 
 `lexicalModels`
 
 : `Object`
 
-  Array of [`LexicalModel`](#obj-lexicalModel) objects.
+  Array of [`LexicalModel`](#toc-the-lexicalmodel-object) objects.
 
 ### The System object
 
@@ -139,7 +139,7 @@ The `StartMenu` object is used by Keyman Desktop to install windows
 
 : `Array`
 
-  An array of [Item](#obj-item) objects
+  An array of [Item](#toc-the-item-object) objects
 
 ### The Item Object
 
@@ -229,7 +229,7 @@ The `Keyboard` object describes an individual keyboard in the Keyman package. A 
 
 : `Array`
 
-  An array of [`Language`](#obj-language) objects linked to the keyboard.
+  An array of [`Language`](#toc-the-language-object) objects linked to the keyboard.
 
 `displayFont`
 
@@ -247,7 +247,7 @@ The `Keyboard` object describes an individual keyboard in the Keyman package. A 
 
 : `Array`
 
-  An array of [`Example`](#obj-example) objects linked to the keyboard.
+  An array of [`Example`](#toc-the-example-object) objects linked to the keyboard.
 
 ### The Language object
 
@@ -342,4 +342,4 @@ The `LexicalModel` object describes an individual model in the Keyman package. A
 
 : `Array`
 
-  An array of [`Language`](#obj-language) objects linked to the model.
+  An array of [`Language`](#toc-the-language-object) objects linked to the model.

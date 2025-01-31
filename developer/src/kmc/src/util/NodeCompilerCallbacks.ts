@@ -23,6 +23,8 @@ const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
   [CompilerErrorSeverity.Warn]: color.hex('FFA500'), // orange
   [CompilerErrorSeverity.Error]: color.redBright,
   [CompilerErrorSeverity.Fatal]: color.redBright,
+  [CompilerErrorSeverity.Verbose]: color.gray,
+  [CompilerErrorSeverity.Debug]: color.blueBright,
 };
 
 /**

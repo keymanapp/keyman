@@ -301,6 +301,16 @@ export function ttfInfo(data, callback) {
 }
 
 /**
+ * @namespace
+ * @param {*} data
+ * @returns {typeof result}
+ */
+export function ttfInfoSync(data) {
+  resultTables(data);
+  return result;
+}
+
+/**
  * @param {string | number | Buffer | URL | DataView} pathOrData
  * @returns {Promise<typeof result>}
  */
