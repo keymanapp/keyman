@@ -8,6 +8,7 @@ import { distributionFromDistanceMaps } from '../../../corrections.js';
 import Modipress from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
+import { correctionKeyFilter } from '../../../correctionLayout.js';
 
 /**
  * Represents a potential multitap gesture's implementation within KeymanWeb.
@@ -104,20 +105,33 @@ export default class Multitap implements GestureHandler {
       keyEvent.baseTranscriptionToken = this.baseContextToken;
 
       const coord = tap.sources[0].currentSample;
-      const baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, this.baseKey.key.spec as ActiveKey);
+
+      const baseSpec = this.baseKey.key.spec;
+      const baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, baseSpec as ActiveKey);
+      // If the key is on a different layer than is shown, what if the user meant to hit a different key?
+      // (Bypass if the tap is part of a modipress gesture.)
       if(coord.stateToken != vkbd.layerId && !tap.matchedId.includes('modipress')) {
         const matchKey = vkbd.layerGroup.findNearestKey({...coord, stateToken: vkbd.layerId});
 
-        // Replace the key at the current location for the current layer key
-        // with the multitap base key.
-        const p = baseDistances.get(matchKey.key.spec);
-        if(p == null) {
-          console.warn("Could not find current layer's key")
+        // That said, if they directly touched a non-output key, simplify and assume
+        // that they hit the intended key.
+        if(correctionKeyFilter(matchKey.key.spec)) {
+          // Replace the key at the current location for the current layer key
+          // with the multitap base key.
+          const p = baseDistances.get(matchKey.key.spec);
+          if(p == null) {
+            console.warn("Could not find current layer's key")
+          } else {
+            baseDistances.delete(matchKey.key.spec);
+            baseDistances.set(coord.item.key.spec, p);
+          }
         }
-        baseDistances.delete(matchKey.key.spec);
-        baseDistances.set(coord.item.key.spec, p);
       }
-      keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
+
+      // Will also bypass if the base key is modipress-compatible.
+      if(coord.item && correctionKeyFilter(coord.item.key.spec)) {
+        keyEvent.keyDistribution = this.currentStageKeyDistribution(baseDistances);
+      }
 
       // TODO for future:  multitap previews.
 

@@ -1,5 +1,5 @@
 ---
-title: Version History
+title: Version History of Keyman for Windows
 ---
 
 A frequently updated changelog for Keyman is kept at

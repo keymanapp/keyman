@@ -36,9 +36,11 @@ run_core() {
 
 run_linux() {
   mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux"
+  mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux"
   docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
     -v "${KEYMAN_ROOT}/linux/build/docker-linux":/home/build/build/linux/build \
+    -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux":/home/build/build/linux/keyman-system-service/build \
     -e DESTDIR=/tmp \
     keymanapp/keyman-linux-ci:default \
     "${builder_extra_params[@]}"

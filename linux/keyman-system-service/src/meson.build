@@ -10,6 +10,7 @@ exe = executable(
   'keyman-system-service',
   sources: [service_files],
   dependencies: deps,
+  include_directories: ['..'],
   install: true,
   install_dir: get_option('libexecdir'),
 )

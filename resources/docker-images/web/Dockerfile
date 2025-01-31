@@ -12,7 +12,8 @@ LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman for Web Build Image"
 
 USER root
-RUN apt-get install -qy git jq xvfb xserver-xephyr metacity
+RUN apt-get update && \
+  apt-get install -qy git jq xvfb xserver-xephyr metacity
 # For playwright:
 RUN apt-get install -qy  libevent-2.1-7t64 libxslt1.1 libwoff1 libvpx9 \
   libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 \

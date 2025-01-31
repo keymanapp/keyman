@@ -13,7 +13,7 @@
 #import "KMLogs.h"
 #import "InputMethodKit/InputMethodKit.h"
 #import "KMInputMethodLifecycle.h"
-
+#import "KMSentryHelper.h"
 
 @implementation KMInputController
 
@@ -25,7 +25,7 @@ KMInputMethodEventHandler* _eventHandler;
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getClientApplicationId]);
+  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getRunningApplicationId]);
 
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
@@ -84,7 +84,7 @@ KMInputMethodEventHandler* _eventHandler;
   if (_eventHandler != nil) {
     [_eventHandler deactivate];
   }
-  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getClientApplicationId] client:self.client];
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getRunningApplicationId] client:self.client];
 
 }
 
@@ -111,17 +111,21 @@ KMInputMethodEventHandler* _eventHandler;
   NSInteger itag = mItem.tag;
   os_log_debug([KMLogs uiLog], "Keyman menu clicked - tag: %lu", itag);
   if (itag == CONFIG_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Configuration..."];
     [self showConfigurationWindow:sender];
   }
   else if (itag == OSK_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard"];
     [KMSettingsRepository.shared writeShowOskOnActivate:YES];
     os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
     [self.appDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"About"];
     [self.appDelegate showAboutWindow];
   }
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Selected Keyboard"];
     [self.appDelegate selectKeyboardFromMenu:itag];
   }
 }

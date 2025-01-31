@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  * 
  * KMLogs.h
@@ -6,7 +6,6 @@
  * 
  * Created by Shawn Schantz on 2024-05-16.
  *
- * Contains methods to get singleton logger objects and constants for subsystem and category names.
  */
 
 #import <Foundation/Foundation.h>

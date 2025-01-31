@@ -21,14 +21,18 @@ export interface CompilerEvent {
 };
 
 export enum CompilerErrorSeverity {
-  Info =          0x000000, // Informational, not necessarily a problem
-  Hint =          0x100000, // Something the user might want to be aware of
-  Warn =          0x200000, // Warning: Not great, but we can keep going.
-  Error =         0x300000, // Severe error where we can't continue
-  Fatal =         0x400000, // OOM or should-not-happen internal problem
+  Debug =         0x000000, // log everything including internal debug
+  Verbose =       0x100000, // log everything, except debug
+  Info =          0x200000, // Informational, not necessarily a problem
+  Hint =          0x300000, // Something the user might want to be aware of
+  Warn =          0x400000, // Warning: Not great, but we can keep going.
+  Error =         0x500000, // Severe error where we can't continue
+  Fatal =         0x600000, // OOM or should-not-happen internal problem
 };
 
 export const CompilerErrorSeverityValues = [
+  CompilerErrorSeverity.Debug,
+  CompilerErrorSeverity.Verbose,
   CompilerErrorSeverity.Info,
   CompilerErrorSeverity.Hint,
   CompilerErrorSeverity.Warn,
@@ -48,6 +52,8 @@ export enum CompilerErrorMask {
 };
 
 const errorSeverityName = {
+  [CompilerErrorSeverity.Debug]: 'debug',
+  [CompilerErrorSeverity.Verbose]: 'verbose',
   [CompilerErrorSeverity.Info]: 'info',
   [CompilerErrorSeverity.Hint]: 'hint',
   [CompilerErrorSeverity.Warn]: 'warn',
@@ -419,8 +425,9 @@ export const ALL_COMPILER_LOG_LEVELS = [
   'error',      /// Only errors emitted
   'warn',       /// Errors + warnings
   'hint',       /// Errors + warnings + hints
-  'info',       /// All messages: errors + warnings + hints + info
-  'debug'       /// All messages: errors + warnings + hints + info, plus debug logs
+  'info',       /// All normal messages: errors + warnings + hints + info
+  'verbose',    /// All messages + verbose logging
+  'debug',      /// All messages + verbose + internal debug
 ] as const;
 
 type CompilerLogLevelTuple = typeof ALL_COMPILER_LOG_LEVELS;
@@ -432,7 +439,8 @@ export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} =
   'warn': CompilerErrorSeverity.Warn,
   'hint': CompilerErrorSeverity.Hint,
   'info': CompilerErrorSeverity.Info,
-  'debug': CompilerErrorSeverity.Info
+  'verbose': CompilerErrorSeverity.Verbose,
+  'debug': CompilerErrorSeverity.Debug,
 };
 
 export const ALL_COMPILER_LOG_FORMATS = [
