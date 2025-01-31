@@ -178,9 +178,6 @@
       "additionalProperties": false,
       "properties": {
         "base": {
-          "enum": [
-            "cldr"
-          ],
           "type": "string"
         },
         "path": {
@@ -601,7 +598,7 @@
       "properties": {
         "cldrVersion": {
           "enum": [
-            "45"
+            "46"
           ],
           "type": "string"
         },
@@ -618,7 +615,8 @@
       "properties": {
         "conformsTo": {
           "enum": [
-            "45"
+            "45",
+            "46"
           ],
           "type": "string"
         },
@@ -691,6 +689,6 @@
   "required": [
     "keyboard3"
   ],
-  "title": "45/dtd/ldmlKeyboard3.xsd",
+  "title": "46/dtd/ldmlKeyboard3.xsd",
   "type": "object"
 }
