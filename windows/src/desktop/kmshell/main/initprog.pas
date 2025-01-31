@@ -453,7 +453,7 @@ begin
       Exit;
   end;
 
-  if not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout, fmBoot]) then   // I4773
+  if not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout]) then   // I4773
   begin
     DoCheckTIPInstallStatus(False);
   end;
