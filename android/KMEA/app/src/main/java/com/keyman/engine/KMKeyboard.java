@@ -32,6 +32,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -110,7 +111,14 @@ final class KMKeyboard extends WebView {
 
   public String specialOskFont = "";
 
-  public KMKeyboard(Context context) {
+  /**
+   * Constructor for KMKeyboard.
+   * If System WebView not installed/enabled, will throw AndroidRuntimeException.
+   * Can't catch the exception here because super(context) must be the first line.
+   * @param context
+   * @throws AndroidRuntimeException
+   */
+  public KMKeyboard(Context context) throws AndroidRuntimeException {
     super(context);
     this.context = context;
     this.keyboardType = KeyboardType.KEYBOARD_TYPE_INAPP;

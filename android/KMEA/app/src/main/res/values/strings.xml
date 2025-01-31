@@ -127,9 +127,13 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">
       Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
 
-  <!-- Context: Fatal keyboard error.  -->
-  <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
       Error in keyboard %1$s:%2$s for %3$s language.</string>
+
+    <!-- Context: Fatal keyboard error. System WebView not installed/enabled -->
+    <string name="webview_failed_text" comment="Notification when WebView failed because it's uninstalled or not enabled">
+        Fatal Error: WebView must be installed or enabled. Exiting"</string>
 
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
@@ -278,4 +282,5 @@
 
     <!-- Context: anywhere -->
     <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+
 </resources>

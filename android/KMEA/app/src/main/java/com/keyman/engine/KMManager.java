@@ -33,6 +33,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
@@ -687,12 +689,22 @@ public final class KMManager {
     KMKeyboardWebViewClient webViewClient = null;
 
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
-      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      try {
+        InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } catch (AndroidRuntimeException e) {
+        // Fatal error: Notify WebView not installed/enabled and exit Keyman
+        notifyWebViewFailed(appContext);
+      }
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
-      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      try {
+        SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      } catch (AndroidRuntimeException e) {
+        // Fatal error: Notify WebView not installed/enabled and exit Keyman
+        notifyWebViewFailed(appContext);
+      }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
@@ -724,6 +736,20 @@ public final class KMManager {
       keyboard.showBanner(true);
     }
     setEngineWebViewVersionStatus(appContext, keyboard);
+  }
+
+  private static void notifyWebViewFailed(Context appContext) {
+    KMLog.LogInfo(TAG, "System WebView not installed/enabled");
+    Toast.makeText(appContext, R.string.webview_failed_text, Toast.LENGTH_LONG).show();
+    try {
+      Thread.sleep(3500);
+    } catch (InterruptedException e) {
+      KMLog.LogException(TAG, "Timer exception", e);
+    }
+
+    // Exit Keyman since WebView failed
+    android.os.Process.killProcess(android.os.Process.myPid());
+    System.exit(1);
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
