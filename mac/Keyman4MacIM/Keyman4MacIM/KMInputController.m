@@ -97,16 +97,20 @@ KMInputMethodEventHandler* _eventHandler;
   os_log_info([KMLogs lifecycleLog], " +++KMInputController, activateServer, self=%p", self);
   [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
   
-  /**
-   * When this KMInputController becomes the active server for the input method, then immediately update the AppDelegate.
-   * The duration that this controller is the active server may be extremely short, but, if so, we will receive another
-   * call to activateServer moments later and can update the AppDelegate again.
+  /*
+   When this KMInputController becomes the active server for the input method,
+   then immediately update the AppDelegate. The duration that this controller is the
+   active server may be extremely short, but, if so, we will receive another
+   call to activateServer moments later and can update the AppDelegate again.
    */
   [self attachToAppDelegate];
   
-  /**
-   * Call the shared lifecycle object so it can evaluate the current state and figure out whether this is a real activation of
-   * the input method or a change in clients or a false alarm.
+  /*
+   Call the shared lifecycle object so it can evaluate the current state
+   and determine whether this is
+   1) a real activation of the input method or
+   2) a change in clients or
+   3) a false alarm
    */
   [KMInputMethodLifecycle.shared activateClient:sender];
 }
@@ -121,9 +125,12 @@ KMInputMethodEventHandler* _eventHandler;
 - (void)deactivateServer:(id)sender {
   os_log_info([KMLogs lifecycleLog], " +++KMInputController, deactivateServer, self=%p", self);
 
-  /**
-   * Call the shared lifecycle object so it can evaluate the current state and figure out whether this is a real deactivation of
-   * the input method or a change in clients or a false alarm.
+  /*
+   Call the shared lifecycle object so it can evaluate the current state
+   and determine whether this is
+   1) a real deactivation of the input method or
+   2) a change in clients or
+   3) a false alarm
    */
   [KMInputMethodLifecycle.shared deactivateClient:sender];
 }
