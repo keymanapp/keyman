@@ -94,6 +94,7 @@ type
                     fmRepair,
                     fmKeepInTouch,
                     fmSettings,
+                    fmBoot,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -232,6 +233,7 @@ begin
         // package installation. See https://superuser.com/a/1395288/521575 and
         // https://github.com/keymanapp/keyman/issues/2467
       else if s = '-f' then FForce := True
+      else if s = '-boot' then FMode := fmBoot
       else if s = '-c' then   FMode := fmMain
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
@@ -458,7 +460,7 @@ begin
 
   // I1818 - remove start mode change
 
-  if FMode = fmStart then FIcon := 'appicon.ico'
+  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
   else FIcon := 'cfgicon.ico';
 
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
@@ -509,6 +511,11 @@ begin
 
 ////TODO:          TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
 
+    fmBoot:
+      begin
+        // on boot splash should be suppressed therefore Silent = True
+        StartKeyman(False, True, FStartWithConfiguration);
+      end;
     fmStart:
       begin  // I2720
         StartKeyman(False, FSilent, FStartWithConfiguration);
@@ -699,8 +706,8 @@ begin
         // UI elements from the state machine we have bring some of logic here.
         UserCanceled := False;
         if BUpdateSM.ReadyToInstall and
-          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout, fmHelp,
-          fmShowHelp, fmSettings])) then
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout,
+          fmHelp, fmShowHelp, fmSettings, fmBoot])) then
         begin
           frmStartInstall := TfrmStartInstall.Create(nil);
           try
