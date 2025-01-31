@@ -19,7 +19,52 @@ describe('ModelCompositor', function() {
         {wordBreaker: wordBreakers.default}
       );
 
-      it('generates suggestions with expected properties', function() {
+      it('does not correct when corrections are disabled', async function() {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        // Corrections are disabled when all inputs provided for a token are single-transform.
+        const suggestions1 = await compositor.predict({
+          insert: "x", // Invalid due to the inserted transform; context root is fine.
+          deleteLeft: 0
+        }, {
+          // Context + insert needs to match a word in the model; there is no matching word here.
+          left: "the app", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.isEmpty(suggestions1.filter((entry) => entry.tag != 'keep'));
+        assert.isOk(suggestions1.find((entry) => entry.tag == 'keep'));
+
+        const suggestions2 = await compositor.predict({
+          insert: "l",
+          deleteLeft: 0
+        }, {
+          // Context + insert needs to match a word in the model; there is no matching word here.
+          // Invalid due to the existing context root.
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.isEmpty(suggestions2.filter((entry) => entry.tag != 'keep'));
+        assert.isOk(suggestions2.find((entry) => entry.tag == 'keep'));
+      });
+
+      it('may predict when corrections are disabled', async function() {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        // Corrections are disabled when all inputs provided for a token are single-transform.
+        const suggestions = await compositor.predict({
+          insert: "l",
+          deleteLeft: 0
+        }, {
+          // Context + insert needs to match a word in the model; 'applied' is a valid entry.
+          left: "the app", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.isNotEmpty(suggestions.filter((entry) => entry.tag != 'keep'));
+        assert.isOk(suggestions.find((entry) => entry.tag == 'keep'));
+        assert.isOk(suggestions.find((entry) => entry.displayAs == 'applied'));
+      });
+
+      it('generates suggestions with expected properties', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'th', startOfBuffer: true, endOfBuffer: true,

@@ -344,7 +344,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     }
 
     let alternates = transcription.alternates;
-    if(!alternates || alternates.length == 0) {
+    if(!this.mayCorrect || !alternates || alternates.length == 0) {
       alternates = [{
         sample: transcription.transform,
         p: 1.0

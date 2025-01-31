@@ -239,100 +239,114 @@ export default class ModelCompositor {
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
-      let bestCorrectionCost: number;
-      const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
-        // Corrections obtained:  now to predict from them!
-        let predictionRoots = matches.map(function(match) {
-          let correction = match.matchString;
-
-          // Worth considering:  extend Traversal to allow direct prediction lookups?
-          // let traversal = match.finalTraversal;
-
-          // Find a proper Transform ID to map the correction to.
-          // Without it, we can't apply the suggestion.
-          let finalInput: Transform;
-          if(match.inputSequence.length > 0) {
-            finalInput = match.inputSequence[match.inputSequence.length - 1].sample;
-          } else {
-            finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
-          }
-
-          // Replace the existing context with the correction.
-          let correctionTransform: Transform = {
-            insert: correction,  // insert correction string
+      if(!searchSpace.correctionsEnabled) {
+        const predictionRoot = {
+          sample: {
+            insert: this.wordbreak(postContext),  // insert correction string
             deleteLeft: deleteLeft,
             id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+          },
+          p: 1.0
+        };
+
+        // Only one 'correction' / prediction root is allowed - the actual text.
+        rawPredictions = this.predictFromCorrections([predictionRoot], context);
+      } else {
+        let bestCorrectionCost: number;
+        const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+        for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
+          // Corrections obtained:  now to predict from them!
+          let predictionRoots = matches.map(function(match) {
+            let correction = match.matchString;
+
+            // Worth considering:  extend Traversal to allow direct prediction lookups?
+            // let traversal = match.finalTraversal;
+
+            // Find a proper Transform ID to map the correction to.
+            // Without it, we can't apply the suggestion.
+            let finalInput: Transform;
+            if(match.inputSequence.length > 0) {
+              finalInput = match.inputSequence[match.inputSequence.length - 1].sample;
+            } else {
+              finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
+            }
+
+            // Replace the existing context with the correction.
+            let correctionTransform: Transform = {
+              insert: correction,  // insert correction string
+              deleteLeft: deleteLeft,
+              id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+            }
+
+            let rootCost = match.totalCost;
+
+            /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+            * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+            * there are significantly more likely words.  We only need this to allow very minor fat-finger
+            * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+            * key borders.
+            *
+            * Technically, the probabilities this produces won't be normalized as-is... but there's no
+            * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+            * to apply it could become tricky, so it's simpler to leave out.
+            *
+            * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+            * is needed in the future.
+            */
+            if(isTokenStart) {
+              /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+              * ambiguous case that would only arise very near the center of the boundary between two keys.
+              * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+              * That seems 'within reason' for correction very near boundaries.
+              *
+              * So, with the second-most-likely key being that close in probability, its best suggestion
+              * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+              * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+              * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+              * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+              */
+              rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+            }
+
+            return {
+              sample: correctionTransform,
+              p: Math.exp(-rootCost)
+            };
+          }, this);
+
+          // Running in bulk over all suggestions, duplicate entries may be possible.
+          let predictions = this.predictFromCorrections(predictionRoots, context);
+
+          // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
+          if(predictions.length > 0 && bestCorrectionCost === undefined) {
+            bestCorrectionCost = -Math.log(predictionRoots[0].p);
           }
 
-          let rootCost = match.totalCost;
+          rawPredictions = rawPredictions.concat(predictions);
+          // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
+          // it's technically possible that we return too few.
 
-          /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-           * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-           * there are significantly more likely words.  We only need this to allow very minor fat-finger
-           * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-           * key borders.
-           *
-           * Technically, the probabilities this produces won't be normalized as-is... but there's no
-           * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-           * to apply it could become tricky, so it's simpler to leave out.
-           *
-           * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-           * is needed in the future.
-           */
-          if(isTokenStart) {
-            /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-             * ambiguous case that would only arise very near the center of the boundary between two keys.
-             * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-             * That seems 'within reason' for correction very near boundaries.
-             *
-             * So, with the second-most-likely key being that close in probability, its best suggestion
-             * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-             * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-             * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-             * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-             */
-            rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-          }
-
-          return {
-            sample: correctionTransform,
-            p: Math.exp(-rootCost)
-          };
-        }, this);
-
-        // Running in bulk over all suggestions, duplicate entries may be possible.
-        let predictions = this.predictFromCorrections(predictionRoots, context);
-
-        // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
-        if(predictions.length > 0 && bestCorrectionCost === undefined) {
-          bestCorrectionCost = -Math.log(predictionRoots[0].p);
-        }
-
-        rawPredictions = rawPredictions.concat(predictions);
-        // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
-        // it's technically possible that we return too few.
-
-        let correctionCost = matches[0].totalCost;
-        // Searching a bit longer is permitted when no predictions have been found.
-        if(correctionCost >= bestCorrectionCost + 8) {
-          break;
-          // If enough have been found, we're safe to terminate earlier.
-        } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-            if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
-            // Very useful for stopping 'sooner' when words reach a sufficient length.
+          let correctionCost = matches[0].totalCost;
+          // Searching a bit longer is permitted when no predictions have been found.
+          if(correctionCost >= bestCorrectionCost + 8) {
             break;
-          } else {
-            // Sort the prediction list; we need them in descending order for the next check.
-            rawPredictions.sort(function(a, b) {
-              return b.p - a.p;
-            });
-
-            // If the best suggestion from the search's current tier fails to beat the worst
-            // pending suggestion from previous tiers, assume all further corrections will
-            // similarly fail to win; terminate the search-loop.
-            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+            // If enough have been found, we're safe to terminate earlier.
+          } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+              if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+              // Very useful for stopping 'sooner' when words reach a sufficient length.
               break;
+            } else {
+              // Sort the prediction list; we need them in descending order for the next check.
+              rawPredictions.sort(function(a, b) {
+                return b.p - a.p;
+              });
+
+              // If the best suggestion from the search's current tier fails to beat the worst
+              // pending suggestion from previous tiers, assume all further corrections will
+              // similarly fail to win; terminate the search-loop.
+              if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+                break;
+              }
             }
           }
         }
