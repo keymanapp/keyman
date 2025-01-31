@@ -1,5 +1,5 @@
 ---
-title: Welcome to Keyman
+title: Welcome to Keyman for iPhone and iPad
 ---
 
 Thank you for installing Keyman for iPhone and iPad. Whether you're a new or returning user,

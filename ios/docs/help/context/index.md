@@ -2,6 +2,8 @@
 title: Keyman for iPhone and iPad Help
 ---
 
+[Keyboard gestures](gestures)
+
 |    | Keyboard Keys <br/>(Keyboard Present) |
 |---|---|
 | ![](../ios_images/globe.png) | Install or select another language/keyboard |

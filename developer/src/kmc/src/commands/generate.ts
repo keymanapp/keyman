@@ -30,7 +30,8 @@ function declareGenerateKmnKeyboard(command: Command) {
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
     .option('-a, --author <author-name>', 'Name of keyboard author')
-    .option('-i, --icon', 'Include a generated icon', true)
+    // TODO-GENERATE: icon support
+    // .option('-i, --icon', 'Include a generated icon', true)
     .option('-d, --description <description>', 'Short description of the project, Markdown')
     .action(generateKmnKeyboard);
 }
@@ -45,7 +46,7 @@ function declareGenerateLdmlKeyboard(command: Command) {
     .option('-o, --out-path <path>', 'Output path (may exist)')
     .option('-n, --name <name>', 'Keyboard descriptive name')
     .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-v, --version <version-string>', 'Keyboard version', '1.0.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
     .option('-a, --author <author-name>', 'Name of keyboard author')
@@ -59,12 +60,12 @@ function declareGenerateLexicalModel(command: Command) {
   modelSubCommand
     .description('Generate a wordlist lexical model project')
     .option('-o, --out-path <path>', 'Output path (may exist)')
-    .option('-n, --name <name>', 'Keyboard descriptive name')
+    .option('-n, --name <name>', 'Lexical model descriptive name')
     .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-v, --version <version-string>', 'Lexical model version', '1.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
-    .option('-a, --author <author-name>', 'Name of keyboard author')
+    .option('-a, --author <author-name>', 'Name of lexical model author')
     .option('-d, --description <description>', 'Short description of the project, Markdown')
     .action(generateLexicalModel);
 
@@ -73,7 +74,8 @@ function declareGenerateLexicalModel(command: Command) {
 
 function commanderOptionsToGeneratorOptions(id: string, options: any): GeneratorOptions {
   const result: GeneratorOptions = {
-    icon: options.icon ?? true,
+    // TODO-GENERATE: icon support
+    // icon: options.icon ?? true,
     id,
     languageTags: options.languageTag ?? [],
     name: options.name ?? id,

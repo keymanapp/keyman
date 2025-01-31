@@ -19,13 +19,7 @@ permission to access storage / "file and media". The screenshot below is from An
 
 ### Android 13.0+ Devices
 
-Step 1)
-Go to Android Settings.
+Due to Google Play Store's "Photo and Video Permissions policy", 
+Keyman for Android must use a system picker to browse for .kmp files from within the Keyman app.
 
-Step 2)
-Depending on your device, click "Apps" and grant Keyman permission to the following:
-  * Photos and videos --> Always allow all
-
-The screenshot below is from Android 14.0.
-
-![](../android_images/keyman-storage-permission-34b.png)
+Follow the steps in [Installing Custom Keyboards/Dictionaries](../basic/installing-custom-packages).

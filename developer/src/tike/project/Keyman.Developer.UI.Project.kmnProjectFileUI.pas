@@ -200,7 +200,7 @@ end;
 
 function TkmnProjectFileUI.TestKeymanWeb(FSilent: Boolean): Boolean;   // I4409
 var
-  FCompiledName: string;
+  FCompiledName, OSKFont: string;
   editor: TfrmTikeEditor;
   wizard: TfrmKeymanWizard;
   i: TKeyboardFont;
@@ -250,7 +250,7 @@ begin
 
   // We register all fonts that are used by the layout,
   // but just once for each reference!
-  for i := kfontChar to kfontTouchLayoutDesktop do
+  for i := kfontChar to kfontDisplayMap do
   begin
     Found := False;
     for j := kfontChar to TKeyboardFont(Ord(i)-1) do
@@ -265,13 +265,18 @@ begin
 
   if TServerUI.VerifyServerRunning then
   begin
+    if Wizard.FontInfo[kfontDisplayMap].Enabled then
+    begin
+      OSKFont := Wizard.FontInfo[kfontDisplayMap].Name
+    end
+    else
+      OSKFont := Wizard.FontInfo[kfontOSK].Name;
+
     TServerDebugAPI.RegisterKeyboard(
       FCompiledName,
       ProjectFile.FileVersion,
-      // We only need to specify the char + osk fonts here
-      // as the others are referenced in the touch layout definition directly
       Wizard.FontInfo[kfontChar].Name,
-      Wizard.FontInfo[kfontOSK].Name
+      OSKFont
     );
 
     wizard.NotifyStartedWebDebug;   // I4021
