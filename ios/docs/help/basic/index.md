@@ -1,5 +1,5 @@
 ---
-title: Keyman for iPhone and iPad Basic Help
+title: Basic Help
 ---
 * [Using the Banner on the Keyboard](using-the-banner)
 
