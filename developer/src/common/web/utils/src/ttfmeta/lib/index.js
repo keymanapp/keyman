@@ -32,6 +32,20 @@ export function ttfInfo(pathOrData, callback) {
 }
 
 /**
+ * @namespace
+ * @param {string | number | Buffer | URL} pathOrData
+ * @returns {typeof ttf.result}
+ */
+export function ttfInfoSync(pathOrData) {
+  if (pathOrData instanceof Buffer) {
+    return ttf.ttfInfoSync(ttf.view(pathOrData));
+  } else {
+    const data = fs.readFileSync(pathOrData);
+    return ttf.ttfInfoSync(ttf.view(data));
+  }
+}
+
+/**
  * @param {string | number | Buffer | URL} pathOrData
  * @returns {Promise<typeof ttf.result>}
  */
@@ -48,5 +62,5 @@ export function promise(pathOrData) {
 }
 
 /** @namespace */
-export const ttfMeta = { ttfInfo, promise };
+export const ttfMeta = { ttfInfo, ttfInfoSync, promise };
 export default ttfMeta;

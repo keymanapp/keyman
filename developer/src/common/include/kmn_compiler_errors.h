@@ -28,11 +28,13 @@
 namespace CompilerErrorSeverity {
   // We use a namespace to stop the enum names leaking out into global namespace scope
   enum {
-    Info =          0x000000, // Informational, not necessarily a problem
-    Hint =          0x100000, // Something the user might want to be aware of
-    Warn =          0x200000, // Warning: Not great, but we can keep going.
-    Error =         0x300000, // Severe error where we can't continue
-    Fatal =         0x400000, // OOM or should-not-happen internal problem
+    Debug =         0x000000, // log everything including internal debug
+    Verbose =       0x100000, // log everything, except debug
+    Info =          0x200000, // Informational, not necessarily a problem
+    Hint =          0x300000, // Something the user might want to be aware of
+    Warn =          0x400000, // Warning: Not great, but we can keep going.
+    Error =         0x500000, // Severe error where we can't continue
+    Fatal =         0x600000, // OOM or should-not-happen internal problem
   };
 };
 

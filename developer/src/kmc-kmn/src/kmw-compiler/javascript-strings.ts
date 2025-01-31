@@ -669,7 +669,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
 
       switch(recContext.Code) {
       case KMX.KMXFile.CODE_ANY:
-        Index = AdjustIndex(fkp.dpContext, ContextIndex) + 1;   // I3910   // I4611
+        Index = AdjustIndex(fkp.dpContext, ContextIndex);   // I3910   // I4611
         Result += nlt + `k.KIO(${len},this.s${JavaScript_Name(recContext.Any.StoreIndex, recContext.Any.Store.dpName)},${Index},t);`;   // I4611
         break;
       case KMX.KMXFile.CODE_DEADKEY:
@@ -681,7 +681,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
           // Note that this is checked in compiler.cpp as well, so this error can probably never occur
           throw new Error('Unexpected: notany() encountered with invalid version');
         }
-        Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)+1});`;
+        Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)});`;
         break;
       case KMX.KMXFile.CODE_IFOPT:
       case KMX.KMXFile.CODE_IFSYSTEMSTORE:
@@ -759,7 +759,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
       case KMX.KMXFile.CODE_CONTEXT:
         if (x > 0 || len == -1) {
           let xContext = 0;
-          let n = 0;
+          let n = 1;
           while(xContext < fkp.dpContext.length) {   // I4611
             if(!isGroupReadOnly(fk, fgp)) {
               Result += ContextChar(n, fkp.dpContext, xContext);
@@ -767,7 +767,6 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
             n++;
             xContext = incxstr(fkp.dpContext, xContext);
           }
-          //Result := Result + Format('k.KO(%d,t,k.KC(%d,%d,t));', [len, xstrlen_printing(fkp.dpContext), xstrlen_printing(fkp.dpContext)]);
         }
         // else, we don't need to output anything - just don't delete the context
         len = -1;
@@ -779,7 +778,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         }
 
         if(!isGroupReadOnly(fk, fgp)) {
-          Result += ContextChar(rec.ContextEx.Index, fkp.dpContext, xContext);   // I4611
+          Result += ContextChar(rec.ContextEx.Index + 1, fkp.dpContext, xContext);   // I4611
         }
         len = -1;
         break;
