@@ -572,6 +572,7 @@ class Constants {
   }
 };
 
+/** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
 const cldrTreatAsLatest: Set<string> = new Set(['45', '46.1', '47']);
 
 export const constants = new Constants();
