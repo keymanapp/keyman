@@ -237,10 +237,4 @@ export class CopierMessages {
     `Copying file '${def(o.from)}' to '${def(o.to)}'`,
   );
 
-  static VERBOSE_CopyingFolder = SevVerbose | 0x0022;
-  static Verbose_CopyingFolder = (o:{from: string, to: string}) => m(
-    this.VERBOSE_CopyingFolder,
-    `Copying folder '${def(o.from)}' from '${def(o.to)}'`,
-  );
-
 };
