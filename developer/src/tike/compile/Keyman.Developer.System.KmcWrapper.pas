@@ -64,7 +64,7 @@ begin
   else
     cmdline := cmdline + ['--no-compiler-warnings-as-errors'];
 
-  if FGlobalProject.Options.WarnDeprecatedCode then
+  if not FGlobalProject.Options.WarnDeprecatedCode then
     cmdline := cmdline + ['--no-warn-deprecated-code'];
 
   if debug then
