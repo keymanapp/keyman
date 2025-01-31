@@ -197,9 +197,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageFiles: TTabSheet
       Caption = 'Files'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel1: TPanel
         Left = 0
         Top = 0
@@ -264,7 +261,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblFileType: TLabel
           Left = 256
           Top = 107
-          Width = 46
+          Width = 47
           Height = 13
           Caption = 'File Type:'
           FocusControl = editFilePath
@@ -356,9 +353,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageKeyboards: TTabSheet
       Caption = 'Keyboards'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel5: TPanel
         Left = 0
         Top = 0
@@ -664,9 +658,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageLexicalModels: TTabSheet
       Caption = 'Lexical Models'
       ImageIndex = 17
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object panLexicalModels: TPanel
         Left = 0
         Top = 0
@@ -953,7 +944,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblDescriptionMarkdown: TLabel
           Left = 114
           Top = 497
-          Width = 214
+          Width = 215
           Height = 13
           Caption = 'Markdown accepted, no embedded HTML'
           Transparent = True
@@ -1166,9 +1157,6 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageShortcuts: TTabSheet
       Caption = 'Shortcuts'
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -1332,16 +1320,10 @@ inherited frmPackageEditor: TfrmPackageEditor
     object pageSource: TTabSheet
       Caption = 'Source'
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
     object pageCompile: TTabSheet
       Caption = 'Build'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbCompile: TScrollBox
         Left = 0
         Top = 0
@@ -1593,7 +1575,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           object Label5: TLabel
             Left = 9
             Top = 73
-            Width = 81
+            Width = 82
             Height = 13
             Caption = 'Target filename:'
           end
