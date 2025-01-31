@@ -47,6 +47,10 @@ export class WebviewConfiguration extends EngineConfiguration {
     return this._embeddingApp;
   }
 
+  set embeddingApp(name: string) {
+    this._embeddingApp = name;
+  }
+
   get oninserttext() {
     return this._oninserttext;
   }
