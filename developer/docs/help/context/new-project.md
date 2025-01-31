@@ -24,17 +24,20 @@ Creates a lexical model project that matches the folder structure used in the Ke
 ## Clone local project
 
 Copies a Keyman keyboard or lexical model project on your local filesystem into
-a new folder, giving the project and included files a new name.
+a new folder, giving the project and included files a new name. Clicking OK will
+open the [Clone Local Project Parameters dialog](clone-local-project-parameters).
 
 ## Clone project from Keyman Cloud
 
 Copies a Keyman keyboard or lexical model project from keyman.com into a new
-folder, giving the project and included files a new name.
+folder, giving the project and included files a new name. Clicking OK will
+open the [Clone Keyman Cloud Project Parameters dialog](clone-keyman-cloud-project-parameters).
 
 ## Clone project from GitHub
 
 Copies a Keyman keyboard or lexical model project from a GitHub repository into
-a new folder, giving the project and included files a new name.
+a new folder, giving the project and included files a new name. Clicking OK will
+open the [Clone GitHub Project Parameters dialog](clone-github-project-parameters).
 
 # Command line access
 

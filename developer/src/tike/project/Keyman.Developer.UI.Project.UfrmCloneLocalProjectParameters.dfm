@@ -2,16 +2,16 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Clone Project'
-  ClientHeight = 231
+  ClientHeight = 257
   ClientWidth = 721
   Position = poScreenCenter
   ExplicitWidth = 727
-  ExplicitHeight = 260
+  ExplicitHeight = 286
   PixelsPerInch = 96
   TextHeight = 13
   object cmdOK: TButton
     Left = 561
-    Top = 198
+    Top = 222
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -21,7 +21,7 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
   end
   object cmdCancel: TButton
     Left = 640
-    Top = 198
+    Top = 222
     Width = 73
     Height = 25
     Cancel = True
@@ -33,7 +33,7 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
     Left = 8
     Top = 63
     Width = 705
-    Height = 129
+    Height = 153
     Caption = 'New Project Details'
     TabOrder = 1
     object lblFileName: TLabel
@@ -42,11 +42,11 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
       Width = 76
       Height = 13
       Caption = '&New project ID:'
-      FocusControl = editKeyboardID
+      FocusControl = editProjectID
     end
     object lblProjectFilename: TLabel
       Left = 12
-      Top = 100
+      Top = 124
       Width = 101
       Height = 13
       Caption = 'New project &filename'
@@ -54,34 +54,53 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
     end
     object lblPath: TLabel
       Left = 12
-      Top = 73
+      Top = 97
       Width = 83
       Height = 13
       Caption = 'Destination &path:'
       FocusControl = editPath
     end
-    object editKeyboardID: TEdit
+    object lblSourceProjectLexicalModel: TLabel
+      Left = 12
+      Top = 46
+      Width = 531
+      Height = 13
+      Caption = 
+        'The source project appears to be a lexical model. The new projec' +
+        't ID must use the author.bcp47.uniq pattern.'
+    end
+    object lblSourceProjectKeyboard: TLabel
+      Left = 12
+      Top = 46
+      Width = 682
+      Height = 13
+      Caption = 
+        'The source project appears to be a keyboard project. The new pro' +
+        'ject ID must be a valid keyboard id pattern (alphanumeric and un' +
+        'derscore).'
+    end
+    object editProjectID: TEdit
       Left = 144
       Top = 19
       Width = 205
       Height = 21
       TabOrder = 0
-      OnChange = editKeyboardIDChange
+      OnChange = editProjectIDChange
     end
     object editProjectFilename: TEdit
       Left = 144
-      Top = 97
+      Top = 121
       Width = 553
       Height = 21
       TabStop = False
       ParentColor = True
       ReadOnly = True
       TabOrder = 4
-      OnChange = editKeyboardIDChange
+      OnChange = editProjectIDChange
     end
     object cmdBrowse: TButton
       Left = 624
-      Top = 70
+      Top = 94
       Width = 73
       Height = 21
       Caption = '&Browse...'
@@ -90,7 +109,7 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
     end
     object editPath: TEdit
       Left = 144
-      Top = 70
+      Top = 94
       Width = 474
       Height = 21
       TabOrder = 2
@@ -98,7 +117,7 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
     end
     object chkRelocateExternal: TCheckBox
       Left = 144
-      Top = 46
+      Top = 70
       Width = 257
       Height = 17
       Caption = 'Relocate &external files into new project folder'
@@ -150,6 +169,6 @@ inherited frmCloneLocalProjectParameters: TfrmCloneLocalProjectParameters
     Options = [fdoPathMustExist, fdoFileMustExist, fdoNoTestFileCreate]
     Title = 'Select source project'
     Left = 584
-    Top = 16
+    Top = 8
   end
 end

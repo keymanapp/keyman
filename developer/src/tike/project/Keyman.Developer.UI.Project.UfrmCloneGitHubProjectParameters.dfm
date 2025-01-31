@@ -2,16 +2,16 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Clone Project from GitHub'
-  ClientHeight = 269
-  ClientWidth = 601
+  ClientHeight = 297
+  ClientWidth = 738
   Position = poScreenCenter
-  ExplicitWidth = 607
-  ExplicitHeight = 298
+  ExplicitWidth = 744
+  ExplicitHeight = 326
   PixelsPerInch = 96
   TextHeight = 13
   object cmdOK: TButton
-    Left = 441
-    Top = 236
+    Left = 578
+    Top = 264
     Width = 73
     Height = 25
     Anchors = [akRight, akBottom]
@@ -19,12 +19,12 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
     Default = True
     TabOrder = 2
     OnClick = cmdOKClick
-    ExplicitLeft = 449
-    ExplicitTop = 218
+    ExplicitLeft = 441
+    ExplicitTop = 236
   end
   object cmdCancel: TButton
-    Left = 520
-    Top = 236
+    Left = 657
+    Top = 264
     Width = 73
     Height = 25
     Anchors = [akRight, akBottom]
@@ -32,14 +32,14 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
     Caption = 'Cancel'
     ModalResult = 2
     TabOrder = 3
-    ExplicitLeft = 528
-    ExplicitTop = 218
+    ExplicitLeft = 520
+    ExplicitTop = 236
   end
   object gbNewProjectDetails: TGroupBox
     Left = 9
     Top = 103
-    Width = 584
-    Height = 129
+    Width = 720
+    Height = 154
     Caption = 'New Project Details'
     TabOrder = 1
     object lblFileName: TLabel
@@ -48,63 +48,82 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
       Width = 76
       Height = 13
       Caption = '&New project ID:'
-      FocusControl = editKeyboardID
+      FocusControl = editProjectID
     end
     object lblProjectFilename: TLabel
-      Left = 16
-      Top = 102
+      Left = 15
+      Top = 126
       Width = 101
       Height = 13
       Caption = 'New project &filename'
       FocusControl = editProjectFilename
     end
     object lblPath: TLabel
-      Left = 16
-      Top = 75
+      Left = 15
+      Top = 99
       Width = 83
       Height = 13
       Caption = 'Destination &path:'
       FocusControl = editPath
     end
-    object editKeyboardID: TEdit
+    object lblSourceProjectLexicalModel: TLabel
+      Left = 15
+      Top = 48
+      Width = 531
+      Height = 13
+      Caption = 
+        'The source project appears to be a lexical model. The new projec' +
+        't ID must use the author.bcp47.uniq pattern.'
+    end
+    object lblSourceProjectKeyboard: TLabel
+      Left = 16
+      Top = 48
+      Width = 682
+      Height = 13
+      Caption = 
+        'The source project appears to be a keyboard project. The new pro' +
+        'ject ID must be a valid keyboard id pattern (alphanumeric and un' +
+        'derscore).'
+    end
+    object editProjectID: TEdit
       Left = 148
       Top = 21
       Width = 205
       Height = 21
       TabOrder = 0
-      OnChange = editKeyboardIDChange
+      OnChange = editProjectIDChange
     end
     object editProjectFilename: TEdit
-      Left = 148
-      Top = 99
-      Width = 429
+      Left = 147
+      Top = 123
+      Width = 564
       Height = 21
       TabStop = False
       ParentColor = True
       ReadOnly = True
       TabOrder = 4
-      OnChange = editKeyboardIDChange
+      OnChange = editProjectIDChange
     end
     object cmdBrowse: TButton
-      Left = 504
-      Top = 72
-      Width = 73
+      Left = 644
+      Top = 96
+      Width = 67
       Height = 21
       Caption = '&Browse...'
       TabOrder = 3
       OnClick = cmdBrowseClick
     end
     object editPath: TEdit
-      Left = 148
-      Top = 72
-      Width = 350
+      Left = 147
+      Top = 96
+      Width = 491
       Height = 21
       TabOrder = 2
-      OnChange = editPathChange
+      OnChange = editGitHubURLChange
     end
     object chkRelocateExternal: TCheckBox
-      Left = 148
-      Top = 48
+      Left = 147
+      Top = 72
       Width = 257
       Height = 17
       Caption = 'Relocate &external files into new project folder'
@@ -114,7 +133,7 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
   object gbSourceProjectDetails: TGroupBox
     Left = 8
     Top = 8
-    Width = 585
+    Width = 721
     Height = 89
     Caption = 'Source Project'
     TabOrder = 0
@@ -147,10 +166,10 @@ inherited frmCloneGitHubProjectParameters: TfrmCloneGitHubProjectParameters
     object editGitHubURL: TEdit
       Left = 149
       Top = 16
-      Width = 428
+      Width = 563
       Height = 21
       TabOrder = 0
-      OnChange = editPathChange
+      OnChange = editGitHubURLChange
     end
   end
 end

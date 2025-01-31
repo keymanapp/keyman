@@ -38,7 +38,7 @@ type
     lblFileName: TLabel;
     lblProjectFilename: TLabel;
     lblPath: TLabel;
-    editKeyboardID: TEdit;
+    editProjectID: TEdit;
     editProjectFilename: TEdit;
     cmdBrowse: TButton;
     editPath: TEdit;
@@ -47,30 +47,33 @@ type
     lblKeyboardName: TLabel;
     editSourceProjectFilename: TEdit;
     cmdBrowseSourceProject: TButton;
+    lblSourceProjectLexicalModel: TLabel;
+    lblSourceProjectKeyboard: TLabel;
     procedure cmdOKClick(Sender: TObject);
     procedure editSourceProjectFilenameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure editVersionChange(Sender: TObject);
     procedure editPathChange(Sender: TObject);
-    procedure editKeyboardIDChange(Sender: TObject);
+    procedure editProjectIDChange(Sender: TObject);
     procedure cmdBrowseClick(Sender: TObject);
     procedure cmdBrowseSourceProjectClick(Sender: TObject);
   private
     dlgBrowse: TBrowse4Folder;
     function GetBasePath: string;
-    function GetKeyboardID: string;
+    function GetProjectID: string;
     function Validate: Boolean;
     procedure EnableControls;
-    procedure SetKeyboardID(const Value: string);
     procedure UpdateProjectFilename;
     function GetProjectFilename: string;
     function GetSourceProjectFilename: string;
     function GetRelocateExternal: Boolean;
+    function IsSourceProjectALexicalModelProject: Boolean;
+    procedure UpdateSourceProjectNote;
   protected
     function GetHelpTopic: string; override;
   public
     property BasePath: string read GetBasePath;
-    property KeyboardID: string read GetKeyboardID write SetKeyboardID;
+    property ProjectID: string read GetProjectID;
     property ProjectFilename: string read GetProjectFilename;
     property SourceProjectFilename: string read GetSourceProjectFilename;
     property RelocateExternal: Boolean read GetRelocateExternal;
@@ -87,6 +90,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.System.KeyboardUtils,
+  Keyman.System.LexicalModelUtils,
   UfrmMain;
 
 {$R *.dfm}
@@ -126,6 +130,7 @@ begin
   dlgBrowse.Root := Desktop;
   dlgBrowse.Title := 'Select folder to save project to';
 
+  UpdateSourceProjectNote;
   EnableControls;
 end;
 
@@ -143,8 +148,15 @@ begin
   if dlgBrowseSourceProject.Execute then
   begin
     editSourceProjectFilename.Text := dlgBrowseSourceProject.Filename;
+    UpdateSourceProjectNote;
     EnableControls;
   end;
+end;
+
+procedure TfrmCloneLocalProjectParameters.UpdateSourceProjectNote;
+begin
+  lblSourceProjectLexicalModel.Visible := IsSourceProjectALexicalModelProject;
+  lblSourceProjectKeyboard.Visible := (editSourceProjectFilename.Text <> '') and not IsSourceProjectALexicalModelProject;
 end;
 
 procedure TfrmCloneLocalProjectParameters.cmdOKClick(Sender: TObject);
@@ -153,7 +165,7 @@ begin
     ModalResult := mrOk;
 end;
 
-procedure TfrmCloneLocalProjectParameters.editKeyboardIDChange(Sender: TObject);
+procedure TfrmCloneLocalProjectParameters.editProjectIDChange(Sender: TObject);
 begin
   UpdateProjectFilename;
   EnableControls;
@@ -162,6 +174,7 @@ end;
 procedure TfrmCloneLocalProjectParameters.editSourceProjectFilenameChange(Sender: TObject);
 begin
   EnableControls;
+  UpdateSourceProjectNote;
 end;
 
 procedure TfrmCloneLocalProjectParameters.editPathChange(Sender: TObject);
@@ -175,15 +188,31 @@ begin
   EnableControls;
 end;
 
+function TfrmCloneLocalProjectParameters.IsSourceProjectALexicalModelProject: Boolean;
+var
+  sourceId: string;
+begin
+  sourceId := ChangeFileExt(ExtractFileName(editSourceProjectFilename.Text), '').ToLower;
+  Result := TLexicalModelUtils.IsValidLexicalModelID(sourceId, False);
+end;
+
 procedure TfrmCloneLocalProjectParameters.EnableControls;
 var
   e: Boolean;
+  sourceId, id: string;
 begin
   e := (Trim(editSourceProjectFilename.Text) <> '') and
     FileExists(Trim(editSourceProjectFilename.Text)) and
     (Trim(editPath.Text) <> '') and
-    (Trim(editKeyboardID.Text) <> '') and
-    TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
+    (Trim(editProjectID.Text) <> '');
+
+  if e then
+  begin
+    id := Trim(editProjectID.Text);
+    if IsSourceProjectALexicalModelProject
+      then e := TLexicalModelUtils.IsValidLexicalModelID(id, True)
+      else e := TKeyboardUtils.IsValidKeyboardID(id, True);
+  end;
 
   cmdOK.Enabled := e;
 end;
@@ -198,9 +227,9 @@ begin
   Result := SHelpTopic_Context_CloneLocalProjectParameters;
 end;
 
-function TfrmCloneLocalProjectParameters.GetKeyboardID: string;
+function TfrmCloneLocalProjectParameters.GetProjectID: string;
 begin
-  Result := Trim(LowerCase(editKeyboardID.Text));
+  Result := Trim(LowerCase(editProjectID.Text));
 end;
 
 function TfrmCloneLocalProjectParameters.GetProjectFilename: string;
@@ -222,7 +251,9 @@ function TfrmCloneLocalProjectParameters.Validate: Boolean;
 var
   ProjectFolder: string;
 begin
-  Result := TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
+  if IsSourceProjectALexicalModelProject
+    then Result := TLexicalModelUtils.IsValidLexicalModelID(Trim(editProjectID.Text), True)
+    else Result := TKeyboardUtils.IsValidKeyboardID(Trim(editProjectID.Text), True);
 
   if Result then
   begin
@@ -232,7 +263,7 @@ begin
         Exit(False);
     end;
 
-    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editKeyboardID.Text;
+    ProjectFolder := IncludeTrailingPathDelimiter(editPath.Text) + editProjectID.Text;
     if DirectoryExists(ProjectFolder) then
     begin
       if MessageDlg('The project folder '+ProjectFolder+' already exists. Are you sure you want to overwrite it?', mtWarning,
@@ -242,18 +273,12 @@ begin
   end;
 end;
 
-procedure TfrmCloneLocalProjectParameters.SetKeyboardID(const Value: string);
-begin
-  editKeyboardID.Text := Value;
-  EnableControls;
-end;
-
 procedure TfrmCloneLocalProjectParameters.UpdateProjectFilename;
 begin
   editProjectFilename.Text :=
     IncludeTrailingPathDelimiter(BasePath) +
-    KeyboardID + PathDelim +
-    KeyboardID + Ext_ProjectSource;
+    ProjectID + PathDelim +
+    ProjectID + Ext_ProjectSource;
   // Scroll to the end of the control to show the filename
   editProjectFilename.Perform(EM_SETSEL, Length(editProjectFilename.Text), Length(editProjectFilename.Text));
   editProjectFilename.Perform(EM_SCROLLCARET, 0, 0);
