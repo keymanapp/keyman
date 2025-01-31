@@ -35,7 +35,11 @@ export class BuildKeyboardInfo extends BuildActivity {
     }
 
     const keyboard = project.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard);
-    const jsFilename = keyboard ? project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard) : null;
+
+    // If the project has more than one keyboard, we should not list any .js files (#12853)
+    const canListJsFile = project.files.filter(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard).length == 1;
+
+    const jsFilename = canListJsFile && keyboard ? project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard) : null;
     const historyPath = path.join(project.projectPath, KeymanFileTypes.HISTORY_MD);
     const lastCommitDate = getLastGitCommitDate(fs.existsSync(historyPath) ? historyPath : project.projectPath);
     const sources = {

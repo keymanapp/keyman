@@ -18,6 +18,7 @@ title: Keyman for iPhone and iPad 18.0 Help
 * [Using the Banner on the Keyboard](basic/using-the-banner)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
 * [Using a Keyboard](basic/keyboard-usage)
+* [Keyboard Gestures](context/gestures)
 * [Using the Menu](context/)
 * [Using the Settings Screen](basic/config/)
 * [Language Settings](basic/language-settings)

@@ -31,7 +31,7 @@ export function verifyCompilerMessagesObject(source: Record<string,any>, namespa
     // Verify each object member matches the pattern we expect
 
     if(typeof m[key] == 'function') {
-      const o = /^(Info|Hint|Warn|Error|Fatal)_([A-Za-z0-9_]+)$/.exec(key);
+      const o = /^(Debug|Verbose|Info|Hint|Warn|Error|Fatal)_([A-Za-z0-9_]+)$/.exec(key);
       expect(o).to.be.instanceOf(Array, `Expected member ${key} to be a valid message function name`);
 
       const c = o[1].toUpperCase() + '_' + o[2];
@@ -41,7 +41,7 @@ export function verifyCompilerMessagesObject(source: Record<string,any>, namespa
       expect(v.code).to.equal(m[c], `Function ${key} returns the wrong code`);
     }
     else if(typeof m[key] == 'number') {
-      const o = /^(INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
+      const o = /^(DEBUG|VERBOSE|INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
       expect(o).to.be.instanceOf(Array);
 
       const f = toTitleCase(o[1]) + '_' + o[2];
@@ -53,7 +53,7 @@ export function verifyCompilerMessagesObject(source: Record<string,any>, namespa
     // Verify severify masks
 
     if(typeof m[key] == 'number') {
-      const o = /^(INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
+      const o = /^(DEBUG|VERBOSE|INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
       expect(o).to.be.instanceOf(Array);
 
       const mask = CompilerError.formatSeverity(m[key]).toUpperCase();

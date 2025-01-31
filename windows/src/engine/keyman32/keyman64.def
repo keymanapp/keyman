@@ -17,6 +17,7 @@ EXPORTS
       TIPActivateEx
       TIPActivateKeyboard
 			TIPProcessKey
+      TIPProcessKeyEx
       TIPIsKeymanRunning
       GetKeyboardPreservedKeys
 
