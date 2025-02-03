@@ -115,7 +115,7 @@ async function generate(generator: KeymanCompiler, ids: string | string[], comma
   const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
 
   const callbacks = new NodeCompilerCallbacks(options);
-  if(!await doGenerate(callbacks, generator, commanderOptions)) {
+  if(!await doGenerate(callbacks, generator, options)) {
     return await exitProcess(1);
   }
 }
