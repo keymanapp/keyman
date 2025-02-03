@@ -678,6 +678,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     SentryManager.breadcrumb(message, sentryLevel: .debug)
 
+    // Overwrites the baseline "embeddingApp" text available before Web engine init with the
+    // active bundle identifier.
+    webView!.evaluateJavaScript("setHostAppName(\"\(Bundle.main.infoDictionary!["CFBundleIdentifier"]!)\")")
+
     self.setSentryState()
     resizeKeyboard()
 
