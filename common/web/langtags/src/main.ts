@@ -114,7 +114,7 @@ function preinit(): void {
  * @returns LangTag or undefined if not found
  */
 function getLangtagByTag(tag: string): LangTag {
-  return langtagsByTag.get(tag.toLowerCase());
+  return langtagsByTag.get(tag?.toLowerCase());
 }
 
 preinit();
