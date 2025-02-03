@@ -184,5 +184,12 @@ export class PackageCompilerMessages {
   static Warn_VisualKeyboardFileIsInvalid = (o:{filename: string}) => m(
     this.WARN_VisualKeyboardFileIsInvalid, `Visual keyboard file '${def(o.filename)}' is invalid.`
   );
+
+  static WARN_PackageVersionIsUnrecognizedFormat = SevWarn | 0x0027;
+  static Warn_PackageVersionIsUnrecognizedFormat = (o:{version: string}) => m(
+    this.WARN_PackageVersionIsUnrecognizedFormat, `Package version '${def(o.version)}' has an unrecognized format.`,
+    `The format for version numbers should be number[.number[.number]]. Each
+    number component should be an integer, without leading zeroes.`
+  );
 }
 
