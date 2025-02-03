@@ -18,16 +18,33 @@ describe('Test of KMX Plus file', () => {
       it('can construct a Strs', () => {
         const strs = new Strs();
         assert.isNotNull(strs);
-        assert.deepEqual(strs.strings, [ new StrsItem('') ]);
+        assert.deepEqual(strs.strings, [new StrsItem('')]);
         assert.deepEqual(strs.allProcessedStrings, new Set<string>());
       });
     });
     describe('Test of allocString()', () => {
-      it('can allocate a one-character StrsItem', () => {
+      it('can allocate a one-character string', () => {
         const strs = new Strs();
         strs['processString'] = stubStrsProcessString;
         const csi = strs.allocString("𐌰", { singleOk: true });
         assert.deepEqual(csi, GOTHIC_A);
+      });
+      it('can allocate an unknown string', () => {
+        const strs = new Strs();
+        strs['processString'] = stubStrsProcessString;
+        const si = strs.allocString("𐌰𐌱𐌲");
+        assert.deepEqual(si, new StrsItem("𐌰𐌱𐌲"));
+        assert.deepEqual(strs.strings, [new StrsItem(''), new StrsItem("𐌰𐌱𐌲")]);
+      });
+      it('can allocate a known string', () => {
+        const strs = new Strs();
+        strs['processString'] = stubStrsProcessString;
+        const one = strs.allocString("𐌰𐌱𐌲");
+        assert.deepEqual(one, new StrsItem("𐌰𐌱𐌲"));
+        assert.deepEqual(strs.strings, [new StrsItem(''), new StrsItem("𐌰𐌱𐌲")]);
+        const two = strs.allocString("𐌰𐌱𐌲");
+        assert.isTrue(two === one);
+        assert.deepEqual(strs.strings, [new StrsItem(''), new StrsItem("𐌰𐌱𐌲")]);
       });
     });
   });
