@@ -1,4 +1,10 @@
+import Sentry from "@sentry/node";
+import * as process from "node:process";
 import { SentryNodeOptions } from "@keymanapp/developer-utils";
+
+Sentry.setContext('Command Line', {
+  argv: process.argv.join(' ')
+});
 
 /**
  * Rewrites sourcemap paths for the esbuild distribution of kmc (as used in
