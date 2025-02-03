@@ -146,7 +146,6 @@ begin
 
   if DoStartWithWindows then kmcom.Options['koStartWithWindows'].Value := True; // I2753
   if DoCheckForUpdates then kmcom.Options['koCheckForUpdates'].Value := True;  // I2753
-  if DoAutomaticUpdates then kmcom.Options['koAutomaticUpdate'].Value := True;
   if DoAutomaticallyReportUsage then kmcom.Options['koAutomaticallyReportUsage'].Value := True;
 
 
