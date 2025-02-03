@@ -143,7 +143,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koStartWithWindows" Version="7.0.230.0" Description="Startup options - Start Keyman with Windows start">[!!Šţářţ ŵĥēń Ŵīŋďơŵš ŝŧâřťš!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowStartup" Version="7.0.230.0" Description="Startup options - show/hide splash screen">[!!Ŝĥơŵ ŝƥļąšħ šćŕęȅņ!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowWelcome" Version="7.0.230.0" Description="Startup options - show/hide welcome screen">[!!Šħơŵ ŵěļĉōmė şĉŕĕěņ!!]</String>
-<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koCheckForUpdates" Version="7.0.230.0" Description="Startup options - check online weekly for updates">[!!Āűŧőmȁŧĩĉáĺłŷ ćħȅčķ ķěɏmąń.čőm ŵȅėķļȳ ƒőŗ ūƿđȃťėŝ!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koTestKeymanFunctioning" Version="7.0.236.0" Description="Startup options - test for conflicting apps when Product starts">[!!Ţēśŧ ƒőŗ ćōńƒłĭćţıņġ ȃƥƿŀīčäťīōňş ŵĥēƞ !!]&Name;[!! şťǻřţš!!]</String>
 
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koReleaseShiftKeysAfterKeyPress" Version="7.0.236.0" Description="OSK options - Releases shift/ctrl/alt on OSK after key press">[!!Ŕěŀęàšĕ Şĥıƒţ/Ĉţřŀ/Ȁľŧ ōň Őņ Ŝčŗėěń Ķēŷƃơâŕđ ȃƒţēŕ ćŀĭċĸīňģ å ĸȅȳ!!]</String>
