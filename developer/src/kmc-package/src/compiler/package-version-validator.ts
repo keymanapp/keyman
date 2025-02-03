@@ -116,7 +116,7 @@ export class PackageVersionValidator {
 }
 
 function isValidVersionNumber(version: string) {
-  return /^[0-9]+(\.(0|[1-9]+[0-9]*)){0,2}$/.test(version);
+  return /^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*)){0,2}$/.test(version);
 }
 
 export const unitTestEndpoints = {

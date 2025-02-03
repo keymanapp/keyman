@@ -52,6 +52,7 @@ describe('package versioning', function () {
       '9',
       '0',
     ], badVersions = [
+      '0001',
       '0.1m',
       '2.3.4.5',
       '1.03.4',
