@@ -1,6 +1,6 @@
 import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
 
-import { ClassicalDistanceCalculation } from './classical-calculation.js';
+import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
@@ -29,6 +29,18 @@ function textToCharTransforms(text: string, transformId?: number) {
   }
 
   return perCharTransforms;
+}
+
+export function getEditPathLastMatch(editPath: EditOperation[]) {
+  const editLength = editPath.length;
+  // Special handling: appending whitespace to whitespace with the default wordbreaker.
+  // The default wordbreaker currently adds an empty token after whitespace; this would
+  // show up with 'substitute', 'match' at the end of the edit path.  (This should remain.)
+  if(editLength >= 2 && editPath[editLength - 2] == 'substitute' && editPath[editLength - 1] == 'match') {
+    return editPath.lastIndexOf('match', editLength - 2);
+  } else {
+    return editPath.lastIndexOf('match');
+  } 
 }
 
 export class TrackedContextSuggestion {
@@ -354,14 +366,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     let editPath = mapping.editPath();
     const firstMatch = editPath.indexOf('match');
-    let lastMatch = editPath.lastIndexOf('match');
-
-    // Special handling: appending whitespace to whitespace with the default wordbreaker.
-    // The default wordbreaker currently adds an empty token after whitespace; this would
-    // show up with 'substitute', 'match' at the end of the edit path.
-    if(editPath.length >= 2 && editPath[editPath.length - 2] == 'substitute' && editPath[editPath.length - 1] == 'match') {
-      lastMatch = editPath.lastIndexOf('match', editPath.length - 2);
-    }
+    const lastMatch = getEditPathLastMatch(editPath);
 
     // Assertion:  for a long context, the bulk of the edit path should be a
     // continuous block of 'match' entries.  If there's anything else in
@@ -451,17 +456,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       // transform as part of the input when doing correction-search.
       let primaryInput = hasDistribution ? tokenDistribution[0]?.sample : null;
 
-      // If the incoming token has text but we have no transform to match it with,
-      // abort the matching attempt.  We can't match this case well yet.
-      // These cases are generally infrequent enough to be low-ROI, not worth the
-      // investment to optimize further.  (Doing so isn't the simplest.)
-      //
-      // This may happen if tokenization for pre-existing text changes due to incoming
-      // input - refer to #12494 for an example case.
+      // If the incoming token has text but we have no transform (or 'insert') to match
+      // it with, abort the matching attempt.  We can't match this case well yet.
       if(editPath[i] != 'delete') {
         if(!incomingToken) {
           return null;
-        } else if(!primaryInput && incomingToken?.text != '') {
+        } else if(!(primaryInput || editPath[i] == 'insert' ) && incomingToken?.text != '') {
           return null;
         }
       }
@@ -477,7 +477,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       // Note:  will need a either a different approach or more specialized
       // handling if/when supporting phrase-level (multi-token) suggestions.
       if(!isLastToken) {
-        preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput) : primaryInput;
+        preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
       }
       const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
 
@@ -565,6 +565,11 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // we know to properly relocate the `f` and `l` transforms?
           if(primaryInput) {
             pushedToken.transformDistributions = tokenDistribution ? [tokenDistribution] : [];
+          } else if(incomingToken.text) {
+            // We have no transform data to match against an inserted token with text; abort!
+            // Refer to #12494 for an example case; we currently can't map previously-committed
+            // input transforms to a newly split-off token.
+            return null;
           }
           pushedToken.isWhitespace = incomingToken.isWhitespace;
 

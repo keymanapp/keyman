@@ -1,6 +1,6 @@
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 
-type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'transpose-start' | 'transpose-end' | 'transpose-insert' | 'transpose-delete';
+export type EditOperation = 'insert' | 'delete' | 'match' | 'substitute' | 'transpose-start' | 'transpose-end' | 'transpose-insert' | 'transpose-delete';
 
 /**
  * Represents the lowest-level unit for comparison during edit-distance calculations.
