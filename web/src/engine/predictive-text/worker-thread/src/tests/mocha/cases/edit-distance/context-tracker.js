@@ -35,6 +35,8 @@ describe('ContextTracker', function() {
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
+      assert.equal(newContextMatch.headTokensRemoved, 1);
+      assert.equal(newContextMatch.tailTokensAdded, 0);
     });
 
     it("properly matches and aligns when lead token + following whitespace are removed", function() {
@@ -53,6 +55,8 @@ describe('ContextTracker', function() {
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
+      assert.equal(newContextMatch.headTokensRemoved, 2);
+      assert.equal(newContextMatch.tailTokensAdded, 0);
     });
 
     it("properly matches and aligns when final token is edited", function() {
@@ -72,6 +76,8 @@ describe('ContextTracker', function() {
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 0);
     });
 
     // Needs improved context-state management (due to 2x tokens)
@@ -99,6 +105,31 @@ describe('ContextTracker', function() {
       let state = newContextMatch?.state;
       assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
       assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 2);
+    });
+
+    it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
+      let existingContext = models.tokenize(defaultBreaker, {
+        left: "an apple a day keeps the doctor "
+      });
+      let transform = {
+        insert: '',
+        deleteLeft: 1
+      }
+      let newContext = models.tokenize(defaultBreaker, {
+        left: "an apple a day keeps the doctor"
+      });
+      let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
+
+      let baseContextMatch = ContextTracker.modelContextState(existingContext.left);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      assert.isOk(newContextMatch?.state);
+      assert.deepEqual(newContextMatch?.state.tokens.map(token => token.raw), rawTokens);
+
+      // The 'wordbreak' transform
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 0);
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
@@ -124,6 +155,9 @@ describe('ContextTracker', function() {
       let state = newContextMatch.state;
       assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
       assert.isNotEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
+
+      assert.equal(newContextMatch.headTokensRemoved, 0);
+      assert.equal(newContextMatch.tailTokensAdded, 1);
     })
 
     // Needs improved context-state management (due to 2x tokens)
@@ -151,6 +185,9 @@ describe('ContextTracker', function() {
       let state = newContextMatch.state;
       assert.isNotEmpty(state.tokens[state.tokens.length - 2].transformDistributions);
       assert.isEmpty(state.tokens[state.tokens.length - 1].transformDistributions);
+
+      assert.equal(newContextMatch.headTokensRemoved, 2);
+      assert.equal(newContextMatch.tailTokensAdded, 2);
     });
 
     it('rejects hard-to-handle case: tail token is split into three rather than two', function() {
