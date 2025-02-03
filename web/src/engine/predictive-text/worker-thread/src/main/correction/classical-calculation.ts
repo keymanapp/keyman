@@ -206,12 +206,15 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
     if(ops) {
       // bypass the ladder.
+    } else if(insertParentCost == currentCost - 1) {
+      // check 'insert' BEFORE 'substitute' - we categorize the path in reverse,
+      // and we want 'insert's to appear after 'substitute's at the path's tail,
+      // the part that matters most.
+      ops = ['insert'];
+      parent = [row, col-1];
     } else if(substitutionParentCost == currentCost - 1) {
         ops = ['substitute'];
       parent = [row-1, col-1];
-    } else if(insertParentCost == currentCost - 1) {
-      ops = ['insert'];
-      parent = [row, col-1];
     } else if(deleteParentCost == currentCost - 1) {
       ops = ['delete'];
       parent = [row-1, col];

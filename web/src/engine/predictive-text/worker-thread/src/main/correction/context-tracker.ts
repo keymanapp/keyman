@@ -353,20 +353,6 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     );
 
     let editPath = mapping.editPath();
-
-    // When the context has but three tokens, the path algorithm tends to invert
-    // 'insert' and 'substitute' from our preferred ordering for them.
-    // Logically, either order makes sense... but logic for other cases is
-    // far simpler if we have 'substitute' before 'insert'.
-    if(editPath.length == 3 && editPath[0] == 'insert' && editPath[1] == 'insert' && editPath[2] == 'substitute') {
-      editPath[0] = 'substitute';
-      editPath[2] = 'insert';
-    } else if(editPath.length == 2 && editPath[0] == 'insert' && editPath[1] == 'substitute') {
-      // This path may be reachable for languages without space-based wordbreaking.
-      editPath[0] = 'substitute';
-      editPath[1] = 'insert';
-    } 
-
     const firstMatch = editPath.indexOf('match');
     let lastMatch = editPath.lastIndexOf('match');
 
