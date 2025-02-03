@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.183 alpha 2025-02-03
+
+* change(ios): set host-app bundle identifier in embedded Web debug-report (#13105)
+* fix(ios): prevent message-handler collision (#13037)
+* change(web): add context tracker bksp handling, alignment-offset calculations (#12911)
+* fix(web): correct edit-path ordering at source (#12925)
+* fix(web): correctly track context transitions caused by applying suggestions (#12927)
+* chore(linux): preserve log files when running tests under Docker (#13107)
+
 ## 18.0.182 alpha 2025-01-31
 
 * feat(windows): report on processor type in tsysinfo (#13084)
