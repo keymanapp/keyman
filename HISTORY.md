@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.184 alpha 2025-02-04
+
+* fix(common): handle undefined input in `@keymanapp/langtags` lookups (#13117)
+* chore: update docs to reference node 20.0 (#13124)
+* feat(developer): include command line in kmc sentry reports (#13113)
+* fix(common/web): replace invalid StrsItem identity checks with isEqual() (#13122)
+
 ## 18.0.183 alpha 2025-02-03
 
 * change(ios): set host-app bundle identifier in embedded Web debug-report (#13105)
