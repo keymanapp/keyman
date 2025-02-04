@@ -124,9 +124,27 @@ export async function buildLdmlRegressionData(regressionDirectory: string, _opti
       let needMod = constants.keys_mod_none;
       if (!event.key.shiftstate) {
         needMod = constants.keys_mod_none;
-      } else if (event.key.shiftstate.shift === '') {
-        needMod = constants.keys_mod_shift;
-      } // TODO: others
+      } else {
+        // see RegressionTest.pas
+        if (event.key.shiftstate.shift === '') {
+          needMod |= constants.keys_mod_shift;
+        }
+        if (event.key.shiftstate.ctrl === '') {
+          needMod |= constants.keys_mod_ctrl;
+        }
+        if (event.key.shiftstate.rctrl === '') {
+          needMod |= constants.keys_mod_ctrlR;
+        }
+        if (event.key.shiftstate.alt === '') {
+          needMod |= constants.keys_mod_alt;
+        }
+        if (event.key.shiftstate.altgr === '') {
+          needMod |= constants.keys_mod_altR; // == altgr
+        }
+        if (event.key.shiftstate.caps === '') {
+          needMod |= constants.keys_mod_caps;
+        }
+      }
 
       const foundKeys = kmx.kmxplus.keys.kmap.filter(({vkey, mod}) => (vkey == vkid && mod == needMod));
 
