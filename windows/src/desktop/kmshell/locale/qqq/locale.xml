@@ -139,6 +139,7 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koAltGrCtrlAlt" Version="7.0.230.0" Description="General options - Ctrl+Alt simulates AltGr on computers without AltGr">[!!Şīmũŀàťȇ ĄŀťĞř ŵīţĥ Ćţřľ+Āĺŧ!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koDeadkeyConversion" Version="9.0.480.0" Description="Advanced options - Base keyboard deadkeys are treated as normal keys">[!!Ťŕėāţ ħȁŗđŵāřĕ ďěãđĸęŷş ǻş ƥľȃįŋ ĸēɏş!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowHints" Version="7.0.244.0" Description="General options - show/hide hint messages (resets hint messages individually disabled)">[!!Ŝĥőŵ ĥĩŉţ měššàĝȇś!!]</String>
+<String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koCheckForUpdates" Version="7.0.230.0" Description="General options - automatically check for updates and download">[!!Āűŧőmȁŧĩĉáĺłŷ ćħȅčķ ƒőŗ ūƿđȃťėŝ àńď đōŵŉłőǻđ!!]</String>
 
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koStartWithWindows" Version="7.0.230.0" Description="Startup options - Start Keyman with Windows start">[!!Šţářţ ŵĥēń Ŵīŋďơŵš ŝŧâřťš!!]</String>
 <String Group="Configuration Dialog - Options tab" Type="FormatString" Id="koShowStartup" Version="7.0.230.0" Description="Startup options - show/hide splash screen">[!!Ŝĥơŵ ŝƥļąšħ šćŕęȅņ!!]</String>
