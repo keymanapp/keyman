@@ -3,7 +3,15 @@ import * as process from "node:process";
 import { SentryNodeOptions } from "@keymanapp/developer-utils";
 
 Sentry.setContext('Command Line', {
-  argv: process.argv.join(' ')
+  // obfusate parameters with longer paths e.g. from 'c:/users/name/a/b' to
+  // '…/a/b' to minimize PII risk without losing all command line data.
+  // Also normalizes backslashes to slashes for simplicity.
+  argv: process.argv.map(param => {
+    const p = param.replaceAll('\\', '/').split('/');
+    return (p.length < 3)
+      ? param
+      : ("…/" + p.slice(-2).join('/'));
+  }).join(' ')
 });
 
 /**
