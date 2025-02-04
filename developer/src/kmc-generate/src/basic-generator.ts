@@ -6,7 +6,9 @@
 
 import { KeymanTargets } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { getLangtagByTag } from "@keymanapp/langtags";
 import { AbstractGenerator, GeneratorArtifacts } from "./abstract-generator.js";
+import { GeneratorMessages } from "./generator-messages.js";
 
 /**
  * @internal
@@ -28,7 +30,19 @@ export class BasicGenerator extends AbstractGenerator {
     this.languageTags = this.options.languageTags.length
       ? this.options.languageTags.map(tag => new Intl.Locale(tag).minimize().toString())
       : [this.DEFAULT_LOCALE];
-    //TODO-GENERATE: validate targets
+
+    // Verify that targets passed in are valid
+    let failed = false;
+    for(const target of this.options.targets) {
+      if(!KeymanTargets.AllKeymanTargets.includes(target)) {
+        this.callbacks.reportMessage(GeneratorMessages.Error_InvalidTarget({target}));
+        failed = true;
+      }
+    }
+    if(failed) {
+      return false;
+    }
+
     if(this.options.targets.includes(KeymanTargets.KeymanTarget.any) || this.options.targets.length == 0) {
       this.resolvedTargets = KeymanTargets.AllKeymanTargets.filter(target => target != KeymanTargets.KeymanTarget.any);
     } else {
@@ -50,6 +64,8 @@ export class BasicGenerator extends AbstractGenerator {
       dt.getDate().toString().padStart(2, '0');
     this.tokenMap['$PACKAGE_LANGUAGES'] = this.generateLanguageListForPackage();
     this.tokenMap['$PLATFORMS_DOTLIST_README'] = this.getPlatformDotListForReadme();
+
+    return true;
   }
 
   protected generate(artifacts: GeneratorArtifacts): boolean {
@@ -57,8 +73,12 @@ export class BasicGenerator extends AbstractGenerator {
   }
 
   private getLanguageName(tag: string) {
-    // TODO-GENERATE: probably need to use langtags.json
-    return new Intl.Locale(tag).language;
+    const langtag = getLangtagByTag(tag);
+    if(!langtag) {
+      // Fallback to Intl.Locale, probably will be undefined
+      return new Intl.Locale(tag).language;
+    }
+    return langtag.name;
   }
 
   private generateLanguageListForPackage(): string {
@@ -89,6 +109,8 @@ export class BasicGenerator extends AbstractGenerator {
     sourceFile = this.callbacks.path.join(this.templateBasePath, this.templatePath, sourceFile);
 
     const sourceData = this.callbacks.loadFile(sourceFile);
+
+    /* c8 ignore next 4 */
     if(sourceData == null) {
       // internal error -- source file should be readable
       throw new Error(`source file ${sourceFile} does not exist`);

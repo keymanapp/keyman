@@ -1,5 +1,5 @@
 ---
-title: Software Task - Update Keyman
+title: Software Task - Update Keyman for Windows
 ---
 
 ## Check for Updates Automatically

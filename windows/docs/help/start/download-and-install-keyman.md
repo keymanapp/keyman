@@ -1,5 +1,5 @@
 ---
-title: How To - Download and Install Keyman
+title: How To - Download and Install Keyman on Windows
 ---
 
 ## Downloading Keyman

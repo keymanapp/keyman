@@ -179,7 +179,7 @@ if [ "$action" == "commit" ]; then
     # In order to avoid potential git conflicts, we run the history collater
     # again on the master HISTORY.md. Note that the script always exits 1 to
     # indicate it hasn't updated VERSION.md. We could tweak that in the future.
-    node resources/build/version/lib/index.js history --no-write-github-comment --github-pr -t "$GITHUB_TOKEN" -b "$base" || true
+    node resources/build/version/build/src/index.js history --no-write-github-comment --github-pr -t "$GITHUB_TOKEN" -b "$base" || true
 
     # If HISTORY.md has been updated, then we want to create a branch and push
     # it for review
@@ -192,7 +192,7 @@ if [ "$action" == "commit" ]; then
       git commit -m "$message (history cherry-pick to master)"
       # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
       # label
-      hub pull-request -f --no-edit -b master
+      hub pull-request -fp --no-edit
     fi
 
     # Return to our best working branch

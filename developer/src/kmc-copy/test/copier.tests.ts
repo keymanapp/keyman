@@ -13,6 +13,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanProjectCopier } from '../src/KeymanProjectCopier.js';
 import { makePathToFixture } from './helpers/index.js';
 import { GitHubRef } from './cloud.js';
+import { KpsFileReader } from '@keymanapp/developer-utils';
 
 const { TEST_SAVE_ARTIFACTS, TEST_SAVE_FIXTURES } = env;
 let outputRoot: string = '/an/imaginary/root/';
@@ -269,8 +270,8 @@ describe('KeymanProjectCopier', function() {
       "/release/j/jawa/source/jawa2.bmp": "source/jawa2.bmp",
       "/release/j/jawa/source/readme.htm": "source/readme.htm",
       "/release/j/jawa/source/welcome/welcome.htm": "source/welcome/welcome.htm",
-      "/release/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf": "external/release/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf",
-      "/release/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf": "external/release/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf",
+      "/release/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf": "external/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf",
+      "/release/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf": "external/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf",
       // NOTE: the following files are not included because this is a 1.0
       // project and they are not referenced by any files:
       // * HISTORY.md
@@ -306,7 +307,6 @@ describe('KeymanProjectCopier', function() {
       assert.isTrue(await copier.init(callbacks, {
         dryRun: false,
         outPath,
-        // TODO-COPY rename: false,
       }));
 
       const result = await copier.run(fullSource);
@@ -316,7 +316,7 @@ describe('KeymanProjectCopier', function() {
       //
 
       assert.isOk(result);
-      assert.isEmpty(callbacks.messages);
+      assert.isEmpty(callbacks.filteredMessages());
 
       if(TEST_SAVE_ARTIFACTS) {
         assert.isTrue(await copier.write(result.artifacts));
@@ -370,7 +370,6 @@ describe('KeymanProjectCopier', function() {
     assert.isTrue(await copier.init(callbacks, {
       dryRun: false,
       outPath,
-      // TODO-COPY rename: false,
     }));
 
     // armenian_mnemonic selected because (a) small, and (b) has v2.0 project, so
@@ -379,7 +378,7 @@ describe('KeymanProjectCopier', function() {
 
     // We should have no messages and a successful result
     assert.isOk(result);
-    assert.isEmpty(callbacks.messages);
+    assert.isEmpty(callbacks.filteredMessages());
 
     // TODO-COPY: verify outcome using pattern above
 
@@ -400,14 +399,13 @@ describe('KeymanProjectCopier', function() {
       assert.isTrue(await copier.init(callbacks, {
         dryRun: false,
         outPath,
-        // TODO-COPY rename: false,
       }));
 
       const result = await copier.run('cloud:'+id);
 
       // We should have no messages and a successful result
       assert.isOk(result);
-      assert.isEmpty(callbacks.messages);
+      assert.isEmpty(callbacks.filteredMessages());
 
       // TODO-COPY: verify outcome using pattern above
 
@@ -492,8 +490,138 @@ describe('KeymanProjectCopier', function() {
     });
   }));
 
+  it('should copy a disorganized project into current structure', async function() {
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {
+      dryRun: false,
+      outPath: 'organized',
+    }));
+
+    const result = await copier.run(makePathToFixture('projects','disorganized','alephwithbeth.kpj'));
+    assert.sameMembers(Object.keys(result.artifacts).map(k => result.artifacts[k].filename), [
+      'organized', // kmc-copy:outputPath
+      'organized/organized.kpj',
+      'organized/HISTORY.md',
+      'organized/LICENSE.md',
+      'organized/README.md',
+      // primary source files get moved to 'source/'
+      'organized/source/organized.kps',
+      'organized/source/organized.kmn',
+      'organized/source/organized.ico',
+      'organized/source/organized.kvks',
+      // files in 'other/' get moved to 'source/other/'
+      'organized/source/other/organized.keyman-touch-layout',
+      'organized/source/other/readme.htm',
+      'organized/source/other/welcome/welcome.htm',
+      'organized/source/other/welcome/KeyboardLayout.png',
+      'organized/source/other/welcome/KeyboardLayoutAlt.png',
+      'organized/source/other/welcome/KeyboardLayoutShift.png',
+      // build artifact files get moved to build/
+      'organized/build/organized.js',
+      'organized/build/organized.kvk',
+      'organized/build/organized.kmx',
+      // 'organized/build/organized.kmp', // TODO-COPY: do we need to copy this file as well?
+    ]);
+  });
+
+  it('should copy external files into an "external" folder when relocateExternalFiles is true', async function() {
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {
+      dryRun: false,
+      outPath: 'organized',
+      relocateExternalFiles: true,
+    }));
+
+    const result = await copier.run(makePathToFixture('projects','external','alephwithbeth','alephwithbeth.kpj'));
+    assert.sameMembers(Object.keys(result.artifacts).map(k => result.artifacts[k].filename), [
+      'organized', // kmc-copy:outputPath
+      'organized/source/organized.keyman-touch-layout',
+      'organized/source/organized.kmn',
+      'organized/source/organized.ico',
+      'organized/source/organized.kvks',
+      'organized/source/organized.kps',
+      'organized/source/readme.htm',
+      // files in 'another-folder/' get moved to 'external/'
+      'organized/external/another-folder/welcome/welcome.htm',
+      'organized/external/another-folder/welcome/KeyboardLayout.png',
+      'organized/external/another-folder/welcome/KeyboardLayoutAlt.png',
+      'organized/external/another-folder/welcome/KeyboardLayoutShift.png',
+      // build artifact files get moved to build/
+      'organized/build/organized.js',
+      'organized/build/organized.kvk',
+      'organized/build/organized.kmx',
+      // 'organized/build/organized.kmp', // TODO-COPY: do we need to copy this file as well?
+      'organized/LICENSE.md',
+      'organized/organized.kpj',
+      'organized/HISTORY.md',
+      'organized/README.md',
+      'organized/source/help/organized.php',
+      'organized/source/help/KeyboardLayout.png',
+      'organized/source/help/KeyboardLayoutAlt.png',
+      'organized/source/help/KeyboardLayoutShift.png',
+    ]);
+
+    // Verify that .kps has the appropriate paths
+    const reader = new KpsFileReader(callbacks);
+    const kpsFilename = Object.keys(result.artifacts).find(k => result.artifacts[k].filename == 'organized/source/organized.kps')!;
+    const kps = reader.read(result.artifacts[kpsFilename].data);
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../external/another-folder/welcome/welcome.htm'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../external/another-folder/welcome/KeyboardLayout.png'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../external/another-folder/welcome/KeyboardLayoutAlt.png'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../external/another-folder/welcome/KeyboardLayoutShift.png'));
+  });
+
+  it('should leave external files in their original location when relocateExternalFiles is false', async function() {
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {
+      dryRun: false,
+      outPath: 'organized',
+      relocateExternalFiles: false,
+    }));
+
+    const result = await copier.run(makePathToFixture('projects','external','alephwithbeth','alephwithbeth.kpj'));
+    assert.sameMembers(Object.keys(result.artifacts).map(k => result.artifacts[k].filename), [
+      'organized', // kmc-copy:outputPath
+      'organized/source/organized.keyman-touch-layout',
+      'organized/source/organized.kmn',
+      'organized/source/organized.ico',
+      'organized/source/organized.kvks',
+      'organized/source/organized.kps',
+      'organized/source/readme.htm',
+
+      // files in 'another-folder/' stay there, so they are not referenced
+      // 'organized/external/welcome.htm',
+      // 'organized/external/KeyboardLayout.png',
+      // 'organized/external/KeyboardLayoutAlt.png',
+      // 'organized/external/KeyboardLayoutShift.png',
+
+      // build artifact files get moved to build/
+      'organized/build/organized.js',
+      'organized/build/organized.kvk',
+      'organized/build/organized.kmx',
+      // 'organized/build/organized.kmp', // TODO-COPY: do we need to copy this file as well?
+      'organized/LICENSE.md',
+      'organized/organized.kpj',
+      'organized/HISTORY.md',
+      'organized/README.md',
+      'organized/source/help/organized.php',
+      'organized/source/help/KeyboardLayout.png',
+      'organized/source/help/KeyboardLayoutAlt.png',
+      'organized/source/help/KeyboardLayoutShift.png',
+    ]);
+
+    // we'll check the .kps for its references, these are relative to the test/organized/source? folder
+    const reader = new KpsFileReader(callbacks);
+    const kpsFilename = Object.keys(result.artifacts).find(k => result.artifacts[k].filename == 'organized/source/organized.kps')!;
+    const kps = reader.read(result.artifacts[kpsFilename].data);
+
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../../../test/fixtures/projects/external/another-folder/welcome/welcome.htm'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../../../test/fixtures/projects/external/another-folder/welcome/KeyboardLayout.png'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../../../test/fixtures/projects/external/another-folder/welcome/KeyboardLayoutAlt.png'));
+    assert.isDefined(kps.Package.Files?.File.find(file => file.Name == '../../../test/fixtures/projects/external/another-folder/welcome/KeyboardLayoutShift.png'));
+  });
+
   // TODO-COPY: additional tests
-  it.skip('should copy a disorganized project into current structure', async function() {});
   it.skip('should copy a standalone .kmn into a new project', async function() {});
   it.skip('should copy a standalone .kmn and .kps into a new project', async function() {});
 });

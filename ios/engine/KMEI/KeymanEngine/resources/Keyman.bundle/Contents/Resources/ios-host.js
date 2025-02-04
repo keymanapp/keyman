@@ -149,6 +149,11 @@ function setKeymanLanguage(stub) {
     });
 }
 
+function setHostAppName(name) {
+    // Sentry will capture this in a breadcrumb for Web errors.
+    keyman.config.embeddingApp = name;
+}
+
 var fragmentToggle = 0;
 /**
  * Inserts the selected string <i>s</i>

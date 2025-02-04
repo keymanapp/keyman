@@ -139,9 +139,9 @@ private:
 //
 
 typedef HRESULT(WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);   // I3567
-// Adding a new interface call IsTextSelected could make sense however this would
-// also require update TIPProcessKey to have another call back function as an argument
-typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);   // I3567
+
+typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);   // I3567
+typedef HRESULT(WINAPI *PKEYMANGETCONTEXTISSELECTEDFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
 
 class Keyman32Interface {
 public:
@@ -154,6 +154,9 @@ public:
 
   static BOOL TIPProcessKey(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
     PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved);
+
+  static BOOL TIPProcessKeyEx(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
+    PKEYMANGETCONTEXTISSELECTEDFUNC ctfunc, BOOL Updateable, BOOL Preserved);
 
   static BOOL GetKeyboardPreservedKeys(PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 

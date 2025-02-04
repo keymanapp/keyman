@@ -99,6 +99,7 @@ type
      * @returns True  if the Keyman is ready to install.
      *)
     function ReadyToInstall: Boolean;
+    function IsInstallingState: Boolean;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState: TUpdateState;
@@ -567,10 +568,15 @@ function TUpdateStateMachine.ReadyToInstall: Boolean;
 begin
   if not IsCurrentStateAssigned then
     Exit(False);
-  if (CurrentState.ClassName = 'WaitingRestartState') and not HasKeymanRun then
+  if (CurrentState is WaitingRestartState) and not HasKeymanRun then
     Result := True
   else
     Result := False;
+end;
+
+function TUpdateStateMachine.IsInstallingState: Boolean;
+begin
+  Result := (CurrentState is InstallingState);
 end;
 
 // base implmentation to be overiden
@@ -767,6 +773,7 @@ begin
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
     'Error Updates not downloaded after 3 attempts');
+    bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
   else
@@ -996,17 +1003,28 @@ function InstallingState.DoInstallPackage(PackageFileName: String): Boolean;
 var
   FPackage: IKeymanPackageFile2;
 begin
-  Result := True;
-  FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
-    as IKeymanPackageFile2;
-  FPackage.Install2(True);
-  // Force overwrites existing package and leaves most settings for it intact
+  Result := False;
+  try
+    FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
+      as IKeymanPackageFile2;
+      // Force overwrites existing package and leaves most settings for it intact
+    FPackage.Install2(True);
+    Result := True;
+  except
+    on E:Exception do
+    begin
+      TKeymanSentryClient.ReportHandledException(E,
+        'Failed to install keyboard package');
+    end;
+  end;
+
   FPackage := nil;
-
-  kmcom.Refresh;
-  kmcom.Apply;
-
-  System.SysUtils.DeleteFile(PackageFileName);
+  if Result then
+  begin
+    kmcom.Refresh;
+    kmcom.Apply;
+    System.SysUtils.DeleteFile(PackageFileName);
+  end;
 
 end;
 
@@ -1021,9 +1039,15 @@ begin
   for i := 0 to High(Params.Packages) do
   begin
     PackageFullPath := SavePath + Params.Packages[i].FileName;
+    if not FileExists(PackageFullPath) then
+    begin
+      Continue;
+    end;
+
     if not DoInstallPackage(PackageFullPath) then // I2742
     begin
-      KL.Log('Installing Package failed' + PackageFullPath);
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Installing Package failed"' + PackageFullPath + '"');
     end;
   end;
   Result := True;
@@ -1078,9 +1102,10 @@ end;
 
 function InstallingState.HandleKmShell;
 begin
-  // Result = exit straight away as we are installing (MSI installer)
-  // need to just do a no-op keyman will it maybe using kmshell to install
-  // packages.
+  // Should not be possible while called in InstallingState. The MSI installer may have
+  // failed. Clean Up and return to Idle
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
   Result := kmShellContinue;
 end;
 

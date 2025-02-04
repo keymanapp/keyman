@@ -33,7 +33,7 @@
       </tbody>
     </table>
   </xsl:template>
-                
+
 
   <xsl:template match="HardDrive">
     <tr>
@@ -128,8 +128,46 @@
             <xsl:value-of select="@x64"/>
           </td>
         </tr>
+        <tr>
+          <th>Native Machine</th>
+          <td>
+            <xsl:choose>
+              <xsl:when test="@NativeMachine = '014C'">Intel 386</xsl:when>
+              <xsl:when test="@NativeMachine = '0162'">MIPS R3000</xsl:when>
+              <xsl:when test="@NativeMachine = '0160'">MIPS R3000</xsl:when>
+              <xsl:when test="@NativeMachine = '0166'">MIPS R4000</xsl:when>
+              <xsl:when test="@NativeMachine = '0168'">MIPS R10000</xsl:when>
+              <xsl:when test="@NativeMachine = '0169'">MIPS WCE v2</xsl:when>
+              <xsl:when test="@NativeMachine = '0184'">Alpha AXP</xsl:when>
+              <xsl:when test="@NativeMachine = '01A2'">SH3</xsl:when>
+              <xsl:when test="@NativeMachine = '01A3'">SH3 DSP</xsl:when>
+              <xsl:when test="@NativeMachine = '01A4'">SH3E</xsl:when>
+              <xsl:when test="@NativeMachine = '01A6'">SH4</xsl:when>
+              <xsl:when test="@NativeMachine = '01A8'">SH5</xsl:when>
+              <xsl:when test="@NativeMachine = '01C0'">ARM</xsl:when>
+              <xsl:when test="@NativeMachine = '01C2'">ARM Thumb</xsl:when>
+              <xsl:when test="@NativeMachine = '01C4'">ARM Thumb 2</xsl:when>
+              <xsl:when test="@NativeMachine = '01D3'">TAM33BD</xsl:when>
+              <xsl:when test="@NativeMachine = '01F0'">PowerPC</xsl:when>
+              <xsl:when test="@NativeMachine = '01F1'">PowerPC FP</xsl:when>
+              <xsl:when test="@NativeMachine = '0200'">Intel IA64</xsl:when>
+              <xsl:when test="@NativeMachine = '0266'">MIPS 16</xsl:when>
+              <xsl:when test="@NativeMachine = '0284'">Alpha 64</xsl:when>
+              <xsl:when test="@NativeMachine = '0366'">MIPSFPU</xsl:when>
+              <xsl:when test="@NativeMachine = '0466'">AXP64</xsl:when>
+              <xsl:when test="@NativeMachine = '0520'">Infineon</xsl:when>
+              <xsl:when test="@NativeMachine = '0CEF'">CEF</xsl:when>
+              <xsl:when test="@NativeMachine = '0EBC'">EBC (EFI Byte Code)</xsl:when>
+              <xsl:when test="@NativeMachine = '8664'">AMD64</xsl:when>
+              <xsl:when test="@NativeMachine = '9041'">M32R</xsl:when>
+              <xsl:when test="@NativeMachine = 'AA64'">ARM64</xsl:when>
+              <xsl:when test="@NativeMachine = 'C0EE'">CEE</xsl:when>
+              <xsl:otherwise><xsl:value-of select="@NativeMachine" /></xsl:otherwise>
+            </xsl:choose>
+          </td>
+        </tr>
       </tbody>
     </table>
   </xsl:template>
 
-</xsl:stylesheet> 
+</xsl:stylesheet>
