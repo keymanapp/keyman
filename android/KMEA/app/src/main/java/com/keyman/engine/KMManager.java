@@ -33,6 +33,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -48,6 +49,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
@@ -73,6 +75,7 @@ import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.MapCompat;
 import com.keyman.engine.util.WebViewUtils;
+import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -687,12 +690,26 @@ public final class KMManager {
     KMKeyboardWebViewClient webViewClient = null;
 
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
-      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      try {
+        InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        return;
+      }
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
-      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      try {
+        SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        // Direct user to pick another system keyboard
+        InputMethodManager imManager = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
+
+        return;
+      }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
@@ -775,6 +792,10 @@ public final class KMManager {
     Context appContext = IMService.getApplicationContext();
     final FrameLayout mainLayout = new FrameLayout(appContext);
     mainLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+    if (SystemKeyboard == null) {
+      return mainLayout;
+    }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
     keyboardLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -2301,9 +2322,9 @@ public final class KMManager {
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       return InAppKeyboard.updateText(text);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       return SystemKeyboard.updateText(text);
     }
 
@@ -2335,13 +2356,13 @@ public final class KMManager {
   public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
         result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
         result = SystemKeyboard.updateSelectionRange();
       }
@@ -2354,11 +2375,11 @@ public final class KMManager {
 
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && InAppKeyboard != null) {
         InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && SystemKeyboard != null) {
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }

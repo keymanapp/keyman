@@ -4,9 +4,11 @@
 package com.keyman.engine.util;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.util.AndroidRuntimeException;
 import android.view.ViewGroup;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
-import com.keyman.engine.util.KMLog;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +22,14 @@ public final class WebViewUtils {
     DISABLED,     // WebView doesn't support touch keyboard features
     DEGRADED,     // WebView supports touch keyboards but not LDML keyboards
     FULL;         // WebView supports touch keyboards and LDML keyboards
+  }
+
+  // System WebView status
+  public enum SystemWebViewStatus {
+    UNDETERMINED,  // Functionality not determined yet
+    NOT_INSTALLED, // WebView not installed
+    DISABLED,      // WebView installed, but disabled
+    FULL;          // WebView installed and enabled
   }
 
   private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
@@ -49,6 +59,33 @@ public final class WebViewUtils {
     }
 
     return EngineWebViewVersionStatus.FULL;
+  }
+
+  /**
+   * Determine the state of the system WebView (required for Keyman)
+   * @param context
+   * @return {SystemWebViewStatus}
+   */
+  public static SystemWebViewStatus getSystemWebViewStatus(
+      Context context) {
+    // Check whether WebView is installed - this also returns true when installed but disabled
+    PackageManager packageManager = context.getPackageManager();
+    if (!packageManager.hasSystemFeature("android.software.webview")) {
+      return SystemWebViewStatus.NOT_INSTALLED;
+    }
+
+    // Use CookieManager to check if WebView is really enabled
+    // https://stackoverflow.com/a/70354583
+    try {
+      CookieManager.getInstance();
+    } catch (AndroidRuntimeException e) {
+      // WebView installed but not enabled
+      return SystemWebViewStatus.DISABLED;
+    } catch (Exception e) {
+      return SystemWebViewStatus.DISABLED;
+    }
+
+    return SystemWebViewStatus.FULL;
   }
 
   // Inject a meta viewport tag into the head of the file if it doesn't exist
