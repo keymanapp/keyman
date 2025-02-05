@@ -231,4 +231,10 @@ export class CopierMessages {
     `The output file '${def(o.filename)}' has two different possible source files.`,
   );
 
+  static VERBOSE_CopyingFile = SevVerbose | 0x0021;
+  static Verbose_CopyingFile = (o:{from: string, to: string}) => m(
+    this.VERBOSE_CopyingFile,
+    `Copying file '${def(o.from)}' to '${def(o.to)}'`,
+  );
+
 };
