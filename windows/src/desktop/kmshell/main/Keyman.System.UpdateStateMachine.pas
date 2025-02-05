@@ -118,6 +118,7 @@ uses
   GlobalProxySettings,
   kmint,
   keymanapi_TLB,
+  KeymanMutex,
   Keyman.System.KeymanSentryClient,
   Keyman.System.DownloadUpdate,
   Keyman.System.RemoteUpdateCheck,
@@ -753,12 +754,21 @@ procedure DownloadingState.Enter;
 var
   DownloadResult: Boolean;
   RetryCount: Integer;
+  FMutex: TKeymanMutex;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
 
   RetryCount := 0;
   DownloadResult := False;
+  FMutex := TKeymanMutex.Create('KeymanDownloading');
+  // Should be impossible but just exit anyway and let the process current
+  // downloading process finish.
+  if not FMutex.MutexOwned then
+  begin
+    FreeAndNil(FMutex);
+    Exit;
+  end;
 
   while (not DownloadResult) and (RetryCount < 3) do
   begin
@@ -766,6 +776,8 @@ begin
     if not DownloadResult then
       Inc(RetryCount);
   end;
+
+  FreeAndNil(FMutex);
 
   if (not DownloadResult) then
   begin
@@ -807,14 +819,38 @@ begin
 end;
 
 function DownloadingState.HandleKmShell;
+var
+  FMutex: TKeymanMutex;
 begin
-  // Downloading state, in other process, so continue
+  // Check to ensure a download process is running if not
+  // clean up return to the the idle state and check for updates
+  FMutex := TKeymanMutex.Create('KeymanDownloading');
+  if FMutex.MutexOwned then
+  begin
+    bucStateContext.RemoveCachedFiles;
+    FreeAndNil(FMutex);
+    ChangeState(IdleState);
+    bucStateContext.CurrentState.HandleCheck;
+  end;
+  FreeAndNil(FMutex);
+  // Downloading state, in another process, so continue to execute kmshell
   Result := kmShellContinue;
 end;
 
 procedure DownloadingState.HandleDownload;
+var
+  FMutex: TKeymanMutex;
 begin
-  // Enter Already Downloading
+  // If downloading process is not running clean files and return to idle
+  FMutex := TKeymanMutex.Create('KeymanDownloading');
+  if FMutex.MutexOwned then
+  begin
+    bucStateContext.RemoveCachedFiles;
+    FreeAndNil(FMutex);
+    ChangeState(IdleState);
+    bucStateContext.CurrentState.HandleCheck;
+  end;
+  FreeAndNil(FMutex);
 end;
 
 procedure DownloadingState.HandleAbort;
