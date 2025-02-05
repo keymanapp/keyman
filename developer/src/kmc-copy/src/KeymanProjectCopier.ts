@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds, CompilerBaseOptions } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -19,12 +19,7 @@ type CopierFunction = (
  * @public
  * Options for the Keyman Developer project copier
  */
-export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
-  /**
-   * Reporting level to console, used by NodeCompilerCallbacks (not used in
-   * compiler modules; all messages are still reported to the internal log)
-   */
-  logLevel?: CompilerLogLevel;
+export interface CopierOptions extends CompilerBaseOptions {
   /**
    * output path where project folder will be created
    */
