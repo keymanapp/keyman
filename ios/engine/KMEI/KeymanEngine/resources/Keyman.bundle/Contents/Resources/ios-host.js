@@ -131,7 +131,7 @@ function getOskWidth() {
 
 function getOskHeight() {
     var height = oskHeight;
-    if(keyman.osk.banner._activeType != 'blank') {
+    if(keyman.osk && keyman.osk.banner && keyman.osk.banner._activeType != 'blank') {
         height = height - keyman.osk.banner.height;
     }
     return height;
