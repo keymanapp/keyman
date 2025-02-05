@@ -146,11 +146,6 @@ class KeymanWebViewController: UIViewController {
 
     view = webView
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: UIResponder.keyboardWillShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: UIResponder.keyboardWillHideNotification, object: nil)
-
     reloadKeyboard()
   }
 
@@ -980,20 +975,5 @@ extension KeymanWebViewController {
 
   var isKeyboardMenuVisible: Bool {
     return keyboardMenuView != nil
-  }
-}
-
-// MARK: - Keyboard Notifications
-extension KeymanWebViewController {
-  @objc func keyboardWillShow(_ notification: Notification) {
-    resizeKeyboard()
-
-    if Manager.shared.isKeymanHelpOn {
-      showHelpBubble(afterDelay: 1.5)
-    }
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    dismissHelpBubble()
   }
 }

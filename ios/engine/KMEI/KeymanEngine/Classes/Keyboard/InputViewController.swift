@@ -206,7 +206,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
-    var message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
+    let message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
     os_log("%{public}s", log: KeymanEngineLogger.settings, type: .default, message)
     SentryManager.breadcrumb(message)
 
@@ -623,9 +623,17 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
   }
+  
+  func dismissHelpBubble() {
+    keymanWeb.dismissHelpBubble()
+  }
 
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
+  }
+  
+  internal func enforceKeyboardSize() {
+    keymanWeb.resizeKeyboard()
   }
 
   func clearText() {

@@ -239,9 +239,34 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         SentryManager.capture(error, message:message)
       }
     }
+    
+    // Keep these within our singleton Manager instance.  As we never remove these,
+    // setting them within something prone to replacement (like the keyboard when in
+    // app-extension mode) can lead to memory leaks.  See #12216.
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), //
+                                           name: UIResponder.keyboardWillShowNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), //
+                                           name: UIResponder.keyboardWillHideNotification, object: nil)
 
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
+  }
+  
+  // MARK: - Keyboard Notifications
+  // Do NOT place these anywhere within InputViewController or its children.
+  // So far as we can tell, the OS causes the app extension to sometimes throw
+  // instances away, and maintaining references via notification to them can
+  // cause memory leaks.  Refer to #12216.
+  @objc func keyboardWillShow(_ notification: Notification) {
+    inputViewController?.enforceKeyboardSize()
+
+    if Manager.shared.isKeymanHelpOn {
+      inputViewController?.showHelpBubble(afterDelay: 1.5)
+    }
+  }
+
+  @objc func keyboardWillHide(_ notification: Notification) {
+    inputViewController?.dismissHelpBubble()
   }
 
   // MARK: - Keyboard management
