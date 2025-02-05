@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.185 alpha 2025-02-05
+
+* fix(developer): make kmc log options consistent across all commands (#13075)
+* feat(developer): add user interface for `kmc copy` to TIKE (#13076)
+* chore(developer): add verbose logs for project copier (#13080)
+* chore(mac, ios): build and run with xcode 16 (#13077)
+
 ## 18.0.184 alpha 2025-02-04
 
 * fix(common): handle undefined input in `@keymanapp/langtags` lookups (#13117)
