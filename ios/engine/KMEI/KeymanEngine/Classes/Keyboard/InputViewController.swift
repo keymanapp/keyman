@@ -589,7 +589,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   // KeymanWebViewController maintenance methods
-  func reload() {
+  public func reload() {
     keymanWeb.reloadKeyboard()
   }
 

@@ -72,14 +72,6 @@ class KeymanWebViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
 
     _ = view
-
-    NotificationCenter.default.addObserver(
-      forName: UIApplication.willEnterForegroundNotification,
-      object: nil,
-      queue: OperationQueue.main
-    ) { _ in
-      self.reloadKeyboard()
-    }
   }
 
   required init?(coder aDecoder: NSCoder) {
