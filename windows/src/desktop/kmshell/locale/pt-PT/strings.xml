@@ -327,10 +327,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Mostrar ecrã de bem-vindo</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 18.0.96.0 -->
-  <string name="koAutomaticUpdate" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Modified: 18.0.96.0 -->
   <string name="koCheckForUpdates" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
   <!-- Context: Configuration Dialog - Options tab -->
