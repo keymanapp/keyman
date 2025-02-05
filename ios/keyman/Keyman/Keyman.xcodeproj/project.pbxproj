@@ -1002,7 +1002,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-tagged.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-tagged.sh\"\necho \"script - set version complete\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CED3CFDA240E49DF001540A1 /* ShellScript */ = {
