@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.186 alpha 2025-02-06
+
+* feat(windows): check updates and automatic update merged (#13115)
+
 ## 18.0.185 alpha 2025-02-05
 
 * fix(developer): make kmc log options consistent across all commands (#13075)

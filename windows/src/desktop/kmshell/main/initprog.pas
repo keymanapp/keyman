@@ -629,7 +629,6 @@ begin
       Pos('installdefaults', FQuery) > 0,
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
-      Pos('automaticupdates', FQuery) > 0,
       FDisablePackages,
       FDefaultUILanguage,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753

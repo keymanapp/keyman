@@ -359,8 +359,8 @@ begin
     Registry.RootKey := HKEY_CURRENT_USER;
     try
       Result := not Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) or
-        not Registry.ValueExists(SRegValue_AutomaticUpdates) or
-        Registry.ReadBool(SRegValue_AutomaticUpdates);
+        not Registry.ValueExists(SRegValue_CheckForUpdates) or
+        Registry.ReadBool(SRegValue_CheckForUpdates);
     except
       on E: ERegistryException do
       begin
