@@ -66,6 +66,7 @@ find_tests = find_program('find-tests.sh', dirs: [meson.current_source_dir() / '
 mutter = find_program('mutter', required: false, version: '>=40')
 can_build_wayland = mutter.found()
 
+# TODO: re-enable and fix test setup
 # test(
 #   'setup-x11',
 #   setup_tests,

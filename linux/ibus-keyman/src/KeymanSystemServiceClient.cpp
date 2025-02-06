@@ -15,7 +15,6 @@ extern gboolean testing;
 
 class KeymanSystemServiceClient {
 private:
-  sd_bus_error *error = NULL;
   sd_bus_message *msg = NULL;
   sd_bus *bus         = NULL;
 
@@ -41,18 +40,13 @@ KeymanSystemServiceClient::KeymanSystemServiceClient() {
 }
 
 KeymanSystemServiceClient::~KeymanSystemServiceClient() {
-  if (error) { sd_bus_error_free(error); }
   if (msg)   { sd_bus_message_unref(msg); }
   if (bus)   { sd_bus_unref(bus); }
 }
 
 void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
-  // If Set/GetCapsLockIndicator is called more than once and previously
-  // failed, we will leak `error`.
-  assert(error == NULL);
-
   if (!bus) {
-    // we already reported the error, so just return
+    // we already reported the error in the c'tor, so just return
     return;
   }
 
@@ -61,30 +55,30 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
     return;
   }
 
+  sd_bus_error *error;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock);
   if (result < 0) {
     g_error("%s: Failed to call method SetCapsLockIndicator: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
+    sd_bus_error_free(error);
     return;
   }
 }
 
 gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
-  // If Set/GetCapsLockIndicator is called more than once and previously
-  // failed, we will leak `error`.
-  assert(error == NULL);
-
   if (!bus) {
-    // we already reported the error, so just return
+    // we already reported the error in the c'tor, so just return
     return -1;
   }
 
+  sd_bus_error *error;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "GetCapsLockIndicator", error, &msg, "");
   if (result < 0) {
     g_error("%s: Failed to call method GetCapsLockIndicator: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
+    sd_bus_error_free(error);
     return -1;
   }
 
@@ -101,18 +95,18 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
 
 void
 KeymanSystemServiceClient::CallOrderedOutputSentinel() {
-  assert(error == NULL);
-
   if (!bus) {
-    // we already reported the error, so just return
+    // we already reported the error in the c'tor, so just return
     return;
   }
 
+  sd_bus_error *error;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "CallOrderedOutputSentinel", error, &msg, "");
   if (result < 0) {
     g_error("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
+    sd_bus_error_free(error);
     return;
   }
 }

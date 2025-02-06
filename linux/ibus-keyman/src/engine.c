@@ -733,7 +733,6 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
   }
 
   commit_queue_item *current_item = &keyman->commit_queue[0];
-  g_message("%s:", __FUNCTION__);
   if (current_item->code_points_to_delete > 0) {
     g_message("%s: Forwarding %d backspaces from commit queue", __FUNCTION__, current_item->code_points_to_delete);
     while (current_item->code_points_to_delete > 0) {
@@ -753,6 +752,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
       debug = debug_utf8_with_codepoints(current_item->char_buffer));
     commit_string(keyman, current_item->char_buffer);
     g_free(current_item->char_buffer);
+    current_item->char_buffer = NULL;
   }
   if (current_item->emitting_keystroke) {
     g_message("%s: Forwarding key from commit queue: keyval=0x%02x, keycode=0x%02x, state=0x%02x",
