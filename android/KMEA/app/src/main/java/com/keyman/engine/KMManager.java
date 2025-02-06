@@ -703,11 +703,10 @@ public final class KMManager {
       try {
         SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } catch (AndroidRuntimeException e) {
-        // Catch fatal error when WebView not installed/enabled
-        // Direct user to pick another system keyboard
-        InputMethodManager imManager = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imManager.showInputMethodPicker();
-
+        // Notify fatal error when WebView not installed/enabled
+        String message = appContext.getString(R.string.body_install_webview);
+        Toast.makeText(appContext, message,
+          Toast.LENGTH_LONG).show();
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
