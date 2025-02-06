@@ -55,7 +55,7 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
     return;
   }
 
-  sd_bus_error *error;
+  sd_bus_error *error = NULL;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock);
   if (result < 0) {
@@ -72,7 +72,7 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
     return -1;
   }
 
-  sd_bus_error *error;
+  sd_bus_error *error = NULL;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "GetCapsLockIndicator", error, &msg, "");
   if (result < 0) {
@@ -100,7 +100,7 @@ KeymanSystemServiceClient::CallOrderedOutputSentinel() {
     return;
   }
 
-  sd_bus_error *error;
+  sd_bus_error *error = NULL;
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "CallOrderedOutputSentinel", error, &msg, "");
   if (result < 0) {
