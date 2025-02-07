@@ -92,6 +92,8 @@ function MakeAPIURL(path: string): string;
 
 function MakeKeymanURL(const path: string): string;
 
+function URL_KmcMessage(id: string): string;
+
 implementation
 
 uses
@@ -108,6 +110,7 @@ const
   S_UserAgent_Developer = 'Keyman Developer';
   S_UserAgent_Diagnostics = 'Keyman for Windows Diagnostics';
 
+  S_HelpKeymanCom = 'https://help.keyman.com';
   S_KeymanCom = 'https://keyman.com';
   S_APIProtocol = 'https';
   S_APIServer = 'api.keyman.com';
@@ -135,7 +138,6 @@ function API_UserAgent_Diagnostics: string;
 begin
   Result := S_UserAgent_Diagnostics + '/' + GetVersionString;
 end;
-
 
 function MakeKeymanURL(const path: string): string;
 begin
@@ -177,6 +179,11 @@ begin
   if IsUpdate then IsUpdateInt := 1 else IsUpdateInt := 0;
 
   Result := Format(URLPath_PackageDownload_Format, [URLEncode(PackageID), URLEncode(CKeymanVersionInfo.Tier), URLEncode(BCP47), IsUpdateInt]);
+end;
+
+function URL_KmcMessage(id: string): string;
+begin
+   Result := S_HelpKeymanCom + '/developer/'+GetMajorMinorVersionString+'/reference/messages/'+id.ToLower;
 end;
 
 end.
