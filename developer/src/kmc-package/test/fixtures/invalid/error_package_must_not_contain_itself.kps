@@ -15,7 +15,7 @@
       <Name>error_package_must_not_contain_itself.kmp</Name>
       <Description>error_package_must_not_contain_itself</Description>
       <CopyLocation>0</CopyLocation>
-      <FileType>.kmx</FileType>
+      <FileType>.kmp</FileType>
     </File>
     <File>
       <Name>basic.kmx</Name>
