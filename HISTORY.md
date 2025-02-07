@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.187 alpha 2025-02-07
+
+* docs(web): relocate gesture docs to web/docs/internal (#13139)
+* chore(mac): remove empty options tab from configuration (#13160)
+* chore(linux): Update debian changelog (#13143)
+
 ## 18.0.186 alpha 2025-02-06
 
 * feat(windows): check updates and automatic update merged (#13115)
