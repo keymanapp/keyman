@@ -35,7 +35,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
-  ":engine/predictive-text=src/engine/predictive-text/worker-main     Builds KMW's predictive text module" \
+  ":engine/predictive-text   Builds KMW's predictive text module" \
   ":help                     Online documentation" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \

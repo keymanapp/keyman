@@ -53,7 +53,6 @@ builder_run_child_actions configure
 ## Build actions
 
 builder_run_child_actions build:wordbreakers
-
 builder_run_child_actions build:templates
 builder_run_child_actions build:worker-thread
 builder_run_child_actions build:worker-main
