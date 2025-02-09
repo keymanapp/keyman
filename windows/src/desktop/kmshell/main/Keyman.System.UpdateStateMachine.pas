@@ -778,19 +778,17 @@ begin
   end
   else
   begin
-    if HasKeymanRun then
+    // TODO: #8993 for stage 2 we can got to the InstallingState
+    // or even have a call back to notify the user to installation
+    // is about to begin.
+    if bucStateContext.GetApplyNow then
     begin
-      if bucStateContext.GetApplyNow then
-      begin
-        bucStateContext.SetApplyNow(False);
-        ChangeState(InstallingState);
-      end
-      else
-        ChangeState(WaitingRestartState);
+      bucStateContext.SetApplyNow(False);
+      ChangeState(InstallingState);
     end
     else
     begin
-      ChangeState(InstallingState);
+      ChangeState(WaitingRestartState);
     end;
   end
 
