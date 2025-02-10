@@ -246,4 +246,6 @@ describe('PackageCompilerMessages', function () {
     await testForMessage(this, ['invalid', 'warn_package_version_is_unrecognized_format.kps'],
       PackageCompilerMessages.WARN_PackageVersionIsUnrecognizedFormat);
   });
+
+  // ERROR_PackageMustNotContainItself test in package-compiler.tests.ts
 });
