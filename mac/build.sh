@@ -109,7 +109,7 @@ execBuildCommand() {
     set +e
     local ret_code=0
     eval "$cmnd" || ret_code=$?
-    set -ex
+    set -e
 
     printXCodeBuildScriptLogs
 

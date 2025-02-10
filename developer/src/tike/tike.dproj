@@ -471,8 +471,8 @@
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
-        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas">
-            <Form>frmNewProjectParameters</Form>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmCloneGitHubProjectParameters.pas">
+            <Form>frmCloneGitHubProjectParameters</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters.pas">
@@ -585,6 +585,18 @@
         <DCCReference Include="main\Keyman.Developer.System.LaunchProjects.pas"/>
         <DCCReference Include="debug\Keyman.System.Debug.DebugUtils.pas"/>
         <DCCReference Include="..\common\delphi\components\Keyman.Developer.UI.RichEdit41.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas">
+            <Form>frmNewProjectParameters</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters.pas">
+            <Form>frmCloneLocalProjectParameters</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters.pas">
+            <Form>frmCloneKeymanCloudProjectParameters</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

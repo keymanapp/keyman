@@ -27,13 +27,13 @@ export class BasicGenerator extends AbstractGenerator {
   protected preGenerate() {
     const dt = new Date();
 
-    this.languageTags = this.options.languageTags.length
+    this.languageTags = this.options.languageTags?.length
       ? this.options.languageTags.map(tag => new Intl.Locale(tag).minimize().toString())
       : [this.DEFAULT_LOCALE];
 
     // Verify that targets passed in are valid
     let failed = false;
-    for(const target of this.options.targets) {
+    for(const target of this.options.targets ?? []) {
       if(!KeymanTargets.AllKeymanTargets.includes(target)) {
         this.callbacks.reportMessage(GeneratorMessages.Error_InvalidTarget({target}));
         failed = true;
@@ -43,7 +43,7 @@ export class BasicGenerator extends AbstractGenerator {
       return false;
     }
 
-    if(this.options.targets.includes(KeymanTargets.KeymanTarget.any) || this.options.targets.length == 0) {
+    if(this.options.targets?.includes(KeymanTargets.KeymanTarget.any) || !this.options.targets?.length) {
       this.resolvedTargets = KeymanTargets.AllKeymanTargets.filter(target => target != KeymanTargets.KeymanTarget.any);
     } else {
       this.resolvedTargets = [].concat(this.options.targets);

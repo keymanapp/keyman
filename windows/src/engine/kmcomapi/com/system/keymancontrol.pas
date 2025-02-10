@@ -281,7 +281,7 @@ function TKeymanControl.IsConfigurationOpen: WordBool;
 begin
   with TKeymanMutex.Create('KeymanConfiguration') do
   try
-    Result := MutexOwned;
+    Result := TakeOwnership;
   finally
     Free;
   end;
@@ -302,7 +302,7 @@ function TKeymanControl.IsTextEditorOpen: WordBool;
 begin
   with TKeymanMutex.Create('KeymanTextEditor') do
   try
-    Result := MutexOwned;
+    Result := TakeOwnership;
   finally
     Free;
   end;

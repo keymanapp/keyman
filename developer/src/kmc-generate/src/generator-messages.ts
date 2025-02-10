@@ -18,8 +18,9 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
  */
 export class GeneratorMessages {
   static FATAL_UnexpectedException = SevFatal | 0x0001;
-  static Fatal_UnexpectedException = (o:{e: any}) => m(
-    this.FATAL_UnexpectedException, null, o.e ?? 'unknown error'
+  static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(
+    this.FATAL_UnexpectedException, null,
+    o.e ?? 'unknown error',
   );
 
   static INFO_GeneratingProject = SevInfo | 0x0002;
