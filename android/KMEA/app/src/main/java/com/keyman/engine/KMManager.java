@@ -49,7 +49,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
@@ -229,6 +228,7 @@ public final class KMManager {
   private static boolean debugMode = false;
   private static boolean shouldAllowSetKeyboard = true;
   private static boolean didCopyAssets = false;
+  private static boolean didShowWebViewError = false;
 
   private static boolean didLogHardwareKeystrokeException = false;
 
@@ -671,6 +671,16 @@ public final class KMManager {
     }
   }
 
+  private static void showWebViewError() {
+    Intent i = new Intent(appContext, WebViewErrorActivity.class);
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT); // Replaces FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
+    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);     // Required to call startActivity() from outside of an Activity context
+    i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+    appContext.startActivity(i);
+  }
+
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
@@ -703,10 +713,7 @@ public final class KMManager {
       try {
         SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } catch (AndroidRuntimeException e) {
-        // Notify fatal error when WebView not installed/enabled
-        String message = appContext.getString(R.string.body_install_webview);
-        Toast.makeText(appContext, message,
-          Toast.LENGTH_LONG).show();
+        // Catch fatal error when WebView not installed/enabled
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
@@ -809,6 +816,11 @@ public final class KMManager {
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
+    if (!didShowWebViewError && SystemKeyboard == null && WebViewUtils.getSystemWebViewStatus(appContext) !=
+        SystemWebViewStatus.FULL) {
+      showWebViewError();
+      didShowWebViewError = true;
+    }
     if (!restarting && SystemKeyboard != null) {
       String packageName = attribute.packageName;
       int inputType = attribute.inputType;
