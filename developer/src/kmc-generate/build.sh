@@ -13,6 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman kmc-generate module" \
   "@/common/web/keyman-version" \
+  "@/common/web/langtags" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/common/web/utils" \

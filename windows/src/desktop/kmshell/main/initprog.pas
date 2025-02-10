@@ -94,6 +94,7 @@ type
                     fmRepair,
                     fmKeepInTouch,
                     fmSettings,
+                    fmBoot,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -161,6 +162,7 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -231,6 +233,7 @@ begin
         // package installation. See https://superuser.com/a/1395288/521575 and
         // https://github.com/keymanapp/keyman/issues/2467
       else if s = '-f' then FForce := True
+      else if s = '-boot' then FMode := fmBoot
       else if s = '-c' then   FMode := fmMain
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
@@ -389,9 +392,6 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  BUpdateSM : TUpdateStateMachine;
-  frmStartInstall: TfrmStartInstall;
-  UserCanceled : Boolean;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -439,54 +439,10 @@ begin
     Exit;
   end;
 
-  BUpdateSM := TUpdateStateMachine.Create(False);
-    try
-      if (FMode = fmBackgroundUpdateCheck) then
-      begin
-        BUpdateSM.HandleCheck;
-        Exit;
-      end
-      else if (FMode = fmBackgroundDownload) then
-      begin
-        BUpdateSM.HandleDownload;
-        Exit;
-      end
-      else if (FMode = fmApplyInstallNow) then
-      begin
-        BUpdateSM.HandleInstallNow;
-        Exit;
-      end
-      else if (FMode = fmInstallKeyboardPackageAdmin) then
-      begin
-        BUpdateSM.HandleInstallPackages;
-        Exit;
-      end
-      else
-      begin
-        // The following logic around the WaitingRestartState should be
-        // encapsulated in the state machine however as we want separation of
-        // UI elements from the state machine we have bring some of logic here.
-        UserCanceled := False;
-        if BUpdateSM.ReadyToInstall and
-          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout])) then
-        begin
-          frmStartInstall := TfrmStartInstall.Create(nil);
-          try
-            if frmStartInstall.ShowModal = mrOk then
-              UserCanceled := False
-            else
-              UserCanceled := True
-          finally
-            frmStartInstall.Free;
-          end;
-        end;
-        if not UserCanceled and (BUpdateSM.HandleKmShell = 1) then
-          Exit;
-        end;
-    finally
-      BUpdateSM.Free;
-    end;
-
+  if ProcessBackgroundUpdate(FMode, FSilent) then
+  begin
+    Exit;
+  end;
 
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin
@@ -504,7 +460,7 @@ begin
 
   // I1818 - remove start mode change
 
-  if FMode = fmStart then FIcon := 'appicon.ico'
+  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
   else FIcon := 'cfgicon.ico';
 
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
@@ -555,6 +511,11 @@ begin
 
 ////TODO:          TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
 
+    fmBoot:
+      begin
+        // on boot splash should be suppressed therefore Silent = True
+        StartKeyman(False, True, FStartWithConfiguration);
+      end;
     fmStart:
       begin  // I2720
         StartKeyman(False, FSilent, FStartWithConfiguration);
@@ -668,7 +629,6 @@ begin
       Pos('installdefaults', FQuery) > 0,
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
-      Pos('automaticupdates', FQuery) > 0,
       FDisablePackages,
       FDefaultUILanguage,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
@@ -695,6 +655,77 @@ begin
       PrintKeyboard(kmcom.Keyboards[n]);
     finally
       Free;
+    end;
+end;
+
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
+var
+  BUpdateSM : TUpdateStateMachine;
+  frmStartInstall: TfrmStartInstall;
+  UserCanceled : Boolean;
+  SkipBUpdate : Boolean;
+begin
+  BUpdateSM := TUpdateStateMachine.Create(False);
+  Result := False;
+    try
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        BUpdateSM.HandleCheck;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmApplyInstallNow) then
+      begin
+        BUpdateSM.HandleInstallNow;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmInstallKeyboardPackageAdmin) then
+      begin
+        BUpdateSM.HandleInstallPackages;
+        Result := True;
+        Exit;
+      end
+      else
+      begin
+        // Since Package upgrade and Keyman upgrade share the installing state
+        // the following package related switches are valid in the installing
+        // state.
+        SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
+        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
+        fmUpgradeMnemonicLayout]));
+        // The following logic around the WaitingRestartState should be
+        // encapsulated in the state machine however as we want separation of
+        // UI elements from the state machine we have bring some of logic here.
+        UserCanceled := False;
+        if BUpdateSM.ReadyToInstall and
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout,
+          fmHelp, fmShowHelp, fmSettings, fmBoot])) then
+        begin
+          frmStartInstall := TfrmStartInstall.Create(nil);
+          try
+            if frmStartInstall.ShowModal = mrOk then
+              UserCanceled := False
+            else
+              UserCanceled := True
+          finally
+            frmStartInstall.Free;
+          end;
+        end;
+        if not UserCanceled and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    finally
+      BUpdateSM.Free;
     end;
 end;
 

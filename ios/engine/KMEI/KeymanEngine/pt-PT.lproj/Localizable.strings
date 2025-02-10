@@ -226,6 +226,24 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "Idioma e teclado";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "Adjust Keyboard Height";
+
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "Adjust Keyboard";
+
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "Reset to Default Keyboard Height";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "Drag arrow control to adjust keyboard height.";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "Rotate device to adjust for landscape.";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "Rotate device to adjust for portrait.";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Download do teclado falhou";
 

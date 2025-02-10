@@ -52,7 +52,7 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerE
   ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
   CompilerMessageOverride,
   CompilerMessageOverrideMap,
-
+  dedentCompilerMessageDetail,
   KeymanCompilerArtifact,
   KeymanCompilerArtifactOptional,
   KeymanCompilerArtifacts,

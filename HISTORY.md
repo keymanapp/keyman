@@ -1,5 +1,79 @@
 # Keyman Version History
 
+## 18.0.187 alpha 2025-02-07
+
+* docs(web): relocate gesture docs to web/docs/internal (#13139)
+* chore(mac): remove empty options tab from configuration (#13160)
+* chore(linux): Update debian changelog (#13143)
+
+## 18.0.186 alpha 2025-02-06
+
+* feat(windows): check updates and automatic update merged (#13115)
+
+## 18.0.185 alpha 2025-02-05
+
+* fix(developer): make kmc log options consistent across all commands (#13075)
+* feat(developer): add user interface for `kmc copy` to TIKE (#13076)
+* chore(developer): add verbose logs for project copier (#13080)
+* chore(mac, ios): build and run with xcode 16 (#13077)
+
+## 18.0.184 alpha 2025-02-04
+
+* fix(common): handle undefined input in `@keymanapp/langtags` lookups (#13117)
+* chore: update docs to reference node 20.0 (#13124)
+* feat(developer): include command line in kmc sentry reports (#13113)
+* fix(common/web): replace invalid StrsItem identity checks with isEqual() (#13122)
+
+## 18.0.183 alpha 2025-02-03
+
+* change(ios): set host-app bundle identifier in embedded Web debug-report (#13105)
+* fix(ios): prevent message-handler collision (#13037)
+* change(web): add context tracker bksp handling, alignment-offset calculations (#12911)
+* fix(web): correct edit-path ordering at source (#12925)
+* fix(web): correctly track context transitions caused by applying suggestions (#12927)
+* chore(linux): preserve log files when running tests under Docker (#13107)
+
+## 18.0.182 alpha 2025-01-31
+
+* feat(windows): report on processor type in tsysinfo (#13084)
+* fix(common): push branch when creating PR in version history writer (#13082)
+* refactor: move langtags to @keymanapp/langtags npm module (#13046)
+* chore(developer): use langtags.json for kmc-generate language names (#13047)
+* feat(developer): support relocation of external files in kmc-copy (#13061)
+* feat(windows): kmshell switch handling for the installing state (#12956)
+* feat(windows): add boot switch (#12995)
+* docs(web): remove `.md` in help links (#13051)
+* chore: add android platform to titles (#13033)
+* chore: add the windows platform to titles (#13026)
+* fix(mac): properly manage Input Method lifecycle (#13006)
+* chore(developer): handle forward slashes in paths in package editor (#13081)
+* chore(developer,core,resources): LDML v46 update and remove workaround for import base (#13099)
+
+## 18.0.181 alpha 2025-01-30
+
+* feat(windows): add localized button captions and form labels (#13025)
+* fix(web): disabled correction state should prevent predictive corrections (#13066)
+* fix(web): disabled autoaccept should not autohighlight suggestions (#13068)
+* chore(common): add 17.0.334 to version history (#13065)
+* fix(windows): add api GetContext and TIPProcessKeyEx with IsTextSelected bool (#13023)
+* fix(web): keyboard query error states should always provide informative Error objects, reports (#13048)
+
+## 18.0.180 alpha 2025-01-29
+
+* chore(common): Update crowdin strings for Portuguese (#13056)
+* chore(common): Update crowdin strings for Spanish (Latin America) (#13044)
+* chore(linux): Update debian changelog (#13063)
+* chore(linux): improve compatibility with Gentoo Linux (#13070)
+
+## 18.0.179 alpha 2025-01-28
+
+* fix(android): improve resource-update tool handling of host Activity's closure (#13004)
+* fix(windows): bool return value of KeymanIsTextSelected (#12841)
+* chore(mac): add breadcrumbs for Sentry (#12939)
+* fix(mac): show and hide OSK consistently for all keyboards (#12988)
+* fix(linux): remove unnecessary files from source tarball (#13053)
+* fix(windows): handle keyboard package not downloaded (#12948)
+
 ## 18.0.178 alpha 2025-01-27
 
 * fix(web): fix handling of data: url fonts, fonts with single quotes in filename (#13032)
@@ -1225,6 +1299,32 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.335 alpha 2025-02-06
+
+* fix(android): improve resource-update tool handling of host Activity's closure (#13057)
+* fix(ios): prevent message-handler collision (#13058)
+* chore(linux): improve compatibility with Gentoo Linux (#12889)
+* chore(linux): Update debian changelog (#13062)
+* fix(web): keyboard query error states should always provide informative Error objects, reports (#13079)
+* chore: push the branch when creating PR in version history writer (#13085)
+* fix(web): disabled correction state should prevent predictive corrections (#13074)
+* change(ios): set host-app bundle identifier in embedded Web debug-report (#13112)
+* chore(mac, ios): build and run with xcode 16 (#13121)
+
+## 17.0.334 stable 2025-01-27
+
+* chore(linux): update copyright year (#12919)
+* chore(linux): Update debian changelog (#12916)
+* fix(android): Remove access to MEDIA storage permissions (#13005)
+* fix(android): restores DOMRect polyfill for old Chrome support (#13014)
+* fix(web): add null guard for focusing next element via keystroke (#13035)
+* fix: use correct path for resources/build/version (#13030)
+* fix(web): fix handling of fonts with single quotes in filename (#13041)
+* fix(android): disable early keyboard-loading when not feasible (#13039)
+* fix(web): do not simplify nul-prefixed contexts when rule-matching (#13040)
+* feat(android): add breadcrumbing during package install about package file, source (#13038)
+* fix(web): prevent multitap warning that occurs multitapping longpressable modifier keys (#12974)
 
 ## 17.0.333 stable 2025-01-16
 

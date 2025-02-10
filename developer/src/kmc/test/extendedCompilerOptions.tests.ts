@@ -42,7 +42,7 @@ describe('commandOptionsMessageToCompilerOptionsMessage', function () {
   ];
   for(const test of valid) {
     it(`should recognize valid message definition ${test.input}`, () => {
-      const result = unitTestEndpoints.commandOptionsMessageToCompilerOptionsMessage(test.input, callbacks);
+      const result = unitTestEndpoints.commanderOptionsMessageToCompilerOptionsMessage(test.input, callbacks);
       callbacks.printMessages();
       assert.deepEqual(result, { code: CompilerError.error(test.result.code), level: test.result.level });
       assert.isEmpty(callbacks.messages);
@@ -58,7 +58,7 @@ describe('commandOptionsMessageToCompilerOptionsMessage', function () {
   ];
   for(const test of invalid) {
     it(`should reject invalid message definition ${test.input}`, () => {
-      assert.isNull(unitTestEndpoints.commandOptionsMessageToCompilerOptionsMessage(test.input, callbacks));
+      assert.isNull(unitTestEndpoints.commanderOptionsMessageToCompilerOptionsMessage(test.input, callbacks));
       assert.isTrue(callbacks.hasMessage(test.code));
     });
   }

@@ -45,6 +45,9 @@ begin
   Result := 'Overview';
 end;
 
+type
+  TIsWow64Process2 = function(hProcess: THandle; out pProcessMachine: USHORT; out pNativeMachine: USHORT): BOOL; stdcall;
+
 function TSI_Overview.DoCollect: Boolean;
 var
   n, nn, node: IXMLDOMNode;
@@ -55,6 +58,9 @@ var
   buf: array[0..1023] of char;
   freespace, totalspace, totalfree: Int64;
   stat: TMemoryStatus;
+  processMachine: USHORT;
+  nativeMachine: USHORT;
+  IsWow64Process2: TIsWow64Process2;
 begin
 {
 SYSTEM INFO:
@@ -84,6 +90,17 @@ SYSTEM INFO:
   if Wow64Process // I2919
     then xmlSetAttribute(n,'x64', 'true')
     else xmlSetAttribute(n,'x64', 'false');
+
+  IsWow64Process2 := GetProcAddress(GetModuleHandle(kernel32), 'IsWow64Process2');
+  if Assigned(IsWow64Process2) then
+  begin
+    if IsWow64Process2(GetCurrentProcess, processMachine, nativeMachine) then
+    begin
+      // https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+      xmlSetAttribute(n, 'ProcessMachine', IntToHex(processMachine, 4));
+      xmlSetAttribute(n, 'NativeMachine', IntToHex(nativeMachine, 4));
+    end;
+  end;
 
   { Free disk space }
 
