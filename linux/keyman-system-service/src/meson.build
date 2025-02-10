@@ -1,6 +1,7 @@
 service_files = files(
   'KeyboardDevice.cpp',
   'KeymanSystemService.cpp',
+  'OrderedOutputDevice.cpp',
   'main.cpp',
 )
 
