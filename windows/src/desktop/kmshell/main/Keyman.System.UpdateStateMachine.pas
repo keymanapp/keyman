@@ -132,6 +132,7 @@ const
   SPackageUpgradeFilename = 'upgrade_packages.inf';
   kmShellContinue = 0;
   kmShellExit = 1;
+  KeymanDownloadMutexName = 'KeymanDownloading';
 
   { State Class Memebers }
 
@@ -759,25 +760,21 @@ begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
 
-  RetryCount := 0;
-  DownloadResult := False;
-  FMutex := nil;
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
 
   try
-    FMutex := TKeymanMutex.Create('KeymanDownloading');
     // Should be impossible but just exit anyway and let the process current
     // downloading process finish.
-    if not FMutex.MutexOwned then
+    if not FMutex.TakeOwnership then
     begin
       Exit;
     end;
 
-    while (not DownloadResult) and (RetryCount < 3) do
-    begin
+    RetryCount := 0;
+    repeat
       DownloadResult := DownloadUpdatesBackground;
-      if not DownloadResult then
-        Inc(RetryCount);
-    end;
+      Inc(RetryCount);
+    until DownloadResult or (RetryCount = 3);
 
   finally
     FreeAndNil(FMutex);
@@ -824,21 +821,19 @@ function DownloadingState.HandleKmShell;
 var
   FMutex: TKeymanMutex;
 begin
-  FMutex := nil;
   // Whether already downloading in another process or download has failed and
   // this function has clean up and force a restart, kmshell should continue processing
   Result := kmShellContinue;
   // Check to ensure a download process is running if not
   // clean up return to the the idle state and check for updates
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
   try
-    FMutex := TKeymanMutex.Create('KeymanDownloading');
-    if FMutex.MutexOwned then
+    if FMutex.TakeOwnership then
     begin
       bucStateContext.RemoveCachedFiles;
-      FreeAndNil(FMutex); // Mutex must be freed before changing state
+      FMutex.ReleaseOwnership; // Mutex must be freed before changing state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck;
-      Exit;
     end;
   finally
     FreeAndNil(FMutex);
@@ -849,17 +844,15 @@ procedure DownloadingState.HandleDownload;
 var
   FMutex: TKeymanMutex;
 begin
-  FMutex := nil;
   // If downloading process is not running clean files and return to idle
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
   try
-    FMutex := TKeymanMutex.Create('KeymanDownloading');
-    if FMutex.MutexOwned then
+    if FMutex.TakeOwnership then
     begin
       bucStateContext.RemoveCachedFiles;
-      FreeAndNil(FMutex);  // Mutex must be freed before changing state
+      FMutex.ReleaseOwnership;  // Mutex must be freed before changing state
       ChangeState(IdleState);
       bucStateContext.CurrentState.HandleCheck;
-      Exit;
     end;
   finally
     FreeAndNil(FMutex);
