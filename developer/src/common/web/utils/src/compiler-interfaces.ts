@@ -399,6 +399,19 @@ export const CompilerMessageSpec = (code: number, message: string, detail?: stri
   detail,
 });
 
+/**
+ * Remove initial whitespace from compiler detail messages, to enable
+ * indented formatting of message detail strings inside the message
+ * definitions
+ * @param event
+ * @returns dedented event detail
+ */
+export function dedentCompilerMessageDetail(event: CompilerEvent) {
+  // TODO(lowpri): dedent may be too naive -- should use least
+  // non-zero whitespace line as amount to dedent
+  return (event.detail ?? '').replace(/^[ ]+/gm, '');
+}
+
 export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
 
 export const CompilerMessageSpecWithException = (code: number, message: string, exceptionVar: any, detail?: string) : CompilerEvent => ({

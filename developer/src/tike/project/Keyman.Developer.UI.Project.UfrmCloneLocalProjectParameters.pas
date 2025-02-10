@@ -199,7 +199,7 @@ end;
 procedure TfrmCloneLocalProjectParameters.EnableControls;
 var
   e: Boolean;
-  sourceId, id: string;
+  id: string;
 begin
   e := (Trim(editSourceProjectFilename.Text) <> '') and
     FileExists(Trim(editSourceProjectFilename.Text)) and
