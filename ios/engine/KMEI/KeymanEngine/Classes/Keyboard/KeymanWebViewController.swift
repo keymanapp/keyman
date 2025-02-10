@@ -173,6 +173,18 @@ class KeymanWebViewController: UIViewController {
 
 // MARK: - JavaScript functions
 extension KeymanWebViewController {
+  // In app-extension mode, there are scenarios in which this class does not properly
+  // deallocate!  We need to help that process along.
+  func destroy() {
+    // Message handlers can maintain references.
+    if #available(iOSApplicationExtension 14.0, *) {
+      self.userContentController.removeAllScriptMessageHandlers()
+    } else {
+      self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
+    }
+    view = nil
+  }
+  
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
     webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {

@@ -41,6 +41,16 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     super.init(coder: coder)
   }
 
+  public func destroy() {
+    // In app-extension mode, there are scenarios in which this class does not properly
+    // deallocate!  We need to help that process along.  In particular, doing this allows
+    // us to guarantee that the WebView is allowed to be GC'd, even when Apple fails to GC
+    // this (`CustomInputView`) instance - which actually happens.  (Refer to #12216.)
+    keymanWeb.removeFromParent()
+    keymanWeb.destroy()
+    keymanWeb = nil
+  }
+
   public var enableInputClicksWhenVisible: Bool {
     get {
       // Implemented as noted by https://developer.apple.com/documentation/uikit/uidevice/1620050-playinputclick.
@@ -98,37 +108,37 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
    */
   func keyboardHeightChanged() {
     os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .info)
-    
+
     // deactivate constraints for both orientations (though one should already be inactive)
     landscapeConstraint?.isActive = false
     portraitConstraint?.isActive = false
- 
+
     // rebuild both portrait and landscape constraints
     self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
-    
+
     // activate constraints for the current orientation
     if InputViewController.isPortrait {
       portraitConstraint?.isActive = true
     } else {
       landscapeConstraint?.isActive = true
     }
-    
+
     self.setNeedsLayout()
   }
-  
+
   private func buildKeyboardHeightConstraints(bannerHeight: CGFloat) {
     os_log("CustomInputView buildKeyboardHeightConstraints", log: KeymanEngineLogger.ui, type: .info)
     let innerView = keymanWeb.view!
-    
+
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
     let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.readKeyboardHeight(isPortrait: true)!)
     portraitHeightConstraint.identifier = "Height constraint for portrait mode"
     portraitHeightConstraint.priority = .defaultHigh
-    
+
     let landscapeHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.readKeyboardHeight(isPortrait: false)!)
     landscapeHeightConstraint.identifier = "Height constraint for landscape mode"
     landscapeHeightConstraint.priority = .defaultHigh
-    
+
     portraitConstraint = portraitHeightConstraint
     landscapeConstraint = landscapeHeightConstraint
     // .isActive will be set according to the current portrait/landscape perspective.
@@ -165,7 +175,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
   var portraitConstraint: NSLayoutConstraint?
   var landscapeConstraint: NSLayoutConstraint?
-  
+
   var outerWidthConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
@@ -217,6 +227,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   public required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+
+  deinit {
+    inputView?.removeFromSuperview()
+    (inputView as? CustomInputView)?.destroy()
+    inputView = nil
   }
 
   open override func updateViewConstraints() {
@@ -302,10 +318,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       keymanWeb.shouldReload = true
     }
   }
-  
+
   open override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
-    
+
     if outerWidthConstraint != nil {
       outerWidthConstraint?.isActive = false
       self.inputView?.removeConstraint(self.outerWidthConstraint!)
@@ -380,7 +396,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       }
     }
   }
-  
+
   func deleteSelection() -> Bool {
     if let selected = textDocumentProxy.selectedText, selected.count > 0 {
       /*
@@ -393,23 +409,23 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       /*
         We have a problem to resolve here: we cannot simply delete the selection
         with either .deleteBackward() or .insertText(""):
-       
+
         - If there is selected text immediately following a space (U+0020),
           .deleteBackward() will delete that space IN ADDITION to the selected text.
         - Unlike .insertText("-any-string-here"), .insertText("") does nothing;
           it does not replace the selection with the new string.
-       
+
         Our policy (#9073) on handling the backspace key when there is a
         text selection is to just delete the selection. We have to override
         the special case of space being deleted by .deleteBackward() ourselves.
         Additionally, the internal Web engine cannot anticipate the special
         case and requires precise and consistent backspace handling in line
         with our policy in order to keep the context on both sides synchronized.
-       
+
         As .insertText() does not delete the selection if the string to
         be inserted is empty, we insert something that won't combine,
         like a ZWNJ, and then delete it.
-       
+
         iOS does not allow users to select text in a way that splits
         character clusters.  This implies that it's impossible for an
         inserted ZWNJ to combine with existing context, making this
@@ -417,14 +433,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       */
       textDocumentProxy.insertText("\u{200c}")
       textDocumentProxy.deleteBackward()
-      
+
       let afterManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
-      
+
       // And now to finish our 'canary' check.
       if beforeManipulation != afterManipulation {
         os_log(.error, log: KeymanEngineLogger.engine, "Could not cleanly execute backspace for selected text")
       }
-      
+
       return true
     }
     return false
@@ -576,7 +592,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       customInputView.keyboardHeightChanged()
     }
   }
-  
+
   func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
@@ -639,7 +655,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
   }
-  
+
   func dismissHelpBubble() {
     keymanWeb.dismissHelpBubble()
   }
@@ -647,7 +663,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
   }
-  
+
   internal func enforceKeyboardSize() {
     keymanWeb.resizeKeyboard()
   }
