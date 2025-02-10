@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.188 alpha 2025-02-10
+
+* fix(windows): check the params status flag equals ucrsUpdateReady before attempting to download the keyman setup file (#13154)
+* feat(windows):  background updates go from downloading to waiting for a restart except if the `apply now` flag is set (#13159)
+* feat(developer): verify package version number format in kmc-package (#13118)
+* fix(developer): support non-US base keyboard layouts in debuggers (#13131)
+* feat(developer): improve compiler messages and user interface (#13156)
+* feat(developer): verify that packages do not contain themselves in kmc-package (#13157)
+* fix(developer): link welcome.htm in package for new projects; use v17 project format for new models (#13161)
+* fix(windows): use Automatically check for updates and download for the english xml (#13162)
+* change(linux): Implement ordered output without patched ibus (#11535)
+
 ## 18.0.187 alpha 2025-02-07
 
 * docs(web): relocate gesture docs to web/docs/internal (#13139)
