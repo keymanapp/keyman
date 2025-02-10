@@ -185,7 +185,14 @@ export class PackageCompilerMessages {
     this.WARN_VisualKeyboardFileIsInvalid, `Visual keyboard file '${def(o.filename)}' is invalid.`
   );
 
-  static ERROR_PackageMustNotContainItself = SevError | 0x0027;
+  static WARN_PackageVersionIsUnrecognizedFormat = SevWarn | 0x0027;
+  static Warn_PackageVersionIsUnrecognizedFormat = (o:{version: string}) => m(
+    this.WARN_PackageVersionIsUnrecognizedFormat, `Package version '${def(o.version)}' has an unrecognized format.`,
+    `The format for version numbers should be number[.number[.number]]. Each
+    number component should be an integer, without leading zeroes.`
+  );
+  
+  static ERROR_PackageMustNotContainItself = SevError | 0x0028;
   static Error_PackageMustNotContainItself = (o:{outputFilename: string}) => m(
     this.ERROR_PackageMustNotContainItself, `The package may not include a .kmp file of the same name '${def(o.outputFilename)}'.`, `
     While it is possible for a package file to contain other .kmp package files,

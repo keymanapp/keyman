@@ -255,8 +255,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
   <!--    -->
   <string name="koShowWelcome" comment="/FormatString: ">வரவேற்பு முகப்பு திரையை  காண்பிக்க</string>
   <!--    -->
-  <string name="koCheckForUpdates" comment="/FormatString: ">வாராந்திர மேம்பாட்டிற்கு www.tavultesoft.comல் சோதனையிட</string>
-  <!--    -->
   <string name="koKeyboardHotkeysAreToggle" comment="/FormatString: ">தட்டச்சுப்பலகைக்கான ஹாட் கீ </string>
   <!--    -->
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">Simulate AltGr with Ctrl+Alt</string>
