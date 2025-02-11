@@ -775,7 +775,7 @@ begin
       DownloadResult := DownloadUpdatesBackground;
       Inc(RetryCount);
     until DownloadResult or (RetryCount >= 3);
-
+    FMutex.ReleaseOwnership;
   finally
     FreeAndNil(FMutex);
   end;
