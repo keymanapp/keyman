@@ -774,7 +774,7 @@ begin
     repeat
       DownloadResult := DownloadUpdatesBackground;
       Inc(RetryCount);
-    until DownloadResult or (RetryCount = 3);
+    until DownloadResult or (RetryCount >= 3);
 
   finally
     FreeAndNil(FMutex);
