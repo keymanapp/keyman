@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.190 beta 2025-02-11
+
+* fix(developer): bundle ttfmeta library internally with kmc-keyboard-info (#11631)
+* fix(developer): support Windows and Unicode names in .ttf (#11633)
+* chore(developer): increase timeout for kmc-ldml compiler test (#11635)
+* chore(common): deps: update eslint typescript plugins (#11842)
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+
 ## 18.0.189 beta 2025-02-11
 
 * chore: move to beta
