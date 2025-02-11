@@ -416,8 +416,8 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</string>
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Automatically check for updates and download</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->

@@ -526,12 +526,16 @@ begin
     fmMain, fmAbout:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanConfiguration');
-        if FMutex.TakeOwnership then Main else FocusConfiguration;
+        if FMutex.TakeOwnership
+          then Main
+          else FocusConfiguration;
       end;
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.TakeOwnership then OpenTextEditor else FocusTextEditor;
+        if FMutex.TakeOwnership 
+          then OpenTextEditor 
+          else FocusTextEditor;
       end;
 
     fmBaseKeyboard:   // I4169
