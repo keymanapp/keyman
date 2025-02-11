@@ -15,7 +15,7 @@
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
     "chai": "^5.1.0",
-    "esbuild": "^0.18.9",
+    "esbuild": "^0.25.0",
     "eslint": "^8.39.0",
     "eslint-config-love": "^53.0.0",
     "eslint-plugin-import": "^2.27.5",
