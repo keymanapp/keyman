@@ -9,6 +9,9 @@ import { KeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
+import { getKeymanRoot } from '../../../getKeymanRoot.mjs';
+const KEYMAN_ROOT = getKeymanRoot();
+
 describe('Engine - Unmatched Final Groups', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/ghp_enter.json'));
   // Common test suite setup.
@@ -24,7 +27,7 @@ describe('Engine - Unmatched Final Groups', function() {
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-    const keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../../common/test/' + testSuite.keyboard.filename);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath(KEYMAN_ROOT + '/common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
 
