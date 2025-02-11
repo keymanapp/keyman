@@ -1,4 +1,4 @@
-# Required minimum versions as of Keyman 18.0
+# Required minimum versions as of Keyman 19.0
 #
 # This is a list of minimum, maximum, and specific versions of any external
 # components or dependencies found in Keyman.
