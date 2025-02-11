@@ -714,6 +714,7 @@ public final class KMManager {
         SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } catch (AndroidRuntimeException e) {
         // Catch fatal error when WebView not installed/enabled
+        showWebViewError();
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
@@ -816,11 +817,12 @@ public final class KMManager {
   }
 
   public static void onStartInput(EditorInfo attribute, boolean restarting) {
-    if (!didShowWebViewError && SystemKeyboard == null && WebViewUtils.getSystemWebViewStatus(appContext) !=
+    /*if (!didShowWebViewError && SystemKeyboard == null && WebViewUtils.getSystemWebViewStatus(appContext) !=
         SystemWebViewStatus.FULL) {
       showWebViewError();
       didShowWebViewError = true;
     }
+     */
     if (!restarting && SystemKeyboard != null) {
       String packageName = attribute.packageName;
       int inputType = attribute.inputType;

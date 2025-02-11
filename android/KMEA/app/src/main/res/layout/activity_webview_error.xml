@@ -1,41 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/webViewErrorLayout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
     android:background="@android:color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="bottom"
+    app:layout_anchorGravity="bottom">
+
+    <View android:id="@+id/pad"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <!-- Banner to display if WebView is not installed/enabled -->
     <TextView
         android:id="@+id/kmWebViewError"
-        android:drawableStart="@drawable/ic_launcher"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center_vertical"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_weight="1"
         android:background="@android:color/white"
+        app:drawableStartCompat="@drawable/ic_launcher"
         android:text="@string/body_switch_keyboard"
         android:textSize="@dimen/titlebar_label_textsize" />
 
     <Button
         android:id="@+id/changeIMEButton"
         style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@android:color/holo_orange_light"
+        android:textColor="@android:color/white"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/kmWebViewError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|center_vertical"
         android:layout_marginStart="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
+        android:elevation="1dp"
         android:paddingStart="@dimen/fab_padding"
         android:paddingEnd="@dimen/fab_padding"
-        android:background="@android:color/holo_orange_light"
-        android:elevation="1dp"
         android:singleLine="true"
-        android:text="@string/label_ok"
-        android:textColor="@android:color/white"/>
+        android:text="@string/label_ok" />
 
-</LinearLayout>
+</RelativeLayout>

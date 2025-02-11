@@ -5,10 +5,12 @@ package com.keyman.engine;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 /**
  * Activity to display when WebView is either not installed or enabled.
@@ -17,17 +19,18 @@ import android.widget.LinearLayout;
 public class WebViewErrorActivity extends BaseActivity {
   private static final String TAG = "WebViewErrorActivity";
 
-  private static LinearLayout linearLayout = null;
+  private static RelativeLayout linearLayout = null;
   private static Button changeIMEButton = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    Log.d(TAG, "creating WebViewErrorActivity");
     final Context context = this;
     setContentView(R.layout.activity_webview_error);
 
-    linearLayout = (LinearLayout) findViewById(R.id.webViewErrorLayout);
+    linearLayout = (RelativeLayout) findViewById(R.id.webViewErrorLayout);
     changeIMEButton = (Button) findViewById(R.id.changeIMEButton);
     changeIMEButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
