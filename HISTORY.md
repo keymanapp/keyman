@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.189 beta 2025-02-11
+
+* chore: move to beta
+
 ## 18.0.188 alpha 2025-02-10
 
 * fix(windows): check the params status flag equals ucrsUpdateReady before attempting to download the keyman setup file (#13154)
