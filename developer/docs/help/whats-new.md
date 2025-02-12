@@ -6,7 +6,7 @@ Keyman Developer 18 has a number of significant changes:
 
 * Updated to Unicode 16.0 (#12393)
 * Improve automatic detection of minimum Keyman version for a keyboard during
-  compilation (#11981, 311982, #11965, #11957)
+  compilation (#11981, #11982, #11965, #11957)
 * Generate keyboards and lexical models from templates, with `kmc generate`
   (#11014)
 * Clone existing keyboard and lexical model projects, both from local file
