@@ -158,5 +158,48 @@ export class InfrastructureMessages {
     this.ERROR_CopyRequiresOutPath,
     `The copy command requires the --out-path, -o parameter`
   );
- }
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_CopyingProject = SevInfo | 0x0023;
+  static Info_CopyingProject = (o:{source:string,dest:string}) => ({filename:o.source, ...m(
+    this.INFO_CopyingProject,
+    `Copying project '${def(o.source)}' to '${def(o.dest)}'`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectCopiedSuccessfully = SevInfo | 0x0024;
+  static Info_ProjectCopiedSuccessfully = (o:{source:string, dest:string}) => ({filename:o.source, ...m(
+    this.INFO_ProjectCopiedSuccessfully,
+    `'${def(o.source)}' copied to '${def(o.dest)}' successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotCopiedSuccessfully = SevInfo | 0x0025;
+  static Info_ProjectNotCopiedSuccessfully = (o:{source:string, dest:string}) => ({filename:o.source, ...m(
+    this.INFO_ProjectNotCopiedSuccessfully,
+    `'${def(o.source)}' was not successfully copied to '${def(o.dest)}'.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_GeneratingProject = SevInfo | 0x0026;
+  static Info_GeneratingProject = (o:{id:string, outPath: string}) => ({filename:o.id, ...m(
+    this.INFO_GeneratingProject,
+    `Generating new project '${def(o.id)}' in '${def(o.outPath)}'.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectGeneratedSuccessfully = SevInfo | 0x0027;
+  static Info_ProjectGeneratedSuccessfully = (o:{id:string}) => ({filename:o.id, ...m(
+    this.INFO_ProjectGeneratedSuccessfully,
+    `New project '${def(o.id)}' generated successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotGeneratedSuccessfully = SevInfo | 0x0028;
+  static Info_ProjectNotGeneratedSuccessfully = (o:{id:string}) => ({filename:o.id, ...m(
+    this.INFO_ProjectNotGeneratedSuccessfully,
+    `New project '${def(o.id)}' was not successfully generated.`,
+  )});
+
+}
 

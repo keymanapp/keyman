@@ -113,9 +113,16 @@ async function generate(generator: KeymanCompiler, ids: string | string[], comma
   }
 
   const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
-
+  const outPath = options.outPath;
   const callbacks = new NodeCompilerCallbacks(options);
-  if(!await doGenerate(callbacks, generator, options)) {
+  callbacks.reportMessage(InfrastructureMessages.Info_GeneratingProject({id, outPath}));
+
+  const result = await doGenerate(callbacks, generator, options);
+
+  if(result) {
+    callbacks.reportMessage(InfrastructureMessages.Info_ProjectGeneratedSuccessfully({id}));
+  } else {
+    callbacks.reportMessage(InfrastructureMessages.Info_ProjectNotGeneratedSuccessfully({id}));
     return await exitProcess(1);
   }
 }
