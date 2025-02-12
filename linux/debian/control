@@ -43,8 +43,8 @@ Build-Depends:
  xserver-xephyr,
  xvfb,
 Standards-Version: 4.7.0
-Vcs-Git: https://github.com/keymanapp/keyman.git -b stable-17.0 [linux/debian]
-Vcs-Browser: https://github.com/keymanapp/keyman/tree/stable-17.0/linux/debian
+Vcs-Git: https://github.com/keymanapp/keyman.git -b beta [linux/debian]
+Vcs-Browser: https://github.com/keymanapp/keyman/tree/beta/linux/debian
 Homepage: https://www.keyman.com
 Rules-Requires-Root: binary-targets
 
