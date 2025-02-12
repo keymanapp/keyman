@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.191 beta 2025-02-12
+
+* feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
+* docs(developer): update what's new for 18.0 (#13198)
+* chore(mac): update whats new for Keyman 18 (#13197)
+* chore(ios): update whats new for Keyman 18 (#13199)
+* fix: use tier and version from branch when merging history from another branch (#13170)
+* fix(linux): start system service when switching keyboards (#13172)
+* chore(linux): update actions/cache to non-deprecated version (#13193)
+* chore(linux): update branch that's used for Debian packaging (#13192)
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13202)
+
 ## 18.0.190 beta 2025-02-11
 
 * fix(developer): bundle ttfmeta library internally with kmc-keyboard-info (#11631)
