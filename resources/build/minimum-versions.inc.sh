@@ -14,7 +14,7 @@ KEYMAN_MIN_TARGET_VERSION_ANDROID=5.0         # Lollipop
 KEYMAN_MIN_TARGET_VERSION_IOS=12.2            # iOS 12.2
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
 KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
-KEYMAN_MIN_TARGET_VERSION_UBUNTU=20.04        # Ubuntu 20.04 Focal
+KEYMAN_MIN_TARGET_VERSION_UBUNTU=22.04        # Ubuntu 22.04 Jammy
 KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME=53.0 # min version of Chrome for Keyman for Android
 
 # Target web browsers for KeymanWeb -- we do not have polyfills for
