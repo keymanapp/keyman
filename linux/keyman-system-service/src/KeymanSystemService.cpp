@@ -76,11 +76,22 @@ on_call_ordered_output_sentinel(
   return sd_bus_reply_method_return(msg, "");
 }
 
+static int32_t
+on_ping(
+  sd_bus_message *msg,
+  void *user_data,
+  sd_bus_error *ret_error
+) {
+  *ret_error = SD_BUS_ERROR_NULL;
+  return sd_bus_reply_method_return(msg, "s", "pong");
+}
+
 static const sd_bus_vtable system_service_vtable[] = {
   SD_BUS_VTABLE_START(0),
     SD_BUS_METHOD("SetCapsLockIndicator", "b", "", on_set_caps_lock_indicator, SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_METHOD("GetCapsLockIndicator", "", "b", on_get_caps_lock_indicator, SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_METHOD("CallOrderedOutputSentinel", "", "", on_call_ordered_output_sentinel, SD_BUS_VTABLE_UNPRIVILEGED),
+    SD_BUS_METHOD("Ping", "", "s", on_ping, SD_BUS_VTABLE_UNPRIVILEGED),
   SD_BUS_VTABLE_END
 };
 
