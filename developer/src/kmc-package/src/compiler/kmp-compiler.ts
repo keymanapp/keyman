@@ -18,16 +18,28 @@ import { PackageKeyboardTargetValidator } from './package-keyboard-target-valida
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
 import { PackageValidation } from './package-validation.js';
+import { getFileDataFromRemote, isLocalFile, KmpCompilerFileDataResult } from './get-file-data.js';
+import { KmpJsonFileContentFile } from 'node_modules/@keymanapp/common-types/src/package/kmp-json-file.js';
 import { getFontFamilySync } from "@keymanapp/developer-utils";
 import { setKvkFontData } from './kvk-font-facename.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
 
+interface KmpFileData {
+  fileData: {[name:string]: { basename: string; data: Uint8Array }};
+}
+
+export interface KmpTransformResult {
+  kmpJsonData?: KmpJsonFile.KmpJsonFile;
+  fileData?: KmpFileData;
+};
+
 // welcome.htm: this is a legacy filename, as of 17.0 the welcome
 // (documentation) filename can be any file, but we will fallback to detecting
 // this filename for existing keyboard packages.
 const WELCOME_HTM_FILENAME = 'welcome.htm';
+const FAILED_TRANSFORM_RESULT: KmpTransformResult = { kmpJsonData: null, fileData: null };
 
 /**
  * @public
@@ -100,7 +112,8 @@ export class KmpCompiler implements KeymanCompiler {
    * @returns         Binary artifacts on success, null on failure.
    */
   public async run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult> {
-    const kmpJsonData = this.transformKpsToKmpObject(inputFilename);
+    const { kmpJsonData, fileData } = await this.transformKpsToKmpObject(inputFilename) ?? {};
+
     if(!kmpJsonData) {
       return null;
     }
@@ -120,7 +133,7 @@ export class KmpCompiler implements KeymanCompiler {
     // Build the .kmp package file
     //
 
-    const data = await this.buildKmpFile(inputFilename, kmpJsonData);
+    const data = await this.buildKmpFile(kmpJsonData, fileData);
     if(!data) {
       return null;
     }
@@ -155,25 +168,25 @@ export class KmpCompiler implements KeymanCompiler {
   /**
    * @internal
    */
-  public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
+  public async transformKpsToKmpObject(kpsFilename: string): Promise<KmpTransformResult> {
     const reader = new KpsFileReader(this.callbacks);
     const data = this.callbacks.loadFile(kpsFilename);
     if(!data) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
-      return null;
+      return FAILED_TRANSFORM_RESULT;
     }
     const kps = reader.read(data);
     if(!kps) {
       // errors will already have been reported by KpsFileReader
-      return null;
+      return FAILED_TRANSFORM_RESULT;
     }
-    const kmp = this.transformKpsFileToKmpObject(kpsFilename, kps.Package);
-    if(!kmp) {
-      return null;
+    const kmp = await this.transformKpsFileToKmpObject(kpsFilename, kps.Package);
+    if(!kmp?.kmpJsonData) {
+      return FAILED_TRANSFORM_RESULT;
     }
 
     // Verify that the generated kmp.json validates with the kmp.json schema
-    if(!SchemaValidators.default.kmp(kmp)) {
+    if(!SchemaValidators.default.kmp(kmp.kmpJsonData)) {
       // This is an internal error, so throwing an exception is appropriate
       throw new Error(JSON.stringify((<any>SchemaValidators.default.kmp).errors));
     }
@@ -186,7 +199,7 @@ export class KmpCompiler implements KeymanCompiler {
   /**
    * @internal
    */
-  public transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile {
+  public async transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): Promise<KmpTransformResult> {
 
     //
     // To convert to kmp.json, we need to:
@@ -247,42 +260,21 @@ export class KmpCompiler implements KeymanCompiler {
     // Add file metadata
     //
 
+    const fileData: KmpFileData = {fileData: {}};
+
+    const supportsRemotes = parseFloat(kps.System.FileVersion) >= parseFloat(KpsFile.KPS_FILE_MINIMUM_VERSION_REMOTE_SUPPORT);
+
     if(kps.Files?.File?.length) {
-      kmp.files = kps.Files.File.map((file: KpsFile.KpsFileContentFile) => {
-        return {
-          name: this.normalizePath(file.Name),
-          description: '',  // kmp.json still requires description, but we ignore the input Description field
-          // note: we no longer emit copyLocation as of 18.0; it was always optional
-          // note: we don't emit fileType as that is not permitted in kmp.json
-        };
-      });
-      if(!kmp.files.reduce((result: boolean, file) => {
-        if(!file.name) {
-          // as the filename field is missing or blank, we'll try with the description instead
-          this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
-          return false;
-        }
-        return result;
-      }, true)) {
-        return null;
+      // TODO: we have to cache the file data now because we use it for example
+      // for metadata collection
+
+      kmp.files = await this.locateFiles(supportsRemotes, kps.System.FileVersion, kpsFilename, kps.Files.File, fileData);
+      if(!kmp.files) {
+        // error reported in locateFiles
+        return FAILED_TRANSFORM_RESULT;
       }
     }
     kmp.files = kmp.files ?? [];
-
-    // Keyboard packages also include a legacy kmp.inf file (this will be removed,
-    // one day)
-    if(kps.Keyboards && kps.Keyboards.Keyboard) {
-      kmp.files.push({
-        name: KMP_INF_FILENAME,
-        description: ""
-      });
-    }
-
-    // Add the standard kmp.json self-referential to match existing implementations
-    kmp.files.push({
-      name: KMP_JSON_FILENAME,
-      description: ""
-    });
 
     //
     // Add keyboard metadata
@@ -339,7 +331,8 @@ export class KmpCompiler implements KeymanCompiler {
     const collector = new PackageMetadataCollector(this.callbacks);
     const metadata = collector.collectKeyboardMetadata(kpsFilename, kmp);
     if(metadata == null) {
-      return null;
+      // error reported in collectKeyboardMetadata
+      return FAILED_TRANSFORM_RESULT;
     }
 
     //
@@ -348,7 +341,8 @@ export class KmpCompiler implements KeymanCompiler {
 
     const versionValidator = new PackageVersionValidator(this.callbacks);
     if(!versionValidator.validateAndUpdateVersions(kps, kmp, metadata)) {
-      return null;
+      // error reported in validateAndUpdateVersions
+      return FAILED_TRANSFORM_RESULT;
     }
 
     if(kps.Keyboards && kps.Keyboards.Keyboard) {
@@ -356,6 +350,23 @@ export class KmpCompiler implements KeymanCompiler {
     } else {
       kmp.system.fileVersion = MIN_LM_FILEVERSION_KMP_JSON;
     }
+
+    // TODO: if targeting 18.0, drop 'description' File field entirely from kmp.json
+    // TODO: ONLY ADD kmp.inf if fileVersion < MIN_LM_FILEVERSION_KMP_JSON (+UNIT TEST)
+    // Keyboard packages also include a legacy kmp.inf file, if targeting an old
+    // version of Keyman
+    if(kps.Keyboards && kps.Keyboards.Keyboard) {
+      kmp.files.push({
+        name: KMP_INF_FILENAME,
+        description: ""
+      });
+    }
+
+    // Add the standard kmp.json self-referential to match existing implementations
+    kmp.files.push({
+      name: KMP_JSON_FILENAME,
+      description: ""
+    });
 
     //
     // Verify that packages that target mobile devices include a .js file
@@ -401,7 +412,7 @@ export class KmpCompiler implements KeymanCompiler {
 
     kmp = this.stripUndefined(kmp) as KmpJsonFile.KmpJsonFile;
 
-    return kmp;
+    return {kmpJsonData: kmp, fileData};
   }
 
     // Helper functions
@@ -460,9 +471,8 @@ export class KmpCompiler implements KeymanCompiler {
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
    * @param kmpJsonData - The kmp.json Object
    */
-  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array> {
+  public async buildKmpFile(kmpJsonData: KmpJsonFile.KmpJsonFile, fileData: KmpFileData): Promise<Uint8Array> {
     const zip = JSZip();
-
 
     // Make a copy of kmpJsonData, as we mutate paths for writing
     const data: KmpJsonFile.KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
@@ -472,43 +482,32 @@ export class KmpCompiler implements KeymanCompiler {
 
     const hasKmpInf = !!data.files.find(file => file.name == KMP_INF_FILENAME);
 
-    let failed = false;
-    data.files.forEach((value) => {
+    for(const value of data.files) {
       // Get the path of the file
       let filename = value.name;
-
       // We add this separately after zipping all other files
       if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
-        return;
+        continue;
       }
 
-      if(this.callbacks.path.isAbsolute(filename)) {
-        // absolute paths are not portable to other computers
-        this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: filename}));
-      }
-
-      let memberFileData = this.getMemberFileData(kpsFilename, filename);
+      let memberFileData = fileData.fileData[filename].data;
       if(!memberFileData) {
-        failed = true;
-        return;
+        return null;
       }
-      filename = this.callbacks.resolveFilename(kpsFilename, filename);
-      const basename = this.callbacks.path.basename(filename);
+      const basename = fileData.fileData[filename].basename;
+
+      // filename = this.callbacks.resolveFilename(kpsFilename, filename);
 
       if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Binary.VisualKeyboard)) {
         if(!this.isKvkFileBinary(memberFileData)) {
           // warn the few users who are still doing this -- non-binary .kvk should not be included in package!
           this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
         } else {
-          memberFileData = this.setKvkFontData(kpsFilename, data, filename, memberFileData);
+          memberFileData = this.setKvkFontData(data, fileData, filename, memberFileData);
         }
       }
 
       zip.file(basename, memberFileData);
-    });
-
-    if(failed) {
-      return null;
     }
 
     data.files.forEach((value) => {
@@ -561,8 +560,65 @@ export class KmpCompiler implements KeymanCompiler {
     return transcodeToCP1252(s);
   }
 
-  private getMemberFileData(kpsFilename: string, filename: string) {
-    filename = this.callbacks.resolveFilename(kpsFilename, filename);
+  private async locateFiles(supportsRemotes: boolean, kpsVersion: string, kpsFilename: string, kpsFiles: KpsFile.KpsFileContentFile[], fileData: KmpFileData) {
+    let result = true;
+    const files: KmpJsonFileContentFile[] = [];
+
+    for(const file of kpsFiles) {
+      const isLocal = isLocalFile(file.Name);
+      if(!isLocal && !supportsRemotes) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Hint_RemoteReferencesShouldBeVersion18Plus({filename:file.Name, kpsVersion}));
+      }
+      const name = isLocal ?
+        this.normalizePath(file.Name) :
+        file.Name;
+
+      if(!name) {
+        // as the filename field is missing or blank, we'll report with the description instead
+        // we'll keep reporting other content file errors
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.Description ?? '(no description)'}));
+        result = false;
+        continue;
+      }
+
+      files.push({
+        name,
+        description: '',  // kmp.json still requires description, but we ignore the input Description field
+        // note: we no longer emit copyLocation as of 18.0; it was always optional
+        // note: we don't emit fileType as that is not permitted in kmp.json
+      });
+
+      const data = isLocal ?
+        this.getFileDataLocal(kpsFilename, file.Name, file.Source) :
+        await getFileDataFromRemote(this.callbacks, file.Name, file.Source);
+
+      if(!data) {
+        // we'll keep reporting other content file errors
+        result = false;
+      }
+      fileData.fileData[name] = data;
+    }
+
+    if(!result) {
+      // error reported above
+      return null;
+    }
+
+    return files;
+  }
+
+  private getFileDataLocal(kpsFilename: string, inputFilename: string, sourceFilename?: string): KmpCompilerFileDataResult {
+    if(sourceFilename) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_SourceCannotBeSetForLocalFiles({filename: inputFilename, sourceFilename}));
+      return null;
+    }
+
+    if(this.callbacks.path.isAbsolute(inputFilename)) {
+      // absolute paths are not portable to other computers
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: inputFilename}));
+    }
+
+    const filename = this.callbacks.resolveFilename(kpsFilename, inputFilename);
 
     if(!this.callbacks.fs.existsSync(filename)) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
@@ -570,14 +626,16 @@ export class KmpCompiler implements KeymanCompiler {
     }
 
     try {
-      return this.callbacks.loadFile(filename);
+      const basename = this.callbacks.path.basename(filename);
+      const data = this.callbacks.loadFile(filename);
+      return { data, basename };
     } catch(e) {
       this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
       return null;
     }
   }
 
-  private setKvkFontData(kpsFilename: string, data: KmpJsonFile.KmpJsonFile, filename: string, kvk: Uint8Array) {
+  private setKvkFontData(data: KmpJsonFile.KmpJsonFile, fileData: KmpFileData, filename: string, kvk: Uint8Array) {
     // find the appropriate font to set
     const kvkId = this.callbacks.path.basename(filename.toLowerCase(), '.kvk');
     const kbd = data.keyboards.find(k => k.id == kvkId);
@@ -601,7 +659,7 @@ export class KmpCompiler implements KeymanCompiler {
     }
 
     // the font is a filename, included in the .kps
-    const fontData = this.getMemberFileData(kpsFilename, fontFile.name);
+    const fontData = fileData.fileData[fontFile.name].data;
     if(!fontData) {
       // cannot find source font
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_CannotFindFontForKeyboard({id: kbd.id, fontFilename: fontFile.name}));

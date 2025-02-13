@@ -38,8 +38,8 @@ describe('package versioning', function () {
       assert.isTrue(await kmpCompiler.init(callbacks, null));
 
       const kpsPath = makePathToFixture('versioning', filename);
-      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
-      assert.isTrue(kmpJson !== null);
+      const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+      assert.isTrue(kmpJsonData !== null);
     });
   }
 
