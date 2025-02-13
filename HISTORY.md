@@ -1,5 +1,84 @@
 # Keyman Version History
 
+## 19.0.2 alpha 2025-02-12
+
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
+
+## 19.0.1 alpha 2025-02-11
+
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+* chore: increment to alpha 19.0 (#13187)
+
+## 18.0.188 alpha 2025-02-10
+
+* fix(windows): check the params status flag equals ucrsUpdateReady before attempting to download the keyman setup file (#13154)
+* feat(windows):  background updates go from downloading to waiting for a restart except if the `apply now` flag is set (#13159)
+* feat(developer): verify package version number format in kmc-package (#13118)
+* fix(developer): support non-US base keyboard layouts in debuggers (#13131)
+* feat(developer): improve compiler messages and user interface (#13156)
+* feat(developer): verify that packages do not contain themselves in kmc-package (#13157)
+* fix(developer): link welcome.htm in package for new projects; use v17 project format for new models (#13161)
+* fix(windows): use Automatically check for updates and download for the english xml (#13162)
+* change(linux): Implement ordered output without patched ibus (#11535)
+
+## 18.0.187 alpha 2025-02-07
+
+* docs(web): relocate gesture docs to web/docs/internal (#13139)
+* chore(mac): remove empty options tab from configuration (#13160)
+* chore(linux): Update debian changelog (#13143)
+
+## 18.0.186 alpha 2025-02-06
+
+* feat(windows): check updates and automatic update merged (#13115)
+
+## 18.0.185 alpha 2025-02-05
+
+* fix(developer): make kmc log options consistent across all commands (#13075)
+* feat(developer): add user interface for `kmc copy` to TIKE (#13076)
+* chore(developer): add verbose logs for project copier (#13080)
+* chore(mac, ios): build and run with xcode 16 (#13077)
+
+## 18.0.184 alpha 2025-02-04
+
+* fix(common): handle undefined input in `@keymanapp/langtags` lookups (#13117)
+* chore: update docs to reference node 20.0 (#13124)
+* feat(developer): include command line in kmc sentry reports (#13113)
+* fix(common/web): replace invalid StrsItem identity checks with isEqual() (#13122)
+
+## 18.0.183 alpha 2025-02-03
+
+* change(ios): set host-app bundle identifier in embedded Web debug-report (#13105)
+* fix(ios): prevent message-handler collision (#13037)
+* change(web): add context tracker bksp handling, alignment-offset calculations (#12911)
+* fix(web): correct edit-path ordering at source (#12925)
+* fix(web): correctly track context transitions caused by applying suggestions (#12927)
+* chore(linux): preserve log files when running tests under Docker (#13107)
+
+## 18.0.182 alpha 2025-01-31
+
+* feat(windows): report on processor type in tsysinfo (#13084)
+* fix(common): push branch when creating PR in version history writer (#13082)
+* refactor: move langtags to @keymanapp/langtags npm module (#13046)
+* chore(developer): use langtags.json for kmc-generate language names (#13047)
+* feat(developer): support relocation of external files in kmc-copy (#13061)
+* feat(windows): kmshell switch handling for the installing state (#12956)
+* feat(windows): add boot switch (#12995)
+* docs(web): remove `.md` in help links (#13051)
+* chore: add android platform to titles (#13033)
+* chore: add the windows platform to titles (#13026)
+* fix(mac): properly manage Input Method lifecycle (#13006)
+* chore(developer): handle forward slashes in paths in package editor (#13081)
+* chore(developer,core,resources): LDML v46 update and remove workaround for import base (#13099)
+
+## 18.0.181 alpha 2025-01-30
+
+* feat(windows): add localized button captions and form labels (#13025)
+* fix(web): disabled correction state should prevent predictive corrections (#13066)
+* fix(web): disabled autoaccept should not autohighlight suggestions (#13068)
+* chore(common): add 17.0.334 to version history (#13065)
+* fix(windows): add api GetContext and TIPProcessKeyEx with IsTextSelected bool (#13023)
+* fix(web): keyboard query error states should always provide informative Error objects, reports (#13048)
+
 ## 18.0.180 alpha 2025-01-29
 
 * chore(common): Update crowdin strings for Portuguese (#13056)
@@ -1241,6 +1320,18 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.335 alpha 2025-02-06
+
+* fix(android): improve resource-update tool handling of host Activity's closure (#13057)
+* fix(ios): prevent message-handler collision (#13058)
+* chore(linux): improve compatibility with Gentoo Linux (#12889)
+* chore(linux): Update debian changelog (#13062)
+* fix(web): keyboard query error states should always provide informative Error objects, reports (#13079)
+* chore: push the branch when creating PR in version history writer (#13085)
+* fix(web): disabled correction state should prevent predictive corrections (#13074)
+* change(ios): set host-app bundle identifier in embedded Web debug-report (#13112)
+* chore(mac, ios): build and run with xcode 16 (#13121)
 
 ## 17.0.334 stable 2025-01-27
 

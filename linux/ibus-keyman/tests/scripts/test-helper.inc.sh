@@ -140,7 +140,7 @@ function _setup_test_dbus_server() {
   CLEANUP_FILE=$2
 
   # Start test dbus server. This will create `/tmp/km-test-server.env`.
-  "${TOP_BINDIR}/tests/km-dbus-test-server" &> /dev/null &
+  "${TOP_BINDIR}/tests/km-dbus-test-server" &> /tmp/km-test-server.log &
   sleep 1
 
   cat /tmp/km-test-server.env >> "$ENV_FILE"
@@ -251,7 +251,7 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  if [[ "${STANDALONE}" == "--standalone" ]] && [[ ! "${DOCKER_RUNNING:-false}" ]]; then
+  if [[ "${STANDALONE}" == "--standalone" ]] && [[ "${DOCKER_RUNNING:-false}" != "true" ]]; then
     # manual test run
     echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else
@@ -320,6 +320,15 @@ function cleanup() {
     bash "$CLEANUP_FILE" # > /dev/null 2>&1
     rm "$CLEANUP_FILE"
     echo "# Finished shutdown of processes."
+  fi
+
+  if [[ "${DOCKER_RUNNING:-false}" == "true" ]]; then
+    # Note: build/tmp is build/docker-linux/tmp on the host!
+    BUILD_TMP="$(dirname "$0")/../../../build/tmp"
+    mkdir -p "${BUILD_TMP}"
+    [[ -f /tmp/ibus-engine-keyman.log ]] && mv /tmp/ibus-engine-keyman.log "${BUILD_TMP}/ibus-engine-keyman.log"
+    [[ -f /tmp/ibus-daemon.log ]] && mv /tmp/ibus-daemon.log "${BUILD_TMP}/ibus-daemon.log"
+    [[ -f /tmp/km-test-server.log ]] && mv /tmp/km-test-server.log "${BUILD_TMP}/km-test-server.log"
   fi
 }
 

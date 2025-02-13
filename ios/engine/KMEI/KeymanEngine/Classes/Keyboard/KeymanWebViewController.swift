@@ -137,7 +137,7 @@ class KeymanWebViewController: UIViewController {
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
-    
+
     if #available(iOSApplicationExtension 16.4, *) {
       if(Version.current.tier != .stable) {
         webView!.isInspectable = true
@@ -164,6 +164,9 @@ class KeymanWebViewController: UIViewController {
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
+    if #available(iOSApplicationExtension 14.0, *) {
+      self.userContentController.removeAllScriptMessageHandlers()
+    }
     self.userContentController.add(self, name: keymanWebViewName)
   }
 
@@ -600,6 +603,10 @@ extension KeymanWebViewController: KeymanWebDelegate {
     os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     SentryManager.breadcrumb(message, sentryLevel: .debug)
 
+    // Overwrites the baseline "embeddingApp" text available before Web engine init with the
+    // active bundle identifier.
+    webView!.evaluateJavaScript("setHostAppName(\"\(Bundle.main.infoDictionary!["CFBundleIdentifier"]!)\")")
+
     self.setSentryState()
     resizeKeyboard()
 
@@ -696,7 +703,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
 // MARK: - Manage views
 extension KeymanWebViewController {
   // MARK: - Sizing
-  
+
   @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
     self.delegate?.menuKeyHeld(self)
   }
@@ -713,10 +720,10 @@ extension KeymanWebViewController {
     let width: CGFloat
     width = UIScreen.main.bounds.width
     var height: CGFloat
-    
+
     // get orientation differently if system or in-app keyboard
     let portrait = Util.isSystemKeyboard ? InputViewController.isPortrait : UIDevice.current.orientation.isPortrait
-    
+
     /**
      * If keyboard height is saved in UserDefaults, then use it
      */
@@ -728,17 +735,17 @@ extension KeymanWebViewController {
        */
       height = self.determineDefaultKeyboardHeight(isPortrait: portrait)
       self.writeKeyboardHeightIfDoesNotExist(isPortrait: portrait, height: height)
-      
+
       /**
        * If we need to write out the keyboard height for one orientation, then we
-       * expect that the other must be written also. 
+       * expect that the other must be written also.
        * Write it out now, but only if a value for keyboard height does not already exist.
        */
       height = self.determineDefaultKeyboardHeight(isPortrait: !portrait)
       self.writeKeyboardHeightIfDoesNotExist(isPortrait: !portrait, height: height)
     }
-    
-    /** 
+
+    /**
      * no need to check for Util.isSystemKeyboard because this is shared storage
      * the UserDefaults are readable and writeable by both system and in-app
      */
@@ -768,7 +775,7 @@ extension KeymanWebViewController {
 
     return height;
   }
-  
+
   /**
    * Write out the keyboard height to the UserDefaults but only if it does not exist there yet.
    * If it exists, then we assume it was configured by the user and do not want to
@@ -789,7 +796,7 @@ extension KeymanWebViewController {
       }
     }
   }
-  
+
   var keyboardSize: CGSize {
     get {
       if kbSize.equalTo(CGSize.zero) {

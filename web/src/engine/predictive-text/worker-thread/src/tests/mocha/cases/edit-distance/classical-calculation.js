@@ -513,6 +513,16 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       assert.deepEqual(buffer.editPath(), editSequence);
     });
 
+    it("'then' -> 'their'", function() {
+      let buffer = compute("then", "their");
+
+      let editSequence = [
+          op.m, op.m, op.m, op.s, op.i
+      ];
+
+      assert.deepEqual(buffer.editPath(), editSequence);
+    });
+
     // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
     it("'abczdefig' -> 'cazefghi'", function() {
       let buffer = compute("abczdefig", "cazefghi", "InputThenMatch", 2);

@@ -65,7 +65,11 @@ function run_tests() {
 
   setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE" --standalone
 
-  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
+  if [[ "${DOCKER_RUNNING:-false}" == "true" ]]; then
+    echo "# NOTE: When the tests fail check ibus-engine-keyman.log, ibus-daemon.log and km-test-server.log in build/docker-linux/tmp/!"
+  else
+    echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log, /tmp/ibus-daemon.log and /tmp/km-test-server.log!"
+  fi
   echo ""
 
   if [ $# -gt 0 ]; then
