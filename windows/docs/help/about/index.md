@@ -1,5 +1,5 @@
 ---
-title: About Keyman
+title: About Keyman for Windows
 ---
 
 * [Welcome to Keyman](welcome)

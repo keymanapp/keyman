@@ -3,7 +3,7 @@
  * kmlmp - Keyman Lexical Model Package Compiler
  */
 
-// Note: this is a deprecated package and will be removed in Keyman 18.0
+// Note: this is a deprecated package and will be removed in Keyman 19.0
 
 import { Command } from 'commander';
 import { KmpCompiler } from '@keymanapp/kmc-package';

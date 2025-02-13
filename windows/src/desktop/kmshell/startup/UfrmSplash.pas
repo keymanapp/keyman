@@ -220,7 +220,7 @@ begin
   begin
     FMutex := TKeymanMutex.Create('KeymanSplash');
     try
-      if not FMutex.MutexOwned then
+      if not FMutex.TakeOwnership then
       begin
         FocusSplash;  // I2562
         Exit;

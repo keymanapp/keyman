@@ -1,5 +1,5 @@
 ---
-title: About Keyman for iPhone and iPad
+title: About Keyman
 ---
 
 * [Welcome to Keyman](welcome)

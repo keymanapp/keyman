@@ -12,7 +12,7 @@ export class PackageValidation {
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) {
   }
 
-  public validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
+  public validate(filename: string, outputFilename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
     if(!this.checkForModelsAndKeyboardsInSamePackage(kmpJson)) {
       return false;
     }
@@ -22,7 +22,7 @@ export class PackageValidation {
     if(!this.checkLexicalModels(filename, kmpJson)) {
       return false;
     }
-    if(!this.checkContentFiles(kmpJson)) {
+    if(!this.checkContentFiles(kmpJson, outputFilename)) {
       return false;
     }
     if(!this.checkPackageInfo(kmpJson)) {
@@ -130,9 +130,9 @@ export class PackageValidation {
     return true;
   }
 
-  private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
+  private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile, outputFilename: string): boolean {
     for(let file of kmpJson.files) {
-      if(!this.checkContentFile(file)) {
+      if(!this.checkContentFile(file, outputFilename)) {
         return false;
       }
     }
@@ -140,7 +140,7 @@ export class PackageValidation {
     return true;
   }
 
-  private checkContentFile(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
+  private checkContentFile(file: KmpJsonFile.KmpJsonFileContentFile, outputFilename: string): boolean {
     const filename = this.callbacks.path.basename(file.name);
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
@@ -155,7 +155,18 @@ export class PackageValidation {
       return false;
     }
 
+    if(this.doesContentFileEqualOutputFilename(file, outputFilename)) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageMustNotContainItself({outputFilename}));
+      return false;
+    }
+
     return true;
+  }
+
+  private doesContentFileEqualOutputFilename(file: KmpJsonFile.KmpJsonFileContentFile, outputFilename: string): boolean {
+    // case-insensitive comparison because Windows has case-insensitive filenames
+    return this.callbacks.path.basename(file.name).toLowerCase() ==
+      this.callbacks.path.basename(outputFilename).toLowerCase();
   }
 
   private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {

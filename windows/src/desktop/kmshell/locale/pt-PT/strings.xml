@@ -327,12 +327,8 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Mostrar ecrã de bem-vindo</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 18.0.96.0 -->
-  <string name="koAutomaticUpdate" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Procurar semanal e automaticamente por atualizações no site www.tavultesoft.com</string>
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -522,7 +518,7 @@
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico 
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico
   que utiliza no Windows. O teclado Keyman irá se adaptar automaticamente ao seu layout preferido.</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->

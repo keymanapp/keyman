@@ -192,7 +192,7 @@ if [ "$action" == "commit" ]; then
       git commit -m "$message (history cherry-pick to master)"
       # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
       # label
-      hub pull-request -f --no-edit -b master
+      hub pull-request -fp --no-edit
     fi
 
     # Return to our best working branch

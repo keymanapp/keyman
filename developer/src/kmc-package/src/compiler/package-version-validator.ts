@@ -91,6 +91,11 @@ export class PackageVersionValidator {
       kmp.info.version = {description: kmp.keyboards[0].version};
     }
 
+    if(result && !isValidVersionNumber(kmp.info.version.description)) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageVersionIsUnrecognizedFormat({version: kmp.info.version.description}));
+      return false;
+    }
+
     return result;
   }
 
@@ -109,3 +114,11 @@ export class PackageVersionValidator {
     return true;
   }
 }
+
+function isValidVersionNumber(version: string) {
+  return /^(0|[1-9][0-9]*)(\.(0|[1-9][0-9]*)){0,2}$/.test(version);
+}
+
+export const unitTestEndpoints = {
+  isValidVersionNumber,
+};

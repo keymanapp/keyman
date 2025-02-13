@@ -184,5 +184,31 @@ export class PackageCompilerMessages {
   static Warn_VisualKeyboardFileIsInvalid = (o:{filename: string}) => m(
     this.WARN_VisualKeyboardFileIsInvalid, `Visual keyboard file '${def(o.filename)}' is invalid.`
   );
+
+  static WARN_PackageVersionIsUnrecognizedFormat = SevWarn | 0x0027;
+  static Warn_PackageVersionIsUnrecognizedFormat = (o:{version: string}) => m(
+    this.WARN_PackageVersionIsUnrecognizedFormat, `Package version '${def(o.version)}' has an unrecognized format.`,
+    `The format for version numbers should be number[.number[.number]]. Each
+    number component should be an integer, without leading zeroes.`
+  );
+  
+  static ERROR_PackageMustNotContainItself = SevError | 0x0028;
+  static Error_PackageMustNotContainItself = (o:{outputFilename: string}) => m(
+    this.ERROR_PackageMustNotContainItself, `The package may not include a .kmp file of the same name '${def(o.outputFilename)}'.`, `
+    While it is possible for a package file to contain other .kmp package files,
+    it is an error for a package file to contain a package with the same name as
+    itself.
+
+    **Note:** it is not recommended to include other package files within a
+    package, as the user experience for installation and uninstallation is
+    complex, and not consistent across all platforms.
+
+    **Note**: Nested packages are not checked for validity or whether or not they
+    may violate this rule transitively.
+  `);
+
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
 }
 
