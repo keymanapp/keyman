@@ -54,9 +54,12 @@ function do_build_abnf() {
     base=$(basename "$file" .abnf)
     peg="$base.pegjs"
     outfile="./src/util/abnf/$peg"
+    outjs="./src/util/abnf/$base.js"
     if [ ! -f "$outfile" ]; then
       printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${base}.abnf -> ${peg}${COLOR_RESET}"
       npx -p abnf abnf_gen  "$file" -o "$outfile"
+      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${peg} -> ${base}.js${COLOR_RESET}"
+      npx peggy "$outfile" -o "$outjs" --format es --dts
     fi
   done
 }

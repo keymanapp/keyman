@@ -7,7 +7,8 @@
     "baseUrl": ".",
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/util/abnf/*.js",
   ],
   "references": [
     { "path": "../../../common/web/keyman-version" },
