@@ -29,7 +29,7 @@ export { default as KMXBuilder } from './types/kmx/kmx-builder.js';
 export { default as KMXPlusBuilder}  from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
 
 export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
-export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
+export { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTAnyAction, LKTCheck, LKTKeystroke } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './types/ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export {
