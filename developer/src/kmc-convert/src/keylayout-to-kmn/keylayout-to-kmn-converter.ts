@@ -71,8 +71,13 @@ import boxXmlArray = util.boxXmlArray;*/
   //     dk <-> dk_C2 ???
   //     check if we use the same  algorithm to get Block1 data
   //     check uniqueA, uniqueV, dk_prv, dk, dk_C2
-}
+  // check duplicate rule conditions which do I need; which can go
+  // when I run german with uniqueCAll why will there be [ ] without key anf modifier
 
+
+
+
+}
 import { XMLParser } from 'fast-xml-parser';  // for reading a file
 import { readFileSync } from 'fs';
 import { util } from '@keymanapp/common-types';
@@ -101,14 +106,14 @@ export interface rule_object {
 
   modifier_prev_deadkey: string,  /* string of modifiers for the first key (e.g. "NCAPS RALT CTRL") */
   prev_deadkey: string,           /* name of the first key (e.g. K_U) */
-  dk_prev: number,                /* Todo needed?*/
-  uniqueA: number,
+  dk_prev: number,                /* dk count for prev-deadkeys */
+  uniqueA: number,                /* ToDo */
 
   modifier_deadkey: string,       /* string of modifiers for the second key (e.g. "NCAPS RALT CTRL") */
   deadkey: string,                /* name of the second key */
   dk: number,                     /* Todo needed?*/
-  dk_C2: number,
-  uniqueB: number,
+  dk_C2: number,                  /* dk count for deadkeys */
+  uniqueB: number,                /* ToDo */
 
   modifier_key: string,           /* string of modifiers for the third key (e.g. "NCAPS RALT CTRL") */
   key: string,                    /* name of the third key (e.g. K_U) */
@@ -243,7 +248,6 @@ export class KeylayoutToKmnConverter {
    */
   //TODO need to use export const USVirtualKeyCodes here
   public write(data_ukelele: convert_object): boolean {
-    console.log("\n###################################################\n")
     let data: string = "\n"
 
     // add top part of kmn file: STORES
@@ -1479,6 +1483,7 @@ export class KeylayoutToKmnConverter {
     return keylayout_modifier.flat().flat().includes("caps")
   }
 
+  // todo check conditions command comes through which should not!
   public isAcceptableKeymanModifier(keylayout_modifier: string): boolean {
     let iskKeymanModifier: boolean = true
     const modifier_single: string[] = keylayout_modifier.split(" ");
@@ -1499,6 +1504,7 @@ export class KeylayoutToKmnConverter {
       ) { iskKeymanModifier = iskKeymanModifier && true }
       else { iskKeymanModifier = iskKeymanModifier && false }
     }
+console.log(" modifier_single",modifier_single, iskKeymanModifier )
     return iskKeymanModifier
   }
   public findDuplicateRules(rules: rule_object[], index: number, rule_type: string): string {
@@ -1541,10 +1547,10 @@ export class KeylayoutToKmnConverter {
   public findAmbiguousRules(rule: rule_object[], index: number): string[] {
     const returnarray: string[] = Array(3).fill("");
 
+    // filter 1 Text...............................................................
     if (rule[index].rule_type === "C0" || rule[index].rule_type === "C1") {
 
-      // filter 1 Text...............................................................
-      // OK A 1-1 amb dup ............................................................................................................................................
+      // OK A 1-1 + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'A'
       const ambiguous_C0C1_vs_C0C1 = rule.filter((curr, idx) =>
         (curr.rule_type === "C0" || curr.rule_type === "C1")
         && curr.modifier_prev_deadkey === ""
@@ -1556,7 +1562,7 @@ export class KeylayoutToKmnConverter {
         && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)   // amb
         && idx < index
       );
-
+      //+ [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'N'
       const duplicate_C0C1_vs_C0C1 = rule.filter((curr, idx) =>
         (curr.rule_type === "C0" || curr.rule_type === "C1")
         && curr.modifier_prev_deadkey === ""
@@ -1590,6 +1596,7 @@ export class KeylayoutToKmnConverter {
       return returnarray
     }
 
+    // filter 2 Text...............................................................
     if (rule[index].rule_type === "C2") {
 
       // 2-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C1)
@@ -1614,56 +1621,48 @@ export class KeylayoutToKmnConverter {
       //3-3  dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
       const ambiguous_C2_vs_C2_B2 = rule.filter((curr, idx) =>
         (curr.rule_type === "C2")
+        && String(curr.dk_C2) === String(rule[index].dk_C2)
+        && rule[index].uniqueB !== 0
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && String(curr.dk_C2) === String(rule[index].dk_C2)
         && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)) // amb
-        && rule[index].uniqueB !== 0
         && idx < index
       );
-
+  //da stimmt noch was nicht
       //3-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
       const duplicate_C2_vs_C2_B2 = rule.filter((curr, idx) =>
         (curr.rule_type === "C2")
+        && String(curr.dk_C2) === String(rule[index].dk_C2) // dup
+        && rule[index].uniqueB === 0
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && String(curr.dk_C2) === String(rule[index].dk_C2) // dup
         && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
-        && rule[index].uniqueB === 0
         && idx < index
       );
-
 
       //1-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
       const ambibguous_C2_vs_C1 = rule.filter((curr, idx) =>
         ((curr.rule_type === "C0") || (curr.rule_type === "C1"))
-
         && curr.modifier_key === rule[index].modifier_deadkey
         && curr.key === rule[index].deadkey
         //&& rule[index].uniqueB === 0  // without this there will be no warning for first 
         //&& (idx < index)              // without this there will be no warning for first 
       );
 
-      if (duplicate_C2_vs_C2.length > 0) {
-        //Firstsentence
-        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "duplicate 2-2 rule: earlier: [" + duplicate_C2_vs_C2[0].modifier_deadkey + " " + duplicate_C2_vs_C2[0].deadkey + "]  >  dk(C" + duplicate_C2_vs_C2[0].dk_C2 + "here: )\'")
-      }
       if (ambiguous_C2_vs_C2.length > 0) {
-        //Firstsentence
         returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 2-2 rule: earlier: [" + ambiguous_C2_vs_C2[0].modifier_deadkey + " " + ambiguous_C2_vs_C2[0].deadkey + "]  >  dk(C" + ambiguous_C2_vs_C2[0].dk_C2 + "here: )\'")
       }
-      if (ambibguous_C2_vs_C1.length > 0) {
-        //Firstsentence
-        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 1-2 rule: earlier: [" + ambibguous_C2_vs_C1[0].modifier_key + " " + ambibguous_C2_vs_C1[0].key + "]  >  \'" + new TextDecoder().decode(ambibguous_C2_vs_C1[0].output) + "\' here: ")
-      }
-
-      if (duplicate_C2_vs_C2_B2.length > 0) {
-        //Secondsentence
-        returnarray[1] = returnarray[1] + ("SECONDTEXT " + "duplicate y 3-3 rule: earlier: dk(C" + duplicate_C2_vs_C2_B2[0].dk_C2 + ") + [" + duplicate_C2_vs_C2_B2[0].modifier_key + " " + duplicate_C2_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C2_vs_C2_B2[0].output) + "\' here: ")
+      if (duplicate_C2_vs_C2.length > 0) {
+        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "duplicate 2-2 rule: earlier: [" + duplicate_C2_vs_C2[0].modifier_deadkey + " " + duplicate_C2_vs_C2[0].deadkey + "]  >  dk(C" + duplicate_C2_vs_C2[0].dk_C2 + "here: )\'")
       }
       if (ambiguous_C2_vs_C2_B2.length > 0) {
-        //Secondsentence
         returnarray[1] = returnarray[1] + ("SECONDTEXT " + "duplicate y 3-3 rule: earlier: dk(C" + ambiguous_C2_vs_C2_B2[0].dk_C2 + ") + [" + ambiguous_C2_vs_C2_B2[0].modifier_key + " " + ambiguous_C2_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(ambiguous_C2_vs_C2_B2[0].output) + "\' here: ")
+      }
+      if (duplicate_C2_vs_C2_B2.length > 0) {
+        returnarray[1] = returnarray[1] + ("SECONDTEXT " + "duplicate y 3-3 rule: earlier: dk(C" + duplicate_C2_vs_C2_B2[0].dk_C2 + ") + [" + duplicate_C2_vs_C2_B2[0].modifier_key + " " + duplicate_C2_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C2_vs_C2_B2[0].output) + "\' here: ")
+      }
+      if (ambibguous_C2_vs_C1.length > 0) {
+        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 1-2 rule: earlier: [" + ambibguous_C2_vs_C1[0].modifier_key + " " + ambibguous_C2_vs_C1[0].key + "]  >  \'" + new TextDecoder().decode(ambibguous_C2_vs_C1[0].output) + "\' here: ")
       }
       return returnarray
     }
@@ -1672,25 +1671,19 @@ export class KeylayoutToKmnConverter {
       returnarray[0] = ""
       returnarray[1] = ""
       returnarray[2] = ""
-      //  A 4-1 amb dup ...........................................................
 
-
-      //1-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      // 1-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
       const ambibguous_C3_vs_C1 = rule.filter((curr, idx) =>
         ((curr.rule_type === "C0") || (curr.rule_type === "C1"))
-
         && curr.modifier_key === rule[index].modifier_prev_deadkey
         && curr.key === rule[index].prev_deadkey
         //&& rule[index].uniqueA === 0 // without this there will be no warning 
         //&& (idx < index)
       );
 
-      //  A 4-2 amb dup ...........................................................
-
-      //2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C1)
+      // 2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C1)
       const ambibguous_C3_vs_C2_B = rule.filter((curr, idx) =>
         ((curr.rule_type === "C2"))
-
         && curr.modifier_deadkey === rule[index].modifier_prev_deadkey
         && curr.deadkey === rule[index].prev_deadkey
         && String(curr.dk_C2) === String(rule[index].dk_prev) // dup        
@@ -1698,38 +1691,34 @@ export class KeylayoutToKmnConverter {
         //&& (idx < index)
       );
 
-      //  A 6-3 amb dup ...........................................................
-
-      //6-3  dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      // 6-3  dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
       const ambiguous_C3_vs_C2_B2 = rule.filter((curr, idx) =>
         (curr.rule_type === "C2")
+        && String(curr.dk_prev) === String(rule[index].dk_prev) // amb
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && String(curr.dk_prev) === String(rule[index].dk_prev) // amb
         && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)) // amb
         // && rule[index].uniqueB !== 0
         // && idx < index
       );
 
-      //6-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      // 6-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
       const duplicate_C3_vs_C2_B2 = rule.filter((curr, idx) =>
         (curr.rule_type === "C2")
+        && String(curr.dk_prev) === String(rule[index].dk_prev) // dup
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && String(curr.dk_prev) === String(rule[index].dk_prev) // dup
         && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
         // && rule[index].uniqueB === 0
         // && idx < index
       );
 
-      //  A 4-4 amb dup ...........................................................
-
       // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'dk(C1)'
       const ambiguous_C3_vs_C3 = rule.filter((curr, idx) =>
         curr.rule_type === "C3"
         && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
-        && curr.prev_deadkey === rule[index].prev_deadkey
         && (String(curr.dk_prev) !== String(rule[index].dk_prev))
+        && curr.prev_deadkey === rule[index].prev_deadkey
         && rule[index].uniqueA !== 0
         && idx < index
       );
@@ -1744,46 +1733,43 @@ export class KeylayoutToKmnConverter {
         && idx < index
       );
 
-      //  A 6-6 amb dup ...........................................................
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
       const ambiguous_C3_vs_C3_C = rule.filter((curr, idx) =>
         (curr.rule_type === "C3")
+        && String(curr.dk_C2) === String(rule[index].dk_C2)   // no need to convert to string
+        && rule[index].uniqueA !== 0
+        && String(curr.dk) === String(rule[index].dk)
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && String(curr.dk_C2) === String(rule[index].dk_C2)   // no need to convert to string
-        && String(curr.dk) === String(rule[index].dk)
         && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)) // amb
-        && rule[index].uniqueA !== 0
+
         && idx < index
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
       const duplicate_C3_vs_C3_C = rule.filter((curr, idx) =>
-        (curr.rule_type === "C3")
-      && curr.modifier_key === rule[index].modifier_key
-      && curr.key === rule[index].key
-
-      && curr.modifier_deadkey === rule[index].modifier_deadkey
-      && curr.deadkey === rule[index].deadkey
-      
-      && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
-      && curr.prev_deadkey === rule[index].prev_deadkey
-
-        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
-
-        && String(curr.dk_prev) === String(rule[index].dk_prev) // dup
-       /* && String(curr.dk) === String(rule[index].dk)
-        && String(curr.dk_C2) === String(rule[index].dk_C2) // dup*/
-        //&& rule[index].uniqueA === 0
-        // && idx < index
-        /*
-          // dup*/
-
+        ((curr.rule_type === "C3")
+          && curr.modifier_key === rule[index].modifier_key
+          && curr.key === rule[index].key
+          && curr.modifier_deadkey === rule[index].modifier_deadkey
+          && curr.deadkey === rule[index].deadkey
+          && curr.modifier_prev_deadkey !== ""
+          && curr.prev_deadkey !== ""
+          && curr.dk_prev !== 0
+          && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
+          && rule[index].uniqueB !== 0
+          && idx < index)
+        ||
+        ((curr.rule_type === "C3")
+          && curr.dk_C2 === rule[index].dk_C2
+          && curr.modifier_key === rule[index].modifier_key
+          && curr.key === rule[index].key
+          && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
+          && idx < index)
       );
-      console.log(".writeDalaset(duplicate_C3_ ", )
 
-       // 5-5 
-       const ambiguous_C3_vs_C3_B = rule.filter((curr, idx) =>
+      // 5-5 
+      const ambiguous_C3_vs_C3_B = rule.filter((curr, idx) =>
         (curr.rule_type === "C3")
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
@@ -1794,12 +1780,11 @@ export class KeylayoutToKmnConverter {
         && idx < index
       );
 
-       // 5-5 
-       const duplicate_C3_vs_C3_B = rule.filter((curr, idx) =>
+      // 5-5 
+      const duplicate_C3_vs_C3_B = rule.filter((curr, idx) =>
         (curr.rule_type === "C3")
         && curr.modifier_deadkey === rule[index].modifier_deadkey
         && curr.deadkey === rule[index].deadkey
-        
         && String(curr.dk_prev) === String(rule[index].dk_prev)   // no need to convert to string
         && String(curr.dk_C2) === String(rule[index].dk_C2)   // no need to convert to string
         && String(curr.dk) === String(rule[index].dk)
@@ -1807,399 +1792,53 @@ export class KeylayoutToKmnConverter {
         && idx < index
       );
 
-
-      this.writeDalasetSingle(rule[index])
-      this.writeDalaset(duplicate_C3_vs_C3_C)
-
       if (ambibguous_C3_vs_C1.length > 0) {
-        //FIR TEXT
         returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 1-4 rule: earlier: [" + ambibguous_C3_vs_C1[0].modifier_key + " " + ambibguous_C3_vs_C1[0].key + "]  >  \'" + new TextDecoder().decode(ambibguous_C3_vs_C1[0].output) + "\' here: ")
       }
 
-      /* if (ambibguous_C3_vs_C2.length > 0) {
-         //FIR TEXT
-         returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 2-4 rule: earlier: ["          + ambibguous_C3_vs_C2[0].modifier_key + " " + ambibguous_C3_vs_C2[0].key + "]  >  \'"          + new TextDecoder().decode(ambibguous_C3_vs_C2[0].output) + "\' here: ")
-       }*/
-
-
-
       if (ambibguous_C3_vs_C2_B.length > 0) {
-        //FIR TEXT
         returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 2-4 rule: earlier: [" + ambibguous_C3_vs_C2_B[0].modifier_deadkey + " " + ambibguous_C3_vs_C2_B[0].deadkey + "]  >  dk(C" + ambibguous_C3_vs_C2_B[0].dk_C2 + ") here: )\'")
       }
 
-
-
-      if (duplicate_C3_vs_C3.length > 0) {
-        //Firstsentence
-        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "duplicate 4-4 rule: earlier: [" + duplicate_C3_vs_C3[0].modifier_deadkey + " " + duplicate_C3_vs_C3[0].deadkey + "]  >  dk(C" + duplicate_C3_vs_C3[0].dk_C2 + "here: )\'")
-      }
-      if (ambiguous_C3_vs_C3.length > 0) {
-        //Firstsentence
-        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 4-4 rule: earlier: [" + ambiguous_C3_vs_C3[0].modifier_deadkey + " " + ambiguous_C3_vs_C3[0].deadkey + "]  >  dk(C" + ambiguous_C3_vs_C3[0].dk_C2 + "here: )\'")
-      }
-
-      if (duplicate_C3_vs_C3_C.length > 0) {
-        //THI TEXT
-        returnarray[2] = returnarray[2] + ("THIRDTEXT " + "duplicate y 6-6 rule: earlier: dk(C" + duplicate_C3_vs_C3_C[0].dk_C2 + ") + [" + duplicate_C3_vs_C3_C[0].modifier_key + " " + duplicate_C3_vs_C3_C[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C3_vs_C3_C[0].output) + "\' here: ")
-      }
-      if (ambiguous_C3_vs_C3_C.length > 0) {
-        //THI TEXT
-        returnarray[2] = returnarray[2] + ("THIRDTEXT " + "ambiguous y 6-6 rule: earlier: dk(C" + ambiguous_C3_vs_C3_C[0].dk_C2 + ") + [" + ambiguous_C3_vs_C3_C[0].modifier_key + " " + ambiguous_C3_vs_C3_C[0].key + "]  >  \'" + new TextDecoder().decode(ambiguous_C3_vs_C3_C[0].output) + "\' here: ")
-      }
-
-      if (duplicate_C3_vs_C2_B2.length > 0) {
-        //Secondsentence
-        returnarray[2] = returnarray[2] + ("SECONDTEXT " + "duplicate y 6-3 rule: earlier: dk(C" + duplicate_C3_vs_C2_B2[0].dk_C2 + ") + [" + duplicate_C3_vs_C2_B2[0].modifier_key + " " + duplicate_C3_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C3_vs_C2_B2[0].output) + "\' here: ")
-      }
       if (ambiguous_C3_vs_C2_B2.length > 0) {
-        //Secondsentence
         returnarray[2] = returnarray[2] + ("SECONDTEXT " + "ambiguous y 6-3 rule: earlier: dk(C" + ambiguous_C3_vs_C2_B2[0].dk_C2 + ") + [" + ambiguous_C3_vs_C2_B2[0].modifier_key + " " + ambiguous_C3_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(ambiguous_C3_vs_C2_B2[0].output) + "\' here: ")
       }
 
-      if (duplicate_C3_vs_C3_B.length > 0) {
-        //THI TEXT
-        returnarray[1] = returnarray[1] + ("THIRDTEXT " + "duplicate y 5-5 rule: earlier: dk(C" + duplicate_C3_vs_C3_B[0].dk_C2 + ") + [" + duplicate_C3_vs_C3_B[0].modifier_key + " " + duplicate_C3_vs_C3_B[0].key + "]  >  dk(" + duplicate_C3_vs_C3_B[0].dk_C2 + ") here: ")
+      if (duplicate_C3_vs_C2_B2.length > 0) {
+        returnarray[2] = returnarray[2] + ("SECONDTEXT " + "duplicate y 6-3 rule: earlier: dk(C" + duplicate_C3_vs_C2_B2[0].dk_C2 + ") + [" + duplicate_C3_vs_C2_B2[0].modifier_key + " " + duplicate_C3_vs_C2_B2[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C3_vs_C2_B2[0].output) + "\' here: ")
       }
+
+      if (ambiguous_C3_vs_C3.length > 0) {
+        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "ambiguous 4-4 rule: earlier: [" + ambiguous_C3_vs_C3[0].modifier_deadkey + " " + ambiguous_C3_vs_C3[0].deadkey + "]  >  dk(C" + ambiguous_C3_vs_C3[0].dk_C2 + "here: )\'")
+      }
+      if (duplicate_C3_vs_C3.length > 0) {
+        returnarray[0] = returnarray[0] + ("FIRSTTEXT " + "duplicate 4-4 rule: earlier: [" + duplicate_C3_vs_C3[0].modifier_deadkey + " " + duplicate_C3_vs_C3[0].deadkey + "]  >  dk(C" + duplicate_C3_vs_C3[0].dk_C2 + "here: )\'")
+      }
+
+      if (ambiguous_C3_vs_C3_C.length > 0) {
+        returnarray[2] = returnarray[2] + ("THIRDTEXT " + "ambiguous y 6-6 rule: earlier: dk(B" + ambiguous_C3_vs_C3_C[0].dk_C2 + ") + [" + ambiguous_C3_vs_C3_C[0].modifier_key + " " + ambiguous_C3_vs_C3_C[0].key + "]  >  \'" + new TextDecoder().decode(ambiguous_C3_vs_C3_C[0].output) + "\' here: ")
+      }
+
+      if (duplicate_C3_vs_C3_C.length > 0) {
+        returnarray[2] = returnarray[2] + ("THIRDTEXT " + "duplicate y 6-6 rule: earlier: dk(B" + duplicate_C3_vs_C3_C[0].dk_C2 + ") + [" + duplicate_C3_vs_C3_C[0].modifier_key + " " + duplicate_C3_vs_C3_C[0].key + "]  >  \'" + new TextDecoder().decode(duplicate_C3_vs_C3_C[0].output) + "\' here: ")
+      }
+
       if (ambiguous_C3_vs_C3_B.length > 0) {
-        //THI TEXT
         returnarray[1] = returnarray[1] + ("THIRDTEXT " + "ambiguous y 5-5 rule: earlier: dk(C" + ambiguous_C3_vs_C3_B[0].dk_C2 + ") + [" + ambiguous_C3_vs_C3_B[0].modifier_key + " " + ambiguous_C3_vs_C3_B[0].key + "]  >  dk(" + ambiguous_C3_vs_C3_B[0].dk_C2 + ") here: ")
       }
 
-
-
+      if (duplicate_C3_vs_C3_B.length > 0) {
+        returnarray[1] = returnarray[1] + ("THIRDTEXT " + "duplicate y 5-5 rule: earlier: dk(C" + duplicate_C3_vs_C3_B[0].dk_C2 + ") + [" + duplicate_C3_vs_C3_B[0].modifier_key + " " + duplicate_C3_vs_C3_B[0].key + "]  >  dk(" + duplicate_C3_vs_C3_B[0].dk_C2 + ") here: ")
+      }
     }
-    //  A 5-5 amb dup ...........................................................
-
-
-
-    // filter 3 text ..............................................................    
-    // OK C 1-4 amb............................................................................................................................................
-    /* const ambiguous_C0C1_vs_C3 = rule.filter((curr, idx) =>
-       (curr.rule_type === "C0" || curr.rule_type === "C1")
-       && (rule[index].rule_type === "C3")
- 
-       && curr.modifier_key === rule[index].modifier_prev_deadkey
-       && curr.key === rule[index].prev_deadkey
-       //&& rule[index].uniqueA !== 0
-       && rule[index].uniqueB !== 0
-     );
- 
-     if (ambiguous_C0C1_vs_C3.length > 0) {
-       //Firstsentence
-       returnarray.push("ambiguous 1-4 rule: earlier: ["
-         + ambiguous_C0C1_vs_C3[0].modifier_key + " "
-         + ambiguous_C0C1_vs_C3[0].key + "]  >  \'"
-         + new TextDecoder().decode(ambiguous_C0C1_vs_C3[0].output)
-         + "\' here: [")
- 
-       return returnarray
-     }*/
-
-
-    // E 2-4 amb................................................................................................................................................
-    /* const ambiguous_C2_vs_C3 = rule.filter((curr, idx) =>
-       (curr.rule_type === "C2")
-       && (rule[index].rule_type === "C3")
- 
-       && curr.modifier_deadkey === rule[index].modifier_prev_deadkey
-       && curr.deadkey === rule[index].prev_deadkey
-       //&& rule[index].uniqueA !== 0
-       //&& rule[index].uniqueB !== 0
-     );
- 
-     if (ambiguous_C2_vs_C3.length > 0)
-       return ("ambiguous 2-4 rule: earlier: ["
-         + ambiguous_C2_vs_C3[0].modifier_deadkey + " "
-         + ambiguous_C2_vs_C3[0].deadkey + "]  >  dk(C"
-         + ambiguous_C2_vs_C3[0].dk_C2
-         + "\' here: [")*/
-
-
-
-    /* const duplicate_C2_vs_C3 = rule.filter((curr, idx) =>
-       (curr.rule_type === "C2")
-       && (rule[index].rule_type === "C3")
- 
- 
-       && curr.modifier_deadkey === rule[index].modifier_prev_deadkey
-       && curr.deadkey === rule[index].prev_deadkey
-       //&& rule[index].uniqueB !== 0
-       && (idx < index)
-       // only amb here since no dup possible  Mod K_A> A  <-> Mod K_A> dk(dk1)
-     );
-     console.log("duplicate_C2_vs_C3 ",)
-     this.writeDalaset(duplicate_C2_vs_C3)
- 
- 
-     if (duplicate_C2_vs_C3.length > 0)
-       return ("duplicate 2-4 rule: earlier: ["
-         + duplicate_C2_vs_C3[0].modifier_deadkey + " "
-         + duplicate_C2_vs_C3[0].modifier_deadkey + "]  >  \'"
-         + duplicate_C2_vs_C3[0].dk_prev
-         + "\' here: [")*/
-
-
-
-    /*
-    
-     const ambiguous_C0C1_vs_C2 = rule.filter((curr, idx) =>
-          (curr.rule_type === "C0" || curr.rule_type === "C1")
-          && (rule[index].rule_type === "C2")
-        
-    
-          && curr.modifier_key === rule[index].modifier_deadkey
-          && curr.key === rule[index].deadkey
-          //&& rule[index].uniqueB !== 0
-          && (idx < index)  
-          // only amb here since no dup possible  Mod K_A> A  <-> Mod K_A> dk(dk1)
-        );
-       console.log("ambiguous_C0C1_vs_C2 ", )
-       this.writeDalaset(ambiguous_C0C1_vs_C2)
-    
-    
-        if (ambiguous_C0C1_vs_C2.length > 0)
-          return ("ambiguous 1-2 rule: earlier: ["
-        
-            + ambiguous_C0C1_vs_C2[0].modifier_key + " "
-            + ambiguous_C0C1_vs_C2[0].key + "]  >  \'"
-            + new TextDecoder().decode(ambiguous_C0C1_vs_C2[0].output)
-            + "\' here: [")
-    
-    */
-
-
-
-
-
-
-
-    // F 3-3 ................................................................................................................................................
-
-    /*const ambiguous_C2_vs_C2_B = rule.filter((curr, idx) =>
-      (curr.rule_type === "C2")
-
-      && curr.modifier_deadkey === rule[index].modifier_deadkey
-      && curr.deadkey === rule[index].deadkey
-
-      && curr.modifier_key === rule[index].modifier_key
-      && curr.key === rule[index].key
-      && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)   // amb
-
-      && rule[index].uniqueB === 0
-      && idx < index
-    );
-
-    if (ambiguous_C2_vs_C2_B.length > 0) {
-      //Firstsentence
-      returnarray.push("FIRSTTEXT 3-3 " + "ambiguous xy 3-3 rule: earlier: ["
-        + ambiguous_C2_vs_C2_B[0].modifier_deadkey + " "
-        + ambiguous_C2_vs_C2_B[0].deadkey + "]  >  dk(C"
-        + ambiguous_C2_vs_C2_B[0].dk_C2
-        + ")\'"
-        + "here: ")
-      //Secondsentence
-      returnarray.push("SECONDTEXT 3-3 " + "ambiguous yx 3-3 rule: earlier: dk(C"
-        + ambiguous_C2_vs_C2_B[0].dk_C2 + ") + ["
-        + ambiguous_C2_vs_C2_B[0].modifier_key + " "
-        + ambiguous_C2_vs_C2_B[0].key + "]  \'"
-        + new TextDecoder().decode(ambiguous_C2_vs_C2_B[0].output)
-        + "here: ")
-
-      return returnarray
-    }*/
-
-
-
-    /*const duplicate_C2_vs_C2_B = rule.filter((curr, idx) =>
-      (curr.rule_type === "C2")
-
-      && curr.modifier_deadkey === rule[index].modifier_deadkey
-      && curr.deadkey === rule[index].deadkey
-
-      && curr.modifier_key === rule[index].modifier_key
-      && curr.key === rule[index].key
-      && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // amb
-
-      && rule[index].uniqueB === 0
-      && idx < index
-    );
-    if (duplicate_C2_vs_C2_B.length > 0)
-      console.log("duplicate_C2_vs_C2_B.length ", duplicate_C2_vs_C2_B.length, index)
-    if ((duplicate_C2_vs_C2_B.length > 0) && (duplicate_C2_vs_C2_B.length < 33))
-      this.writeDalaset(duplicate_C2_vs_C2_B)
-*/
-    /*
-        console.log("curr.rule_type ", rule[368].rule_type, rule[397].rule_type, rule[368].rule_type === rule[397].rule_type)
-        console.log("curr.modifier_prev_deadkey ", rule[368].modifier_prev_deadkey, rule[397].modifier_prev_deadkey, rule[368].modifier_prev_deadkey === rule[397].modifier_prev_deadkey)
-        console.log("curr.prev_deadkey ", rule[368].prev_deadkey, rule[397].prev_deadkey, rule[368].prev_deadkey === rule[397].prev_deadkey)
-        console.log("curr.dk_prev ", rule[368].dk_prev, rule[397].dk_prev, rule[368].dk_prev === rule[397].dk_prev)
-        console.log("curr.uniqueA ", rule[368].uniqueA, rule[397].uniqueA, rule[368].uniqueA === rule[397].uniqueA)
-    
-        console.log("curr.modifier_deadkey ", rule[368].modifier_deadkey, rule[397].modifier_deadkey, rule[368].modifier_deadkey === rule[397].modifier_deadkey)
-        console.log("curr.deadkey ", rule[368].deadkey, rule[397].deadkey, rule[368].deadkey === rule[397].deadkey)
-        console.log("curr.dk ", rule[368].dk, rule[397].dk, rule[368].dk === rule[397].dk)
-        console.log("curr.dk_C2 ", rule[368].dk_C2, rule[397].dk_C2, rule[368].dk_C2 === rule[397].dk_C2)
-        console.log("curr.uniqueB ", rule[368].uniqueB, rule[397].uniqueB, rule[368].uniqueB === rule[397].uniqueB)
-    
-        console.log("curr.modifier_key ", rule[368].modifier_key, rule[397].modifier_key, rule[368].modifier_key === rule[397].modifier_key)
-        console.log("curr.key ", rule[368].key, rule[397].key, rule[368].key === rule[397].key)
-        console.log("curr.output ", new TextDecoder().decode(rule[368].output), new TextDecoder().decode(rule[397].output),
-          (new TextDecoder().decode(rule[368].output) === new TextDecoder().decode(rule[397].output)))
-        //-------------------------------------------
-        console.log("curr.rule_type ", rule[397].rule_type, rule[426].rule_type, rule[397].rule_type === rule[426].rule_type)
-        console.log("curr.modifier_prev_deadkey ", rule[397].modifier_prev_deadkey, rule[426].modifier_prev_deadkey, rule[397].modifier_prev_deadkey === rule[426].modifier_prev_deadkey)
-        console.log("curr.prev_deadkey ", rule[397].prev_deadkey, rule[426].prev_deadkey, rule[397].prev_deadkey === rule[426].prev_deadkey)
-        console.log("curr.dk_prev ", rule[397].dk_prev, rule[426].dk_prev, rule[397].dk_prev === rule[426].dk_prev)
-        console.log("curr.uniqueA ", rule[397].uniqueA, rule[426].uniqueA, rule[397].uniqueA === rule[426].uniqueA)
-    
-        console.log("curr.modifier_deadkey ", rule[397].modifier_deadkey, rule[426].modifier_deadkey, rule[397].modifier_deadkey === rule[426].modifier_deadkey)
-        console.log("curr.deadkey ", rule[397].deadkey, rule[426].deadkey, rule[397].deadkey === rule[426].deadkey)
-        console.log("curr.dk ", rule[397].dk, rule[426].dk, rule[397].dk === rule[426].dk)
-        console.log("curr.dk_C2 ", rule[397].dk_C2, rule[426].dk_C2, rule[397].dk_C2 === rule[426].dk_C2)
-        console.log("curr.uniqueB ", rule[397].uniqueB, rule[426].uniqueB, rule[397].uniqueB === rule[426].uniqueB)
-    
-        console.log("curr.modifier_key ", rule[397].modifier_key, rule[426].modifier_key, rule[397].modifier_key === rule[426].modifier_key)
-        console.log("curr.key ", rule[397].key, rule[426].key, rule[397].key === rule[426].key)
-        console.log("curr.output ", new TextDecoder().decode(rule[397].output), new TextDecoder().decode(rule[426].output),
-          (new TextDecoder().decode(rule[397].output) === new TextDecoder().decode(rule[426].output)))
-    
-    
-    */
-
-    /*console.log(" rule[539]", rule[539])
-    console.log(" rule[540]", rule[540])
-    console.log(" rule[541]", rule[541])*/
-
-
-    /* if (duplicate_C2_vs_C2_B.length > 0) {
-       //Firstsentence
-       returnarray.push("FIRSTTEXT 3-3 " + "duplicate 3-3 rule: earlier: ["
-         + duplicate_C2_vs_C2_B[0].modifier_deadkey + " "
-         + duplicate_C2_vs_C2_B[0].deadkey + "]  >  dk(C"
-         + duplicate_C2_vs_C2_B[0].dk_C2
-         + ")\'"
-         + "here: ")
-       //Secondsentence
-       returnarray.push("SECONDTEXT 3-3 " + "duplicate 3-3 rule: earlier: dk(C"
-         + duplicate_C2_vs_C2_B[0].dk_C2 + ") + ["
-         + duplicate_C2_vs_C2_B[0].modifier_key + " "
-         + duplicate_C2_vs_C2_B[0].key + "]  \'"
-         + new TextDecoder().decode(duplicate_C2_vs_C2_B[0].output)
-         + "here: ")
- 
-       return returnarray
-     }*/
-
-
-
-
-    /*const duplicate_C3_vs_C3 = rule.filter((curr, idx) =>
-      (rule[index].rule_type === "C2")
-      && (curr.rule_type === "C2")
-
-      && curr.modifier_deadkey === rule[index].modifier_deadkey
-      && curr.deadkey === rule[index].deadkey
-
-      && curr.modifier_key === rule[index].modifier_key
-      && curr.key === rule[index].key
-      // && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)   // amb
-      && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
-
-      && rule[index].uniqueB === 0
-      && idx < index
-
-
-    );
-    if (duplicate_C3_vs_C3.length > 0) {
-      const text1: string = "FIRSTTEXT 3-3 " + "duplicate 3-3 rule: earlier: ["
-        + duplicate_C3_vs_C3[0].modifier_deadkey + " "
-        + duplicate_C3_vs_C3[0].deadkey + "]  >  dk(C"
-        + duplicate_C3_vs_C3[0].dk_C2
-        + ")\'"
-      const text2: string = "SECONDTEXT 3-3 " + "duplicate 3-3 rule: earlier: dk(C"
-        + duplicate_C3_vs_C3[0].dk_C2 + ") + ["
-        + duplicate_C3_vs_C3[0].modifier_key + " "
-        + duplicate_C3_vs_C3[0].key + "]  \'"
-        + new TextDecoder().decode(duplicate_C3_vs_C3[0].output)
-
-      return (text1 + text2 + "\' here: [")
-    }*/
-    // G 3-6 ................................................................................................................................................
-    // H 4-4 ................................................................................................................................................
-    // I 5-5 ................................................................................................................................................
-    // J 6-6 ................................................................................................................................................
-
-    /* const ambiguous_C3_vs_C3_C = rule.filter((curr, idx) =>
-       (rule[index].rule_type === "C2")
-       && (curr.rule_type === "C2")
- 
-       && curr.modifier_deadkey === rule[index].modifier_deadkey
-       && curr.deadkey === rule[index].deadkey
- 
-       && curr.modifier_key === rule[index].modifier_key
-       && curr.key === rule[index].key
-       && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)   // amb
- 
-       && rule[index].uniqueB === 0
-       && idx < index
-     );
- 
-     if (ambiguous_C3_vs_C3_C.length > 0) {
-       const text1: string = "FIRSTTEXT 3-3 " + "duplicate 3-3 rule: earlier: ["
-         + ambiguous_C3_vs_C3_C[0].modifier_deadkey + " "
-         + ambiguous_C3_vs_C3_C[0].deadkey + "]  >  dk(C"
-         + ambiguous_C3_vs_C3_C[0].dk_C2
-         + ")\'"
-       const text2: string = "SECONDTEXT 3-3 " + "duplicate 3-3 rule: earlier: dk(C"
-         + ambiguous_C3_vs_C3_C[0].dk_C2 + ") + ["
-         + ambiguous_C3_vs_C3_C[0].modifier_key + " "
-         + ambiguous_C3_vs_C3_C[0].key + "]  \'"
-         + new TextDecoder().decode(ambiguous_C3_vs_C3_C[0].output)
- 
-       return (text1 + text2 + "\' here: [")
-     }
- 
- 
-     const duplicate_C3_vs_C3_C = rule.filter((curr, idx) =>
-       (rule[index].rule_type === "C2")
-       && (curr.rule_type === "C2")
- 
-       && curr.modifier_deadkey === rule[index].modifier_deadkey
-       && curr.deadkey === rule[index].deadkey
- 
-       && curr.modifier_key === rule[index].modifier_key
-       && curr.key === rule[index].key
-       // && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)   // amb
-       && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)   // dup
- 
-       && rule[index].uniqueB === 0
-       && idx < index);
-       
-     if (duplicate_C3_vs_C3_C.length > 0) {
-       const text1: string = "FIRSTTEXT 6-6 " + "duplicate 3-3 rule: earlier: ["
-         + duplicate_C3_vs_C3_C[0].modifier_deadkey + " "
-         + duplicate_C3_vs_C3_C[0].deadkey + "]  >  dk(C"
-         + duplicate_C3_vs_C3_C[0].dk_C2
-         + ")\'"
-       const text2: string = "SECONDTEXT 6-6 " + "duplicate 3-3 rule: earlier: dk(C"
-         + duplicate_C3_vs_C3_C[0].dk_C2 + ") + ["
-         + duplicate_C3_vs_C3_C[0].modifier_key + " "
-         + duplicate_C3_vs_C3_C[0].key + "]  \'"
-         + new TextDecoder().decode(duplicate_C3_vs_C3_C[0].output)
- 
-       return (text1 + text2 + "\' here: [")
-     }*/
-
-
-
-    //}
-
-
     return returnarray
   }
 
   public findUnAvailableRule(unique_Rules: rule_object[], index: number): string {
+    console.log("isAcceptableKeymanModifier ",unique_Rules[index].modifier_key,this.isAcceptableKeymanModifier(unique_Rules[index].modifier_key) )
+    if(unique_Rules[index].modifier_key ==="CAPS" )
+      console.log("isAcceptableKeymanModifier A",this.isAcceptableKeymanModifier(unique_Rules[index].modifier_key) )
+
     if (
       (((unique_Rules[index].rule_type === "C0") || (unique_Rules[index].rule_type === "C1") || (unique_Rules[index].rule_type === "C4"))
         && (this.isAcceptableKeymanModifier(unique_Rules[index].modifier_key)))
@@ -2295,39 +1934,39 @@ export class KeylayoutToKmnConverter {
     const maxkey: number = 50
     let data: string = ""
     let keymarker: string = ""
-    /*
-        const data_CAll: rule_object[] = data_ukelele.ArrayOf_Rules.filter((curr) => {
-          if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
-            && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
-            return curr;
-          }
-          else return ""
-        });
-        const unique_CAll_Rules: rule_object[] = data_CAll.reduce((unique, o) => {
-          if (!unique.some((obj: { output: Uint8Array; rule_type: string; modifier_key: string; modifier_deadkey: string; prev_deadkey: string; modifier_prev_deadkey: string; deadkey: string; key: string }) =>
-            new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
-    
-            && obj.rule_type === o.rule_type
-            && obj.modifier_key === o.modifier_key
-            && obj.key === o.key
-    
-            && obj.modifier_deadkey === o.modifier_deadkey
-            && obj.deadkey === o.deadkey
-    
-            && obj.modifier_prev_deadkey === o.modifier_prev_deadkey
-            && obj.prev_deadkey === o.prev_deadkey)
-          ) {
-            unique.push(o);
-          }
-          return unique;
-        }, []);*/
-    const unique_CAll_Rules: rule_object[] = data_ukelele.ArrayOf_Rules
+
+    const data_CAll: rule_object[] = data_ukelele.ArrayOf_Rules.filter((curr) => {
+      if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
+        && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
+        return curr;
+      }
+      else return ""
+    });
+    const unique_CAll_Rules: rule_object[] = data_CAll.reduce((unique, o) => {
+      if (!unique.some((obj: { output: Uint8Array; rule_type: string; modifier_key: string; modifier_deadkey: string; prev_deadkey: string; modifier_prev_deadkey: string; deadkey: string; key: string }) =>
+        new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
+
+        && obj.rule_type === o.rule_type
+        && obj.modifier_key === o.modifier_key
+        && obj.key === o.key
+
+        && obj.modifier_deadkey === o.modifier_deadkey
+        && obj.deadkey === o.deadkey
+
+        && obj.modifier_prev_deadkey === o.modifier_prev_deadkey
+        && obj.prev_deadkey === o.prev_deadkey)
+      ) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+    //const unique_CAll_Rules: rule_object[] = data_ukelele.ArrayOf_Rules
 
     console.log("xx  data_ukelele.ArrayOf_Rules", data_ukelele.ArrayOf_Rules.length)
-    //console.log("xx  data_ukelele.ArrayOf_Rules", this.writeDalaset(data_ukelele.ArrayOf_Rules))
+    console.log("xx  data_ukelele.ArrayOf_Rules", this.writeDataset(data_ukelele.ArrayOf_Rules))
 
     console.log("xx  unique_CAll_Rules", unique_CAll_Rules.length)
-    console.log("xx  unique_CAll_Rules", this.writeDalaset(unique_CAll_Rules))
+    // console.log("xx  unique_CAll_Rules", this.writeDataset(unique_CAll_Rules))
 
     //................................................ C0 C1 ................................................................
     //................................................ C0 C1 ................................................................
@@ -2381,7 +2020,8 @@ export class KeylayoutToKmnConverter {
         // warningtext = warningtext + this.findAmbiguousRules(unique_CAll_Rules, k)
         // warningtext = warningtext + this.findUnAvailableRule(unique_CAll_Rules, k)
 
-
+// add something loke that + return string[] instead of string
+        //warningtextArray[0] = warningtextArray[0] + this.findUnAvailableRule(unique_CAll_Rules, k)
         warningtextArray = this.findAmbiguousRules(unique_CAll_Rules, k)
         // console.log("warningtextArray ", warningtextArray)
 
@@ -2441,9 +2081,6 @@ export class KeylayoutToKmnConverter {
         // warningtext = warningtext + this.findDuplicateRules(unique_CAll_Rules, k, "C3")    // OK
         // warningtext = warningtext + this.findAmbiguousRules(unique_CAll_Rules, k)     // OK
         //warningtext = warningtext + this.findUnAvailableRule(unique_CAll_Rules, k)    // OK
-
-        warningtextArray = this.findAmbiguousRules(unique_CAll_Rules, k)
-        console.log(" warningtextArray", warningtextArray)
 
 
 
@@ -2602,10 +2239,10 @@ export class KeylayoutToKmnConverter {
     const unique_CAll_Rules: rule_object[] = data_ukelele.ArrayOf_Rules
 
     console.log("xx  data_ukelele.ArrayOf_Rules", data_ukelele.ArrayOf_Rules.length)
-    //console.log("xx  data_ukelele.ArrayOf_Rules", this.writeDalaset(data_ukelele.ArrayOf_Rules))
+    //console.log("xx  data_ukelele.ArrayOf_Rules", this.writeDataset(data_ukelele.ArrayOf_Rules))
 
     console.log("xx  unique_CAll_Rules", unique_CAll_Rules.length)
-    console.log("xx  unique_CAll_Rules", this.writeDalaset(unique_CAll_Rules))
+    // console.log("xx  unique_CAll_Rules", this.writeDataset(unique_CAll_Rules))
 
     //................................................ C0 C1 ................................................................
     //................................................ C0 C1 ................................................................
@@ -2691,10 +2328,7 @@ export class KeylayoutToKmnConverter {
         warningtext = warningtext + this.findAmbiguousRules(unique_CAll_Rules, k)
         warningtext = warningtext + this.findUnAvailableRule(unique_CAll_Rules, k)
         const warningtextArray: string[] = this.findAmbiguousRules(unique_CAll_Rules, k)
-        console.log(" warningtextArray", warningtextArray[0], warningtextArray[1], warningtextArray)
 
-
-        // console.log("warningtext C2", warningtext)
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~ draft print ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2874,21 +2508,21 @@ export class KeylayoutToKmnConverter {
   }
 
   /// console log all entries C3  TODO remove
-  public writeDalaset(dataRules: rule_object[]) {
+  public writeDataset(dataRules: rule_object[]) {
     for (let i = 0; i < dataRules.length; i++) {
 
       console.log("dataRules ",
 
         dataRules[i].rule_type !== "" ? dataRules[i].rule_type : "--".padEnd(4, " ")
-        , dataRules.length, i,
+        , /*dataRules.length, i,*/
 
         "|  ", (dataRules[i].modifier_prev_deadkey !== "" ? dataRules[i].modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
         (dataRules[i].prev_deadkey !== "" ? dataRules[i].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
-        //(dataRules[i].dk_prev !== 0 ? ("dk(A" + String(dataRules[i].dk_prev) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-        //(dataRules[i].uniqueA !== 0 ? ("unique(A" + String(dataRules[i].uniqueA) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+        (dataRules[i].dk_prev !== 0 ? ("dk(A" + String(dataRules[i].dk_prev) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+        (dataRules[i].uniqueA !== 0 ? ("unique(A" + String(dataRules[i].uniqueA) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
 
-        (("dk(A-B-C " + String(dataRules[i].dk_prev) + "-" + String(dataRules[i].dk)).padEnd(9, "-") + (String(dataRules[i].dk_C2) + ")").padEnd(9, " ")),
-        ("unique(AB " + String(dataRules[i].uniqueA) + "-" + String(dataRules[i].uniqueB) + ")"),
+       /* (("dk(A-B-C " + String(dataRules[i].dk_prev) + "-" + String(dataRules[i].dk)).padEnd(9, "-") + (String(dataRules[i].dk_C2) + ")").padEnd(9, " ")),
+        ("unique(AB " + String(dataRules[i].uniqueA) + "-" + String(dataRules[i].uniqueB) + ")"),*/
 
 
         (dataRules[i].modifier_deadkey !== "" ? dataRules[i].modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
@@ -2910,7 +2544,7 @@ export class KeylayoutToKmnConverter {
 
   }
   // TODO remove
-  public writeDalasetSingle(dataRules: rule_object) {
+  public writeDatasetSingle(dataRules: rule_object) {
 
     console.log("dataRules ",
       dataRules.rule_type !== "" ? dataRules.rule_type : "--".padEnd(4, " ")
@@ -2948,7 +2582,7 @@ class Rules {
 
     public modifier_deadkey: string,      /* second key used by C2,C3 rules*/
     public deadkey: string,
-    public dk: number,                    //todo remove one
+    public dk: number,                    
     public dk_C2: number,
     public uniqueB: number,
 
