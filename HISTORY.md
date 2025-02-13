@@ -1336,7 +1336,7 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
-## 17.0.335 alpha 2025-02-06
+## 17.0.335 stable 2025-02-06
 
 * fix(android): improve resource-update tool handling of host Activity's closure (#13057)
 * fix(ios): prevent message-handler collision (#13058)
