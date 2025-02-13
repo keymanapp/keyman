@@ -416,6 +416,9 @@ public class CloudRepository {
             context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
         } catch (DownloadManagerDisabledException e) {
           onFailure.run();
+        } catch (Exception e) {
+          KMLog.LogException(TAG, "Unexpected exception type occurred when trying to query the server", e);
+          onFailure.run();
         }
       }
     }
