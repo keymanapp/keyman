@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.keyman.engine.data.CloudRepository;
 import com.keyman.engine.data.Dataset;
@@ -110,9 +111,15 @@ public final class ModelPickerActivity extends BaseActivity {
         aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
           CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
 
-        CloudDownloadMgr.getInstance().executeAsDownload(
-          context, _downloadid, null, _callback,
-          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+        try {
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+        } catch (DownloadManagerDisabledException e) {
+          Toast.makeText(context,
+            context.getString(R.string.update_check_unavailable),
+            Toast.LENGTH_SHORT).show();
+        }
       } else {
         Toast.makeText(context,
           context.getString(R.string.cannot_connect),
