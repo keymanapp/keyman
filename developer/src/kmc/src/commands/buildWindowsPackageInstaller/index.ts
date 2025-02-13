@@ -3,10 +3,10 @@ import * as path from 'path';
 import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/developer-utils';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '@keymanapp/kmc-package';
-import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
+import { CommandLineBuildBaseOptions } from 'src/util/baseOptions.js';
 import { exitProcess } from '../../util/sysexits.js';
 
-interface WindowsPackageInstallerCommandLineOptions extends CommandLineBaseOptions {
+interface WindowsPackageInstallerCommandLineOptions extends CommandLineBuildBaseOptions {
   msi: string;
   exe: string;
   license: string;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Note: conformsTo= references a previous release here,
+  because this keyboard does not depend on schema or data from later CLDR versions.
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="ja-Latn" conformsTo="45">
+	<locales>
+		<locale id="en" />
+	</locales>
+	<version number="0.0.0" />
+	<info name="Romaji (JIS)" />
+
+	<keys>
+		<import base="cldr" path="45/keys-Zyyy-punctuation.xml" />
+		<import base="cldr" path="45/keys-Zyyy-currency.xml" />
+	</keys>
+
+	<layers formId="jis">
+		<layer modifiers="none">
+			<row keys="1 2 3 4 5 6 7 8 9 0 hyphen caret yen" />
+			<row keys="q w e r t y u i o p at open-square" />
+			<row keys="a s d f g h j k l semi-colon colon close-square" />
+			<row keys="z x c v b n m comma period slash underscore" />
+			<row keys="space"/>
+		</layer>
+		<layer modifiers="shift">
+			<row keys="bang double-quote hash dollar percent amp apos open-paren close-paren 0 equal tilde pipe" /> <!-- 0 is repeated from "none" -->
+			<row keys="Q W E R T Y U I O P grave open-curly" />
+			<row keys="A S D F G H J K L plus asterisk close-curly" />
+			<row keys="Z X C V B N M open-angle close-angle question underscore" /> <!-- underscore is repeated from "none" -->
+			<row keys="space"/>
+		</layer>
+	</layers>
+</keyboard3>

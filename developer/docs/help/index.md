@@ -1,5 +1,5 @@
 ---
-title: Keyman Developer 18.0 User Guide
+title: Keyman Developer 19.0 User Guide
 ---
 
 Need help using Keyman Developer to create your keyboard layouts? You'll
@@ -8,7 +8,7 @@ and tutorials, and full reference information.
 
 ## Guides and Tutorials
 -   [What is Keyman Developer?](guides/intro)
--   [What's new in 18.0](whats-new)
+-   [What's new in 19.0](whats-new)
 -   [Developing Keyman keyboard layouts](guides/develop)
 -   [Testing Keyman keyboards](guides/test)
 -   [Distributing Keyman keyboards](guides/distribute)

@@ -6,6 +6,6 @@ Thank you for installing Keyman for Linux. Whether you're a new or returning use
 
 ## What is Keyman for Linux?
 
-Keyman for Linux makes it possible to type in over 1,000 languages in any Linux application.
+Keyman for Linux makes it possible to type in over 2,000 languages in any Linux application.
 
 [Click here](../start/) to get started.

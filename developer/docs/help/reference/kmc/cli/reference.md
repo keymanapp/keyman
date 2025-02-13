@@ -90,13 +90,32 @@ The following parameters are available:
 
 : Prints the version number of kmc
 
-`--no-error-reporting`, `--error-reporting`
+`--color`, `--no-color`
 
-: Enable or disable error reporting to keyman.com, overriding [user
-  settings](../../user-settings). Error reporting is for fatal errors in the
-  compiler, and not errors in compiled files. No user data is sent in error
+: Controls colorization for log messages, using ANSI color controls. If both of
+  these settings are omitted, kmc will attempt to detect from console, and will
+  use colorization for interactive terminals, and no colorization when
+  redirection is being used.
+
+`--error-reporting`, `--no-error-reporting`
+
+: Enable or disable error reporting to keyman.com, overriding
+  [user settings](../../user-settings). Error reporting is for fatal errors in
+  the compiler, and not errors in compiled files. No user data is sent in error
   reports, although some filenames and paths may be present in the diagnostic
   data attached to the report.
+
+`--log-format <logFormat>`
+
+: Output log format. The available options are:
+  * `formatted` (default): emits log messages in a human-readable format
+  * `tsv`: emits log messages in UTF-8 tab-separated format. This format will be
+    stable across versions of kmc. The format has the following fields:
+    * filename
+    * line number
+    * severity
+    * code
+    * message
 
 `-l <logLevel>`, `--log-level <logLevel>`
 
@@ -108,22 +127,18 @@ The following parameters are available:
   * `hint`: emits compilation errors, warnings, and hints
   * `info` (default): emits compilation errors, warnings, hints, and
     informational messages
+  * `verbose`: emits all compilation messages, including verbose
+    informational messages
   * `debug`: emits all compilation messages, plus internal debug messages
 
-  Logging of specific [messages](messages) can be controlled with `--message`, `-m`.
+  Logging of specific [messages](messages) can be controlled with `--message`,
+  `-m` (`build` command only).
 
   Note that when warnings are treated as errors
   (`--compiler-warnings-as-errors`, `-w`), they will still be logged as
   warnings, so suppressing warnings while using this flag may be confusing.
 
 ## `kmc build` options
-
-`--color`, `--no-color`
-
-: Controls colorization for log messages, using ANSI color controls. If both of
-  these settings are omitted, kmc will attempt to detect from console, and will
-  use colorization for interactive terminals, and no colorization when
-  redirection is being used.
 
 `-d`, `--debug`
 
@@ -167,17 +182,6 @@ The following parameters are available:
 : Turns off warnings (CWARN_HeaderStatementIsDeprecated,
   CWARN_LanguageHeadersDeprecatedInKeyman10) for deprecated code styles
 
-`--log-format <logFormat>`
-
-: Output log format. The available options are:
-  * `formatted` (default): emits log messages in a human-readable format
-  * `tsv`: emits log messages in UTF-8 tab-separated format. This format will be
-    stable across versions of kmc. The format has the following fields:
-    * filename
-    * line number
-    * severity
-    * code
-    * message
 
 `-o <filename>`, `--out-file <filename>`
 
@@ -508,6 +512,12 @@ following sources:
 `-n, --dry-run`
 
 : Show what would happen, without making changes
+
+`-r, --relocate-external`
+
+: Copy referenced files that are outside the project folder into an 'external'
+  folder within the new project, rather than just referencing them in their
+  current location.
 
 ### File copying, renaming, and structure rules
 
