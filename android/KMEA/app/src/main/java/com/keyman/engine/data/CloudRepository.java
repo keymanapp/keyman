@@ -13,12 +13,14 @@ import com.keyman.engine.KMManager;
 import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.R;
 import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudCatalogDownloadCallback;
 import com.keyman.engine.cloud.impl.CloudCatalogDownloadReturns;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
 import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.DownloadFileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.VersionUtils;
 
@@ -366,6 +368,10 @@ public class CloudRepository {
    * @param onFailure  A callback to be triggered upon failure of a query.
    */
   private void downloadMetaDataFromServer(@NonNull Context context, UpdateHandler updateHandler, Runnable onSuccess, Runnable onFailure) {
+    if(DownloadFileUtils.getDownloadManager(context) == null) {
+      onFailure.run();
+      return;
+    }
     boolean cacheValid = getCacheValidity(context);
 
     // For local and PR test builds, force download of metadata
@@ -405,8 +411,12 @@ public class CloudRepository {
         BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
       } else {
         updateIsRunning = true;
-        CloudDownloadMgr.getInstance().executeAsDownload(
-          context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
+        try {
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
+        } catch (DownloadManagerDisabledException e) {
+          onFailure.run();
+        }
       }
     }
   }
