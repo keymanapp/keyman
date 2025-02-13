@@ -4,6 +4,9 @@
 
 package com.keyman.android;
 
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
+import com.keyman.engine.util.DownloadFileUtils;
+import com.keyman.engine.util.KMLog;
 import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
@@ -84,7 +87,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
-    KMManager.executeResourceUpdate(this);
+    // Checking for updates should never be allowed to crash the keyboard.
+    // Just silently fail if this occurs.
+    if(DownloadFileUtils.getDownloadManager(this) != null) {
+      // Will try to emit a toast if it fails - i.e., is not silent.
+      KMManager.executeResourceUpdate(this);
+    }
   }
 
   @Override
