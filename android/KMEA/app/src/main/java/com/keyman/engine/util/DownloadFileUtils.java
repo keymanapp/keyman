@@ -26,12 +26,14 @@ public final class DownloadFileUtils {
   private static final String DOWNLOAD_MANAGER_PACKAGE_NAME = "com.android.providers.downloads";
 
   /**
-   * Determines whether or not Android's `DownloadManager` service is active;
-   * downloads and cloud queries are impossible when it's disabled.
+   * Determines whether or not Android's `DownloadManager` service is active, only
+   * returning an instance of DownloadManager when it is currently accessible and enabled.
+   * Downloads and cloud queries are impossible when it's disabled.
    *
    * This solution is based heavily on
    * https://gist.github.com/Folyd/b9412bb6e2b06eb511f7.
-   * @return
+   * @return A valid and enabled reference to the system's DownloadManager service.  May be null
+   * if it is not accessible or is disabled.
    */
   public static DownloadManager getDownloadManager(Context context) {
     DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
