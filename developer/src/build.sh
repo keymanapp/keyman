@@ -157,6 +157,7 @@ function do_publish() {
 
   ./common/web/utils/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../common/web/keyman-version/build.sh publish $DRY_RUN $NPM_PUBLISH
+  ../../common/web/langtags/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../common/web/types/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../core/include/ldml/build.sh publish $DRY_RUN $NPM_PUBLISH
   # end TODO

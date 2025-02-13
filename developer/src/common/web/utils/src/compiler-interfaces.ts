@@ -295,10 +295,8 @@ export interface CompilerMessageOverride {
   level: CompilerErrorSeverityOverride;
 };
 
-export interface CompilerCallbackOptions {
-  logLevel?: CompilerLogLevel;
-  logFormat?: CompilerLogFormat;
-  color?: boolean; // null or undefined == use console default
+export interface CompilerCallbackOptions extends CompilerBaseOptions {
+  // TODO: these overlap with CompilerOptions, should refactor
   compilerWarningsAsErrors?: boolean;
   messageOverrides?: CompilerMessageOverrideMap;
 };
@@ -404,6 +402,19 @@ export const CompilerMessageSpec = (code: number, message: string, detail?: stri
   message,
   detail,
 });
+
+/**
+ * Remove initial whitespace from compiler detail messages, to enable
+ * indented formatting of message detail strings inside the message
+ * definitions
+ * @param event
+ * @returns dedented event detail
+ */
+export function dedentCompilerMessageDetail(event: CompilerEvent) {
+  // TODO(lowpri): dedent may be too naive -- should use least
+  // non-zero whitespace line as amount to dedent
+  return (event.detail ?? '').replace(/^[ ]+/gm, '');
+}
 
 export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
 

@@ -1,6 +1,6 @@
 # Bundled node.js
 
-We are bundling node 18.14.1 here as of Keyman 17.0.52.
+We are bundling node 20.16.1 here as of Keyman 18.0.156-alpha
 
 Note that if we change the node version, we will need to
 rebuild the binary modules in /developer/src/server/src/win32/

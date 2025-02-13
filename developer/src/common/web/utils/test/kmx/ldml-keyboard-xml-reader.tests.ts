@@ -32,7 +32,7 @@ describe('ldml keyboard xml reader tests', function () {
         instancePath: '/keyboard3/conformsTo',
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
-        params: 'allowedValues="45"',
+        params: 'allowedValues="45,46"', // this has to be kept in sync with the DTD
       })],
     },
     {

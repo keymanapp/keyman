@@ -25,5 +25,14 @@
     <method name="GetCapsLockIndicator">
       <arg name="state" type="b" direction="out" />
     </method>
+
+    <!--
+      CallOrderedOutputSentinel:
+
+      Press the ordered output sentinel key to serialize the output.
+    -->
+    <method name="CallOrderedOutputSentinel">
+    </method>
+
   </interface>
 </node>

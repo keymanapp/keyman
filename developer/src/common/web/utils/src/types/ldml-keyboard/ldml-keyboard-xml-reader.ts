@@ -231,6 +231,10 @@ export class LDMLKeyboardXMLSourceFileReader {
         this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
         return false;
       }
+      if (constants.treatAsLatest(paths[0])) {
+        /** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
+        paths[0] = constants.cldr_version_latest;
+      }
       importData = this.readImportFile(paths[0], paths[1]);
     } else {
       // local import

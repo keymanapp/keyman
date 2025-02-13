@@ -82,7 +82,7 @@ type
       InstallSuccess: Boolean);
     function InstallMSI(msiLocation: TInstallInfoFileLocation; var InstallDefaults: Boolean; ContinueSetup: Boolean): Boolean;
     procedure ConfigFirstRun(StartKeyman,StartWithWindows,
-      CheckForUpdates,AutomaticUpdates,StartDisabled,StartWithConfiguration,InstallDefaults,
+      CheckForUpdates,StartDisabled,StartWithConfiguration,InstallDefaults,
       AutomaticallyReportUsage: Boolean);
     procedure PrepareForReboot(res: Cardinal; InstallDefaults: Boolean);
     function RestartWindows: Boolean;
@@ -101,7 +101,7 @@ type
     destructor Destroy; override;
     procedure CheckInternetConnectedState;
     function DoInstall(Handle: THandle;
-      StartAfterInstall, StartWithWindows, CheckForUpdates, AutomaticUpdates, StartDisabled,
+      StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
       StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
     procedure LogInfo(const msg: string; ShowDialogIfNotSilent: Boolean = False);
@@ -194,7 +194,7 @@ begin
 end;
 
 function TRunTools.DoInstall(Handle: THandle;
-  StartAfterInstall, StartWithWindows, CheckForUpdates, AutomaticUpdates, StartDisabled,
+  StartAfterInstall, StartWithWindows, CheckForUpdates, StartDisabled,
   StartWithConfiguration, InstallDefaults, AutomaticallyReportUsage, ContinueSetup: Boolean): Boolean;
 var
   msiLocation: TInstallInfoFileLocation;
@@ -224,7 +224,7 @@ begin
       Exit(False);
   end;
 
-  ConfigFirstRun(StartAfterInstall,StartWithWindows,CheckForUpdates,AutomaticUpdates,
+  ConfigFirstRun(StartAfterInstall,StartWithWindows,CheckForUpdates,
     StartDisabled,StartWithConfiguration,InstallDefaults,AutomaticallyReportUsage);
 
   Result := True;
@@ -588,7 +588,7 @@ begin
   end;
 end;
 
-procedure TRunTools.ConfigFirstRun(StartKeyman,StartWithWindows,CheckForUpdates,AutomaticUpdates,
+procedure TRunTools.ConfigFirstRun(StartKeyman,StartWithWindows,CheckForUpdates,
   StartDisabled,StartWithConfiguration,InstallDefaults,AutomaticallyReportUsage: Boolean);
 var
   i: Integer;
@@ -686,7 +686,6 @@ begin
 
     if StartWithWindows then s := s + 'StartWithWindows,';
     if CheckForUpdates then s := s + 'CheckForUpdates,';
-    if AutomaticUpdates then s := s + 'AutomaticUpdates,';
     if AutomaticallyReportUsage then s := s + 'AutomaticallyReportUsage,';
 
     if InstallDefaults then
