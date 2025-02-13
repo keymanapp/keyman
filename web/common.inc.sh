@@ -105,7 +105,6 @@ function test-headless() {
   fi
   if [[ -n "$TEST_EXTENSIONS" ]]; then
     TEST_OPTS="$TEST_OPTS --extension $TEST_EXTENSIONS"
-    TEST_CD_REQD=true
   fi
 
   if [[ -e .c8rc.json ]]; then
