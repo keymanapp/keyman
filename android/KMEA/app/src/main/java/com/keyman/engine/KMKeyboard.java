@@ -129,7 +129,8 @@ final class KMKeyboard extends WebView {
    * Constructor for KMKeyboard.
    * If System WebView not installed/enabled, will throw AndroidRuntimeException.
    * Can't catch the exception here because super(context) must be the first line.
-   * @param context
+   * @param context {Context}
+   * @param keyboardType {KeyboardType}
    * @throws AndroidRuntimeException
    */
   public KMKeyboard(Context context, KeyboardType keyboardType) throws AndroidRuntimeException {
