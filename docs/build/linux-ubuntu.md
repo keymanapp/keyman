@@ -23,7 +23,7 @@ The following projects **cannot** be built on Linux:
 
 ### System Requirements
 
-- Minimum Ubuntu version: Ubuntu 20.04
+- Minimum Ubuntu version: Ubuntu 22.04
 
 Other Linux distributions will also work if appropriate dependencies are installed.
 
@@ -113,7 +113,7 @@ All dependencies are already installed if you followed the instructions under
 
 Keyman Core can be built with the `core/build.sh` script.
 
-- [Building Keyman Core](../../core/doc/BUILDING.md)
+- [Building Keyman Core](../../core/docs/BUILDING.md)
 
 ## Keyman for Linux
 

@@ -59,8 +59,8 @@ no on-screen keyboard for Wayland that works with Keyman.
 **A.** Keyman runs on Debian, Ubuntu, Wasta Linux and can be compiled to run
 from source in most distributions.
 
-**Note:** Ubuntu versions before Ubuntu 20.04 LTS are no longer supported with
-Keyman 17. If you are still running an older version and require Keyman you'll
+**Note:** Ubuntu versions before Ubuntu 22.04 LTS are no longer supported with
+Keyman 18. If you are still running an older version and require Keyman you'll
 have to install an older Keyman version.
 
 ## Q. Will my existing Windows Keyman keyboard work with Keyman for Linux?

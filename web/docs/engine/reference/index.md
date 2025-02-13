@@ -1,5 +1,5 @@
 ---
-title: KeymanWeb 18.0 Reference
+title: KeymanWeb Reference
 ---
 
 [KeymanWeb Overview](overview)
