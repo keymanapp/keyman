@@ -323,10 +323,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Show welcome screen</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Test for conflicting applications when Keyman starts</string>
   <!-- Context: Configuration Dialog - Options tab -->

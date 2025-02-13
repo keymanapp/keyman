@@ -319,7 +319,7 @@ type
     procedure UpdateStartMenuPrograms;
     procedure FillFileList(combo: TComboBox; obj: TObject; FileType: TKMFileType = ftOther);
     procedure UpdateImagePreviews;
-    procedure AddFile(FileName: WideString);
+    procedure AddFile(FileName: string);
     procedure SourceChanged(Sender: TObject);
     procedure MovePackageToSource;
     function MoveSourceToPackage: Boolean;
@@ -381,6 +381,7 @@ implementation
 
 uses
   System.Math,
+  System.StrUtils,
   Vcl.Clipbrd,
   Vcl.Imaging.GifImg,
 
@@ -708,7 +709,7 @@ begin
     mtConfirmation, mbOkCancel, 0) = mrOk;
 end;
 
-procedure TfrmPackageEditor.AddFile(FileName: WideString);
+procedure TfrmPackageEditor.AddFile(FileName: string);
 var
   f: TPackageContentFile;
   ki: TKeyboardInfo;
@@ -771,7 +772,7 @@ begin
   end;
 
   pack.Files.Add(f);
-  lbFiles.ItemIndex := lbFiles.Items.AddObject(ExtractFileName(FileName), f);
+  lbFiles.ItemIndex := lbFiles.Items.AddObject(ExtractFileName(FileName.Replace('/','\',[rfReplaceAll])), f);
   lbFilesClick(lbFiles);
   UpdateWelcomeFile;
   UpdateReadme;
@@ -1315,7 +1316,7 @@ begin
     lbFiles.Clear;
 
     for i := 0 to pack.Files.Count - 1 do
-      lbFiles.Items.AddObject(ExtractFileName(pack.Files[i].FileName), pack.Files[i]);
+      lbFiles.Items.AddObject(ExtractFileName(ReplaceStr(pack.Files[i].FileName,'/','\')), pack.Files[i]);
 
     UpdateOutPath;
     UpdateWelcomeFile;

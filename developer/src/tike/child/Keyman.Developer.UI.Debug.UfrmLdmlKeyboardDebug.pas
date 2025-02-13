@@ -39,7 +39,7 @@ uses
   UframeTextEditor,
   UfrmMDIEditor,
   UfrmTike,
-  UserMessages;
+  UserMessages, Keyman.Developer.UI.RichEdit41;
 
 type
   TLdmlDebugUIStatus = (
@@ -340,7 +340,7 @@ begin
   if not SetKeyEventContext then
     Exit(False);
 
-  if km_core_process_event(FDebugCore.State, Message.WParam, modifier, 1, KM_CORE_EVENT_FLAG_DEFAULT) = KM_CORE_STATUS_OK then
+  if km_core_process_event(FDebugCore.State, VKToScanCodeToVK(Message.WParam, GetKeyboardLayout(0)), modifier, 1, KM_CORE_EVENT_FLAG_DEFAULT) = KM_CORE_STATUS_OK then
   begin
     // Process keystroke -- true = swallow keystroke
     Result := True;

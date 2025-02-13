@@ -217,33 +217,45 @@ export class LdmlCompilerMessages {
   static Error_UnparseableTransformFrom   = (o: { from: string, message: string }) =>
   m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
 
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
+
   static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
   static Error_IllegalTransformDollarsign = (o: { from: string }) => m(
     this.ERROR_IllegalTransformDollarsign,
-    `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
-    `**Hint**: Use \`\\$\` to match a literal dollar-sign. If this precedes a variable name, `+
-    `the variable name may not be valid (A-Z, a-z, 0-9, _, 32 character maximum).`
-  );
+    `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`, `
+    **Hint**: Use \`\\$\` to match a literal dollar-sign. If this precedes a
+    variable name, the variable name may not be valid (A-Z, a-z, 0-9, _, 32
+    character maximum).
+  `);
 
   static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
-  static Error_TransformFromMatchesNothing = (o: { from: string }) =>
-  m(this.ERROR_TransformFromMatchesNothing, `Invalid transfom from="${def(o.from)}": Matches an empty string.`);
+  static Error_TransformFromMatchesNothing = (o: { from: string }) => m(
+    this.ERROR_TransformFromMatchesNothing,
+    `Invalid transfom from="${def(o.from)}": Matches an empty string.`
+  );
 
   static ERROR_IllegalTransformPlus = SevErrorTransform | 0x03;
-  static Error_IllegalTransformPlus = (o: { from: string }) =>
-  m(this.ERROR_IllegalTransformPlus,  `Invalid transform from="${def(o.from)}": Unescaped plus (+) is not valid transform syntax.`,
-                                            '**Hint**: Use `\\+` to match a literal plus.');
+  static Error_IllegalTransformPlus = (o: { from: string }) => m(
+    this.ERROR_IllegalTransformPlus,
+    `Invalid transform from="${def(o.from)}": Unescaped plus (+) is not valid transform syntax.`, `
+    **Hint**: Use \`\\+\` to match a literal plus.
+  `);
 
   static ERROR_IllegalTransformAsterisk = SevErrorTransform | 0x04;
-  static Error_IllegalTransformAsterisk = (o: { from: string }) =>
-  m(this.ERROR_IllegalTransformAsterisk,  `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`,
-                                            '**Hint**: Use `\\*` to match a literal asterisk.');
+  static Error_IllegalTransformAsterisk = (o: { from: string }) =>m(
+    this.ERROR_IllegalTransformAsterisk,
+    `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`, `
+    **Hint**: Use \`\\*\` to match a literal asterisk.
+  `);
 
   static ERROR_IllegalTransformToUset = SevErrorTransform | 0x05;
   static Error_IllegalTransformToUset = (o: { to: string }) => m(
     this.ERROR_IllegalTransformToUset,
-    `Invalid transform to="${def(o.to)}": Set variable (\\$[…]) cannot be used in 'to=' unless part of a map.`,
-    '**Hint**: If a map was meant, must use the form `<transform from="($[fromSet])" to="$[1:toSet]"/>`.'
-  );
+    `Invalid transform to="${def(o.to)}": Set variable (\\$[…]) cannot be used in 'to=' unless part of a map.`, `
+    **Hint**: If a map was meant, must use the form
+    \`<transform from="($[fromSet])" to="$[1:toSet]"/>\`.
+  `);
 
 }
