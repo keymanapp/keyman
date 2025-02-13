@@ -99,7 +99,6 @@ function test-headless() {
   fi
 
   TEST_OPTS=
-  TEST_CD_REQD=false
   if builder_has_option --ci; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
