@@ -9,6 +9,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+# for CLDR version
+. "$KEYMAN_ROOT/core/include/ldml/keyman_core_ldml.sh"
 
 builder_describe "Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
@@ -34,15 +36,29 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_clean() {
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
+  rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/util/abnf/*.pegjs
 }
 
 function do_configure() {
   verify_npm_setup
+  do_build_abnf
 }
 
 function do_build() {
   npm run build
+}
+
+function do_build_abnf() {
+  ABNF_SRC="$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/$LDML_CLDR_VERSION_LATEST/abnf"
+  for file in ${ABNF_SRC}/*.abnf; do
+    base=$(basename "$file" .abnf)
+    peg="$base.pegjs"
+    outfile="./src/util/abnf/$peg"
+    if [ ! -f "$outfile" ]; then
+      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${base}.abnf -> ${peg}${COLOR_RESET}"
+      npx -p abnf abnf_gen  "$file" -o "$outfile"
+    fi
+  done
 }
 
 function do_build_fixtures() {
