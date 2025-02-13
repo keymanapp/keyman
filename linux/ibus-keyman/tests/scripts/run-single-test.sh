@@ -16,6 +16,7 @@ fi
 
 if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null || ! which mutter > /dev/null; then
   echo "Please install Xvfb, Xephyr, metacity and mutter before running these tests!"
+  echo "sudo apt install xvfb xserver-xephyr metacity mutter"
   exit 1
 fi
 

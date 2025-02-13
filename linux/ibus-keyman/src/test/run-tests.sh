@@ -15,6 +15,7 @@ fi
 
 if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null; then
   echo "# Please install Xvfb, Xephyr and metacity before running these tests!"
+  echo "# sudo apt install xvfb xserver-xephyr metacity"
   exit 1
 fi
 
