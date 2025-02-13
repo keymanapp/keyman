@@ -5,8 +5,8 @@
 #
 
 
-# keyboards in resources/standards-data/ldml-keyboards/45/3.0/
-# tests     in resources/standards-data/ldml-keyboards/45/test/
+# keyboards in resources/standards-data/ldml-keyboards/46/3.0/
+# tests     in resources/standards-data/ldml-keyboards/46/test/
 tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
@@ -57,7 +57,7 @@ tests += tests_from_cldr
 # Setup kmc
 
 kmc_root = meson.global_source_root() / '../developer/src/kmc'
-ldml_root = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/45'
+ldml_root = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/46'
 ldml_data = join_paths(ldml_root, '3.0')
 ldml_testdata = join_paths(ldml_root, 'test')
 kmc_cmd = [node, '--enable-source-maps', kmc_root]

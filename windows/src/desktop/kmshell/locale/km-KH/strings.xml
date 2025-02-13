@@ -327,10 +327,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">បង្ហាញ​អេក្រង់​ស្វាគមន៍</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">ពិនិត្យ​រក​អាប់ដេតនៅលើ keyman.com ដោយស្វ័យប្រវត្តិ​រៀងរាល់​សប្ដាហ៍</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">តេស្ត​រក​កម្មវិធីដែល​ប្រឆាំងគ្នា ពេល Keyman ចាប់ផ្ដើម</string>
   <!-- Context: Configuration Dialog - Options tab -->

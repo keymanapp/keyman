@@ -11,7 +11,6 @@
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">Simulate AltGr with Ctrl+Alt</string>
   <string name="koAutoOpenOSK" comment="/FormatString: ">ကီးမန်းကီးဘုတ်ကို ရွေးသည့်အခါတိုင်း Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ် ကိုပြပါ</string>
   <string name="koAutoSwitchOSKPages" comment="/FormatString: ">ကီးဘုတ်ကိုရွေးချယ်ပြီးပါက သင့်လျော်သော Screenမှာပေါ်မှာမြင်ရမည့်ကီးဘုတ်/အကူအညီကို အလိုအလျောက်ပြပါ</string>
-  <string name="koCheckForUpdates" comment="/FormatString: ">www.tavultesoft.com ကိုအပတ်စဉ် အဆင့်မြှင့်တင်နိုင်ရန်စစ်ဆေးပါ</string>
   <string name="koDebugging" comment="/FormatString: ">Debugging</string>
   <string name="kogAdvanced" comment="/FormatString: ">အဆင့်မြင့်</string>
   <string name="kogGeneral" comment="/FormatString: ">General</string>

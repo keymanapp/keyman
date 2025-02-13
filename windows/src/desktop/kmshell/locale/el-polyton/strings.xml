@@ -323,10 +323,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Προβάλετε τὴν ὀθόνης καλωσορίσματος</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Νὰ ἐλέγχετε σὲ ἑβδομαδιαία βάση τὸ keyman.com γιὰ ἐνημερώσεις</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Κατὰ τὴν ἔναρξη τοῦ Keyman, νὰ ἐξετάζετε ἂν ὑπάρχουν μὴ συμβατὲς ἐφαρμογές</string>
   <!-- Context: Configuration Dialog - Options tab -->

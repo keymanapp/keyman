@@ -241,4 +241,11 @@ describe('PackageCompilerMessages', function () {
     await testForMessage(this, ['invalid', 'error_package_file_has_empty_version.kps'],
       PackageCompilerMessages.ERROR_PackageFileHasEmptyVersion);
   });
+
+  it('should generate Warn_PackageVersionIsUnrecognizedFormat if package version field is not a valid format', async function() {
+    await testForMessage(this, ['invalid', 'warn_package_version_is_unrecognized_format.kps'],
+      PackageCompilerMessages.WARN_PackageVersionIsUnrecognizedFormat);
+  });
+
+  // ERROR_PackageMustNotContainItself test in package-compiler.tests.ts
 });
