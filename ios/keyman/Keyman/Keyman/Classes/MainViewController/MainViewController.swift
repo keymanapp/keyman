@@ -278,13 +278,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     // Setup NavigationBar
     if let navbar = navigationController?.navigationBar {
-      if #available(iOS 13.0, *) {
-        // Dark mode settings must be applied through this new property,
-        // its class, and others like it.
-        navbar.standardAppearance.configureWithOpaqueBackground()
-      } else {
-        // Fallback on earlier versions
-      }
+      navbar.standardAppearance.configureWithOpaqueBackground()
       navbarBackground = KMNavigationBarBackgroundView()
       navbarBackground.addToNavbar(navbar)
       navbarBackground.setOrientation(UIApplication.shared.statusBarOrientation)
@@ -695,12 +689,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     let lframe = CGRect(x: 0, y: bframe.origin.y - 1, width: sframe.size.width, height: 1)
     let borderLine = UIView(frame: lframe)
-    if #available(iOS 13.0, *) {
-      borderLine.backgroundColor = UIColor.separator
-    } else {
-      let c: CGFloat = 230.0 / 255.0
-      borderLine.backgroundColor = UIColor(red: c, green: c, blue: c, alpha: 1.0)
-    }
+    borderLine.backgroundColor = UIColor.separator
     containerView.addSubview(borderLine)
 
     let tframe = CGRect(x: 0, y: 0, width: bframe.size.width, height: 40)
@@ -709,11 +698,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     textSizeTitle.backgroundColor = UIColor.clear
     textSizeTitle.text = String.init(format: NSLocalizedString("text-size-label", comment: ""), Int(textSize))
     textSizeTitle.textAlignment = .center
-    if #available(iOS 13.0, *) {
-      textSizeTitle.textColor = UIColor.secondaryLabel
-    } else {
-      textSizeTitle.textColor = UIColor.gray
-    }
+    textSizeTitle.textColor = UIColor.secondaryLabel
     textSizeTitle.font = textSizeTitle.font.withSize(14.0)
     containerView.addSubview(textSizeTitle)
 

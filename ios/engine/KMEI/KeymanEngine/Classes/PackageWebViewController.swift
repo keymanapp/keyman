@@ -43,15 +43,13 @@ class PackageWebViewController: UIViewController, WKNavigationDelegate {
     let prefs = WKPreferences()
     prefs.javaScriptEnabled = true
 
-    if #available(iOS 13.0, *) {
-      /**
-        In iPadOS 16 and above WKWebView defaults to lying about its user-agent,
-        telling the web server that it is a mac. We can avoid this with .mobile:
-        */
-      let pref = WKWebpagePreferences.init()
-      pref.preferredContentMode = .mobile
-      config.defaultWebpagePreferences = pref
-    }
+    /**
+      In iPadOS 16 and above WKWebView defaults to lying about its user-agent,
+      telling the web server that it is a mac. We can avoid this with .mobile:
+      */
+    let pref = WKWebpagePreferences.init()
+    pref.preferredContentMode = .mobile
+    config.defaultWebpagePreferences = pref
 
     // Inject a meta viewport tag into the head of the file if it doesn't exist
     let metaViewportInjection = """
