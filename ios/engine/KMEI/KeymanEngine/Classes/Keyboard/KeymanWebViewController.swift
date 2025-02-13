@@ -165,6 +165,7 @@ class KeymanWebViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.userContentController.removeAllScriptMessageHandlers()
+    self.userContentController.add(self, name: keymanWebViewName)
   }
 
   // Very useful for immediately adjusting the WebView's properties upon loading.
