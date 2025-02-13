@@ -14,5 +14,6 @@
 
 - (void)menuAction:(id)sender;
 - (void)handleBackspace:(NSEvent *)event;
-
+- (void)changeClients:(NSString *)clientAppId;
+- (void)deactivateClient;
 @end

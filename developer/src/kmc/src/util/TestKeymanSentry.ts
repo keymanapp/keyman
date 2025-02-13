@@ -43,7 +43,7 @@ export class TestKeymanSentry {
       try {
         throw new Error('Test error from -sentry-client-test-exception event');
       } catch(e: any) {
-        await KeymanSentry.captureException(e);
+        await KeymanSentry.captureException(e, true);
       }
     }
   }

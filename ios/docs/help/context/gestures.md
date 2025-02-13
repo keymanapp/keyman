@@ -1,5 +1,5 @@
 ---
-title: Gesture Hints and Tips - Keyman for iPhone and iPad
+title: Gesture Hints and Tips
 ---
 
 ## Using Gestures on the Keyboard Keys

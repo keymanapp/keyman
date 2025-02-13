@@ -5,20 +5,21 @@ import * as path from 'node:path';
 import 'mocha';
 import { assert } from 'chai';
 
-import { LexicalModelGenerator } from '@keymanapp/kmc-generate';
+import { GeneratorOptions, LexicalModelGenerator } from '@keymanapp/kmc-generate';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 import { unitTestEndpoints } from '../src/commands/generate.js';
-import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
+import { KeymanTargets } from '@keymanapp/common-types';
 
 describe('generateLexicalModel', function() {
-  const modelOptions = {
-    icon: true,
+  const modelOptions: GeneratorOptions = {
+    // icon: true,
     // id is written by generate functions
+    id: '',
     languageTags: ['en'],
     name: 'Sample Model',
     outPath: '.',
-    targets: 'any',
+    targets: [KeymanTargets.KeymanTarget.any],
     version: '1.0',
     author: 'Keyman',
     copyright: 'Keyman',
@@ -44,32 +45,11 @@ describe('generateLexicalModel', function() {
     outPath = null;
   });
 
-  it('should only allow a single id', async function() {
-    assert.isFalse(await unitTestEndpoints.doGenerate(
-      callbacks,
-      new LexicalModelGenerator(),
-      ['sample1.en.sample','sample2.en.sample'],
-      { ...modelOptions }
-    ));
-    assert.isTrue(callbacks.hasMessage(InfrastructureMessages.ERROR_GenerateRequiresId));
-  });
-
-  it('should require an id parameter', async function() {
-    assert.isFalse(await unitTestEndpoints.doGenerate(
-      callbacks,
-      new LexicalModelGenerator(),
-      null,
-      { ...modelOptions }
-    ));
-    assert.isTrue(callbacks.hasMessage(InfrastructureMessages.ERROR_GenerateRequiresId));
-  });
-
   it('should generate a lexical model project', async function() {
     assert.isTrue(await unitTestEndpoints.doGenerate(
       callbacks,
       new LexicalModelGenerator(),
-      'sample.en.sample',
-      { ...modelOptions, outPath }
+      { ...modelOptions, id: 'sample.en.sample', outPath }
     ));
 
     // Note: we won't test contents of files as this is tested in kmc-generate directly

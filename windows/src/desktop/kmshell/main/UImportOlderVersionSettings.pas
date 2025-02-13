@@ -24,7 +24,7 @@ unit UImportOlderVersionSettings;
 
 interface
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates,DoAutomaticUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
 
 implementation
 
@@ -44,7 +44,7 @@ uses
   Keyman.System.UpdateStateMachine,
   UImportOlderKeyboardUtils;
 
-function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates,DoAutomaticUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
+function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
 var
   n, I: Integer;
   v: Integer;
@@ -146,7 +146,6 @@ begin
 
   if DoStartWithWindows then kmcom.Options['koStartWithWindows'].Value := True; // I2753
   if DoCheckForUpdates then kmcom.Options['koCheckForUpdates'].Value := True;  // I2753
-  if DoAutomaticUpdates then kmcom.Options['koAutomaticUpdate'].Value := True;
   if DoAutomaticallyReportUsage then kmcom.Options['koAutomaticallyReportUsage'].Value := True;
 
 

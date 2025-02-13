@@ -1,6 +1,7 @@
 test_service_files = files(
   '../src/main.cpp',
   '../src/KeymanSystemService.cpp',
+  '../src/OrderedOutputDevice.cpp',
   'KeyboardDeviceMock.cpp',
 )
 

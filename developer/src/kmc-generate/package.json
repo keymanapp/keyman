@@ -27,7 +27,8 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*",
-    "@keymanapp/keyman-version": "*"
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/langtags": "*"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",

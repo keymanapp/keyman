@@ -14,16 +14,12 @@ uses
   KeymanPaths;
 
 type
-  TDownloadUpdateParams = record
-    TotalSize: Integer;
-    TotalDownloads: Integer;
-    StartPosition: Integer;
-  end;
+
 
   TDownloadUpdate = class
   private
     FShowErrors: Boolean;
-    FDownload: TDownloadUpdateParams;
+    FSuccessfulDownloadCount: Integer;
     (**
      *
      * Performs updates download in the background.
@@ -135,35 +131,38 @@ var
 
 begin
   Result := False;
-
-  FDownload.TotalSize := 0;
-  FDownload.TotalDownloads := 0;
-
+  FSuccessfulDownloadCount := 0;
   // Keyboard Packages
-  FDownload.StartPosition := 0;
   for i := 0 to High(Params.Packages) do
   begin
-    Inc(FDownload.TotalDownloads);
-    Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
     Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
-    if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
+    if DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then
+    begin
+      Inc(FSuccessfulDownloadCount);
+    end
+    else
     begin
       Params.Packages[i].Install := False; // Download failed but install other files
     end;
-    FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
   end;
 
   // Keyman Installer
-  Inc(FDownload.TotalDownloads);
-  Inc(FDownload.TotalSize, Params.InstallSize);
-  if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
+  //
+  if Params.Status = ucrsUpdateReady then
   begin
-    ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
-  end
-  else
+    if DownloadFile(Params.InstallURL, SavePath + Params.FileName) then
+    begin
+      Inc(FSuccessfulDownloadCount);
+    end
+    else
+    begin
+      ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
+    end;
+  end;
+  // If there is at least one keyboard package or version of keyman downloaded then
+  // the result is true
+  if (FSuccessfulDownloadCount > 0) then
   begin
-    // If installer has downloaded that is success even
-    // if zero packages were downloaded.
     Result := True;
   end;
 end;
