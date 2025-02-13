@@ -724,6 +724,7 @@ public final class KMManager {
       keyboard.showBanner(true);
     }
     setEngineWebViewVersionStatus(appContext, keyboard);
+    sendLongpressDelay();
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
@@ -921,7 +922,7 @@ public final class KMManager {
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
-      
+
       // Needed until our minimum version of Chrome is 61.0+.
       copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
@@ -2124,7 +2125,7 @@ public final class KMManager {
   }
 
   /**
-   * Set the longpress delay (in milliseconds) as a stored preference.
+   * Set the longpress delay (in milliseconds) as a stored preference and sends to KeymanWeb.
    * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
    * @return boolean
@@ -2140,17 +2141,19 @@ public final class KMManager {
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
 
+    // Send longpress delay to KeymanWeb
+    sendLongpressDelay();
+
     return true;
   }
 
   /**
-   * Sends options to the KeymanWeb keyboard.
+   * Sends longpress delay to the KeymanWeb keyboard.
    * 1. number of milliseconds to trigger a longpress gesture.
-   * This method requires a keyboard to be loaded for the value to take effect.
    */
-  public static void sendOptionsToKeyboard() {
+  private static void sendLongpressDelay() {
     int longpressDelay = getLongpressDelay();
-    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+    if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
     }
 

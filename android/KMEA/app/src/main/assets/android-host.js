@@ -13,6 +13,7 @@ var bannerImagePath = '';
 var bannerHTMLContents = '';
 var fragmentToggle = 0;
 var deferredBannerCall;
+var longpressDelay = null;
 
 var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
@@ -71,6 +72,10 @@ function init() {
 
       keyman.refreshOskLayout();
     }
+    // Initialize the longpress delay
+    if(longpressDelay !== null) {
+      setLongpressDelay(longpressDelay);
+    }
   });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
@@ -128,7 +133,8 @@ function notifyHost(event, params) {
 // Update the KeymanWeb longpress delay
 // delay is in milliseconds
 function setLongpressDelay(delay) {
-  if (keyman.osk) {
+  longpressDelay = delay;
+  if (keyman && keyman.osk) {
     keyman.osk.gestureParams.longpress.waitLength = delay;
     console_debug('setLongpressDelay('+delay+')');
   } else {
