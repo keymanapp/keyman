@@ -23,7 +23,7 @@ The following projects **cannot** be built on Linux:
 
 ### System Requirements
 
-- Minimum Ubuntu version: Ubuntu 20.04
+- Minimum Ubuntu version: Ubuntu 22.04
 
 Other Linux distributions will also work if appropriate dependencies are installed.
 
