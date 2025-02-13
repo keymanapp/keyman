@@ -979,14 +979,19 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
             CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
 
+          Toast errorToast = Toast.makeText(context,
+            context.getString(com.keyman.engine.R.string.update_check_unavailable),
+            Toast.LENGTH_SHORT);
+
           try {
             CloudDownloadMgr.getInstance().executeAsDownload(
               context, _downloadid, null, _callback,
               aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
           } catch (DownloadManagerDisabledException e) {
-            Toast.makeText(context,
-              context.getString(R.string.update_check_unavailable),
-              Toast.LENGTH_SHORT).show();
+            errorToast.show();
+          } catch (Exception e) {
+            errorToast.show();
+            KMLog.LogException(TAG, "Unexpected exception occurred during download attempt", e);
           }
         }
       }

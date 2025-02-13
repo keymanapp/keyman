@@ -112,14 +112,19 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
 
           BaseActivity.makeToast(aContext, R.string.dictionary_download_start_in_background, Toast.LENGTH_SHORT);
 
+          Toast errorToast = Toast.makeText(aContext,
+            aContext.getString(R.string.update_check_unavailable),
+            Toast.LENGTH_SHORT);
+
           try {
-            CloudDownloadMgr.getInstance().executeAsDownload(aContext,
-              _r.additionalDownloadid, null, _callback,
+            CloudDownloadMgr.getInstance().executeAsDownload(
+              aContext, _r.additionalDownloadid, null, _callback,
               _r.additionalDownloads.toArray(new CloudApiTypes.CloudApiParam[0]));
           } catch (DownloadManagerDisabledException e) {
-            Toast.makeText(aContext,
-              aContext.getString(R.string.update_check_unavailable),
-              Toast.LENGTH_SHORT).show();
+            errorToast.show();
+          } catch (Exception e) {
+            errorToast.show();
+            KMLog.LogException(TAG, "Unexpected exception occurred during download attempt", e);
           }
         }
       }
