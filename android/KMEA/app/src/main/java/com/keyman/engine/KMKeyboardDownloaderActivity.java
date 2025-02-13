@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudKeyboardPackageDownloadCallback;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
@@ -72,7 +73,7 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
 
   //TODO: move to keyboard manager class
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -164,9 +165,15 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
         context.getString(R.string.keyboard_download_start_in_background),
         Toast.LENGTH_SHORT).show();
 
-      CloudDownloadMgr.getInstance().executeAsDownload(
-        context, _downloadid, null, _callback,
-        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+      try {
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, _downloadid, null, _callback,
+          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+      } catch (DownloadManagerDisabledException e) {
+        Toast.makeText(context,
+          context.getString(R.string.update_check_unavailable),
+          Toast.LENGTH_SHORT).show();
+      }
     }
 
     ((AppCompatActivity) context).finish();
@@ -219,9 +226,15 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
         context.getString(R.string.dictionary_download_start_in_background),
         Toast.LENGTH_SHORT).show();
 
-      CloudDownloadMgr.getInstance().executeAsDownload(
-        context, _downloadid, null, _callback,
-        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+      try {
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, _downloadid, null, _callback,
+          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+      } catch (DownloadManagerDisabledException e) {
+        Toast.makeText(context,
+          context.getString(R.string.update_check_unavailable),
+          Toast.LENGTH_SHORT).show();
+      }
     }
 
     ((AppCompatActivity) context).finish();
