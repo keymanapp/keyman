@@ -722,9 +722,9 @@ public final class KMManager {
       }
       keyboard.setBanner(KMManager.BannerType.HTML);
       keyboard.showBanner(true);
+      sendLongpressDelay();
     }
     setEngineWebViewVersionStatus(appContext, keyboard);
-    sendLongpressDelay();
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {
