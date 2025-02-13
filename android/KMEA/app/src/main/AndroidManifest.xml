@@ -7,6 +7,11 @@
       </intent>
     </queries>
 
+    <queries>
+        <package android:name="com.android.webkit" />
+        <package android:name="com.google.android.ims" />
+    </queries>
+
     <!-- https://developer.android.com/develop/ui/views/notifications/notification-permission#declare -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -56,13 +61,6 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Light.Dialog" >
-        </activity>
-        <activity
-            android:name="com.keyman.engine.WebViewErrorActivity"
-            android:exported="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoTitleDialog">
         </activity>
 
         <!-- Put other WebViewActivities in a separate process so the Keyboard WebView doesn't lag.

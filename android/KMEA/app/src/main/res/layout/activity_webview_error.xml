@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/webViewErrorLayout"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:background="@android:color/white"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:gravity="bottom"
-    app:layout_anchorGravity="bottom">
+    android:layout_gravity="bottom"
+    android:background="@android:color/white" >
 
-    <View android:id="@+id/pad"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="10" />
 
     <!-- Banner to display if WebView is not installed/enabled -->
     <TextView
         android:id="@+id/kmWebViewError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
         android:background="@android:color/white"
@@ -32,8 +30,7 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:background="@android:color/holo_orange_light"
         android:textColor="@android:color/white"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/kmWebViewError"
+        android:layout_gravity="bottom|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/fab_margin"
@@ -46,4 +43,4 @@
         android:singleLine="true"
         android:text="@string/label_ok" />
 
-</RelativeLayout>
+</LinearLayout>

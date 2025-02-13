@@ -12,10 +12,6 @@
        https://developer.android.com/reference/android/Manifest.permission#READ_EXTERNAL_STORAGE -->
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
-    <queries>
-        <package android:name="com.android.webkit" />
-        <package android:name="com.google.android.ims" />
-    </queries>
   <!-- Ideally we would declare this permission so we can get other installed keyboard names.
   But would involve a long review process with the Play Store:
   https://support.google.com/googleplay/android-developer/answer/9214102#
