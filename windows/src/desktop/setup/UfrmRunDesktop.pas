@@ -129,6 +129,7 @@ type
     procedure SetupMSI;  // I2644
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
     procedure GetDefaultSettings;
+    procedure GetSavedSettings;
     procedure FillActionText;
     procedure FillLanguageList;
     procedure FillStrings;
@@ -547,7 +548,6 @@ procedure TfrmRunDesktop.FormCreate(Sender: TObject);
 var
   oldHeight: Integer;
 begin
-  FAutomaticallyReportUsage := True;
 
   FillStrings;
 
@@ -564,7 +564,7 @@ begin
   CheckVersion9Upgrade;
   CheckVersion10Upgrade;
 
-  GetDefaultSettings;  // I2651
+  GetSavedSettings;
 
   FillLanguageList;
   FillStrings;
@@ -1033,16 +1033,25 @@ procedure TfrmRunDesktop.GetDefaultSettings; // I2651
 begin
   FStartWithWindows := True; // I2607
   FCheckForUpdates := True;  // I2609
+  FAutomaticallyReportUsage := True;
+end;
 
+procedure TfrmRunDesktop.GetSavedSettings;
+begin
+  GetDefaultSettings;
   try
     with CreateHKCURegistry do  // I2749
     try
+      if OpenKeyReadOnly('\' + SRegKey_KeymanEngine_CU) then
+      begin
+        if ValueExists(SRegValue_AutomaticallyReportUsage) then
+          FAutomaticallyReportUsage := ReadBool(SRegValue_AutomaticallyReportUsage)
+      end;
       if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
-
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin
