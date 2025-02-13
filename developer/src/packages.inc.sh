@@ -5,6 +5,7 @@
 
 readonly PACKAGES=(
   common/web/keyman-version
+  common/web/langtags
   common/web/types
   core/include/ldml
   developer/src/common/web/utils

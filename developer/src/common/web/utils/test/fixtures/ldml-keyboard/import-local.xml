@@ -2,6 +2,6 @@
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty"  name="Test Minimal Keyboard"/>
   <keys>
-    <import base="" path="keys-Zyyy-morepunctuation.xml"/>
+    <import path="keys-Zyyy-morepunctuation.xml"/>
   </keys>
 </keyboard3>

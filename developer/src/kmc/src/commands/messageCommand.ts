@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Command, Option } from 'commander';
-import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/developer-utils';
+import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent, dedentCompilerMessageDetail } from '@keymanapp/developer-utils';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
@@ -189,7 +189,7 @@ function getMessageDetail(cls: any, id: string, escapeMarkdown: boolean): Compil
     throw new Error(`Call to ${cls.name}.${f} returned null`);
   }
 
-  event.detail = (event.detail ?? '').replace(/^[ ]+/gm, ''); // TODO(lowpri): dedent may be too naive?
+  event.detail = dedentCompilerMessageDetail(event);
   event.message = event.message ?? '';
   event.message = event?.exceptionVar
     ? 'This is an internal error; the message will vary'

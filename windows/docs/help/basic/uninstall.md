@@ -1,5 +1,5 @@
 ---
-title: Software Task - Uninstall Keyman
+title: Software Task - Uninstall Keyman for Windows
 ---
 
 ## Uninstall Keyman from Windows 10

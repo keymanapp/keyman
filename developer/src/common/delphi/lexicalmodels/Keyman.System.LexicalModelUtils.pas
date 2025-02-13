@@ -4,7 +4,6 @@ interface
 
 type
   TLexicalModelUtils = class
-  private
   public
     const SPackageNameDoesNotFollowLexicalModelConventions_Message: string =
       'The package file %0:s does not follow the recommended model filename conventions. The name should be all lower case, '+
@@ -31,6 +30,8 @@ type
     class function CleanLexicalModelIDComponent(const Name: string): string; static;
     class function IsCleanLexicalModelIDComponent(const Name: string): Boolean; static;
 
+    class function IsValidLexicalModelID(ID: string; EnforceCaseAndWhitespace: Boolean): Boolean; static;
+
     class function ExtractFileExt(filename: string): string; static;
     class function RemoveFileExt(filename: string): string; static;
     class function ChangeFileExt(filename, ext: string): string; static;
@@ -51,10 +52,19 @@ const
 
   // The model ID SHOULD adhere to this pattern (see also developer/src/kmc-model):
   //                           author           .bcp47            .uniq
+  MODEL_ID_PATTERN         = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*$';
   MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.js$';
   MODEL_ID_PATTERN_TS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$';
   MODEL_ID_PATTERN_PACKAGE = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$';
   MODEL_ID_PATTERN_PROJECT = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$';
+
+class function TLexicalModelUtils.IsValidLexicalModelID(ID: string;
+  EnforceCaseAndWhitespace: Boolean): Boolean;
+begin
+  if not EnforceCaseAndWhitespace then
+    ID := LowerCase(Trim(ID));
+  Result := TRegEx.IsMatch(ID, MODEL_ID_PATTERN);
+end;
 
 class function TLexicalModelUtils.DoesJSFilenameFollowLexicalModelConventions(
   const Name: string): Boolean;

@@ -1,0 +1,40 @@
+{
+  "id": "alephwithbeth",
+  "name": "Aleph With Beth",
+  "license": "mit",
+  "isRTL": true,
+  "authorName": "Cameron Briggs",
+  "description": "<p>alephwithbeth keyboard</p>",
+  "languages": {
+    "he": {
+      "examples": [],
+      "languageName": "Hebrew",
+      "displayName": "Hebrew"
+    }
+  },
+  "lastModifiedDate": "2025-01-27T23:04:56.765Z",
+  "packageFilename": "alephwithbeth.kmp",
+  "packageFileSize": 244476,
+  "jsFilename": "alephwithbeth.js",
+  "jsFileSize": 23534,
+  "packageIncludes": [
+    "documentation",
+    "welcome",
+    "visualKeyboard"
+  ],
+  "version": "1.0.6",
+  "encodings": [
+    "unicode"
+  ],
+  "platformSupport": {
+    "windows": "full",
+    "macos": "full",
+    "linux": "full",
+    "desktopWeb": "full",
+    "ios": "full",
+    "android": "full",
+    "mobileWeb": "full"
+  },
+  "minKeymanVersion": "14.0",
+  "helpLink": "https://help.keyman.com/keyboard/alephwithbeth"
+}
