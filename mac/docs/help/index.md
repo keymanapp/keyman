@@ -1,5 +1,5 @@
 ---
-title: Keyman 18.0 for macOS Help
+title: Keyman 19.0 for macOS Help
 ---
 
 Need help using Keyman for macOS?  You'll find everything you need here, including product documentation,

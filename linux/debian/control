@@ -10,7 +10,7 @@ Build-Depends:
  debhelper-compat (= 12),
  dh-python,
  gawk,
- gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
+ gir1.2-webkit2-4.1,
  ibus,
  libevdev-dev,
  libgtk-3-dev,
@@ -88,7 +88,7 @@ Architecture: all
 Depends:
  dbus-x11,
  dconf-cli,
- gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
+ gir1.2-webkit2-4.1,
  keyman-engine,
  python3-bs4,
  python3-fonttools,
