@@ -27,9 +27,6 @@
   <!-- Context: Menu Action -->
   <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Install Updates</string>
 
-  <!-- Context:  Update check failure notification -->
-  <string name="update_check_impossible" comment="Notification that the app cannot check for keyboard updates">DownloadManager disabled - cannot check for updates</string>
-
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Version: %1$s</string>
 
