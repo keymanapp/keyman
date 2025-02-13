@@ -177,7 +177,7 @@ export class InfrastructureMessages {
   static INFO_ProjectNotCopiedSuccessfully = SevInfo | 0x0025;
   static Info_ProjectNotCopiedSuccessfully = (o:{source:string, dest:string}) => ({filename:o.source, ...m(
     this.INFO_ProjectNotCopiedSuccessfully,
-    `'${def(o.source)}' was not successfully copied to '${def(o.dest)}'.`,
+    `Failed to copy '${def(o.source)}' to '${def(o.dest)}'.`,
   )});
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
@@ -198,7 +198,7 @@ export class InfrastructureMessages {
   static INFO_ProjectNotGeneratedSuccessfully = SevInfo | 0x0028;
   static Info_ProjectNotGeneratedSuccessfully = (o:{id:string}) => ({filename:o.id, ...m(
     this.INFO_ProjectNotGeneratedSuccessfully,
-    `New project '${def(o.id)}' was not successfully generated.`,
+    `Failed to generate new project '${def(o.id)}'.`,
   )});
 
 }
