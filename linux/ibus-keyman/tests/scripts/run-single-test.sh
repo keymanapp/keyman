@@ -44,7 +44,7 @@ function help() {
 function run_tests() {
   # Output these lines to stderr - the first line on stdout has to be the TAP version number
   # which running ${TESTFILE} outputs
-  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!" >&2
+  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log, /tmp/ibus-daemon.log and /tmp/km-test-server.log!" >&2
   echo "" >&2
 
   echo "# Starting tests..." >&2
