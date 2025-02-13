@@ -68,7 +68,8 @@ public final class WebViewUtils {
    */
   public static SystemWebViewStatus getSystemWebViewStatus(
       Context context) {
-    // Check whether WebView is installed - this also returns true when installed but disabled
+    // Check whether WebView is installed
+    // If the package is installed but disabled, hasSystemFeature() still returns true
     PackageManager packageManager = context.getPackageManager();
     if (!packageManager.hasSystemFeature("android.software.webview")) {
       return SystemWebViewStatus.NOT_INSTALLED;
