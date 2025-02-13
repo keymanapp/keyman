@@ -4,7 +4,7 @@ title: KMManager.setLongpressDelay()
 
 ## Summary
 
-The `setLongpressDelay()` method sets the number of milliseconds to trigger a longpress gesture as a stored preference and sends it to the KeymanWeb Engine.
+The `setLongpressDelay()` method sets the number of milliseconds to trigger a longpress gesture, applies to the keyboard, and stores preference.
 
 ## Syntax
 
