@@ -184,6 +184,9 @@
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Failed to access server!</string>
 
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager disabled - cannot check for updates</string>
+
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"All resources are up to date!"</string>
 

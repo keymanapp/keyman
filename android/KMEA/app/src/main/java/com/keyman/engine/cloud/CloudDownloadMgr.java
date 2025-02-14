@@ -11,6 +11,7 @@ import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.keyman.engine.R;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.DownloadFileUtils;
 
@@ -214,17 +215,16 @@ public class CloudDownloadMgr{
                                 ModelType aTargetModel,
                                 ICloudDownloadCallback<ModelType,ResultType> aCallback,
                                 CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException {
-    Toast errorToast = Toast.makeText(aContext,
-      // TODO:  reintroduce custom error message
-      aContext.getString(com.keyman.engine.R.string.update_check_unavailable),
-      Toast.LENGTH_SHORT);
-
     try {
       executeAsDownloadInternal(aContext, aDownloadIdentifier, aTargetModel, aCallback, params);
     } catch (DownloadManagerDisabledException e) {
-      errorToast.show();
+      Toast.makeText(aContext,
+        aContext.getString(R.string.update_check_download_manager_disabled),
+        Toast.LENGTH_SHORT).show();
     } catch (Exception e) {
-      errorToast.show();
+      Toast.makeText(aContext,
+        aContext.getString(R.string.update_check_unavailable),
+        Toast.LENGTH_SHORT).show();
       KMLog.LogException(TAG, "Unexpected exception occurred during download/query attempt", e);
     }
   }
