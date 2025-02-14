@@ -1,8 +1,8 @@
 ---
-title: KeymanWeb - The Guide
+title: KeymanWeb 18.0 - The Guide
 ---
 
-Welcome to the guide for using KeymanWeb.
+Welcome to the guide for using KeymanWeb 18.0.
 
 -   [Getting Started with Keyman Web](get-started)
 -   [User Interface Design](user-interface-design)
@@ -10,4 +10,4 @@ Welcome to the guide for using KeymanWeb.
 -   [Installing Keyboards](adding-keyboards)
 -   [Additional Examples](examples/)
 
-[Return to the main KeymanWeb page](../)
+[Return to the main KeymanWeb 18.0 page](../)

@@ -6,8 +6,8 @@ Keyman Engine for Android allows you to use any Keyman touch keyboard in your An
 system keyboard app for purchase in the Play Store.<br/>
 This guide will walk you through the steps for creating your first Android app with Keyman Engine for Android.
 
-If you are not familiar with Android development, you will find the
-[Android Developer online training](https://developer.android.com/training/index.html) an invaluable
+If you are not familiar with Android development, you will find the 
+[Android Developer online training](https://developer.android.com/training/index.html) an invaluable 
 resource, and working through some of their tutorials first will help you with the rest of this guide.
 
 ### 1. Install Free Tools
@@ -131,5 +131,5 @@ And there you have it: your first Keyman Engine for Android app!
 ## See Also
 * [Guide: Build a system keyboard app](../system-keyboard/)
 * [Keyman Developer Documentation](/developer/17.0/)
-* [Keyman Engine for Android Documentation](/developer/engine/android/19.0/)
+* [Keyman Engine for Android Documentation](/developer/engine/android/18.0/)
 * [Android Developer Home](https://developer.android.com/index.html)
