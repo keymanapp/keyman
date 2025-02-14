@@ -71,9 +71,10 @@ on_call_ordered_output_sentinel(
 ) {
   *ret_error = SD_BUS_ERROR_NULL;
 
-  KeymanSystemService *service = static_cast<KeymanSystemService *>(user_data);
+  int result = sd_bus_reply_method_return(msg, "");
+  KeymanSystemService* service = static_cast<KeymanSystemService*>(user_data);
   service->CallOrderedOutputSentinel();
-  return sd_bus_reply_method_return(msg, "");
+  return result;
 }
 
 static int32_t
@@ -97,49 +98,14 @@ static const sd_bus_vtable system_service_vtable[] = {
 
 KeymanSystemService::KeymanSystemService()
 {
-  int ret;
-
-  GetKbdDevices();
-  CreateOrderedOutputDevice();
-
-#ifdef KEYMAN_TESTING
-  ret = sd_bus_open_user(&bus);
-#else
-  ret = sd_bus_open_system(&bus);
-#endif
-
-  if (ret < 0) {
-    syslog(LOG_USER | LOG_NOTICE, "Failed to connect to system bus: %s", strerror(-ret));
-    failed = true;
-    return;
-  }
-
-  // Install the object
-  ret = sd_bus_add_object_vtable(bus,
-                                 &slot,
-                                 KEYMAN_OBJECT_PATH,
-                                 KEYMAN_INTERFACE_NAME,
-                                 system_service_vtable,
-                                 this);
-  if (ret < 0) {
-    syslog(LOG_USER | LOG_NOTICE, "Failed to issue method call: %s", strerror(-ret));
-    failed = true;
-    return;
-  }
-
-  // Take a well-known service name so that clients can find us
-  ret = sd_bus_request_name(bus, KEYMAN_BUS_NAME, 0);
-  if (ret < 0) {
-    syslog(LOG_USER | LOG_NOTICE, "Failed to acquire service name: %s", strerror(-ret));
-    failed = true;
-    return;
-  }
 }
 
 KeymanSystemService::~KeymanSystemService()
 {
-  if (slot) sd_bus_slot_unref(slot);
-  if (bus)  sd_bus_unref(bus);
+  if (bus) {
+    sd_bus_unref(bus);
+    bus = nullptr;
+  }
 
   if (kbd_devices) {
     for (KeyboardDevice *device : *kbd_devices) {
@@ -155,8 +121,41 @@ KeymanSystemService::~KeymanSystemService()
   }
 }
 
-int KeymanSystemService::Loop()
-{
+void KeymanSystemService::Initialize() {
+  int ret;
+
+  GetKbdDevices();
+#ifdef KEYMAN_TESTING
+  ret = sd_bus_default(&bus);
+#else
+  ret = sd_bus_open_system(&bus);
+#endif
+
+  if (ret < 0) {
+    syslog(LOG_USER | LOG_NOTICE, "Failed to connect to system bus: %s", strerror(-ret));
+    failed = true;
+    return;
+  }
+
+  // Install the object
+  ret = sd_bus_add_object_vtable(bus, NULL, KEYMAN_OBJECT_PATH, KEYMAN_INTERFACE_NAME, system_service_vtable, this);
+  if (ret < 0) {
+    syslog(LOG_USER | LOG_NOTICE, "Failed to issue method call: %s", strerror(-ret));
+    failed = true;
+    return;
+  }
+
+  // Take a well-known service name so that clients can find us
+  ret = sd_bus_request_name(bus, KEYMAN_BUS_NAME, 0);
+  if (ret < 0) {
+    syslog(LOG_USER | LOG_NOTICE, "Failed to acquire service name: %s", strerror(-ret));
+    failed = true;
+    return;
+  }
+  CreateOrderedOutputDeviceIfNecessary();
+}
+
+int KeymanSystemService::Loop() {
   for (;;) {
     // Process requests
     int ret = sd_bus_process(bus, NULL);
@@ -203,13 +202,15 @@ void KeymanSystemService::GetKbdDevices() {
   }
 }
 
-void KeymanSystemService::CreateOrderedOutputDevice() {
-  if (!kbd_ordered_output) {
-    kbd_ordered_output = new OrderedOutputDevice();
-    if (!kbd_ordered_output->Initialize()) {
-      delete kbd_ordered_output;
-      kbd_ordered_output = nullptr;
-    }
+void KeymanSystemService::CreateOrderedOutputDeviceIfNecessary() {
+  if (kbd_ordered_output) {
+    return;
+  }
+
+  kbd_ordered_output = ::CreateOrderedOutputDevice();
+  if (!kbd_ordered_output->Initialize()) {
+    delete kbd_ordered_output;
+    kbd_ordered_output = nullptr;
   }
 }
 

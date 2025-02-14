@@ -305,6 +305,7 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   ibus_prop_list_append(keyman->prop_list, keyman->status_prop);
 
   keyman->state = NULL;
+  initialize_keyman_system_service_client();
 }
 
 static km_core_cu* get_base_layout()
@@ -641,17 +642,18 @@ process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   gchar *output_utf8 = g_ucs4_to_utf8(output_utf32, -1, NULL, NULL, NULL);
   g_autofree gchar *debug  = NULL;
-  if (!client_supports_surrounding_text(engine)) {
+
+  if (client_supports_surrounding_text(engine)) {
+    // compliant app
+    g_message("%s: compliant app: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
+    commit_string(keyman, output_utf8);
+    g_free(output_utf8);
+  } else {
     // non-compliant app
-    g_message("%s: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
+    g_message("%s: non-compliant app: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     g_assert(keyman->commit_item->char_buffer == NULL);
     keyman->commit_item->char_buffer = output_utf8;
     // don't free output_utf8 - assigned to char_buffer!
-  } else {
-    // compliant app
-    g_message("%s: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
-    commit_string(keyman, output_utf8);
-    g_free(output_utf8);
   }
 }
 
@@ -843,6 +845,7 @@ ibus_keyman_engine_process_key_event(
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
   if (!client_supports_surrounding_text(engine) && keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL) {
+    // non-compliant app
     if (!isKeyDown) {
       g_message("%s: got F24 Sentinel, ignore keyup", __FUNCTION__);
       return TRUE;

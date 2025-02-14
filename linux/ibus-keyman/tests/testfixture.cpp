@@ -1,6 +1,3 @@
-#include <glib-object.h>
-#include <glib.h>
-#include <ibus.h>
 #include <iostream>
 #include <keyman/keyman_core_api.h>
 #include <kmx/kmx_processevent.h>
@@ -10,18 +7,15 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
-#include "ibusimcontext.h"
+#include "DbusTestHelper.h"
 #include "keycodes.h"
 #include "keymanutil.h"
 #include "KeymanSystemServiceClient.h"
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
+#include "testfixture.h"
+#include "KeyHandling.h"
 
-typedef struct {
-  IBusBus *bus;
-  GtkIMContext *context;
-  IBusIMContext *ibuscontext;
-} IBusKeymanTestsFixture;
 
 typedef struct {
   char *test_name;
@@ -32,10 +26,10 @@ typedef struct {
 
 static gboolean loaded        = FALSE;
 static gboolean use_wayland   = FALSE;
-static GdkWindow *window      = NULL;
 static GMainLoop *thread_loop = NULL;
 static GTypeModule *module    = NULL;
 gboolean testing              = TRUE;
+GdkWindow* window             = NULL;
 
 static void
 module_register(GTypeModule *module) {
@@ -48,11 +42,15 @@ destroy(GtkWidget *widget, gpointer data) {
 }
 
 static void
-ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
-  IBusIMContextClass *classClass;
+ibus_keyman_tests_fixture_set_up(
+  IBusKeymanTestsFixture* fixture,
+  gconstpointer user_data
+) {
+  IBusIMContextClass* classClass;
+  initialize_keyman_system_service_client();
 
   if (!window) {
-    GtkWidget *widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    GtkWidget* widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(widget, "destroy", G_CALLBACK(destroy), NULL);
     window = gtk_widget_get_window(widget);
   }
@@ -64,7 +62,7 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
     g_assert_nonnull(module);
 
     /* Not loaded until we call ref for the first time */
-    classClass = static_cast<IBusIMContextClass *>(g_type_class_peek(IBUS_TYPE_IM_CONTEXT));
+    classClass = static_cast<IBusIMContextClass*>(g_type_class_peek(IBUS_TYPE_IM_CONTEXT));
     g_assert_null(classClass);
 
     loaded = TRUE;
@@ -75,6 +73,7 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
 
 static void
 ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
+  dbus_testhelper_close();
   if (thread_loop) {
     g_main_loop_unref(thread_loop);
     thread_loop = NULL;
@@ -109,6 +108,7 @@ switch_keyboard(IBusKeymanTestsFixture *fixture, const gchar *keyboard) {
   fixture->context     = (GtkIMContext *)fixture->ibuscontext;
 
   thread_loop = g_main_loop_new(NULL, TRUE);
+  dbus_testhelper_init(fixture);
   ibus_im_test_set_thread_loop(fixture->ibuscontext, thread_loop);
 }
 
@@ -126,105 +126,7 @@ string_format(const std::string &format, Args... args) {
   return std::string(buf.get(), buf.get() + size - 1);  // We don't want the '\0' inside
 }
 
-static unsigned short vk_to_keycode(unsigned short vk) {
-  for (int i = 0; i < (int)sizeof(keycode_to_vk); i++) {
-    if (keycode_to_vk[i] == vk)
-      return i;
-  }
-  return -1;
-}
-
-#define KEYMAN_LCTRL 29  // 0x1D
-#define KEYMAN_LALT 56   // 0x38
-#define KEYMAN_RCTRL 97  // 0x61
-#define KEYMAN_RALT 100  // 0x64
-
-typedef struct {
-  guint modifiers_keydown;
-  guint modifiers_keyup;
-  guint keyval;
-  guint16 keycode;
-  guint is_modifier;
-} gdk_key_event;
-
-static gdk_key_event
-get_key_event_for_modifier(guint modifier, guint & prev_modifiers, guint keyval, guint keycode) {
-  gdk_key_event event;
-  event.modifiers_keydown = prev_modifiers;
-  event.modifiers_keyup   = prev_modifiers | modifier | IBUS_RELEASE_MASK;
-  prev_modifiers |= modifier;
-  event.keyval  = keyval;
-  event.keycode = keycode;
-  event.is_modifier = 1;
-  return event;
-}
-
-static bool
-is_modifier(guint16 keycode) {
-  switch (keycode) {
-    case KEY_LEFTSHIFT:
-    case KEY_RIGHTSHIFT:
-    case KEY_LEFTALT:
-    case KEY_RIGHTALT:
-    case KEY_LEFTCTRL:
-    case KEY_RIGHTCTRL:
-    case KEY_CAPSLOCK:
-      return true;
-    }
-    return false;
-}
-
-static std::list<gdk_key_event>
-get_involved_keys(km::tests::key_event test_event) {
-  guint modifiers = 0;
-  if (get_capslock_indicator()) {
-    modifiers = IBUS_LOCK_MASK;
-  }
-
-  // process all modifiers
-  std::list<gdk_key_event> result;
-  if (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) {
-    // we don't distinguish between R and L Shift
-    result.push_back(get_key_event_for_modifier(IBUS_SHIFT_MASK, modifiers, GDK_KEY_Shift_L, KEY_LEFTSHIFT));
-  }
-  if (test_event.modifier_state & KM_CORE_MODIFIER_ALT || test_event.modifier_state & KM_CORE_MODIFIER_LALT) {
-    result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_L, KEY_LEFTALT));
-  }
-  if (test_event.modifier_state & KM_CORE_MODIFIER_RALT) {
-    if (test_event.vk == KEYMAN_RALT)
-      result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
-    else
-      result.push_back(get_key_event_for_modifier(IBUS_MOD5_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
-  }
-  if (test_event.modifier_state & KM_CORE_MODIFIER_CTRL || test_event.modifier_state & KM_CORE_MODIFIER_LCTRL) {
-    result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_L, KEY_LEFTCTRL));
-  }
-  if (test_event.modifier_state & KM_CORE_MODIFIER_RCTRL) {
-    result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_R, KEY_RIGHTCTRL));
-  }
-
-  // process key
-  guint keyval = (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
-                                                                     : gdk_keyval_to_lower(test_event.vk);
-
-  // REVIEW: the keyval we use here are not correct for < 0x20 and >= 0x7f
-  // See /usr/include/X11/keysymdef.h and /usr/include/ibus-1.0/ibuskeysyms.h
-  // Currently this is not a problem because we don't use keyval, but if that ever changes we
-  // should be aware that our test behaves different than the real client.
-
-  gdk_key_event event;
-  event.modifiers_keydown = modifiers;
-  event.modifiers_keyup   = modifiers | IBUS_RELEASE_MASK;
-  event.keyval            = keyval;
-  event.keycode           = vk_to_keycode(test_event.vk);
-  event.is_modifier       = is_modifier(event.keycode);
-  result.push_back(event);
-
-  return result;
-}
-
-static std::list<km::tests::key_event>
-get_context_keys(std::u16string context) {
+static std::list<km::tests::key_event> get_context_keys(std::u16string context) {
   std::list<km::tests::key_event> result;
   for (auto c = context.begin(); c != context.end(); c++) {
     gchar utf8[6];
@@ -239,62 +141,11 @@ get_context_keys(std::u16string context) {
   return result;
 }
 
-static void
-press_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event key_event) {
-  auto involved_keys = get_involved_keys(key_event);
-
-  // press and hold the individual modifier keys, finally the actual key
-  std::stack<GdkEventKey> keys_to_release;
-  for (auto key = involved_keys.begin(); key != involved_keys.end(); key++) {
-    bool old_caps_lock  = get_capslock_indicator();
-    guint lock_modifier = 0;
-
-    // KEY_CAPSLOCK behaves a bit strange:
-    // If capslock is off:
-    // - on keypress we turn on capslock, but the modifier is still not set.
-    // - The LOCK_MASK modifier gets set on release.
-    // When capslock is already on:
-    // - the LOCK_MASK modifier is set on both keypress and release
-    // - capslock gets turned off on release
-    if (key->keycode == KEY_CAPSLOCK && !old_caps_lock) {
-      set_capslock_indicator((guint32)true);
-      lock_modifier = IBUS_LOCK_MASK;
-    }
-    GdkEventKey keyEvent = {
-        .type             = GDK_KEY_PRESS,
-        .window           = window,
-        .send_event       = 0,
-        .time             = 0,
-        .state            = key->modifiers_keydown,
-        .keyval           = key->keyval,
-        .length           = 0,
-        .string           = NULL,
-        .hardware_keycode = key->keycode,
-        .group            = 0,
-        .is_modifier      = key->is_modifier};
-    gtk_im_context_filter_keypress(fixture->context, &keyEvent);
-
-    keyEvent.type  = GDK_KEY_RELEASE;
-    keyEvent.state = key->modifiers_keyup | lock_modifier;
-    keys_to_release.push(keyEvent);
-
-    if (key->keycode == KEY_CAPSLOCK && old_caps_lock) {
-      set_capslock_indicator((guint32) false);
-    }
-  }
-
-  // then release the keys in reverse order
-  while (!keys_to_release.empty()) {
-    auto keyEvent = keys_to_release.top();
-    gtk_im_context_filter_keypress(fixture->context, &keyEvent);
-    keys_to_release.pop();
-  }
-}
-
-static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
+static void test_source(IBusKeymanTestsFixture* fixture, gconstpointer user_data) {
   auto data       = (TestData*)user_data;
   auto sourcefile = string_format("%s.kmn", data->test_path);
   auto kmxfile    = string_format("und:%s.kmx", data->test_path);
+
   ibus_im_test_set_surrounding_text_supported(data->use_surrounding_text);
 
   km::tests::KmxTestSource test_source;
@@ -322,13 +173,13 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
 
   auto contextKeys = get_context_keys(context);
   for (auto k = contextKeys.begin(); k != contextKeys.end(); k++) {
-    press_keys(fixture, *k);
+    press_key(fixture, *k);
   }
 
   gtk_im_context_focus_in(fixture->context);
 
   for (auto p = test_source.next_key(keys); p.vk != 0; p = test_source.next_key(keys)) {
-    press_keys(fixture, p);
+    press_key(fixture, p);
   }
 
   if (expected.length() == 0) {
