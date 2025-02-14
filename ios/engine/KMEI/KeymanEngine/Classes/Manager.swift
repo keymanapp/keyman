@@ -165,6 +165,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
 
     set(value) {
+      // The system keyboard will set itself here when its `viewDidAppear` triggers.
       _inputViewController = value
     }
   }
