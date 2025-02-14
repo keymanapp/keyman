@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.192 beta 2025-02-14
+
+* chore(common): Fix 17.0.335 tier in HISTORY.md (#13213)
+* docs(linux): update what's new for 18.0 (#13207)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+* docs(windows): update keyman for windows 18.0 whats-new (#13211)
+* chore: undo master merge (#13238)
+* change(ios): prevent memory leaks from keyboard-related notification observers (#13129)
+* change(ios): mitigate keyboard input-view memory leak by force-discarding WebView (#13169)
+
 ## 18.0.191 beta 2025-02-12
 
 * feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
