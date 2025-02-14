@@ -1,4 +1,5 @@
 test_files = [
+  'km_g_test/km_gtestutils.c',
   'DbusTestHelper.cpp',
   'EventSource.cpp',
   'ibusimcontext.c',
