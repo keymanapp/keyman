@@ -165,6 +165,8 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
   var portraitConstraint: NSLayoutConstraint?
   var landscapeConstraint: NSLayoutConstraint?
+  
+  var outerWidthConstraint: NSLayoutConstraint?
 
   private var keymanWeb: KeymanWebViewController
   private var swallowBackspaceTextChange: Bool = false
@@ -206,7 +208,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
-    var message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
+    let message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
     os_log("%{public}s", log: KeymanEngineLogger.settings, type: .default, message)
     SentryManager.breadcrumb(message)
 
@@ -298,6 +300,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // as system keyboard.  Do NOT perform if in-app, as this unnecessarily resets the WebView.
     if(Manager.shared.isSystemKeyboard) {
       keymanWeb.shouldReload = true
+    }
+  }
+  
+  open override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    
+    if outerWidthConstraint != nil {
+      outerWidthConstraint?.isActive = false
+      self.inputView?.removeConstraint(self.outerWidthConstraint!)
+      outerWidthConstraint = nil
     }
   }
 
@@ -527,11 +539,15 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   // These require the view to appear - parent and our relationship with it must exist!
+  // ... wait, is THIS possibly a leak source?
   private func setOuterConstraints() {
-    var baseWidthConstraint: NSLayoutConstraint
-    baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
-    baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
-    baseWidthConstraint.isActive = true
+    guard outerWidthConstraint == nil else {
+      outerWidthConstraint!.isActive = true
+      return
+    }
+    outerWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
+    outerWidthConstraint!.priority = UILayoutPriority(rawValue: 999)
+    outerWidthConstraint!.isActive = true
   }
 
   public var kmwHeight: CGFloat {
@@ -589,7 +605,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   // KeymanWebViewController maintenance methods
-  func reload() {
+  public func reload() {
     keymanWeb.reloadKeyboard()
   }
 
@@ -623,9 +639,17 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   func showHelpBubble() {
     keymanWeb.showHelpBubble()
   }
+  
+  func dismissHelpBubble() {
+    keymanWeb.dismissHelpBubble()
+  }
 
   func showHelpBubble(afterDelay delay: TimeInterval) {
     keymanWeb.showHelpBubble(afterDelay: delay)
+  }
+  
+  internal func enforceKeyboardSize() {
+    keymanWeb.resizeKeyboard()
   }
 
   func clearText() {

@@ -112,6 +112,14 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
+    
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willEnterForegroundNotification,
+      object: nil,
+      queue: OperationQueue.main
+    ) { _ in
+      Manager.shared.inputViewController.reload()
+    }
 
     // Unfortunately, it's the main app with the file definitions.
     // We have to gerry-rig this so that the framework-based SettingsViewController
