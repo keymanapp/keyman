@@ -147,7 +147,7 @@ Run `ibus restart` after installing any of them.
 Keyman tries to activate the keyboard automatically. If you want to activate
 it for a different language, you can do so by following the steps below.
 
-#### GNOME3 (Ubuntu default)
+#### GNOME3 (focal and bionic default, also newer Ubuntu versions)
 
 - Click the connection/sound/shutdown section in the top right. Then the tools
   icon for Settings.

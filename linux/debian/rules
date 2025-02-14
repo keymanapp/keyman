@@ -66,7 +66,10 @@ override_dh_auto_install:
 	rm $(CURDIR)/debian/keyman/usr/share/locale/*.po*
 	# Don't call `build.sh install` - dh_auto_install does some extra smarts
 	dh_auto_install --sourcedir=linux/keyman-config --buildsystem=pybuild $@
-	dh $@ --with-python3 --with bash-completion
+	# Unfortunately bash-completion 2.10 (focal) doesn't yet provide dh-sequence-bash-completion,
+	# which we could add as build-dependency, so we'll have to explicitly call
+	# dh_bash_completion here instead of using `dh $@ --with-python3 --with bash-completion`
+	dh_bash-completion -O--buildsystem=pybuild
 	dh_python3 -O--buildsystem=pybuild
 
 override_dh_missing:

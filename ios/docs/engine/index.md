@@ -4,7 +4,7 @@ title: Keyman for iPhone and iPad Developer Support
 
 ## Overview
 
-The Keyman Engine for iPhone and iPad 19.0 SDK is designed to provide
+The Keyman Engine for iPhone and iPad 18.0 SDK is designed to provide
 advanced international keyboard support to iOS apps.
 
 As a developer, you simply need to use (or subclass) TextView or

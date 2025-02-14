@@ -113,7 +113,7 @@ All dependencies are already installed if you followed the instructions under
 
 Keyman Core can be built with the `core/build.sh` script.
 
-- [Building Keyman Core](../../core/docs/BUILDING.md)
+- [Building Keyman Core](../../core/doc/BUILDING.md)
 
 ## Keyman for Linux
 
