@@ -24,7 +24,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action clean           rm -rf ./out/ ./tsconfig.tsbuildinfo .vscode-test
+builder_run_action clean           rm -rf ./out/ ./tsconfig.tsbuildinfo .vscode-test ./build .parcel-cache
 builder_run_action configure       verify_npm_setup
 builder_run_action build           npm run compile
 builder_run_action test            npm test

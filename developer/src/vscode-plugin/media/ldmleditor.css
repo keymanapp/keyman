@@ -1,0 +1,28 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * CSS for the LDML editor
+ */
+
+body {
+	justify-content: center;
+	align-items: center;
+	/* margin: 1em 2em; */
+	/* background-repeat: repeat; */
+}
+
+
+h1 {
+	color: black;
+	background-color: white;
+}
+
+pre {
+	color: black;
+	background-color: goldenrod;
+	border: 2px solid purple;
+	padding: 1em;
+	height: 10em;
+	overflow-y: scroll;
+}
+

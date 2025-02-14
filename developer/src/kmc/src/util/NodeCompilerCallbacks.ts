@@ -195,6 +195,11 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.printMessage(event);
   }
 
+  /** Bottleneck for output */
+  protected writeString(str: string) {
+    process.stdout.write(str);
+  }
+
   private printMessage(event: CompilerEvent) {
     if(this.options.logFormat == 'tsv') {
       this.printTsvMessage(event);
@@ -204,7 +209,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   private printTsvMessage(event: CompilerEvent) {
-    process.stdout.write([
+    this.writeString([
       CompilerError.formatFilename(event.filename, {fullPath:true, forwardSlashes:false}),
       CompilerError.formatLine(event.line),
       CompilerError.formatSeverity(event.code),
@@ -216,7 +221,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   private printFormattedMessage(event: CompilerEvent) {
     const severityColor = severityColors[CompilerError.severity(event.code)] ?? color.reset;
     const messageColor = this.messageSpecialColor(event) ?? color.reset;
-    process.stdout.write(
+    this.writeString(
       (
         event.filename
         ? color.cyan(CompilerError.formatFilename(event.filename)) +
@@ -230,7 +235,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
 
     if(event.code == InfrastructureMessages.INFO_ProjectBuiltSuccessfully) {
       // Special case: we'll add a blank line after project builds
-      process.stdout.write('\n');
+      this.writeString('\n');
     }
   }
 
