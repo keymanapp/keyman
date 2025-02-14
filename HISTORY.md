@@ -9,6 +9,11 @@
 
 * chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
 
+## 19.0.1 alpha 2025-02-11
+
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+* chore: increment to alpha 19.0 (#13187)
+
 ## 18.0.191 beta 2025-02-12
 
 * feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
