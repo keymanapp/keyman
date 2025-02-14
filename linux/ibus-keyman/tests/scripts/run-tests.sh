@@ -36,6 +36,7 @@ function help() {
   echo "  --help, -h, -?          Display this help"
   echo "  --verbose, -v           Run tests verbosely"
   echo "  --debug                 debug test logging output"
+  echo "  --remote-debug          start gdbserver after setup but prior to running the tests"
   echo "  -k                      passed to GLib testing framework"
   echo "  --tap                   output in TAP format. Passed to GLib testing framework"
   echo "  --surrounding-text      run tests with surrounding texts enabled"
@@ -86,10 +87,14 @@ function run_tests() {
   source "$ENV_FILE"
   echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
 
+  if [[ -n ${REMOTE_DEBUG:-} ]]; then
+    echo "===> Now attach debugger to ${REMOTE_HOST}"
+  fi
+
   # Note: -k and --tap are consumed by the GLib testing framework
   #shellcheck disable=SC2068 # we want to split array elements!
   #shellcheck disable=SC2086
-  "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
+  ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
     --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
@@ -111,6 +116,7 @@ while (( $# )); do
     --no-x11) USE_X11=0;;
     --verbose|-v) ARG_VERBOSE=--verbose;;
     --debug) ARG_DEBUG=--debug-log;;
+    --remote-debug) REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345" && REMOTE_DEBUG="gdbserver ${REMOTE_HOST}";;
     --) shift && break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
