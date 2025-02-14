@@ -67,10 +67,11 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
   return writer.write(data);
 
   function getRootAttributes() {
+    const conform = meta.conform.value;
     return {
-      '$xmlns': `https://schemas.unicode.org/cldr/${constants.cldr_version_latest}/keyboard3`,
+      '$xmlns': `https://schemas.unicode.org/cldr/${conform}/keyboard3`,
       '$locale': kmx.kmxplus.loca.locales[0].value,
-      '$conformsTo': constants.cldr_version_latest,
+      '$conformsTo': conform,
     };
   }
 
