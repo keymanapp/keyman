@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.DownloadFileUtils;
@@ -212,8 +213,26 @@ public class CloudDownloadMgr{
   public <ModelType,ResultType> void executeAsDownload(Context aContext, String aDownloadIdentifier,
                                 ModelType aTargetModel,
                                 ICloudDownloadCallback<ModelType,ResultType> aCallback,
-                                CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException
-  {
+                                CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException {
+    Toast errorToast = Toast.makeText(aContext,
+      // TODO:  reintroduce custom error message
+      aContext.getString(com.keyman.engine.R.string.update_check_unavailable),
+      Toast.LENGTH_SHORT);
+
+    try {
+      executeAsDownloadInternal(aContext, aDownloadIdentifier, aTargetModel, aCallback, params);
+    } catch (DownloadManagerDisabledException e) {
+      errorToast.show();
+    } catch (Exception e) {
+      errorToast.show();
+      KMLog.LogException(TAG, "Unexpected exception occurred during download/query attempt", e);
+    }
+  }
+
+  private <ModelType,ResultType> void executeAsDownloadInternal(Context aContext, String aDownloadIdentifier,
+                                ModelType aTargetModel,
+                                ICloudDownloadCallback<ModelType,ResultType> aCallback,
+                                CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException {
     if(!isInitialized) {
       Log.w(TAG, "DownloadManager not initialized. Initializing CloudDownloadMgr.");
       initialize(aContext);

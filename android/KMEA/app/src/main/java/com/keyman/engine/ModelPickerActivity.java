@@ -112,20 +112,9 @@ public final class ModelPickerActivity extends BaseActivity {
         aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
           CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
 
-        Toast errorToast = Toast.makeText(context,
-          context.getString(R.string.update_check_unavailable),
-          Toast.LENGTH_SHORT);
-
-        try {
-          CloudDownloadMgr.getInstance().executeAsDownload(
-            context, _downloadid, null, _callback,
-            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
-        } catch (DownloadManagerDisabledException e) {
-          errorToast.show();
-        } catch (Exception e) {
-          errorToast.show();
-          KMLog.LogException(TAG, "Unexpected exception occurred during download attempt", e);
-        }
+        CloudDownloadMgr.getInstance().executeAsDownload(
+          context, _downloadid, null, _callback,
+          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
       } else {
         Toast.makeText(context,
           context.getString(R.string.cannot_connect),

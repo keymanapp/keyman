@@ -166,20 +166,9 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
         context.getString(R.string.keyboard_download_start_in_background),
         Toast.LENGTH_SHORT).show();
 
-      Toast errorToast = Toast.makeText(context,
-        context.getString(R.string.update_check_unavailable),
-        Toast.LENGTH_SHORT);
-
-      try {
-        CloudDownloadMgr.getInstance().executeAsDownload(
-          context, _downloadid, null, _callback,
-          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
-      } catch (DownloadManagerDisabledException e) {
-        errorToast.show();
-      } catch (Exception e) {
-        errorToast.show();
-        KMLog.LogException(TAG, "Unexpected exception occurred during download attempt", e);
-      }
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback,
+        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
     }
 
     ((AppCompatActivity) context).finish();
@@ -232,20 +221,9 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
         context.getString(R.string.dictionary_download_start_in_background),
         Toast.LENGTH_SHORT).show();
 
-      Toast errorToast = Toast.makeText(context,
-        context.getString(R.string.update_check_unavailable),
-        Toast.LENGTH_SHORT);
-
-      try {
-        CloudDownloadMgr.getInstance().executeAsDownload(
-          context, _downloadid, null, _callback,
-          aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
-      } catch (DownloadManagerDisabledException e) {
-        errorToast.show();
-      } catch (Exception e) {
-        errorToast.show();
-        KMLog.LogException(TAG, "Unexpected exception occurred during download attempt", e);
-      }
+      CloudDownloadMgr.getInstance().executeAsDownload(
+        context, _downloadid, null, _callback,
+        aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
     }
 
     ((AppCompatActivity) context).finish();
