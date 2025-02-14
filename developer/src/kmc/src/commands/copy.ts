@@ -79,6 +79,18 @@ async function doCopy(callbacks: NodeCompilerCallbacks, sources: string | string
     return false;
   }
 
+  const dest = options.outPath;
+  callbacks.reportMessage(InfrastructureMessages.Info_CopyingProject({source, dest}));
+  const result = runCopier(callbacks, source, options);
+  if(result) {
+    callbacks.reportMessage(InfrastructureMessages.Info_ProjectCopiedSuccessfully({source, dest}));
+  } else {
+    callbacks.reportMessage(InfrastructureMessages.Info_ProjectNotCopiedSuccessfully({source, dest}));
+  }
+  return result;
+}
+
+async function runCopier(callbacks: NodeCompilerCallbacks, source: string, options: CopierOptions) {
   const copier = new KeymanProjectCopier();
   try {
     if(!await copier.init(callbacks, options)) {
