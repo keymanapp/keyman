@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 ################################ Main script ################################
 
@@ -35,6 +36,12 @@ run_core() {
 }
 
 run_linux() {
+  if [[ -z "${UBUNTU_VERSION:-}" ]]; then
+    image_version=default
+  else
+    image_version="${UBUNTU_VERSION}-java${KEYMAN_VERSION_JAVA}-node$(_print_expected_node_version)-emsdk${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+  fi
+
   mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux"
   mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux"
   docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
@@ -42,7 +49,7 @@ run_linux() {
     -v "${KEYMAN_ROOT}/linux/build/docker-linux":/home/build/build/linux/build \
     -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux":/home/build/build/linux/keyman-system-service/build \
     -e DESTDIR=/tmp \
-    keymanapp/keyman-linux-ci:default \
+    "keymanapp/keyman-linux-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
