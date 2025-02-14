@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.4 alpha 2025-02-14
+
+* feat(developer): serialize KMXPlus into XML (#13174)
+
 ## 19.0.3 alpha 2025-02-13
 
 * docs: update keyboard processor build source (#13221)
