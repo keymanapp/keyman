@@ -131,10 +131,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">ကဳဗုဒ် %1$s စုတ်လဝ်တုဲ</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ဇိုတ် ကဳဗုဒ်တုဲ</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">ပံက် ပလေဝ်ဒါန်</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">ပံက် တၚ်ချိၚ်ခယျဂမၠိုၚ်</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Disable suggestions</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">တၚ်ချိၚ်ခယျဂမၠိုၚ်ဟေၚ်</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">တၚ်ချၚ်ခယျ ကေုာံ တၚ်ပလေဝ်ဂမၠိုၚ်</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">တၚ်ချိၚ်ခယျနကဵု တၚ်ပလေဝ်အဝ်တဵု</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">အဘိဓာန်</string>
     <plurals name="model_count">
