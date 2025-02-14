@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 CORE_LDML_H_FILE="../../include/ldml/keyman_core_ldml.h"
+CORE_LDML_SH_FILE="../../include/ldml/keyman_core_ldml.sh"
 
 ################################ Main script ################################
 
@@ -35,8 +36,8 @@ if builder_start_action build; then
 fi
 
 if builder_start_action run; then
-  node --enable-source-maps ../../include/ldml/ldml-const-builder/ldml-const-builder.js > ${CORE_LDML_H_FILE}
-  echo "Updated ${CORE_LDML_H_FILE}"
+  node --enable-source-maps ../../include/ldml/ldml-const-builder/ldml-const-builder.js ${CORE_LDML_H_FILE} ${CORE_LDML_SH_FILE}
+  echo "Updated ${CORE_LDML_H_FILE} and ${CORE_LDML_SH_FILE}"
 
   builder_finish_action success run
 fi

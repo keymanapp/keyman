@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/core/include/ldml/keyman_core_ldml.sh"
 
 builder_describe "Build Keyman common file types module" \
   "@/core/include/ldml" \
@@ -30,8 +31,8 @@ builder_parse "$@"
 function compile_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboard3.schema.json"
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboardtest3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/$LDML_CLDR_VERSION_LATEST/ldml-keyboard3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/$LDML_CLDR_VERSION_LATEST/ldml-keyboardtest3.schema.json"
     "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"
