@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.3 alpha 2025-02-13
+
+* docs: update keyboard processor build source (#13221)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+
+## 19.0.2 alpha 2025-02-12
+
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
+
 ## 18.0.191 beta 2025-02-12
 
 * feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
