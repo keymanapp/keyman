@@ -141,12 +141,26 @@ test_action() {
 
 coverage_action() {
   builder_echo "Creating coverage report..."
-  cd "$KEYMAN_ROOT"
-  mkdir -p web/build/coverage/tmp
-  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t web/build/coverage/tmp
-  c8 report --config web/.c8rc.json ---reporter html --clean=false --reports-dir=web/build/coverage
-  rm -rf web/build/coverage/tmp
-  cd web
+
+  # Always ensure our collation folder is clean, just in case something went wrong on a prior run.
+  rm -rf build/coverage/tmp
+
+  # Also clean out the sub-report directories + main index.html; don't keep old ones if we fail!
+  rm -rf build/coverage/app
+  rm -rf build/coverage/engine
+  rm -f  build/coverage/index.html
+
+  # Collate the results into a single folder
+  mkdir build/coverage/tmp
+  find . -type f -name coverage-\*.json -print0 | xargs -0 cp -t build/coverage/tmp
+
+  # Note for maintainers:  the .c8rc.json config needs to be written from the perspective of
+  # the working directory - including its `include` and `exclude` entries.  All ignores and
+  # such must be redefined in whatever that top-level .c8rc.json is.
+  c8 report --reporter html
+
+  # No need to keep the collation folder around afterward; we can always redo that work.
+  rm -rf build/coverage/tmp
 }
 
 builder_run_child_actions build:engine/dom-utils
