@@ -287,13 +287,13 @@ describe('KmpCompiler', function () {
     assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJsonData));
   });
 
-  it(`should reject an package that contains itself`, function () {
+  it(`should reject an package that contains itself`, async function () {
     const inputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kps');
     const outputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kmp');
     const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
     assert.isNotNull(kmpJsonData);
     const validation = new PackageValidation(callbacks, {});
-    assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJson));
+    assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJsonData));
     assert.equal(callbacks.messages[0].code, PackageCompilerMessages.ERROR_PackageMustNotContainItself);
   });
 
