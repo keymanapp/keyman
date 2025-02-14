@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/updateChromeLayout"
+  android:id="@+id/checkWebViewChromeLayout"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:background="@android:color/white"
   android:orientation="horizontal">
 
-  <!-- Banner to display if old version of Chrome installed -->
+  <!-- Banner to display if WebView is not installed/enabled or old version of Chrome installed -->
   <TextView
-    android:id="@+id/kmUpgradeChromeTextView"
+    android:id="@+id/kmWebViewChromeTextView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_weight="1"
@@ -20,7 +20,7 @@
     android:textSize="@dimen/update_chrome_label_textsize" />
 
   <Button
-    android:id="@+id/updateChromeButton"
+    android:id="@+id/webViewChromeButton"
     style="@style/Widget.AppCompat.Button.Colored"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
