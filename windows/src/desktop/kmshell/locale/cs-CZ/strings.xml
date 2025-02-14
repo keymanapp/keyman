@@ -327,6 +327,10 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Zobrazit úvodní obrazovku</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Automatically check for updates and download</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Test pro protichůdné aplikace při spuštění klíče</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -454,6 +458,22 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostika</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_No_Updates_Available" comment="Update tab - no updates are available">Žádné dostupné aktualizace.</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">K dispozici jsou aktualizace, které budou aplikovány při příštím restartu Windows.</string>
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Aktualizace nyní vyžaduje restart počítače.</string>
+  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Aktualizace Keyman je připravena k instalaci.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -546,6 +566,10 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">Klávesa %1$s je v konfliktu s jiným klávesovým zkratkou. Pokud budete pokračovat, ostatní klávesová zkratka bude vymazána. Pokračovat?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update" comment="Update tab name">Aktualizovat</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">K dispozici jsou aktualizované komponenty klíče</string>
   <!-- Context: Online Update Dialog -->
@@ -615,6 +639,14 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Aplikovat aktualizaci nyní</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_CheckNow" comment="Check for updates now button - update dialog">Zkontrolovat aktualizace</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
