@@ -256,7 +256,7 @@ function _setup_ibus() {
     echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else
     # test run as part of the build
-    echo "kill -9 ${PID} || true" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} || true # ibus-daemon" >> "${CLEANUP_FILE}"
   fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
