@@ -7,6 +7,7 @@
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include "km_g_test/km_gtestutils.h"
 #include "DbusTestHelper.h"
 #include "keycodes.h"
 #include "keymanutil.h"
@@ -196,7 +197,7 @@ static void test_source(IBusKeymanTestsFixture* fixture, gconstpointer user_data
 static void
 test_skip(IBusKeymanTestsFixture *fixture, gconstpointer user_data) {
   auto data = (TestData *)user_data;
-  g_test_skip(data->skip_reason);
+  km_g_test_skip(data->skip_reason);
 }
 
 void
@@ -224,7 +225,7 @@ add_test(const char* directory, const char* filename, gboolean use_surrounding_t
   testdata->test_path            = g_file_get_parse_name(testfile);
   testdata->use_surrounding_text = use_surrounding_text;
   testdata->skip_reason          = skip_reason;
-  g_test_add(
+  km_g_test_add(
       testname->str, IBusKeymanTestsFixture, testdata, ibus_keyman_tests_fixture_set_up, skip_reason ? test_skip : test_source,
       ibus_keyman_tests_fixture_tear_down);
   g_object_unref(file);
@@ -235,8 +236,8 @@ add_test(const char* directory, const char* filename, gboolean use_surrounding_t
 int
 main(int argc, char *argv[]) {
   gtk_init(&argc, &argv);
-  g_test_init(&argc, &argv, NULL);
-  g_test_set_nonfatal_assertions();
+  km_g_test_init(&argc, &argv, NULL);
+  km_g_test_set_nonfatal_assertions();
 
   if (argc < 4) {
     print_usage();
@@ -317,7 +318,7 @@ main(int argc, char *argv[]) {
   }
 
   // Run tests
-  int retVal = g_test_run();
+  int retVal = km_g_test_run();
 
   test_module_unuse(module);
   return retVal;

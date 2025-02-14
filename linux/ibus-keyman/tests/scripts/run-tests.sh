@@ -95,7 +95,7 @@ function run_tests() {
   # Note: -k and --tap are consumed by the GLib testing framework
   #shellcheck disable=SC2068 # we want to split array elements!
   #shellcheck disable=SC2086
-  ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
+  ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} ${ARG_TEAMCITY-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
     --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
@@ -111,6 +111,7 @@ while (( $# )); do
     --help|-h|-\?) help ;;
     -k) ARG_K=$1 ;;
     --tap) ARG_TAP=$1 ;;
+    --teamcity) ARG_TEAMCITY=$1 ;;
     --surrounding-text) ARG_SURROUNDING_TEXT=$1 ;;
     --no-surrounding-text) ARG_NO_SURROUNDING_TEXT=$1 ;;
     --no-wayland) USE_WAYLAND=0;;
@@ -123,6 +124,10 @@ while (( $# )); do
   esac
   shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
 done
+
+# TEMPORARY CODE! Remove before merging!
+ARG_TEAMCITY=--teamcity
+# TEMPORARY CODE! Remove before merging!
 
 if ! can_run_wayland && [ "$USE_WAYLAND" == "0" ]; then
   # support for --headless got added in mutter 40.x
