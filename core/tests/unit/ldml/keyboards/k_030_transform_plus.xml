@@ -42,11 +42,11 @@
     <transformGroup>
       <!-- these three should all be the same -->
       <transform from="a\u{002B}" to="plus" />
-      <transform from="A\+" to="tard" />
+      <transform from="A\u{2b}" to="tard" />
       <transform from="q${plus}" to="Plus" />
       <transform from="w${plusescaped}" to="PLUS" />
       <transform from="e\u{002A}" to="asterisk" />
-      <transform from="E\*" to="star" />
+      <transform from="E\u{002A}" to="star" />
       <transform from="d${asterisk}" to="Asterisk" />
       <transform from="c${asteriskescaped}" to="ASTERISK" />
     </transformGroup>

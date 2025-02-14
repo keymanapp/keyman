@@ -34,15 +34,35 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_clean() {
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
+  rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/util/abnf/*.pegjs
 }
 
 function do_configure() {
   verify_npm_setup
+  do_build_abnf
 }
 
 function do_build() {
   npm run build
+}
+
+function do_build_abnf() {
+  # we convert over all abnf files found. 
+  for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
+    cldrver=$(basename $(dirname $(dirname "$file")))
+    base=$(basename "$file" .abnf)
+    peg="$base.pegjs"
+    outdir="./src/util/abnf/$cldrver"
+    outfile="$outdir/$peg"
+    outjs="$outdir/$base.js"
+    if [ ! -f "$outjs" ]; then
+      mkdir -p "$outdir"
+      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${cldrver}/${base}.abnf -> ${peg}${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/abnf_gen"  "$file" -o "$outfile"
+      printf "${COLOR_GREY}peggy ${COLOR_PURPLE}${cldrver}/${peg} -> ${base}.js${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/peggy" "$outfile" -o "$outjs" --format es --dts
+    fi
+  done
 }
 
 function do_build_fixtures() {
