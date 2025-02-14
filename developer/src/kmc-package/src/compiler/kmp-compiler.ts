@@ -118,12 +118,14 @@ export class KmpCompiler implements KeymanCompiler {
       return null;
     }
 
+    outputFilename = outputFilename ?? inputFilename.replace(/\.kps$/, '.kmp');
+
     //
     // Validate the package file
     //
 
     const validation = new PackageValidation(this.callbacks, this.options);
-    if(!validation.validate(inputFilename, kmpJsonData)) {
+    if(!validation.validate(inputFilename, outputFilename, kmpJsonData)) {
       return null;
     }
 
@@ -140,7 +142,7 @@ export class KmpCompiler implements KeymanCompiler {
       artifacts: {
         kmp: {
           data,
-          filename: outputFilename ?? inputFilename.replace(/\.kps$/, '.kmp')
+          filename: outputFilename
         }
       }
     }

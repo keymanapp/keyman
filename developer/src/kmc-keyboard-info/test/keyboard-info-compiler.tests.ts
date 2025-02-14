@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import 'mocha';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
-import langtags from "../src/imports/langtags.js";
+import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
+import { getLangtagByTag, langtags } from "@keymanapp/langtags";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
 import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
@@ -122,10 +122,10 @@ describe('keyboard-info-compiler', function () {
     const compiler = new KeyboardInfoCompiler(); // indirectly call preinit()
     assert.isNotNull(compiler);
     const en_langtag = langtags.find(({ tag }) => tag === 'en');
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en'], en_langtag);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn-US'], en_langtag);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-Latn'], en_langtag);
-    assert.deepEqual((<any>unitTestEndpoints.langtagsByTag)['en-US'], en_langtag);
+    assert.deepEqual(getLangtagByTag('en'), en_langtag);
+    assert.deepEqual(getLangtagByTag('en-latn-us'), en_langtag);
+    assert.deepEqual(getLangtagByTag('en-latn'), en_langtag);
+    assert.deepEqual(getLangtagByTag('en-us'), en_langtag);
   });
 
   it('check init initialises KeyboardInfoCompiler correctly', async function() {

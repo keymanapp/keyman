@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds, CompilerBaseOptions } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -19,12 +19,7 @@ type CopierFunction = (
  * @public
  * Options for the Keyman Developer project copier
  */
-export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
-  /**
-   * Reporting level to console, used by NodeCompilerCallbacks (not used in
-   * compiler modules; all messages are still reported to the internal log)
-   */
-  logLevel?: CompilerLogLevel;
+export interface CopierOptions extends CompilerBaseOptions {
   /**
    * output path where project folder will be created
    */
@@ -33,6 +28,12 @@ export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
    * dryRun: show what would happen
    */
   dryRun: boolean;
+  /**
+   * Copy referenced files that are outside the project folder into an
+   * 'external' folder within the new project, rather than just referencing them
+   * in their current location
+   */
+  relocateExternalFiles?: boolean;
 };
 
 /**
@@ -78,7 +79,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
   isLocalOrigin(): boolean {
     return this.githubRef == undefined;
   }
-  relocateExternalFiles: boolean = false; // TODO-COPY: support
 
   public async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
     if(!callbacks || !options) {
@@ -357,6 +357,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
       const subFilename = this.normalizePath(this.resolveFilename(project.projectFilename, normalizedFilePath));
       const copier = this.copiers[<KeymanFileTypes.Source> file.fileType] ?? this.copyGenericFile.bind(this);
       // Ignore errors because we will continue to do a best effort
+      this.callbacks.reportMessage(CopierMessages.Verbose_CopyingFile({from: normalizedFilePath, to: subFilename}));
       await copier(project, subFilename, subOutputPath, source, result);
     }
 
@@ -559,20 +560,25 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     let subOutputPath: string;
     if(this.callbacks.path.isAbsolute(subFilenameRelative) || subFilenameRelative.startsWith('..')) {
-      if(this.isLocalOrigin() && !this.relocateExternalFiles) {
+      if(this.isLocalOrigin() && !this.options.relocateExternalFiles) {
         // Reference outside the project structure, do not attempt to normalize or copy,
         // but we do need to update references for the new output path
-        return this.normalizePath(this.callbacks.path.relative(result.artifacts[parentFilename].filename, subFilenameAbsolute));
+        const destinationFilename =
+          this.normalizePath(this.callbacks.path.relative(result.artifacts[parentFilename].filename, subFilenameAbsolute));
+        this.callbacks.reportMessage(CopierMessages.Verbose_CopyingFile({from: originalSubfilename, to: destinationFilename}));
+        return destinationFilename;
       } else {
         // Reference outside the project structure, we will copy into a subfolder of the project;
         // should be relative to root of remote repo, e.g. release/k/khmer_angkor references release/shared/fonts/...,
         // so should go external/release/shared/fonts/...
-        subOutputPath = this.normalizePath(this.callbacks.path.join(this.options.outPath, 'external', this.callbacks.path.dirname(subFilenameAbsolute)));
+        const relativePath = this.callbacks.path.dirname(subFilenameRelative).replace(/\.\.[/\\]/g, '');
+        subOutputPath = this.normalizePath(this.callbacks.path.join(this.options.outPath, 'external', relativePath));
       }
     } else {
       subOutputPath = this.normalizePath(this.callbacks.path.join(outputPath, this.callbacks.path.dirname(originalSubfilename)));
     }
 
+    this.callbacks.reportMessage(CopierMessages.Verbose_CopyingFile({from: originalSubfilename, to: subFilename}));
     await this.copyGenericFile(project, subFilename, subOutputPath, source, result);
 
     // Even if the subfile is missing, we'll still continue the overall copy

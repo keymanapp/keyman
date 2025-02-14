@@ -271,18 +271,30 @@ describe('KmpCompiler', function () {
 
   it(`should handle a range of valid BCP47 tags`, async function () {
     const inputFilename = makePathToFixture('bcp47', 'valid_bcp47.kps');
+    const outputFilename = makePathToFixture('bcp47', 'valid_bcp47.kmp');
     const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
     assert.isNotNull(kmpJsonData);
     const validation = new PackageValidation(callbacks, {});
-    assert.isTrue(validation.validate(inputFilename, kmpJsonData));
+    assert.isTrue(validation.validate(inputFilename, outputFilename, kmpJsonData));
   });
 
   it(`should reject an invalid BCP47 tag`, async function () {
     const inputFilename = makePathToFixture('bcp47', 'invalid_bcp47_1.kps');
+    const outputFilename = makePathToFixture('bcp47', 'invalid_bcp47_1.kmp');
     const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
     assert.isNotNull(kmpJsonData);
     const validation = new PackageValidation(callbacks, {});
-    assert.isFalse(validation.validate(inputFilename, kmpJsonData));
+    assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJsonData));
+  });
+
+  it(`should reject an package that contains itself`, async function () {
+    const inputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kps');
+    const outputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kmp');
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJsonData);
+    const validation = new PackageValidation(callbacks, {});
+    assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJsonData));
+    assert.equal(callbacks.messages[0].code, PackageCompilerMessages.ERROR_PackageMustNotContainItself);
   });
 
   it(`should download a file from a GitHub raw url`, async function () {

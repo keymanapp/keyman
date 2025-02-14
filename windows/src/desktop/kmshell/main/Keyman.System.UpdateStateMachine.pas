@@ -99,6 +99,7 @@ type
      * @returns True  if the Keyman is ready to install.
      *)
     function ReadyToInstall: Boolean;
+    function IsInstallingState: Boolean;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState: TUpdateState;
@@ -358,8 +359,8 @@ begin
     Registry.RootKey := HKEY_CURRENT_USER;
     try
       Result := not Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) or
-        not Registry.ValueExists(SRegValue_AutomaticUpdates) or
-        Registry.ReadBool(SRegValue_AutomaticUpdates);
+        not Registry.ValueExists(SRegValue_CheckForUpdates) or
+        Registry.ReadBool(SRegValue_CheckForUpdates);
     except
       on E: ERegistryException do
       begin
@@ -573,6 +574,11 @@ begin
     Result := False;
 end;
 
+function TUpdateStateMachine.IsInstallingState: Boolean;
+begin
+  Result := (CurrentState is InstallingState);
+end;
+
 // base implmentation to be overiden
 
 procedure TState.HandleInstallPackages;
@@ -772,19 +778,17 @@ begin
   end
   else
   begin
-    if HasKeymanRun then
+    // TODO: #8993 for stage 2 we can got to the InstallingState
+    // or even have a call back to notify the user to installation
+    // is about to begin.
+    if bucStateContext.GetApplyNow then
     begin
-      if bucStateContext.GetApplyNow then
-      begin
-        bucStateContext.SetApplyNow(False);
-        ChangeState(InstallingState);
-      end
-      else
-        ChangeState(WaitingRestartState);
+      bucStateContext.SetApplyNow(False);
+      ChangeState(InstallingState);
     end
     else
     begin
-      ChangeState(InstallingState);
+      ChangeState(WaitingRestartState);
     end;
   end
 
@@ -1096,9 +1100,10 @@ end;
 
 function InstallingState.HandleKmShell;
 begin
-  // Result = exit straight away as we are installing (MSI installer)
-  // need to just do a no-op keyman will it maybe using kmshell to install
-  // packages.
+  // Should not be possible while called in InstallingState. The MSI installer may have
+  // failed. Clean Up and return to Idle
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
   Result := kmShellContinue;
 end;
 

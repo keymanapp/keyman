@@ -1,5 +1,5 @@
 ---
-title: How To - Granting Storage Permission
+title: How To - Granting Storage Permission on Keyman for Android
 ---
 
 ## Granting Storage Permission

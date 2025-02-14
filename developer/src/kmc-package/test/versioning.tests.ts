@@ -1,8 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
+import { unitTestEndpoints } from '../src/compiler/package-version-validator.js';
+import { makePathToFixture } from './helpers/index.js';
 
 // This unit test was translated from a Delphi test
 // Keyman.Test.System.CompilePackageVersioningTest, but note the difference in
@@ -40,4 +41,34 @@ describe('package versioning', function () {
       assert.isTrue(kmpJsonData !== null);
     });
   }
+
+  it('should validate recognized version numbers', function() {
+    const goodVersions = [
+      '1.0',
+      '1',
+      '1.0.2',
+      '2.2.3',
+      '9',
+      '0',
+    ], badVersions = [
+      '0001',
+      '0.1m',
+      '2.3.4.5',
+      '1.03.4',
+      'test',
+      '1.0-beta',
+      '',
+      null,
+      undefined,
+      'xxx',
+    ];
+
+    for(const v of goodVersions) {
+      assert.isTrue(unitTestEndpoints.isValidVersionNumber(v), `'${v}' should be recognized as a valid version number`);
+    }
+
+    for(const v of badVersions) {
+      assert.isFalse(unitTestEndpoints.isValidVersionNumber(v), `'${v}' should be recognized as an invalid version number`);
+    }
+  });
 });
