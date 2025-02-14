@@ -1,2 +1,3 @@
-src/util/abnf/*.pegjs
-src/util/abnf/*.js
+src/util/abnf/**/*.pegjs
+src/util/abnf/**/*.d.ts
+src/util/abnf/**/*.js

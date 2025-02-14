@@ -9,8 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-# for CLDR version
-. "$KEYMAN_ROOT/core/include/ldml/keyman_core_ldml.sh"
 
 builder_describe "Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
@@ -49,17 +47,20 @@ function do_build() {
 }
 
 function do_build_abnf() {
-  ABNF_SRC="$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/$LDML_CLDR_VERSION_LATEST/abnf"
-  for file in ${ABNF_SRC}/*.abnf; do
+  # we convert over all abnf files found. 
+  for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
+    cldrver=$(basename $(dirname $(dirname "$file")))
     base=$(basename "$file" .abnf)
     peg="$base.pegjs"
-    outfile="./src/util/abnf/$peg"
-    outjs="./src/util/abnf/$base.js"
-    if [ ! -f "$outfile" ]; then
-      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${base}.abnf -> ${peg}${COLOR_RESET}"
-      npx -p abnf abnf_gen  "$file" -o "$outfile"
-      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${peg} -> ${base}.js${COLOR_RESET}"
-      npx peggy "$outfile" -o "$outjs" --format es --dts
+    outdir="./src/util/abnf/$cldrver"
+    outfile="$outdir/$peg"
+    outjs="$outdir/$base.js"
+    if [ ! -f "$outjs" ]; then
+      mkdir -p "$outdir"
+      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${cldrver}/${base}.abnf -> ${peg}${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/abnf_gen"  "$file" -o "$outfile"
+      printf "${COLOR_GREY}peggy ${COLOR_PURPLE}${cldrver}/${peg} -> ${base}.js${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/peggy" "$outfile" -o "$outjs" --format es --dts
     fi
   done
 }
