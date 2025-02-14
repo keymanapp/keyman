@@ -27,7 +27,7 @@ scripts/run-tests.sh -- k_000___null_keyboard k_005___nul_with_initial_context
 
 ## Debugging tests
 
-This is easiest done by running the tests in a VM and then remote debugging
+This is most easily done by running the tests in a VM and then remote debugging
 into the VM. The VM should be the same Linux version as the host, and the
 Keyman repo should be shared with the VM through a shared folder.
 
