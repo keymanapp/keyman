@@ -287,8 +287,8 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
         { code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
-          matchMessage: /Invalid regular expression.*Unterminated group/,
-        }
+          matchMessage: /.*SyntaxError.*/,
+        },
       ],
     },
     {
@@ -296,6 +296,15 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
         LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-bad-tran-3.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /.*Syntax.*0-9.*/,
+        }
       ],
     },
     {
@@ -334,50 +343,81 @@ describe('tran', function () {
         LdmlCompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // cases that are now caught by the abnf
+    ...[
+      'fail-IllegalTransformDollarsign-1',
+      'fail-IllegalTransformDollarsign-2',
+      'fail-IllegalTransformDollarsign-3',
+      'fail-IllegalTransformAsterisk-1',
+      'fail-IllegalTransformAsterisk-2',
+      'fail-IllegalTransformPlus-1',
+      'fail-IllegalTransformPlus-2',
+      'fail-matches-nothing-3',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[
+      'fail-IllegalTransformUsetRHS-1',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformTo,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
     // cases that share the same error code
-    ...[1, 2, 3].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
-      errors: [
-        {
-          code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
-          matchMessage: /.*/,
-        }
-      ],
-    })),
-    ...[1, 2].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
-      errors: [
-        {
-          code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
-          matchMessage: /.*/,
-        }
-      ],
-    })),
-    ...[1, 2].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
-      errors: [
-        {
-          code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,
-          matchMessage: /.*/,
-        }
-      ],
-    })),
-    ...[1].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformUsetRHS-${n}.xml`,
-      errors: [
-        {
-          code: LdmlCompilerMessages.ERROR_IllegalTransformToUset,
-          matchMessage: /.*/,
-        }
-      ],
-    })),
+    // NOTE: These used to be more helpful before ABNF.
+    // ...[].map(n => ({
+    //   subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
+    //   errors: [
+    //     {
+    //       code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
+    //       matchMessage: /.*/,
+    //     }
+    //   ],
+    // })),
+    // ...[].map(n => ({
+    //   subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
+    //   errors: [
+    //     {
+    //       code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
+    //       matchMessage: /.*/,
+    //     }
+    //   ],
+    // })),
+    // ...[].map(n => ({
+    //   subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
+    //   errors: [
+    //     {
+    //       code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,
+    //       matchMessage: /.*/,
+    //     }
+    //   ],
+    // })),
+    // ...[].map(n => ({
+    //   subpath: `sections/tran/fail-IllegalTransformUsetRHS-${n}.xml`,
+    //   errors: [
+    //     {
+    //       code: LdmlCompilerMessages.ERROR_IllegalTransformToUset,
+    //       matchMessage: /.*/,
+    //     }
+    //   ],
+    // })),
     // successful compile
     ...[1, 2].map(n => ({
       subpath: `sections/tran/ok-${n}.xml`,
       errors: false,
     })),
     // cases that share the same error code
-    ...[1, 2, 3].map(n => ({
+    ...[1, 2].map(n => ({
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
       errors: [
         {

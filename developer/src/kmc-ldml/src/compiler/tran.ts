@@ -148,6 +148,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // We run this first because it's more helpful than the ABNF.
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
 
+    if (cookedFrom === '') {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }));
+      return null;
+    }
+
     // run the parser here next
     try {
       if (cookedFrom != null) {
@@ -155,12 +160,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       }
     } catch (e) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
+      return null;
     }
 
     try {
       transform_to_parse(transform.to || '');
     } catch (e) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
+      return null;
     }
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
