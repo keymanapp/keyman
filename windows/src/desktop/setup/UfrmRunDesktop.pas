@@ -693,6 +693,7 @@ begin
     CanUpgradeKeyman := FCanUpgrade6 or FCanUpgrade7 or FCanUpgrade8 or FCanUpgrade9 or FCanUpgrade10;   // I4293
     if ShowModal = mrOk then
     begin
+      FAutomaticallyReportUsage := AutomaticallyReportUsage;
       FStartWithWindows := StartWithWindows;
       FStartAfterInstall := StartAfterInstall;
       FCheckForUpdates := CheckForUpdates;
