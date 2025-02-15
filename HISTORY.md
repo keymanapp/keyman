@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.5 alpha 2025-02-15
+
+* fix(linux): update location of lcov.deb for Jammy (#13253)
+
 ## 19.0.4 alpha 2025-02-14
 
 * feat(developer): serialize KMXPlus into XML (#13174)
