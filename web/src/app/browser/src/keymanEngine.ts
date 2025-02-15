@@ -7,7 +7,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
-import { DeviceSpec, Keyboard } from "keyman/engine/keyboard";
+import { DeviceSpec, JSKeyboard, Keyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -191,11 +191,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // globe key - are accessible.
     //
     // The `super` call above initializes `keyboardRequisitioner`, as needed here.
-    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', () => {
+    this.keyboardRequisitioner.cloudQueryEngine.once('unboundregister', async () => {
       if(!this.contextManager.activeKeyboard?.keyboard) {
         // Autoselects this.keyboardRequisitioner.cache.defaultStub, which will be
         // set to an actual keyboard on mobile devices.
-        this.setActiveKeyboard('', '');
+        await this.setActiveKeyboard('', '');
       }
     });
 
@@ -271,7 +271,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Function     setKeyboardForControl
    * Scope        Public
    * @param       {Element}    Pelem    Control element
-   * @param       {string|null=}    Pkbd     Keyboard (Clears the set keyboard if set to null.)
+   * @param       {string|null=}    Pkbd     JSKeyboard (Clears the set keyboard if set to null.)
    * @param       {string|null=}     Plc      Language Code
    * Description  Set default keyboard for the control
    *
@@ -385,12 +385,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * This is a public API function documented at
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboard.
    *
-   * @param       {Object}    Lstub      Keyboard stub object
-   * @param       {Object}    Lkbd       Keyboard script object
+   * @param       {Object}    Lstub      JSKeyboard stub object
+   * @param       {Object}    Lkbd       JSKeyboard script object
    * @return      {Object}               Copy of keyboard identification strings
    *
    */
-  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: Keyboard) { // I2078 - Full keyboard detail
+  private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: JSKeyboard) { // I2078 - Full keyboard detail
     let Lr = {
       Name: Lstub.KN,
       InternalName: Lstub.KI,
@@ -431,13 +431,14 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       if(kbdDetail.KeyboardID){
         kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
-        kbd = new Keyboard(k0);
+        kbd = new JSKeyboard(k0);
       }
     } else {
       kbd = this.core.activeKeyboard;
     }
 
-    return kbd && kbd.isCJK;
+    // TODO-web-core: implement for KMX keyboards if needed
+    return kbd && kbd instanceof JSKeyboard && kbd.isCJK;
   }
 
   /**
@@ -453,7 +454,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return stub && this._GetKeyboardDetail(stub, keyboard);
+    if (keyboard instanceof JSKeyboard) {
+      return stub && this._GetKeyboardDetail(stub, keyboard);
+    } else {
+      // TODO-web-core: implement for KMX keyboards if needed
+      return null;
+    }
   }
 
   /**
@@ -478,8 +484,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
       // This is a later version than the default on our oldest-supported Android devices.
       const Lkbd = cache.getKeyboardForStub(Lstub);
-      const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
-      Lr.push(Lrn);
+      if (Lkbd instanceof JSKeyboard) {
+        const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
+        Lr.push(Lrn);
+      } else {
+        // TODO-web-core: implement for KMX keyboards if needed
+      }
     }
     return Lr;
   }
@@ -676,6 +686,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     PKbd = PKbd || this.core.activeKeyboard;
+    if (!(PKbd instanceof JSKeyboard)) {
+      // TODO-web-core: implement for KMX keyboards if needed
+      return null;
+    }
     let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
     // help.keyman.com will set this function in place to specify the desired

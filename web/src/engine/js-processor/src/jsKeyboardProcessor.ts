@@ -9,13 +9,13 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
 import type OutputTarget from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
-import KeyboardInterface from './kbdInterface.js';
+import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
@@ -28,15 +28,15 @@ export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
   baseLayout?: string;
-  keyboardInterface?: KeyboardInterface;
+  keyboardInterface?: JSKeyboardInterface;
   defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
 }
 
 interface EventMap {
-  statekeychange: (stateKeys: typeof KeyboardProcessor.prototype.stateKeys) => void;
+  statekeychange: (stateKeys: typeof JSKeyboardProcessor.prototype.stateKeys) => void;
 }
 
-export default class KeyboardProcessor extends EventEmitter<EventMap> {
+export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us',
     defaultOutputRules: new DefaultRules()
@@ -55,7 +55,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   // Needed for AltGr simulation.
   modStateFlags: number = 0;
 
-  keyboardInterface: KeyboardInterface;
+  keyboardInterface: JSKeyboardInterface;
 
   /**
    * Indicates the device (platform) to be used for non-keystroke events,
@@ -77,21 +77,21 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     super();
 
     if(!options) {
-      options = KeyboardProcessor.DEFAULT_OPTIONS;
+      options = JSKeyboardProcessor.DEFAULT_OPTIONS;
     }
 
     this.contextDevice = device;
 
-    this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
-    this.keyboardInterface = options.keyboardInterface || new KeyboardInterface(globalObject(), MinimalKeymanGlobal);
-    this.defaultRules = options.defaultOutputRules || KeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
+    this.baseLayout = options.baseLayout || JSKeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
+    this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
+    this.defaultRules = options.defaultOutputRules || JSKeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
   }
 
-  public get activeKeyboard(): Keyboard {
+  public get activeKeyboard(): JSKeyboard {
     return this.keyboardInterface.activeKeyboard;
   }
 
-  public set activeKeyboard(keyboard: Keyboard) {
+  public set activeKeyboard(keyboard: JSKeyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated

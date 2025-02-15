@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { ManagedPromise, type Keyboard } from 'keyman/engine/keyboard';
-import { type KeyboardInterface, type OutputTarget } from 'keyman/engine/js-processor';
+import { type JSKeyboardInterface, type OutputTarget } from 'keyman/engine/js-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { EngineConfiguration } from './engineConfiguration.js';
@@ -99,7 +99,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     this.keyboardCache = config.keyboardCache;
   }
 
-  insertText(kbdInterface: KeyboardInterface, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: JSKeyboardInterface, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.
     const outputTarget = this.activeTarget;
 

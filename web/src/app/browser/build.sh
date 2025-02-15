@@ -72,6 +72,10 @@ compile_and_copy() {
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
+  # Copy Keyman Core build artifacts for local reference
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/browser/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/browser/release/"
+
   # Update the build/publish copy of our build artifacts
   prepare
 
