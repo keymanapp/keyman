@@ -10,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudKeyboardPackageDownloadCallback;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.cloud.impl.CloudLexicalPackageDownloadCallback;
+import com.keyman.engine.util.KMLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
 
   //TODO: move to keyboard manager class
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

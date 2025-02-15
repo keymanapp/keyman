@@ -22,12 +22,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.keyman.engine.data.CloudRepository;
 import com.keyman.engine.data.Dataset;
 import com.keyman.engine.data.LexicalModel;
 import com.keyman.engine.data.adapters.NestedAdapter;
 import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.MapCompat;
 
 import java.io.File;

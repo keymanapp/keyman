@@ -12,6 +12,7 @@ import com.keyman.engine.R;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.ICloudDownloadCallback;
 import com.keyman.engine.util.KMLog;
 
@@ -111,8 +112,8 @@ public class CloudLexicalModelMetaDataDownloadCallback implements ICloudDownload
 
           BaseActivity.makeToast(aContext, R.string.dictionary_download_start_in_background, Toast.LENGTH_SHORT);
 
-          CloudDownloadMgr.getInstance().executeAsDownload(aContext,
-            _r.additionalDownloadid, null, _callback,
+          CloudDownloadMgr.getInstance().executeAsDownload(
+            aContext, _r.additionalDownloadid, null, _callback,
             _r.additionalDownloads.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
       }
