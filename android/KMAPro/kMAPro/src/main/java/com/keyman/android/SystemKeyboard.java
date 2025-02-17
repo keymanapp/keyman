@@ -4,7 +4,6 @@
 
 package com.keyman.android;
 
-import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.util.DownloadFileUtils;
 import com.keyman.engine.util.KMLog;
 import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;

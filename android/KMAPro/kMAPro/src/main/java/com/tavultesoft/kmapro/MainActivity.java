@@ -32,7 +32,6 @@ import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDownloadMgr;
-import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
 import com.keyman.engine.data.CloudRepository;
 import com.keyman.engine.data.Dataset;
