@@ -242,10 +242,9 @@ public class CloudDownloadMgr{
 
     DownloadManager downloadManager = DownloadFileUtils.getDownloadManager(aContext);
     if(downloadManager == null) {
-      aCallback.initializeContext(aContext);
-
-      // Signal the failure state; we literally can't do this right now!
-      // Fortunately, that does mean there's no need to signal via callback.
+      // The callback object provided to us provides no way to directly signal a
+      // failure.  That said, we can also immediately detect that we WILL fail and
+      // corresponding error _now_, rather than later.
       //
       // Unique custom error so it's easy to explicitly filter.
       throw new DownloadManagerDisabledException();
