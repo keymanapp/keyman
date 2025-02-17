@@ -157,6 +157,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     // Verify WebView installed and enabled before attempting to initialize KMManager
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+
     KMManager.executeResourceUpdate(this);
 
     DefaultLanguageResource.install(context);
