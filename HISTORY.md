@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.194 beta 2025-02-17
+
+* fix(android): Use TIER.md to determine Play Store tier (#13259)
+* fix(android): prevent update-checks from crashing system keyboard and app if `DownloadManager` is disabled (#13218)
+* feat(linux): add `--remote-debug` flag to `run-tests.sh` script (#13233)
+* chore(linux): improve output when running tests (#13247)
+* refactor(linux): cleanup code of test fixture (#13248)
+
 ## 18.0.193 beta 2025-02-14
 
 * chore(developer): add INFO messages for `kmc copy` and `kmc generate` (#13200)
