@@ -13,8 +13,7 @@ import com.keyman.engine.cloud.CloudDownloadMgr;
 import com.keyman.engine.cloud.impl.CloudKeyboardPackageDownloadCallback;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
-import com.keyman.engine.cloud.impl.CloudLexicalPackageDownloadCallback;
-import com.keyman.engine.util.KMLog;
+import com.keyman.engine.cloud.impl.CloudLexicalPackageDownloadCallback;=
 
 import java.util.ArrayList;
 import java.util.HashMap;
