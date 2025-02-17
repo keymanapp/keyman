@@ -153,23 +153,6 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       return null;
     }
 
-    // run the parser here next
-    try {
-      if (cookedFrom != null) {
-        transform_from_parse(cookedFrom);
-      }
-    } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
-      return null;
-    }
-
-    try {
-      transform_to_parse(transform.to || '');
-    } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
-      return null;
-    }
-
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
     const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
@@ -210,6 +193,24 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       return null;
     }
 
+    // run the parser here next, on the original from
+    try {
+      if (cookedFrom != null) {
+        transform_from_parse(transform.from);
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
+      return null;
+    }
+    
+    // run the parser here next, on the original to
+    try {
+      transform_to_parse(transform.to || '');
+    } catch (e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
+      return null;
+    }
+  
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,

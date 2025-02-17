@@ -287,7 +287,7 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
         { code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
-          matchMessage: /.*SyntaxError.*/,
+          matchMessage: /.*Unterminated group.*/,
         },
       ],
     },
@@ -345,14 +345,7 @@ describe('tran', function () {
     },
     // cases that are now caught by the abnf
     ...[
-      'fail-IllegalTransformDollarsign-1',
-      'fail-IllegalTransformDollarsign-2',
-      'fail-IllegalTransformDollarsign-3',
-      'fail-IllegalTransformAsterisk-1',
-      'fail-IllegalTransformAsterisk-2',
-      'fail-IllegalTransformPlus-1',
-      'fail-IllegalTransformPlus-2',
-      'fail-matches-nothing-3',
+      'fail-bad-tran-5',
     ].map(s => ({
       subpath: `sections/tran/${s}.xml`,
       errors: [
@@ -363,7 +356,7 @@ describe('tran', function () {
       ],
     })),
     ...[
-      'fail-IllegalTransformUsetRHS-1',
+      'fail-bad-tran-4',
     ].map(s => ({
       subpath: `sections/tran/${s}.xml`,
       errors: [
@@ -373,51 +366,59 @@ describe('tran', function () {
         }
       ],
     })),
-    // cases that share the same error code
-    // NOTE: These used to be more helpful before ABNF.
-    // ...[].map(n => ({
-    //   subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
-    //   errors: [
-    //     {
-    //       code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
-    //       matchMessage: /.*/,
-    //     }
-    //   ],
-    // })),
-    // ...[].map(n => ({
-    //   subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
-    //   errors: [
-    //     {
-    //       code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
-    //       matchMessage: /.*/,
-    //     }
-    //   ],
-    // })),
-    // ...[].map(n => ({
-    //   subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
-    //   errors: [
-    //     {
-    //       code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,
-    //       matchMessage: /.*/,
-    //     }
-    //   ],
-    // })),
-    // ...[].map(n => ({
-    //   subpath: `sections/tran/fail-IllegalTransformUsetRHS-${n}.xml`,
-    //   errors: [
-    //     {
-    //       code: LdmlCompilerMessages.ERROR_IllegalTransformToUset,
-    //       matchMessage: /.*/,
-    //     }
-    //   ],
-    // })),
+    ...[
+      'fail-IllegalTransformDollarsign-1',
+      'fail-IllegalTransformDollarsign-2',
+      'fail-IllegalTransformDollarsign-3',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[
+      'fail-IllegalTransformAsterisk-1',
+      'fail-IllegalTransformAsterisk-2',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[
+      'fail-IllegalTransformPlus-1',
+      'fail-IllegalTransformPlus-2',
+    ].map(n => ({
+      subpath: `sections/tran/${n}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[1].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformUsetRHS-${n}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_IllegalTransformToUset,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
     // successful compile
     ...[1, 2].map(n => ({
       subpath: `sections/tran/ok-${n}.xml`,
       errors: false,
     })),
     // cases that share the same error code
-    ...[1, 2].map(n => ({
+    ...[1, 2, 3].map(n => ({
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
       errors: [
         {
