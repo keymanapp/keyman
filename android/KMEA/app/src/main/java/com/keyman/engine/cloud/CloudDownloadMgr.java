@@ -210,23 +210,28 @@ public class CloudDownloadMgr{
    * @param params the cloud api params for download
    * @param <ModelType> the target models type
    * @param <ResultType> the cloud requests result type
+   * @return `false` if the download request cannot be executed; `true` otherwise.
    */
-  public <ModelType,ResultType> void executeAsDownload(Context aContext, String aDownloadIdentifier,
+  public <ModelType,ResultType> boolean executeAsDownload(Context aContext, String aDownloadIdentifier,
                                 ModelType aTargetModel,
                                 ICloudDownloadCallback<ModelType,ResultType> aCallback,
-                                CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException {
+                                CloudApiTypes.CloudApiParam... params) {
     try {
       executeAsDownloadInternal(aContext, aDownloadIdentifier, aTargetModel, aCallback, params);
     } catch (DownloadManagerDisabledException e) {
       Toast.makeText(aContext,
         aContext.getString(R.string.update_check_download_manager_disabled),
         Toast.LENGTH_SHORT).show();
+      return false;
     } catch (Exception e) {
       Toast.makeText(aContext,
         aContext.getString(R.string.update_check_unavailable),
         Toast.LENGTH_SHORT).show();
       KMLog.LogException(TAG, "Unexpected exception occurred during download/query attempt", e);
+      return false;
     }
+
+    return true;
   }
 
   private <ModelType,ResultType> void executeAsDownloadInternal(Context aContext, String aDownloadIdentifier,
