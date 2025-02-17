@@ -411,9 +411,13 @@ public class CloudRepository {
         BaseActivity.makeToast(context, R.string.catalog_download_is_running_in_background, Toast.LENGTH_SHORT);
       } else {
         updateIsRunning = true;
-        CloudDownloadMgr.getInstance().executeAsDownload(
+        boolean executionStarted = CloudDownloadMgr.getInstance().executeAsDownload(
           context, DOWNLOAD_IDENTIFIER_CATALOGUE, memCachedDataset, _download_callback, params);
-        // if it fails, we should `updateIsRunning = false`, right?
+        if(!executionStarted) {
+          // Since we couldn't initiate the execution's async components,
+          // we need to immediately clear the update-running flag.
+          updateIsRunning = false;
+        }
       }
     }
   }
