@@ -250,8 +250,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
-    // Initialize keyboard options
-    KMManager.sendOptionsToKeyboard();
   }
 
   @Override

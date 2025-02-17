@@ -1,5 +1,28 @@
 # Keyman Version History
 
+## 18.0.193 beta 2025-02-14
+
+* chore(developer): add INFO messages for `kmc copy` and `kmc generate` (#13200)
+* fix(android): Remove sendOptionsToKeyboard function from Engine API (#13219)
+* docs(android): Document removing sendOptionsToKeyboard API (#13220)
+* chore(ios): increase minimum ios version to 15 (#13201)
+* fix(android): Catch WebView exceptions and prompt user to install WebView (#13140)
+* chore(common): Update crowdin strings for Mon (#13241)
+* chore(ios,windows): Update Crowdin strings for Czech (#13242)
+* change(web): drop 'dom' unit test concurrency when run in CI mode (#13141)
+* chore(web): ensure /web/build.sh clean triggers all predictive-text child actions (#13158)
+* chore(web): fix coverage-reporting artifact (#13196)
+
+## 18.0.192 beta 2025-02-14
+
+* chore(common): Fix 17.0.335 tier in HISTORY.md (#13213)
+* docs(linux): update what's new for 18.0 (#13207)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+* docs(windows): update keyman for windows 18.0 whats-new (#13211)
+* chore: undo master merge (#13238)
+* change(ios): prevent memory leaks from keyboard-related notification observers (#13129)
+* change(ios): mitigate keyboard input-view memory leak by force-discarding WebView (#13169)
+
 ## 18.0.191 beta 2025-02-12
 
 * feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)

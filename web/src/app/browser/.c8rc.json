@@ -3,7 +3,7 @@
   "clean": true,
   "exclude-after-remap": true,
   "reporter": ["text", "text-summary"],
-  "reports-dir": "../../../build/coverage/raw/engine/keyboard-storage",
+  "reports-dir": "../../../build/coverage/raw/app/browser",
   "src": [
     "src/"
   ]

@@ -6,6 +6,10 @@ import { LMLayerWorkerCode, LMLayerWorkerSourcemapComment } from "@keymanapp/lm-
 export default class Worker {
   static constructInstance(): Worker {
     let scriptStr = unwrap(LMLayerWorkerCode);
+    const srcMapUrlIndex = scriptStr.indexOf("//# sourceMappingURL")
+    if(srcMapUrlIndex > 0) {
+      scriptStr = scriptStr.substring(0, srcMapUrlIndex);
+    }
 
     scriptStr += '\n' + LMLayerWorkerSourcemapComment;
     let worker = new MappedWorker(scriptStr);
