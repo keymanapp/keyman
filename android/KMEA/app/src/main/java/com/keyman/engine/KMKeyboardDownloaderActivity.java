@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
-import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.impl.CloudKeyboardPackageDownloadCallback;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;

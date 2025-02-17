@@ -12,7 +12,6 @@ import com.keyman.engine.R;
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDataJsonUtil;
 import com.keyman.engine.cloud.CloudDownloadMgr;
-import com.keyman.engine.cloud.DownloadManagerDisabledException;
 import com.keyman.engine.cloud.ICloudDownloadCallback;
 import com.keyman.engine.util.KMLog;
 
