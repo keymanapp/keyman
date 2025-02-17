@@ -28,7 +28,6 @@ import com.keyman.engine.data.Dataset;
 import com.keyman.engine.data.LexicalModel;
 import com.keyman.engine.data.adapters.NestedAdapter;
 import com.keyman.engine.util.BCP47;
-import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.MapCompat;
 
 import java.io.File;
