@@ -6,21 +6,16 @@
   <script type='text/javascript' src='js/laokeys_load.js'></script>
 
   <script type="text/javascript">
-
-    var KWControl = null;
-
     function SetupDocument()
     {
-      keyman.init();
-      KWControl = document.getElementById('KWControl');
-      keyman.setActiveKeyboard('laokeys');
-      keyman.osk.hide();
+      keyman.init().then(function() {
+        keyman.setActiveKeyboard('laokeys');
+        keyman.osk.hide();
+      });
     }
 
     function KWControlClick()
     {
-      var KWControl = document.getElementById('KWControl');
-
       if(keyman.osk.isEnabled()) {
         keyman.osk.hide();
       } else {
