@@ -27,14 +27,14 @@ builder_describe "Keyman kmc Keyboard Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
-  configure     /node_modules \
+  configure     /developer/src/kmc-ldml/src/util/abnf/46/transform-from-required.js \
   build         /developer/src/kmc-ldml/build/src/main.js \
   api           /developer/build/api/kmc-ldml.api.json
 
 builder_parse "$@"
 
 function do_clean() {
-  rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/util/abnf/*.pegjs
+  rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/util/abnf/*/*.pegjs ./src/util/abnf/*/*.ts ./src/util/abnf/*/*.js
 }
 
 function do_configure() {
