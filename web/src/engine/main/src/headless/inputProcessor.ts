@@ -55,6 +55,11 @@ export class InputProcessor {
     }
   }
 
+  /**
+   * Returns the module directly responsible for communicating with the predictive-text WebWorker.
+   *
+   * Note:  may be `undefined` if the user's browser does not support WebWorkers.  (See #13262.)
+   */
   public get languageProcessor(): LanguageProcessor {
     return this.lngProcessor;
   }
