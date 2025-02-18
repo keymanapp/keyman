@@ -89,16 +89,6 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 }
 
 static void
-set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
-  set_capslock_indicator((guint32)caps_lock_on);
-}
-
-static bool
-get_caps_lock_state(IBusKeymanTestsFixture *fixture) {
-  return get_capslock_indicator();
-}
-
-static void
 switch_keyboard(IBusKeymanTestsFixture *fixture, const gchar *keyboard) {
   ibus_bus_set_global_engine(fixture->bus, keyboard);
 
@@ -185,9 +175,9 @@ is_modifier(guint16 keycode) {
 }
 
 static std::list<gdk_key_event>
-get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_event) {
+get_involved_keys(km::tests::key_event test_event) {
   guint modifiers = 0;
-  if (get_caps_lock_state(fixture)) {
+  if (get_capslock_indicator()) {
     modifiers = IBUS_LOCK_MASK;
   }
 
@@ -250,13 +240,13 @@ get_context_keys(std::u16string context) {
 }
 
 static void
-press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_source,km::tests::key_event key_event) {
-  auto involved_keys = get_involved_keys(fixture, key_event);
+press_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event key_event) {
+  auto involved_keys = get_involved_keys(key_event);
 
   // press and hold the individual modifier keys, finally the actual key
   std::stack<GdkEventKey> keys_to_release;
   for (auto key = involved_keys.begin(); key != involved_keys.end(); key++) {
-    bool old_caps_lock = get_caps_lock_state(fixture);
+    bool old_caps_lock  = get_capslock_indicator();
     guint lock_modifier = 0;
 
     // KEY_CAPSLOCK behaves a bit strange:
@@ -267,7 +257,7 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
     // - the LOCK_MASK modifier is set on both keypress and release
     // - capslock gets turned off on release
     if (key->keycode == KEY_CAPSLOCK && !old_caps_lock) {
-      set_caps_lock_state(fixture, true);
+      set_capslock_indicator((guint32)true);
       lock_modifier = IBUS_LOCK_MASK;
     }
     GdkEventKey keyEvent = {
@@ -289,7 +279,7 @@ press_keys(IBusKeymanTestsFixture *fixture, km::tests::KmxTestSource & test_sour
     keys_to_release.push(keyEvent);
 
     if (key->keycode == KEY_CAPSLOCK && old_caps_lock) {
-      set_caps_lock_state(fixture, false);
+      set_capslock_indicator((guint32) false);
     }
   }
 
@@ -326,19 +316,19 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
   g_settings_sync();
 
   switch_keyboard(fixture, kmxfile.c_str());
-  if (test_source.caps_lock_state() != get_caps_lock_state(fixture)) {
-    set_caps_lock_state(fixture, test_source.caps_lock_state());
+  if (test_source.caps_lock_state() != get_capslock_indicator()) {
+    set_capslock_indicator((guint32)test_source.caps_lock_state());
   }
 
   auto contextKeys = get_context_keys(context);
   for (auto k = contextKeys.begin(); k != contextKeys.end(); k++) {
-    press_keys(fixture, test_source, *k);
+    press_keys(fixture, *k);
   }
 
   gtk_im_context_focus_in(fixture->context);
 
   for (auto p = test_source.next_key(keys); p.vk != 0; p = test_source.next_key(keys)) {
-    press_keys(fixture, test_source, p);
+    press_keys(fixture, p);
   }
 
   if (expected.length() == 0) {
