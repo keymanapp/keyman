@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.195 beta 2025-02-18
+
+* docs(web): use promise-chaining in manual-control example (#13272)
+
 ## 18.0.194 beta 2025-02-17
 
 * fix(android): Use TIER.md to determine Play Store tier (#13259)
