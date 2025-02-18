@@ -48,7 +48,11 @@ export class InputProcessor {
 
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
-    this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
+    try {
+      this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
+    } catch {
+      /* Some browsers ("Yeti") do not support WebWorkers - see #13262. */
+    }
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -76,7 +80,7 @@ export class InputProcessor {
   }
 
   public get activeModel(): ModelSpec {
-    return this.languageProcessor.activeModel;
+    return this.languageProcessor?.activeModel;
   }
 
   /**
@@ -166,7 +170,7 @@ export class InputProcessor {
     // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
     // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
     // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-    if(this.languageProcessor.isActive) {
+    if(this.languageProcessor?.isActive) {
       // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
 
       // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
@@ -260,7 +264,7 @@ export class InputProcessor {
     }
 
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
-    ruleBehavior.predictionPromise = this.languageProcessor.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
+    ruleBehavior.predictionPromise = this.languageProcessor?.predict(ruleBehavior.transcription, this.keyboardProcessor.layerId);
 
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!ruleBehavior.triggersDefaultCommand) {
@@ -276,7 +280,7 @@ export class InputProcessor {
 
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
     // Also, don't do fat-finger stuff if predictive text isn't enabled.
-    if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
+    if(this.languageProcessor?.isActive && !ruleBehavior.triggersDefaultCommand) {
       let keyDistribution = keyEvent.keyDistribution;
 
       // We don't need to track absolute indexing during alternate-generation;
@@ -287,7 +291,7 @@ export class InputProcessor {
       let windowedMock = contextWindow.toMock();
 
       // Note - we don't yet do fat-fingering with longpress keys.
-      if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {
+      if(keyDistribution && keyEvent.kbdLayer) {
         // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
         // and device is slow enough that the calculation takes too long.
         //
@@ -381,6 +385,6 @@ export class InputProcessor {
     // Also handles new-context events, which may modify the layer
     this.keyboardProcessor.resetContext(outputTarget);
     // With the layer now set, we trigger new predictions.
-    this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
+    this.languageProcessor?.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
   }
 }

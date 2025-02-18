@@ -709,7 +709,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.pageIntegration.shutdown();
     this.contextManager.shutdown();
     this.osk?.shutdown();
-    this.core.languageProcessor.shutdown();
+    this.core.languageProcessor?.shutdown();
     this.hardKeyboard.shutdown();
     this.util.shutdown(); // For tracked dom events, stylesheets.
 

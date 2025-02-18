@@ -61,7 +61,7 @@ export default class KeymanEngine<
       return;
     }
 
-    if(!this.core.languageProcessor.mayCorrect) {
+    if(!this.core.languageProcessor?.mayCorrect) {
       event.keyDistribution = [];
     }
 
@@ -125,7 +125,7 @@ export default class KeymanEngine<
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
     this.core = new InputProcessor(config.hostDevice, worker, processorConfiguration);
 
-    this.core.languageProcessor.on('statechange', (state) => {
+    this.core.languageProcessor?.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
@@ -269,7 +269,7 @@ export default class KeymanEngine<
      * This is called after the suggestion is applied but _before_ new
      * predictions are requested based on the resulting context.
      */
-    this.core.languageProcessor.on('suggestionapplied', () => {
+    this.core.languageProcessor?.on('suggestionapplied', () => {
       // Tell the keyboard that the current layer has not changed
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
@@ -418,12 +418,12 @@ export default class KeymanEngine<
 
     if(this.core.activeModel != model) {
       if(this.core.activeModel) {
-        this.core.languageProcessor.unloadModel();
+        this.core.languageProcessor?.unloadModel();
       }
 
       // Semi-hacky management of banner display state.
       if(model) {
-        return this.core.languageProcessor.loadModel(model).then(() => {
+        return this.core.languageProcessor?.loadModel(model).then(() => {
           return model;
         });
       }
@@ -495,7 +495,7 @@ export default class KeymanEngine<
 
     // Is it the active model?
     if(this.core.activeModel && this.core.activeModel.id == modelId) {
-      this.core.languageProcessor.unloadModel();
+      this.core.languageProcessor?.unloadModel();
     }
   }
 
