@@ -1,7 +1,8 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
-ARG UBUNTU_VERSION=latest
-FROM ubuntu:${UBUNTU_VERSION}
+ARG DISTRO=ubuntu
+ARG DISTRO_VERSION=latest
+FROM ${DISTRO}:${DISTRO_VERSION}
 
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
@@ -21,8 +22,10 @@ ENV DEBCONF_NOWARNINGS=yes
 # Update to the latest
 RUN apt-get -q -y update &&  \
   apt-get -q -y install ca-certificates curl gnupg meson software-properties-common sudo && \
-  add-apt-repository ppa:keymanapp/keyman && \
-  add-apt-repository ppa:keymanapp/keyman-alpha
+  if [[ "$(lsb_release -is)" == "Ubuntu" ]]; then \
+    add-apt-repository ppa:keymanapp/keyman && \
+    add-apt-repository ppa:keymanapp/keyman-alpha ; \
+  fi
 RUN apt-get -q -y update &&  \
   apt-get -q -y upgrade
 
