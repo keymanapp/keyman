@@ -434,19 +434,21 @@ ibus_im_context_finalize(GObject *obj) {
 }
 
 static gboolean
-ibus_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *event) {
+ibus_im_context_filter_keypress(GtkIMContext* context, GdkEventKey* event) {
   IDEBUG("%s", __FUNCTION__);
 
   IBusIMContext *ibusimcontext = IBUS_IM_CONTEXT(context);
 
-  if (event->state & IBUS_HANDLED_MASK)
+  if (event->state & IBUS_HANDLED_MASK) {
     return TRUE;
+  }
 
   /* Do not call gtk_im_context_filter_keypress() because
    * gtk_im_context_simple_filter_keypress() binds Ctrl-Shift-u
    */
-  if (event->state & IBUS_IGNORED_MASK)
+  if (event->state & IBUS_IGNORED_MASK) {
     return ibus_im_context_commit_event(ibusimcontext, event);
+  }
 
   /* XXX it is a workaround for some applications do not set client
    * window. */
@@ -1008,7 +1010,7 @@ _run_main_loop_with_timeout(IBusIMContext *ibusimcontext) {
   timeout_data data;
   data.thread_loop = ibusimcontext->thread_loop;
   data.timed_out   = FALSE;
-  int timeout_id   = g_timeout_add(1000 /*ms*/, (GSourceFunc)_timeout_callback, &data);
+  int timeout_id   = g_timeout_add(10 /*ms*/, (GSourceFunc)_timeout_callback, &data);
   g_main_loop_run(ibusimcontext->thread_loop);
   if (!data.timed_out) {
     g_source_remove(timeout_id);
@@ -1067,7 +1069,6 @@ _create_input_context(IBusIMContext *ibusimcontext) {
     if (!g_queue_is_empty(ibusimcontext->events_queue)) {
       GdkEventKey *event;
       while ((event = g_queue_pop_head(ibusimcontext->events_queue))) {
-        _process_key_event(context, event, ibusimcontext);
         gboolean result = _process_key_event(context, event, ibusimcontext);
         if (result) {
           _run_main_loop_with_timeout(ibusimcontext);
@@ -1081,6 +1082,7 @@ _create_input_context(IBusIMContext *ibusimcontext) {
 void
 ibus_im_test_set_thread_loop(IBusIMContext *context, GMainLoop *loop) {
   context->thread_loop = loop;
+  _run_main_loop_with_timeout(context);
 }
 
 void

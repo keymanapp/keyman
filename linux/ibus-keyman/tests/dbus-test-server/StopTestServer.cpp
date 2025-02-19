@@ -8,6 +8,7 @@
 #else
 #include <basu/sd-bus.h>
 #endif
+#include "KmDbusTestServer.h"
 
 using namespace std;
 
@@ -46,8 +47,8 @@ int StopTestServer::Run()
     return 1;
   }
 
-  result = sd_bus_call_method(bus, "com.keyman.ExitTestService",
-    "/com/keyman/ExitTestService/Exit", "com.keyman.ExitTestService.Exit",
+  result = sd_bus_call_method(bus, KEYMAN_TESTSVC_BUS_NAME,
+    KEYMAN_TESTSVC_OBJECT_PATH, KEYMAN_TESTSVC_INTERFACE_NAME,
     "Exit", error, &msg, "");
   if (result < 0) {
     std::cerr << "Failed to issue method call: " << strerror(-result) << std::endl;

@@ -1,8 +1,8 @@
 #include <dirent.h>
 #include <fcntl.h>
-#include <iostream>
 #include <string.h>
 #include <string>
+#include <syslog.h>
 #include <unistd.h>
 #include "KeyboardDevice.h"
 
@@ -40,15 +40,17 @@ bool KeyboardDevice::Initialize(const char* name)
 
   fd = open(path.c_str(), O_RDWR);
   if (fd < 0) {
-    std::cerr << "Failed to open device " << path << ": " << strerror(errno) << std::endl;
     Close();
+    syslog(LOG_USER | LOG_NOTICE, "Failed to open device %s: %s",
+      path.c_str(), strerror(errno));
     return false;
   }
 
   int rc = libevdev_new_from_fd(fd, &dev);
   if (rc < 0) {
-    std::cerr << "Failed to init libevdev for " << path << ": " << strerror(-rc) << std::endl;
     Close();
+    syslog(LOG_USER | LOG_NOTICE, "Failed to init libevdev for %s: %s",
+      path.c_str(), strerror(-rc));
     return false;
   }
 
@@ -61,8 +63,8 @@ bool KeyboardDevice::HasCapsLockLed()
     if (!libevdev_has_event_code(dev, EV_LED, LED_CAPSL)) {
       hasCapsLockLed = 0;
       if (debug) {
-        std::cerr << "Device '" << libevdev_get_name(dev) << "' doesn't have "
-                  << libevdev_event_code_get_name(EV_LED, LED_CAPSL) << "." << std::endl;
+        syslog( LOG_USER | LOG_NOTICE, "Device '%s' doesn't have %s.", libevdev_get_name(dev),
+          libevdev_event_code_get_name(EV_LED, LED_CAPSL));
       }
     } else {
       hasCapsLockLed = 1;
@@ -79,8 +81,8 @@ void KeyboardDevice::SetCapsLockLed(bool on)
 
   int rc = libevdev_kernel_set_led_value(dev, LED_CAPSL, on ? LIBEVDEV_LED_ON : LIBEVDEV_LED_OFF);
   if (rc != 0) {
-    std::cerr << "Failed to set LED " << libevdev_event_code_get_name(EV_LED, LED_CAPSL)
-              << ": " << strerror(-rc) << std::endl;
+    syslog(LOG_USER | LOG_NOTICE, "Failed to set LED %s: %s",
+      libevdev_event_code_get_name(EV_LED, LED_CAPSL), strerror(-rc));
   }
 }
 
