@@ -75,6 +75,8 @@ import boxXmlArray = util.boxXmlArray;*/
   // when I run german with uniqueCAll why will there be [ ] without key anf modifier
   // 77 replace uniqueA 0, >0 with true, false
   // what if keylayout file is not correct e.g missing >
+  // check for keys < 50 whern working with keys
+  // add links to HEADLINE of kmc-convert document
 
 
 
@@ -122,8 +124,9 @@ export interface rule_object {
 };
 
 export interface convert_object {
-  ArrayOf_Modifiers: string[][],
-  ArrayOf_Rules: rule_object[],
+  keylayout_filename: string,
+  arrayOf_Modifiers: string[][],
+  arrayOf_Rules: rule_object[],
 };
 
 
@@ -221,12 +224,15 @@ export class KeylayoutToKmnConverter {
    */
   public convert(jsonObj: any): convert_object {
 
+    const jsonObj_any: any = jsonObj
+    const keylayout_file: string = jsonObj_any.keyboard['@_name'] + ".keylayout"
     const modifierBehavior: string[][] = []          // modifier for each keymapselect
     const RuleObject: rule_object[] = []             // an array of objects which hold data for a kmn rule
 
     const DataObject: convert_object = {
-      ArrayOf_Modifiers: modifierBehavior,   // e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      ArrayOf_Rules: RuleObject
+      keylayout_filename: keylayout_file,
+      arrayOf_Modifiers: modifierBehavior,   // e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
+      arrayOf_Rules: RuleObject
     };
 
     // create an array of modifier Combinations (e.g. shift? leftShift caps? )
@@ -249,6 +255,7 @@ export class KeylayoutToKmnConverter {
    */
   //TODO need to use export const USVirtualKeyCodes here
   public write(data_ukelele: convert_object): boolean {
+
     let data: string = "\n"
 
     // add top part of kmn file: STORES
@@ -311,7 +318,7 @@ export class KeylayoutToKmnConverter {
 
     let action_id: string
 
-    const isCapsused: boolean = this.checkIfCapsIsUsed(data_ukelele.ArrayOf_Modifiers)
+    const isCapsused: boolean = this.checkIfCapsIsUsed(data_ukelele.arrayOf_Modifiers)
 
     // loop keys 0-50 (= all keys we use)
     for (let j = 0; j <= KeylayoutToKmnConverter.used_Keys_count; j++) {
@@ -331,7 +338,7 @@ export class KeylayoutToKmnConverter {
           if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
 
             // loop behaviours
-            for (let l = 0; l < data_ukelele.ArrayOf_Modifiers[i].length; l++) {
+            for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
               if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
 
                 RuleObj = new Rules(
@@ -348,7 +355,7 @@ export class KeylayoutToKmnConverter {
                           /*   dk for C2*/                0,
                           /*   unique B */                0,
 
-                          /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.ArrayOf_Modifiers[i][l], isCapsused),
+                          /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.arrayOf_Modifiers[i][l], isCapsused),
                           /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                           /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
                 )
@@ -369,12 +376,12 @@ export class KeylayoutToKmnConverter {
           // ...............e. g. <when state="none" output="a" ...................................................
           // ......................................................................................................
 
-          for (let l = 0; l < data_ukelele.ArrayOf_Modifiers[i].length; l++) {
+          for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
 
             if ((this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined) && (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== "")) {
 
               const outputchar: string = this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id)
-              const resultArraySS_Key_Out: string[][] = this.get_Datat_array2D__From__ActionID_stateOutput(jsonObj, data_ukelele.ArrayOf_Modifiers, action_id, outputchar, isCapsused)
+              const resultArraySS_Key_Out: string[][] = this.get_Datat_array2D__From__ActionID_stateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused)
 
               for (let m = 0; m < resultArraySS_Key_Out.length; m++) {
 
@@ -427,7 +434,7 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 ....................................................................................................................
               /*  eg: [ '6', '31', '32' ]*/               const b4_code_arr: string[] = this.get_KeyMap_Code_array__From__KeyMap_Action(jsonObj, b5_actionId)
               /*  eg: [['24', 0], ['24', 3]] */           const b4_keyBehaviour_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(action_id))
-              /* e.g. [['','caps?'], ['Caps']]*/          const b4_modifier2D_array: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.ArrayOf_Modifiers, b4_keyBehaviour_arr)
+              /* e.g. [['','caps?'], ['Caps']]*/          const b4_modifier2D_array: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.arrayOf_Modifiers, b4_keyBehaviour_arr)
               // .......................................................................................................................................
 
               // Data of Block Nr 6 ....................................................................................................................
@@ -498,7 +505,7 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 ....................................................................................................................
               /*  eg: [ '6', '31', '32' ]*/               const b4_code_arr: string[] = this.get_KeyMap_Code_array__From__KeyMap_Action(jsonObj, b5_actionId)
               /*  eg: [['24', 0], ['24', 3]] */           const b4_keyBehaviour_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(action_id))
-              /* e.g. [['','caps?'], ['Caps']]*/          const b4_modifier2D_array: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.ArrayOf_Modifiers, b4_keyBehaviour_arr)
+              /* e.g. [['','caps?'], ['Caps']]*/          const b4_modifier2D_array: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.arrayOf_Modifiers, b4_keyBehaviour_arr)
               // .......................................................................................................................................
 
               // Data of Block Nr 3 ....................................................................................................................
@@ -508,7 +515,7 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 2  ....................................................................................................................
               /*  eg: ['K_8', 'K_M]  */                   const b2_keyname_arr: string[] = this.get_KecCode_arr__From__ActionId(jsonObj, b3_actionId)
               /*  eg: index=3 */                          const b2_keyBehaviour_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(b3_actionId))
-              /* e.g. [[ '0','1shift? caps?']]*/          const b2_modifier_arr_all: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.ArrayOf_Modifiers, b2_keyBehaviour_arr)
+              /* e.g. [[ '0','1shift? caps?']]*/          const b2_modifier_arr_all: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.arrayOf_Modifiers, b2_keyBehaviour_arr)
               // .......................................................................................................................................
 
               // Data of Block Nr 6 ....................................................................................................................
@@ -569,7 +576,7 @@ export class KeylayoutToKmnConverter {
 
           const next_id: string = this.get_ActionID_Next__From__ActionID_None(jsonObj, action_id)
 
-          for (let l = 0; l < data_ukelele.ArrayOf_Modifiers[i].length; l++) {
+          for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
             if (new TextEncoder().encode(this.get_Terminator_Output__From__Terminator_State(jsonObj, next_id)).length !== 0) {
 
               RuleObj = new Rules(
@@ -586,7 +593,7 @@ export class KeylayoutToKmnConverter {
                         /*   dk for C2*/                0,
                         /*   unique B */                0,
 
-                        /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.ArrayOf_Modifiers[i][l], isCapsused),
+                        /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.arrayOf_Modifiers[i][l], isCapsused),
                         /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                         /*   output */                  new TextEncoder().encode(this.get_Terminator_Output__From__Terminator_State(jsonObj, next_id))
               )
@@ -850,7 +857,7 @@ export class KeylayoutToKmnConverter {
     //---------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------
 
-    data_ukelele.ArrayOf_Rules = ObjectArray
+    data_ukelele.arrayOf_Rules = ObjectArray
     return data_ukelele
   }
 
@@ -859,7 +866,9 @@ export class KeylayoutToKmnConverter {
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.used_Keys_count) {
+            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+          }
         }
       }
     }
@@ -870,7 +879,9 @@ export class KeylayoutToKmnConverter {
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.used_Keys_count) {
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+          }
         }
       }
     }
@@ -883,11 +894,14 @@ export class KeylayoutToKmnConverter {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           const returnarray: string[] = []
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0]) {
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
-            returnarray.push(search[k][2])
+            if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.used_Keys_count) {
+              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+              returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
+              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+
+              returnarray.push(search[k][2])
+            }
           }
           if (returnarray.length > 0)
             returnarray2D.push(returnarray)
@@ -1133,7 +1147,7 @@ export class KeylayoutToKmnConverter {
   }
 
   public checkIfCapsIsUsed(keylayout_modifier: string[][]): boolean {
-    return keylayout_modifier.flat().flat().includes("caps")
+    return JSON.stringify(keylayout_modifier).includes("caps")
   }
 
   // todo check conditions command comes through which should not!
@@ -1265,11 +1279,11 @@ export class KeylayoutToKmnConverter {
       const amb_3_3_bot = rule.filter((curr, idx) =>
         (curr.rule_type === "C2")
         && curr.dk_C2 === rule[index].dk_C2
-        && rule[index].uniqueB !== 0
         && curr.modifier_key === rule[index].modifier_key
         && curr.key === rule[index].key
-        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
         && idx < index
+        // && rule[index].uniqueB !== 0
       );
 
       //3-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
@@ -1282,7 +1296,6 @@ export class KeylayoutToKmnConverter {
         && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
         && idx < index
       );
-
       //1-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
       const amb_1_2_mid = rule.filter((curr, idx) =>
         ((curr.rule_type === "C0") || (curr.rule_type === "C1"))
@@ -1543,7 +1556,7 @@ export class KeylayoutToKmnConverter {
     let data: string = ""
     let keymarker: string = ""
 
-    const data_CAll: rule_object[] = data_ukelele.ArrayOf_Rules.filter((curr) => {
+    const data_CAll: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
         && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
         return curr;
@@ -1568,13 +1581,13 @@ export class KeylayoutToKmnConverter {
       }
       return unique;
     }, []);
-    //const unique_CAll_Rules: rule_object[] = data_ukelele.ArrayOf_Rules
+    //const unique_CAll_Rules: rule_object[] = data_ukelele.arrayOf_Rules
 
-    console.log("xx  data_ukelele.ArrayOf_Rules", data_ukelele.ArrayOf_Rules.length)
-    //console.log("xx  data_ukelele.ArrayOf_Rules", this.writeDataset(data_ukelele.ArrayOf_Rules))
+    console.log("xx  data_ukelele.arrayOf_Rules", data_ukelele.arrayOf_Rules.length)
+    //console.log("xx  data_ukelele.arrayOf_Rules", this.writeDataset(data_ukelele.arrayOf_Rules))
 
     console.log("xx  unique_CAll_Rules", unique_CAll_Rules.length)
-    // console.log("xx  unique_CAll_Rules", this.writeDataset(unique_CAll_Rules))
+    console.log("xx  unique_CAll_Rules", this.writeDataset(unique_CAll_Rules))
 
     //................................................ C0 C1 ................................................................
     //................................................ C0 C1 ................................................................
@@ -1669,55 +1682,26 @@ export class KeylayoutToKmnConverter {
 
 
   public createData_Stores(data_ukelele: convert_object): string {
-    let data: string = ""
+    let data: string = ""  
 
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ~~~~ draft print ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    if (KeylayoutToKmnConverter.print_draft) {
-      data += "c\n"
-      data += "c Keyman keyboard generated by kmn-convert\n"
-      data += "c\n"
-      data += "\n"
+    data += "c\n"
+    data += "c Keyman keyboard generated by kmn-convert\n"
+    data += "c from original file: " + data_ukelele.keylayout_filename + "\n"
+    data += "c\n"
+    data += "\n"
 
-      data += '\########## OK #################################################################\n'
-      data += "store(&VERSION) \'10.0\'\n"
-      data += "store(&TARGETS) \'any\'\n"
-      data += "store(&KEYBOARDVERSION) \'1.0\'\n"
-      data += "store(&COPYRIGHT) '© 2024 SIL International\'\n"
-      // TODO what else ??
+    data += "store(&VERSION) \'10.0\'\n"
+    data += "store(&TARGETS) \'any\'\n"
+    data += "store(&KEYBOARDVERSION) \'1.0\'\n"
+    data += "store(&COPYRIGHT) '© 2024 SIL International\'\n"
+    // TODO what else ??
 
-      data += '\########## OK #################################################################\n'
-      data += "\n"
-      data += "begin Unicode > use(main)\n\n"
-      data += "group(main) using keys\n\n"
+    data += "\n"
+    data += "begin Unicode > use(main)\n\n"
+    data += "group(main) using keys\n\n"
 
-      data += '\########## OK #################################################################\n'
-      data += "Tipp: if K_? is replaced by undefined-> no enry in kmn_Key_Name=> add K_? there and it will be shown here\n"
-      data += "Tipp: keys that are marked with sction do not aoear in ukelele_Array_output->do not appear in kmn\n"
-      data += "\n"
-    }
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ~~~~ draft print end ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    else {
-      data += "c\n"
-      data += "c Keyman keyboard generated by kmn-convert\n"
-      data += "c\n"
-      data += "\n"
+    data += "\n"
 
-      data += "store(&VERSION) \'10.0\'\n"
-      data += "store(&TARGETS) \'any\'\n"
-      data += "store(&KEYBOARDVERSION) \'1.0\'\n"
-      data += "store(&COPYRIGHT) '© 2024 SIL International\'\n"
-      // TODO what else ??
-
-      data += "\n"
-      data += "begin Unicode > use(main)\n\n"
-      data += "group(main) using keys\n\n"
-
-      data += "\n"
-    }
     return data
   }
 
