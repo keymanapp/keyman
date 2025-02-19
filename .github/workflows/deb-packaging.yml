@@ -221,7 +221,7 @@ jobs:
         export DEBIAN_PRIORITY=critical
         export DEBCONF_NOWARNINGS=yes
         sudo apt-get update
-        sudo apt-get install -q -y dput
+        sudo apt-get install -q -y dput rsync
 
     - name: Setup .dput.cf
       run: |
