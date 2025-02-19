@@ -5,7 +5,11 @@
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 
-declare var keyman: KeymanEngine
+declare global {
+  interface Window {
+    keyman: KeymanEngine
+  }
+}
 
 type MapRegion = {
   /** The title of the region */
@@ -50,10 +54,14 @@ interface ListedKeyboard {
   aNode: HTMLAnchorElement;
 }
 
+const keymanweb=window.keyman;
+
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keyman?.ui?.name) {
+if(!keymanweb) {
+  throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
+} else if(!keymanweb.ui?.name) {
   /********************************/
   /*                              */
   /* Toolbar User Interface       */
@@ -71,7 +79,6 @@ if(!keyman?.ui?.name) {
 
   try {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    const keymanweb=keyman;
     const util=keymanweb.util;
 
     // Disable UI for touch devices
