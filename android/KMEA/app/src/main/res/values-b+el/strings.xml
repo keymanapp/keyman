@@ -133,10 +133,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Τὸ πληκτρολόγιο %1$s ἐγκατεστάθη</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Τὸ πληκτρολόγιο διεγράφη</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Ἐνεργοποιῆστε τὶς διορθώσεις</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Ἐνεργοποιῆστε προβλέψεις κειμένου</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Ἀπενεργοποίηση προτάσεων</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Μόνο προβλέψεις</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Προβλέψεις καὶ διορθώσεις</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Προβλέψεις μὲ αὐτόματες διορθώσεις</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Λεξικό</string>
     <plurals name="model_count">
