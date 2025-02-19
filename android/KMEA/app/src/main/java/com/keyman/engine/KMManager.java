@@ -33,6 +33,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -73,6 +74,7 @@ import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.MapCompat;
 import com.keyman.engine.util.WebViewUtils;
+import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -687,12 +689,32 @@ public final class KMManager {
     KMKeyboardWebViewClient webViewClient = null;
 
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard == null) {
-      InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      try {
+        InAppKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_INAPP);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        // Only log exceptions unrelated to WebView
+        if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
+          KMLog.LogException(TAG, "initKeyboard for INAPP" , e);
+        }
+        return;
+      }
       InAppKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = InAppKeyboard;
       webViewClient = InAppKeyboardWebViewClient;
     } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard == null) {
-      SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      try {
+        SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      } catch (AndroidRuntimeException e) {
+        // Catch fatal error when WebView not installed/enabled
+        // Catch fatal error when WebView not installed/enabled
+        // Only log exceptions unrelated to WebView
+        if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
+          KMLog.LogException(TAG, "initKeyboard for SYSTEM" , e);
+        }
+        // TODO: Send user to pick another system keyboard
+        return;
+      }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
       keyboard = SystemKeyboard;
       webViewClient = SystemKeyboardWebViewClient;
@@ -722,6 +744,7 @@ public final class KMManager {
       }
       keyboard.setBanner(KMManager.BannerType.HTML);
       keyboard.showBanner(true);
+      sendLongpressDelay();
     }
     setEngineWebViewVersionStatus(appContext, keyboard);
   }
@@ -775,6 +798,10 @@ public final class KMManager {
     Context appContext = IMService.getApplicationContext();
     final FrameLayout mainLayout = new FrameLayout(appContext);
     mainLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+    if (SystemKeyboard == null) {
+      return mainLayout;
+    }
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
     keyboardLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
@@ -921,7 +948,7 @@ public final class KMManager {
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
-      
+
       // Needed until our minimum version of Chrome is 61.0+.
       copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
@@ -2124,7 +2151,7 @@ public final class KMManager {
   }
 
   /**
-   * Set the longpress delay (in milliseconds) as a stored preference.
+   * Set the longpress delay (in milliseconds) as a stored preference and sends to KeymanWeb.
    * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
    * @return boolean
@@ -2140,17 +2167,19 @@ public final class KMManager {
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
 
+    // Send longpress delay to KeymanWeb
+    sendLongpressDelay();
+
     return true;
   }
 
   /**
-   * Sends options to the KeymanWeb keyboard.
+   * Sends longpress delay to the KeymanWeb keyboard.
    * 1. number of milliseconds to trigger a longpress gesture.
-   * This method requires a keyboard to be loaded for the value to take effect.
    */
-  public static void sendOptionsToKeyboard() {
+  private static void sendLongpressDelay() {
     int longpressDelay = getLongpressDelay();
-    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+    if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
     }
 
@@ -2301,9 +2330,9 @@ public final class KMManager {
   public static boolean updateText(KeyboardType kbType, String text) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       return InAppKeyboard.updateText(text);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       return SystemKeyboard.updateText(text);
     }
 
@@ -2335,13 +2364,13 @@ public final class KMManager {
   public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
 
-    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+    if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
         result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
-    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+    } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
         result = SystemKeyboard.updateSelectionRange();
       }
@@ -2354,11 +2383,11 @@ public final class KMManager {
 
   public static void resetContext(KeyboardType kbType) {
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && InAppKeyboard != null) {
         InAppKeyboard.loadJavascript("resetContext()");
       }
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && SystemKeyboard != null) {
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }

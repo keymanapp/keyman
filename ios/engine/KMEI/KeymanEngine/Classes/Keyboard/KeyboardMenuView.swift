@@ -26,7 +26,9 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
   private var tableView: UITableView?
   private let closeButtonTitle: String?
 
-  private var _inputViewController: InputViewController?
+  // Is populated during init from a weak ref by KeymanWebViewController,
+  // and instances of this class are owned by the same.
+  private weak var _inputViewController: InputViewController?
   override var inputViewController: InputViewController? {
     return _inputViewController
   }

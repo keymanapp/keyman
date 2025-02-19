@@ -104,15 +104,13 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
 
     let config = WKWebViewConfiguration()
 
-    if #available(iOS 13.0, *) {
-      /**
-       In iPadOS 16 and above WKWebView defaults to lying about its user-agent,
-       telling the web server that it is a mac. We can avoid this with .mobile:
-       */
-      let pref = WKWebpagePreferences.init()
-      pref.preferredContentMode = .mobile
-      config.defaultWebpagePreferences = pref
-    }
+    /**
+     In iPadOS 16 and above WKWebView defaults to lying about its user-agent,
+     telling the web server that it is a mac. We can avoid this with .mobile:
+     */
+    let pref = WKWebpagePreferences.init()
+    pref.preferredContentMode = .mobile
+    config.defaultWebpagePreferences = pref
 
     let webView = WKWebView.init(frame: CGRect.zero, configuration: config)
     webView.navigationDelegate = self

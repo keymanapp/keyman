@@ -9,14 +9,14 @@
 
     <!-- Context: Title for list -->
     <plurals name="title_keyboards">
-      <item quantity="one">Keyboard</item>
-      <item quantity="other">Keyboards</item>
+        <item quantity="one">Keyboard</item>
+        <item quantity="other">Keyboards</item>
     </plurals>
 
     <!-- Context: Title for list -->
     <plurals name="title_other_input_methods">
-      <item quantity="one">Other Input Method</item>
-      <item quantity="other">Other Input Methods</item>
+        <item quantity="one">Other Input Method</item>
+        <item quantity="other">Other Input Methods</item>
     </plurals>
 
     <!-- Context: Title for list -->
@@ -127,9 +127,33 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">
       Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
 
-  <!-- Context: Fatal keyboard error.  -->
-  <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
       Error in keyboard %1$s:%2$s for %3$s language.</string>
+
+    <!-- Context: Alert Dialog title: System WebView not installed or enabled -->
+    <string name="alert_dialog_title_webview_missing">
+        Fatal Error: WebView Missing</string>
+
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">
+        Keyman requires WebView to be installed."</string>
+
+    <!-- ContexT: Alert Dialog body: Switch to another keyboard -->
+    <string name="body_switch_keyboard" comment="Direct user to select another keyboard">
+        Keyman requires WebView to be installed and enabled.\n\n
+        Switch to a different keyboard.
+    </string>
+
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">
+        Keyman requires WebView to be enabled."</string>
+
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">Install WebView</string>
+
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">Enable WebView</string>
 
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Checking for associated dictionary to download</string>
@@ -184,6 +208,9 @@
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Failed to access server!</string>
 
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager disabled - cannot check for updates</string>
+
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"All resources are up to date!"</string>
 
@@ -229,8 +256,8 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>
     <plurals name="model_count">
-      <item quantity="one">Dictionary</item>
-      <item quantity="other">Dictionaries</item>
+        <item quantity="one">Dictionary</item>
+        <item quantity="other">Dictionaries</item>
     </plurals>
 
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
@@ -251,8 +278,8 @@
 
     <!-- Context: Language Settings menu strings -->
     <plurals name="keyboard_count">
-      <item quantity="one">(%1$d keyboard)</item>
-      <item quantity="other">(%1$d keyboards)</item>
+        <item quantity="one">(%1$d keyboard)</item>
+        <item quantity="other">(%1$d keyboards)</item>
     </plurals>
 
 
@@ -278,4 +305,5 @@
 
     <!-- Context: anywhere -->
     <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+
 </resources>

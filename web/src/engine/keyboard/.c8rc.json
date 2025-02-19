@@ -8,7 +8,7 @@
   ],
   "exclude-after-remap": true,
   "reporter": ["text", "text-summary"],
-  "reports-dir": "build/coverage",
+  "reports-dir": "../../../build/coverage/raw/engine/keyboard",
   "src": [
     "src/"
   ]

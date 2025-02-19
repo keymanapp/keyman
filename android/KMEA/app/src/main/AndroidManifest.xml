@@ -7,6 +7,11 @@
       </intent>
     </queries>
 
+    <queries>
+        <package android:name="com.android.webkit" />
+        <package android:name="com.google.android.ims" />
+    </queries>
+
     <!-- https://developer.android.com/develop/ui/views/notifications/notification-permission#declare -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
