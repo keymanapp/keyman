@@ -6,6 +6,7 @@ import { GitHub } from '@actions/github';
 import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
 import { reportHistory } from './reportHistory.js';
+import { spawnChild } from './util/spawnAwait.js';
 
 interface PRInformation {
   title: string;
@@ -16,16 +17,28 @@ interface PRInformation {
 // splitPullsIntoHistory
 // ------------------------------------------------------------------------------------
 
-const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: number, pulls: number[]}> => {
+const splicePullsIntoHistory = async (pulls: PRInformation[], base?: string): Promise<{count: number, pulls: number[]}> => {
 
   let currentPulls: number[] = [];
 
   //
-  // Get current version and history from VERSION.md and TIER.md
+  // Get current version and history from VERSION.md and TIER.md. This may not
+  // yet be committed, so read the details from the worktree.
   //
 
-  const version = readFileSync('./VERSION.md', 'utf8').trim();
-  const tier = readFileSync('./TIER.md', 'utf8').trim();
+  let version = readFileSync('./VERSION.md', 'utf8').trim();
+  let tier = readFileSync('./TIER.md', 'utf8').trim();
+
+  if(base) {
+    // If we are merging history from another branch, we need to use the data
+    // from that branch. In this case, we must assume that the version and tier
+    // data are definitely already committed.
+    const currentBase = (await spawnChild('git', ['branch', '--show-current'])).trim();
+    if(currentBase != base) {
+      version = (await spawnChild('git', ['show', base+':VERSION.md'])).trim();
+      tier = (await spawnChild('git', ['show', base+':TIER.md'])).trim();
+    }
+  }
   //logInfo(`VERSION="${version}"`);
 
   //
@@ -208,7 +221,7 @@ export const fixupHistory = async (
   // Splice these into HISTORY.md
   //
 
-  const historyResult = await splicePullsIntoHistory(pulls);
+  const historyResult = await splicePullsIntoHistory(pulls, base);
 
   //
   // Write a comment to GitHub for each of the pulls

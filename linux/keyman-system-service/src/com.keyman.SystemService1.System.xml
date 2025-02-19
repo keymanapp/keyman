@@ -34,5 +34,13 @@
     <method name="CallOrderedOutputSentinel">
     </method>
 
+    <!--
+      Ping:
+
+      Verifies that the keyman-system-service is started and available
+    -->
+    <method name="Ping">
+    </method>
+
   </interface>
 </node>
