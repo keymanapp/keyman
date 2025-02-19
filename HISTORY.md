@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.196 beta 2025-02-19
+
+* fix(windows): remove sentry report on firstrun in idle state (#13266)
+* fix(android): Correct the scope of `tier` in build.gradle (#13268)
+* chore(common): Update crowdin strings for Polytonic Greek (#13277)
+* fix(web): provide informative error + message when loading UI without the engine (#13269)
+* fix(developer): Use 'desktop' for target in OSK fill temp keyboard (#13271)
+* fix(linux): add missing dependency for uploading to llso (#13279)
+* refactor(linux): re-enable integration tests (#13234)
+
 ## 18.0.195 beta 2025-02-18
 
 * docs(web): use promise-chaining in manual-control example (#13272)
