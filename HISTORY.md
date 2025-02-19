@@ -22,6 +22,30 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.191 beta 2025-02-12
+
+* feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
+* docs(developer): update what's new for 18.0 (#13198)
+* chore(mac): update whats new for Keyman 18 (#13197)
+* chore(ios): update whats new for Keyman 18 (#13199)
+* fix: use tier and version from branch when merging history from another branch (#13170)
+* fix(linux): start system service when switching keyboards (#13172)
+* chore(linux): update actions/cache to non-deprecated version (#13193)
+* chore(linux): update branch that's used for Debian packaging (#13192)
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13202)
+
+## 18.0.190 beta 2025-02-11
+
+* fix(developer): bundle ttfmeta library internally with kmc-keyboard-info (#11631)
+* fix(developer): support Windows and Unicode names in .ttf (#11633)
+* chore(developer): increase timeout for kmc-ldml compiler test (#11635)
+* chore(common): deps: update eslint typescript plugins (#11842)
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+
+## 18.0.189 beta 2025-02-11
+
+* chore: move to beta
+
 ## 18.0.188 alpha 2025-02-10
 
 * fix(windows): check the params status flag equals ucrsUpdateReady before attempting to download the keyman setup file (#13154)
@@ -1334,7 +1358,7 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
-## 17.0.335 alpha 2025-02-06
+## 17.0.335 stable 2025-02-06
 
 * fix(android): improve resource-update tool handling of host Activity's closure (#13057)
 * fix(ios): prevent message-handler collision (#13058)
