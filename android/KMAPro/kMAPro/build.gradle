@@ -9,6 +9,8 @@ plugins {
 ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
+String tier = new File('../../TIER.md').getText('UTF-8').trim();
+
 android {
     compileSdk 34
     namespace="com.tavultesoft.kmapro"
@@ -67,7 +69,6 @@ android {
     productFlavors {
     }
 
-    String tier = new File('../../TIER.md').getText('UTF-8').trim();
     applicationVariants.all { variant ->
         // Append tag to app name to help differentiate versions for app testers:
         //  - stable builds have no suffix
@@ -128,7 +129,7 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        switch (String.valueOf(tier)) {
+        switch (tier) {
             case 'beta':
                 track.set("beta")
                 println "TIER set to beta"
