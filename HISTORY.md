@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.6 alpha 2025-02-19
+
+* chore: merge beta to master B18S1 (#13239)
+* fix(linux): add missing dependency for uploading to llso (#13280)
+
 ## 19.0.5 alpha 2025-02-15
 
 * fix(linux): update location of lcov.deb for Jammy (#13253)
