@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.7 alpha 2025-02-20
+
+* chore(linux): allow to build and use Debian docker image (#13284)
+
 ## 19.0.6 alpha 2025-02-19
 
 * chore: merge beta to master B18S1 (#13239)
