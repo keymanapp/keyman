@@ -3,7 +3,7 @@ import { DeviceDetector } from 'keyman/engine/main';
 import { type DeviceSpec } from '@keymanapp/web-utils';
 
 import type { KeymanEngine } from 'keyman/app/browser';
-import type { FloatingOSKView } from 'keyman/engine/osk';
+import { JSKeyboard, type FloatingOSKView } from 'keyman/engine/osk';
 
 declare var keyman: KeymanEngine;
 
@@ -114,19 +114,23 @@ export class BatchRenderer {
       eleDescription.appendChild(document.createElement('br'));
 
       const keyboard = keyman.core.activeKeyboard;
-      // Some keyboards, such as sil_euro_latin and sil_ipa, no longer specify this property.
-      if(keyboard['_legacyLayoutSpec']) {
-        eleDescription.appendChild(document.createTextNode('Font:  ' + keyboard['_legacyLayoutSpec'].F));
-      } else {
-        // They instead specify only the post-KMW-10 touch-layout format.
-        const layout = keyboard.layout(formFactor);
-        if(!layout) {
-          eleDescription.appendChild(document.createTextNode('Keyboard is help-text based'));
+      if (keyboard instanceof JSKeyboard) {
+        // Some keyboards, such as sil_euro_latin and sil_ipa, no longer specify this property.
+        if (keyboard['_legacyLayoutSpec']) {
+          eleDescription.appendChild(document.createTextNode('Font:  ' + keyboard['_legacyLayoutSpec'].F));
         } else {
-          eleDescription.appendChild(document.createTextNode('Font:  ' + layout.font));
+          // They instead specify only the post-KMW-10 touch-layout format.
+          const layout = keyboard.layout(formFactor);
+          if (!layout) {
+            eleDescription.appendChild(document.createTextNode('Keyboard is help-text based'));
+          } else {
+            eleDescription.appendChild(document.createTextNode('Font:  ' + layout.font));
+          }
         }
+      } else {
+        // TODO-web-core: implement for KMX keyboards
+        eleDescription.appendChild(document.createTextNode('Keyboard is help-text based'));
       }
-
     } else {
       eleDescription.appendChild(document.createTextNode('Unable to load this keyboard!'));
     }
@@ -168,7 +172,7 @@ export class BatchRenderer {
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
       let layers: string[];
-      if(!isMobile) {
+      if(!isMobile && keyman.core.activeKeyboard instanceof JSKeyboard) {
         // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
         // We instead rely upon the KLS definition to ensure we keep the renders sparse.
         //

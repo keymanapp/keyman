@@ -40,18 +40,16 @@ namespace
 }  // namespace
 
 km_core_status
-km_core_keyboard_load_from_blob(
+keyboard_load_from_blob_internal(
   const km_core_path_name kb_name,
-  const void* blob,
-  const size_t blob_size,
+  const std::vector<uint8_t>& buf,
   km_core_keyboard** keyboard
 ) {
   assert(keyboard);
-  if (!keyboard || !blob) {
+  if (!keyboard) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
-  std::vector<uint8_t> buf((uint8_t*)blob, (uint8_t*)blob + blob_size);
   *keyboard = nullptr;
   try {
     abstract_processor* kp = processor_factory(kb_name, buf);
@@ -65,6 +63,21 @@ km_core_keyboard_load_from_blob(
     return KM_CORE_STATUS_NO_MEM;
   }
   return KM_CORE_STATUS_OK;
+}
+
+km_core_status
+km_core_keyboard_load_from_blob(
+  const km_core_path_name kb_name,
+  const void* blob,
+  const size_t blob_size,
+  km_core_keyboard** keyboard
+) {
+  if (!blob) {
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
+
+  std::vector<uint8_t> buf((uint8_t*)blob, (uint8_t*)blob + blob_size);
+  return keyboard_load_from_blob_internal(kb_name, buf, keyboard);
 }
 
 void
