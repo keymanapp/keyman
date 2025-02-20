@@ -258,9 +258,11 @@ export class LdmlCompilerMessages {
     \`<transform from="($[fromSet])" to="$[1:toSet]"/>\`.
   `);
 
-  static ERROR_UnparseableTransformTo   = SevErrorTransform | 0x06;
-  static Error_UnparseableTransformTo   = (o: { to: string, message: string }) =>
-  m(this.ERROR_UnparseableTransformTo,    `Invalid transform to="${def(o.to)}": "${def(o.message)}"`);
+  static ERROR_UnparseableTransformTo = SevErrorTransform | 0x06;
+  static Error_UnparseableTransformTo = (o: {to: string, message: string}) => m(
+    this.ERROR_UnparseableTransformTo,
+    `Invalid transform to="${def(o.to)}": "${def(o.message)}"`,
+  );
 
 
 }

@@ -48,13 +48,14 @@ function do_build() {
 
 function do_build_abnf() {
   # we convert over all abnf files found. 
+  local file
   for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
-    cldrver=$(basename $(dirname $(dirname "$file")))
-    base=$(basename "$file" .abnf)
-    peg="$base.pegjs"
-    outdir="./src/util/abnf/$cldrver"
-    outfile="$outdir/$peg"
-    outjs="$outdir/$base.js"
+    local cldrver="$(basename $(dirname $(dirname "$file")))"
+    local base="$(basename "$file" .abnf)"
+    local peg="$base.pegjs"
+    local outdir="./src/util/abnf/$cldrver"
+    local outfile="$outdir/$peg"
+    local outjs="$outdir/$base.js"
     if [ ! -f "$outjs" ]; then
       mkdir -p "$outdir"
       printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${cldrver}/${base}.abnf -> ${peg}${COLOR_RESET}\n"
