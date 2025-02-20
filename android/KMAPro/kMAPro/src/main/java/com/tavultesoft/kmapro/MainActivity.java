@@ -154,6 +154,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+
     KMManager.executeResourceUpdate(this);
 
     DefaultLanguageResource.install(context);
