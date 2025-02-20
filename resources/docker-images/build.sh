@@ -33,11 +33,7 @@ _add_build_args() {
   local name=$3
   local value
 
-  if [[ -n "${!var:-}" ]]; then
-    value="${!var}"
-  else
-    value="${!default_var:-}"
-  fi
+  value="${!var:=${!default_var:-}}"
 
   build_args+=(--build-arg="${var}=${value}")
 
@@ -77,10 +73,8 @@ build_action() {
 
   builder_echo debug "Building image for ${platform}"
 
-  _convert_parameters_to_build_args
-
   if [[ "${platform}" == "base" ]]; then
-    docker pull --platform "amd64" "${DISTRO:-ubuntu}:${DISTRO_VERSION:-${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER}}"
+    docker pull --platform "amd64" "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
   fi
@@ -111,6 +105,8 @@ test_action() {
   ./run.sh --distro "${DISTRO}" --distro-version "${DISTRO_VERSION}" \
     "${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
+
+_convert_parameters_to_build_args
 
 if builder_has_action build; then
   build_action base
