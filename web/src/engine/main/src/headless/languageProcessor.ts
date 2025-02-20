@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { LMLayer } from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
@@ -25,7 +25,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _state: StateChangeEnum = 'inactive';
 
-  public constructor(predictiveTextWorker: Worker, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
+  public constructor(predictiveWorkerFactory: WorkerFactory, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
 
     this.recentTranscriptions = transcriptionCache;
@@ -38,11 +38,15 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       maxRightContextCodePoints: supportsRightDeletions ? 0 : 64
     }
 
-    if(!predictiveTextWorker) {
+    if(!predictiveWorkerFactory) {
       return;
     }
 
-    this.lmEngine = new LMLayer(capabilities, predictiveTextWorker);
+    try {
+      this.lmEngine = new LMLayer(capabilities, predictiveWorkerFactory?.constructInstance());
+    } catch {
+      // We can condition on `lmEngine` being null/undefined.
+    }
   }
 
   public get activeModel(): ModelSpec {
@@ -58,6 +62,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public unloadModel() {
+    if(!this.isActive) {
+      return;
+    }
+
     this.lmEngine.unloadModel();
     delete this.currentModel;
     delete this.configuration;
@@ -69,6 +77,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   loadModel(model: ModelSpec): Promise<void> {
     if(!model) {
       throw new Error("Null reference not allowed.");
+    }
+
+    if(!this.canEnable) {
+      return Promise.resolve();
     }
 
     let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
@@ -108,9 +120,6 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
-    // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
-    this.emit('invalidatesuggestions', 'context');
-
     // If there's no active model, there can be no predictions.
     // We'll also be missing important data needed to even properly REQUEST the predictions.
     if(!this.currentModel || !this.configuration) {
@@ -121,7 +130,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // invalidateContext otherwise bypasses .predict()'s check against this.
     if(!this.isActive) {
       return Promise.resolve([]);
-    } else if(outputTarget) {
+    }
+
+    // Signal to any predictive text UI that the context has changed, invalidating recent predictions.
+    this.emit('invalidatesuggestions', 'context');
+
+    if(outputTarget) {
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
@@ -171,6 +185,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget, getLayerId: ()=>string): Promise<Reversion> {
     if(!outputTarget) {
       throw "Accepting suggestions requires a destination OutputTarget instance."
+    }
+
+    if(!this.isActive) {
+      return null;
     }
 
     if(!this.isConfigured) {
@@ -244,6 +262,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       throw "Accepting suggestions requires a destination OutputTarget instance."
     }
 
+    if(!this.isActive) {
+      return null;
+    }
+
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
@@ -278,7 +300,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
-    if(!outputTarget) {
+    if(!this.isActive || !outputTarget) {
       return null;
     }
 
@@ -292,7 +314,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    * @param transcription The triggering transcription (if it exists)
    */
   private predict_internal(transcription: Transcription, resetContext: boolean, layerId: string): Promise<Suggestion[]> {
-    if(!transcription) {
+    if(!this.isActive || !transcription) {
       return null;
     }
 
@@ -341,19 +363,19 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public shutdown() {
-    this.lmEngine.shutdown();
+    this.lmEngine?.shutdown();
     this.removeAllListeners();
   }
 
   public get isActive(): boolean {
-    if(!this.canEnable()) {
+    if(!this.canEnable) {
       this._mayPredict = false;
       return false;
     }
     return (this.activeModel || false) && this._mayPredict;
   }
 
-  canEnable(): boolean {
+  public get canEnable(): boolean {
     // Is not initialized if there is no worker.
     return !!this.lmEngine;
   }
@@ -363,7 +385,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public set mayPredict(flag: boolean) {
-    if(!this.canEnable()) {
+    if(!this.canEnable) {
       return;
     }
 
@@ -416,6 +438,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public tryAcceptSuggestion(source: string): boolean {
+    if(!this.isActive) {
+      return false;
+    }
+
     // The object below is to facilitate a pass-by-reference on the boolean flag,
     // allowing the event's handler to signal if whitespace has been added via
     // auto-applied suggestion that should be blocked on the next keystroke.
@@ -426,6 +452,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public tryRevertSuggestion(): boolean {
+    if(!this.isActive) {
+      return false;
+    }
+
     // If and when we do auto-revert, the suggestion is to pass this object to the event and
     // denote any mutations to the contained value.
     //let returnObj = {shouldSwallow: false};

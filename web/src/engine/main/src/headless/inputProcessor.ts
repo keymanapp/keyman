@@ -20,6 +20,7 @@ import {
 
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { WorkerFactory } from "@keymanapp/lexical-model-layer";
 
 export class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
@@ -37,7 +38,7 @@ export class InputProcessor {
 
   private readonly contextCache = new TranscriptionCache();
 
-  constructor(device: DeviceSpec, predictiveTextWorker: Worker, options?: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, predictiveWorkerFactory: WorkerFactory, options?: ProcessorInitOptions) {
     if(!device) {
       throw new Error('device must be defined');
     }
@@ -48,7 +49,7 @@ export class InputProcessor {
 
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
-    this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
+    this.lngProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
   public get languageProcessor(): LanguageProcessor {
