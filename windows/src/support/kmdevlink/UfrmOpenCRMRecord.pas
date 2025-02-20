@@ -17,9 +17,11 @@ type
     cmdCancel: TButton;
     lblRepo: TLabel;
     cbRepository: TComboBox;
+    cmdCopyHTML: TButton;
     procedure cbRepositoryClick(Sender: TObject);
     procedure editSearchForChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure cmdCopyHTMLClick(Sender: TObject);
   private
     Changing: Boolean;
     function GetSearchText: WideString;
@@ -33,7 +35,20 @@ type
 function RepoFullNameToShortName(name: string): string;
 function RepoShortNameToFullName(name: string): string;
 
+
+type
+  TIssueQuery = record
+    searchString: string;
+    repo: string;
+    issueNumber: Integer;
+  end;
+
+function SearchTextToQuery(s: string): TIssueQuery;
+
 implementation
+
+uses
+  Vcl.Clipbrd;
 
 {$R *.dfm}
 
@@ -74,27 +89,130 @@ begin
   Result := name;
 end;
 
+function SearchTextToQuery(s: string): TIssueQuery;
+var
+  parts: TArray<String>;
+begin
+  Result.repo := 'keyman';
+  Result.issueNumber := 0;
+  Result.searchString := '';
+
+  s := s.Trim;
+  parts := s.Split(['#']);
+  if Length(parts) = 0 then
+  begin
+    Exit;
+  end
+  else if Length(parts) = 1 then
+  begin
+    Result.issueNumber := StrToIntDef(s, 0);
+    if IntToStr(Result.issueNumber) <> s then
+    begin
+      Result.issueNumber := 0;
+      Result.searchString := s;
+    end;
+  end
+  else
+  begin
+    Result.repo := RepoShortNameToFullName(parts[0]);
+    Result.issueNumber := StrToIntDef(parts[1], 0);
+    if IntToStr(Result.issueNumber) <> parts[1] then
+    begin
+      Result.issueNumber := 0;
+      Result.searchString := parts[1];
+    end;
+  end;
+end;
+
+type
+  TMyClipboard = class(TClipboard);
+
+procedure TfrmOpenCRMRecord.cmdCopyHTMLClick(Sender: TObject);
+var
+  c: TMyClipboard;
+  m: TMemoryStream;
+  ss: TStream;
+  displayRepo, html, s: string;
+  iq: TIssueQuery;
+  CF_HTML: UINT;
+  header: string;
+const
+  // https://learn.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format
+  // yeesh what a format
+  header_template =
+    'Version:0.9'#$D#$A+
+    'StartHTML:%0.09d'#$D#$A+
+    'EndHTML:%0.09d'#$D#$A+
+    'StartFragment:%0.09d'#$D#$A+
+    'EndFragment:%0.09d'#$D#$A;
+  start_fragment =  '<!--StartFragment -->';
+  end_fragment = '<!--EndFragment -->';
+  context_start = '<html>'#$D#$A'<body>'#$D#$A;
+  context_end = #$D#$A'</body>'#$D#$A'</html>';
+begin
+  iq := SearchTextToQuery(SearchText);
+  if iq.repo = 'keyman' then
+    displayRepo := ''
+  else
+    displayRepo := iq.repo;
+  html := Format('<a href="https://github.com/keymanapp/%0:s/issues/%1:d">%2:s#%1:d</a>', [
+    iq.repo, iq.issueNumber, displayRepo
+  ]);
+
+  // Warning, this will go sadly badly with non-ascii letters
+  // because I am lazily not using UTF8Strings at this point
+
+  header := Format(header_template, [0,0,0,0]);
+  s := Format(header_template, [
+    header.Length,
+    header.Length + context_start.Length + start_fragment.Length + html.Length + end_fragment.Length + context_end.Length,
+    header.Length + context_start.Length + start_fragment.Length,
+    header.Length + context_start.Length + start_fragment.Length + html.Length
+  ]) + context_start + start_fragment + html + end_fragment + context_end + #0;
+
+  ss := TStringStream.Create(s, TEncoding.UTF8);
+  try
+    CF_HTML := RegisterClipboardFormat('HTML Format');
+    m := TMemoryStream.Create;
+    try
+      m.CopyFrom(ss, 0);
+      c := TMyClipboard(Clipboard); // access protected members yay delphi
+      c.SetBuffer(CF_HTML, m.Memory^, m.Size);
+    finally
+      m.Free;
+    end;
+  finally
+    ss.Free;
+  end;
+end;
+
 procedure TfrmOpenCRMRecord.editSearchForChange(Sender: TObject);
 var
-  s: string;
-  parts: TArray<String>;
-  repo: string;
+  iq: TIssueQuery;
 begin
   if Changing then Exit;
 
   Changing := True;
 
-  s := editSearchFor.Text;
-  parts := s.Split(['#']);
-  if Length(parts) = 1 then
+  iq := SearchTextToQuery(SearchText);
+
+  if iq.searchString <> '' then
   begin
-    cbRepository.ItemIndex := cbRepository.Items.IndexOf('keyman');
+    cmdCopyHTML.Enabled := False;
+    cmdOK.Caption := '&Search';
+  end
+  else if iq.issueNumber > 0 then
+  begin
+    cmdCopyHTML.Enabled := True;
+    cmdOK.Caption := '&Open issue';
   end
   else
   begin
-    repo := RepoShortNameToFullName(parts[0]);
-    cbRepository.ItemIndex := cbRepository.Items.IndexOf(repo);
+    cmdCopyHTML.Enabled := False;
+    cmdOK.Caption := '&All issues';
   end;
+
+  cbRepository.ItemIndex := cbRepository.Items.IndexOf(iq.repo);
 
   Changing := False;
 end;
@@ -106,11 +224,12 @@ begin
   for i := 0 to High(repos) do
     cbRepository.Items.Add(repos[i][0]);
   cbRepository.ItemIndex := cbRepository.Items.IndexOf('keyman');
+  editSearchForChange(nil);
 end;
 
 function TfrmOpenCRMRecord.GetSearchText: WideString;
 begin
-  Result := editSearchFor.Text;
+  Result := Trim(editSearchFor.Text);
 end;
 
 procedure TfrmOpenCRMRecord.cbRepositoryClick(Sender: TObject);
