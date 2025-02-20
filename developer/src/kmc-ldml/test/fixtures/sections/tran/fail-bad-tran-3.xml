@@ -7,7 +7,7 @@
 
     <transforms type="simple">
         <transformGroup>
-            <transform from="(abc){1,}" /> 
+            <transform from="(abc){1,}" /> <!-- fails: unbounded quantifier -->
         </transformGroup>
     </transforms>
 </keyboard3>
