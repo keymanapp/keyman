@@ -133,7 +133,7 @@ const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I36
   (opt: koCheckForUpdates;                   RegistryName: SRegValue_CheckForUpdates;                 OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
 
   (opt: koAutomaticallyReportErrors;         RegistryName: SRegValue_AutomaticallyReportErrors;        OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
-  (opt: koAutomaticallyReportUsage;          RegistryName: SRegValue_AutomaticallyReportUsage;         OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
+  (opt: koAutomaticallyReportUsage;          RegistryName: SRegValue_AutomaticallyReportUsage;         OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),   // I4393
 
   // OSK options
 
