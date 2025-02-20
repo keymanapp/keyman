@@ -64,8 +64,16 @@ _convert_parameters_to_build_args() {
   fi
 }
 
+_check_for_default_values() {
+  if [[ -z "${DISTRO_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]]; then
+    is_default_values=true
+  else
+    is_default_values=false
+  fi
+}
+
 _is_default_values() {
-  [[ -z "${DISTRO_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]]
+  ${is_default_values}
 }
 
 build_action() {
@@ -74,6 +82,7 @@ build_action() {
   builder_echo debug "Building image for ${platform}"
 
   if [[ "${platform}" == "base" ]]; then
+    # shellcheck disable=SC2154 # set by _convert_parameters_to_build_args
     docker pull --platform "amd64" "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
@@ -106,6 +115,7 @@ test_action() {
     "${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
 
+_check_for_default_values
 _convert_parameters_to_build_args
 
 if builder_has_action build; then
