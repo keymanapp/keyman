@@ -93,19 +93,19 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   }
 
   private connect() {
-    this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
-    this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.addListener('tryaccept', this.doTryAccept);
-    this.langProcessor.addListener('tryrevert', this.doTryRevert);
-    this.langProcessor.addListener('statechange', this.onModelStateChange);
+    this.langProcessor?.addListener('invalidatesuggestions', this.invalidateSuggestions);
+    this.langProcessor?.addListener('suggestionsready', this.updateSuggestions);
+    this.langProcessor?.addListener('tryaccept', this.doTryAccept);
+    this.langProcessor?.addListener('tryrevert', this.doTryRevert);
+    this.langProcessor?.addListener('statechange', this.onModelStateChange);
   }
 
   public disconnect() {
-    this.langProcessor.removeListener('invalidatesuggestions', this.invalidateSuggestions);
-    this.langProcessor.removeListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.removeListener('tryaccept', this.doTryAccept);
-    this.langProcessor.removeListener('tryrevert', this.doTryRevert);
-    this.langProcessor.removeListener('statechange', this.onModelStateChange);
+    this.langProcessor?.removeListener('invalidatesuggestions', this.invalidateSuggestions);
+    this.langProcessor?.removeListener('suggestionsready', this.updateSuggestions);
+    this.langProcessor?.removeListener('tryaccept', this.doTryAccept);
+    this.langProcessor?.removeListener('tryrevert', this.doTryRevert);
+    this.langProcessor?.removeListener('statechange', this.onModelStateChange);
     this.clearSuggestions();
   }
 
@@ -356,7 +356,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(target) {
       // Note:  should be triggered after the corresponding new-context event rule has been processed,
       // as that may affect the value of layerId here.
-      return this.langProcessor.invalidateContext(target, this.getLayerId());
+      return this.langProcessor?.invalidateContext(target, this.getLayerId()) ?? Promise.resolve([]);
     } else {
       return Promise.resolve([]);
     }
