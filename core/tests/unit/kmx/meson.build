@@ -212,7 +212,7 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
   input: kbd_src,
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
 )
-  test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
+test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 
 external_e = executable('ext_event_tests', ['kmx_external_event.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
@@ -231,4 +231,4 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
   input: kbd_src,
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
 )
-  test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )
+test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )

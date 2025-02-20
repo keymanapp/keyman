@@ -1,6 +1,6 @@
-export { Codes, DeviceSpec, Keyboard, KeyboardProperties, SpacebarText } from 'keyman/engine/keyboard';
+export { Codes, DeviceSpec, JSKeyboard, KeyboardProperties, SpacebarText } from 'keyman/engine/keyboard';
 
-export { default as OSKView } from './views/oskView.js';
+export { default as OSKView, JSKeyboardData } from './views/oskView.js';
 export { default as FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';
 export { default as AnchoredOSKView } from './views/anchoredOskView.js';
 export { default as InlinedOSKView } from './views/inlinedOskView.js';
