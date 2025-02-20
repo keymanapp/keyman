@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.197 beta 2025-02-20
+
+* fix(linux): address compiling with ICU 76 (#13285)
+
 ## 18.0.196 beta 2025-02-19
 
 * fix(windows): remove sentry report on firstrun in idle state (#13266)
