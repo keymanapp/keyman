@@ -17,37 +17,32 @@ builder_describe \
   "core" \
   "linux" \
   "web" \
-  "--ubuntu-version=UBUNTU_VERSION  The Ubuntu version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})"
+  "--distro=DISTRO                  The distribution (debian or ubuntu, default: ubuntu)" \
+  "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})"
 
 builder_parse "$@"
 
 run_android() {
   docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
-    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
-    keymanapp/keyman-android-ci:default \
+    -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
+    "keymanapp/keyman-android-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_core() {
   docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
-    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
-    keymanapp/keyman-core-ci:default \
+    -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
+    "keymanapp/keyman-core-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_linux() {
-  if [[ -z "${UBUNTU_VERSION:-}" ]]; then
-    image_version=default
-  else
-    image_version="${UBUNTU_VERSION}-java${KEYMAN_VERSION_JAVA}-node$(_print_expected_node_version)-emsdk${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
-  fi
-
-  mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux"
-  mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux"
+  mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}"
+  mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}"
   docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
-    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
-    -v "${KEYMAN_ROOT}/linux/build/docker-linux":/home/build/build/linux/build \
-    -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux":/home/build/build/linux/keyman-system-service/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
+    -v "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}":/home/build/build/linux/build \
+    -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}":/home/build/build/linux/keyman-system-service/build \
     -e DESTDIR=/tmp \
     "keymanapp/keyman-linux-ci:${image_version}" \
     "${builder_extra_params[@]}"
@@ -55,12 +50,20 @@ run_linux() {
 
 run_web() {
   docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
-    -v "${KEYMAN_ROOT}/core/build/docker-core":/home/build/build/core/build \
-    keymanapp/keyman-web-ci:default \
+    -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
+    "keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
-mkdir -p "${KEYMAN_ROOT}/core/build/docker-core"
+if [[ -z "${DISTRO_VERSION:-}" ]]; then
+  image_version=default
+  build_dir=default
+else
+  image_version="${DISTRO:-}-${DISTRO_VERSION}-java${KEYMAN_VERSION_JAVA}-node$(_print_expected_node_version)-emsdk${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+  build_dir="${DISTRO:-}-${DISTRO_VERSION}"
+fi
+
+mkdir -p "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}"
 
 builder_run_action android  run_android
 builder_run_action core     run_core
