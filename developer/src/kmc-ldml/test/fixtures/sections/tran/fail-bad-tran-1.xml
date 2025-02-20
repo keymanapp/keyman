@@ -7,6 +7,7 @@
 
   <transforms type="simple">
     <transformGroup>
+      <!-- fails: capture group is not terminated -->
       <transform from="AB(now if only I would terminate this group.." to="x"/>
     </transformGroup>
   </transforms>
