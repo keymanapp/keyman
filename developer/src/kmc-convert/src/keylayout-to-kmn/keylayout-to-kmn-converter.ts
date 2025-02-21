@@ -60,6 +60,9 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // OK  when I run german with uniqueCAll why will there be [ ] without key anf modifier
 // OK  add links to HEADLINE of kmc-convert document
 // OK  TODO more  Data stores to add ??
+// OK  check for keys < 50 whern working with keys
+// OK  NO OUTPUT FOR SPACE in C0C1 !!!
+// OK  check code for code styles keyman
 //     tests for 3 functions read write convert
 //     Return conditions
 //     Tests throws
@@ -72,12 +75,10 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 //     replace unique_prev_deadkey 0, >0 with true, false
 //     TODO waht about using actions twice in a row??? -> error msg if chain >4
 //     what if keylayout file is not correct e.g missing >
-//     check for keys < 50 whern working with keys
-//     check code for code styles keyman
 //     read TODO which stores?
 //     does order of modifier matter ?
-//     NO OUTPUT FOR SPACE in C0C1 !!!
 //     remove all markers c0, 1-1, #### C2 ###, ...
+//     better function names for get......
 
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
@@ -260,10 +261,11 @@ export class KeylayoutToKmnConverter {
     this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data))
 
     // ToDo conditions?
-    if (data.length > 0)
+    if (data.length > 0) {
       return true;
-    else
+    } else {
       return false
+    }
   }
 
   //   TODO move outside of class?
@@ -318,8 +320,9 @@ export class KeylayoutToKmnConverter {
                   /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                   /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
               )
-              if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
+              if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
                 object_array.push(rule_obj)
+              }
             }
           }
 
@@ -432,8 +435,9 @@ export class KeylayoutToKmnConverter {
                         /*   key */                   b1_modifierKey_arr[n4][0],
                         /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n4][4]),
                       )
-                      if (b1_modifierKey_arr[n4][4] !== undefined)
+                      if (b1_modifierKey_arr[n4][4] !== undefined) {
                         object_array.push(rule_obj)
+                      }
                     }
                   }
                 }
@@ -518,8 +522,9 @@ export class KeylayoutToKmnConverter {
                               /*   key */                   b1_modifierKey_arr[n7][0],
                               /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n7][4]),
                             )
-                            if (b1_modifierKey_arr[n7][4] !== undefined)
+                            if (b1_modifierKey_arr[n7][4] !== undefined) {
                               object_array.push(rule_obj)
+                            }
                           }
                         }
                       }
@@ -529,9 +534,9 @@ export class KeylayoutToKmnConverter {
               }
             }
           }
-        }
-        else
+        } else {
           console.log("ERROR : some entries are not available")
+        }
       }
     }
 
@@ -598,8 +603,9 @@ export class KeylayoutToKmnConverter {
           unique_dkA_count++
           // check if first part of C3 rule contains already defined rule
           for (let k = 0; k < unique_ruleArrayC2.length; k++) {
-            if ((unique_ruleArrayC2[k][0] === object_array[i].modifier_deadkey) && ((unique_ruleArrayC2[k][1] === object_array[i].deadkey)))
+            if ((unique_ruleArrayC2[k][0] === object_array[i].modifier_deadkey) && ((unique_ruleArrayC2[k][1] === object_array[i].deadkey))) {
               object_array[i].unique_deadkey = Number(unique_ruleArrayC2[k][2])
+            }
           }
         }
 
@@ -687,8 +693,9 @@ export class KeylayoutToKmnConverter {
             returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
             returnarray.push(search[k][2])
           }
-          if (returnarray.length > 0)
+          if (returnarray.length > 0) {
             returnarray2D.push(returnarray)
+          }
         }
       }
     }
@@ -701,8 +708,9 @@ export class KeylayoutToKmnConverter {
  */
   public get_ActionID_Index__From__ActionID_Id(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
-      if (data.keyboard.actions.action[i]['@_id'] === search)
+      if (data.keyboard.actions.action[i]['@_id'] === search) {
         return i
+      }
     }
     return 0
   }
@@ -739,8 +747,9 @@ export class KeylayoutToKmnConverter {
           returnarray.push(data.keyboard.actions.action[i].when[j]['@_state'])
           returnarray.push(data.keyboard.actions.action[i].when[j]['@_output'])
         }
-        if (returnarray.length > 0)
+        if (returnarray.length > 0) {
           returnarray2D.push(returnarray)
+        }
       }
     }
     return returnarray2D
@@ -782,8 +791,9 @@ export class KeylayoutToKmnConverter {
         returnarray1D.push(search[i][3])  /* behaviour*/
         returnarray1D.push(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)) /* modifier */
         returnarray1D.push(search[i][4])  /* char*/
-        if (returnarray1D.length > 0)
+        if (returnarray1D.length > 0) {
           returnarray.push(returnarray1D)
+        }
       }
     }
     // remove duplicates
@@ -825,8 +835,9 @@ export class KeylayoutToKmnConverter {
             returnarray.push(keyName)
             returnarray.push(modifierkmn)
 
-            if (returnarray.length > 0)
+            if (returnarray.length > 0) {
               returnarray2D.push(returnarray)
+            }
           }
         }
       }
@@ -861,8 +872,9 @@ export class KeylayoutToKmnConverter {
           mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
           mapIndexArrayperKey.push(i)
         }
-        if (mapIndexArrayperKey.length > 0)
+        if (mapIndexArrayperKey.length > 0) {
           mapIndexArray_max.push(mapIndexArrayperKey)
+        }
       }
     }
     return mapIndexArray_max
@@ -880,14 +892,6 @@ export class KeylayoutToKmnConverter {
     return mapIndexArray_max
   }
 
-  /**
-   * @brief  member function to return the unicode value of a character
-   * @param  character the value that will converted
-   * @return headecimal value of a character
-   */
-  /* public getHexFromChar(character: string): string {
-    return character.charCodeAt(0).toString(16).slice(-4).toUpperCase().padStart(4, "0")
-  }*/
   /** 
    * @brief  member function to create a string of modifiers in kmn-style from the modifierMap section of .keylayout-file
    * @param  keylayout_modifier the modifier value used in the .keylayout-file
@@ -904,31 +908,61 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < modifier_state.length; i++) {
 
-      if (isCAPSused && (keylayout_modifier).toUpperCase().indexOf("CAPS") === -1)
+      if (isCAPSused && (keylayout_modifier).toUpperCase().indexOf("CAPS") === -1) {
         kmn_ncaps = " NCAPS "
+      }
 
       // if we find a modifier containing a '?' e.g. SHIFT?: => SHIFT is not neccessary. If it is not neccessary we don`t write this modifier
-      if (modifier_state[i].toUpperCase().includes('?') && (!modifier_state[i].toUpperCase().includes('CAPS?'))) add_modifier = "";
+      if (modifier_state[i].toUpperCase().includes('?') && (!modifier_state[i].toUpperCase().includes('CAPS?'))) {
+        add_modifier = "";
+      }
 
       // TODO is this correct: caps? => caps is not neccessary. If its not neccessary and isCAPSused we need to write out NCAPS. Correct?
-      else if (isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) add_modifier = "NCAPS ";
-      else if (!isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) add_modifier = "";
-      else if (modifier_state[i].toUpperCase().includes('CAPS')) add_modifier = "CAPS ";
-      else if (isCAPSused && (modifier_state[i].toUpperCase().includes('NCAPS'))) add_modifier = "NCAPS ";
+      else if (isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) {
+        add_modifier = "NCAPS ";
+      }
+      else if (!isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) {
+        add_modifier = "";
+      }
+      else if (modifier_state[i].toUpperCase().includes('CAPS')) {
+        add_modifier = "CAPS ";
+      }
+      else if (isCAPSused && (modifier_state[i].toUpperCase().includes('NCAPS'))) {
+        add_modifier = "NCAPS ";
+      }
 
       // Keyman does not use the right or left version of a modifier (e.g. rightshift, leftshift). If those are used in keylayout files
       // they will not be changed but written to the kmn as they are with a warning placed in front of them
-      else if ((modifier_state[i].toUpperCase() === 'ANYSHIFT') || (modifier_state[i].toUpperCase() === 'SHIFT')) add_modifier = "SHIFT ";
-      else if ((modifier_state[i].toUpperCase() === "LEFTSHIFT") || (modifier_state[i].toUpperCase() === "LSHIFT")) add_modifier = "SHIFT ";
-      else if ((modifier_state[i].toUpperCase() === "RIGHTSHIFT") || (modifier_state[i].toUpperCase() === "RSHIFT")) add_modifier = "SHIFT ";
-      else if ((modifier_state[i].toUpperCase() === 'ANYCONTROL') || (modifier_state[i].toUpperCase() === 'CONTROL')) add_modifier = "RCTRL ";
-      else if ((modifier_state[i].toUpperCase() === "LEFTCONTROL") || (modifier_state[i].toUpperCase() === "LCONTROL")) add_modifier = "CTRL ";
-      else if ((modifier_state[i].toUpperCase() === "RIGHTCONTROL") || (modifier_state[i].toUpperCase() === "LCONTROL")) add_modifier = "CTRL ";
-      else if ((modifier_state[i].toUpperCase() === "LEFTOPTION") || (modifier_state[i].toUpperCase() === "LOPTION")) add_modifier = "RALT ";
-      else if ((modifier_state[i].toUpperCase() === "RIGHTOPTION") || (modifier_state[i].toUpperCase() === "ROPTION")) add_modifier = "RALT ";
-      else if ((modifier_state[i].toUpperCase() === 'ANYOPTION') || (modifier_state[i].toUpperCase() === 'OPTION')) add_modifier = "RALT ";
-
-      else add_modifier = String(modifier_state[i]) + " "
+      else if ((modifier_state[i].toUpperCase() === 'ANYSHIFT') || (modifier_state[i].toUpperCase() === 'SHIFT')) {
+        add_modifier = "SHIFT ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "LEFTSHIFT") || (modifier_state[i].toUpperCase() === "LSHIFT")) {
+        add_modifier = "SHIFT ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "RIGHTSHIFT") || (modifier_state[i].toUpperCase() === "RSHIFT")) {
+        add_modifier = "SHIFT ";
+      }
+      else if ((modifier_state[i].toUpperCase() === 'ANYCONTROL') || (modifier_state[i].toUpperCase() === 'CONTROL')) {
+        add_modifier = "RCTRL ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "LEFTCONTROL") || (modifier_state[i].toUpperCase() === "LCONTROL")) {
+        add_modifier = "CTRL ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "RIGHTCONTROL") || (modifier_state[i].toUpperCase() === "LCONTROL")) {
+        add_modifier = "CTRL ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "LEFTOPTION") || (modifier_state[i].toUpperCase() === "LOPTION")) {
+        add_modifier = "RALT ";
+      }
+      else if ((modifier_state[i].toUpperCase() === "RIGHTOPTION") || (modifier_state[i].toUpperCase() === "ROPTION")) {
+        add_modifier = "RALT ";
+      }
+      else if ((modifier_state[i].toUpperCase() === 'ANYOPTION') || (modifier_state[i].toUpperCase() === 'OPTION')) {
+        add_modifier = "RALT ";
+      }
+      else {
+        add_modifier = String(modifier_state[i]) + " "
+      }
       kmn_modifier += kmn_ncaps + add_modifier
     }
 
@@ -960,11 +994,9 @@ export class KeylayoutToKmnConverter {
         || (modifier_single[i].toUpperCase() === "LCTRL")
         || (modifier_single[i].toUpperCase() === "RCTRL")
         || (modifier_single[i].toUpperCase() === "")
-
       ) {
         iskKeymanModifier &&= true
-      }
-      else {
+      } else {
         iskKeymanModifier &&= false
       }
     }
@@ -986,7 +1018,7 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-   else if (rule[index].rule_type === "C2") {
+    else if (rule[index].rule_type === "C2") {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
         warningTextArray[1] = "C2 unavailable modifier in: "
       }
@@ -1159,7 +1191,7 @@ export class KeylayoutToKmnConverter {
       );
 
       // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'dk(C1)'
-      const amb_4_4_mid = rule.filter((curr, idx) =>
+      const amb_4_4 = rule.filter((curr, idx) =>
         curr.rule_type === "C3"
         && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
         && curr.id_prev_deadkey !== rule[index].id_prev_deadkey
@@ -1238,8 +1270,8 @@ export class KeylayoutToKmnConverter {
         warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "duplicate 6-3 rule: earlier: dk(C" + dup_6_3[0].id_deadkey + ") + [" + dup_6_3[0].modifier_key + " " + dup_6_3[0].key + "]  >  \'" + new TextDecoder().decode(dup_6_3[0].output) + "\' here: ")
       }
 
-      if (amb_4_4_mid.length > 0) {
-        warningTextArray[0] = warningTextArray[0] + ("C3 FIRSTTEXT " + "ambiguous 4-4 rule: earlier: [" + amb_4_4_mid[0].modifier_prev_deadkey + " " + amb_4_4_mid[0].prev_deadkey + "]  >  dk(C" + amb_4_4_mid[0].id_prev_deadkey + ") here: ")
+      if (amb_4_4.length > 0) {
+        warningTextArray[0] = warningTextArray[0] + ("C3 FIRSTTEXT " + "ambiguous 4-4 rule: earlier: [" + amb_4_4[0].modifier_prev_deadkey + " " + amb_4_4[0].prev_deadkey + "]  >  dk(C" + amb_4_4[0].id_prev_deadkey + ") here: ")
       }
 
       if (dup_4_4.length > 0) {
@@ -1263,9 +1295,15 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    if (warningTextArray[0] !== "") warningTextArray[0] = "c WARNING: " + warningTextArray[0]
-    if (warningTextArray[1] !== "") warningTextArray[1] = "c WARNING: " + warningTextArray[1]
-    if (warningTextArray[2] !== "") warningTextArray[2] = "c WARNING: " + warningTextArray[2]
+    if (warningTextArray[0] !== "") {
+      warningTextArray[0] = "c WARNING: " + warningTextArray[0]
+    }
+    if (warningTextArray[1] !== "") {
+      warningTextArray[1] = "c WARNING: " + warningTextArray[1]
+    }
+    if (warningTextArray[2] !== "") {
+      warningTextArray[2] = "c WARNING: " + warningTextArray[2]
+    }
 
     return warningTextArray
   }
@@ -1348,8 +1386,9 @@ export class KeylayoutToKmnConverter {
       if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
         && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
         return curr;
+      } else {
+        return ""
       }
-      else return ""
     });
     const unique_data_Rules: rule_object[] = data_rules.reduce((unique, o) => {
       if (!unique.some((obj: { output: Uint8Array; rule_type: string; modifier_key: string; modifier_deadkey: string; prev_deadkey: string; modifier_prev_deadkey: string; deadkey: string; key: string }) =>
@@ -1383,38 +1422,40 @@ export class KeylayoutToKmnConverter {
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
 
-      if ((unique_data_Rules[k].rule_type === "C0")||(unique_data_Rules[k].rule_type === "C1")) {
+      if ((unique_data_Rules[k].rule_type === "C0") || (unique_data_Rules[k].rule_type === "C1")) {
 
-      // lookup key nr of the key that is being processed
-      let keyNr: number = 0;
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-        if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
-          keyNr = j
-          break
+        // lookup key nr of the key that is being processed
+        let keyNr: number = 0;
+        for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+          if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
+            keyNr = j
+            break
+          }
+        }
+
+        // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
+        if ((keyNr === 48) || (keyNr === 36)) {
+          continue
+        }
+
+        //---------------------------------------------------------------------------------------------
+
+        // add a line after rules of each key
+        if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
+          data += '\n'
+        }
+
+        const warn_text = this.reviewRules(unique_data_Rules, k)
+
+        // add a warning in front of rules that use unavailable modifiers or ambiguous rules
+        // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
+
+        // ToDo include condition again
+        if ((warn_text[2].indexOf("duplicate") < 0)) {
+          data += warn_text[2] + "+ [" + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim() + `]  > \'` + new TextDecoder().decode(unique_data_Rules[k].output) + '\'\n'
         }
       }
-
-      // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
-      if ((keyNr === 48) || (keyNr === 36))
-        continue
-
-      //---------------------------------------------------------------------------------------------
-
-      // add a line after rules of each key
-      if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
-        data += '\n'
-      }
-
-      const warn_text = this.reviewRules(unique_data_Rules, k)
-
-      // add a warning in front of rules that use unavailable modifiers or ambiguous rules
-      // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
-
-      // ToDo include condition again
-      if ((warn_text[2].indexOf("duplicate") < 0)) {
-        data += warn_text[2] + "+ [" + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim() + `]  > \'` + new TextDecoder().decode(unique_data_Rules[k].output) + '\'\n'
-      }
-    }}
+    }
 
     // Todo remove this marker
     data += "\n c ########## C2 #################################################################\n"
