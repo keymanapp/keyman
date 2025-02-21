@@ -95,7 +95,8 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        switch (System.env.TIER) {
+        String tier = new File('../../../TIER.md').getText('UTF-8').trim();
+        switch (tier) {
             case 'beta':
                 track.set("beta")
                 println "TIER set to beta"
