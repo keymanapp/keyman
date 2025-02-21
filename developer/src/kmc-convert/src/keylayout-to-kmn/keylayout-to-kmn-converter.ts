@@ -77,6 +77,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 //     read TODO which stores?
 //     does order of modifier matter ?
 //     NO OUTPUT FOR SPACE in C0C1 !!!
+//     remove all markers c0, 1-1, #### C2 ###, ...
 
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
@@ -189,6 +190,7 @@ export class KeylayoutToKmnConverter {
 
     const options = {
       ignoreAttributes: false,
+      trimValues: false,           // preserve spaces
       attributeNamePrefix: '@_'    // to access the attribute
     };
 
@@ -202,12 +204,6 @@ export class KeylayoutToKmnConverter {
       // Todo how to break correctly; return what??
       console.log(" FILE NOT FOUND")
     }
-      console.log("jsonobj ",jsonObj.keyboard.actions.action[0] )
-      console.log("tttttt ", )
-
-
-
-
     return jsonObj
   }
 
@@ -298,15 +294,14 @@ export class KeylayoutToKmnConverter {
         // ...............e. g. <key code="1" output="s"/> ...............................................................................
         // ...............................................................................................................................
 
-        if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined)) {
+        if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined)
+          && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")) {
 
-          if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
+          // loop behaviours
+          for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
+            if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
 
-            // loop behaviours
-            for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
-              if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
-
-                rule_obj = new Rules(
+              rule_obj = new Rules(
                   /*   rule_type */               "C0",
 
                   /*   modifier_prev_deadkey*/    "",
@@ -322,19 +317,16 @@ export class KeylayoutToKmnConverter {
                   /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.arrayOf_Modifiers[i][l], isCapsused),
                   /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                   /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
-                )
-                if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
-                  object_array.push(rule_obj)
-              }
+              )
+              if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
+                object_array.push(rule_obj)
             }
           }
+
         }
         else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] !== undefined) {
 
-
           action_id = jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']
-          console.log("i j  ", i, j)
-          console.log("action_id ", action_id)
           // ...............................................................................................................................
           // case C1: action + state none + output .........................................................................................
           // C1 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
@@ -342,30 +334,14 @@ export class KeylayoutToKmnConverter {
           // KeyMap:code->KeyMap:action->action:action_state(none)->action_output ..........................................................
           // ...............e. g. <when state="none" output="a" ............................................................................
           // ...............................................................................................................................
-          console.log("data_ukelele.arrayOf_Modifiers[i].length; ", data_ukelele.arrayOf_Modifiers[i].length)
 
           for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
 
-            console.log("xxxthis.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id ", this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id), "--")
-
-            console.log("this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined ", this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined)
-
-            console.log("(this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !==  ", (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== ""))
-
-            console.log("((this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined) && (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !==  ",
-              ((this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined) && (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== "")))
-
-
-            if ((this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined) && (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== "")) {
-
+            if ((this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== undefined)
+              && (this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id) !== "")) {
 
               const outputchar: string = this.get_Action2ID_NoneOutput__From__ActionID_Id(jsonObj, action_id)
               const b1_modifierKey_arr: string[][] = this.get_Datat_array2D__From__ActionID_stateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused)
-
-              console.log("action_id2", action_id)
-
-              if (action_id === "a0")
-                console.log("outputchar", outputchar, "...")
 
               for (let m = 0; m < b1_modifierKey_arr.length; m++) {
 
@@ -576,17 +552,17 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < object_array.length; i++) {
       if ((object_array[i].modifier_deadkey !== "") && (object_array[i].deadkey !== "")) {
-        let isUnique_dkB: boolean = true
+        let isFirstUsedHere_dk: boolean = true
 
         // check if not used before
         for (let j = 0; j < i; j++) {
           if ((object_array[i].modifier_deadkey === object_array[j].modifier_deadkey)
             && (object_array[i].deadkey === object_array[j].deadkey)) {
-            isUnique_dkB = isUnique_dkB && false
+            isFirstUsedHere_dk = isFirstUsedHere_dk && false
           }
         }
 
-        if (isUnique_dkB) {
+        if (isFirstUsedHere_dk) {
           const ruleArray: string[] = []
           object_array[i].unique_deadkey = unique_dkB_count
           ruleArray.push(object_array[i].modifier_deadkey)
@@ -607,17 +583,17 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < object_array.length; i++) {
       if ((object_array[i].modifier_prev_deadkey !== "") && (object_array[i].prev_deadkey !== "")) {
-        let isUnique_dkA: boolean = true
+        let isFirstUsedHere_prev_dk: boolean = true
 
         // check if not used before
         for (let j = 0; j < i; j++) {
           if ((object_array[i].modifier_prev_deadkey === object_array[j].modifier_prev_deadkey)
             && (object_array[i].prev_deadkey === object_array[j].prev_deadkey)) {
-            isUnique_dkA = isUnique_dkA && false
+            isFirstUsedHere_prev_dk = isFirstUsedHere_prev_dk && false
           }
         }
 
-        if (isUnique_dkA) {
+        if (isFirstUsedHere_prev_dk) {
           object_array[i].unique_prev_deadkey = unique_dkA_count
           unique_dkA_count++
           // check if first part of C3 rule contains already defined rule
@@ -627,7 +603,7 @@ export class KeylayoutToKmnConverter {
           }
         }
 
-        if (isUnique_dkA) {
+        if (isFirstUsedHere_prev_dk) {
           const ruleArray: string[] = []
           object_array[i].unique_deadkey = unique_dkB_count
           ruleArray.push(object_array[i].modifier_prev_deadkey)
@@ -642,11 +618,9 @@ export class KeylayoutToKmnConverter {
     for (let i = 0; i < object_array.length; i++) {
       for (let j = 0; j < unique_ruleArrayC2.length; j++) {
         if ((object_array[i].modifier_prev_deadkey === unique_ruleArrayC2[j][0]) && (object_array[i].prev_deadkey === unique_ruleArrayC2[j][1])) {
-          // write unique nr into rule obj
           object_array[i].id_prev_deadkey = Number(unique_ruleArrayC2[j][2])
         }
         if ((object_array[i].modifier_deadkey === unique_ruleArrayC2[j][0]) && (object_array[i].deadkey === unique_ruleArrayC2[j][1])) {
-          // write nr into rule obj
           object_array[i].id_deadkey = Number(unique_ruleArrayC2[j][2])
         }
       }
@@ -667,10 +641,10 @@ export class KeylayoutToKmnConverter {
     const returnarray: string[] = []
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
-          }
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search
+          && data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+          returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+
         }
       }
     }
@@ -685,10 +659,10 @@ export class KeylayoutToKmnConverter {
     const returnarray: string[] = []
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-          }
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search
+          && data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+
         }
       }
     }
@@ -705,14 +679,13 @@ export class KeylayoutToKmnConverter {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           const returnarray: string[] = []
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0]) {
-            if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-              returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
-              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
-              returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
-              returnarray.push(search[k][2])
-            }
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'])
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index'])
+            returnarray.push(search[k][2])
           }
           if (returnarray.length > 0)
             returnarray2D.push(returnarray)
@@ -780,39 +753,15 @@ export class KeylayoutToKmnConverter {
   public get_Action2ID_NoneOutput__From__ActionID_Id(data: any, search: string): string {
     let OutputValue: string = ""
 
-    if (search === "a0")
-      console.log("search ", search)
-
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
-
-
-
         for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-
-      /*    console.log("data.keyboard.actions.action.length ",
-            i, j,
-            data.keyboard.actions.action.length,
-            data.keyboard.actions.action[i]['@_id'],
-            search,
-            data.keyboard.actions.action[i].when.length,
-            data.keyboard.actions.action[i].when[j]['@_output'],
-            OutputValue
-          )*/
           if (data.keyboard.actions.action[i].when[j]['@_state'] === "none") {
             OutputValue = data.keyboard.actions.action[i].when[j]['@_output']
-           // console.log("OutputValue ", OutputValue)
-
           }
         }
       }
     }
-    if (search === "a19")
-      console.log(" OutputValue a19", OutputValue, "..")
-    if (search === "a0")
-      console.log(" OutputValue a0", OutputValue, "..")
-
-
     return OutputValue
   }
   /*
@@ -1022,7 +971,7 @@ export class KeylayoutToKmnConverter {
     return iskKeymanModifier
   }
 
-  // definition of comparisons 1-1, 2-4, 6-6, ...  see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0
+  // definition of comparisons 1-1, 2-4, 6-6,...  see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
   // todo remove comments n filters after check of several keylayout files
   public reviewRules(rule: rule_object[], index: number): string[] {
 
@@ -1032,33 +981,27 @@ export class KeylayoutToKmnConverter {
 
     // Todo remoce C1-C3's and other markers
     if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
-
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[2] = "C1 unavailable modifier in: "
       }
     }
 
-    if (rule[index].rule_type === "C2") {
-      if
-        (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
+   else if (rule[index].rule_type === "C2") {
+      if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
         warningTextArray[1] = "C2 unavailable modifier in: "
       }
-
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[2] = "C2 unavailable modifier in: "
       }
     }
 
-    if (rule[index].rule_type === "C3") {
-
+    else if (rule[index].rule_type === "C3") {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_prev_deadkey)) {
         warningTextArray[2] = "C3 unavailable modifier in: "
       }
-
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
         warningTextArray[1] = "C3 unavailable modifier in: "
       }
-
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[0] = "C3 unavailable modifier in: "
       }
@@ -1162,10 +1105,10 @@ export class KeylayoutToKmnConverter {
         warningTextArray[1] = warningTextArray[1] + ("C2 SECONDTEXT " + "duplicate 2-2 rule: earlier: [" + dup_2_2[0].modifier_deadkey + " " + dup_2_2[0].deadkey + "]  >  dk(C" + dup_2_2[0].id_deadkey + ") here: ")
       }
       if (amb_3_3.length > 0) {
-        warningTextArray[2] = warningTextArray[2] + ("C2 THIRDTEXT " + "ambiguous y 3-3 rule: earlier: dk(C" + amb_3_3[0].id_deadkey + ") + [" + amb_3_3[0].modifier_key + " " + amb_3_3[0].key + "]  >  \'" + new TextDecoder().decode(amb_3_3[0].output) + "\' here: ")
+        warningTextArray[2] = warningTextArray[2] + ("C2 THIRDTEXT " + "ambiguous 3-3 rule: earlier: dk(C" + amb_3_3[0].id_deadkey + ") + [" + amb_3_3[0].modifier_key + " " + amb_3_3[0].key + "]  >  \'" + new TextDecoder().decode(amb_3_3[0].output) + "\' here: ")
       }
       if (dup_3_3.length > 0) {
-        warningTextArray[2] = warningTextArray[2] + ("C2 THIRDTEXT " + "duplicate y 3-3 rule: earlier: dk(C" + dup_3_3[0].id_deadkey + ") + [" + dup_3_3[0].modifier_key + " " + dup_3_3[0].key + "]  >  \'" + new TextDecoder().decode(dup_3_3[0].output) + "\' here: ")
+        warningTextArray[2] = warningTextArray[2] + ("C2 THIRDTEXT " + "duplicate 3-3 rule: earlier: dk(C" + dup_3_3[0].id_deadkey + ") + [" + dup_3_3[0].modifier_key + " " + dup_3_3[0].key + "]  >  \'" + new TextDecoder().decode(dup_3_3[0].output) + "\' here: ")
       }
       if (amb_1_2.length > 0) {
         warningTextArray[1] = warningTextArray[1] + ("C2 SECONDTEXT " + "ambiguous 1-2 rule: earlier: [" + amb_1_2[0].modifier_key + " " + amb_1_2[0].key + "]  >  \'" + new TextDecoder().decode(amb_1_2[0].output) + "\' here: ")
@@ -1288,11 +1231,11 @@ export class KeylayoutToKmnConverter {
       }
 
       if (amb_6_3.length > 0) {
-        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "ambiguous y 6-3 rule: earlier: dk(C" + amb_6_3[0].id_deadkey + ") + [" + amb_6_3[0].modifier_key + " " + amb_6_3[0].key + "]  >  \'" + new TextDecoder().decode(amb_6_3[0].output) + "\' here: ")
+        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "ambiguous 6-3 rule: earlier: dk(C" + amb_6_3[0].id_deadkey + ") + [" + amb_6_3[0].modifier_key + " " + amb_6_3[0].key + "]  >  \'" + new TextDecoder().decode(amb_6_3[0].output) + "\' here: ")
       }
 
       if (dup_6_3.length > 0) {
-        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "duplicate y 6-3 rule: earlier: dk(C" + dup_6_3[0].id_deadkey + ") + [" + dup_6_3[0].modifier_key + " " + dup_6_3[0].key + "]  >  \'" + new TextDecoder().decode(dup_6_3[0].output) + "\' here: ")
+        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "duplicate 6-3 rule: earlier: dk(C" + dup_6_3[0].id_deadkey + ") + [" + dup_6_3[0].modifier_key + " " + dup_6_3[0].key + "]  >  \'" + new TextDecoder().decode(dup_6_3[0].output) + "\' here: ")
       }
 
       if (amb_4_4_mid.length > 0) {
@@ -1304,19 +1247,19 @@ export class KeylayoutToKmnConverter {
       }
 
       if (amb_5_5.length > 0) {
-        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "ambiguous y 5-5 rule: earlier: dk(B" + amb_5_5[0].id_prev_deadkey + ") + [" + amb_5_5[0].modifier_deadkey + " " + amb_5_5[0].deadkey + "]  >  dk(B" + amb_5_5[0].id_deadkey + ") here: ")
+        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "ambiguous 5-5 rule: earlier: dk(B" + amb_5_5[0].id_prev_deadkey + ") + [" + amb_5_5[0].modifier_deadkey + " " + amb_5_5[0].deadkey + "]  >  dk(B" + amb_5_5[0].id_deadkey + ") here: ")
       }
 
       if (dup_5_5.length > 0) {
-        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "duplicate y 5-5 rule: earlier: dk(B" + dup_5_5[0].id_prev_deadkey + ") + [" + dup_5_5[0].modifier_deadkey + " " + dup_5_5[0].deadkey + "]  >  dk(B" + dup_5_5[0].id_deadkey + ") here: ")
+        warningTextArray[1] = warningTextArray[1] + ("C3 SECONDTEXT " + "duplicate 5-5 rule: earlier: dk(B" + dup_5_5[0].id_prev_deadkey + ") + [" + dup_5_5[0].modifier_deadkey + " " + dup_5_5[0].deadkey + "]  >  dk(B" + dup_5_5[0].id_deadkey + ") here: ")
       }
 
       if (amb_6_6.length > 0) {
-        warningTextArray[2] = warningTextArray[2] + ("C3 THIRDTEXT " + "ambiguous y 6-6 rule: earlier: dk(B" + amb_6_6[0].id_deadkey + ") + [" + amb_6_6[0].modifier_key + " " + amb_6_6[0].key + "]  >  \'" + new TextDecoder().decode(amb_6_6[0].output) + "\' here: ")
+        warningTextArray[2] = warningTextArray[2] + ("C3 THIRDTEXT " + "ambiguous 6-6 rule: earlier: dk(B" + amb_6_6[0].id_deadkey + ") + [" + amb_6_6[0].modifier_key + " " + amb_6_6[0].key + "]  >  \'" + new TextDecoder().decode(amb_6_6[0].output) + "\' here: ")
       }
 
       if (dup_6_6.length > 0) {
-        warningTextArray[2] = warningTextArray[2] + ("C3 THIRDTEXT " + "duplicate y 6-6x rule: earlier: dk(B" + dup_6_6[0].id_deadkey + ") + [" + dup_6_6[0].modifier_key + " " + dup_6_6[0].key + "]  >  \'" + new TextDecoder().decode(dup_6_6[0].output) + "\' here: ")
+        warningTextArray[2] = warningTextArray[2] + ("C3 THIRDTEXT " + "duplicate 6-6x rule: earlier: dk(B" + dup_6_6[0].id_deadkey + ") + [" + dup_6_6[0].modifier_key + " " + dup_6_6[0].key + "]  >  \'" + new TextDecoder().decode(dup_6_6[0].output) + "\' here: ")
       }
     }
 
@@ -1336,61 +1279,60 @@ export class KeylayoutToKmnConverter {
 
     // ukelele KC  -->  // VK_US
     if (pos === 0x0A) return "K_BKQUOTE"    /* ^ */
-    if (pos === 0x12) return "K_1"          /* 1 */
-    if (pos === 0x13) return "K_2"          /* 2 */
-    if (pos === 0x14) return "K_3"          /* 3 */
-    if (pos === 0x15) return "K_4"          /* 4 */
-    if (pos === 0x17) return "K_5"          /* 5 */
-    if (pos === 0x16) return "K_6"          /* 6 */
-    if (pos === 0x1A) return "K_7"          /* 7 */
-    if (pos === 0x1C) return "K_8"          /* 8 */
-    if (pos === 0x19) return "K_9"          /* 9 */
-    if (pos === 0x1D) return "K_0"          /* 0 */
-    if (pos === 0x1B) return "K_HYPHEN"     /* ß */
-    if (pos === 0x18) return "K_EQUAL"      /* ´ */
+    else if (pos === 0x12) return "K_1"          /* 1 */
+    else if (pos === 0x13) return "K_2"          /* 2 */
+    else if (pos === 0x14) return "K_3"          /* 3 */
+    else if (pos === 0x15) return "K_4"          /* 4 */
+    else if (pos === 0x17) return "K_5"          /* 5 */
+    else if (pos === 0x16) return "K_6"          /* 6 */
+    else if (pos === 0x1A) return "K_7"          /* 7 */
+    else if (pos === 0x1C) return "K_8"          /* 8 */
+    else if (pos === 0x19) return "K_9"          /* 9 */
+    else if (pos === 0x1D) return "K_0"          /* 0 */
+    else if (pos === 0x1B) return "K_HYPHEN"     /* ß */
+    else if (pos === 0x18) return "K_EQUAL"      /* ´ */
 
-    if (pos === 0x0C) return "K_Q"          /* Q */
-    if (pos === 0x0D) return "K_W"          /* W */
-    if (pos === 0x0E) return "K_E"          /* E */
-    if (pos === 0x0F) return "K_R"          /* R */
-    if (pos === 0x11) return "K_T"          /* T */
-    if (pos === 0x10) return "K_Y"          /* Y */
-    if (pos === 0x20) return "K_U"          /* U */
-    if (pos === 0x22) return "K_I"          /* I */
-    if (pos === 0x1F) return "K_O"          /* O */
-    if (pos === 0x23) return "K_P"          /* P */
-    if (pos === 0x21) return "K_LBRKT"      /* [ */
-    if (pos === 0x1E) return "K_RBRKT"      /* ] */
-    if (pos === 0x31) return "K_SPACE"      /* \ */
-    if (pos === 0x2A) return "K_BKSLASH"    /* \ */   // 42 for ISO  correct??
-    // if (pos === 0x30) return "K_?C1"     /* \ */   // 48 for ANSI  correct??
-    // TODO numbers OK??
+    else if (pos === 0x0C) return "K_Q"          /* Q */
+    else if (pos === 0x0D) return "K_W"          /* W */
+    else if (pos === 0x0E) return "K_E"          /* E */
+    else if (pos === 0x0F) return "K_R"          /* R */
+    else if (pos === 0x11) return "K_T"          /* T */
+    else if (pos === 0x10) return "K_Y"          /* Y */
+    else if (pos === 0x20) return "K_U"          /* U */
+    else if (pos === 0x22) return "K_I"          /* I */
+    else if (pos === 0x1F) return "K_O"          /* O */
+    else if (pos === 0x23) return "K_P"          /* P */
+    else if (pos === 0x21) return "K_LBRKT"      /* [ */
+    else if (pos === 0x1E) return "K_RBRKT"      /* ] */
+    else if (pos === 0x31) return "K_SPACE"      /* \ */
+    else if (pos === 0x2A) return "K_BKSLASH"    /* \ */   // 42 for ISO  correct??
+    // else if (pos === 0x30) return "K_?C1"     /* \ */   // 48 for ANSI  correct??
 
-    if (pos === 0x00) return "K_A"          /* A */
-    if (pos === 0x01) return "K_S"          /* S */
-    if (pos === 0x02) return "K_D"          /* D */
-    if (pos === 0x03) return "K_F"          /* F */
-    if (pos === 0x05) return "K_G"          /* G */
-    if (pos === 0x04) return "K_H"          /* H */
-    if (pos === 0x26) return "K_J"          /* J */
-    if (pos === 0x28) return "K_K"          /* K */
-    if (pos === 0x25) return "K_L"          /* L */
-    if (pos === 0x29) return "K_COLON"      /* : */
-    if (pos === 0x27) return "K_QUOTE"      /* " */
+    else if (pos === 0x00) return "K_A"          /* A */
+    else if (pos === 0x01) return "K_S"          /* S */
+    else if (pos === 0x02) return "K_D"          /* D */
+    else if (pos === 0x03) return "K_F"          /* F */
+    else if (pos === 0x05) return "K_G"          /* G */
+    else if (pos === 0x04) return "K_H"          /* H */
+    else if (pos === 0x26) return "K_J"          /* J */
+    else if (pos === 0x28) return "K_K"          /* K */
+    else if (pos === 0x25) return "K_L"          /* L */
+    else if (pos === 0x29) return "K_COLON"      /* : */
+    else if (pos === 0x27) return "K_QUOTE"      /* " */
 
-    if (pos === 0x23) return "K_oE2"        /* | */
-    if (pos === 0x06) return "K_Z"          /* Z */
-    if (pos === 0x07) return "K_X"          /* X */
-    if (pos === 0x08) return "K_C"          /* C */
-    if (pos === 0x09) return "K_V"          /* V */
-    if (pos === 0x0B) return "K_B"          /* B */
-    if (pos === 0x2D) return "K_N"          /* N */
-    if (pos === 0x2E) return "K_M"          /* M */
-    if (pos === 0x2B) return "K_COMMA"      /* , */
-    if (pos === 0x2F) return "K_PERIOD"     /* . */
-    if (pos === 0x2C) return "K_SLASH"      /* / */
+    else if (pos === 0x23) return "K_oE2"        /* | */
+    else if (pos === 0x06) return "K_Z"          /* Z */
+    else if (pos === 0x07) return "K_X"          /* X */
+    else if (pos === 0x08) return "K_C"          /* C */
+    else if (pos === 0x09) return "K_V"          /* V */
+    else if (pos === 0x0B) return "K_B"          /* B */
+    else if (pos === 0x2D) return "K_N"          /* N */
+    else if (pos === 0x2E) return "K_M"          /* M */
+    else if (pos === 0x2B) return "K_COMMA"      /* , */
+    else if (pos === 0x2F) return "K_PERIOD"     /* . */
+    else if (pos === 0x2C) return "K_SLASH"      /* / */
 
-    if (pos === 0x24) return "K_ENTER"
+    else if (pos === 0x24) return "K_ENTER"
     else return ""
   }
   //----------------------------------------------------------------------------------------------------
@@ -1400,10 +1342,9 @@ export class KeylayoutToKmnConverter {
   public createData_Rules(data_ukelele: convert_object): string {
 
     let data: string = ""
-    let keymarker: string = ""
 
     // create array of all rules and remove duplicates
-    /*const data_rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
+    const data_rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
         && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
         return curr;
@@ -1427,10 +1368,10 @@ export class KeylayoutToKmnConverter {
         unique.push(o);
       }
       return unique;
-    }, []);*/
+    }, []);
 
     // ToDo remove
-    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules
+    //const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules
     console.log("xx  data_ukelele.arrayOf_Rules", data_ukelele.arrayOf_Rules.length)
     //console.log("xx  data_ukelele.arrayOf_Rules", this.writeDataset(data_ukelele.arrayOf_Rules))
     console.log("xx  unique_data_Rules", unique_data_Rules.length)
@@ -1442,39 +1383,39 @@ export class KeylayoutToKmnConverter {
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
 
-      if ((unique_data_Rules[k].rule_type === "C0") || (unique_data_Rules[k].rule_type === "C1")) {
-        // lookup key nr of the key that is being processed
-        let keyNr: number = 0;
-        for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-          if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
-            keyNr = j
-            //break
-          }
+      if ((unique_data_Rules[k].rule_type === "C0")||(unique_data_Rules[k].rule_type === "C1")) {
+
+      // lookup key nr of the key that is being processed
+      let keyNr: number = 0;
+      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
+          keyNr = j
+          break
         }
-
-        // skip keyNr 48 ( TAB )
-        if (keyNr === 48)
-          console.log(" keyNr", keyNr)
-
-        //continue
-
-        // add a line after rules of each key
-        if (unique_data_Rules[k].key !== keymarker)
-          data += '\n'
-
-        //---------------------------------------------------------------------------------------------
-
-        // add a warning in front of rules that use unavailable modifiers or ambiguous rules
-        const warn_text = this.reviewRules(unique_data_Rules, k)
-
-        // ToDo include condition again
-        // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
-        //     if ((warn_text[2].indexOf("duplicate") < 0)) {
-        data += warn_text[2] + "+ [" + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim() + `]  > \'` + new TextDecoder().decode(unique_data_Rules[k].output) + '\'\n'
-        //      }
-        keymarker = unique_data_Rules[k].key
       }
-    }
+
+      // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
+      if ((keyNr === 48) || (keyNr === 36))
+        continue
+
+      //---------------------------------------------------------------------------------------------
+
+      // add a line after rules of each key
+      if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
+        data += '\n'
+      }
+
+      const warn_text = this.reviewRules(unique_data_Rules, k)
+
+      // add a warning in front of rules that use unavailable modifiers or ambiguous rules
+      // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
+
+      // ToDo include condition again
+      if ((warn_text[2].indexOf("duplicate") < 0)) {
+        data += warn_text[2] + "+ [" + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim() + `]  > \'` + new TextDecoder().decode(unique_data_Rules[k].output) + '\'\n'
+      }
+    }}
+
     // Todo remove this marker
     data += "\n c ########## C2 #################################################################\n"
 
@@ -1551,7 +1492,7 @@ export class KeylayoutToKmnConverter {
     data += "c from Ukelele file: " + data_ukelele.keylayout_filename + "\n"
     data += "c ......................................................................\n"
     data += "c ......................................................................\n"
-    data += "c \n"
+    data += "\n"
 
     data += "store(&VERSION) \'10.0\'\n"
     data += "store(&TARGETS) \'any\'\n"
@@ -1572,9 +1513,7 @@ export class KeylayoutToKmnConverter {
 
       console.log("dataRules ", i,
 
-        dataRules[i].rule_type !== "" ? dataRules[i].rule_type : "--".padEnd(4, " ")
-
-        , /*dataRules.length, i,*/
+        dataRules[i].rule_type !== "" ? dataRules[i].rule_type : "--".padEnd(4, " "),
 
         "|  ", (dataRules[i].modifier_prev_deadkey !== "" ? dataRules[i].modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
         (dataRules[i].prev_deadkey !== "" ? dataRules[i].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
@@ -1599,14 +1538,12 @@ export class KeylayoutToKmnConverter {
   public writeDatasetSingle(dataRules: rule_object) {
 
     console.log("dataRules ",
-      dataRules.rule_type !== "" ? dataRules.rule_type : "--".padEnd(4, " ")
-      ,
+      dataRules.rule_type !== "" ? dataRules.rule_type : "--".padEnd(4, " "),
 
       "|  ", (dataRules.modifier_prev_deadkey !== "" ? dataRules.modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
       (dataRules.prev_deadkey !== "" ? dataRules.prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
       (dataRules.id_prev_deadkey !== 0 ? ("dk(A" + String(dataRules.id_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
       (dataRules.unique_prev_deadkey !== 0 ? ("unique(A" + String(dataRules.unique_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-
 
       (dataRules.modifier_deadkey !== "" ? dataRules.modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
       (dataRules.deadkey !== "" ? dataRules.deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
