@@ -81,6 +81,11 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private boolean dismissOnSelect = true;
+
+  // Flag when System Keyboard keyboard picker can clear the activity stack
+  // so keyboard picker becomes the new task root.
+  private static boolean canClearActivityTask = true;
+
   protected static boolean canAddNewKeyboard = true;
   protected static boolean canRemoveKeyboard = true;
   protected static boolean shouldCheckKeyboardUpdates = true;
@@ -472,6 +477,26 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     notifyKeyboardsUpdate(context);
+  }
+
+  /**
+   * Returns canClearActivityTask
+   * @return boolean
+   */
+  public static boolean getClearActivityTask() { return canClearActivityTask; }
+
+  /**
+   * Set canClearActivityTask to false so keyboard picker won't become the root of the activity stack
+   */
+  public static void disableClearActivityTask() {
+    canClearActivityTask = false;
+  }
+
+  /**
+   * Set canClearActivityTask to true so keyboard picker becomes the root of the activity stack
+   */
+  public static void enableClearActivityTask() {
+    canClearActivityTask = true;
   }
 
   /**
