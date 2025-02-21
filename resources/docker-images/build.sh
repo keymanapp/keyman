@@ -18,8 +18,7 @@ builder_describe \
   ":core" \
   ":linux" \
   ":web" \
-  "--distro=DISTRO                  The distribution to use for the base image "\
-  "                                 (debian or ubuntu, default: ubuntu)" \
+  "--distro=DISTRO                  The distribution to use for the base image (debian or ubuntu, default: ubuntu)" \
   "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
   "build                            Build docker images" \
@@ -83,7 +82,7 @@ build_action() {
 
   if [[ "${platform}" == "base" ]]; then
     # shellcheck disable=SC2154 # set by _convert_parameters_to_build_args
-    docker pull --platform "amd64" "${DISTRO}:${DISTRO_VERSION}"
+    docker pull "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
   fi
@@ -95,12 +94,12 @@ build_action() {
   # shellcheck disable=SC2164
   cd "${platform}"
   # shellcheck disable=SC2248,SC2086
-  docker build ${OPTION_NO_CACHE:-} --platform amd64 -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
+  docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
   if _is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker build --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
+    docker build -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
   # shellcheck disable=SC2164,SC2103
   cd -
