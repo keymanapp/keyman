@@ -81,6 +81,10 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private boolean dismissOnSelect = true;
+
+  // Flag when System Keyboard keyboard picker can clear the activity stack.
+  public static boolean canFlagActivityClearTask = true;
+
   protected static boolean canAddNewKeyboard = true;
   protected static boolean canRemoveKeyboard = true;
   protected static boolean shouldCheckKeyboardUpdates = true;

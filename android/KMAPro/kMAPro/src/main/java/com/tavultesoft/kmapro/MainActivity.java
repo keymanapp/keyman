@@ -26,6 +26,7 @@ import com.keyman.engine.KMHelpFileActivity;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.KmpInstallMode;
 import com.keyman.engine.KMTextView;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
@@ -246,6 +247,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
+    // Reset flag
+    KeyboardPickerActivity.canFlagActivityClearTask = true;
 
     // onConfigurationChanged() only triggers when device is rotated while app is in foreground
     // This handles when device is rotated while app is in background
