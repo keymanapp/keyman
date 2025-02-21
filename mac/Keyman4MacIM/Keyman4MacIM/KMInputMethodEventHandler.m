@@ -38,17 +38,22 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
-  _keySender = [[KeySender alloc] init];
-  _clientApplicationId = clientAppId;
-  _generatedBackspaceCount = 0;
-  _lowLevelBackspaceCount = 0;
-  _queuedText = nil;
+  self = [super init];
+  if(self) {
+    _keySender = [[KeySender alloc] init];
+    _clientApplicationId = clientAppId;
+    _generatedBackspaceCount = 0;
+    _lowLevelBackspaceCount = 0;
+    _queuedText = nil;
+ 
+    os_log_debug([KMLogs testLog], "KMInputMethodEventHandler initWithClient [client: %p] [clientAppId: %{public}@]", sender, clientAppId);
+    os_log_debug([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient [client: %p] [clientAppId: %{public}@]", sender, clientAppId);
+    [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
 
-  _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
-  os_log_info([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient, clientAppId: %{public}@", clientAppId);
-  [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
-
-  [KMSentryHelper addClientAppIdTag:clientAppId];
+    _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
+    
+    [KMSentryHelper addClientAppIdTag:clientAppId];
+  }
   return self;
 }
 
@@ -191,32 +196,34 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // If the TextApiCompliance object is stale, create a new one for the current application and context.
   // The text api compliance may vary from one text field to another of the same app.
   
-  if ([self textApiComplianceIsStale]) {
+  if ([self textApiComplianceIsStale:client]) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     os_log_debug([KMLogs complianceLog], "KMInputMethodHandler initWithClient checkTextApiCompliance: %{public}@", _apiCompliance);
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
-    [self.apiCompliance checkCompliance:client];
+    [self.apiCompliance checkCompliance];
   }
 }
 
-- (BOOL)textApiComplianceIsStale {
+- (BOOL)textApiComplianceIsStale:(id)client {
   BOOL stale = false;
   NSString *complianceAppId = nil;
   TextApiCompliance *currentApiCompliance = self.apiCompliance;
   
   // test for three scenarios in which the api compliance is stale
   if (currentApiCompliance == nil) { // if we have no previous api compliance object
+    os_log_debug([KMLogs testLog], "*** stale: currentApiCompliance == nil");
     stale = true;
   } else { // if we have one but for a different client
-    complianceAppId = self.apiCompliance.clientApplicationId;
-    if ([complianceAppId isNotEqualTo:self.clientApplicationId]) {
-      stale = true;
-    } else {
-      stale = false;
+    stale = ![currentApiCompliance isMatchingClient:client applicationId:self.clientApplicationId];
+    if (stale){
+      os_log_debug([KMLogs testLog], "*** stale: due to failed isMatchingClient");
     }
   }
   if (self.contextChanged) { // if the context has changed
+    if(!stale) {
+      os_log_debug([KMLogs testLog], "*** stale: due to contextChanged");
+    }
     stale = true;
   }
 
@@ -479,8 +486,9 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   
   [client insertText:text replacementRange:replacementRange];
-  if (self.apiCompliance.isComplianceUncertain) {
-    [self.apiCompliance checkComplianceAfterInsert:client delete:textToDelete insert:text];
+  
+  if ((self.apiCompliance.isComplianceUncertain) && (text != nil)) {
+    [self.apiCompliance checkComplianceAfterInsert:text deleted:textToDelete];
   }
 }
 
@@ -531,7 +539,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 -(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
     os_log_debug([KMLogs keyLog], "insertQueuedText, inserting %{public}@", self.queuedText);
-    [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:nil client:client];
+    [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:@"" client:client];
     self.queuedText = nil;
   } else {
     os_log_debug([KMLogs keyLog], "insertQueuedText called but no text to insert");

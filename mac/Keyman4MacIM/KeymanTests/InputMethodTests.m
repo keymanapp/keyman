@@ -128,7 +128,8 @@ id testClient = nil;
   testEventHandler.contextChanged = YES;
   // second call causes new textApiCompliance object to be created due to setting contextChanged flag
   [testEventHandler checkTextApiCompliance:testClient];
-  XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created after contextChanged flag set");
+  XCTAssertNotEqual(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created after contextChanged flag set");
+  XCTAssertEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not functionally equal to original object");
 }
 
 @end

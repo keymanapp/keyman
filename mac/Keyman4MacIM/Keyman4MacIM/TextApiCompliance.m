@@ -43,7 +43,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 @interface TextApiCompliance()
 
-@property (readonly) id client;
+@property (readonly, weak) id client;
 @property BOOL complianceUncertain;
 @property BOOL hasCompliantSelectionApi;
 @property NSRange initialSelection;
@@ -67,13 +67,54 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     NSString *message = [NSString stringWithFormat:@"TextApiCompliance initWithClient, client: %p applicationId: %@", client, appId];
     [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
     os_log_debug([KMLogs complianceLog], "%{public}@", message);
-    
+
+    os_log_debug([KMLogs testLog], "### TextApiCompliance initWithClient [client: %p] [clientAppId: %{public}@]", client, appId);
+
     // if we do not have hard-coded noncompliance, then test the app
-    if (![self applyNoncompliantAppLists:appId]) {
-      [self checkCompliance:client];
+    if (appId && [self applyNoncompliantAppLists:appId]) {
+      [self checkCompliance];
     }
   }
   return self;
+}
+
+- (BOOL)isEqual:(id)other {
+  // this is the same object
+  if (other == self) {
+    return YES;
+  }
+  // this is an object of another type
+  if (!other || ![other isKindOfClass:[self class]]) {
+    return NO;
+  }
+  // both are unique TextApiCompliance objects, compare what matters
+  return [self isEqualToObject:other];
+}
+
+- (BOOL)isEqualToObject:(TextApiCompliance *)complianceObject {
+  if (self == complianceObject) {
+    return YES;
+  }
+  if (![(id)[self client] isEqual:[complianceObject client]]) {
+    return NO;
+  }
+  if (![[self clientApplicationId] isEqual:[complianceObject clientApplicationId]]) {
+    return NO;
+  }
+  return YES;
+}
+
+-(BOOL)isMatchingClient:(nullable id) otherClient applicationId:(nullable NSString *)otherAppId {
+  BOOL matches = YES;
+  if (![(id)[self client] isEqual:otherClient]) {
+    matches = NO;
+  }
+  if (![[self clientApplicationId] isEqual:otherAppId]) {
+    matches = NO;
+  }
+  
+  os_log_debug([KMLogs testLog], "## isMatchingClient = %@", matches?@"YES":@"NO");
+  return matches;
 }
 
 -(NSString *)description
@@ -92,16 +133,16 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
--(void) checkCompliance:(id) client {
-  // confirm that the API actually exists (this always seems to return true)
-  self.hasCompliantSelectionApi = [client respondsToSelector:@selector(selectedRange)];
+-(void) checkCompliance {
+  // confirm that the API actually exists (always seems to return true unless client is nil)
+  self.hasCompliantSelectionApi = [self.client respondsToSelector:@selector(selectedRange)];
   
   if (!self.hasCompliantSelectionApi) {
     self.complianceUncertain = NO;
   }
   else {
     // if API exists, call it and see if it works as expected
-    self.initialSelection = [client selectedRange];
+    self.initialSelection = [self.client selectedRange];
     os_log_debug([KMLogs complianceLog], "checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length);
     [self checkComplianceUsingInitialSelection];
   }
@@ -135,7 +176,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
  * Delete and insert are what core instructed us to do.
  * Text that was selected in the client when the key was processed is irrelevant as it does not affect the location.
  */
--(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert {
+-(void) checkComplianceAfterInsert:(NSString *)insertedText deleted:(NSString *)deletedText {
   
   // return if compliance is already certain
   if(!self.complianceUncertain) {
@@ -143,9 +184,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     return;
   }
   
-  NSRange selectionRange = [client selectedRange];
-  if ([self validateNewLocation:selectionRange.location delete:textToDelete]) {
-    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:textToDelete insert:textToInsert];
+  NSRange selectionRange = [self.client selectedRange];
+  if ([self validateNewLocation:selectionRange.location delete:deletedText]) {
+    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:deletedText insert:insertedText];
     BOOL locationChanged = [self hasLocationChanged:selectionRange];
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
