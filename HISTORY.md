@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.198 beta 2025-02-21
+
+* fix(android): Update system keyboard height consistently (#13273)
+
 ## 18.0.197 beta 2025-02-20
 
 * fix(linux): address compiling with ICU 76 (#13285)
