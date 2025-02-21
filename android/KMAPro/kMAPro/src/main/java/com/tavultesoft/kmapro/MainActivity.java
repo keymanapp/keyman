@@ -247,8 +247,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
-    // Reset flag
-    KeyboardPickerActivity.canFlagActivityClearTask = true;
+
+    // Reset keyboard picker Activity Task flag
+    KeyboardPickerActivity.enableClearActivityTask();
 
     // onConfigurationChanged() only triggers when device is rotated while app is in foreground
     // This handles when device is rotated while app is in background

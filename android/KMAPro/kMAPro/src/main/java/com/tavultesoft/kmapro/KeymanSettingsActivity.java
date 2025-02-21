@@ -34,8 +34,8 @@ public class KeymanSettingsActivity extends BaseActivity {
 
     innerFragment = (KeymanSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.keyman_settings_fragment);
 
-    // For Keyman sites, prevent keyboard picker from closing Keyman
-    KeyboardPickerActivity.canFlagActivityClearTask = false;
+    // For Keyman sites, disable keyboard picker task flag
+    KeyboardPickerActivity.disableClearActivityTask();
   }
 
   @Override

@@ -2299,8 +2299,9 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      if (KeyboardPickerActivity.canFlagActivityClearTask) {
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clears keyman app
+      if (KeyboardPickerActivity.getClearActivityTask()) {
+        // Keyboard Picker Activity becomes root activity and clears Keyman app
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
       }
     }
 
