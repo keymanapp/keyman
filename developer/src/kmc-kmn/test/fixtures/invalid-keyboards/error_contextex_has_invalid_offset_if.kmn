@@ -1,0 +1,12 @@
+﻿store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+store(cons) 'bcd'
+store(ifx) '1'
+
+group(main) using keys
+
+c ERROR_ContextExHasInvalidOffset: `context(3)` should be `context(2)`
+if(ifx='1') any(cons) + 'a' > 'x' context(3) 'z'
+

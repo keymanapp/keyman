@@ -1458,13 +1458,23 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
-        if (contextOffset > xstrlen(context))
+        if (contextOffset > xstrlen(context)) {
           return KmnCompilerMessages::ERROR_ContextExHasInvalidOffset;
+        }
+
+        // contextOffset <= 0 is tested in parse stage
+
+        for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
+        if(*q == UC_SENTINEL && (*(q + 1) == CODE_IFOPT || *(q + 1) == CODE_IFSYSTEMSTORE)) {
+          return KmnCompilerMessages::ERROR_ContextExCannotReferenceIf;
+        }
+        if(*q == UC_SENTINEL && *(q + 1) == CODE_NUL) {
+          return KmnCompilerMessages::ERROR_ContextExCannotReferenceNul;
+        }
 
         // Due to a limitation in earlier versions of KeymanWeb, the minimum version
         // for context() referring to notany() is 14.0. See #917 for details.
         if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
-          for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
             if(!VerifyKeyboardVersion(fk, VERSION_140)) {
               return KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb;
@@ -2267,7 +2277,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           }
           int n1b;
           n1b = atoiW(q);
-          if (n1b < 1 || n1b >= 0xF000) return KmnCompilerMessages::ERROR_InvalidToken;
+          if (n1b < 1 || n1b >= 0xF000) {
+            return KmnCompilerMessages::ERROR_ContextExHasInvalidOffset;
+          }
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_CONTEXTEX;
           tstr[mx++] = n1b;

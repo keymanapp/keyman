@@ -737,7 +737,19 @@ export class KmnCompilerMessages {
   static HINT_IndexStoreLong                                  = SevHint | 0x0B0;
   static Hint_IndexStoreLong                                  = () => m(
     this.HINT_IndexStoreLong,
-    `The store referenced in index() is longer than the store referenced in any()`
+    `The store referenced in index() is longer than the store referenced in any()`,
+  );
+
+  static ERROR_ContextExCannotReferenceIf                     = SevError | 0x0B1;
+  static Error_ContextExCannotReferenceIf                     = () => m(
+    this.ERROR_ContextExCannotReferenceIf,
+    `The offset in context() points to a non-character if() statement in the context`,
+  );
+
+  static ERROR_ContextExCannotReferenceNul                    = SevError | 0x0B2;
+  static Error_ContextExCannotReferenceNul                     = () => m(
+    this.ERROR_ContextExCannotReferenceNul,
+    `The offset in context() points to a non-character nul statement in the context`,
   );
 
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
