@@ -73,7 +73,12 @@ tests = [
   'k_045___deadkey_and_context',
   'k_046___deadkey_and_contextex',
   'k_047___caps_always_off_initially_on',
-  'k_048___modifier_keys_keep_context'
+  'k_048___modifier_keys_keep_context',
+  'k_049___enter_invalidates_context',
+  'k_050___nul_and_context',
+  'k_051___if_and_context',
+  'k_052___nul_and_index',
+  'k_053___if_and_index',
 ]
 
 foreach kbd : tests

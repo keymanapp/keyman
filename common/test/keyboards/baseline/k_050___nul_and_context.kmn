@@ -1,0 +1,15 @@
+store(&NAME) '050 - nul_and_context'
+c Description: Tests that context has the right offset when used with nul
+c keys: [K_T][K_B]
+c expected: 2t3
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+store(cons) 'mnpqrstv'
+
+group(Main) using keys
+
+nul any(cons) + 'b' > '2' context(2) '3'
