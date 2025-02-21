@@ -38,7 +38,10 @@ class KMX_ProcessEvent {
 private:
   PKMX_WORD m_indexStack;
   PKMX_WCHAR m_miniContext;
-  int m_miniContextIfLen; // number of if() statements excluded from start of m_miniContext
+  /** number of `if()` statements excluded from start of `m_miniContext` for offset calculations */
+  int m_miniContextIfLen;
+  /** flag if we need to account for `nul` in offset calculations */
+  bool m_miniContextStartsWithNul;
   KMSTATE m_state;
   km_core_state *m_core_state;
 

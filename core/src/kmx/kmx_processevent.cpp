@@ -23,6 +23,7 @@ KMX_ProcessEvent::KMX_ProcessEvent() : m_actions(&m_context), m_options(&m_keybo
   m_indexStack = new KMX_WORD[GLOBAL_ContextStackSize];
   m_miniContext = new KMX_WCHAR[GLOBAL_ContextStackSize];
   m_miniContextIfLen = 0;
+  m_miniContextStartsWithNul = FALSE;
   m_debug_items = nullptr;
 }
 
@@ -338,10 +339,14 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
   m_miniContextIfLen = xstrlen(kkp->dpContext) - xstrlen_ignoreifopt(kkp->dpContext);
 
   // 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
-  if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
+  if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL) {
+    m_miniContextStartsWithNul = TRUE;
     u16cpy(m_miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)-1) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
-  else
+  }
+  else {
+    m_miniContextStartsWithNul = FALSE;
     u16cpy(m_miniContext, /*GLOBAL_ContextStackSize,*/ m_context.Buf(xstrlen_ignoreifopt(kkp->dpContext)) /*, GLOBAL_ContextStackSize*/);  // I3162   // I3536
+  }
 
   m_miniContext[GLOBAL_ContextStackSize-1] = 0;
 
@@ -458,7 +463,12 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
       }
       case CODE_CONTEXTEX:
         p++;
-        for (q = m_miniContext, i = m_miniContextIfLen; *q && i < *p - 1; i++, q = incxstr(q));
+        // We have to exclude nul and if() statements from our offset calculation
+        i = m_miniContextIfLen;
+        if(m_miniContextStartsWithNul) {
+          i++;
+        }
+        for (q = m_miniContext; *q && i < *p - 1; i++, q = incxstr(q));
         if (*q) {
           KMX_BOOL ignoreOutputKeystroke;
           temp = incxstr(q);
@@ -600,6 +610,7 @@ KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
   memset(m_indexStack, 0, GLOBAL_ContextStackSize*sizeof(KMX_WORD));
 
   p = kkp->dpContext;
+  indexp = m_indexStack;
 
   if(*p == 0)
   {
@@ -611,6 +622,7 @@ KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
     // If context buf is longer than the context, then obviously not start of doc.
     if(m_context.Buf(xstrlen_ignoreifopt(p))) return FALSE;
     p = incxstr(p);
+    indexp++;
     if(*p == 0) return TRUE;
   }
 
@@ -660,7 +672,6 @@ KMX_BOOL KMX_ProcessEvent::ContextMatch(LPKEY kkp)
   {
     return FALSE; // context buf is too short!
   }
-  indexp = m_indexStack;
 
   for(; *p && *q; p = incxstr(p))
   {
