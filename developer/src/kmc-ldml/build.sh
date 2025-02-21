@@ -27,22 +27,43 @@ builder_describe "Keyman kmc Keyboard Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
-  configure     /node_modules \
+  configure     /developer/src/kmc-ldml/src/util/abnf/46/transform-from-required.js \
   build         /developer/src/kmc-ldml/build/src/main.js \
   api           /developer/build/api/kmc-ldml.api.json
 
 builder_parse "$@"
 
 function do_clean() {
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
+  rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/util/abnf/*/*.pegjs ./src/util/abnf/*/*.ts ./src/util/abnf/*/*.js
 }
 
 function do_configure() {
   verify_npm_setup
+  do_build_abnf
 }
 
 function do_build() {
   npm run build
+}
+
+function do_build_abnf() {
+  # we convert over all abnf files found. 
+  local file
+  for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
+    local cldrver="$(basename $(dirname $(dirname "$file")))"
+    local base="$(basename "$file" .abnf)"
+    local peg="$base.pegjs"
+    local outdir="./src/util/abnf/$cldrver"
+    local outfile="$outdir/$peg"
+    local outjs="$outdir/$base.js"
+    if [ ! -f "$outjs" ]; then
+      mkdir -p "$outdir"
+      printf "${COLOR_GREY}abnf_gen ${COLOR_PURPLE}${cldrver}/${base}.abnf -> ${peg}${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/abnf_gen"  "$file" -o "$outfile"
+      printf "${COLOR_GREY}peggy ${COLOR_PURPLE}${cldrver}/${peg} -> ${base}.js${COLOR_RESET}\n"
+      "$KEYMAN_ROOT/node_modules/.bin/peggy" "$outfile" -o "$outjs" --format es --dts
+    fi
+  done
 }
 
 function do_build_fixtures() {

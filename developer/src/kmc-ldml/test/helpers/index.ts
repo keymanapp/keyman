@@ -275,12 +275,6 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         return;
       }
       let section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
-      if (expectFailure) {
-        assert.isNull(section, 'expected compilation result failure (null)');
-      } else {
-        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
-      }
-
       const testcaseErrors = matchCompilerEventsOrBoolean(callbacks.messages, testcase.errors);
       const testcaseWarnings = matchCompilerEvents(callbacks.messages, testcase.warnings);
       // if we expected errors or warnings, show them
@@ -295,6 +289,12 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
         assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
+      }
+      
+      if (expectFailure) {
+        assert.isNull(section, 'expected compilation result failure (null)');
+      } else {
+        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
       }
 
       // run the user-supplied callback if any
