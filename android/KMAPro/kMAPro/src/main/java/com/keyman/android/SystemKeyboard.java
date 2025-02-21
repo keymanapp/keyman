@@ -155,16 +155,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
-    // making it an important time to detect orientation changes.
     Context appContext = getApplicationContext();
-    int newOrientation = KMManager.getOrientation(appContext);
-    if(newOrientation != lastOrientation) {
-      lastOrientation = newOrientation;
-      Configuration newConfig = this.getResources().getConfiguration();
-      KMManager.onConfigurationChanged(newConfig);
-    }
-
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     int inputType = attribute.inputType;
     KMManager.setMayPredictOverride(inputType);
@@ -233,6 +224,16 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onComputeInsets(InputMethodService.Insets outInsets) {
     super.onComputeInsets(outInsets);
+
+    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
+    // making it an important time to detect orientation changes.
+    Context appContext = getApplicationContext();
+    int newOrientation = KMManager.getOrientation(appContext);
+    if(newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
+      KMManager.onConfigurationChanged(newConfig);
+    }
 
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
     Point size = KMManager.getWindowSize(getApplicationContext());
