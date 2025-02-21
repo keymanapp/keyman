@@ -1,0 +1,10 @@
+﻿store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+store(cons) 'bcd'
+
+group(main) using keys
+
+c ERROR_ContextExCannotReferenceNul:
+nul any(cons) + 'a' > 'x' context(1)
