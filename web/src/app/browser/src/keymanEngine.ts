@@ -27,6 +27,7 @@ import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
 import KeyboardInterface from './keyboardInterface.js';
+import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -55,10 +56,10 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.contextManager.restoreLastActiveTarget();
   }
 
-  constructor(worker: Worker, sourceUri: string) {
+  constructor(workerFactory: WorkerFactory, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
+    super(workerFactory, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
