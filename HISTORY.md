@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.8 alpha 2025-02-21
+
+* feat(windows): hack in some fun features for kmdevlink (#13237)
+* feat(developer): use ABNF to validate LDML transform (#13236)
+* fix(linux): remove `--platform amd64` from docker build script (#13318)
+
 ## 19.0.7 alpha 2025-02-20
 
 * chore(linux): allow to build and use Debian docker image (#13284)
