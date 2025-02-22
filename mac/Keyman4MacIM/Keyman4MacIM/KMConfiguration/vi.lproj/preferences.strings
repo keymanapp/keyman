@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Luôn hiện bàn phím ảo";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Chọn verbose Console logging";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Hỗ trợ";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Tải về bàn phím...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Cấu hình Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Quay lại";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Bàn phím";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Khi tuỳ chọn ghi nhật ký chi tiết được bật, Keyman sẽ ghi các hành động có thể giúp Bộ phận Hỗ trợ Keyman chẩn đoán sự cố. Chương trình Console có thể được sử dụng để xem nhật ký tin nhắn từ Keyman. Trong Console, bộ lọc để hiển thị tất cả tin nhắn từ quá trình \"Keyman\". Nhật ký này có thể được xuất khẩu và gửi cho Bộ phận Hỗ trợ Keyman nếu cần.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Chuyển tiếp";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Trang chủ";
+
+/* Options button text */
+"frd-No-seV.label" = "Tùy chỉnh";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Bàn phím được tải về";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Mở cái này khi bạn có khó khăn với một bàn phím cụ thể nói riêng hoặc với Keyman nói chung.";
