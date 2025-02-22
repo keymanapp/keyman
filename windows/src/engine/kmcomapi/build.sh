@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "COM API library" \
   @/common/include \
   @/common/windows/delphi \
-  clean configure build test publish install
+  clean configure build test publish install edit
 
 builder_parse "$@"
 
@@ -76,4 +76,5 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
+builder_run_action edit:project         start kmcompai.dproj
 

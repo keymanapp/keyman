@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Keyman for Windows Delphi components" \
   @/common/windows/delphi \
-  clean configure build test \
+  clean configure build test edit \
   :components \
   :message-identifiers
 builder_parse "$@"
@@ -45,3 +45,4 @@ builder_run_action build:components                 do_build_components
 builder_run_action clean:message-identifiers        rm -f "$KEYMAN_ROOT/$MESSAGE_IDENTIFIERS"
 builder_run_action build:message-identifiers        do_build_message_identifiers
 # builder_run_action test:project         do_test
+builder_run_action edit:components                  start keyman_components.dproj
