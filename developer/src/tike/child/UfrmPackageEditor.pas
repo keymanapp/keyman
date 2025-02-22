@@ -68,7 +68,6 @@ uses
 type
   TfrmPackageEditor = class(TfrmTikeEditor)   // I4689
     dlgFiles: TOpenDialog;
-    dlgNewCustomisation: TSaveDialog;
     pages: TLeftTabbedPageControl;
     pageFiles: TTabSheet;
     pageDetails: TTabSheet;
@@ -628,6 +627,7 @@ begin
     end;
   end;
 
+  dlgFiles.InitialDir := ExtractFileDir(FileName);
   UpdateData;
   Result := True;
 end;
@@ -806,8 +806,10 @@ begin
         if Found then Continue; // Don't add the file again
 
         AddFile(Files[i]);
+        dlgFiles.InitialDir := ExtractFileDir(Files[i]);
       end;
   if lbFiles.CanFocus then lbFiles.SetFocus;  // I3100   // I3506
+  dlgFiles.FileName := '';
 end;
 
 procedure TfrmPackageEditor.cmdRemoveFileClick(Sender: TObject);
