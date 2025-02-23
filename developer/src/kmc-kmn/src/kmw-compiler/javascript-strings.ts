@@ -643,7 +643,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
       let recContext = ExpandSentinel(fk, pwszContext, x);
 
       if(isKeyboardVersion10OrLater()) {
-        if(recContext.IsSentinel && [KMX.KMXFile.CODE_NUL, KMX.KMXFile.CODE_IFOPT, KMX.KMXFile.CODE_IFSYSTEMSTORE].includes(recContext.Code)) {
+        if(recContext.IsSentinel && [KMX.KMXFile.CODE_IFOPT, KMX.KMXFile.CODE_IFSYSTEMSTORE].includes(recContext.Code)) {
           Result--;
         }
       }

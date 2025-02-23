@@ -1,8 +1,9 @@
 ﻿c test_index_12980 generated from template at 2025-01-22 13:25:35
 c Validates index() offsets when used with if() - see #12980
+c Test with v10+ kmw compiler
 
 store(&VERSION) '14.0'
-store(&NAME) 'test_index_12980'
+store(&NAME) 'test_index_12980_v10'
 store(&TARGETS) 'web'
 
 
