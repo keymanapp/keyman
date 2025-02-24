@@ -895,7 +895,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
-  procedure DoChar(text: string);
+  procedure DoChar(const text: string);
   var
     state: TMemoSelectionState;
     selStart: Integer;
