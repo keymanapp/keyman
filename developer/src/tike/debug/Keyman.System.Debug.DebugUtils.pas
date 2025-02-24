@@ -12,6 +12,8 @@ function GetContextFromMemo(Memo: TKeymanDeveloperDebuggerMemo; DeadKeys: TDebug
 implementation
 
 uses
+  System.SysUtils,
+
   Unicode;
 
 function GetContextFromMemo(Memo: TKeymanDeveloperDebuggerMemo; DeadKeys: TDebugDeadkeyInfoList; IncludeMarkers: Boolean): TArray<km_core_context_item>;
