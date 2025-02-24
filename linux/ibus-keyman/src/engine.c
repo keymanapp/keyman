@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2009-2023 SIL International
+ * Copyright (C) 2009-2023 SIL Global
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -21,6 +21,7 @@
  *
  */
 
+#include <errno.h>
 #include <ibus.h>
 #include <string.h>
 #include <stdio.h>
@@ -38,29 +39,18 @@
 #include "engine.h"
 #include "keycodes.h"
 
-// Fallback for older ibus versions that don't define IBUS_PREFILTER_MASK
-#ifndef IBUS_HAS_PREFILTER
-#ifdef KEYMAN_PKG_BUILD
-// When building packages on Ubuntu and Debian servers we probably don't have
-// a patched ibus available and additionally treat warnings as errors, but
-// still want to build packages.
-#pragma message "Compiling against ibus version that does not include prefilter mask patch\n(https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled."
-#else
-#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
-#endif
-
-#define IBUS_PREFILTER_MASK (1 << 23)
-#endif
-
 #define MAXCONTEXT_ITEMS 128
+
+// Values from /usr/include/linux/input-event-codes.h
 #define KEYMAN_BACKSPACE 14
 #define KEYMAN_BACKSPACE_KEYSYM  IBUS_KEY_BackSpace
-#define KEYMAN_LCTRL 29 // 0x1D
-#define KEYMAN_LALT  56 // 0x38
-#define KEYMAN_RCTRL 97 // 0x61
-#define KEYMAN_RALT 100 // 0x64
-#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL  202
-#define KEYMAN_NOCHAR_KEYSYM (0xfdd0 | 0x1000000) // Unicode NOCHAR
+#define KEYMAN_LCTRL  29 // 0x1D
+#define KEYMAN_LSHIFT 42 // 0x2A
+#define KEYMAN_RSHIFT 54 // 0x36
+#define KEYMAN_LALT   56 // 0x38
+#define KEYMAN_RCTRL  97 // 0x61
+#define KEYMAN_RALT  100 // 0x64
+#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL  194 // 0xC2
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
@@ -68,11 +58,12 @@ typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
 #define MAX_QUEUE_SIZE 100
 
 typedef struct _commit_queue_item {
-  // char_buffer and emitting_keystroke as well as more than one queue
-  // item are only used if ibus supports prefilter but the client
-  // doesn't support surrounding text (non-compliant app)
+  // char_buffer, emitting_keystroke and code_points_to_delete as well as
+  // more than one queue item are only used if the client doesn't
+  // support surrounding text (non-compliant app)
   gchar *char_buffer;
   gboolean emitting_keystroke;
+  guint code_points_to_delete;
 
   guint keyval;
   guint keycode;
@@ -249,17 +240,6 @@ debug_utf8_with_codepoints(const gchar *utf8) {
   return g_string_free_and_steal(output);
 #else
   return g_string_free(output, FALSE);
-#endif
-}
-
-static gboolean
-client_supports_prefilter(IBusEngine *engine)
-{
-  g_assert(engine != NULL);
-#ifdef IBUS_HAS_PREFILTER
-  return (engine->client_capabilities & IBUS_CAP_PREFILTER) != 0;
-#else
-  return FALSE;
 #endif
 }
 
@@ -498,10 +478,10 @@ ibus_keyman_engine_constructor(
 
     g_strfreev(split_name);
 
-    g_autofree gchar *kmx_file = g_path_get_basename(abs_kmx_path);
-    p = rindex(kmx_file, '.'); // get id to use as dbus service name
+    g_autofree gchar *kmx_filename = g_path_get_basename(abs_kmx_path);
+    p = rindex(kmx_filename, '.'); // get id to use as dbus service name
     if (p) {
-        keyman->kb_name = g_strndup(kmx_file, p-kmx_file);
+        keyman->kb_name = g_strndup(kmx_filename, p-kmx_filename);
         p = rindex(abs_kmx_path, '.');
         if (p)
         {
@@ -516,7 +496,42 @@ ibus_keyman_engine_constructor(
 
     km_core_status status;
 
-    status = km_core_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    FILE* kmx_file = fopen(abs_kmx_path, "rb");
+    if (!kmx_file) {
+      g_warning("%s: problem opening kmx_file %s. (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      return NULL;
+    }
+
+    if (fseek(kmx_file, 0, SEEK_END) < 0) {
+      g_warning("%s: problem seeking to end of kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      return NULL;
+    }
+    long length = ftell(kmx_file);
+    if (length < 0) {
+      g_warning("%s: problem determining length of kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      return NULL;
+    }
+    rewind(kmx_file);
+    void* buffer = malloc(length);
+    if (!buffer) {
+      g_warning("%s: problem allocating buffer for reading kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      return NULL;
+    }
+    if (fread(buffer, 1, length, kmx_file) != length) {
+      g_warning("%s: problem reading entire kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      free(buffer);
+      return NULL;
+    }
+    fclose(kmx_file);
+
+    status = km_core_keyboard_load_from_blob(abs_kmx_path, buffer, length,
+      &(keyman->keyboard));
+
+    free(buffer);
 
     if (status != KM_CORE_STATUS_OK) {
       g_warning("%s: problem loading km_core_keyboard %s. Status is %u.", __FUNCTION__, abs_kmx_path, status);
@@ -624,14 +639,14 @@ process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   gchar *output_utf8 = g_ucs4_to_utf8(output_utf32, -1, NULL, NULL, NULL);
   g_autofree gchar *debug  = NULL;
-  if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine)) {
-    // non-compliant app with patched ibus
+  if (!client_supports_surrounding_text(engine)) {
+    // non-compliant app
     g_message("%s: Adding to commit queue: %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     g_assert(keyman->commit_item->char_buffer == NULL);
     keyman->commit_item->char_buffer = output_utf8;
     // don't free output_utf8 - assigned to char_buffer!
   } else {
-    // compliant app or unpatched ibus
+    // compliant app
     g_message("%s: Outputing %s", __FUNCTION__, debug = debug_utf8_with_codepoints(output_utf8));
     commit_string(keyman, output_utf8);
     g_free(output_utf8);
@@ -659,11 +674,9 @@ process_backspace_action(IBusEngine *engine, unsigned int code_points_to_delete)
     g_message("%s: compliant app: deleting surrounding text %d codepoints", __FUNCTION__, code_points_to_delete);
     ibus_engine_delete_surrounding_text(engine, -code_points_to_delete, code_points_to_delete);
   } else {
-    g_message("%s: non-compliant app: forwarding %d backspaces", __FUNCTION__, code_points_to_delete);
-    while (code_points_to_delete > 0) {
-      ibus_engine_forward_key_event(engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, 0);
-      code_points_to_delete--;
-    }
+    g_message("%s: non-compliant app: queueing %d backspaces", __FUNCTION__, code_points_to_delete);
+    IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
+    keyman->commit_item->code_points_to_delete = code_points_to_delete;
   }
 }
 
@@ -687,8 +700,8 @@ process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
     return;
   }
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  if (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) {
-    // compliant app or unpatched ibus version
+  if (client_supports_surrounding_text(engine)) {
+    // compliant app
     ibus_engine_forward_key_event(engine, keyman->commit_item->keyval,
       keyman->commit_item->keycode, keyman->commit_item->state);
     return;
@@ -709,21 +722,42 @@ process_capslock_action(km_core_caps_state caps_state) {
 
 static void
 commit_current_queue_item(IBusKeymanEngine *keyman) {
-  // only called for non-compliant apps with patched ibus
+  // only called for non-compliant apps
   g_assert(keyman != NULL);
-  g_assert(client_supports_prefilter((IBusEngine *)keyman));
-  g_assert(!client_supports_surrounding_text((IBusEngine *)keyman));
+  IBusEngine* engine = (IBusEngine *)keyman;
+  g_assert(!client_supports_surrounding_text(engine));
 
-  if (keyman->commit_item <= keyman->commit_queue)
+  if (keyman->commit_item <= keyman->commit_queue){
+    g_message("%s: queue is empty", __FUNCTION__);
     return;
+  }
 
   commit_queue_item *current_item = &keyman->commit_queue[0];
+  if (current_item->code_points_to_delete > 0) {
+    g_message("%s: Forwarding %d backspaces from commit queue", __FUNCTION__, current_item->code_points_to_delete);
+    while (current_item->code_points_to_delete > 0) {
+      ibus_engine_forward_key_event(engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, 0);
+      current_item->code_points_to_delete--;
+    }
+    // don't remove the item from the queue yet - we need to process it
+    // again for the output and keystrokes. Instead emit the sentinel key
+    // again.
+    g_message("%s: Forcing ordered output", __FUNCTION__);
+    call_ordered_output_sentinel();
+    return;
+  }
   if (current_item->char_buffer != NULL) {
+    g_autofree gchar *debug = NULL;
+    g_message("%s: Committing from commit queue: %s", __FUNCTION__,
+      debug = debug_utf8_with_codepoints(current_item->char_buffer));
     commit_string(keyman, current_item->char_buffer);
     g_free(current_item->char_buffer);
+    current_item->char_buffer = NULL;
   }
   if (current_item->emitting_keystroke) {
-    ibus_engine_forward_key_event((IBusEngine*)keyman, current_item->keyval, current_item->keycode, current_item->state);
+    g_message("%s: Forwarding key from commit queue: keyval=0x%02x, keycode=0x%02x, state=0x%02x",
+      __FUNCTION__, current_item->keyval, current_item->keycode, current_item->state);
+    ibus_engine_forward_key_event(engine, current_item->keyval, current_item->keycode, current_item->state);
   }
   keyman->commit_item--;
   memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
@@ -734,30 +768,41 @@ static void
 finish_process_actions(IBusEngine *engine) {
   g_assert(engine != NULL);
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
-  if (!client_supports_prefilter(engine) || client_supports_surrounding_text(engine)) {
-    // compliant app or unpatched ibus
+  if (client_supports_surrounding_text(engine)) {
+    // compliant app
     return;
   }
 
-  // non-compliant app with patched ibus
-  guint state = keyman->commit_item->state;
-  keyman->commit_item++;
-  if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE-1]) {
-    g_error("Overflow of keyman commit_queue!");
-    // TODO: log to Sentry
-    keyman->commit_item--;
-  }
+  // non-compliant app
+  guint keycode = keyman->commit_item->keycode;
 
-  // Forward a fake key event to get the correct order of events so that any backspace key we
-  // generated will be processed before the character we're adding. We need to send a
-  // valid keyval/keycode combination so that it doesn't get swallowed by GTK but which
-  // isn't very likely used in real keyboards. F24 seems to work for that.
-  ibus_engine_forward_key_event(engine,
-    KEYMAN_NOCHAR_KEYSYM,
-    KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL,
-    (state & IBUS_RELEASE_MASK)
-      ? IBUS_PREFILTER_MASK | IBUS_RELEASE_MASK
-      : IBUS_PREFILTER_MASK);
+  switch (keycode) {
+    case KEYMAN_LSHIFT:
+    case KEYMAN_RSHIFT:
+    case KEYMAN_LCTRL:
+    case KEYMAN_RCTRL:
+    case KEYMAN_LALT:
+    case KEYMAN_RALT:
+      // we don't forward modifier keys that the user holds while pressing another
+      // key.
+      g_message("%s: Ignoring modifier key", __FUNCTION__);
+      break;
+    default:
+      keyman->commit_item++;
+      if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
+        g_error("Overflow of keyman commit_queue!");
+        // TODO: log to Sentry
+        keyman->commit_item--;
+      }
+
+      // Forward a fake key event to get the correct order of events so that any backspace key we
+      // generated will be processed before the character we're adding. We need to send a
+      // valid keycode so that it doesn't get swallowed by GTK but which isn't very likely used
+      // in real keyboards. F24 seems to work for that.
+      g_message("%s: Forcing ordered output", __FUNCTION__);
+      call_ordered_output_sentinel();
+      break;
+  }
 }
 
 static void
@@ -790,13 +835,25 @@ ibus_keyman_engine_process_key_event(
 
   g_message("-----------------------------------------------------------------------------------------------------------------");
   g_message(
-      "DAR: %s - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, supports_prefilter=%d, compliant=%d", __FUNCTION__, keyval, keycode,
-      state, isKeyDown, client_supports_prefilter(engine), client_supports_surrounding_text(engine));
+      "DAR: %s - keyval=0x%02x keycode=0x%02x, state=0x%02x, isKeyDown=%d, compliant=%d", __FUNCTION__, keyval, keycode,
+      state, isKeyDown, client_supports_surrounding_text(engine));
 
   // This keycode is a fake keycode that we send when it's time to commit the text, ensuring the
   // correct output order of backspace and text.
-  if (client_supports_prefilter(engine) && !client_supports_surrounding_text(engine) &&
-      keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL && (state & IBUS_PREFILTER_MASK)) {
+  if (!client_supports_surrounding_text(engine) && keycode == KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL) {
+    if (!isKeyDown) {
+      g_message("%s: got F24 Sentinel, ignore keyup", __FUNCTION__);
+      return TRUE;
+    }
+    g_message("%s: got F24 Sentinel, queue content:", __FUNCTION__);
+    for (int i = 0; i < MAX_QUEUE_SIZE && &keyman->commit_queue[i] != keyman->commit_item; i++) {
+      commit_queue_item *item = &keyman->commit_queue[i];
+      g_message(
+          "    queue item %d:  keyval=0x%02x keycode=0x%02x, state=0x%02x, char_buffer=%s, "
+          "emitting_keystroke=%d, code_points_to_delete=%d",
+          i, item->keyval, item->keycode, item->state, item->char_buffer,
+          item->emitting_keystroke, item->code_points_to_delete);
+    }
     commit_current_queue_item(keyman);
     return TRUE;
   }
@@ -833,7 +890,7 @@ ibus_keyman_engine_process_key_event(
   // #10476: Core currently doesn't handle IBUS_MOD{2-4}_MASK modifiers.
   // On Ubuntu 23.10/24.04 we get IBUS_MOD4_MASK set on keycode 0x39 (space) when
   // the user tries to switch keyboards. Since this is not a regular keypress
-  // and Core doesn't handle it, we need to just return and let the Gnome deal
+  // and Core doesn't handle it, we need to just return and let GTK deal
   // with it. We could consider to add it to Core and let Core ignore it.
   // As for IBUS_MOD3_MASK it's unclear when/how that gets set, so we
   // just not deal with that for now until we notice problems.
@@ -847,7 +904,7 @@ ibus_keyman_engine_process_key_event(
   // it. At the moment however we let Core process the keypress and since
   // it doesn't have rules for the numeric keypad keys we eventually
   // forward the key to ibus (in process_emit_keystroke_action) and let
-  // Gnome deal with it.
+  // GTK deal with it.
 
   // keyman modifiers are different from X11/ibus
   uint16_t km_mod_state = 0;
@@ -893,15 +950,14 @@ ibus_keyman_engine_process_key_event(
 
   process_actions(engine, core_actions);
 
-  // If we have a new ibus version that supports prefilter and a non-compliant
-  // client, i.e. a client that doesn't support surrounding text (e.g.
-  // Chromium as of v104) we forwarded the key event with IBUS_PREFILTER_MASK
-  // set and now stop further processing by returning TRUE.
-  // With an old ibus version without prefilter support as well as with
-  // a compliant client (i.e. it does support surrounding text), we return
+  // If we have a non-compliant client, i.e. a client that doesn't support
+  // surrounding text (e.g. Chromium as of v104) we sent the key event
+  // to the system service and now stop further processing by returning TRUE.
+  // With a compliant client (i.e. it does support surrounding text), we return
   // TRUE because we completely processed the event and no further
   // processing should happen.
   g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
+
   return TRUE;
 }
 

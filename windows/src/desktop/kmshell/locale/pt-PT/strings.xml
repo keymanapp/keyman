@@ -191,7 +191,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 16.0.47 -->
-  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Add/remove language</string>
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Adicionar/remover idioma</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -295,6 +295,10 @@
   <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simular AltGr com Ctrl+Alt</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Permitir modificador direito para atalhos</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Tratar teclas mortas como teclas simples</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -323,8 +327,8 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Mostrar ecrã de bem-vindo</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Procurar semanal e automaticamente por atualizações no site www.tavultesoft.com</string>
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Verificar automaticamente por atualizações e download</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -420,6 +424,14 @@
   <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright 1994-2006 Tavultesoft Pty Ltd. Todos os direitos reservados.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">Criado por %1$s</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright © %1$s. Todos os direitos reservados.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Version" comment="Support - version">Versão</string>
   <!-- Context: Configuration Dialog - Support tab -->
@@ -506,7 +518,7 @@
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico 
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico
   que utiliza no Windows. O teclado Keyman irá se adaptar automaticamente ao seu layout preferido.</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
@@ -536,6 +548,10 @@
   <!-- Introduced: 14.0.117 -->
   <!-- String Type: FormatString -->
   <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">A tecla de atalho %1$s está em conflito com outra tecla de atalho. Se continuar, a outra tecla de atalho será apagada. Continuar?</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update" comment="Update tab name">Atualizar</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -607,14 +623,25 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Aplicar atualização agora</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_CheckNow" comment="Check for updates now button - update dialog">Procurar atualizações</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="S_Splash_Name" comment="Splash major title">Teclado</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_Splash_Start" comment="Start Keyman button">Teclado Inicial</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0 -->
+  <string name="S_Splash_Start_2" comment="Start {Keyman} button">Iniciar %1$s</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
@@ -658,7 +685,6 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKShortApplicationTitle" comment="Product name">Teclado</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
@@ -782,7 +808,6 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Teclado</string>
   <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->

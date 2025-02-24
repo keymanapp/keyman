@@ -1,7 +1,8 @@
 [binaries]
-c = ['emcc.py']
-cpp = ['em++.py']
-ar = ['emar.py']
+c = ['emcc']
+cpp = ['em++']
+ar = ['emar']
+strip = ['emstrip']
 exe_wrapper = 'node'
 
 [properties]

@@ -4,19 +4,12 @@
   "compilerOptions": {
     "outDir": "build/src/",
     "rootDir": "src/",
-    /*
-      following two settings allow us to import langtags.js. It cannot be a .ts
-      because the type is too complex for TypeScript to infer.
-    */
-    "allowJs": true,
-    "noImplicitAny": false,
   },
   "include": [
     "src/**/*.ts",
-    "src/ttfmeta/lib/*.js",
-    "src/imports/langtags.js",
   ],
   "references": [
+    { "path": "../../../common/web/langtags" },
     { "path": "../../../common/web/types" },
     { "path": "../kmc-package/" },
     { "path": "../common/web/utils/" },

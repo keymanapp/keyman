@@ -156,9 +156,6 @@
   <!-- Introduced: 9.0.492.0 -->
   <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">T</string>
 
-
-
-
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -419,8 +416,8 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</string>
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Automatically check for updates and download</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
@@ -586,7 +583,25 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostics</string>
 
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_No_Updates_Available" comment="Update tab - no updates are available">No Updates are available.</string>
 
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Updates are available which will be applied when Windows is next restarted.</string>
+
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Updating now will require a computer restart.</string>
+
+  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Keyman Update ready to install.</string>
 
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
@@ -712,6 +727,10 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 
 
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update" comment="Update tab name">Update</string>
 
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
@@ -802,6 +821,16 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
 
 
+
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Apply update now</string>
+
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_CheckNow" comment="Check for updates now button - update dialog">Check for new updates</string>
 
 
   <!-- Context: Splash Dialog -->

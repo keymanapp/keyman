@@ -8,14 +8,17 @@
 
 #import "OSKWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMInputMethodLifecycle.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 
 @interface OSKWindowController ()
 @property (nonatomic, strong) NSButton *helpButton;
 @property (nonatomic, strong) NSTimer *modFlagsTimer;
-@property (nonatomic, assign) BOOL xShiftState;
-@property (nonatomic, assign) BOOL xAltState;
-@property (nonatomic, assign) BOOL xCtrlState;
+@property (nonatomic, assign) BOOL previousShiftState;
+@property (nonatomic, assign) BOOL previousOptionState;
+@property (nonatomic, assign) BOOL previousControlState;
 @end
 
 @implementation OSKWindowController
@@ -25,7 +28,6 @@
 }
 
 - (void)dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self stopTimer];
 }
 
@@ -55,15 +57,27 @@
 - (void)windowDidLoad {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowDidLoad");
   [super windowDidLoad];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:self.window];
   [self.oskView setKvk:[self.AppDelegate kvk]];
   [self startTimerWithTimeInterval:0.1];
-  // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+  //  [self startTimerToTrackPhysicalModifierState:0.1];
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowDidResize");
   [self.oskView resizeOSKLayout];
+}
+
+- (void)prepareToShowOsk {
+  os_log_info([KMLogs oskLog], "OSKWindowController prepareToShowOsk");
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+  os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose");
+  [KMSettingsRepository.shared writeShowOskOnActivate:NO];
+  
+  // whenever the OSK is closing clear all of its modifier keys
+  [self.oskView clearOskModifiers];
+  [KMSentryHelper addOskVisibleTag:NO];
 }
 
 - (void)helpAction:(id)sender {
@@ -92,6 +106,16 @@
   }
 }
 
+/**
+ * returns current event flags representing the state of the modifiers on the OSK or zero if OSK is closed
+ */
+- (NSEventModifierFlags)getOskEventModifierFlags {
+  if (self.window.isVisible) {
+    return [self.oskView getOskEventModifierFlags];
+  } else {
+    return 0;
+  }
+}
 - (void)startTimerWithTimeInterval:(NSTimeInterval)interval {
   if (_modFlagsTimer == nil) {
     TimerTarget *timerTarget = [[TimerTarget alloc] init];
@@ -111,52 +135,73 @@
   }
 }
 
+/**
+ * Called repeatedly by timer to track the state of the physical modifier keys.
+ * Changes in state are reported to the OSKView, so it can make corresponding updates to the OSK's appearance
+ * and apply the state as necessary when keys on the OSK are clicked.
+ */
 - (void)timerAction:(NSTimer *)timer {
   UInt32 modifiers = GetCurrentKeyModifiers();
+  
+  [self trackPhysicalShiftKeyState: modifiers];
+  [self trackPhysicalOptionKeyState: modifiers];
+  [self trackPhysicalControlKeyState: modifiers];
+}
+
+- (void)trackPhysicalShiftKeyState:(UInt32) modifiers {
   if ((modifiers & shiftKey) == shiftKey) {
-    [self.oskView setShiftState:YES];
-    self.xShiftState = YES;
+    [self.oskView setPhysicalShiftState:YES];
+    self.previousShiftState = YES;
   }
   else {
-    [self.oskView setShiftState:NO];
-    if (self.xShiftState)
+    [self.oskView setPhysicalShiftState:NO];
+    if (self.previousShiftState) {
       [self.oskView setOskShiftState:NO];
-    self.xShiftState = NO;
+    }
+    self.previousShiftState = NO;
   }
-  
+}
+
+- (void)trackPhysicalOptionKeyState:(UInt32) modifiers {
   if ((modifiers & optionKey) == optionKey) {
-    [self.oskView setAltState:YES];
-    self.xAltState = YES;
+    [self.oskView setPhysicalOptionState:YES];
+    self.previousOptionState = YES;
   }
   else {
-    [self.oskView setAltState:NO];
-    if (self.xAltState)
-      [self.oskView setOskAltState:NO];
-    self.xAltState = NO;
+    [self.oskView setPhysicalOptionState:NO];
+    if (self.previousOptionState) {
+      [self.oskView setOskOptionState:NO];
+    }
+    self.previousOptionState = NO;
   }
-  
+}
+
+- (void)trackPhysicalControlKeyState:(UInt32) modifiers {
   if ((modifiers & controlKey) == controlKey) {
-    [self.oskView setCtrlState:YES];
-    self.xCtrlState = YES;
+    [self.oskView setPhysicalControlState:YES];
+    self.previousControlState = YES;
   }
   else {
-    [self.oskView setCtrlState:NO];
-    if (self.xCtrlState)
-      [self.oskView setOskCtrlState:NO];
-    self.xCtrlState = NO;
+    [self.oskView setPhysicalControlState:NO];
+    if (self.previousControlState) {
+      [self.oskView setOskControlState:NO];
+    }
+    self.previousControlState = NO;
   }
 }
 
 - (BOOL)hasHelpDocumentation {
   NSString *kvkPath = [self AppDelegate].kvk.filePath;
-  if (!kvkPath)
+  if (!kvkPath) {
     return NO;
+  }
   
   NSString *packagePath = [kvkPath stringByDeletingLastPathComponent];
   if (packagePath != nil) {
     NSString *welcomeFile = [packagePath stringByAppendingPathComponent:@"welcome.htm"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:welcomeFile])
+    if ([[NSFileManager defaultManager] fileExistsAtPath:welcomeFile]) {
       return YES;
+    }
   }
   
   return NO;

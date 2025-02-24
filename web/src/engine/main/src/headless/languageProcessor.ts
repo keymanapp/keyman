@@ -4,7 +4,11 @@ import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
-import { Capabilities, Configuration, Reversion, Suggestion } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import Configuration = LexicalModelTypes.Configuration;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
 
 /* Is more like the model configuration engine */
 export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
@@ -17,6 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
+  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
 
   private _state: StateChangeEnum = 'inactive';
 
@@ -299,7 +304,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
 
     let alternates = transcription.alternates;
-    if(!alternates || alternates.length == 0) {
+    if(!this.mayCorrect || !alternates || alternates.length == 0) {
       alternates = [{
         sample: transcription.transform,
         p: 1.0
@@ -396,6 +401,14 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public set mayCorrect(flag: boolean) {
     this._mayCorrect = flag;
+  }
+
+  public get mayAutoCorrect() {
+    return this._mayAutoCorrect;
+  }
+
+  public set mayAutoCorrect(flag: boolean) {
+    this._mayAutoCorrect = flag;
   }
 
   public get wordbreaksAfterSuggestions() {

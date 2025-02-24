@@ -3,8 +3,21 @@ project('keyman-system-service', 'c', 'cpp',
         license: 'GPL-2+',
         meson_version: '>=1.0')
 
+conf = configuration_data()
+
 evdev    = dependency('libevdev', version: '>= 1.9')
-systemd  = dependency('libsystemd')
+
+systemd  = dependency('libsystemd', 'libelogind', required: false)
+if systemd.found()
+  conf.set('DBUS_IMPLEMENTATION', 'SYSTEMD')
+else
+  # Gentoo can use libelogind or basu
+  systemd = dependency('basu', required: true)
+  conf.set('DBUS_IMPLEMENTATION', 'BASU')
+endif
+
+configure_file(output : 'config.h',
+               configuration : conf)
 
 subdir('resources')
 subdir('src')

@@ -59,7 +59,7 @@ class Constants {
   /**
    * The current CLDR version
    */
-  readonly cldr_version_latest = '45';
+  readonly cldr_version_latest = '46';
   /**
    * The version for testdata files
    */
@@ -564,7 +564,16 @@ class Constants {
   /** maximum count of markers (not including 'any') */
   readonly marker_max_count    = this.marker_max_index - this.marker_min_index + 1;
 
+  /**
+   * List of versions to treat as if they were the 'latest' version.
+   */
+  treatAsLatest(version: string): boolean {
+    return cldrTreatAsLatest.has(version);
+  }
 };
+
+/** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
+const cldrTreatAsLatest: Set<string> = new Set(['45', '46.1', '47']);
 
 export const constants = new Constants();
 

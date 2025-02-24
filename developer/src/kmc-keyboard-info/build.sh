@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Build Keyman kmc keyboard-info Compiler module" \
+  "@/common/web/langtags" \
   "@/common/web/types" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-package" \
@@ -21,34 +22,19 @@ builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
-  configure     /developer/src/kmc-keyboard-info/src/imports/langtags.js \
+  configure     /node_modules \
   build         /developer/src/kmc-keyboard-info/build/src/index.js \
   api           /developer/build/api/kmc-keyboard-info.api.json
 
 builder_parse "$@"
 
-function do_configure() {
-  verify_npm_setup
-  mkdir -p src/imports
-  echo 'export default ' > src/imports/langtags.js
-  cat "$KEYMAN_ROOT/resources/standards-data/langtags/langtags.json" >> src/imports/langtags.js
-
-}
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure   do_configure
+builder_run_action configure   verify_npm_setup
 builder_run_action build       tsc --build
 builder_run_action api         api-extractor run --local --verbose
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action test; then
-  eslint .
-  tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
-  builder_finish_action success test
-fi
+builder_run_action test        builder_do_typescript_tests
 
 #-------------------------------------------------------------------------------------------------------------------
 

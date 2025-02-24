@@ -1,13 +1,16 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 //
-// The interfaces in this file are designed with reference to the
-// mapped structures produced by xml2js when passed a .kps file.
+// The interfaces in this file are designed with reference to the mapped
+// structures produced by fast-xml-parser when passed a .kps file.
 //
 // A few notes:
 //
-// * Casing is updated to camelCase during load (leaving `iD` as a
-//   mixed up beastie).
 // * Arrays are buried a layer too deep (e.g. <Files><File/><File/></Files>
-//   leads to KpsFiles.KpsFile[]
+//   leads to KpsFiles.KpsFile[]. These are boxed automatically by
+//   KpsFileReader.
 // * Properties such as used in Info Items use `_` and `$` and must be
 //   extracted.
 // * Strings element is not yet checked to be correct
@@ -63,17 +66,17 @@ export interface KpsFileInfoItem {
 }
 
 export interface KpsFileContentFiles {
-  File: KpsFileContentFile[] | KpsFileContentFile;
+  File: KpsFileContentFile[];
 }
 
 export interface KpsFileContentFile {
   Name: string;
   /** @deprecated */
-  Description: string;
+  Description?: string;
   /** @deprecated */
-  CopyLocation: string;
+  CopyLocation?: string;
   /** @deprecated */
-  FileType: string;
+  FileType?: string;
 }
 
 export interface KpsFileLexicalModel {
@@ -83,11 +86,11 @@ export interface KpsFileLexicalModel {
 }
 
 export interface KpsFileLexicalModels {
-  LexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
+  LexicalModel: KpsFileLexicalModel[];
 }
 
 export interface KpsFileLanguages {
-  Language: KpsFileLanguage[] | KpsFileLanguage;
+  Language: KpsFileLanguage[];
 }
 
 export interface KpsFileLanguage {
@@ -96,7 +99,7 @@ export interface KpsFileLanguage {
 }
 
 export interface KpsFileRelatedPackages {
-  RelatedPackage: KpsFileRelatedPackage | KpsFileRelatedPackage[];
+  RelatedPackage: KpsFileRelatedPackage[];
 }
 
 export interface KpsFileRelatedPackage {
@@ -129,7 +132,7 @@ export interface KpsFileKeyboard {
 }
 
 export interface KpsFileFonts {
-  Font: KpsFileFont[] | KpsFileFont;
+  Font: KpsFileFont[];
 }
 
 export interface KpsFileFont {
@@ -139,7 +142,7 @@ export interface KpsFileFont {
 }
 
 export interface KpsFileKeyboards {
-  Keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
+  Keyboard: KpsFileKeyboard[];
 }
 
 export interface KpsFileStartMenu {
@@ -157,11 +160,11 @@ export interface KpsFileStartMenuItem {
 }
 
 export interface KpsFileStartMenuItems {
-  Item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
+  Item: KpsFileStartMenuItem[];
 }
 
 export interface KpsFileStrings {
-  String: KpsFileString[] | KpsFileString;
+  String: KpsFileString[];
 }
 
 export interface KpsFileString {
@@ -172,7 +175,7 @@ export interface KpsFileString {
 }
 
 export interface KpsFileLanguageExamples {
-  Example: KpsFileLanguageExample | KpsFileLanguageExample[];
+  Example: KpsFileLanguageExample[];
 }
 
 /**

@@ -1,3 +1,5 @@
+import { CompilerCallbacks } from "./compiler-callbacks.js";
+
 /**
  * Abstract interface for compiler error and warning messages
  */
@@ -19,14 +21,18 @@ export interface CompilerEvent {
 };
 
 export enum CompilerErrorSeverity {
-  Info =          0x000000, // Informational, not necessarily a problem
-  Hint =          0x100000, // Something the user might want to be aware of
-  Warn =          0x200000, // Warning: Not great, but we can keep going.
-  Error =         0x300000, // Severe error where we can't continue
-  Fatal =         0x400000, // OOM or should-not-happen internal problem
+  Debug =         0x000000, // log everything including internal debug
+  Verbose =       0x100000, // log everything, except debug
+  Info =          0x200000, // Informational, not necessarily a problem
+  Hint =          0x300000, // Something the user might want to be aware of
+  Warn =          0x400000, // Warning: Not great, but we can keep going.
+  Error =         0x500000, // Severe error where we can't continue
+  Fatal =         0x600000, // OOM or should-not-happen internal problem
 };
 
 export const CompilerErrorSeverityValues = [
+  CompilerErrorSeverity.Debug,
+  CompilerErrorSeverity.Verbose,
   CompilerErrorSeverity.Info,
   CompilerErrorSeverity.Hint,
   CompilerErrorSeverity.Warn,
@@ -46,6 +52,8 @@ export enum CompilerErrorMask {
 };
 
 const errorSeverityName = {
+  [CompilerErrorSeverity.Debug]: 'debug',
+  [CompilerErrorSeverity.Verbose]: 'verbose',
   [CompilerErrorSeverity.Info]: 'info',
   [CompilerErrorSeverity.Hint]: 'hint',
   [CompilerErrorSeverity.Warn]: 'warn',
@@ -264,39 +272,18 @@ export enum CompilerErrorNamespace {
    */
   KeyboardInfoCompiler = 0x9000,
   /**
-   * kmc-convert 0xA000…0xAFFF
+   * kmc-generate 0xA000…0xAFFF
    */
-  Converter = 0xA000,
+  Generator = 0xA000,
+  /**
+   * kmc-copy 0xB000…0xBFFF
+   */
+  Copier = 0xB000,
+  /**
+   * kmc-convert 0xC000…0xCFFF
+   */
+  Converter = 0xC000,
 };
-
-/**
- * A mapping for common path operations, maps to Node path module. This only
- * defines the functions we are actually using, so that we can port more easily
- * between different systems.
- */
-export interface CompilerPathCallbacks {
-  dirname(name: string): string;
-  extname(name: string): string;
-  basename(name: string, ext?: string): string;
-  isAbsolute(name: string): boolean;
-  join(...paths: string[]): string;
-  normalize(p: string): string;
-}
-
-/**
- * A mapping for common filesystem operations, maps to Node fs module. This only
- * defines the functions we are actually using, so that we can port more easily
- * between different systems.
- */
-export interface CompilerFileSystemCallbacks {
-  readdirSync(name: string): string[];
-  readFileSync(path: string, options?: { encoding?: null; flag?: string; } | null): Uint8Array;
-  readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
-  readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
-  writeFileSync(path: string, data: Uint8Array): void;
-
-  existsSync(name: string): boolean;
-}
 
 type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';
 export interface CompilerMessageOverrideMap {
@@ -308,10 +295,8 @@ export interface CompilerMessageOverride {
   level: CompilerErrorSeverityOverride;
 };
 
-export interface CompilerCallbackOptions {
-  logLevel?: CompilerLogLevel;
-  logFormat?: CompilerLogFormat;
-  color?: boolean; // null or undefined == use console default
+export interface CompilerCallbackOptions extends CompilerBaseOptions {
+  // TODO: these overlap with CompilerOptions, should refactor
   compilerWarningsAsErrors?: boolean;
   messageOverrides?: CompilerMessageOverrideMap;
 };
@@ -349,133 +334,6 @@ export interface KeymanCompiler {
    */
   write(artifacts: KeymanCompilerArtifacts): Promise<boolean>;
 };
-
-/**
- * Abstract interface for callbacks, to abstract out file i/o
- */
-export interface CompilerCallbacks {
-  /**
-   * Attempt to load a file. Return falsy if not found.
-   * TODO: never return falsy, just throw if not found?
-   * @param filename
-   */
-  loadFile(filename: string): Uint8Array;
-
-  /**
-   * Get file size, returns undefined if not found
-   */
-  fileSize(filename: string): number;
-
-  get path(): CompilerPathCallbacks;
-  get fs(): CompilerFileSystemCallbacks;
-
-  /**
-   * Resolves a file path relative to the baseFilename
-   * @param baseFilename
-   * @param filename
-   */
-  resolveFilename(baseFilename: string, filename: string): string;
-
-  reportMessage(event: CompilerEvent): void;
-
-  debug(msg: string): void;
-};
-
-/**
- * Wrapper class for CompilerCallbacks for a given input file
- */
-export class CompilerFileCallbacks implements CompilerCallbacks {
-  messages: CompilerEvent[] = [];
-
-  constructor(private filename: string, private options: CompilerCallbackOptions, private parent: CompilerCallbacks) {
-  }
-
-  /**
-   * Returns `true` if any message in the `messages` array is a Fatal or Error
-   * message, and if `compilerWarningsAsErrors` is `true`, then also returns
-   * `true` if any message is a Warning.
-   */
-  static hasFailureMessage(messages: CompilerEvent[], compilerWarningsAsErrors: boolean) {
-    const failureCodes = [
-      CompilerErrorSeverity.Fatal, CompilerErrorSeverity.Error
-    ].concat(compilerWarningsAsErrors ? [CompilerErrorSeverity.Warn] : []);
-    return messages.find(m => failureCodes.includes(CompilerError.severity(m.code))) != undefined;
-  }
-
-  /**
-   *
-   * @param event
-   * @param overrides
-   * @returns true if event has been suppressed
-   */
-  static applyMessageOverridesToEvent(event: CompilerEvent, overrides: CompilerMessageOverrideMap) {
-    // Override event severity from user preference -- this will not override
-    // fatal or error events
-    const severity = overrides?.[CompilerError.error(event.code)] ??
-      CompilerError.severity(event.code);
-
-    if(severity == 'disable') {
-      return true;
-    }
-
-    // Override the default event severity with the command line option
-    event.code = severity | (event.code & ~CompilerErrorMask.Severity);
-
-    return false;
-  }
-
-  /**
-   * Returns `true` if any message in the `messages` array is a Fatal or Error
-   * message, and if `compilerWarningsAsErrors` is `true`, then also returns
-   * `true` if any message is a Warning.
-   *
-   * If passed a defined `compilerWarningsAsErrors` value, then uses that,
-   * otherwise uses `options.compilerWarningsAsErrors`, or `false` if that is
-   * also `undefined`.
-   */
-  hasFailureMessage(compilerWarningsAsErrors?: boolean) {
-    return CompilerFileCallbacks.hasFailureMessage(
-      this.messages,
-      compilerWarningsAsErrors ?? this.options.compilerWarningsAsErrors ?? false
-    );
-  }
-
-  clear() {
-    this.messages = [];
-  }
-
-  loadFile(filename: string): Uint8Array {
-    return this.parent.loadFile(filename);
-  }
-
-  fileSize(filename: string): number {
-    return this.parent.fileSize(filename);
-  }
-
-  get path(): CompilerPathCallbacks {
-    return this.parent.path;
-  }
-
-  get fs(): CompilerFileSystemCallbacks {
-    return this.parent.fs;
-  }
-
-  resolveFilename(baseFilename: string, filename: string): string {
-    return this.parent.resolveFilename(baseFilename, filename);
-  }
-
-  reportMessage(event: CompilerEvent): void {
-    const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
-    this.messages.push(event);
-    if(!disable) {
-      this.parent.reportMessage({filename: this.filename, ...event});
-    }
-  }
-
-  debug(msg: string): void {
-    return this.parent.debug(msg);
-  }
-}
 
 /**
  * Abstract interface for compiler options
@@ -545,6 +403,19 @@ export const CompilerMessageSpec = (code: number, message: string, detail?: stri
   detail,
 });
 
+/**
+ * Remove initial whitespace from compiler detail messages, to enable
+ * indented formatting of message detail strings inside the message
+ * definitions
+ * @param event
+ * @returns dedented event detail
+ */
+export function dedentCompilerMessageDetail(event: CompilerEvent) {
+  // TODO(lowpri): dedent may be too naive -- should use least
+  // non-zero whitespace line as amount to dedent
+  return (event.detail ?? '').replace(/^[ ]+/gm, '');
+}
+
 export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
 
 export const CompilerMessageSpecWithException = (code: number, message: string, exceptionVar: any, detail?: string) : CompilerEvent => ({
@@ -565,8 +436,9 @@ export const ALL_COMPILER_LOG_LEVELS = [
   'error',      /// Only errors emitted
   'warn',       /// Errors + warnings
   'hint',       /// Errors + warnings + hints
-  'info',       /// All messages: errors + warnings + hints + info
-  'debug'       /// All messages: errors + warnings + hints + info, plus debug logs
+  'info',       /// All normal messages: errors + warnings + hints + info
+  'verbose',    /// All messages + verbose logging
+  'debug',      /// All messages + verbose + internal debug
 ] as const;
 
 type CompilerLogLevelTuple = typeof ALL_COMPILER_LOG_LEVELS;
@@ -578,7 +450,8 @@ export const compilerLogLevelToSeverity: {[index in CompilerLogLevel]: number} =
   'warn': CompilerErrorSeverity.Warn,
   'hint': CompilerErrorSeverity.Hint,
   'info': CompilerErrorSeverity.Info,
-  'debug': CompilerErrorSeverity.Info
+  'verbose': CompilerErrorSeverity.Verbose,
+  'debug': CompilerErrorSeverity.Debug,
 };
 
 export const ALL_COMPILER_LOG_FORMATS = [

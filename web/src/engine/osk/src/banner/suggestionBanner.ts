@@ -19,7 +19,7 @@ import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 import { BannerScrollState } from './bannerScrollState.js';
-import { Suggestion } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 const TOUCHED_CLASS: string = 'kmw-suggest-touched';
 const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
@@ -82,7 +82,7 @@ export class BannerSuggestion {
 
   public readonly rtl: boolean;
 
-  private _suggestion: Suggestion;
+  private _suggestion: LexicalModelTypes.Suggestion;
 
   private index: number;
 
@@ -142,18 +142,18 @@ export class BannerSuggestion {
     }
   }
 
-  get suggestion(): Suggestion {
+  get suggestion(): LexicalModelTypes.Suggestion {
     return this._suggestion;
   }
 
   /**
    * Function update
-   * @param {Suggestion} suggestion   Suggestion from the lexical model
+   * @param {LexicalModelTypes.Suggestion} suggestion   Suggestion from the lexical model
    * @param {BannerSuggestionFormatSpec} format Formatting metadata to use for the Suggestion
    *
    * Update the ID and text of the BannerSuggestionSpec
    */
-  public update(suggestion: Suggestion, format: BannerSuggestionFormatSpec) {
+  public update(suggestion: LexicalModelTypes.Suggestion, format: BannerSuggestionFormatSpec) {
     this._suggestion = suggestion;
 
     let display = this.generateSuggestionText(this.rtl);
@@ -176,7 +176,6 @@ export class BannerSuggestion {
     }
 
     this.currentWidth = this.collapsedWidth;
-    this.highlight(suggestion?.autoAccept);
     this.updateLayout();
   }
 
@@ -384,7 +383,7 @@ export class SuggestionBanner extends Banner {
 
   public readonly type = "suggestion";
 
-  private currentSuggestions: Suggestion[] = [];
+  private currentSuggestions: LexicalModelTypes.Suggestion[] = [];
 
   private options : BannerSuggestion[] = [];
   private separators: HTMLElement[] = [];
@@ -557,13 +556,10 @@ export class SuggestionBanner extends Banner {
 
       const autoselection = this._predictionContext.selected;
       this._predictionContext.selected = null;
-      if(autoselection) {
-        this.options.forEach((entry) => {
-          if(entry.suggestion == autoselection) {
-            entry.highlight(false);
-          };
-        });
-      }
+      // Always clear pre-existing selections when a new banner input/gesture starts.
+      this.options.forEach((entry) => {
+          entry.highlight(false);
+      });
 
       this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);
       const suggestion = source.baseItem;
@@ -715,7 +711,7 @@ export class SuggestionBanner extends Banner {
    * suggestions, including optimization of the banner's layout.
    * @param suggestions
    */
-  public onSuggestionUpdate = (suggestions: Suggestion[]): void => {
+  public onSuggestionUpdate = (suggestions: LexicalModelTypes.Suggestion[]): void => {
     this.currentSuggestions = suggestions;
     // Immediately stop all animations and reset options accordingly.
     this.highlightAnimation?.cancel();
@@ -753,6 +749,9 @@ export class SuggestionBanner extends Banner {
       if(suggestions.length > i) {
         const suggestion = suggestions[i];
         d.update(suggestion, optionFormat);
+        if(this.predictionContext.selected == suggestion) {
+          d.highlight(true);
+        }
       } else {
         d.update(null, optionFormat);
       }

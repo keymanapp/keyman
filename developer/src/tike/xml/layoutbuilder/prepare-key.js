@@ -140,7 +140,7 @@ $(function() {
           .data('direction', key.direction) // used only by flicks
           .data('default', key.default) // used only by longpress
           .css('width', (100 * 0.7) + 'px')
-          .css('font-family', key.font)
+          .css('font-family',builder.escapeFontName(key.font))
           .css('font-size', key.fontsize);
 
         if(builder.specialCharacters[text]) {

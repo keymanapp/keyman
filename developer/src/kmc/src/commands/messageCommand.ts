@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { Command, Option } from 'commander';
-import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/developer-utils';
+import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent, dedentCompilerMessageDetail } from '@keymanapp/developer-utils';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
@@ -178,7 +178,7 @@ function allMessageDetails(): CompilerMessageDetail[] {
 const toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
 
 function getMessageDetail(cls: any, id: string, escapeMarkdown: boolean): CompilerEvent {
-  const o = /^(INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(id);
+  const o = /^(DEBUG|VERBOSE|INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(id);
   if(!o) {
     throw new Error(`Unexpected compiler message ${id}, does not match message error format`);
   }
@@ -189,7 +189,7 @@ function getMessageDetail(cls: any, id: string, escapeMarkdown: boolean): Compil
     throw new Error(`Call to ${cls.name}.${f} returned null`);
   }
 
-  event.detail = (event.detail ?? '').replace(/^[ ]+/gm, ''); // TODO(lowpri): dedent may be too naive?
+  event.detail = dedentCompilerMessageDetail(event);
   event.message = event.message ?? '';
   event.message = event?.exceptionVar
     ? 'This is an internal error; the message will vary'

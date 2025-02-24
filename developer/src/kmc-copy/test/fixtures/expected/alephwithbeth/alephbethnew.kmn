@@ -1,0 +1,215 @@
+store(&TARGETS) 'any'
+store(&NAME) 'Aleph With Beth'
+store(&BITMAP) 'alephbethnew.ico'
+store(&VISUALKEYBOARD) 'alephbethnew.kvks'
+
+store(letters-with-final-forms) "כמנפצ"
+store(sofit-forms-of-letters) "ךםןףץ"
+store(presentation-dageshed-letters-with-final-forms) "כּפּ"
+store(presentation-dageshed-sofit-forms-of-letters) "ךּףּ"
+store(dagesh) 'ּ'
+c store(vowels) "ְֱֲֳִֵֶַׇׇָֹֻׅ"
+
+store(normal-dageshed-letters-with-final-forms) "מּנּצּ"
+store(normal-undageshed-sofit-forms-of-letters) "םןץ"
+
+store(punctuation) U+0591 .. U+05AF U+05BD .. U+05BF U+05C0 U+05C4
+store(whitespace) [K_SPACE] [K_ENTER] [K_TAB]
+
+store(&KMW_RTL) '1'
+store(&LAYOUTFILE) 'alephbethnew.keyman-touch-layout'
+store(&COPYRIGHT) '© Cameron Briggs'
+store(&KEYBOARDVERSION) '1.0.6'
+store(&KMW_HELPTEXT) 'Aleph With Beth'
+
+begin Unicode > use(main)
+
+group(main) using keys
++ [SHIFT K_I] > nul
++ [ALT K_BKQUOTE] > nul
++ [ALT K_B] > nul
++ [ALT K_V] > nul
++ [ALT K_C] > nul
++ [ALT K_Z] > nul
++ [ALT K_L] > nul
++ [ALT K_J] > nul
++ [ALT K_F] > nul
++ [ALT K_D] > nul
++ [ALT K_S] > nul
++ [ALT K_U] > nul
++ [ALT K_Y] > nul
++ [ALT K_T] > nul
++ [ALT K_R] > nul
++ [ALT K_W] > nul
++ [ALT K_Q] > nul
++ [SHIFT K_BKSLASH] > '|'
++ [SHIFT K_EQUAL] > '+'
++ [SHIFT K_HYPHEN] > '_'
++ [SHIFT K_0] > ')'
++ [SHIFT K_9] > '('
++ [SHIFT K_SLASH] > '?'
++ [SHIFT K_QUOTE] > '"'
++ [SHIFT K_BKQUOTE] > nul
++ [K_EQUAL] > '='
++ [K_HYPHEN] > '־'
++ [K_0] > '0'
++ [K_9] > '9'
++ [K_8] > '8'
++ [K_7] > '7'
++ [K_6] > '6'
++ [K_5] > '5'
++ [K_4] > '4'
++ [K_3] > '3'
++ [K_2] > '2'
++ [K_1] > '1'
++ [K_PERIOD] > '.'
++ [K_SLASH] > '/'
++ [K_QUOTE] > U+0027
++ [SHIFT K_COLON] > '״'
++ [ALT K_A] > 'ֲ'
++ [SHIFT K_RBRKT] > '}'
++ [SHIFT K_LBRKT] > '{'
++ [K_BKSLASH] > '\'
++ [K_RBRKT] > ']'
++ [K_LBRKT] > '['
++ [SHIFT K_R] > 'רּ'
++ [SHIFT CTRL K_SPACE] > ' '
++ [SHIFT K_SPACE] > ' '
++ [K_SPACE] > ' '
++ [ALT K_SPACE] > ' '
++ [SHIFT K_8] > '֝'
++ [SHIFT K_7] > '֬'
++ [SHIFT K_6] > '֔'
++ [SHIFT K_5] > '֞'
++ [SHIFT K_4] > '֜'
++ [SHIFT K_3] > '֨'
++ [SHIFT K_2] > '֘'
++ [SHIFT K_1] > '!'
++ [ALT K_SLASH] > '״'
++ [ALT K_PERIOD] > '̈'
++ [ALT K_COMMA] > '֫'
++ [ALT K_QUOTE] > 'ׄ'
++ [ALT K_COLON] > '׃'
++ [ALT K_H] > '̊'
++ [ALT K_G] > '•'
++ [ALT K_BKSLASH] > '֫'
++ [ALT K_RBRKT] > '֒'
++ [ALT K_LBRKT] > '֔'
++ [ALT K_I] > 'ֽ'
++ [ALT K_O] > 'ֳ'
++ [ALT K_E] > 'ֱ'
++ [ALT K_EQUAL] > '◌'
++ [ALT K_HYPHEN] > 'ֿ'
++ [ALT K_0] > '֯'
++ [ALT K_9] > '֓'
++ [ALT K_8] > '֕'
++ [ALT K_7] > '֡'
++ [ALT K_6] > '֟'
++ [ALT K_5] > '֩'
++ [ALT K_4] > '֠'
++ [ALT K_3] > '֙'
++ [ALT K_2] > '֮'
++ [ALT K_1] > '֗'
++ [ALT K_N] > 'ן'
++ [ALT K_P] > 'ף'
++ [ALT K_K] > 'ך'
++ [ALT K_M] > 'ם'
++ [ALT K_X] > 'ץ'
++ [SHIFT K_PERIOD] > 'ּ'
++ [SHIFT K_COMMA] > nul
++ [SHIFT K_M] > 'מּ'
++ [SHIFT K_N] > 'נּ'
++ [SHIFT K_B] > 'בּ'
++ [SHIFT K_V] > 'שּׁ'
++ [SHIFT K_C] > 'שּׂ'
++ [SHIFT K_X] > 'צּ'
++ [SHIFT K_Z] > 'זּ'
++ [SHIFT K_L] > 'לּ'
++ [SHIFT K_K] > 'כּ'
++ [SHIFT K_J] > 'וַיּ'
++ [SHIFT K_H] > 'הּ'
++ [SHIFT K_G] > 'גּ'
++ [SHIFT K_F] > 'טּ'
++ [SHIFT K_D] > 'דּ'
++ [SHIFT K_S] > 'סּ'
++ [SHIFT K_A] > 'ָ'
++ [SHIFT K_P] > 'פּ'
++ [SHIFT K_O] > 'וֹ'
++ [SHIFT K_U] > 'ֻ'
++ [SHIFT K_Y] > 'יּ'
++ [SHIFT K_T] > 'תּ'
++ [SHIFT K_E] > 'ֵ'
++ [SHIFT K_W] > 'וּ'
++ [SHIFT K_Q] > 'קּ'
++ [K_BKQUOTE] > '֑'
++ [K_COMMA] > 'א'
++ [K_M] > 'מ'
++ [K_N] > 'נ'
++ [K_B] > 'ב'
++ [K_V] > 'שׁ'
++ [K_C] > 'שׂ'
++ [K_X] > 'צ'
++ [K_Z] > 'ז'
++ [K_COLON] > 'ְ'
++ [K_L] > 'ל'
++ [K_K] > 'כ'
++ [K_J] > 'ח'
++ [K_H] > 'ה'
++ [K_G] > 'ג'
++ [K_F] > 'ט'
++ [K_D] > 'ד'
++ [K_S] > 'ס'
++ [K_A] > 'ַ'
++ [K_P] > 'פ'
++ [K_O] > 'ֹ'
++ [K_I] > 'ִ'
++ [K_U] > 'ע'
++ [K_Y] > 'י'
++ [K_T] > 'ת'
++ [K_R] > 'ר'
++ [K_E] > 'ֶ'
++ [K_W] > 'ו'
++ [K_Q] > 'ק'
+c Transform final letters
+any(letters-with-final-forms) + any(whitespace) > index(sofit-forms-of-letters,1)
+
+c Transform final letters with a dagesh
+any(letters-with-final-forms) $dagesh + any(whitespace) > index(sofit-forms-of-letters,1) $dagesh
+any(presentation-dageshed-letters-with-final-forms) + any(whitespace) > index(presentation-dageshed-sofit-forms-of-letters,1)
+any(normal-dageshed-letters-with-final-forms) + any(whitespace) > index(normal-undageshed-sofit-forms-of-letters,1) $dagesh
+
+c Transform final letters with a vowel
+c any(letters-with-final-forms) any(vowels) + any(whitespace) > index(sofit-forms-of-letters,1) index(vowels,2)
+
+c Transform final letters with a vowel and a dagesh
+c any(letters-with-final-forms) any(vowels) $dagesh + any(whitespace) > index(sofit-forms-of-letters,1) index(vowels,2) $dagesh
+c any(letters-with-final-forms) $dagesh any(vowels) + any(whitespace) > index(sofit-forms-of-letters,1) $dagesh index(vowels,3)
+c any(presentation-dageshed-letters-with-final-forms) any(vowels) + any(whitespace) > index(presentation-dageshed-sofit-forms-of-letters,1) index(vowels,2)
+c any(normal-dageshed-letters-with-final-forms) any(vowels) + any(whitespace) > index(normal-undageshed-sofit-forms-of-letters,1) $dagesh index(vowels,2)
+
+c Transform final letters with punctuation
+any(letters-with-final-forms) any(punctuation) + any(whitespace) > index(sofit-forms-of-letters,1) index(punctuation,2)
+
+c Transform final letters with punctuation and a dagesh
+any(letters-with-final-forms) any(punctuation) $dagesh + any(whitespace) > index(sofit-forms-of-letters,1) index(punctuation,2) $dagesh
+any(letters-with-final-forms) $dagesh any(punctuation) + any(whitespace) > index(sofit-forms-of-letters,1) $dagesh index(punctuation,3)
+any(presentation-dageshed-letters-with-final-forms) any(punctuation) + any(whitespace) > index(presentation-dageshed-sofit-forms-of-letters,1) index(punctuation,2)
+any(normal-dageshed-letters-with-final-forms) any(punctuation) + any(whitespace) > index(normal-undageshed-sofit-forms-of-letters,1) $dagesh index(punctuation,2)
+
+c Transfrom final letters with a punctuation and a vowel
+c any(letters-with-final-forms) any(punctuation) any(vowels) + any(whitespace) > index(sofit-forms-of-letters,1) index(punctuation,2) index(vowels,3)
+c any(letters-with-final-forms) any(vowels) any(punctuation) + any(whitespace) > index(sofit-forms-of-letters,1) index(vowels,2) index(punctuation,3)
+
+c Transform final letters with punctuation, a vowel, and a dagesh (phew!)
+c any(letters-with-final-forms) any(punctuation) any(vowels) $dagesh + any(whitespace) > index(sofit-forms-of-letters,1) index(punctuation,2) index(vowels,3) $dagesh
+c any(letters-with-final-forms) any(punctuation) $dagesh any(vowels) + any(whitespace) > index(sofit-forms-of-letters,1) index(punctuation,2) $dagesh index(vowels,4)
+c any(letters-with-final-forms) any(vowels) any(punctuation) $dagesh + any(whitespace) > index(sofit-forms-of-letters,1) index(vowels,2) index(punctuation,3) $dagesh
+c any(letters-with-final-forms) any(vowels) $dagesh any(punctuation) + any(whitespace) > index(sofit-forms-of-letters,1) index(vowels,2) $dagesh index(punctuation,4)
+c any(letters-with-final-forms) $dagesh any(punctuation) any(vowels) + any(whitespace) > index(sofit-forms-of-letters,1) $dagesh index(punctuation,3) index(vowels,4)
+c any(letters-with-final-forms) $dagesh any(vowels) any(punctuation) + any(whitespace) > index(sofit-forms-of-letters,1) $dagesh index(vowels,3) index(punctuation,4)
+
+
+c any(presentation-dageshed-letters-with-final-forms) any(punctuation) any(vowels) + any(whitespace) > index(presentation-dageshed-sofit-forms-of-letters,1) index(punctuation,2) index(vowels,3)
+c any(presentation-dageshed-letters-with-final-forms) any(vowels) any(punctuation) + any(whitespace) > index(presentation-dageshed-sofit-forms-of-letters,1) index(vowels,2) index(punctuation,3)
+c any(normal-dageshed-letters-with-final-forms) any(punctuation) any(vowels) + any(whitespace) > index(normal-undageshed-sofit-forms-of-letters,1) $dagesh index(punctuation,2) index(vowels,3)
+c any(normal-dageshed-letters-with-final-forms) any(vowels) any(punctuation) + any(whitespace) > index(normal-undageshed-sofit-forms-of-letters,1) $dagesh index(vowels,2) index(punctuation,3)

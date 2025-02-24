@@ -4,39 +4,39 @@ title: Keyman Minimum Versions
 
 Changes in [minimum-versions.inc.sh](minimum-versions.inc.sh) should manually be propagated to the linked help files below:
 
-## Keyman 18.0
+## Keyman 19.0
 
 Target Operating System and Platform Versions
 
 ### Keyman for Windows
 
-Helpfile: [os.md](../../windows/src/desktop/help/common/os.md)
+Helpfile: [os.md](../windows/docs/help/common/os.md)
 
 ### Keyman for macOS
 
-Helpfile: [requirements.md](../../mac/help/about/requirements.md)
+Helpfile: [requirements.md](../mac/docs/help/about/requirements.md)
 
 ### Keyman for Linux
 
-Helpfile: [common/index.md](../../linux/help/common/index.md#q-what-linux-distros-will-keyman-work-with)
+Helpfile: [common/index.md](../linux/docs/help/common/index.md#q-what-linux-distros-will-keyman-work-with)
 
 ### Keyman iPhone and iPad
 
-Helpfile: [system-requirements.md](../../ios/help/about/system-requirements.md)
+Helpfile: [system-requirements.md](../ios/docs/help/about/system-requirements.md)
 
 ### Keyman for Android
 
-Helpfile: [system-requirements.md](../../android/help/about/system-requirements.md)
+Helpfile: [system-requirements.md](../android/docs/help/about/system-requirements.md)
 
 ----
 
 ## Product Build Documentation
 
-[linux-ubuntu.md](../../docs/build/linux-ubuntu.md)
+[linux-ubuntu.md](../docs/build/linux-ubuntu.md)
 
-[macos.md](../../docs/build/macos.md)
+[macos.md](../docs/build/macos.md)
 
-[windows.md](../../docs/build/windows.md)
+[windows.md](../docs/build/windows.md)
 
 ## Keyman Engine Documentation
 
@@ -49,11 +49,15 @@ https://help.keyman.com/developer/engine/android/latest-version/
 |          KEYMAN Variable          |     Value    |
 |-----------------------------------|--------------|
 | KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER | noble |
-| KEYMAN_MIN_TARGET_VERSION_ANDROID | 5 |
-| KEYMAN_MIN_TARGET_VERSION_CHROME | 95.0 |
+| KEYMAN_MIN_TARGET_VERSION_ANDROID | 5.0 |
+| KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME | 53.0 |
 | KEYMAN_MIN_TARGET_VERSION_IOS | 12.2 |
 | KEYMAN_MIN_TARGET_VERSION_MAC | 10.13 |
-| KEYMAN_MIN_TARGET_VERSION_UBUNTU | 20.04 |
+| KEYMAN_MIN_TARGET_VERSION_UBUNTU | 22.04 |
+| KEYMAN_MIN_TARGET_VERSION_WEB_CHROME | 95.0 |
+| KEYMAN_MIN_TARGET_VERSION_WEB_FIREFOX | 79.0 |
+| KEYMAN_MIN_TARGET_VERSION_WEB_OPERA | 47.0 |
+| KEYMAN_MIN_TARGET_VERSION_WEB_SAFARI | 13.0 |
 | KEYMAN_MIN_TARGET_VERSION_WINDOWS | 10 |
 | KEYMAN_MIN_VERSION_ANDROID_SDK | 21 |
 | KEYMAN_MIN_VERSION_CPP | 17 |
@@ -63,6 +67,7 @@ https://help.keyman.com/developer/engine/android/latest-version/
 | KEYMAN_MIN_VERSION_NPM | 10.5.1 |
 | KEYMAN_MIN_VERSION_VISUAL_STUDIO | 2019 |
 | KEYMAN_VERSION_CLDR | 45 |
+| KEYMAN_VERSION_GRADLE | 7.6.4 |
 | KEYMAN_VERSION_ICU | 73.1 |
 | KEYMAN_VERSION_ISO639_3 | 2024-05-22 |
 | KEYMAN_VERSION_JAVA | 11 |

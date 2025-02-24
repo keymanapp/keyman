@@ -28,11 +28,13 @@
 namespace CompilerErrorSeverity {
   // We use a namespace to stop the enum names leaking out into global namespace scope
   enum {
-    Info =          0x000000, // Informational, not necessarily a problem
-    Hint =          0x100000, // Something the user might want to be aware of
-    Warn =          0x200000, // Warning: Not great, but we can keep going.
-    Error =         0x300000, // Severe error where we can't continue
-    Fatal =         0x400000, // OOM or should-not-happen internal problem
+    Debug =         0x000000, // log everything including internal debug
+    Verbose =       0x100000, // log everything, except debug
+    Info =          0x200000, // Informational, not necessarily a problem
+    Hint =          0x300000, // Something the user might want to be aware of
+    Warn =          0x400000, // Warning: Not great, but we can keep going.
+    Error =         0x500000, // Severe error where we can't continue
+    Fatal =         0x600000, // OOM or should-not-happen internal problem
   };
 };
 
@@ -90,16 +92,16 @@ namespace KmnCompilerMessages {
     ERROR_ZeroLengthString =                              SevError | 0x017,
     ERROR_TooManyIndexToKeyRefs =                         SevError | 0x018,
     ERROR_UnterminatedString =                            SevError | 0x019,
-    ERROR_StringInVirtualKeySection =                     SevError | 0x01A,
-    ERROR_AnyInVirtualKeySection =                        SevError | 0x01B,
+//    ERROR_StringInVirtualKeySection =                     SevError | 0x01A, no longer used, see #12612
+//    ERROR_AnyInVirtualKeySection =                        SevError | 0x01B, no longer used, see #12612
     ERROR_InvalidAny =                                    SevError | 0x01C,
     ERROR_StoreDoesNotExist =                             SevError | 0x01D,
-    ERROR_BeepInVirtualKeySection =                       SevError | 0x01E,
-    ERROR_IndexInVirtualKeySection =                      SevError | 0x01F,
+//    ERROR_BeepInVirtualKeySection =                       SevError | 0x01E, no longer used, see #12612
+//    ERROR_IndexInVirtualKeySection =                      SevError | 0x01F, no longer used, see #12612
     ERROR_InvalidIndex =                                  SevError | 0x020,
-    ERROR_OutsInVirtualKeySection =                       SevError | 0x021,
+//    ERROR_OutsInVirtualKeySection =                       SevError | 0x021, no longer used, see #12612
     ERROR_InvalidOuts =                                   SevError | 0x022,
-    ERROR_ContextInVirtualKeySection =                    SevError | 0x024,
+//    ERROR_ContextInVirtualKeySection =                    SevError | 0x024, no longer used, see #12612
     ERROR_InvalidUse =                                    SevError | 0x025,
     ERROR_GroupDoesNotExist =                             SevError | 0x026,
     ERROR_VirtualKeyNotAllowedHere =                      SevError | 0x027,
@@ -117,7 +119,7 @@ namespace KmnCompilerMessages {
     ERROR_ReservedCharacter =                             SevError | 0x033,
     ERROR_InvalidCharacter =                              SevError | 0x034,
     ERROR_InvalidCall =                                   SevError | 0x035,
-    ERROR_CallInVirtualKeySection =                       SevError | 0x036,
+//    ERROR_CallInVirtualKeySection =                       SevError | 0x036, no longer used, see #12612
     ERROR_CodeInvalidInKeyStore =                         SevError | 0x037,
     ERROR_CannotLoadIncludeFile =                         SevError | 0x038,
 
@@ -138,7 +140,7 @@ namespace KmnCompilerMessages {
     ERROR_70FeatureOnly =                                 SevError | 0x046,
 
     ERROR_80FeatureOnly =                                 SevError | 0x047,
-    ERROR_InvalidInVirtualKeySection =                    SevError | 0x048,
+//    ERROR_InvalidInVirtualKeySection =                    SevError | 0x048, no longer used, see #12612
     ERROR_InvalidIf =                                     SevError | 0x049,
     ERROR_InvalidReset =                                  SevError | 0x04A,
     ERROR_InvalidSet =                                    SevError | 0x04B,

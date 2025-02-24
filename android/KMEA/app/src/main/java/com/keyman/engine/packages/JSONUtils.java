@@ -38,6 +38,9 @@ public class JSONUtils {
       return new JSONArray();
     }
     File[] packages = resourceRoot.listFiles();
+    if (packages == null) {
+      return new JSONArray();
+    }
     JSONArray languagesArray = new JSONArray();
     JSONParser parser = new JSONParser();
 
@@ -60,6 +63,9 @@ public class JSONUtils {
               String kbdFilename = pkg.getName() + "/" + kbdID + ".js";
 
               // Merge languages
+              if (!kmpKeyboardObj.has("languages")) {
+                continue;
+              }
               JSONArray kmpLanguageArray = kmpKeyboardObj.getJSONArray("languages");
               for (int j=0; j<kmpLanguageArray.length(); j++) {
                 JSONObject languageObj = kmpLanguageArray.getJSONObject(j);

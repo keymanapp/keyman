@@ -1,0 +1,65 @@
+{
+  "name": "@keymanapp/kmc-copy",
+  "description": "Keyman Developer copy module",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "ldml",
+    "unicode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./build/src/main.js"
+  },
+  "files": [
+    "/build/src/"
+  ],
+  "scripts": {
+    "build": "gosh ./build.sh build",
+    "lint": "eslint .",
+    "test": "gosh ./build.sh test"
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/keyman-version": "*"
+  },
+  "devDependencies": {
+    "@keymanapp/developer-test-helpers": "*",
+    "@keymanapp/resources-gosh": "*",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.4.1",
+    "@types/semver": "^7.3.12",
+    "c8": "^7.12.0",
+    "chalk": "^2.4.2",
+    "mocha": "^10.0.0",
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/*.tests.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/",
+      "src/template/",
+      "src/main.ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

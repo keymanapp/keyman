@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018 SIL International
+ * Copyright (C) 2018 SIL Global
  *
  * keymanutil is dual licensed under the MIT or GPL licenses as described below.
  *
@@ -649,9 +649,8 @@ _ptr_array_new_from_array(
 }
 
 // `g_ptr_array_new_from_null_terminated_array` is only available in GLib 2.76, but we're still
-// stuck to 2.64 (Ubuntu 20.04 Focal) and 2.72 (Ubuntu 22.04 Jammy). Therefore we
-// copy the implementation here (slightly simplified). Once we're past 2.76 we can use the GLib method
-// directly.
+// stuck to 2.72 (Ubuntu 22.04 Jammy). Therefore we copy the implementation here (slightly
+// simplified). Once we're past 2.76 we can use the GLib method directly.
 GPtrArray *
 _g_ptr_array_new_from_null_terminated_array(
     gpointer *data,

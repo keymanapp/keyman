@@ -14,8 +14,8 @@
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
-NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
-NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
+NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
+NSString *const kForceSentryError = @"KMForceSentryError";
 
 /**
  * The following constant "KMSavedStoresKey" is left here for documentation
@@ -25,6 +25,16 @@ NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
  * represents what it is saving.
  */
 NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
+/**
+ * The following constant "KMAlwaysShowOSKKey" is left here for documentation
+ * but the related UI has been removed according to issue #12342
+ */
+NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
+/**
+ * The following constant "KMUseVerboseLogging" is left here for documentation
+ * but it is obsolete and removed issue #11525
+ */
+NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
@@ -306,24 +316,19 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   }
 }
 
-- (BOOL)readAlwaysShowOsk {
+- (BOOL)readShowOskOnActivate {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData boolForKey:kAlwaysShowOSKKey];
+  return [userData boolForKey:kShowOskOnActivate];
 }
 
-- (void)writeAlwaysShowOsk:(BOOL)alwaysShowOsk {
+- (void)writeShowOskOnActivate:(BOOL)show {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:alwaysShowOsk forKey:kAlwaysShowOSKKey];
+  [userData setBool:show forKey:kShowOskOnActivate];
 }
 
-- (BOOL)readUseVerboseLogging {
+- (BOOL)readForceSentryError {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData boolForKey:kUseVerboseLogging];
-}
-
-- (void)writeUseVerboseLogging:(BOOL)verboseLogging {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:verboseLogging forKey:kUseVerboseLogging];
+  return [userData boolForKey:kForceSentryError];
 }
 
 @end

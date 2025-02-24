@@ -5,11 +5,14 @@
 
 readonly PACKAGES=(
   common/web/keyman-version
+  common/web/langtags
   common/web/types
   core/include/ldml
   developer/src/common/web/utils
   developer/src/kmc-analyze
+  developer/src/kmc-copy
   developer/src/kmc-convert
+  developer/src/kmc-generate
   developer/src/kmc-keyboard-info
   developer/src/kmc-kmn
   developer/src/kmc-ldml

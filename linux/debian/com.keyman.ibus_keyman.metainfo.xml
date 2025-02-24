@@ -2,9 +2,11 @@
 <component type="inputmethod">
   <id>com.keyman.ibus_keyman</id>
   <metadata_license>MIT</metadata_license>
-  <project_license>GPL-2+</project_license>
+  <project_license>GPL-2.0+</project_license>
   <project_group>Keyman</project_group>
-  <developer_name>SIL International</developer_name>
+  <developer id="org.sil.keyman">
+    <name>SIL Global</name>
+  </developer>
   <icon type="remote" width="96" height="96">https://keyman.com/cdn/dev/img/keyman-logo.png</icon>
 
   <name>ibus-keyman</name>

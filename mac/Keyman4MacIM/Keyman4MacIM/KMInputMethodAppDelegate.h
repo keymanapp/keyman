@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
+#import "KMModifierMapping.h"
 #import "KMPackageReader.h"
 #import "KMInputController.h"
 #import "KMAboutWindowController.h"
@@ -61,23 +62,25 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 }
 
 @property (nonatomic, strong) KMEngine *kme;
-@property (nonatomic, strong) KMXFile *kmx;
+// TODO: refactor and encapsulate below properties with current keyboard
+@property (nonatomic, strong, readonly) KMXFile *kmx;
+@property (nonatomic, strong, readonly) KMModifierMapping *modifierMapping;
 @property (nonatomic, strong) KVKFile *kvk;
+@property (nonatomic, strong) NSString *keyboardName;
+@property (nonatomic, strong) NSString *selectedKeyboard;
+@property (nonatomic, strong) NSImage *keyboardIcon;
+// TODO: refactor above properties
 @property (nonatomic, strong) NSString *keyboardsPath;
 @property (nonatomic, strong) NSString *fontsPath;
 @property (nonatomic, strong) NSMutableArray *kmxFileList;
-@property (nonatomic, strong) NSString *selectedKeyboard;
 @property (nonatomic, strong) NSMutableArray *activeKeyboards;
 @property (assign) int numberOfKeyboardMenuItems;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
-@property (nonatomic, assign) NSEventModifierFlags currentModifierFlags;
+@property (nonatomic, assign) NSEventModifierFlags currentModifiers;
 @property (nonatomic, assign) CFMachPortRef lowLevelEventTap;
 @property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
-@property (nonatomic, assign) BOOL sleeping;
 @property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
-@property (nonatomic, strong) NSString *keyboardName;
-@property (nonatomic, strong) NSImage *keyboardIcon;
 @property (nonatomic, strong) NSAlert *downloadInfoView;
 @property (nonatomic, strong) NSProgressIndicator *progressIndicator;
 @property (nonatomic, weak) KMInputController *inputController;
@@ -90,10 +93,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, strong) NSString *downloadFilename;
 @property (nonatomic, strong) NSMutableData *receivedData;
 @property (nonatomic, assign) NSUInteger expectedBytes;
-@property (nonatomic, assign) BOOL alwaysShowOSK;
-@property (nonatomic, assign) BOOL useVerboseLogging;
-@property (nonatomic, assign) BOOL useNullChar;
-@property (nonatomic, assign) BOOL debugMode;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
@@ -102,9 +101,10 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)showOSK;
 - (void)showConfigurationWindow;
 - (void)selectKeyboardFromMenu:(NSInteger)tag;
-- (void)sleepFollowingDeactivationOfServer:(id)lastServer;
-- (void)wakeUpWith:(id)newServer;
 - (void)handleKeyEvent:(NSEvent *)event;
+- (void)loadKeyboardFromKmxFile:(KMXFile *)kmx;
+- (void)resetKmx;
+- (NSEventModifierFlags) determineModifiers;
 - (BOOL)unzipFile:(NSString *)filePath;
 - (NSWindowController *)downloadKBWindow_;
 - (NSWindowController *)aboutWindow_;
@@ -124,6 +124,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
+- (BOOL)canForceSentryEvents;
 @end
 
 #endif /* KMInputMethodAppDelegate_h */

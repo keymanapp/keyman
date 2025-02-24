@@ -90,7 +90,6 @@ uses
   MessageIdentifierConsts,
   MessageIdentifiers,
   KeymanMutex,
-  OnlineUpdateCheck,
   PngImage,
   ErrorControlledRegistry,
   RegistryKeys,
@@ -221,7 +220,7 @@ begin
   begin
     FMutex := TKeymanMutex.Create('KeymanSplash');
     try
-      if not FMutex.MutexOwned then
+      if not FMutex.TakeOwnership then
       begin
         FocusSplash;  // I2562
         Exit;
@@ -268,8 +267,7 @@ begin
 
     if kmcom.Options[KeymanOptionName(TUtilKeymanOption.koCheckForUpdates)].Value then
     begin
-      if not kmcom.Control.IsOnlineUpdateCheckOpen then
-        RunConfiguration(0, '-ouc -s');
+      RunConfiguration(0, '-buc -s');
     end;
   end;
 end;

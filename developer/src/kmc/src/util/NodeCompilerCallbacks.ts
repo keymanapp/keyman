@@ -6,11 +6,15 @@ import { CompilerCallbacks, CompilerEvent,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
          CompilerCallbackOptions,
-         CompilerFileCallbacks} from '@keymanapp/developer-utils';
+         CompilerFileCallbacks,
+         CompilerNetAsyncCallbacks,
+         CompilerFileSystemAsyncCallbacks,
+         FileSystemFolderEntry} from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
 import { KeymanSentry } from '@keymanapp/developer-utils';
+import { fileURLToPath } from 'url';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -19,6 +23,8 @@ const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
   [CompilerErrorSeverity.Warn]: color.hex('FFA500'), // orange
   [CompilerErrorSeverity.Error]: color.redBright,
   [CompilerErrorSeverity.Fatal]: color.redBright,
+  [CompilerErrorSeverity.Verbose]: color.gray,
+  [CompilerErrorSeverity.Debug]: color.blueBright,
 };
 
 /**
@@ -33,9 +39,13 @@ const MaxMessagesDefault = 100;
 export class NodeCompilerCallbacks implements CompilerCallbacks {
   /* NodeCompilerCallbacks */
 
+  private readonly _net: NodeCompilerNetAsyncCallbacks = new NodeCompilerNetAsyncCallbacks();
+  private readonly _fsAsync = new NodeCompilerFileSystemAsyncCallbacks();
+
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
     color.enabled = this.options.color ?? (supportsColor.stdout ? supportsColor.stdout.hasBasic : false);
@@ -111,12 +121,28 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     return fs.statSync(filename)?.size;
   }
 
+  isDirectory(filename: string): boolean {
+    return fs.statSync(filename)?.isDirectory();
+  }
+
   get path(): CompilerPathCallbacks {
     return path;
   }
 
   get fs(): CompilerFileSystemCallbacks {
     return fs;
+  }
+
+  get net(): CompilerNetAsyncCallbacks {
+    return this._net;
+  }
+
+  get fsAsync(): CompilerFileSystemAsyncCallbacks {
+    return this._fsAsync;
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return fileURLToPath(url);
   }
 
   reportMessage(event: CompilerEvent): void {
@@ -152,17 +178,17 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     // message emitted.
 
     this.messageCount++;
-    if(this.messageCount > MaxMessagesDefault) {
+    if(this.messageCount > this.maxLogMessages) {
       return;
     }
 
-    if(this.messageCount == MaxMessagesDefault) {
+    if(this.messageCount == this.maxLogMessages) {
       // We've hit our event limit so we'll suppress further messages, and emit
       // our little informational message so users know what's going on. Note
       // that this message will not be included in the this.messages array, and
       // that will continue to collect all messages; this only affects the
       // console emission of messages.
-      event = InfrastructureMessages.Info_TooManyMessages({count: MaxMessagesDefault});
+      event = InfrastructureMessages.Info_TooManyMessages({count: this.maxLogMessages});
       event.filename = this.messageFilename;
     }
 
@@ -238,22 +264,75 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   resolveFilename(baseFilename: string, filename: string) {
-    const basePath =
-      baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
-      baseFilename :
-      path.dirname(baseFilename);
-    // Transform separators to platform separators -- we are agnostic
-    // in our use here but path prefers files may use
-    // either / or \, although older kps files were always \.
-    if(path.sep == '/') {
-      filename = filename.replace(/\\/g, '/');
-    } else {
-      filename = filename.replace(/\//g, '\\');
+    return _resolveFilename(baseFilename, filename);
+  }
+}
+
+class NodeCompilerNetAsyncCallbacks implements CompilerNetAsyncCallbacks {
+  async fetchBlob(url: string, options?: RequestInit): Promise<Uint8Array> {
+    try {
+      const response = await fetch(url, options);
+      if(!response.ok) {
+        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.blob();
+      return new Uint8Array(await data.arrayBuffer());
+    } catch(e) {
+      throw new Error(`Error downloading ${url}`, {cause:e});
     }
-    if(!path.isAbsolute(filename)) {
-      filename = path.resolve(basePath, filename);
-    }
-    return filename;
   }
 
+  async fetchJSON(url: string, options?: RequestInit): Promise<any> {
+    try {
+      const response = await fetch(url, options);
+      if(!response.ok) {
+        throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch(e) {
+      throw new Error(`Error downloading ${url}`, {cause:e});
+    }
+  }
+}
+
+class NodeCompilerFileSystemAsyncCallbacks implements CompilerFileSystemAsyncCallbacks {
+  async exists(filename: string): Promise<boolean> {
+    return fs.existsSync(filename);
+  }
+
+  async readFile(filename: string): Promise<Uint8Array> {
+    return fs.readFileSync(filename);
+  }
+
+  async readdir(filename: string): Promise<FileSystemFolderEntry[]> {
+    return fs.readdirSync(filename).map(item => ({
+      filename: item,
+      type: fs.statSync(path.join(filename, item))?.isDirectory() ? 'dir' : 'file'
+    }));
+  }
+
+  resolveFilename(baseFilename: string, filename: string): string {
+    return _resolveFilename(baseFilename, filename);
+  }
+}
+
+function _resolveFilename(baseFilename: string, filename: string) {
+  const basePath =
+    baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+    baseFilename :
+    path.dirname(baseFilename);
+  // Transform separators to platform separators -- we are agnostic
+  // in our use here but path prefers files may use
+  // either / or \, although older kps files were always \.
+  if(path.sep == '/') {
+    filename = filename.replace(/\\/g, '/');
+  } else {
+    filename = filename.replace(/\//g, '\\');
+  }
+  if(!path.isAbsolute(filename)) {
+    filename = path.resolve(basePath, filename);
+  }
+  return filename;
 }

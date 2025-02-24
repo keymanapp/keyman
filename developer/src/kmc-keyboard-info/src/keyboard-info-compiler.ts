@@ -7,38 +7,15 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
 import { KeymanFileTypes, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
-import langtags from "./imports/langtags.js";
+import { getLangtagByTag } from "@keymanapp/langtags";
 import { CompilerCallbacks, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact, KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
-import { getFontFamily } from "./font-family.js";
+import { getFontFamily } from "@keymanapp/developer-utils";
 
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
-const langtagsByTag = {};
-
-/**
- * Build a dictionary of language tags from langtags.json
- */
-
-function preinit(): void {
-  if(langtagsByTag['en']) {
-    // Already initialized, we can reasonably assume that 'en' will always be in
-    // langtags.json.
-    return;
-  }
-
-  for(const tag of langtags) {
-    langtagsByTag[tag.tag] = tag;
-    langtagsByTag[tag.full] = tag;
-    if(tag.tags) {
-      for(const t of tag.tags) {
-        langtagsByTag[t] = tag;
-      }
-    }
-  }
-}
 
 /**
  * @public
@@ -107,10 +84,6 @@ export interface KeyboardInfoCompilerResult extends KeymanCompilerResult {
 export class KeyboardInfoCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: KeyboardInfoCompilerOptions;
-
-  constructor() {
-    preinit();
-  }
 
   /**
    * Initialize the compiler.
@@ -499,8 +472,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       keyboard_info.languages[language] = {};
     }
 
-    const fontSource = [].concat(...kmpJsonData.keyboards.map(e => e.displayFont ? [e.displayFont] : []), ...kmpJsonData.keyboards.map(e => e.webDisplayFonts ?? []));
-    const oskFontSource = [].concat(...kmpJsonData.keyboards.map(e => e.oskFont ? [e.oskFont] : []), ...kmpJsonData.keyboards.map(e => e.webOskFonts ?? []));
+    let commonScript = null;
 
     for(const bcp47 of Object.keys(keyboard_info.languages)) {
       const language = keyboard_info.languages[bcp47];
@@ -525,6 +497,20 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       // optimization, but it's another keyboard_info breaking change so don't want to
       // do it right now.
       //
+
+      // The code below:
+      // 1. Only includes fonts associated with keyboards which support the current bcp47 (filter)
+      // 2. Joins the displayFont and webDisplayFonts data, and removes duplicates (...new Set())
+
+      const supportedKeyboards = kmpJsonData.keyboards.filter(k => k.languages.find(lang => lang.id == bcp47));
+      const fontSource = [...new Set([].concat(
+        ...supportedKeyboards.map(e => e.displayFont ? [e.displayFont] : []),
+        ...supportedKeyboards.map(e => e.webDisplayFonts ?? [])
+      ))];
+      const oskFontSource = [...new Set([].concat(
+        ...supportedKeyboards.map(e => e.oskFont ? [e.oskFont] : []),
+        ...supportedKeyboards.map(e => e.webOskFonts ?? [])
+      ))];
 
       if(fontSource.length) {
         language.font = await this.fontSourceToKeyboardInfoFont(kpsFilename, kmpJsonData, fontSource);
@@ -558,7 +544,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
           }
         }
       }
-      const tag = langtagsByTag[bcp47] ?? langtagsByTag[locale.language];
+      const tag = getLangtagByTag(bcp47) ?? getLangtagByTag(locale.language);
       language.languageName = tag ? tag.name : bcp47;
       language.regionName = mapName(locale.region, regionNames);
       language.scriptName = mapName(locale.script, scriptNames);
@@ -572,6 +558,15 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
         ` (${language.regionName})` :
         ''
       );
+
+      const resolvedScript = locale.script ?? getLangtagByTag(bcp47)?.script ?? getLangtagByTag(locale.language)?.script ?? undefined;
+      if(commonScript === null) {
+        commonScript = resolvedScript;
+      } else {
+        if(resolvedScript !== commonScript) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({commonScript, bcp47, script: resolvedScript}))
+        }
+      }
     }
     return true;
   }
@@ -626,10 +621,3 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   }
 
 }
-
-/**
- * these are exported only for unit tests, do not use
- */
-export const unitTestEndpoints = {
-  langtagsByTag,
-};

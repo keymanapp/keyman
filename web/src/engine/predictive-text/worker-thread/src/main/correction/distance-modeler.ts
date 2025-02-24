@@ -3,7 +3,13 @@ import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-uti
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { Distribution, LexicalModel, LexiconTraversal, ProbabilityMass, Transform, USVString } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
+import Transform = LexicalModelTypes.Transform;
+import USVString = LexicalModelTypes.USVString;
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
@@ -245,6 +251,10 @@ export class SearchNode {
 class SearchSpaceTier {
   correctionQueue: PriorityQueue<SearchNode>;
   processed: SearchNode[] = [];
+
+  /**
+   * Indicates the depth searched, in terms of number of inputs, by this tier of the search space.
+   */
   index: number;
 
   constructor(instance: SearchSpaceTier);
@@ -468,6 +478,12 @@ export class SearchSpace {
 
   increaseMaxEditDistance() {
     this.tierOrdering.forEach(function(tier) { tier.increaseMaxEditDistance() });
+  }
+
+  get correctionsEnabled() {
+    // When corrections are disabled, the Web engine will only provide individual Transforms
+    // for an input, not a distribution.  No distributions means we shouldn't do corrections.
+    return !!this.inputSequence.find((distribution) => distribution.length > 1);
   }
 
   addInput(inputDistribution: Distribution<Transform>) {

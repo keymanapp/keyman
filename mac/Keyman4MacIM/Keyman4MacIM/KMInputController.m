@@ -1,37 +1,35 @@
-//
-//  KMInputController.m
-//  Keyman4MacIM
-//
-//  Created by Serkan Kurt on 29/01/2015.
-//  Copyright (c) 2017 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Created by Serkan Kurt on 2015-01-29.
+ *
+ */
 
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
 #import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "InputMethodKit/InputMethodKit.h"
+#import "KMInputMethodLifecycle.h"
+#import "KMSentryHelper.h"
 
 @implementation KMInputController
 
 KMInputMethodEventHandler* _eventHandler;
-NSMutableArray *servers;
 
-- (KMInputMethodAppDelegate *)AppDelegate {
+- (KMInputMethodAppDelegate *)appDelegate {
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  os_log_debug([KMLogs lifecycleLog], "Initializing Keyman Input Method for server with bundleID: %{public}@", server.bundle.bundleIdentifier);
-  
+  os_log_debug([KMLogs lifecycleLog], "+++KMInputController initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getRunningApplicationId]);
+
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
-    servers = [[NSMutableArray alloc] initWithCapacity:2];
-    self.AppDelegate.inputController = self;
-    if (self.AppDelegate.kvk != nil && self.AppDelegate.alwaysShowOSK) {
-      [self.AppDelegate showOSK];
-    }
+    os_log_debug([KMLogs lifecycleLog], " +++initWithServer, self: %p", self);
   }
   
   return self;
@@ -59,102 +57,90 @@ NSMutableArray *servers;
   }
 }
 
-- (void)activateServer:(id)sender {
-  @synchronized(servers) {
-    [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    
-    [self.AppDelegate wakeUpWith:sender];
-    [servers addObject:sender];
-    
-    if (_eventHandler != nil) {
-      [_eventHandler deactivate];
-    }
-    
-    NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *clientAppId = [currApp bundleIdentifier];
-    os_log_debug([KMLogs lifecycleLog], "activateServer, new active app: '%{public}@'", clientAppId);
-    
-    _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
-    
-  }
-}
-
-- (void)deactivateServer:(id)sender {
-  if ([self.AppDelegate debugMode]) {
-    os_log_debug([KMLogs lifecycleLog], "deactivateServer, sender %{public}@", sender);
-  }
-  @synchronized(servers) {
-    for (int i = 0; i < servers.count; i++) {
-      if (servers[i] == sender) {
-        [servers removeObjectAtIndex:i];
-        break;
-      }
-    }
-    if (servers.count == 0) {
-      os_log_debug([KMLogs lifecycleLog], "No known active server for Keyman IM. Starting countdown to sleep...");
-      [self performSelector:@selector(timerAction:) withObject:sender afterDelay:0.7];
-    }
-  }
-}
-
-- (void)timerAction:(id)lastServer {
-  @synchronized(servers) {
-    if (servers.count == 0) {
-      if (_eventHandler != nil) {
-        [_eventHandler deactivate];
-        _eventHandler = nil;
-      }
-      [self.AppDelegate sleepFollowingDeactivationOfServer:lastServer];
-    }
-  }
-}
-
-
-/*
- - (NSDictionary *)modes:(id)sender {
- if ([self.AppDelegate debugMode])
- os_log_debug([KMLogs lifecycleLog], "*** Modes ***");
- if (_kmModes == nil) {
- NSDictionary *amhMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"A", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"amh", @"TISIntendedLanguage", nil];
- 
- NSDictionary *hinMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"H", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"hin", @"TISIntendedLanguage", nil];
- 
- NSDictionary *modeList = [[NSDictionary alloc] initWithObjectsAndKeys:amhMode, @"com.apple.inputmethod.amh", hinMode, @"com.apple.inputmethod.hin", nil];
- NSArray *modeOrder = [[NSArray alloc] initWithObjects:@"com.apple.inputmethod.amh", @"com.apple.inputmethod.hin", nil];
- _kmModes = [[NSDictionary alloc] initWithObjectsAndKeys:modeList, kTSInputModeListKey,
- modeOrder, kTSVisibleInputModeOrderedArrayKey, nil];
- }
- 
- return _kmModes;
- }
+/**
+ * Called by the app delegate when KMInputMethodLifecycle determines the user has switched clients
  */
+- (void)changeClients:(NSString *)clientAppId {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController changeClients, deactivate old eventHandler and activate new one");
+  
+  [self deactivateEventHandler];
+  [self activateEventHandler:clientAppId];
+}
+
+/**
+ * Called by the app delegate when KMInputMethodLifecycle determines the user has deactivated Keyman
+ */
+- (void)deactivateClient {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController deactivateClient, deactivate old eventHandler");
+  
+  [self deactivateEventHandler];
+}
+
+- (void)deactivateEventHandler {
+  if (_eventHandler != nil) {
+    os_log_debug([KMLogs lifecycleLog], " * KMInputController deactivate old eventHandler");
+    [_eventHandler deactivate];
+  }
+}
+
+- (void)activateEventHandler:(NSString *)clientAppId {
+  os_log_debug([KMLogs lifecycleLog], " * KMInputController activate new eventHandler");
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:self.client];
+}
+
+/**
+ * Called by the OS to activate the input method, but some calls are not useful and are followed milliseconds later
+ * by a deactivateServer. These short-lived activations may be generated by clicking and releasing menu items without changing applications.
+ * Rather than treat every message received as a true activation, we send a message to KMInputMethodLifeCycle to evaluate.
+ */
+- (void)activateServer:(id)sender {
+  os_log_info([KMLogs lifecycleLog], " +++KMInputController, activateServer, self=%p", self);
+  [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+  
+  /*
+   When this KMInputController becomes the active server for the input method,
+   then immediately update the AppDelegate. The duration that this controller is the
+   active server may be extremely short, but, if so, we will receive another
+   call to activateServer moments later and can update the AppDelegate again.
+   */
+  [self attachToAppDelegate];
+  
+  /*
+   Call the shared lifecycle object so it can evaluate the current state
+   and determine whether this is
+   1) a real activation of the input method or
+   2) a change in clients or
+   3) a false alarm
+   */
+  [KMInputMethodLifecycle.shared activateClient:sender];
+}
+
+- (void)attachToAppDelegate {
+  self.appDelegate.inputController = self;
+}
+
+/**
+ * Called by the OS to deactivate the input method
+ */
+- (void)deactivateServer:(id)sender {
+  os_log_info([KMLogs lifecycleLog], " +++KMInputController, deactivateServer, self=%p", self);
+
+  /*
+   Call the shared lifecycle object so it can evaluate the current state
+   and determine whether this is
+   1) a real deactivation of the input method or
+   2) a change in clients or
+   3) a false alarm
+   */
+  [KMInputMethodLifecycle.shared deactivateClient:sender];
+}
 
 - (NSMenu *)menu {
-  return self.AppDelegate.menu;
+  return self.appDelegate.menu;
 }
 
 - (KMXFile *)kmx {
-  return self.AppDelegate.kmx;
+  return self.appDelegate.kmx;
 }
 
 - (void)menuAction:(id)sender {
@@ -162,16 +148,22 @@ NSMutableArray *servers;
   NSInteger itag = mItem.tag;
   os_log_debug([KMLogs uiLog], "Keyman menu clicked - tag: %lu", itag);
   if (itag == CONFIG_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Configuration..."];
     [self showConfigurationWindow:sender];
   }
   else if (itag == OSK_MENUITEM_TAG) {
-    [self.AppDelegate showOSK];
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard"];
+    [KMSettingsRepository.shared writeShowOskOnActivate:YES];
+    os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
+    [self.appDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {
-    [self.AppDelegate showAboutWindow];
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"About"];
+    [self.appDelegate showAboutWindow];
   }
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
-    [self.AppDelegate selectKeyboardFromMenu:itag];
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Selected Keyboard"];
+    [self.appDelegate selectKeyboardFromMenu:itag];
   }
 }
 
@@ -183,7 +175,7 @@ NSMutableArray *servers;
   if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
   {
     os_log_info([KMLogs uiLog], "Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
-    [self.AppDelegate showConfigurationWindow]; // call our workaround
+    [self.appDelegate showConfigurationWindow]; // call our workaround
   }
   else
   {

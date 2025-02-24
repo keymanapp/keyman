@@ -1,0 +1,8 @@
+# /usr/share/dbus-1/system-services/com.keyman.SystemService1.service
+# This version used with systemd (e.g. on Debian)
+
+[D-BUS Service]
+Name=com.keyman.SystemService1
+Exec=/bin/false
+User=root
+SystemdService=systemd-keyman.service

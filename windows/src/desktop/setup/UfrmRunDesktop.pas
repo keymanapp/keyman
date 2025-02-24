@@ -113,6 +113,7 @@ type
     FCanUpgrade9: Boolean;
     FCanUpgrade10: Boolean;
     FCheckForUpdates: Boolean;
+
     FStartAfterInstall: Boolean;
     FStartWithWindows: Boolean;
     FAutomaticallyReportUsage: Boolean;
@@ -1041,6 +1042,7 @@ begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
+
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin

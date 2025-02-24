@@ -2,6 +2,7 @@
 // based on the sd-bus library, see
 // https://0pointer.net/blog/the-new-sd-bus-api-of-systemd.html
 
+#include "config.h"
 #include <cstdint>
 #include <dirent.h>
 #include <errno.h>
@@ -11,7 +12,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <syslog.h>
+#if DBUS_IMPLEMENTATION == SYSTEMD
 #include <systemd/sd-bus.h>
+#else
+#include <basu/sd-bus.h>
+#endif
 #include "KeymanSystemService.h"
 #include "KeyboardDevice.h"
 
@@ -58,10 +63,24 @@ on_get_caps_lock_indicator(
   return sd_bus_reply_method_return(msg, "b", state);
 }
 
+static int32_t
+on_call_ordered_output_sentinel(
+  sd_bus_message *msg,
+  void *user_data,
+  sd_bus_error *ret_error
+) {
+  *ret_error = SD_BUS_ERROR_NULL;
+
+  KeymanSystemService *service = static_cast<KeymanSystemService *>(user_data);
+  service->CallOrderedOutputSentinel();
+  return sd_bus_reply_method_return(msg, "");
+}
+
 static const sd_bus_vtable system_service_vtable[] = {
   SD_BUS_VTABLE_START(0),
     SD_BUS_METHOD("SetCapsLockIndicator", "b", "", on_set_caps_lock_indicator, SD_BUS_VTABLE_UNPRIVILEGED),
     SD_BUS_METHOD("GetCapsLockIndicator", "", "b", on_get_caps_lock_indicator, SD_BUS_VTABLE_UNPRIVILEGED),
+    SD_BUS_METHOD("CallOrderedOutputSentinel", "", "", on_call_ordered_output_sentinel, SD_BUS_VTABLE_UNPRIVILEGED),
   SD_BUS_VTABLE_END
 };
 
@@ -70,6 +89,7 @@ KeymanSystemService::KeymanSystemService()
   int ret;
 
   GetKbdDevices();
+  CreateOrderedOutputDevice();
 
 #ifdef KEYMAN_TESTING
   ret = sd_bus_open_user(&bus);
@@ -115,6 +135,12 @@ KeymanSystemService::~KeymanSystemService()
       delete device;
     }
     delete kbd_devices;
+    kbd_devices = nullptr;
+  }
+
+  if (kbd_ordered_output) {
+    delete kbd_ordered_output;
+    kbd_ordered_output = nullptr;
   }
 }
 
@@ -166,6 +192,16 @@ void KeymanSystemService::GetKbdDevices() {
   }
 }
 
+void KeymanSystemService::CreateOrderedOutputDevice() {
+  if (!kbd_ordered_output) {
+    kbd_ordered_output = new OrderedOutputDevice();
+    if (!kbd_ordered_output->Initialize()) {
+      delete kbd_ordered_output;
+      kbd_ordered_output = nullptr;
+    }
+  }
+}
+
 // Set the CapsLock indicator on all keyboard devices.
 void
 KeymanSystemService::SetCapsLockIndicatorOnDevices(uint32_t state) {
@@ -192,4 +228,14 @@ KeymanSystemService::GetCapsLockIndicatorOnDevices() {
     state = state || kbdDevice->GetCapsLockLed();
   }
   return state;
+}
+
+// Emit a ordered output sentinel key event
+void
+KeymanSystemService::CallOrderedOutputSentinel() {
+  if (!kbd_ordered_output) {
+    syslog(LOG_USER | LOG_ERR, "%s: No keyboard initialized", __FUNCTION__);
+    return;
+  }
+  kbd_ordered_output->PressSentinelKey();
 }

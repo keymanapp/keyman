@@ -25,7 +25,8 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/langtags": "*"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
@@ -36,7 +37,7 @@
     "typescript": "^5.4.5"
   },
   "mocha": {
-    "spec": "build/test/**/test-*.js",
+    "spec": "build/test/**/*.tests.js",
     "require": [
       "source-map-support/register"
     ]

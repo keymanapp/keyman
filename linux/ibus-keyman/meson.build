@@ -8,13 +8,26 @@ project('ibus-keyman', 'c', 'cpp',
 # meson doesn't allow us to reference a file outside its root
 subdir('resources')
 
+if get_option('buildtype') != 'debug'
+  # Disable assertions on release builds
+  defns += ['-DG_DISABLE_ASSERT']
+endif
+
 conf = configuration_data()
 
 ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')
 gtk =            dependency('gtk+-3.0',             version: '>= 2.4')
 json_glib =      dependency('json-glib-1.0',        version: '>= 1.0')
-systemd  =       dependency('libsystemd')
 icu =            dependency('icu-i18n')
+
+systemd  =       dependency('libsystemd', 'libelogind', required: false)
+if systemd.found()
+  conf.set('DBUS_IMPLEMENTATION', 'SYSTEMD')
+else
+  # Gentoo can use libelogind or basu
+  systemd = dependency('basu', required: true)
+  conf.set('DBUS_IMPLEMENTATION', 'BASU')
+endif
 
 core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'

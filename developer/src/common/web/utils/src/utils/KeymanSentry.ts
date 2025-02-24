@@ -64,8 +64,20 @@ export class KeymanSentry {
     }
   }
 
-  static async captureException(e: any): Promise<never> {
+  /**
+   * capture an exception for Sentry; note that in local environments, this will normally
+   * throw the exception rather than sending to Sentry
+   * @param e
+   * @param force if true, reports to Sentry even in local environments
+   */
+  static async captureException(e: any, force?: boolean): Promise<never> {
     if(isInit) {
+      // For local development, we don't want to bury the trace; we need the cast to avoid
+      // TS2367 (comparison appears to be unintentional)
+      if(!force && (KEYMAN_VERSION.VERSION_ENVIRONMENT as string) == 'local') {
+        throw e;
+      }
+
       const eventId = Sentry.captureException(e);
       process.stderr.write(`
       Fatal error: ${(e??'').toString()}
@@ -73,11 +85,6 @@ export class KeymanSentry {
       this.writeSentryMessage(eventId);
       await this.close();
 
-      // For local development, we don't want to bury the trace; we need the cast to avoid
-      // TS2367 (comparison appears to be unintentional)
-      if((KEYMAN_VERSION.VERSION_ENVIRONMENT as string) == 'local') {
-        throw e;
-      }
       process.exit(1);
     } else {
       throw e;
@@ -86,7 +93,11 @@ export class KeymanSentry {
 
   static async close() {
     if(isInit) {
-      await Sentry.close(CLOSE_TIMEOUT);
+      try {
+        await Sentry.close(CLOSE_TIMEOUT);
+      } catch(e) {
+        // ignore any errors here
+      }
     }
   }
 }

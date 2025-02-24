@@ -4,12 +4,13 @@ import * as kmcLdml from '@keymanapp/kmc-ldml';
 import { CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/developer-utils';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
-import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
+import { CommandLineBuildBaseOptions } from 'src/util/baseOptions.js';
 import { exitProcess } from '../../util/sysexits.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
+import { dirname } from 'node:path';
 
 export async function buildTestData(infile: string, _options: any, commander: any): Promise<void> {
-  const options: CommandLineBaseOptions = commander.optsWithGlobals();
+  const options: CommandLineBuildBaseOptions = commander.optsWithGlobals();
 
   let compilerOptions: kmcLdml.LdmlCompilerOptions = {
     ...defaultCompilerOptions,
@@ -17,7 +18,8 @@ export async function buildTestData(infile: string, _options: any, commander: an
     saveDebug: false,
     shouldAddCompilerVersion: false,
     readerOptions: {
-      importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+      cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+      localImportsPaths: [ dirname(infile) ], // local dir
     }
   };
 

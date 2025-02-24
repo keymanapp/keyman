@@ -16,9 +16,12 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
+  "@/core/include/ldml" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
+  "@/developer/src/kmc-copy" \
   "@/developer/src/kmc-convert" \
+  "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
@@ -51,21 +54,17 @@ function do_build() {
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_api() {
-  rm -rf ./build/messages
-  mkdir -p ./build/messages
-  node . message --format markdown --out-path build/messages
+function do_test() {
+  builder_do_typescript_tests 50
+  ./test/command-line-tests.sh test
 }
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_test() {
-  eslint .
-  tsc --build test/
-  readonly C8_THRESHOLD=45
-  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
+function do_api() {
+  rm -rf ./build/messages
+  mkdir -p ./build/messages
+  node . message --format markdown --out-path build/messages
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -95,7 +94,10 @@ function do_bundle() {
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
 
-  cp build/dist/* "$BUILD_PATH"
+  # Manually copy over templates
+  cp -R ../kmc-generate/build/src/template/ build/dist/
+
+  cp -R build/dist/* "$BUILD_PATH"
 
   builder_finish_action success bundle
 }

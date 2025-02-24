@@ -5,13 +5,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
 builder_describe "Builds Keyman for macOS." \
   "@/core:mac" \
+  "@/resources/tools/check-markdown  test:help" \
   "clean" \
   "configure" \
   "build" \
@@ -20,11 +20,9 @@ builder_describe "Builds Keyman for macOS." \
   "install     Installs result of Keyman4MacIM locally." \
   ":engine     KeymanEngine4Mac" \
   ":app        Keyman4MacIM" \
+  ":help       Online documentation" \
   ":testapp    Keyman4Mac (test harness)" \
   "--quick,-q  Bypasses notarization for $(builder_term install)"
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 builder_parse "$@"
 
@@ -89,8 +87,8 @@ UPLOAD_SENTRY=false
 
 # Import local environment variables for build
 #
-# /mac/localenv.sh can be used to define CERTIFICATE_ID, 
-# APPSTORECONNECT_PROVIDER, APPSTORECONNECT_USERNAME, 
+# /mac/localenv.sh can be used to define CERTIFICATE_ID,
+# APPSTORECONNECT_PROVIDER, APPSTORECONNECT_USERNAME,
 # APPSTORECONNECT_PASSWORD, DEVELOPMENT_TEAM variables;
 # see /mac/README.md for details.
 #
@@ -111,7 +109,7 @@ execBuildCommand() {
     set +e
     local ret_code=0
     eval "$cmnd" || ret_code=$?
-    set -ex
+    set -e
 
     printXCodeBuildScriptLogs
 
@@ -304,6 +302,7 @@ builder_run_action build:testapp  do_build_testapp
 
 builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS test -scheme $ENGINE_NAME"
 builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+builder_run_action test:help      check-markdown  "$KEYMAN_ROOT/mac/docs/help"
 
 builder_run_action install do_install
 
