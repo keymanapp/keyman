@@ -42,16 +42,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return;
     }
 
-    let instance: <TypeHere>;
+    let workerInstance: Worker;
     try {
-      instance = predictiveWorkerFactory?.constructInstance();
+      workerInstance = predictiveWorkerFactory?.constructInstance();
     } catch(e) {
       // We can condition on `lmEngine` being null/undefined.
       console.warn('Web workers are not available: ' + (e ?? '').toString());
-      instance = null;
+      workerInstance = null;
     }
-    if(instance) {
-      this.lmEngine = new LMLayer(capabilities, instance);
+    if(workerInstance) {
+      this.lmEngine = new LMLayer(capabilities, workerInstance);
     }
   }
 
