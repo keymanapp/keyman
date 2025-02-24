@@ -12,6 +12,8 @@ function GetContextFromMemo(Memo: TKeymanDeveloperDebuggerMemo; DeadKeys: TDebug
 implementation
 
 uses
+  System.SysUtils,
+
   Unicode;
 
 function GetContextFromMemo(Memo: TKeymanDeveloperDebuggerMemo; DeadKeys: TDebugDeadkeyInfoList; IncludeMarkers: Boolean): TArray<km_core_context_item>;
@@ -35,7 +37,7 @@ begin
       Result[n].character := Uni_SurrogateToUTF32(ch, t[i+1]);
       Inc(i);
     end
-    else if Ord(ch) = $FFFC then
+    else if ch = DeadKey_Marker then
     begin
       if IncludeMarkers then
       begin
