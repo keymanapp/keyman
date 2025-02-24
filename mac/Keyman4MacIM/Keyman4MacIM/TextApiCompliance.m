@@ -146,7 +146,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     os_log_debug([KMLogs complianceLog], "checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length);
     [self checkComplianceUsingInitialSelection];
   }
-  os_log_debug([KMLogs complianceLog], "checkCompliance workingSelectionApi for app %{public}@: set to %{public}@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO");
+  NSString *message = [NSString stringWithFormat:@"checkCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
   [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 
@@ -173,7 +175,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 /**
  * If complianceUncertain is true, checking the location after an insert can confirm whether the app is compliant.
- * Delete and insert are what core instructed us to do.
+ * insertedText and deletedText contain the text that Keyman Core instructed us to insert and delete
  * Text that was selected in the client when the key was processed is irrelevant as it does not affect the location.
  */
 -(void) checkComplianceAfterInsert:(NSString *)insertedText deleted:(NSString *)deletedText {
@@ -191,7 +193,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
   
-  os_log_info([KMLogs complianceLog], "checkComplianceAfterInsert, self.hasWorkingSelectionApi = %{public}@ for app %{public}@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId);
+  NSString *message = [NSString stringWithFormat:@"checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
   [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 

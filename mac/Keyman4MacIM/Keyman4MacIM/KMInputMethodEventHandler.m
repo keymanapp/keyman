@@ -325,7 +325,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // we do this whether the context has changed or not
   if (self.apiCompliance.canReadText) {
     contextString = [self readContext:event forClient:client];
-    os_log_debug([KMLogs eventsLog], "reportContext, setting new context='%{public}@' for compliant app (if needed)", contextString);
+    os_log_debug([KMLogs eventsLog], "reportContext, setting new context for compliant app (if needed)");
     [self.kme setCoreContextIfNeeded:contextString];
   } else if (self.contextChanged) {
     // we cannot read the text but know the context has changed, so we must clear it
@@ -391,15 +391,21 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   BOOL handledEvent = YES;
   
   if (output.isInsertOnlyScenario) {
-    os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, insert only scenario");
+    NSString *message = @"applyOutputToTextInputClient, insert only scenario";
+    os_log_debug([KMLogs keyLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario with passthrough");
+      NSString *message = @"applyOutputToTextInputClient, delete only scenario with passthrough";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       handledEvent = NO;
     } else {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario");
+      NSString *message = @"applyOutputToTextInputClient, delete only scenario";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
@@ -421,10 +427,14 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
      */
     
     if (self.apiCompliance.mustBackspaceUsingEvents) {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with events");
+      NSString *message = @"applyOutputToTextInputClient, delete and insert scenario with events";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       [self sendEvents:event forOutput:output];
     } else {
-      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with insert API");
+      NSString *message = @"applyOutputToTextInputClient, delete and insert scenario with insert API";
+      os_log_debug([KMLogs keyLog], "%@", message);
+      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -481,7 +491,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  * this method can only be used if approved by TextApiCompliance
  */
 -(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount toReplace:(NSString*)textToDelete client:(id) client {
-  os_log_debug([KMLogs keyLog], "insertAndReplaceText, insert: %{public}@, delete: %{public}@, replacementCount: %d", text, textToDelete, replacementCount);
   NSRange selectionRange = [client selectedRange];
   NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   
