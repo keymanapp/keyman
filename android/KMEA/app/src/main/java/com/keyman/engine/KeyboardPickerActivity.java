@@ -81,6 +81,14 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private boolean dismissOnSelect = true;
+
+  /*
+  // When the System Keyboard launches the keyboard picker while this flag is set,
+  // the intent includes Intent.FLAG_ACTIVITY_CLEAR_TASK which clears the activity stack.
+  // Disable this to keep the keyboard picker from clearing the Keyman app.
+   */
+  private static boolean canClearActivityTask = true;
+
   protected static boolean canAddNewKeyboard = true;
   protected static boolean canRemoveKeyboard = true;
   protected static boolean shouldCheckKeyboardUpdates = true;
@@ -472,6 +480,26 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     notifyKeyboardsUpdate(context);
+  }
+
+  /**
+   * Returns canClearActivityTask
+   * @return boolean
+   */
+  public static boolean getClearActivityTask() { return canClearActivityTask; }
+
+  /**
+   * Set canClearActivityTask to false so keyboard picker won't become the root of the activity stack
+   */
+  protected static void disableClearActivityTask() {
+    canClearActivityTask = false;
+  }
+
+  /**
+   * Set canClearActivityTask to true so keyboard picker becomes the root of the activity stack
+   */
+  protected static void enableClearActivityTask() {
+    canClearActivityTask = true;
   }
 
   /**

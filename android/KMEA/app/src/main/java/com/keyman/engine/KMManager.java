@@ -791,6 +791,20 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Calls disableClearActivityTask() so keyboard picker from system keyboard won't become the root of the activity stack
+   */
+  public static void disableClearActivityTask() {
+    KeyboardPickerActivity.disableClearActivityTask();
+  }
+
+  /**
+   * Calls enableClearActivityTask() keyboard picker from system keyboard becomes the root of the activity stack
+   */
+  public static void enableClearActivityTask() {
+    KeyboardPickerActivity.enableClearActivityTask();
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
@@ -2299,7 +2313,10 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      if (KeyboardPickerActivity.getClearActivityTask()) {
+        // Keyboard Picker Activity becomes root activity and clears Keyman app
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      }
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
