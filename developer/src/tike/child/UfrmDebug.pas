@@ -679,7 +679,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     dk: TDeadKeyInfo;
   begin
     Result.Selection := memo.Selection;
-    Result.Length := Length(memo.Text);
+    Result.Length := Length(memo.GetTextCR);
     for dk in FDeadkeys do
     begin
       if dk.Position >= Result.Selection.Start
@@ -694,7 +694,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     L: Integer;
     s: string;
   begin
-    s := memo.Text;
+    s := memo.GetTextCR;
     L := Length(s);
     for dk in FDeadkeys do
       if dk.SavedPosition < 0 then
@@ -710,6 +710,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
   procedure DoBackspace(BackspaceType: km_core_backspace_type; ExpectedValue: NativeUInt);
   var
+    t: string;
     m, n: Integer;
     dk: TDeadKeyInfo;
     state: TMemoSelectionState;
@@ -721,7 +722,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       'ExpectedValue=U+'+IntToHex(ExpectedValue, 4)+'; '+
       'memo.SelStart='+IntToStr(memo.SelStart)+'; '+
       'memo.SelLength='+IntToStr(memo.SelLength)+'; '+
-      'memo.Text='+Copy(memo.Text, 1, 256);
+      'memo.Text='+Copy(memo.GetTextCR, 1, 256);
     end;
   begin
     // Offset is zero-based, but string is 1-based. Beware!
@@ -740,11 +741,14 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       Exit;
     end;
 
+    t := memo.GetTextCR;
+
     case BackspaceType of
       KM_CORE_BT_MARKER:
         begin
           Assert(m >= 1, AssertionMessage);
-          Assert(memo.Text[m] = #$FFFC, AssertionMessage);
+          Assert(m <= t.Length, AssertionMessage);
+          Assert(t[m] = #$FFFC, AssertionMessage);
           dk := FDeadkeys.GetFromPosition(m-1);
           Assert(Assigned(dk));
           dk.Delete;
@@ -753,23 +757,19 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       KM_CORE_BT_CHAR:
         begin
           Assert(m >= 1, AssertionMessage);
-          Assert(memo.Text[m] <> #$FFFC, AssertionMessage);
+          Assert(m <= t.Length, AssertionMessage);
+          Assert(t[m] <> #$FFFC, AssertionMessage);
           // Delete surrogate pairs
           if (m > 1) and
-              Uni_IsSurrogate2(memo.Text[m]) and
-              Uni_IsSurrogate1(memo.Text[m-1]) then
-            Dec(m, 2)
-          // Delete \r\n line breaks
-          else if (m > 1) and
-              (memo.Text[m] = #$0A) and
-              (memo.Text[m-1] = #$0D) then
+              Uni_IsSurrogate2(t[m]) and
+              Uni_IsSurrogate1(t[m-1]) then
             Dec(m, 2)
           else
             Dec(m);
         end;
       KM_CORE_BT_UNKNOWN:
         begin
-          while (m >= 1) and (memo.Text[m] = #$FFFC) do
+          while (m >= 1) and (t[m] = #$FFFC) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk), AssertionMessage);
@@ -779,14 +779,14 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
           // Delete character
           if (m > 1) and
-              Uni_IsSurrogate2(memo.Text[m]) and
-              Uni_IsSurrogate1(memo.Text[m-1]) then
+              Uni_IsSurrogate2(t[m]) and
+              Uni_IsSurrogate1(t[m-1]) then
             Dec(m, 2)
           else
             Dec(m);
 
           // Also delete deadkeys to left of current character
-          while (m >= 1) and (memo.Text[m] = #$FFFC) do
+          while (m >= 1) and (t[m] = #$FFFC) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk), AssertionMessage);
@@ -800,7 +800,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
 
     memo.Lines.BeginUpdate;
     try
-      memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
+      memo.Text := Copy(t, 1, m) + Copy(t, n+1, MaxInt);
       memo.SelStart := m;
     finally
       memo.Lines.EndUpdate;
@@ -895,14 +895,16 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
-  procedure DoChar(const text: string);
+  procedure DoChar(text: string);
   var
     state: TMemoSelectionState;
+    selStart: Integer;
   begin
     state := SaveMemoSelectionState;
     // Line breaks: replace \r (0x0D) with \r\n (0x0D 0x0A) so line breaks work
-    memo.SelText := ReplaceStr(Text, #$0D, #$0D#$0A);
-    memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
+    selStart := memo.SelStart;
+    memo.SelText := text;
+    memo.SelStart := selStart + text.Length;
     memo.SelLength := 0;
     RealignMemoSelectionState(state);
   end;
@@ -1357,20 +1359,22 @@ end;
 procedure TfrmDebug.UpdateCharacterGrid;   // I4808
 var
   start, len: Integer;
+  t: string;
 begin
   if csDestroying in ComponentState then
     Exit;
 
   start := memo.SelStart;
   len := memo.SelLength;
-  if start + len > Length(memo.Text) then
+  t := memo.GetTextCR;
+  if start + len > t.Length then
   begin
     // RichEdit has a virtual final character, which is selected when
     // pressing Ctrl+A, etc.
-    len := Length(memo.Text) - start;
+    len := t.Length - start;
   end;
 
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len, memo.Selection.Anchor);
+  TCharacterGridRenderer.Fill(sgChars, t, FDeadkeys, start, len, memo.Selection.Anchor);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 

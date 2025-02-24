@@ -53,6 +53,8 @@ type
     procedure WndProc(var Message: TMessage); override;
   public
     constructor Create(AOwner: TComponent); override;
+    function GetTextCR: string;
+    function GetSelTextCR: string;
   published
     property AllowUnicode: Boolean read FAllowUnicodeInput write SetAllowUnicode default True;
     property OnMessage: TKeymanDeveloperDebuggerMessageEvent read FOnMessage write FOnMessage;
@@ -64,6 +66,9 @@ type
 procedure Register;
 
 implementation
+
+uses
+  System.SysUtils;
 
 { TKeymanDeveloperDebuggerMemo }
 
@@ -121,6 +126,16 @@ begin
       FSelectionChanging := False;
     end;
   end;
+end;
+
+function TKeymanDeveloperDebuggerMemo.GetSelTextCR: string;
+begin
+  Result := SelText.Replace(#$0D#$0A, #$0D, [rfReplaceAll]);
+end;
+
+function TKeymanDeveloperDebuggerMemo.GetTextCR: string;
+begin
+  Result := string(Text).Replace(#$0D#$0A, #$0D, [rfReplaceAll]);
 end;
 
 procedure TKeymanDeveloperDebuggerMemo.SetAllowUnicode(const Value: Boolean);
