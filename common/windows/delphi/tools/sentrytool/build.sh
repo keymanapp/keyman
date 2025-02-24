@@ -31,4 +31,4 @@ builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        delphi_msbuild sentrytool.dproj "//p:Platform=Win32"
 # builder_run_action test:project         do_test
-builder_run_action edit:project         start sentrytoolTests.dproj
+builder_run_action edit:project         start sentrytool.dproj

@@ -76,5 +76,5 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
-builder_run_action edit:project         start kmcompai.dproj
+builder_run_action edit:project         start kmcompapi.dproj
 
