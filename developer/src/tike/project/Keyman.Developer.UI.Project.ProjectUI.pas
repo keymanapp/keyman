@@ -40,6 +40,9 @@ uses
   Keyman.Developer.System.Project.Project,
   utildir;
 
+function LockProject(const AFilename: string): Boolean; forward;
+procedure UnlockProject; forward;
+
 function GetGlobalProjectUI: TProjectUI;
 begin
   Result := FGlobalProject as TProjectUI;
@@ -52,8 +55,12 @@ end;
 
 procedure FreeGlobalProjectUI;
 begin
-  FreeAndNil(FGlobalProject);
-  TikeMultiProcess.CloseProject;
+  try
+    FreeAndNil(FGlobalProject);
+    TikeMultiProcess.CloseProject;
+  finally
+    UnlockProject;
+  end;
 end;
 
 function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
@@ -65,6 +72,11 @@ begin
 
   AFileName := KGetTempFileName('.kpj');
   System.SysUtils.DeleteFile(AFileName);
+
+  if not LockProject(AFilename) then
+  begin
+    Exit(nil);
+  end;
 
   kpj := TProject.Create(pt, AFilename, False);
   try
@@ -93,6 +105,10 @@ end;
 function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 begin
   Assert(not Assigned(FGlobalProject));
+
+  if not LockProject(AFilename) then
+    Exit(nil);
+
   Result := TProjectUI.Create(pt, AFilename, True);   // I4687
   FGlobalProject := Result;
   TikeMultiProcess.OpenProject(
@@ -100,6 +116,24 @@ begin
     FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
       '', '')
   );
+end;
+
+var
+  hLockFile: THandle = INVALID_HANDLE_VALUE;
+
+function LockProject(const AFilename: string): Boolean;
+begin
+  Assert(hLockFile = INVALID_HANDLE_VALUE);
+  hLockFile := CreateFile(PChar(AFilename + '.lock'), GENERIC_READ or GENERIC_WRITE, 0, nil, CREATE_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, 0);
+  Result := hLockFile <> INVALID_HANDLE_VALUE;
+end;
+
+procedure UnlockProject;
+begin
+  if not hLockFile = INVALID_HANDLE_VALUE then
+    Exit;
+  CloseHandle(hLockFile);
+  hLockFile := INVALID_HANDLE_VALUE;
 end;
 
 end.
