@@ -109,7 +109,9 @@ begin
   Assert(not Assigned(FGlobalProject));
 
   if not LockProject(AFilename) then
+  begin
     Exit(nil);
+  end;
 
   Result := TProjectUI.Create(pt, AFilename, True);   // I4687
   FGlobalProject := Result;
@@ -130,7 +132,9 @@ begin
   Assert(hLockFile = INVALID_HANDLE_VALUE);
 
   if not ForceDirectories(TKeymanDeveloperPaths.LockFilePath) then
+  begin
     Exit(False);
+  end;
 
   LockFilename := TKeymanDeveloperPaths.LockFilePath + THashSHA1.GetHashString(AFilename.ToLower) + '.lock';
 
@@ -141,7 +145,10 @@ end;
 procedure UnlockProject;
 begin
   if not hLockFile = INVALID_HANDLE_VALUE then
+  begin
     Exit;
+  end;
+
   CloseHandle(hLockFile);
   hLockFile := INVALID_HANDLE_VALUE;
 end;
