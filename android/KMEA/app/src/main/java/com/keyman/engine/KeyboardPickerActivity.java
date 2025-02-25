@@ -85,9 +85,9 @@ public final class KeyboardPickerActivity extends BaseActivity {
   /*
   // When the System Keyboard launches the keyboard picker while this flag is set,
   // the intent includes Intent.FLAG_ACTIVITY_CLEAR_TASK which clears the activity stack.
-  // Disable this to keep the keyboard picker from clearing the Keyman app.
+  // Disable this to keep the keyboard picker from clearing the parent app.
    */
-  private static boolean canClearActivityTask = true;
+  private static boolean canCloseParentAppOnShowKeyboardPicker = true;
 
   protected static boolean canAddNewKeyboard = true;
   protected static boolean canRemoveKeyboard = true;
@@ -483,23 +483,29 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   /**
-   * Returns canClearActivityTask
+   * Returns canCloseParentAppOnShowKeyboardPicker
    * @return boolean
    */
-  public static boolean getClearActivityTask() { return canClearActivityTask; }
-
-  /**
-   * Set canClearActivityTask to false so keyboard picker won't become the root of the activity stack
-   */
-  protected static void disableClearActivityTask() {
-    canClearActivityTask = false;
+  public static boolean getCanCloseParentAppOnShowKeyboardPicker() {
+    return canCloseParentAppOnShowKeyboardPicker;
   }
 
   /**
-   * Set canClearActivityTask to true so keyboard picker becomes the root of the activity stack
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function keeps the parent app running in the background
    */
-  protected static void enableClearActivityTask() {
-    canClearActivityTask = true;
+  protected static void dontCloseParentAppOnShowKeyboardPicker() {
+    canCloseParentAppOnShowKeyboardPicker = false;
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function restores this default behavior
+   */
+  protected static void closeParentAppOnShowKeyboardPicker() {
+    canCloseParentAppOnShowKeyboardPicker = true;
   }
 
   /**
