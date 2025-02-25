@@ -7,18 +7,7 @@
  */
 
 export enum TokenTypes {
-  TT_EVENTS     = "TT_EVENTS",
-  TT_RESET      = "TT_RESET",
-  TT_COMMANDS   = "TT_COMMANDS",
-  TT_END        = "TT_END",
-  TT_STATE      = "TT_STATE",
-  TT_ACTIONS    = "TT_ACTIONS",
-  TT_LEFT       = "TT_LEFT",
-  TT_RIGHT      = "TT_RIGHT",
-  TT_TRANSITION = "TT_TRANSITION",
-  TT_IDENTIFIER = "TT_IDENTIFIER",
-  TT_WHITESPACE = "TT_WHITESPACE",
-  TT_COMMENT    = "TT_COMMENT",
+  TT_STORE = "TT_STORE",
 };
 
 export class ScanRecogniser {
@@ -46,18 +35,7 @@ class StateMachineTokeniser {
     this.buffer    = buffer;
     this.tokenList = tokenList;
     const scanRecognisers = [
-      new ScanRecogniser(TokenTypes.TT_EVENTS,     new RegExp("^events"),      true),
-      new ScanRecogniser(TokenTypes.TT_RESET,      new RegExp("^resetEvents"), true),
-      new ScanRecogniser(TokenTypes.TT_COMMANDS,   new RegExp("^commands"),    true),
-      new ScanRecogniser(TokenTypes.TT_END,        new RegExp("^end"),         true),
-      new ScanRecogniser(TokenTypes.TT_STATE,      new RegExp("^state"),       true),
-      new ScanRecogniser(TokenTypes.TT_ACTIONS,    new RegExp("^actions"),     true),
-      new ScanRecogniser(TokenTypes.TT_LEFT,       new RegExp("^\\{"),         true),
-      new ScanRecogniser(TokenTypes.TT_RIGHT,      new RegExp("^\\}"),         true),
-      new ScanRecogniser(TokenTypes.TT_TRANSITION, new RegExp("^=>"),          true),
-      new ScanRecogniser(TokenTypes.TT_IDENTIFIER, new RegExp("^(\\w)+"),      true),
-      new ScanRecogniser(TokenTypes.TT_WHITESPACE, new RegExp("^(\\s)+"),      false),
-      new ScanRecogniser(TokenTypes.TT_COMMENT,    new RegExp("^\\\\(.)*$"),   false),
+      new ScanRecogniser(TokenTypes.TT_STORE, new RegExp("^store"), true),
     ];
     this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of scanRecognisers) {
@@ -70,7 +48,7 @@ class StateMachineTokeniser {
   }
 
   private matchToken() {
-    let patternIterator: MapIterator<ScanRecogniser> = this.patternMatchers.values();
+    let patternIterator: Iterator<ScanRecogniser> = this.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
     let match: RegExpExecArray | null;
