@@ -843,27 +843,6 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     end;
   end;
 
-  procedure DoHandleShortcut(vk: UINT);
-  begin
-    // Because we disable shortcuts in the debug memo, there are a small set of
-    // editor Ctrl+Key shortcuts we need to rehandle here. Note that Ctrl+Ins,
-    // Shift+Ins, Shift+Del appear to be handled natively by the debug memo
-    // control (Windows code?), as are all cursor movement / selection keys,
-    // apart from Ctrl+A
-
-    if GetKeyState(VK_CONTROL) >= 0 then
-      Exit;
-
-    case vk of
-      Ord('A'): memo.SelectAll;
-      Ord('C'): memo.CopyToClipboard;
-      Ord('V'): memo.PasteFromClipboard;
-      Ord('X'): memo.CutToClipboard;
-      Ord('Y'): ; // redo not supported in edit
-      Ord('Z'): memo.Undo;
-    end;
-  end;
-
   procedure DoEmitKeystroke(dwData: DWord);
   var
     flag: Integer;
@@ -888,8 +867,6 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         then msg.Msg := WM_SYSKEYUP
         else msg.Msg := WM_KEYUP;
       memo.Dispatch(msg);
-
-      DoHandleShortcut(LOBYTE(dwData));
 
       RealignMemoSelectionState(state);
     end;
