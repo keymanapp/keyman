@@ -33,9 +33,11 @@ function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
 implementation
 
 uses
+  System.Hash,
   System.SysUtils,
   Winapi.Windows,
 
+  Keyman.Developer.System.KeymanDeveloperPaths,
   Keyman.Developer.System.TikeMultiProcess,
   Keyman.Developer.System.Project.Project,
   utildir;
@@ -122,9 +124,17 @@ var
   hLockFile: THandle = INVALID_HANDLE_VALUE;
 
 function LockProject(const AFilename: string): Boolean;
+var
+  LockFilename: string;
 begin
   Assert(hLockFile = INVALID_HANDLE_VALUE);
-  hLockFile := CreateFile(PChar(AFilename + '.lock'), GENERIC_READ or GENERIC_WRITE, 0, nil, CREATE_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, 0);
+
+  if not ForceDirectories(TKeymanDeveloperPaths.LockFilePath) then
+    Exit(False);
+
+  LockFilename := TKeymanDeveloperPaths.LockFilePath + THashSHA1.GetHashString(AFilename.ToLower) + '.lock';
+
+  hLockFile := CreateFile(PChar(LockFilename), GENERIC_READ or GENERIC_WRITE, 0, nil, CREATE_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, 0);
   Result := hLockFile <> INVALID_HANDLE_VALUE;
 end;
 
