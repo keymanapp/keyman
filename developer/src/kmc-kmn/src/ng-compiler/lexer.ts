@@ -26,14 +26,14 @@ export class ScanRecogniser {
   }
 }
 
-class StateMachineTokeniser {
+export class Lexer {
   patternMatchers: Map<TokenTypes, ScanRecogniser>;
   buffer: String;
   tokenList: Token[];
 
-  constructor(buffer: String, tokenList: Token[]) {
+  constructor(buffer: String) {
     this.buffer    = buffer;
-    this.tokenList = tokenList;
+    this.tokenList = [];
     const scanRecognisers = [
       new ScanRecogniser(TokenTypes.TT_STORE, new RegExp("^store"), true),
     ];
@@ -43,8 +43,9 @@ class StateMachineTokeniser {
     }
   }
 
-  public parse(): void {
+  public parse(): Token[]  {
     while (this.matchToken());
+    return this.tokenList;
   }
 
   private matchToken() {
@@ -88,9 +89,3 @@ export class Token {
   }
 }
 
-export function lexer(buffer: String): Token[] {
-  const tokens: Token[] = [];
-  const smt: StateMachineTokeniser = new StateMachineTokeniser(buffer, tokens);
-  smt.parse();
-  return tokens;
-}

@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { lexer, ScanRecogniser, Token, TokenTypes } from '../../src/ng-compiler/lexer.js'
+import { Lexer, ScanRecogniser, Token, TokenTypes } from '../../src/ng-compiler/lexer.js'
 
 describe("Lexer Tests", () => {
   describe("ScanRecogniser", () => {
@@ -23,9 +23,10 @@ describe("Lexer Tests", () => {
       assert.deepEqual(token.toString(), '[TT_STORE,store]');
     });
   });
-  describe("lexer", () => {
+  describe("Lexer", () => {
     it("can recognise a TT_STORE token", () => {
-      const actual   = lexer(new String('store'));
+      const lexer = new Lexer(new String('store'));
+      const actual   = lexer.parse();
       const expected = [new Token(TokenTypes.TT_STORE, 'store')];
       assert.deepEqual(actual, expected);
     });
