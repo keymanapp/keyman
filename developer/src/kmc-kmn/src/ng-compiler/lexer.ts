@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Dr Mark C. Sinclair on 2025-02-25
+ *
+ * KMC KMN Next Generation Lexer
+ */
+
 export enum TokenTypes {
   TT_EVENTS     = "TT_EVENTS",
   TT_RESET      = "TT_RESET",
@@ -66,7 +74,6 @@ class StateMachineTokeniser {
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
     let match: RegExpExecArray | null;
-    let lastIndex: number        = 0;
     let tokenMatch: boolean      = false;
     let parseInProgress: boolean = true;
 
