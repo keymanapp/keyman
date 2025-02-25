@@ -32,6 +32,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.text.InputType;
 import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
@@ -707,12 +708,17 @@ public final class KMManager {
         SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } catch (AndroidRuntimeException e) {
         // Catch fatal error when WebView not installed/enabled
-        // Catch fatal error when WebView not installed/enabled
         // Only log exceptions unrelated to WebView
         if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
-          KMLog.LogException(TAG, "initKeyboard for SYSTEM" , e);
+          KMLog.LogException(TAG, "initKeyboard for SYSTEM", e);
         }
-        // TODO: Send user to pick another system keyboard
+        // Direct user to pick another system keyboard
+        Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        appContext.startActivity(intent);
+
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);

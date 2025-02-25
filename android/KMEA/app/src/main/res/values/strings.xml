@@ -139,7 +139,7 @@
     <string name="body_install_webview" comment="Notification when WebView not installed">
         Keyman requires WebView to be installed."</string>
 
-    <!-- ContexT: Alert Dialog body: Switch to another keyboard -->
+    <!-- Context: Alert Dialog body: Switch to another keyboard -->
     <string name="body_switch_keyboard" comment="Direct user to select another keyboard">
         Keyman requires WebView to be installed and enabled.\n\n
         Switch to a different keyboard.
