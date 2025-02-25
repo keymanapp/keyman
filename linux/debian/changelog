@@ -1,3 +1,9 @@
+keyman (18.0-1) UNRELEASED; urgency=medium
+
+  * closes: 1092463
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 19 Feb 2025 17:21:51 +0100
+
 keyman (17.0.335-1) unstable; urgency=medium
 
   * New upstream release.

@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.199 beta 2025-02-24
+
+* fix(windows): Update Greek Polytonic for keyboard help (#13323)
+
+## 18.0.198 beta 2025-02-21
+
+* fix(android): Update system keyboard height consistently (#13273)
+
+## 18.0.197 beta 2025-02-20
+
+* fix(linux): address compiling with ICU 76 (#13285)
+
 ## 18.0.196 beta 2025-02-19
 
 * fix(windows): remove sentry report on firstrun in idle state (#13266)

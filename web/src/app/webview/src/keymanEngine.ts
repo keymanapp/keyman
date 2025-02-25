@@ -9,12 +9,13 @@ import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec 
 import ContextManager, { ContextHost } from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
+import { WorkerFactory } from '@keymanapp/lexical-model-layer';
 
 export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, ContextManager, PassthroughKeyboard> {
   // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
   // But it's too new of a feature to utilize... and also expects to be in a module, when this may
   // be compiled down to an IIFE.
-  constructor(worker: Worker, sourceUri: string) {
+  constructor(workerFactory: WorkerFactory, sourceUri: string) {
     const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
     config.onRuleFinalization = (ruleBehavior: RuleBehavior) => {
@@ -30,7 +31,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
       }
     }
 
-    super(worker, config, new ContextManager(config), (engine) => {
+    super(workerFactory, config, new ContextManager(config), (engine) => {
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
