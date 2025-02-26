@@ -32,7 +32,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.text.InputType;
 import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
@@ -713,12 +712,8 @@ public final class KMManager {
           KMLog.LogException(TAG, "initKeyboard for SYSTEM", e);
         }
         // Direct user to pick another system keyboard
-        Intent intent = new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        appContext.startActivity(intent);
-
+        InputMethodManager imManager = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);

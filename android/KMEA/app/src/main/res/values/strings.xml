@@ -131,19 +131,9 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
       Error in keyboard %1$s:%2$s for %3$s language.</string>
 
-    <!-- Context: Alert Dialog title: System WebView not installed or enabled -->
-    <string name="alert_dialog_title_webview_missing">
-        Fatal Error: WebView Missing</string>
-
     <!-- Context: Alert Dialog body: System WebView not installed -->
     <string name="body_install_webview" comment="Notification when WebView not installed">
         Keyman requires WebView to be installed."</string>
-
-    <!-- Context: Alert Dialog body: Switch to another keyboard -->
-    <string name="body_switch_keyboard" comment="Direct user to select another keyboard">
-        Keyman requires WebView to be installed and enabled.\n\n
-        Switch to a different keyboard.
-    </string>
 
     <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
     <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">
