@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.201 beta 2025-02-26
+
+* fix(web): prevent cookie-default behavior from mangling engine init (#13331)
+* chore(linux): adjust to renamed xdg module (#13354)
+
 ## 18.0.200 beta 2025-02-25
 
 * fix(web): properly support workerless use of Web engine (#13290)
