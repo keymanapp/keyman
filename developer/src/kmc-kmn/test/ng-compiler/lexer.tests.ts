@@ -45,6 +45,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_VERSION token", () => {
       recogniseToken(TokenTypes.TT_VERSION, 'version');
     });
+    it("can recognise a TT_NAME token", () => {
+      recogniseToken(TokenTypes.TT_NAME, 'name');
+    });
     it("can recognise a TT_STRING token (single quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
     });
@@ -53,6 +56,15 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.TT_WHITESPACE, ' ');
+    });
+    it("can recognise a TT_NEWLINE token (LF)", () => {
+      recogniseToken(TokenTypes.TT_NEWLINE, '\n');
+    });
+    it("can recognise a TT_NEWLINE token (CR)", () => {
+      recogniseToken(TokenTypes.TT_NEWLINE, '\r');
+    });
+    it("can recognise a TT_NEWLINE token (CRLF)", () => {
+      recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
     });
     it("can recognise a version store", () => {
       recogniseTokens(
@@ -65,6 +77,20 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_RIGHT_BR,   ')'),
           new Token(TokenTypes.TT_WHITESPACE, ' '),
           new Token(TokenTypes.TT_STRING,     '\'10.0\''),
+        ]
+      );
+    });
+    it("can recognise a name store", () => {
+      recogniseTokens(
+        'store(&NAME) "Khmer Angkor"',
+        [
+          new Token(TokenTypes.TT_STORE,      'store'),
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_AMPHASAND,  '&'),
+          new Token(TokenTypes.TT_NAME,       'NAME'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_STRING,     '"Khmer Angkor"'),
         ]
       );
     });

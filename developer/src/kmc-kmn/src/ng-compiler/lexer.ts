@@ -12,8 +12,10 @@ export enum TokenTypes {
   TT_RIGHT_BR   = "TT_RIGHT_BR",
   TT_AMPHASAND  = "TT_AMPHASAND",
   TT_VERSION    = "TT_VERSION",
+  TT_NAME       = "TT_NAME",
   TT_STRING     = "TT_STRING",
-  TT_WHITESPACE = "TT_WHITESPACE"
+  TT_WHITESPACE = "TT_WHITESPACE",
+  TT_NEWLINE    = "TT_NEWLINE",
 };
 
 export class ScanRecogniser {
@@ -41,13 +43,15 @@ export class Lexer {
     this.buffer    = buffer;
     this.tokenList = [];
     const scanRecognisers = [
-      new ScanRecogniser(TokenTypes.TT_STORE,      new RegExp("^store", "i"),    true),
-      new ScanRecogniser(TokenTypes.TT_LEFT_BR,    new RegExp("^\\("),           true),
-      new ScanRecogniser(TokenTypes.TT_RIGHT_BR,   new RegExp("^\\)"),           true),
-      new ScanRecogniser(TokenTypes.TT_AMPHASAND,  new RegExp("^&"),             true),
-      new ScanRecogniser(TokenTypes.TT_VERSION,    new RegExp("^version", "i"),  true),
-      new ScanRecogniser(TokenTypes.TT_STRING,     new RegExp("^('.*'|\".*\")"), true),
-      new ScanRecogniser(TokenTypes.TT_WHITESPACE, new RegExp("^(\\s)+"),        true),
+      new ScanRecogniser(TokenTypes.TT_STORE,      new RegExp("^store", "i"),       true),
+      new ScanRecogniser(TokenTypes.TT_LEFT_BR,    new RegExp("^\\("),              true),
+      new ScanRecogniser(TokenTypes.TT_RIGHT_BR,   new RegExp("^\\)"),              true),
+      new ScanRecogniser(TokenTypes.TT_AMPHASAND,  new RegExp("^&"),                true),
+      new ScanRecogniser(TokenTypes.TT_VERSION,    new RegExp("^version", "i"),     true),
+      new ScanRecogniser(TokenTypes.TT_NAME,       new RegExp("^name", "i"),        true),
+      new ScanRecogniser(TokenTypes.TT_STRING,     new RegExp("^('.*'|\".*\")"),    true),
+      new ScanRecogniser(TokenTypes.TT_WHITESPACE, new RegExp("^[^\\S\\r\\n]+"),    true),
+      new ScanRecogniser(TokenTypes.TT_NEWLINE,    new RegExp("^(\\r\\n|\\n|\\r)"), true),
     ];
     this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of scanRecognisers) {
