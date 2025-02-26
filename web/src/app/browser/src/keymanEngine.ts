@@ -204,7 +204,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Capture the saved-keyboard string now, before we load any keyboards/stubs
     // or do anything that would mutate the value.
-    const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
+    let savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
     if(device.touchable) {
       this.osk = new views.AnchoredOSKView(this);
@@ -229,12 +229,17 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Let any deferred, pre-init stubs complete registration
     await Promise.resolve();
 
-    // Attempt to restore the user's last-used keyboard from their previous session.
-    //
-    // Note:  any cloud stubs will probably not be available yet.
-    // If we tracked cloud requests and awaited a Promise.all on pending queries,
-    // we could handle that too.
-    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+    // If there's no value here, we should check to see if `Keyboard_us:en`
+    // is one of the available stubs; we default to that if it's available.
+    savedKeyboardStr ||= this.contextManager.getSavedKeyboard();
+    if(savedKeyboardStr) {
+      // Attempt to restore the user's last-used keyboard from their previous session.
+      //
+      // Note:  any cloud stubs will probably not be available yet.
+      // If we tracked cloud requests and awaited a Promise.all on pending queries,
+      // we could handle that too.
+      this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+    }
 
     await Promise.resolve();
   }
