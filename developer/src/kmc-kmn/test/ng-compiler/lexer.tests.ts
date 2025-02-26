@@ -25,10 +25,61 @@ describe("Lexer Tests", () => {
   });
   describe("Lexer", () => {
     it("can recognise a TT_STORE token", () => {
-      const lexer = new Lexer(new String('store'));
-      const actual   = lexer.parse();
-      const expected = [new Token(TokenTypes.TT_STORE, 'store')];
-      assert.deepEqual(actual, expected);
+      recogniseToken(TokenTypes.TT_STORE, 'store');
+    });
+    it("can recognise a TT_STORE token in upper case", () => {
+      recogniseToken(TokenTypes.TT_STORE, 'STORE');
+    });
+    it("can recognise a TT_STORE token in mixed case", () => {
+      recogniseToken(TokenTypes.TT_STORE, 'Store');
+    });
+    it("can recognise a TT_LEFT_BR token", () => {
+      recogniseToken(TokenTypes.TT_LEFT_BR, '(');
+    });
+    it("can recognise a TT_RIGHT_BR token", () => {
+      recogniseToken(TokenTypes.TT_RIGHT_BR, ')');
+    });
+    it("can recognise a TT_AMPHASAND token", () => {
+      recogniseToken(TokenTypes.TT_AMPHASAND, '&');
+    });
+    it("can recognise a TT_VERSION token", () => {
+      recogniseToken(TokenTypes.TT_VERSION, 'version');
+    });
+    it("can recognise a TT_STRING token (single quote)", () => {
+      recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
+    });
+    it("can recognise a TT_STRING token (double quote)", () => {
+      recogniseToken(TokenTypes.TT_STRING, '"10.0"');
+    });
+    it("can recognise a TT_WHITESPACE token (single space)", () => {
+      recogniseToken(TokenTypes.TT_WHITESPACE, ' ');
+    });
+    it("can recognise a version store", () => {
+      recogniseTokens(
+        'store(&VERSION) \'10.0\'',
+        [
+          new Token(TokenTypes.TT_STORE,      'store'),
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_AMPHASAND,  '&'),
+          new Token(TokenTypes.TT_VERSION,    'VERSION'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_STRING,     '\'10.0\''),
+        ]
+      );
     });
   });
 });
+
+function recogniseToken(type: TokenTypes, text: String): void {
+  const lexer    = new Lexer(new String(text));
+  const actual   = lexer.parse();
+  const expected = [new Token(type, text)];
+  assert.deepEqual(actual, expected);
+}
+
+function recogniseTokens(text: String, expected: Token[]): void {
+  const lexer    = new Lexer(new String(text));
+  const actual   = lexer.parse();
+  assert.deepEqual(actual, expected);
+}

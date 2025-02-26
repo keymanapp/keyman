@@ -7,7 +7,13 @@
  */
 
 export enum TokenTypes {
-  TT_STORE = "TT_STORE",
+  TT_STORE      = "TT_STORE",
+  TT_LEFT_BR    = "TT_LEFT_BR",
+  TT_RIGHT_BR   = "TT_RIGHT_BR",
+  TT_AMPHASAND  = "TT_AMPHASAND",
+  TT_VERSION    = "TT_VERSION",
+  TT_STRING     = "TT_STRING",
+  TT_WHITESPACE = "TT_WHITESPACE"
 };
 
 export class ScanRecogniser {
@@ -35,7 +41,13 @@ export class Lexer {
     this.buffer    = buffer;
     this.tokenList = [];
     const scanRecognisers = [
-      new ScanRecogniser(TokenTypes.TT_STORE, new RegExp("^store"), true),
+      new ScanRecogniser(TokenTypes.TT_STORE,      new RegExp("^store", "i"),    true),
+      new ScanRecogniser(TokenTypes.TT_LEFT_BR,    new RegExp("^\\("),           true),
+      new ScanRecogniser(TokenTypes.TT_RIGHT_BR,   new RegExp("^\\)"),           true),
+      new ScanRecogniser(TokenTypes.TT_AMPHASAND,  new RegExp("^&"),             true),
+      new ScanRecogniser(TokenTypes.TT_VERSION,    new RegExp("^version", "i"),  true),
+      new ScanRecogniser(TokenTypes.TT_STRING,     new RegExp("^('.*'|\".*\")"), true),
+      new ScanRecogniser(TokenTypes.TT_WHITESPACE, new RegExp("^(\\s)+"),        true),
     ];
     this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of scanRecognisers) {
