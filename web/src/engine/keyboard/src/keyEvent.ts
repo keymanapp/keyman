@@ -93,6 +93,15 @@ export default class KeyEvent implements KeyEventSpec {
   keyDistribution?: KeyDistribution;
 
   /**
+   * Information provided here may be used for breadcrumbs regarding internal engine errors and warnings.
+   * It should be scrubbed of info that could be used to directly reproduce what the user has typed.
+   *
+   * One great use is to identify scenarios such as how the current state of an OSK gesture was reached and
+   * culminated in this key event.
+   */
+  inputBreadcrumb?: string;
+
+  /**
    * The device model for web-core to follow when processing the keystroke.
    */
   device: DeviceSpec;

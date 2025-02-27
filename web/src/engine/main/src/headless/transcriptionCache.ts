@@ -34,4 +34,11 @@ export class TranscriptionCache {
       this.map.delete(this.map.keys().next().value);
     }
   }
+
+  public buildLog(): string {
+    const entries = [...this.map.entries()].reverse();
+    return entries
+      .map(([key, entry]) => `Context state ${key}'s keystroke:\n${entry.keystroke.inputBreadcrumb ?? ''}`)
+      .join('\n');
+  }
 }
