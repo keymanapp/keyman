@@ -969,28 +969,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } catch (ex) { }
     return null;
   }
-
-  /**
-   *  Repeat backspace as long as the backspace key is held down
-   **/
-  repeatDelete: () => void = function (this: VisualKeyboard) {
-    if (this.deleting) {
-      this.modelKeyClick(this.deleteKey);
-      this.deleting = window.setTimeout(this.repeatDelete, 100);
-    }
-  }.bind(this);
-
-  /**
-   * Cancels any active repeatDelete() timeouts, ensuring that
-   * repeating backspace operations are properly terminated.
-   */
-  cancelDelete() {
-    // Clears the delete-repeating timeout.
-    if (this.deleting) {
-      window.clearTimeout(this.deleting);
-    }
-    this.deleting = 0;
-  }
   //#endregion
 
   modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
