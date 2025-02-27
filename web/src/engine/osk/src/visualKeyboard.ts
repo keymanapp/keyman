@@ -597,9 +597,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
-
         const coordSource = gestureStage.sources[0];
-        const coord: InputSample<KeyElement, string> = coordSource ? coordSource.currentSample : null;
 
         let keyResult: KeyRuleEffects = null;
 
@@ -628,7 +626,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+            keyResult = this.modelKeyClick(gestureSequence, correctionKeyDistribution); // second spot for modelKeyClick
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
@@ -660,7 +658,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             //
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
-            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
+            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureSequence))]; // site 1 for modelKeyClick
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => {
               gestureKey.key.highlight(false);
@@ -946,7 +944,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
   //#endregion
 
-  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
+  // Retool:  take in `gestureStage` (or its index?) and the SEQUENCE; the latter lets us log gesture breadcrumbs.
+  modelKeyClick(sequence: GestureSequence<KeyElement>, keyDistribution?: KeyDistribution) {
+    if(!sequence) {
+      throw new Error("cannot model key event without its gesture");
+    }
+    const stage = sequence.stageReports[sequence.stageReports.length-1];
+    const e = stage.item;
+    const input = stage.sources[0]?.currentSample;
+
+    if(!e) {
+      throw new Error(`Cannot model keypress without a selected key: \n${sequence.trace()}`);
+    }
+
     let keyEvent = this.initKeyEvent(e);
 
     if (input) {
@@ -956,6 +966,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       keyEvent.keyDistribution = keyDistribution;
     }
 
+    keyEvent.inputBreadcrumb = sequence.trace();
     return this.raiseKeyEvent(keyEvent, e);
   }
 
