@@ -979,12 +979,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
-    //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
-
     // Start:  mirrors _GetKeyEventProperties
 
     // First check the virtual key, and process shift, control, alt or function keys
-    //let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
     let Lkc = this.layoutKeyboard.constructKeyEvent(keySpec, this.device, this.stateKeys);
 
     /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
@@ -1013,7 +1010,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    */
   _UpdateVKShiftStyle(layerId?: string) {
     var i;
-    //let core = com.keyman.singleton.core;
 
     if (!layerId) {
       layerId = this.layerId;
