@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.202 beta 2025-02-27
+
+* fix(android): Direct user to switch system IME when WebView fails (#13352)
+* fix(android): Filter out SocketTimeoutExceptions (#13353)
+* refactor(linux): extract method for setting up mocks in tests (#13355)
+* chore(linux): update to current Debian policy version (#13362)
+* fix(developer): prevent double action of editor hotkeys in debugger (#13345)
+* fix(linux): ignore DBusException during install and uninstall (#13356)
+* fix(linux): ignore exception when fcitx5-configtool is not found (#13363)
+* fix(developer): prevent simultaneous opening of the same project by two processes (#13341)
+* chore: add a workflow to automatically close linked issues (#13369)
+
 ## 18.0.201 beta 2025-02-26
 
 * fix(web): prevent cookie-default behavior from mangling engine init (#13331)
