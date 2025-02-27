@@ -27,7 +27,7 @@ class KeymanConfigService(dbus.service.Object):
 
     @dbus.service.method(BUS_NAME)
     def keyboard_list_changed(self):
-        logging.debug("%s: -------------keyboard_list_changed--------------------" % os.getpid())
+        logging.debug(f"{os.getpid()}: -------------keyboard_list_changed--------------------")
         if self.__keyboard_list_changed_handler:
             self.__keyboard_list_changed_handler()
         self.KeyboardListChangedSignal()
@@ -45,30 +45,30 @@ class KeymanConfigServiceManager:
 
     def __is_name_owner(self) -> bool:
         retval = self.__bus.request_name(BUS_NAME, dbus.bus.NAME_FLAG_DO_NOT_QUEUE)
-        return (
-          retval == dbus.bus.REQUEST_NAME_REPLY_ALREADY_OWNER or
-          retval == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER)
+        return retval in [
+            dbus.bus.REQUEST_NAME_REPLY_ALREADY_OWNER,
+            dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER,
+        ]
 
     def __create_service(self) -> None:
         if self.__signal_receiver:
             self.__signal_receiver.remove()
             self.__signal_receiver = None
         if self.__is_name_owner():
-            logging.debug('%s: I am now owner (%s)' % (os.getpid(), self.__bus.get_name_owner(BUS_NAME)))
+            logging.debug(f'{os.getpid()}: I am now owner ({self.__bus.get_name_owner(BUS_NAME)})')
             if self.__name_owner_watch:
                 self.__name_owner_watch.cancel()
                 self.__name_owner_watch = None
             self.__service = KeymanConfigService(self.__bus, self.__keyboard_list_changed_handler)
         else:
-            logging.debug('%s: Not owner. Owner is %s. Connecting signal' %
-                          (os.getpid(), self.__bus.get_name_owner(BUS_NAME)))
+            logging.debug(f'{os.getpid()}: Not owner. Owner is {self.__bus.get_name_owner(BUS_NAME)}. Connecting signal')
             self.__service = self.__bus.get_object(BUS_NAME, OBJECT_PATH, introspect=False)
             if self.__keyboard_list_changed_handler:
                 self.__signal_receiver = self.__service.connect_to_signal(
                   'KeyboardListChangedSignal', self.__keyboard_list_changed_handler, dbus_interface=BUS_NAME)
 
     def __name_owner_changed(self, new_owner) -> None:
-        logging.debug('%s: Owner changed. Recreating service.' % os.getpid())
+        logging.debug(f'{os.getpid()}: Owner changed. Recreating service.')
         self.__create_service()
 
     def __verify_service_exists(self) -> None:

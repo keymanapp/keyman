@@ -237,35 +237,23 @@ class UninstallKmpIbusTests(unittest.TestCase):
 
 class UninstallKmpCommonTests(unittest.TestCase):
     def setUp(self):
-        patcher1 = patch('keyman_config.uninstall_kmp.get_keyboard_dir')
-        self.mockGetKeyboardDir = patcher1.start()
-        self.addCleanup(patcher1.stop)
-        patcher2 = patch('keyman_config.uninstall_kmp.get_keyman_doc_dir')
-        self.mockGetKeymanDocDir = patcher2.start()
-        self.addCleanup(patcher2.stop)
-        patcher3 = patch('keyman_config.uninstall_kmp.get_keyman_font_dir')
-        self.mockGetKeymanFontDir = patcher3.start()
-        self.addCleanup(patcher3.stop)
-        patcher4 = patch('keyman_config.uninstall_kmp.is_gnome_desktop')
-        self.mockIsGnomeShell = patcher4.start()
-        self.addCleanup(patcher4.stop)
+        self.mockGetKeyboardDir = self._setupMock('keyman_config.uninstall_kmp.get_keyboard_dir')
+        self.mockGetKeymanDocDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_doc_dir')
+        self.mockGetKeymanFontDir = self._setupMock('keyman_config.uninstall_kmp.get_keyman_font_dir')
+        self.mockIsGnomeShell = self._setupMock('keyman_config.uninstall_kmp.is_gnome_desktop')
         self.mockIsGnomeShell.return_value = False
-        patcher5 = patch('keyman_config.uninstall_kmp.is_fcitx_running')
-        self.mockIsFcitxRunning = patcher5.start()
-        self.addCleanup(patcher5.stop)
+        self.mockIsFcitxRunning = self._setupMock('keyman_config.uninstall_kmp.is_fcitx_running')
         self.mockIsFcitxRunning.return_value = False
-        patcher6 = patch('keyman_config.uninstall_kmp._uninstall_keyboards_from_ibus')
-        self.mockUninstallKeyboardsFromIbus = patcher6.start()
-        self.addCleanup(patcher6.stop)
-        patcher7 = patch('keyman_config.uninstall_kmp._uninstall_dir')
-        self.mockUninstallDir = patcher7.start()
-        self.addCleanup(patcher7.stop)
-        patcher8 = patch('keyman_config.uninstall_kmp.get_metadata')
-        self.mockGetMetaData = patcher8.start()
-        self.addCleanup(patcher8.stop)
-        patcher9 = patch('keyman_config.uninstall_kmp.CustomKeyboards')
-        self.mockCustomKeyboardsClass = patcher9.start()
-        self.addCleanup(patcher9.stop)
+        self.mockUninstallKeyboardsFromIbus = self._setupMock('keyman_config.uninstall_kmp._uninstall_keyboards_from_ibus')
+        self.mockUninstallDir = self._setupMock('keyman_config.uninstall_kmp._uninstall_dir')
+        self.mockGetMetaData = self._setupMock('keyman_config.uninstall_kmp.get_metadata')
+        self.mockCustomKeyboardsClass = self._setupMock('keyman_config.uninstall_kmp.CustomKeyboards')
+
+    def _setupMock(self, arg0):
+        patcher = patch(arg0)
+        result = patcher.start()
+        self.addCleanup(patcher.stop)
+        return result
 
     def test_UninstallKmpCommon_NoRemoveLanguage(self):
         # Setup
