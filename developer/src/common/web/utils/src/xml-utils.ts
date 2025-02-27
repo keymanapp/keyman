@@ -125,9 +125,27 @@ const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
   },
 };
 
+export interface LineColumn {
+  line: number;
+  column?: number;
+}
+
 /** wrapper for XML parsing support */
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
+  }
+
+  public static offsetToLineColumn(offset: number, text: string) : LineColumn {
+    const lines: string[] = text.split("\n");
+    for (let line = 1; line < lines.length + 1; line++) { // 1-based
+      const linestr = lines[line - 1];
+      if (linestr.length < offset) {
+        offset = offset - (linestr.length + 1); // count newline at end
+        continue;
+      }
+      return { line, column: offset };
+    }
+    return { line: lines.length + 1 };
   }
 
   /**
@@ -138,13 +156,13 @@ export class KeymanXMLReader {
    * @param from source for symbols
    * @returns the onto object
    */
-    public static copySymbols<T>(onto: T, from: any): T {
-      const o = onto as any;
-      for (const sym of Object.getOwnPropertySymbols(from)) {
-        o[sym] = from[sym];
-      }
-      return onto;
+  private static copySymbols<T>(onto: T, from: any): T {
+    const o = onto as any;
+    for (const sym of Object.getOwnPropertySymbols(from)) {
+      o[sym] = from[sym];
     }
+    return onto;
+  }
   
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
   private static fixupDollarAttributes(data: any) : any {
