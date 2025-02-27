@@ -1258,48 +1258,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     };
   }
 
-  // Appears to be abandoned now - candidate for removal in future.
-  /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-    if (!this.layerGroup) {
-      return allottedHeight;
-    }
-
-    /*
-      Note:  these may not be fully preprocessed yet!
-
-      However, any "empty row bug" preprocessing has been applied, and that's
-      what we care about here.
-    */
-    const layers = this.layerGroup.spec.layer;
-    let oskHeight = 0;
-
-    // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-    for (const layerID in layers) {
-      const layer = layers[layerID];
-      let nRows = layer.row.length;
-      let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
-      let layerHeight = nRows * rowHeight;
-
-      if (layerHeight > oskHeight) {
-        oskHeight = layerHeight;
-      }
-    }
-
-    // This isn't set anywhere else; it's a legacy part of the original methods.
-    const oskPad = 0;
-    let oskPaddedHeight = oskHeight + oskPad;
-
-    return oskPaddedHeight;
-  }
-
   /**
    *  Append a style sheet for the current keyboard if needed for specifying an embedded font
    *  or to re-apply the default element font
    *
    **/
   appendStyleSheet() {
-    //let util = com.keyman.singleton.util;
-
     var activeKeyboard = this.layoutKeyboard;
     var activeStub = this.layoutKeyboardProperties;
 
