@@ -35,7 +35,7 @@ import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
-import { type KeyElement, getKeyFrom } from './keyElement.js';
+import { type KeyElement } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
@@ -943,31 +943,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
-  }
-
-  /**
-   * Get the current key target from the touch point element within the key
-   *
-   * @param   {Object}  t   element at touch point
-   * @return  {Object}      the key element (or null)
-   **/
-  keyTarget(target: HTMLElement | EventTarget): KeyElement {
-    let t = <HTMLElement>target;
-
-    try {
-      if (t) {
-        if (t.classList.contains('kmw-key')) {
-          return getKeyFrom(t);
-        }
-        if (t.parentNode && (t.parentNode as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.parentNode);
-        }
-        if (t.firstChild && (t.firstChild as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.firstChild);
-        }
-      }
-    } catch (ex) { }
-    return null;
   }
   //#endregion
 
