@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 describe('Headless keyboard loading', function() {
@@ -58,7 +58,7 @@ describe('Headless keyboard loading', function() {
 
       // Runs a blank KeyEvent through the keyboard's rule processing...
       // but via separate harness configured with a different captured global.
-      let ruleHarness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let ruleHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       ruleHarness.activeKeyboard = keyboard;
       try {
         ruleHarness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device));
