@@ -8,6 +8,8 @@
 
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
+export const START_INDEX = new XMLParser().getStartIndexSymbol();
+
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
@@ -128,6 +130,22 @@ export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
   }
 
+  /**
+   * Copy symbols from 'from' onto 'onto'
+   * This is used to propagate special symbols
+   * and XML
+   * @param onto object to copy onto
+   * @param from source for symbols
+   * @returns the onto object
+   */
+    public static copySymbols<T>(onto: T, from: any): T {
+      const o = onto as any;
+      for (const sym of Object.getOwnPropertySymbols(from)) {
+        o[sym] = from[sym];
+      }
+      return onto;
+    }
+  
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
   private static fixupDollarAttributes(data: any) : any {
     if (typeof data === 'object') {
@@ -146,9 +164,9 @@ export class KeymanXMLReader {
         }
       });
       if (attrs.length) {
-        e.push(['$', Object.fromEntries(attrs)]);
+        e.push(['$', this.copySymbols(Object.fromEntries(attrs), data)]);
       }
-      return Object.fromEntries(e);
+      return this.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -184,7 +202,7 @@ export class KeymanXMLReader {
           }
         }
       });
-      return Object.fromEntries(e);
+      return this.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }

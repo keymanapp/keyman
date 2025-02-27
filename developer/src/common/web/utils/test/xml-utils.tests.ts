@@ -12,7 +12,7 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, START_INDEX } from '../src/xml-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 
 // if true, attempt to WRITE the fixtures
@@ -159,4 +159,26 @@ describe(`XML Writer Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
       }
     });
   }
+});
+
+describe(`XML Reader line number test`, () => {
+  const path = 'tran_fail-empty.xml';
+  const xmlPath = makePathToFixture('xml', `${path}`);
+  const type: KeymanXMLType = 'keyboard3';
+  it(`Should report line numbers on parse of ${type} ${path}`, () => {
+    const xml = readData(xmlPath);
+    assert.ok(xml, `Could not read ${xmlPath}`);
+
+    const reader = new KeymanXMLReader(type);
+    assert.ok(reader);
+
+    // now, parse. subsitute endings for Win
+    const actual = reader.parse(xml.replace(/\r\n/g, '\n'));
+    assert.ok(actual, `Parser failed on ${xmlPath}`);
+
+    // now, assert char offset
+    assert.equal(actual.keyboard3[START_INDEX as any], 40); // index of <keyboard3> element
+    assert.equal(actual.keyboard3.info[START_INDEX as any], 136);  // index of <info> etc
+    assert.equal(actual.keyboard3.transforms[START_INDEX as any], 186);
+  });
 });
