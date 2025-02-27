@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.9 alpha 2025-02-27
+
+* docs: move node.js before Emscripten (#13366)
+* chore: add a workflow to automatically close linked issues (#13368)
+
 ## 19.0.8 alpha 2025-02-21
 
 * feat(windows): hack in some fun features for kmdevlink (#13237)
