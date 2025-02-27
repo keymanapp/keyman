@@ -10,8 +10,9 @@ import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, compilerTestOptions } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-
 import { makePathToFixture } from './helpers/index.js';       // _S2 my imports
+
+
 
 describe('KeylayoutToKmnConverter', function () {
 
@@ -45,7 +46,7 @@ describe('KeylayoutToKmnConverter', function () {
 
     //const inputFilename  = makePathToFixture('../data/US_complete.keylayout');          // OK
     //const inputFilename  = makePathToFixture('../data/German_complete.keylayout');      // OK
-    const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');         // OK
+    const inputFilename = makePathToFixture('../data/Italian_copy.keylayout');         // OK
     //const inputFilename  = makePathToFixture('../data/German_Standard_copy.keylayout');         //OK
     //const inputFilename  = makePathToFixture('../data/German_Standard2.keylayout');         //OK
     //const inputFilename = makePathToFixture('../data/German_StandardTweaked.keylayout');         //NO C3
@@ -73,5 +74,127 @@ describe('KeylayoutToKmnConverter', function () {
     }
     assert.isTrue(threw);
   });
+  //------------------------
+
+  it('should should return empty array on null input', async function () {
+    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const result = converter.read(null);
+    assert.isEmpty(result);
+  });
+
+  it('should should return empty array on empty input', async function () {
+    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const result = converter.read("");
+    assert.isEmpty(result);
+  });
+
+  it('should should return empty array on space as input', async function () {
+    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const result = converter.read(" ");
+    assert.isEmpty(result);
+  });
+
+  it('should should return filled array on correct input', async function () {
+    const inputFilename = makePathToFixture('../data/Italian_copy.keylayout');
+    const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const result = converter.read(inputFilename);
+    assert.isNotEmpty(result);
+  });
+
+
+  // todo test read - wrong name, empty string, ok name
+  // todo test for all public func for all "return paths"
+
+  //-----------------
+
+
+  describe("create kmn modifier ", function () {
+    [
+      ["anycontrol", true, "NCAPS CTRL"],
+      ["shift?", true, "NCAPS"],
+      ["?", true, "NCAPS"],
+      ["?", false, ""],
+      ["caps", true, "CAPS"],
+      ["", true, "NCAPS"],
+      [" ", false, ""],
+      ["wrongModifierName", false, "wrongModifierName"],
+      ["shift", false, "SHIFT"],
+      ["shift command", true, "NCAPS SHIFT command"],
+      ["rshift", true, "NCAPS SHIFT"],
+      ["rshift", false, "SHIFT"],
+      ["rightshift", true, "NCAPS SHIFT"],
+      ["riGhtsHift", true, "NCAPS SHIFT"],
+      ["LEFTCONTROL", true, "NCAPS LCTRL"],
+      ["RCONTROL", true, "NCAPS RCTRL"],
+      ["leftoption", true, "NCAPS RALT"],
+      ["loption", true, "NCAPS RALT"],
+    ].forEach(function (values) {
+
+      it('should convert "' + values[0] + '" to "' + values[2] + '"', async function () {
+        const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const result = sut.create_kmn_modifier(values[0] as string, values[1] as boolean);
+        assert.equal(result, values[2]);
+      });
+    })
+  })
+
+  describe("isAcceptableKeymanModifier ", function () {
+    [
+      ["NCAPS", true],
+      ["NxCAPS", false],
+      ["SHIFT", true],
+      ["ALT", true],
+      ["RALT", true],
+      ["LALT", true],
+      ["CTRL", true],
+      ["LCTRL", true],
+      ["RCTRL", true],
+      ["", true],
+      ["LCTRL CAPS", true],
+      ["LCTRL X", false],
+    ].forEach(function (values) {
+      it( "'" + values[0] + "'" +' should return ' + values[1] , async function () {
+        const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const result = sut.isAcceptableKeymanModifier(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    })
+  })
+
+  describe("map_UkeleleKC_To_VK ", function () {
+    [
+      [0x00, "K_A"],
+      [0x31, "K_SPACE"],
+      [0x18, "K_EQUAL"],
+      [0x10, "K_Y"],
+      [0x18, "K_EQUAL"],
+      [0x21, "K_LBRKT"],
+      [0x999, ""],
+      [-1, ""],
+    ].forEach(function (values) {
+      it(  values[0] + ' should return ' + "'"+values[1] +"'", async function () {
+        const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        const result = sut.map_UkeleleKC_To_VK(values[0] as number);
+        assert.equal(result, values[1]);
+      });
+    })
+  })
+
+  describe("checkIfCapsIsUsed ", function () {
+
+    it('should return true', async function () {
+      const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      const input: string[][] = [["caps", "xxx"], ["yyy"]]
+      const result = sut.checkIfCapsIsUsed(input);
+      assert.isTrue(result);
+    });
+
+    it('should return false', async function () {
+      const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      const input: string[][] = [["zzz", "xxx"], ["yyy"]]
+      const result = sut.checkIfCapsIsUsed(input);
+      assert.isFalse(result);
+    });
+  })
 
 });
