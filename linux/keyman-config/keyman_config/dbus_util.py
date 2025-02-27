@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import contextlib
 import logging
 import os
 
@@ -6,6 +7,8 @@ import dbus
 import dbus.bus
 import dbus.mainloop.glib
 import dbus.service
+
+from dbus import DBusException
 
 BUS_NAME = 'com.Keyman.Config'
 OBJECT_PATH = '/com/Keyman/Config'
@@ -77,7 +80,9 @@ class KeymanConfigServiceManager:
 
     def keyboard_list_changed(self) -> None:
         self.__verify_service_exists()
-        if self.__service:
+        if not self.__service:
+            return
+        with contextlib.suppress(DBusException):
             self.__service.keyboard_list_changed()
 
 
