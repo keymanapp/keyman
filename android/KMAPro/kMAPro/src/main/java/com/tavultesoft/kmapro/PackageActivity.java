@@ -84,6 +84,7 @@ public class PackageActivity extends AppCompatActivity implements
       if (pkgTarget.equals(PackageProcessor.PP_TARGET_LEXICAL_MODELS)) {
         kmpProcessor = new LexicalModelPackageProcessor(resourceRoot);
       } else if (!pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
+        KMLog.LogBreadcrumb(TAG, "kmpFile: " + kmpFile, true);
         showErrorToast(getString(R.string.no_targets_to_install));
         return;
       }
