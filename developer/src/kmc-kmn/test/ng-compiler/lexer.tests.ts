@@ -87,8 +87,20 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_OLDCHARPOSMATCHING token", () => {
       recogniseToken(TokenTypes.TT_OLDCHARPOSMATCHING, 'oldcharposmatching');
     });
+    it("can recognise a TT_OLDLAYER token", () => {
+      recogniseToken(TokenTypes.TT_OLDLAYER, 'oldlayer');
+    });
+    it("can recognise a TT_TARGETS token", () => {
+      recogniseToken(TokenTypes.TT_TARGETS, 'targets');
+    });
     it("can recognise a TT_VERSION token", () => {
       recogniseToken(TokenTypes.TT_VERSION, 'version');
+    });
+    it("can recognise a TT_VISUALKEYBOARD token", () => {
+      recogniseToken(TokenTypes.TT_VISUALKEYBOARD, 'visualkeyboard');
+    });
+    it("can recognise a TT_WINDOWSLANGUAGES token", () => {
+      recogniseToken(TokenTypes.TT_WINDOWSLANGUAGES, 'windowslanguages');
     });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');
