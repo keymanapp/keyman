@@ -24,6 +24,27 @@ describe("Lexer Tests", () => {
     });
   });
   describe("Lexer", () => {
+    it("can recognise a TT_BITMAP token", () => {
+      recogniseToken(TokenTypes.TT_BITMAP, 'bitmap');
+    });
+    it("can recognise a TT_CASEDKEYS token", () => {
+      recogniseToken(TokenTypes.TT_CASEDKEYS, 'casedkeys');
+    });
+    it("can recognise a TT_COPYRIGHT token", () => {
+      recogniseToken(TokenTypes.TT_COPYRIGHT, 'copyright');
+    });
+    it("can recognise a TT_DISPLAYMAP token", () => {
+      recogniseToken(TokenTypes.TT_DISPLAYMAP, 'displaymap');
+    });
+    it("can recognise a TT_ETHNOLOGUECODE token", () => {
+      recogniseToken(TokenTypes.TT_ETHNOLOGUECODE, 'ethnologuecode');
+    });
+    it("can recognise a TT_NAME token", () => {
+      recogniseToken(TokenTypes.TT_NAME, 'name');
+    });
+    it("can recognise a TT_VERSION token", () => {
+      recogniseToken(TokenTypes.TT_VERSION, 'version');
+    });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');
     });
@@ -41,12 +62,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_AMPHASAND token", () => {
       recogniseToken(TokenTypes.TT_AMPHASAND, '&');
-    });
-    it("can recognise a TT_VERSION token", () => {
-      recogniseToken(TokenTypes.TT_VERSION, 'version');
-    });
-    it("can recognise a TT_NAME token", () => {
-      recogniseToken(TokenTypes.TT_NAME, 'name');
     });
     it("can recognise a TT_STRING token (single quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
@@ -69,20 +84,6 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_NEWLINE token (CRLF)", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
     });
-    it("can recognise a version store", () => {
-      recogniseTokens(
-        'store(&VERSION) \'10.0\'',
-        [
-          new Token(TokenTypes.TT_STORE,      'store'),
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_AMPHASAND,  '&'),
-          new Token(TokenTypes.TT_VERSION,    'VERSION'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_STRING,     '\'10.0\''),
-        ]
-      );
-    });
     it("can recognise a name store", () => {
       recogniseTokens(
         'store(&NAME) "Khmer Angkor"',
@@ -94,6 +95,20 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_RIGHT_BR,   ')'),
           new Token(TokenTypes.TT_WHITESPACE, ' '),
           new Token(TokenTypes.TT_STRING,     '"Khmer Angkor"'),
+        ]
+      );
+    });
+    it("can recognise a version store", () => {
+      recogniseTokens(
+        'store(&VERSION) \'10.0\'',
+        [
+          new Token(TokenTypes.TT_STORE,      'store'),
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_AMPHASAND,  '&'),
+          new Token(TokenTypes.TT_VERSION,    'VERSION'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_STRING,     '\'10.0\''),
         ]
       );
     });
