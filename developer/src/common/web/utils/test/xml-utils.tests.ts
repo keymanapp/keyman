@@ -119,7 +119,7 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
             writeJson(jsonPath, actual);
           } else {
             assert.ok(expect, `Could not read ${jsonPath} - run with env GEN_XML_FIXTURES=1 to update.`);
-            assert.deepEqual(actual, expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
+            assert.deepEqual(KeymanXMLReader.removeSymbols(actual), expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
           }
         });
       }

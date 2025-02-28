@@ -156,12 +156,21 @@ export class KeymanXMLReader {
    * @param from source for symbols
    * @returns the onto object
    */
-  private static copySymbols<T>(onto: T, from: any): T {
+  public static copySymbols<T>(onto: T, from: any): T {
     const o = onto as any;
     for (const sym of Object.getOwnPropertySymbols(from)) {
       o[sym] = from[sym];
     }
     return onto;
+  }
+
+  /** use Object.entries to remove all symbols */
+  public static removeSymbols<T>(from: T): T {
+    if (Array.isArray(from)) {
+      return from.map(o => KeymanXMLReader.removeSymbols(o)) as T;
+    }
+    if (typeof from !== "object") return from;
+    return Object.fromEntries(Object.entries(from).map(([k, v]) => ([k, KeymanXMLReader.removeSymbols(v)]))) as T;
   }
   
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
