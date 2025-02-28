@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withColumn } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -442,7 +442,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows());
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withColumn(276)));
   });
 
   it('should reject layouts with too many hardware keys', async function() {

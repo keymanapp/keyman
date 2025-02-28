@@ -8,7 +8,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
+import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, START_INDEX, } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -326,4 +326,11 @@ const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
 
 export function hex_str(s?: string) : string {
   return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
+}
+
+/** return an object simulating an XML object with a column number */
+export function withColumn(c: number) : any {
+  return {
+    [START_INDEX as any]: c
+  };
 }

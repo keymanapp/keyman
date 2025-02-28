@@ -180,9 +180,8 @@ describe(`XML Reader line number test`, () => {
     assert.equal(actual.keyboard3[START_INDEX as any], 40); // index of <keyboard3> element
     assert.equal(actual.keyboard3.info[START_INDEX as any], 136);  // index of <info> etc
     assert.equal(actual.keyboard3.transforms[START_INDEX as any], 186);
-
-    assert.equal(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[START_INDEX as any], xml), { line: 3, column: 0 });
-    assert.equal(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[START_INDEX as any], xml), { line: 4, column: 2 });
-    assert.equal(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[START_INDEX as any], xml), { line: 8, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[START_INDEX as any], xml), { line: 3, column: 0 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[START_INDEX as any], xml), { line: 4, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[START_INDEX as any], xml), { line: 8, column: 2 });
   });
 });

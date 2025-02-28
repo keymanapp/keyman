@@ -26,7 +26,6 @@ describe('kpj-file-writer', function () {
     // The outputKpj may not contain all the fields from the inputKpj, only the
     // essential fields. Many of the fields in .kpj are deprecated, when they
     // relate to file content (e.g. parented files, file details)
-
     assert.deepEqual(outputKpj.KeymanDeveloperProject.Options, {
       "BuildPath": "$PROJECTPATH\\build",
       "CompilerWarningsAsErrors": "True",
