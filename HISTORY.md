@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 18.0.203 beta 2025-02-28
+
+* feat(windows): keyman configuration icon refresh (#13294)
+* fix(windows): if kmshell is "silent" don't start a Keyman update (#13330)
+* chore(windows): Update crowdin strings for Khmer (#13364)
+* docs: clean up links in builder.md (#13328)
+* chore: add build.sh edit action for Delphi projects (#13327)
+* fix(developer): handle line breaks in debugger correctly (#13334)
+* fix(developer): use U+0001 for deadkey markers in the debugger (#13336)
+* feat(developer): use .kps folder as initial dir for Add Files (#13324)
+* fix(developer): verify `context(n)` offsets are valid in kmcmplib (#13308)
+* chore(core): add unit tests to validate `nul` with `index` and `context` (#13311)
+* fix(core): include `nul` in context offset calculations in kmx processor (#13314)
+* fix(developer): include `nul` in offset calculations for kmw v10 compiler (#13326)
+
 ## 18.0.202 beta 2025-02-27
 
 * fix(android): Direct user to switch system IME when WebView fails (#13352)
