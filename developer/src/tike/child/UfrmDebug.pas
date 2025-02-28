@@ -700,7 +700,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       if dk.SavedPosition < 0 then
       begin
         dk.Position := L + dk.SavedPosition;
-        if (dk.Position < 0) or (dk.Position >= L) or (s[dk.Position + 1] <> #$FFFC) then
+        if (dk.Position < 0) or (dk.Position >= L) or (s[dk.Position + 1] <> DeadKey_Marker) then
           // This can happen if the deadkey was in a replaced selection
           dk.Delete;
       end;
@@ -748,7 +748,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         begin
           Assert(m >= 1, AssertionMessage);
           Assert(m <= t.Length, AssertionMessage);
-          Assert(t[m] = #$FFFC, AssertionMessage);
+          Assert(t[m] = DeadKey_Marker, AssertionMessage);
           dk := FDeadkeys.GetFromPosition(m-1);
           Assert(Assigned(dk));
           dk.Delete;
@@ -758,7 +758,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         begin
           Assert(m >= 1, AssertionMessage);
           Assert(m <= t.Length, AssertionMessage);
-          Assert(t[m] <> #$FFFC, AssertionMessage);
+          Assert(t[m] <> DeadKey_Marker, AssertionMessage);
           // Delete surrogate pairs
           if (m > 1) and
               Uni_IsSurrogate2(t[m]) and
@@ -769,7 +769,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
         end;
       KM_CORE_BT_UNKNOWN:
         begin
-          while (m >= 1) and (t[m] = #$FFFC) do
+          while (m >= 1) and (t[m] = DeadKey_Marker) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk), AssertionMessage);
@@ -786,7 +786,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
             Dec(m);
 
           // Also delete deadkeys to left of current character
-          while (m >= 1) and (t[m] = #$FFFC) do
+          while (m >= 1) and (t[m] = DeadKey_Marker) do
           begin
             dk := FDeadkeys.GetFromPosition(m-1);
             Assert(Assigned(dk), AssertionMessage);
@@ -830,7 +830,7 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
     begin
       state := SaveMemoSelectionState;
 
-      memo.SelText := WideChar($FFFC);
+      memo.SelText := DeadKey_Marker;
       memo.SelStart := memo.SelStart + memo.SelLength;  // I1603
       memo.SelLength := 0;
       dk.Position := memo.SelStart - 1;
