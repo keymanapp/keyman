@@ -15,6 +15,7 @@ import chalk from 'chalk';
 import supportsColor from 'supports-color';
 import { KeymanSentry } from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
+import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -148,6 +149,16 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   reportMessage(event: CompilerEvent): void {
     if(!event.filename) {
       event.filename = this.messageFilename;
+    }
+
+    if (event.column && !event.line && event.filename) {
+      try {
+        // TODO: rereads XML every single time.
+        // Should cache unless the filename changes (this.messageFilename)
+        LdmlCompilerMessages.resolveLineNumber(event, this.fs.readFileSync(event.filename, "utf-8"));
+      } catch(e) {
+        console.error(e); // resolving line numbers
+      }
     }
 
     if(this.messageFilename != event.filename) {

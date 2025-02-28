@@ -5,7 +5,13 @@ import { CompilerCallbacks } from "./compiler-callbacks.js";
  */
 export interface CompilerEvent {
   filename?: string;
+  /** line where a message applies */
   line?: number;
+  /** 
+   * column where a message applies.
+   * where line is unset, column is a file offset
+   */
+  column?: number;
   code: number;
   message: string;
   /**

@@ -446,7 +446,10 @@ export class KeysCompiler extends SectionCompiler {
 
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows()
+        LdmlCompilerMessages.col(
+          LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(),
+          layer
+        )
       );
       valid = false;
     }

@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, START_INDEX, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -264,5 +264,29 @@ export class LdmlCompilerMessages {
     `Invalid transform to="${def(o.to)}": "${def(o.message)}"`,
   );
 
+  /**
+   * Get a column number from o and set e's column field
+   * @param event a compiler event, such as from functions in this class
+   * @param o any object parsed from XML or with the START_INDEX symbol copied over
+   * @returns modified event object
+   */
+  static col(event: CompilerEvent, o: any): CompilerEvent {
+    event.column = (o as any)[START_INDEX as any];
+    return event;
+  }
 
+  /**
+   * Given an event with a column number but no line, resolve it into line:column
+   * @param event event to modify
+   * @param xml XML source
+   * @returns the modified event
+   */
+  static resolveLineNumber(event: CompilerEvent, xml: string) : CompilerEvent { 
+    if (event.column && !event.line && xml) {
+      const loc = KeymanXMLReader.offsetToLineColumn(event.column, xml);
+      event.line = loc.line;
+      event.column = loc.column;
+    }
+    return event;
+  }
 }
