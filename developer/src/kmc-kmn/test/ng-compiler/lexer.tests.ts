@@ -39,6 +39,21 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_ETHNOLOGUECODE token", () => {
       recogniseToken(TokenTypes.TT_ETHNOLOGUECODE, 'ethnologuecode');
     });
+    it("can recognise a TT_HOTKEY token", () => {
+      recogniseToken(TokenTypes.TT_HOTKEY, 'hotkey');
+    });
+    it("can recognise a TT_INCLUDECODES token", () => {
+      recogniseToken(TokenTypes.TT_INCLUDECODES, 'includecodes');
+    });
+    it("can recognise a TT_KEYBOARDVERSION token", () => {
+      recogniseToken(TokenTypes.TT_KEYBOARDVERSION, 'keyboardversion');
+    });
+    it("can recognise a TT_KMW_EMBEDCSS token", () => {
+      recogniseToken(TokenTypes.TT_KMW_EMBEDCSS, 'kmw_embedcss');
+    });
+    it("can recognise a TT_KMW_EMBEDJS token", () => {
+      recogniseToken(TokenTypes.TT_KMW_EMBEDJS, 'kmw_embedjs');
+    });
     it("can recognise a TT_NAME token", () => {
       recogniseToken(TokenTypes.TT_NAME, 'name');
     });
