@@ -141,6 +141,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_CHEVRON token", () => {
       recogniseToken(TokenTypes.TT_CHEVRON, '>');
     });
+    it("can recognise a TT_COMMA token", () => {
+      recogniseToken(TokenTypes.TT_COMMA, ',');
+    });
     it("can recognise a TT_STRING token (single quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
     });
@@ -162,8 +165,64 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_NEWLINE token (CRLF)", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
     });
-    it("can recognise a TT_IDENTIFIER token", () => {
-      recogniseToken(TokenTypes.TT_IDENTIFIER, 'main');
+    it("can recognise a TT_PARAMETER token", () => {
+      recogniseToken(TokenTypes.TT_PARAMETER, 'main');
+    });
+    it("can recognise a TT_PARAMETER token in brackets", () => {
+      recogniseTokens(
+        '(main)',
+        [
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
+    });
+    it("can recognise a TT_PARAMETER token in brackets (single space before)", () => {
+      recogniseTokens(
+        '( main)',
+        [
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
+    });
+    it("can recognise a TT_PARAMETER token in brackets (single space after)", () => {
+      recogniseTokens(
+        '(main )',
+        [
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
+    });
+    it("can recognise two TT_PARAMETER tokens in brackets (comma separated)", () => {
+      recogniseTokens(
+        '(main,2)',
+        [
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_COMMA,      ','),
+          new Token(TokenTypes.TT_PARAMETER,  '2'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
+    });
+    it("can recognise two TT_PARAMETER tokens in brackets (space separated)", () => {
+      recogniseTokens(
+        '(main 2)',
+        [
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_PARAMETER,  '2'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
     });
     it("can recognise a bitmap store", () => {
       recogniseStoreWithString(TokenTypes.TT_BITMAP, 'khmer_angkor.ico');
