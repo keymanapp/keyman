@@ -102,6 +102,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_WINDOWSLANGUAGES token", () => {
       recogniseToken(TokenTypes.TT_WINDOWSLANGUAGES, 'windowslanguages');
     });
+    it("can recognise a TT_BEGIN token", () => {
+      recogniseToken(TokenTypes.TT_BEGIN, 'begin');
+    });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');
     });
@@ -111,6 +114,21 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_STORE token in mixed case", () => {
       recogniseToken(TokenTypes.TT_STORE, 'Store');
     });
+    it("can recognise a TT_USE token", () => {
+      recogniseToken(TokenTypes.TT_USE, 'use');
+    });
+    it("can recognise a TT_UNICODE token", () => {
+      recogniseToken(TokenTypes.TT_UNICODE, 'unicode');
+    });
+    it("can recognise a TT_NEWCONTEXT token", () => {
+      recogniseToken(TokenTypes.TT_NEWCONTEXT, 'newcontext');
+    });
+    it("can recognise a TT_POSTKEYSTROKE token", () => {
+      recogniseToken(TokenTypes.TT_POSTKEYSTROKE, 'postkeystroke');
+    });
+    it("can recognise a TT_ANSI token", () => {
+      recogniseToken(TokenTypes.TT_ANSI, 'ansi');
+    });
     it("can recognise a TT_LEFT_BR token", () => {
       recogniseToken(TokenTypes.TT_LEFT_BR, '(');
     });
@@ -119,6 +137,9 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_AMPHASAND token", () => {
       recogniseToken(TokenTypes.TT_AMPHASAND, '&');
+    });
+    it("can recognise a TT_CHEVRON token", () => {
+      recogniseToken(TokenTypes.TT_CHEVRON, '>');
     });
     it("can recognise a TT_STRING token (single quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
@@ -140,6 +161,9 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_NEWLINE token (CRLF)", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
+    });
+    it("can recognise a TT_IDENTIFIER token", () => {
+      recogniseToken(TokenTypes.TT_IDENTIFIER, 'main');
     });
     it("can recognise a bitmap store", () => {
       recogniseStoreWithString(TokenTypes.TT_BITMAP, 'khmer_angkor.ico');
