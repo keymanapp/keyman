@@ -9,6 +9,9 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
 
+// like m() but takes an XML object for line numbers
+const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => LdmlCompilerMessages.col(m(code, message, detail), x);
+
 /**
  * @internal
  */
@@ -20,7 +23,8 @@ export class LdmlCompilerMessages {
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
-  static Error_HardwareLayerHasTooManyRows = () => m(this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
+  static Error_HardwareLayerHasTooManyRows = (x: any) => mx(x,
+    this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
   static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`);
@@ -267,11 +271,13 @@ export class LdmlCompilerMessages {
   /**
    * Get a column number from o and set e's column field
    * @param event a compiler event, such as from functions in this class
-   * @param o any object parsed from XML or with the START_INDEX symbol copied over
+   * @param x any object parsed from XML or with the START_INDEX symbol copied over
    * @returns modified event object
    */
-  static col(event: CompilerEvent, o: any): CompilerEvent {
-    event.column = (o as any)[START_INDEX as any];
+  static col(event: CompilerEvent, x?: any): CompilerEvent {
+    if(x) {
+      event.column = (x as any)[START_INDEX as any];
+    }
     return event;
   }
 
