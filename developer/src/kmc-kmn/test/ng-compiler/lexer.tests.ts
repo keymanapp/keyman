@@ -141,33 +141,35 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_NEWLINE token (CRLF)", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
     });
+    it("can recognise a bitmap store", () => {
+      recogniseStoreWithString(TokenTypes.TT_BITMAP, 'khmer_angkor.ico');
+    });
+    it("can recognise a copyright store", () => {
+      recogniseStoreWithString(TokenTypes.TT_COPYRIGHT, '© SIL Global');
+    });
+    it("can recognise a displaymap store", () => {
+      recogniseStoreWithString(TokenTypes.TT_DISPLAYMAP, '../../../shared/fonts/kbd/kbdkhmr/KbdKhmr.json');
+    });
+    it("can recognise a keyboardversion store", () => {
+      recogniseStoreWithString(TokenTypes.TT_KEYBOARDVERSION, '2.0');
+    });
+    it("can recognise a layoutfile store", () => {
+      recogniseStoreWithString(TokenTypes.TT_LAYOUTFILE, 'khmer_angkor.keyman-touch-layout');
+    });
     it("can recognise a name store", () => {
-      recogniseTokens(
-        'store(&NAME) "Khmer Angkor"',
-        [
-          new Token(TokenTypes.TT_STORE,      'store'),
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_AMPHASAND,  '&'),
-          new Token(TokenTypes.TT_NAME,       'NAME'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_STRING,     '"Khmer Angkor"'),
-        ]
-      );
+      recogniseStoreWithString(TokenTypes.TT_NAME, "Khmer Angkor");
+    });
+    it("can recognise a message store", () => {
+      recogniseStoreWithString(TokenTypes.TT_MESSAGE, "More than just a Khmer Unicode keyboard.");
+    });
+    it("can recognise a targets store", () => {
+      recogniseStoreWithString(TokenTypes.TT_TARGETS, 'any');
     });
     it("can recognise a version store", () => {
-      recogniseTokens(
-        'store(&VERSION) \'10.0\'',
-        [
-          new Token(TokenTypes.TT_STORE,      'store'),
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_AMPHASAND,  '&'),
-          new Token(TokenTypes.TT_VERSION,    'VERSION'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_STRING,     '\'10.0\''),
-        ]
-      );
+      recogniseStoreWithString(TokenTypes.TT_VERSION, 'khmer_angkor.kvks');
+    });
+    it("can recognise a visualkeyboard store", () => {
+      recogniseStoreWithString(TokenTypes.TT_VISUALKEYBOARD, '10.0');
     });
   });
 });
@@ -183,4 +185,20 @@ function recogniseTokens(text: String, expected: Token[]): void {
   const lexer    = new Lexer(new String(text));
   const actual   = lexer.parse();
   assert.deepEqual(actual, expected);
+}
+
+function recogniseStoreWithString(type: TokenTypes, text: String) {
+  const value = TokenTypes[type].substring(3).toLowerCase();
+  recogniseTokens(
+    `store(&${value}) '${text}'`,
+    [
+      new Token(TokenTypes.TT_STORE,      'store'),
+      new Token(TokenTypes.TT_LEFT_BR,    '('),
+      new Token(TokenTypes.TT_AMPHASAND,  '&'),
+      new Token(type, value),
+      new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+      new Token(TokenTypes.TT_WHITESPACE, ' '),
+      new Token(TokenTypes.TT_STRING,     `'${text}'`),
+    ]
+  );
 }
