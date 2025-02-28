@@ -33,13 +33,21 @@ export enum TokenTypes {
   TT_VERSION            = "TT_VERSION",
   TT_VISUALKEYBOARD     = "TT_VISUALKEYBOARD",
   TT_WINDOWSLANGUAGES   = "TT_WINDOWSLANGUAGES",
+  TT_BEGIN              = "TT_BEGIN",
   TT_STORE              = "TT_STORE",
+  TT_USE                = "TT_USE",
+  TT_UNICODE            = "TT_UNICODE",
+  TT_NEWCONTEXT         = "TT_NEWCONTEXT",
+  TT_POSTKEYSTROKE      = "TT_POSTKEYSTROKE",
+  TT_ANSI               = "TT_ANSI",
   TT_LEFT_BR            = "TT_LEFT_BR",
   TT_RIGHT_BR           = "TT_RIGHT_BR",
   TT_AMPHASAND          = "TT_AMPHASAND",
+  TT_CHEVRON            = "TT_CHEVRON",
   TT_STRING             = "TT_STRING",
   TT_WHITESPACE         = "TT_WHITESPACE",
   TT_NEWLINE            = "TT_NEWLINE",
+  TT_IDENTIFIER         = "TT_IDENTIFIER",
 };
 
 export class ScanRecogniser {
@@ -93,13 +101,21 @@ export class Lexer {
       new ScanRecogniser(TokenTypes.TT_VERSION,            new RegExp("^version", "i"),            true),
       new ScanRecogniser(TokenTypes.TT_VISUALKEYBOARD,     new RegExp("^visualkeyboard", "i"),     true),
       new ScanRecogniser(TokenTypes.TT_WINDOWSLANGUAGES,   new RegExp("^windowslanguages", "i"),   true),
+      new ScanRecogniser(TokenTypes.TT_BEGIN,              new RegExp("^begin", "i"),              true),
       new ScanRecogniser(TokenTypes.TT_STORE,              new RegExp("^store", "i"),              true),
+      new ScanRecogniser(TokenTypes.TT_USE,                new RegExp("^use", "i"),                true),
+      new ScanRecogniser(TokenTypes.TT_UNICODE,            new RegExp("^unicode", "i"),            true),
+      new ScanRecogniser(TokenTypes.TT_NEWCONTEXT,         new RegExp("^newcontext", "i"),         true),
+      new ScanRecogniser(TokenTypes.TT_POSTKEYSTROKE,      new RegExp("^postkeystroke", "i"),      true),
+      new ScanRecogniser(TokenTypes.TT_ANSI,               new RegExp("^ansi", "i"),               true),
       new ScanRecogniser(TokenTypes.TT_LEFT_BR,            new RegExp("^\\("),                     true),
       new ScanRecogniser(TokenTypes.TT_RIGHT_BR,           new RegExp("^\\)"),                     true),
       new ScanRecogniser(TokenTypes.TT_AMPHASAND,          new RegExp("^&"),                       true),
+      new ScanRecogniser(TokenTypes.TT_CHEVRON,            new RegExp("^>"),                       true),
       new ScanRecogniser(TokenTypes.TT_STRING,             new RegExp("^('.*'|\".*\")"),           true),
       new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+"),           true),
       new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)"),        true),
+      new ScanRecogniser(TokenTypes.TT_IDENTIFIER,         new RegExp("^[^,\\)\s]+"),              true),
     ];
     this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of scanRecognisers) {
