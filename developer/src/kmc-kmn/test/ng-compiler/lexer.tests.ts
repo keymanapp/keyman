@@ -54,6 +54,21 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_KMW_EMBEDJS token", () => {
       recogniseToken(TokenTypes.TT_KMW_EMBEDJS, 'kmw_embedjs');
     });
+    it("can recognise a TT_KMW_HELPFILE token", () => {
+      recogniseToken(TokenTypes.TT_KMW_HELPFILE, 'kmw_helpfile');
+    });
+    it("can recognise a TT_KMW_HELPTEXT token", () => {
+      recogniseToken(TokenTypes.TT_KMW_HELPTEXT, 'kmw_helptext');
+    });
+    it("can recognise a TT_KMW_RTL token", () => {
+      recogniseToken(TokenTypes.TT_KMW_RTL, 'kmw_rtl');
+    });
+    it("can recognise a TT_LANGUAGE token", () => {
+      recogniseToken(TokenTypes.TT_LANGUAGE, 'language');
+    });
+    it("can recognise a TT_LAYER token", () => {
+      recogniseToken(TokenTypes.TT_LAYER, 'layer');
+    });
     it("can recognise a TT_NAME token", () => {
       recogniseToken(TokenTypes.TT_NAME, 'name');
     });
