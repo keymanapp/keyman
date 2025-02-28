@@ -54,6 +54,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_STRING token (double quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '"10.0"');
     });
+    it("does not pick out tokens from inside strings", () => {
+      recogniseToken(TokenTypes.TT_STRING, '"store"');
+    });
     it("can recognise a TT_WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.TT_WHITESPACE, ' ');
     });
