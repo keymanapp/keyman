@@ -46,6 +46,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  /** cache of the contentes of the text */
+  messageFiletext: string = '';
   maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
@@ -56,6 +58,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.messages = [];
     this.messageCount = 0;
     this.messageFilename = '';
+    this.messageFiletext = '';
   }
 
   /**
@@ -151,20 +154,29 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       event.filename = this.messageFilename;
     }
 
-    if (event.column && !event.line && event.filename) {
-      try {
-        // TODO: rereads XML every single time.
-        // Should cache unless the filename changes (this.messageFilename)
-        LdmlCompilerMessages.resolveLineNumber(event, this.fs.readFileSync(event.filename, "utf-8"));
-      } catch(e) {
-        console.error(e); // resolving line numbers
-      }
-    }
-
     if(this.messageFilename != event.filename) {
       // Reset max message limit when a new file is being processed
       this.messageFilename = event.filename;
       this.messageCount = 0;
+      this.messageFiletext = '';
+    }
+
+    if (event.column && !event.line && event.filename) {
+      try {
+        let text = '';
+        if (this.messageFilename == event.filename) {
+          text = this.messageFiletext;
+        }
+        if (text == '') {
+          text = this.fs.readFileSync(event.filename, "utf-8");
+          if (this.messageFilename == event.filename) {
+            this.messageFiletext = text;
+          }
+        }
+        LdmlCompilerMessages.resolveLineNumber(event, text);
+      } catch(e) {
+        console.error(e); // resolving line numbers
+      }
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
