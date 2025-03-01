@@ -558,6 +558,7 @@ ibus_keyman_engine_constructor(
     }
 
     ping_keyman_system_service();
+  g_message("%s", __FUNCTION__);
 
     set_context_if_needed(engine);
 
@@ -636,10 +637,10 @@ is_core_options_end(km_core_option_item *option) {
   return option->key == NULL && option->value == NULL && option->scope == 0;
 }
 
-static void
+static gboolean
 process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
   if (output_utf32 == NULL || output_utf32[0] == '\0') {
-    return;
+    return FALSE;
   }
 
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -658,6 +659,7 @@ process_output_action(IBusEngine *engine, const km_core_usv* output_utf32) {
     keyman->commit_item->char_buffer = output_utf8;
     // don't free output_utf8 - assigned to char_buffer!
   }
+  return TRUE;
 }
 
 static void process_alert_action(km_core_bool alert) {
@@ -812,18 +814,20 @@ finish_process_actions(IBusEngine *engine) {
   }
 }
 
-static void
+static gboolean
 process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
 ) {
+  gboolean result = FALSE;
   process_backspace_action(engine, actions->code_points_to_delete);
-  process_output_action(engine, actions->output);
+  result = process_output_action(engine, actions->output);
   process_persist_action(engine, actions->persist_options);
   process_alert_action(actions->do_alert);
   process_emit_keystroke_action(engine, actions->emit_keystroke);
   process_capslock_action(actions->new_caps_lock_state);
   finish_process_actions(engine);
+  return result;
 }
 
 static gboolean
@@ -956,7 +960,7 @@ ibus_keyman_engine_process_key_event(
   keyman->commit_item->char_buffer = NULL;
   const km_core_actions *core_actions = km_core_state_get_actions(keyman->state);
 
-  process_actions(engine, core_actions);
+  gboolean result = process_actions(engine, core_actions);
 
   // If we have a non-compliant client, i.e. a client that doesn't support
   // surrounding text (e.g. Chromium as of v104) we sent the key event
@@ -966,7 +970,7 @@ ibus_keyman_engine_process_key_event(
   // processing should happen.
   g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
 
-  return TRUE;
+  return result;
 }
 
 static void
@@ -975,6 +979,7 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
                                             guint       cursor_pos,
                                             guint       anchor_pos)
 {
+  g_message("%s", __FUNCTION__);
     parent_class->set_surrounding_text(engine, text, cursor_pos, anchor_pos);
     set_context_if_needed(engine);
 }
@@ -993,6 +998,7 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
 {
+  g_message("%s", __FUNCTION__);
     IBusKeymanEngine *keyman = (IBusKeymanEngine *) engine;
 
     g_message("%s", __FUNCTION__);
