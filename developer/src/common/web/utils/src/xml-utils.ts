@@ -114,6 +114,13 @@ const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
     textNodeName: '_',
     suppressEmptyNode: true,
   },
+  keyboard3: {
+    attributeNamePrefix: '$',
+    ignoreAttributes: false,
+    format: true,
+    textNodeName: '_',
+    suppressEmptyNode: true,
+  },
 };
 
 /** wrapper for XML parsing support */

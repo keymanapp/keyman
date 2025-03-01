@@ -1,5 +1,38 @@
 # Keyman Version History
 
+## 19.0.9 alpha 2025-02-27
+
+* docs: move node.js before Emscripten (#13366)
+* chore: add a workflow to automatically close linked issues (#13368)
+
+## 19.0.8 alpha 2025-02-21
+
+* feat(windows): hack in some fun features for kmdevlink (#13237)
+* feat(developer): use ABNF to validate LDML transform (#13236)
+* fix(linux): remove `--platform amd64` from docker build script (#13318)
+
+## 19.0.7 alpha 2025-02-20
+
+* chore(linux): allow to build and use Debian docker image (#13284)
+
+## 19.0.6 alpha 2025-02-19
+
+* chore: merge beta to master B18S1 (#13239)
+* fix(linux): add missing dependency for uploading to llso (#13280)
+
+## 19.0.5 alpha 2025-02-15
+
+* fix(linux): update location of lcov.deb for Jammy (#13253)
+
+## 19.0.4 alpha 2025-02-14
+
+* feat(developer): serialize KMXPlus into XML (#13174)
+
+## 19.0.3 alpha 2025-02-13
+
+* docs: update keyboard processor build source (#13221)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+
 ## 19.0.2 alpha 2025-02-12
 
 * chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
@@ -8,6 +41,30 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.191 beta 2025-02-12
+
+* feat(windows): handle a hard windows reset occurring while downloading updated keyman files (#13128)
+* docs(developer): update what's new for 18.0 (#13198)
+* chore(mac): update whats new for Keyman 18 (#13197)
+* chore(ios): update whats new for Keyman 18 (#13199)
+* fix: use tier and version from branch when merging history from another branch (#13170)
+* fix(linux): start system service when switching keyboards (#13172)
+* chore(linux): update actions/cache to non-deprecated version (#13193)
+* chore(linux): update branch that's used for Debian packaging (#13192)
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13202)
+
+## 18.0.190 beta 2025-02-11
+
+* fix(developer): bundle ttfmeta library internally with kmc-keyboard-info (#11631)
+* fix(developer): support Windows and Unicode names in .ttf (#11633)
+* chore(developer): increase timeout for kmc-ldml compiler test (#11635)
+* chore(common): deps: update eslint typescript plugins (#11842)
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+
+## 18.0.189 beta 2025-02-11
+
+* chore: move to beta
 
 ## 18.0.188 alpha 2025-02-10
 
@@ -1321,7 +1378,7 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
-## 17.0.335 alpha 2025-02-06
+## 17.0.335 stable 2025-02-06
 
 * fix(android): improve resource-update tool handling of host Activity's closure (#13057)
 * fix(ios): prevent message-handler collision (#13058)
