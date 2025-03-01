@@ -40,10 +40,25 @@ describe('Unit tests for wasm Core API', function () {
     assert.isOk(result.object);
   });
 
+  function loadKeyboard(name) {
+    const kmxdata = fs.readFileSync(path.join(__dirname, `tests/unit/kmx/${name}.kmx`));
+    const result = km_core.keyboard_load_from_blob(name, kmxdata);
+    assert.equal(result.status, 0);
+    assert.isOk(result.object);
+    return result.object;
+  }
+
+  it('can dispose keyboard', function () {
+    // Setup
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+
+    // Execute
+    km_core.keyboard_dispose(keyboard);
+  });
+
   it('can get keyboard attributes', function () {
     // Setup
-    const kmxdata = fs.readFileSync(path.join(__dirname, 'tests/unit/kmx/k_022___options_with_preset.kmx'));
-    const keyboard = km_core.keyboard_load_from_blob('k_022___options_with_preset', kmxdata).object;
+    const keyboard = loadKeyboard('k_022___options_with_preset');
 
     // Execute
     const result = km_core.keyboard_get_attrs(keyboard);
@@ -54,5 +69,53 @@ describe('Unit tests for wasm Core API', function () {
     assert.equal(result.object.id, 'k_022___options_with_preset');
     assert.equal(result.object.version_string, '0.0');
     assert.deepEqual(result.object.default_options, [{ key: 'foo', value: '0', scope: 1 }]);
+  });
+
+  it('can create the state object', function () {
+    // Setup
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+
+    // Execute
+    const result = km_core.state_create(keyboard, []);
+
+    // Verify
+    assert.equal(result.status, 0);
+    assert.isOk(result.object);
+  });
+
+  it('can dispose the state object', function () {
+    // Setup
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const state = km_core.state_create(keyboard, []);
+
+    // Execute
+    km_core.state_dispose(state.object);
+  });
+
+  it('can clone the state object', function () {
+    // Setup
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const state = km_core.state_create(keyboard, []);
+
+    // Execute
+    const result = km_core.state_clone(state.object);
+
+    // Verify
+    assert.equal(result.status, 0);
+    assert.isOk(result.object);
+    // TODO-web-core: add deeper tests
+  });
+
+  it('can process event', function () {
+    // Setup
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const state = km_core.state_create(keyboard, []);
+
+    // Execute
+    const status = km_core.process_event(state.object, 0x20, 0, 1, 0);
+
+    // Verify
+    assert.equal(status, 0);
+    // TODO-web-core: add more asserts
   });
 });

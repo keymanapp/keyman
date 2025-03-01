@@ -1166,7 +1166,7 @@ returned by [km_core_keyboard_load_from_blob].
 ```c */
 KMN_API
 void
-km_core_keyboard_dispose(km_core_keyboard *keyboard);
+km_core_keyboard_dispose(km_core_keyboard const* keyboard);
 
 /*
 ```
@@ -1384,7 +1384,7 @@ the environment passed.
 ```c */
 KMN_API
 km_core_status
-km_core_state_create(km_core_keyboard *keyboard,
+km_core_state_create(km_core_keyboard const *keyboard,
                     km_core_option_item const *env,
                     km_core_state **out);
 
@@ -1470,7 +1470,7 @@ invalid.
 ```c */
 KMN_API
 void
-km_core_state_dispose(km_core_state *state);
+km_core_state_dispose(km_core_state const *state);
 
 /*
 ```
@@ -1677,7 +1677,7 @@ the state may also be modified.
 ```c */
 KMN_API
 km_core_status
-km_core_process_event(km_core_state *state,
+km_core_process_event(km_core_state const *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
@@ -1733,7 +1733,7 @@ the state may also be modified.
 KMN_API
 km_core_status
 km_core_event(
-  km_core_state *state,
+  km_core_state const *state,
   uint32_t event,
   void* data
 );

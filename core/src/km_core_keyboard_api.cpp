@@ -81,7 +81,7 @@ km_core_keyboard_load_from_blob(
 }
 
 void
-km_core_keyboard_dispose(km_core_keyboard *keyboard)
+km_core_keyboard_dispose(km_core_keyboard const* keyboard)
 {
   delete keyboard;
 }
