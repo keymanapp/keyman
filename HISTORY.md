@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.204 beta 2025-03-01
+
+* chore(windows): ensure dependencies for keyman32 exclude core:wasm (#13379)
+
 ## 18.0.203 beta 2025-02-28
 
 * feat(windows): keyman configuration icon refresh (#13294)
