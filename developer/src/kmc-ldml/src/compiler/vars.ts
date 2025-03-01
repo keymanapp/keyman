@@ -285,7 +285,7 @@ export class VarsCompiler extends SectionCompiler {
     // this is not 'forMatch', all variables are to be assumed as string literals, not regex
     // content.
     const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
-    result.sets.push(new SetVarItem(id, cookedItems, sections, rawItems));
+    result.sets.push(new SetVarItem(id, cookedItems, sections));
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;
