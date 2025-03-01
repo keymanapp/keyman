@@ -1,4 +1,4 @@
-import { MainModule as KmCoreModule, KM_CORE_STATUS } from 'keyman/engine/core-processor';
+import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-processor';
 import { JSKeyboard } from "./jsKeyboard.js";
 import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
@@ -10,7 +10,6 @@ export type Keyboard = JSKeyboard | KMXKeyboard;
 
 export abstract class KeyboardLoaderBase {
   private _harness: KeyboardHarness;
-  protected _km_core: Promise<KmCoreModule>;
 
   public get harness(): KeyboardHarness {
     return this._harness;
@@ -18,10 +17,6 @@ export abstract class KeyboardLoaderBase {
 
   constructor(harness: KeyboardHarness) {
     this._harness = harness;
-  }
-
-  public set coreModule(km_core: Promise<KmCoreModule>) {
-    this._km_core = km_core;
   }
 
   /**
@@ -51,11 +46,9 @@ export abstract class KeyboardLoaderBase {
 
     if (byteArray.slice(0, 4) == Uint8Array.from([0x4b, 0x58, 0x54, 0x53])) { // 'KXTS'
       // KMX or LDML (KMX+) keyboard
-      const result = (await this._km_core).keyboard_load_from_blob(uri, byteArray);
+      const result = KM_Core.instance.keyboard_load_from_blob(uri, byteArray);
       if (result.status == KM_CORE_STATUS.OK) {
-        // extract keyboard name from URI
-        const id = uri.split('#')[0].split('?')[0].split('/').pop().split('.')[0];
-        return new KMXKeyboard(id, result.object);
+        return new KMXKeyboard(result.object);
       }
       return null;
     }

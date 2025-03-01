@@ -14,6 +14,45 @@
 
 namespace em = emscripten;
 
+// This little bit of magic gives us implicit bindings for any `std::vector`,
+// so long as we bind `emscripten::value_object<T>`, and comes from:
+// https://github.com/emscripten-core/emscripten/issues/11070#issuecomment-717675128
+namespace emscripten {
+namespace internal {
+
+template <typename T, typename Allocator>
+struct BindingType<std::vector<T, Allocator>> {
+    using ValBinding = BindingType<val>;
+    using WireType = ValBinding::WireType;
+
+#if __EMSCRIPTEN_major__ == 3 && __EMSCRIPTEN_minor__ == 1 && __EMSCRIPTEN_tiny__ >= 60
+    // emscripten-core/emscripten#21692
+    static WireType toWireType(const std::vector<T, Allocator> &vec, rvp::default_tag) {
+        return ValBinding::toWireType(val::array(vec), rvp::default_tag{});
+    }
+#else
+    static WireType toWireType(const std::vector<T, Allocator> &vec) {
+        return ValBinding::toWireType(val::array(vec));
+    }
+#endif
+
+    static std::vector<T, Allocator> fromWireType(WireType value) {
+        return vecFromJSArray<T>(ValBinding::fromWireType(value));
+    }
+};
+
+template <typename T>
+struct TypeID<T,
+              typename std::enable_if_t<std::is_same<
+                  typename Canonicalized<T>::type,
+                  std::vector<typename Canonicalized<T>::type::value_type,
+                              typename Canonicalized<T>::type::allocator_type>>::value>> {
+    static constexpr TYPEID get() { return TypeID<val>::get(); }
+};
+
+}  // namespace internal
+}  // namespace emscripten
+
 constexpr km_core_attr const engine_attrs = {
   256,
   KM_CORE_LIB_CURRENT,
@@ -26,6 +65,20 @@ constexpr km_core_attr const engine_attrs = {
 EMSCRIPTEN_KEEPALIVE km_core_attr const& tmp_wasm_attributes() {
   return engine_attrs;
 }
+
+struct km_core_option_item_wasm {
+  std::u16string   key;
+  std::u16string   value;
+  uint8_t          scope;
+};
+
+
+class km_core_keyboard_attrs_wasm {
+public:
+  std::u16string version_string;
+  std::u16string id;
+  std::vector<km_core_option_item_wasm> default_options;
+};
 
 template <typename T> class CoreReturn {
 public:
@@ -64,6 +117,26 @@ km_core_keyboard_load_from_blob_wasm(
   return new CoreReturn<km_core_keyboard>(retVal, keyboard_ptr);
 }
 
+EMSCRIPTEN_KEEPALIVE const CoreReturn<km_core_keyboard_attrs_wasm>*
+km_core_keyboard_get_attrs_wasm(const km_core_keyboard* keyboard) {
+  const km_core_keyboard_attrs* attrs = nullptr;
+  km_core_status retVal = km_core_keyboard_get_attrs(keyboard, &attrs);
+  km_core_keyboard_attrs_wasm* attrs_wasm = nullptr;
+  if (attrs) {
+    attrs_wasm = new km_core_keyboard_attrs_wasm();
+    attrs_wasm->version_string = std::u16string(attrs->version_string);
+    attrs_wasm->id = std::u16string(attrs->id);
+    for (const km_core_option_item* item = attrs->default_options; item->key; ++item) {
+      km_core_option_item_wasm item_wasm;
+      item_wasm.key = std::u16string(item->key);
+      item_wasm.value = std::u16string(item->value);
+      item_wasm.scope = item->scope;
+      attrs_wasm->default_options.push_back(item_wasm);
+    }
+  }
+  return new CoreReturn<km_core_keyboard_attrs_wasm>(retVal, attrs_wasm);
+}
+
 EMSCRIPTEN_BINDINGS(core_interface) {
 
   em::value_object<km_core_attr>("km_core_attr")
@@ -74,6 +147,10 @@ EMSCRIPTEN_BINDINGS(core_interface) {
     .field("technology", &km_core_attr::technology)
     //.field("vendor", &km_core_attr::vendor, em::allow_raw_pointers())
     ;
+  em::value_object<km_core_option_item_wasm>("km_core_option_item")
+    .field("key", &km_core_option_item_wasm::key)
+    .field("value", &km_core_option_item_wasm::value)
+    .field("scope", &km_core_option_item_wasm::scope);
 
   em::function("tmp_wasm_attributes", &tmp_wasm_attributes);
 
@@ -99,7 +176,15 @@ EMSCRIPTEN_BINDINGS(core_interface) {
   em::class_<CoreReturn<km_core_keyboard>>("CoreKeyboardReturn")
       .property("status", &CoreReturn<km_core_keyboard>::getStatus)
       .property("object", &CoreReturn<km_core_keyboard>::getObject, em::allow_raw_pointers());
+  em::class_<CoreReturn<km_core_keyboard_attrs_wasm>>("CoreKeyboardAttrsReturn")
+      .property("status", &CoreReturn<km_core_keyboard_attrs_wasm>::getStatus)
+      .property("object", &CoreReturn<km_core_keyboard_attrs_wasm>::getObject, em::allow_raw_pointers());
+  em::class_<km_core_keyboard_attrs_wasm>("km_core_keyboard_attrs")
+    .property("version_string", &km_core_keyboard_attrs_wasm::version_string)
+    .property("id", &km_core_keyboard_attrs_wasm::id)
+    .property("default_options", &km_core_keyboard_attrs_wasm::default_options);
 
   em::function("keyboard_load_from_blob", &km_core_keyboard_load_from_blob_wasm, em::allow_raw_pointers());
+  em::function("keyboard_get_attrs", &km_core_keyboard_get_attrs_wasm, em::allow_raw_pointers());
 }
 #endif
