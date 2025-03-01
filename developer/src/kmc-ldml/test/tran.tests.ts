@@ -287,8 +287,8 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
         { code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
-          matchMessage: /Invalid regular expression.*Unterminated group/,
-        }
+          matchMessage: /.*Unterminated group.*/,
+        },
       ],
     },
     {
@@ -296,6 +296,15 @@ describe('tran', function () {
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
         LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+      ],
+    },
+    {
+      subpath: `sections/tran/fail-bad-tran-3.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /.*Syntax.*0-9.*/,
+        }
       ],
     },
     {
@@ -334,9 +343,35 @@ describe('tran', function () {
         LdmlCompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
-    // cases that share the same error code
-    ...[1, 2, 3].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
+    // cases that are now caught by the abnf
+    ...[
+      'fail-bad-tran-5',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[
+      'fail-bad-tran-4',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_UnparseableTransformTo,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[
+      'fail-IllegalTransformDollarsign-1',
+      'fail-IllegalTransformDollarsign-2',
+      'fail-IllegalTransformDollarsign-3',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
       errors: [
         {
           code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
@@ -344,8 +379,11 @@ describe('tran', function () {
         }
       ],
     })),
-    ...[1, 2].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
+    ...[
+      'fail-IllegalTransformAsterisk-1',
+      'fail-IllegalTransformAsterisk-2',
+    ].map(s => ({
+      subpath: `sections/tran/${s}.xml`,
       errors: [
         {
           code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
@@ -353,8 +391,11 @@ describe('tran', function () {
         }
       ],
     })),
-    ...[1, 2].map(n => ({
-      subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
+    ...[
+      'fail-IllegalTransformPlus-1',
+      'fail-IllegalTransformPlus-2',
+    ].map(n => ({
+      subpath: `sections/tran/${n}.xml`,
       errors: [
         {
           code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,

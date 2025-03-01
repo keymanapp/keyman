@@ -18,7 +18,8 @@ builder_describe \
   ":core" \
   ":linux" \
   ":web" \
-  "--ubuntu-version=UBUNTU_VERSION  The Ubuntu version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
+  "--distro=DISTRO                  The distribution to use for the base image (debian or ubuntu, default: ubuntu)" \
+  "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
   "build                            Build docker images" \
   "test                             Test the docker images by running configure,build,test for all or the specified platforms"
@@ -31,11 +32,7 @@ _add_build_args() {
   local name=$3
   local value
 
-  if [[ -n "${!var:-}" ]]; then
-    value="${!var}"
-  else
-    value="${!default_var:-}"
-  fi
+  value="${!var:=${!default_var:-}}"
 
   build_args+=(--build-arg="${var}=${value}")
 
@@ -49,11 +46,14 @@ _add_build_args() {
 _convert_parameters_to_build_args() {
   build_args=()
   build_version=
-  local required_node_version
+  local required_node_version keyman_default_distro
   # shellcheck disable=SC2034
   required_node_version="$(_print_expected_node_version)"
+  # shellcheck disable=SC2034
+  keyman_default_distro="ubuntu"
 
-  _add_build_args UBUNTU_VERSION               KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
+  _add_build_args DISTRO                       keyman_default_distro                    ""
+  _add_build_args DISTRO_VERSION               KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
   _add_build_args JAVA_VERSION                 KEYMAN_VERSION_JAVA                      java
   _add_build_args REQUIRED_NODE_VERSION        required_node_version                    node
   _add_build_args REQUIRED_EMSCRIPTEN_VERSION  KEYMAN_MIN_VERSION_EMSCRIPTEN            emsdk
@@ -63,8 +63,16 @@ _convert_parameters_to_build_args() {
   fi
 }
 
+_check_for_default_values() {
+  if [[ -z "${DISTRO_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]]; then
+    is_default_values=true
+  else
+    is_default_values=false
+  fi
+}
+
 _is_default_values() {
-  [[ -z "${UBUNTU_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]]
+  ${is_default_values}
 }
 
 build_action() {
@@ -72,10 +80,9 @@ build_action() {
 
   builder_echo debug "Building image for ${platform}"
 
-  _convert_parameters_to_build_args
-
   if [[ "${platform}" == "base" ]]; then
-    docker pull --platform "amd64" "ubuntu:${UBUNTU_VERSION:-${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER}}"
+    # shellcheck disable=SC2154 # set by _convert_parameters_to_build_args
+    docker pull "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
   fi
@@ -87,12 +94,12 @@ build_action() {
   # shellcheck disable=SC2164
   cd "${platform}"
   # shellcheck disable=SC2248,SC2086
-  docker build ${OPTION_NO_CACHE:-} --platform amd64 -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
+  docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
   if _is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker build --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
+    docker build -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
   # shellcheck disable=SC2164,SC2103
   cd -
@@ -103,8 +110,12 @@ test_action() {
   local platform=$1
 
   builder_echo debug "Testing image for ${platform}"
-  ./run.sh "${platform}" -- ./build.sh configure,build,test:"${platform}"
+  ./run.sh --distro "${DISTRO}" --distro-version "${DISTRO_VERSION}" \
+    "${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
+
+_check_for_default_values
+_convert_parameters_to_build_args
 
 if builder_has_action build; then
   build_action base
