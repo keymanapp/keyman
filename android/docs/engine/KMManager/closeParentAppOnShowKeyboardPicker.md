@@ -7,14 +7,14 @@ The **closeParentAppOnShowKeyboardPicker()** method restores the default behavio
 
 ## Syntax
 
-```javascript
+```java
 KMManager.closeParentAppOnShowKeyboardPicker()
 ```
 
 ## Description
 Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app.
 
-(The keyboard picker becomes the root of the activity stack)
+(The keyboard picker becomes the root of the activity stack.)
 
 Calling this function restores this default behavior.
 
