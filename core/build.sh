@@ -29,6 +29,7 @@ archtargets=(":wasm   WASM build")
 case $BUILDER_OS in
   win)
     archtargets+=(
+      ":win    Both x86 and x64"
       ":x86    32-bit Windows (x86) build"
       ":x64    64-bit Windows (x64) build"
     )
@@ -92,9 +93,12 @@ fi
 # generates a 'fat' library from them.
 builder_describe_internal_dependency \
   build:mac build:mac-x86_64 \
-  build:mac build:mac-arm64
+  build:mac build:mac-arm64 \
+  build:win build:x86 \
+  build:win build:x64
 
 builder_describe_outputs \
+  configure:win             /core/build/win/$BUILDER_CONFIGURATION/ \
   configure:x86             /core/build/x86/$BUILDER_CONFIGURATION/build.ninja \
   configure:x64             /core/build/x64/$BUILDER_CONFIGURATION/build.ninja \
   configure:mac             /core/build/mac/$BUILDER_CONFIGURATION/ \
@@ -102,6 +106,7 @@ builder_describe_outputs \
   configure:mac-arm64       /core/build/mac-arm64/$BUILDER_CONFIGURATION/build.ninja \
   configure:arch            /core/build/arch/$BUILDER_CONFIGURATION/build.ninja \
   configure:wasm            /core/build/wasm/$BUILDER_CONFIGURATION/build.ninja \
+  build:win                 /core/build/win/$BUILDER_CONFIGURATION/BUILT \
   build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a \
@@ -139,24 +144,21 @@ do_action clean
 
 do_action configure
 
-# After we have built the necessary internal dependencies, then we can go
-# ahead and build a fat library for external consumption
-if builder_start_action configure:mac; then
-  mkdir -p "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION"
-  builder_finish_action success configure:mac
-fi
+# After we have built the necessary internal dependencies, then we can go ahead
+# and build a fat library for external consumption for mac, and no-op for win
+builder_run_action configure:mac   mkdir -p "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION"
+builder_run_action configure:win   mkdir -p "$KEYMAN_ROOT/core/build/win/$BUILDER_CONFIGURATION"
 
 # -------------------------------------------------------------------------------
 
 do_action build
 
-if builder_start_action build:mac; then
-  lipo -create \
-    "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
-    "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
-    -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a"
-  builder_finish_action success build:mac
-fi
+builder_run_action build:mac lipo -create \
+  "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+  "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+  -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a"
+
+builder_run_action build:win touch "$KEYMAN_ROOT/core/build/win/$BUILDER_CONFIGURATION/BUILT"
 
 # -------------------------------------------------------------------------------
 
@@ -175,6 +177,15 @@ if builder_start_action test:mac; then
   MESON_PATH="$KEYMAN_ROOT/core/build/$target/$BUILDER_CONFIGURATION"
   meson test -C "$MESON_PATH" $testparams
   builder_finish_action success test:mac
+fi
+
+if builder_start_action test:win; then
+  # We can assume that build:win has run so both architectures will be available
+  MESON_PATH="$KEYMAN_ROOT/core/build/x86/$BUILDER_CONFIGURATION"
+  meson test -C "$MESON_PATH" $testparams
+  MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
+  meson test -C "$MESON_PATH" $testparams
+  builder_finish_action success test:win
 fi
 
 # -------------------------------------------------------------------------------
