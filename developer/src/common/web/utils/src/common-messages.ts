@@ -58,4 +58,10 @@ export class CommonTypesMessages {
     this.ERROR_InvalidPackageFile,
     `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`
   );
+
+  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000A;
+  static Error_UnsupportedPackageFileVersion = (o:{version:string}) => m(
+    this.ERROR_UnsupportedPackageFileVersion,
+    `Package source file is an unsupported version '${def(o.version)}'`,
+  );
 };
