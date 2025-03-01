@@ -12,7 +12,9 @@ uses
 
 const
   SStatusSiteURL = 'https://status.keyman.com';
-  SSearchURL = 'https://github.com/keymanapp/%s/issues/%s';
+  SOpenIssueURL = 'https://github.com/keymanapp/%s/issues/%d';
+  SOpenAllIssuesURL = 'https://github.com/keymanapp/%s/issues';
+  SIssueSearchURL = 'https://github.com/keymanapp/%s/issues?q=state%%3Aopen%%20%s';
   SAddIssueURL = 'https://github.com/keymanapp/keyman/issues/new';
 
 type
@@ -81,6 +83,7 @@ var
 implementation
 
 uses
+  System.NetEncoding,
   ErrorControlledRegistry,
   ShellApi,
   UfrmCharacterIdentifier,
@@ -228,8 +231,8 @@ end;
 
 procedure TfrmMain.cmdOpenIssueOrPRClick(Sender: TObject);
 var
-  parts: TArray<string>;
-  repo, number: string;
+  URL: string;
+  iq: TIssueQuery;
 begin
   with TfrmOpenCRMRecord.Create(Self) do
   try
@@ -240,20 +243,21 @@ begin
     Free;
   end;
 
-  parts := CustomerText.Split(['#']);
-  if Length(parts) = 1 then
+  iq := SearchTextToQuery(CustomerText);
+  if iq.searchString <> '' then
   begin
-    repo := 'keyman';
-    number := parts[0];
+    URL := Format(SIssueSearchURL, [iq.repo, TNetEncoding.URL.Encode(iq.searchString)]);
+  end
+  else if iq.issueNumber > 0 then
+  begin
+    URL := Format(SOpenIssueURL, [iq.repo, iq.issueNumber]);
   end
   else
   begin
-    repo := parts[0];
-    if repo = '' then repo := 'keyman' else repo := RepoShortNameToFullName(repo);
-
-    number := parts[1];
+    URL := Format(SOpenAllIssuesURL, [iq.repo]);
   end;
-  if not TUtilExecute.URL(Format(SSearchURL, [repo, number])) then  // I3349
+
+  if not TUtilExecute.URL(URL) then  // I3349
     ShowMessage(SysErrorMessage(GetLastError));
 end;
 

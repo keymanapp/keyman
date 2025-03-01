@@ -553,6 +553,8 @@ ibus_keyman_engine_constructor(
       return NULL;
     }
 
+    ping_keyman_system_service();
+
     set_context_if_needed(engine);
 
     return (GObject *) keyman;
