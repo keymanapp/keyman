@@ -362,7 +362,10 @@ class InstallKmpWindow(Gtk.Dialog):
                 dialog.run()
                 dialog.destroy()
                 if is_fcitx_running():
-                    subprocess.run(['fcitx5-configtool'])
+                    try:
+                        subprocess.run(['fcitx5-configtool'])
+                    except FileNotFoundError:
+                        logging.warning('Ignoring not found fcitx5-configtool')
 
             if self.viewwindow:
                 self.viewwindow.refresh_installed_kmp()

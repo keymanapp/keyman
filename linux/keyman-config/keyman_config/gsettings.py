@@ -5,9 +5,15 @@ import os
 import subprocess
 import sys
 
-from xdg.BaseDirectory import xdg_config_home
 from gi.repository import Gio  # needs to come before gi.overrides.GLib!
 from gi.overrides.GLib import Variant
+
+# The xdg module got renamed to xdg_base_dirs, but the package
+# (python3-xdg) on Ubuntu still ships xdg. So we support both.
+try:
+    from xdg_base_dirs import xdg_config_home
+except ModuleNotFoundError:
+    from xdg.BaseDirectory import xdg_config_home
 
 from keyman_config import file_cleanup, get_dbus_started_for_session
 
