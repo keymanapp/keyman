@@ -23,7 +23,7 @@ RUN apt-get update && \
 # version 2.0-1 from Mantic.
 RUN LCOV_VERSION=$(dpkg -s lcov | grep Version | cut -d' ' -f2) && \
   if dpkg --compare-versions "${LCOV_VERSION}" lt 2.0; then \
-    curl -sS -o /tmp/lcov.deb --location http://mirrors.kernel.org/ubuntu/pool/universe/l/lcov/lcov_2.0-1_all.deb && \
+    curl -sS -o /tmp/lcov.deb --location https://old-releases.ubuntu.com/ubuntu/pool/universe/l/lcov/lcov_2.0-1ubuntu0.2_all.deb && \
     apt-get -qy install /tmp/lcov.deb && \
     rm /tmp/lcov.deb ; \
   fi

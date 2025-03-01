@@ -55,4 +55,20 @@ export abstract class SectionCompiler {
     ]);
     return defaults;
   }
+
+  /**
+   * Copy symbols from 'from' onto 'onto'
+   * This is used to propagate special symbols such as ImportStatus
+   * and XML
+   * @param onto object to copy onto
+   * @param from source for symbols
+   * @returns the onto object
+   */
+  public static copySymbols<T>(onto: T, from: any) : T {
+    const o = onto as any;
+    for (const sym of Object.getOwnPropertySymbols(from)) {
+      o[sym] = from[sym];
+    }
+    return onto;
+  }
 }

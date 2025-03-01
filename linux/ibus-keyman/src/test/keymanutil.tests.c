@@ -123,22 +123,6 @@ _free_tst_kb_data(add_keyboard_data* kb_data) {
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(add_keyboard_data, _free_tst_kb_data)
 
-// Newer glib versions have g_assert_cmpstrv which would allow to do
-// g_assert_cmpstrv(result, keyboards);
-// but unfortunately Ubuntu 20.04 Focal doesn't have that, so we roll
-// our own
-void
-_kmn_assert_cmpstrv(gchar** result, gchar** expected) {
-  g_assert_nonnull(result);
-  g_assert_nonnull(expected);
-  int i = 0;
-  for (; result[i] && expected[i]; i++) {
-    g_assert_cmpstr(result[i], ==, expected[i]);
-  }
-  g_assert_null(result[i]);
-  g_assert_null(expected[i]);
-}
-
 //----------------------------------------------------------------------------------------------
 void
 test_keyman_put_keyboard_options_todconf__invalid() {
@@ -526,7 +510,7 @@ test_keyman_set_custom_keyboards__new_key() {
   // Verify
   g_auto(GStrv) result = _get_tst_kbds_key();
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, keyboards);
+  g_assert_cmpstrv(result, keyboards);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -546,7 +530,7 @@ test_keyman_set_custom_keyboards__overwrite_key() {
   // Verify
   g_auto(GStrv) result = _get_tst_kbds_key();
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, keyboards);
+  g_assert_cmpstrv(result, keyboards);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -565,7 +549,7 @@ test_keyman_set_custom_keyboards__delete_key_NULL() {
   g_auto(GStrv) result = _get_tst_kbds_key();
   gchar* expected[] = {NULL};
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, expected);
+  g_assert_cmpstrv(result, expected);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -585,7 +569,7 @@ test_keyman_set_custom_keyboards__delete_key_empty_array() {
   // Verify
   g_auto(GStrv) result = _get_tst_kbds_key();
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, keyboards);
+  g_assert_cmpstrv(result, keyboards);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -604,7 +588,7 @@ test_keyman_set_custom_keyboards__invalid_values() {
   g_auto(GStrv) result = _get_tst_kbds_key();
   g_assert_nonnull(result);
   gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
-  _kmn_assert_cmpstrv(result, expected);
+  g_assert_cmpstrv(result, expected);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -622,7 +606,7 @@ test_keyman_get_custom_keyboards__value() {
 
   // Verify
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, keyboards);
+  g_assert_cmpstrv(result, keyboards);
 
   // Cleanup
   _delete_tst_kbds_key();
@@ -640,7 +624,7 @@ test_keyman_get_custom_keyboards__invalid_values() {
   // Verify
   gchar* expected[] = {"fr:/tmp/test/test.kmx", NULL};
   g_assert_nonnull(result);
-  _kmn_assert_cmpstrv(result, expected);
+  g_assert_cmpstrv(result, expected);
 
   // Cleanup
   _delete_tst_kbds_key();

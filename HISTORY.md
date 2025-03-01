@@ -1,5 +1,47 @@
 # Keyman Version History
 
+## 19.0.9 alpha 2025-02-27
+
+* docs: move node.js before Emscripten (#13366)
+* chore: add a workflow to automatically close linked issues (#13368)
+
+## 19.0.8 alpha 2025-02-21
+
+* feat(windows): hack in some fun features for kmdevlink (#13237)
+* feat(developer): use ABNF to validate LDML transform (#13236)
+* fix(linux): remove `--platform amd64` from docker build script (#13318)
+
+## 19.0.7 alpha 2025-02-20
+
+* chore(linux): allow to build and use Debian docker image (#13284)
+
+## 19.0.6 alpha 2025-02-19
+
+* chore: merge beta to master B18S1 (#13239)
+* fix(linux): add missing dependency for uploading to llso (#13280)
+
+## 19.0.5 alpha 2025-02-15
+
+* fix(linux): update location of lcov.deb for Jammy (#13253)
+
+## 19.0.4 alpha 2025-02-14
+
+* feat(developer): serialize KMXPlus into XML (#13174)
+
+## 19.0.3 alpha 2025-02-13
+
+* docs: update keyboard processor build source (#13221)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+
+## 19.0.2 alpha 2025-02-12
+
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
+
+## 19.0.1 alpha 2025-02-11
+
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+* chore: increment to alpha 19.0 (#13187)
+
 ## 18.0.203 beta 2025-02-28
 
 * feat(windows): keyman configuration icon refresh (#13294)
