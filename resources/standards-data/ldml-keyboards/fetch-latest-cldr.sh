@@ -49,10 +49,12 @@ DTD_DIR="${KEYBOARDS_DIR}/dtd"
 IMPORT_DIR="${KEYBOARDS_DIR}/import"
 DATA_DIR="${KEYBOARDS_DIR}/3.0"
 TEST_DIR="${KEYBOARDS_DIR}/test"
+ABNF_DIR="${KEYBOARDS_DIR}/abnf"
 
 # a file to check
-CHECK_1="${DTD_DIR}/ldmlKeyboard3.dtd"      # Critical, present in prior CLDR
-CHECK_2="${DTD_DIR}/ldmlKeyboardTest3.dtd"  # Only in Keyboard 3.0+
+CHECK_1="${DTD_DIR}/ldmlKeyboard3.dtd"            # Critical, present in prior CLDR
+CHECK_2="${DTD_DIR}/ldmlKeyboardTest3.dtd"        # Only in Keyboard 3.0+
+CHECK_3="${ABNF_DIR}/transform-from-required.abnf" # Present in v47+
 
 if [[ ! -f "${CHECK_1}" ]];
 then
@@ -63,6 +65,12 @@ if [[ ! -f "${CHECK_2}" ]];
 then
     builder_die "${CHECK_2} did not exist: is ${CLDR_DIR} a valid CLDR keyboard directory?"
 fi
+
+if [[ ! -f "${CHECK_3}" ]];
+then
+    builder_die "${CHECK_3} did not exist: does ${CLDR_DIR} contain CLDR 47+? Or did ABNF change?"
+fi
+
 
 # collect git info
 GIT_DESCRIBE=$(cd "${CLDR_DIR}" && git describe HEAD || echo unknown)
@@ -82,7 +90,7 @@ pwd
 # delete the old files in case some were removed from CLDR
 rm -rf ./import ./3.0 ./dtd ./test
 # copy over everything
-cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" .
+cp -Rv "${IMPORT_DIR}" "${DATA_DIR}" "${DTD_DIR}" "${TEST_DIR}" "${ABNF_DIR}" .
 
 # delete old files, no reason to keep them
 rm -vf dtd/{ldmlKeyboard,ldmlPlatform}.{xsd,dtd}
