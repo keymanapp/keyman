@@ -11,7 +11,7 @@ import {
 import { KeyEvent, KeyEventSpec, KeyboardHarness } from "keyman/engine/keyboard";
 import { Mock, type OutputTarget } from "keyman/engine/js-processor";
 import { DeviceSpec } from "@keymanapp/web-utils";
-import { KeyboardInterface, KeyboardProcessor } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
 export default class NodeProctor extends Proctor {
   private keyboardWithHarness: KeyboardHarness;
@@ -56,8 +56,8 @@ export default class NodeProctor extends Proctor {
     }
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.
-    let processor = new KeyboardProcessor(this.device);
-    processor.keyboardInterface = this.keyboardWithHarness as KeyboardInterface;
+    let processor = new JSKeyboardProcessor(this.device);
+    processor.keyboardInterface = this.keyboardWithHarness as JSKeyboardInterface;
     const keyboard = processor.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {

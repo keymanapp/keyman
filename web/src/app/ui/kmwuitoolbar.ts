@@ -813,7 +813,7 @@ if(!keyman?.ui?.name) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
+      async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
         keymanweb.activatingUI(true);
 
         if(this.selectedLanguage) {
@@ -834,7 +834,7 @@ if(!keyman?.ui?.name) {
         // Return focus to input area and activate the selected keyboard
         this.addKeyboardToList(lang, kbd);
         if(updateKeyman) {
-          keymanweb.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode).then(() => {
+          await keymanweb.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode).then(() => {
             // Restore focus _after_ the keyboard finishes loading.
             this.setLastFocus();
           });
@@ -936,7 +936,7 @@ if(!keyman?.ui?.name) {
        * @return      {boolean}
        * Description  Update the UI when all keyboards disabled by user
        **/
-      readonly offButtonClickEvent = (event: Event) => {
+      readonly offButtonClickEvent = async (event: Event) => {
         if(this.toolbarNode.className != 'kmw_controls_disabled') {
           this.hideKeyboardsForLanguage(null);
           if(this.selectedLanguage) {
@@ -952,7 +952,7 @@ if(!keyman?.ui?.name) {
 
         // Return the focus to the input area and set the active keyboard to nothing
         this.setLastFocus();
-        keymanweb.setActiveKeyboard('','');
+        await keymanweb.setActiveKeyboard('','');
 
         //Save current state when deselecting a keyboard (may not be needed)
         this.saveCookie();

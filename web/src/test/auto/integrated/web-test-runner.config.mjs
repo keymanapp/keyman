@@ -24,7 +24,7 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    'build/test/integrated//**/*.tests.mjs',
+    'web/build/test/integrated/**/*.tests.mjs',
     // '**/*.tests.html'
   ],
   middleware: [
@@ -34,6 +34,12 @@ export default {
         context.url = '/common/test' + context.url;
       }
 
+      return next();
+    },
+    function rewriteWasmContentType(context, next) {
+      if (context.url.endsWith('.wasm')) {
+        context.headers['content-type'] = 'application/wasm';
+      }
       return next();
     }
   ],

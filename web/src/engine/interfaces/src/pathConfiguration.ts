@@ -106,6 +106,10 @@ export default class PathConfiguration implements OSKResourcePathConfiguration {
     return this._root;
   }
 
+  get basePath(): string {
+    return this.sourcePath;
+  }
+
   get resources(): string {
     return this._resources;
   }
