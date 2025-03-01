@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.10 alpha 2025-03-01
+
+* chore: merge beta into master B18S2 (#13391)
+
 ## 19.0.9 alpha 2025-02-27
 
 * docs: move node.js before Emscripten (#13366)
