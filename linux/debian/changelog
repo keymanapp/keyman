@@ -1,8 +1,16 @@
-keyman (18.0-1) UNRELEASED; urgency=medium
+keyman (18.0.199-2) unstable; urgency=medium
+
+  * Team upload.
+  * Source-only upload.
+
+ -- Boyuan Yang <byang@debian.org>  Thu, 27 Feb 2025 14:17:40 -0500
+
+keyman (18.0.199-1) unstable; urgency=medium
 
   * closes: 1092463
+  * New upstream release.
 
- -- Eberhard Beilharz <eb1@sil.org>  Wed, 19 Feb 2025 17:21:51 +0100
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 25 Feb 2025 14:57:28 +0100
 
 keyman (17.0.335-1) unstable; urgency=medium
 
