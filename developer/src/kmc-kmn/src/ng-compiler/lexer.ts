@@ -118,7 +118,7 @@ export class Lexer {
       new ScanRecogniser(TokenTypes.TT_STRING,             new RegExp("^('.*'|\".*\")"),           true),
       new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+"),           true),
       new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)"),        true),
-      new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=(\\s*,?[^,\\)\\s]+)*\\s*\\))"), true),
+      new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=(\\s*,?\\s*[^,\\)\\s]+)*\\s*\\))"), true),
     ];
     this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of scanRecognisers) {

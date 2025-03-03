@@ -260,6 +260,40 @@ describe("Lexer Tests", () => {
     it("can recognise a visualkeyboard store", () => {
       recogniseStoreWithString(TokenTypes.TT_VISUALKEYBOARD, '10.0');
     });
+    it("can recognise a begin statement (unicode)", () => {
+      recogniseTokens(
+        'begin Unicode > use(main)',
+        [
+          new Token(TokenTypes.TT_BEGIN,      'begin'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_UNICODE,    'Unicode'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_CHEVRON,    '>'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_USE,        'use'),
+          new Token(TokenTypes.TT_LEFT_BR,    '('),
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
+    });
+    it("can recognise a begin statement (postkeystroke)", () => {
+      recogniseTokens(
+        'begin PostKeystroke > use(PostKeystroke)',
+        [
+          new Token(TokenTypes.TT_BEGIN,         'begin'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CHEVRON,       '>'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_USE,           'use'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke'), // recognised as keyword
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+        ]
+      );
+    });
   });
 });
 
