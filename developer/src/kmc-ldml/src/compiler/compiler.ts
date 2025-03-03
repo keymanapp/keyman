@@ -30,6 +30,7 @@ import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
 import { LinterKeycaps } from './linter-keycaps.js';
+import { LdmlEventResolver } from './eventresolver.js';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -94,6 +95,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
   // uset parser
   private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
+  private static eventResolver: LdmlEventResolver = new LdmlEventResolver();
 
   /**
    * Initialize the compiler, including loading the WASM host for uset parsing.
@@ -106,6 +108,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
     this.options = { ...options };
     this.callbacks = callbacks;
+    this.callbacks.setEventResolver(LdmlKeyboardCompiler.eventResolver);
     return true;
   }
 
@@ -245,6 +248,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
     }
+    LdmlKeyboardCompiler.eventResolver.addFile(filename, new TextDecoder().decode(data)); // TODO: double decode
     // parse (load) the string into an object tree
     const source = reader.load(data);
     if (!source) {

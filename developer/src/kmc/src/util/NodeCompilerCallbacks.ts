@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { platform } from 'os';
-import { CompilerCallbacks, CompilerEvent,
+import { CompilerCallbacks, CompilerEvent, EventResolver, NullEventResolver,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
@@ -15,7 +15,6 @@ import chalk from 'chalk';
 import supportsColor from 'supports-color';
 import { KeymanSentry } from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
-import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
 
 const color = chalk.default;
 const severityColors: {[value in CompilerErrorSeverity]: chalk.Chalk} = {
@@ -149,7 +148,18 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     return fileURLToPath(url);
   }
 
+  private eventResolver = new NullEventResolver();
+
+  setEventResolver(eventResolver: EventResolver): void {
+    this.eventResolver = eventResolver;
+  }
+
   reportMessage(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
+    this.handleReportMessage(event);
+  }
+
+  handleReportMessage(event: CompilerEvent): void {
     if(!event.filename) {
       event.filename = this.messageFilename;
     }
@@ -159,24 +169,6 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       this.messageFilename = event.filename;
       this.messageCount = 0;
       this.messageFiletext = '';
-    }
-
-    if (event.offset && !event.line && event.filename) {
-      try {
-        let text = '';
-        if (this.messageFilename == event.filename) {
-          text = this.messageFiletext;
-        }
-        if (text == '') {
-          text = this.fs.readFileSync(event.filename, "utf-8");
-          if (this.messageFilename == event.filename) {
-            this.messageFiletext = text;
-          }
-        }
-        LdmlCompilerMessages.resolveLineNumber(event, text);
-      } catch(e) {
-        console.error(e); // resolving line numbers
-      }
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);

@@ -42,6 +42,8 @@ export {
   CompilerPathCallbacks,
   CompilerFileSystemCallbacksFolderEntry as FileSystemFolderEntry,
   DefaultCompilerFileSystemAsyncCallbacks,
+  EventResolver,
+  NullEventResolver,
 } from './compiler-callbacks.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerEvent, CompilerErrorNamespace,

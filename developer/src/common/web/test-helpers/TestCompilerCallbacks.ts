@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks,
   CompilerError, CompilerNetAsyncCallbacks, DefaultCompilerFileSystemAsyncCallbacks,
-  CompilerFileSystemAsyncCallbacks,
+  CompilerFileSystemAsyncCallbacks, EventResolver, NullEventResolver,
   CompilerErrorSeverity} from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
 
@@ -111,7 +111,18 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return filename;
   }
 
+  private eventResolver = new NullEventResolver();
+
+  setEventResolver(eventResolver: EventResolver): void {
+    this.eventResolver = eventResolver;
+  }
+
   reportMessage(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
+    this.handleReportMessage(event);
+  }
+
+  handleReportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);
   }
