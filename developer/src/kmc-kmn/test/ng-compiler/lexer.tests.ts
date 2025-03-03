@@ -166,7 +166,13 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\r\n');
     });
     it("can recognise a TT_PARAMETER token", () => {
-      recogniseToken(TokenTypes.TT_PARAMETER, 'main');
+      recogniseTokens(
+        'main)',
+        [
+          new Token(TokenTypes.TT_PARAMETER,  'main'),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+        ]
+      );
     });
     it("can recognise a TT_PARAMETER token in brackets", () => {
       recogniseTokens(
