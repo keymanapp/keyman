@@ -301,10 +301,11 @@ km_core_cu * _new_error_string(std::u16string const str) {
 }
 
 km_core_cu * km_core_state_context_debug(
-  km_core_state *state,
+  const km_core_state *state_,
   km_core_debug_context_type context_type
 ) {
   km_core_context_item * context_items = nullptr;
+  km_core_state* state = const_cast<km_core_state*>(state_);
 
   if(context_type == KM_CORE_DEBUG_CONTEXT_INTERMEDIATE) {
     if(km_core_state_get_intermediate_context(state, &context_items) != KM_CORE_STATUS_OK) {

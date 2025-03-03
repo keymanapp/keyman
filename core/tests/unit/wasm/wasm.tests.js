@@ -109,13 +109,34 @@ describe('Unit tests for wasm Core API', function () {
   it('can process event', function () {
     // Setup
     const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
-    const state = km_core.state_create(keyboard, []);
+    const state = km_core.state_create(keyboard, []).object;
 
     // Execute
-    const status = km_core.process_event(state.object, 0x20, 0, 1, 0);
+    const status = km_core.process_event(state, 0x20, 0, 1, 0);
 
     // Verify
     assert.equal(status, 0);
-    // TODO-web-core: add more asserts
+
+    const actions = km_core.state_get_actions(state);
+    assert.equal(actions.output, ' ');
+    assert.lengthOf(actions.persist_options, 0);
+    assert.equal(actions.do_alert, false);
+    assert.equal(actions.emit_keystroke, false);
+    assert.equal(actions.new_caps_lock_state, -1);
+    assert.equal(actions.deleted_context, '');
+  });
+
+  it('can set the context', function () {
+    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
+    const state = km_core.state_create(keyboard, []).object;
+
+    // Execute
+    const status = km_core.state_context_set_if_needed(state, 'abc');
+
+    // Verify
+    assert.equal(status, 1); // KM_CORE_CONTEXT_STATUS_UPDATED
+
+    const context = km_core.state_context_debug(state, 0);
+    assert.equal(context, '|abc| (len: 3) [ U+0061 U+0062 U+0063 ]');
   });
 });

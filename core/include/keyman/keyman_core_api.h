@@ -1538,7 +1538,7 @@ Returns a debug formatted string of the context from the state.
 ```c */
 KMN_API
 km_core_cu *
-km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
+km_core_state_context_debug(const km_core_state *state, km_core_debug_context_type context_type);
 
 /*
 ```
