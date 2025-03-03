@@ -13,8 +13,8 @@ import { Lexer, ScanRecogniser, Token, TokenTypes } from '../../src/ng-compiler/
 describe("Lexer Tests", () => {
   describe("ScanRecogniser", () => {
     it("can construct a ScanRecogniser", () => {
-      const sr = new ScanRecogniser(TokenTypes.TT_STORE, new RegExp("^store"),      true);
-      assert.deepEqual(sr.toString(), '[TT_STORE,/^store/,true]');
+      const sr = new ScanRecogniser(TokenTypes.TT_STORE, new RegExp("^store"));
+      assert.deepEqual(sr.toString(), '[TT_STORE,/^store/]');
     });
   });
   describe("Token", () => {
