@@ -13,8 +13,8 @@ import {
   DefaultRules, EmulationKeystrokes
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
-import type OutputTarget from "./outputTarget.js";
-import RuleBehavior from "./ruleBehavior.js";
+import { type OutputTargetBase }  from "./outputTargetBase.js";
+import { RuleBehavior }  from "./ruleBehavior.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
@@ -23,7 +23,7 @@ import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
-export type BeepHandler = (outputTarget: OutputTarget) => void;
+export type BeepHandler = (outputTarget: OutputTargetBase) => void;
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
@@ -128,7 +128,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
    * @return  {string}
    */
-  defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget, readonly: boolean): RuleBehavior {
+  defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
     let preInput = Mock.from(outputTarget, readonly);
     let ruleBehavior = new RuleBehavior();
 
@@ -198,19 +198,19 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     return ruleBehavior;
   }
 
-  processNewContextEvent(device: DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+  processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
     return this.activeKeyboard ?
       this.keyboardInterface.processNewContextEvent(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  processPostKeystroke(device: DeviceSpec, outputTarget: OutputTarget): RuleBehavior {
+  processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
     return this.activeKeyboard ?
       this.keyboardInterface.processPostKeystroke(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
+  processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): RuleBehavior {
     var matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
@@ -539,7 +539,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
   // Returns true if the key event is a modifier press, allowing keyPress to return selectively
   // in those cases.
-  doModifierPress(Levent: KeyEvent, outputTarget: OutputTarget, isKeyDown: boolean): boolean {
+  doModifierPress(Levent: KeyEvent, outputTarget: OutputTargetBase, isKeyDown: boolean): boolean {
     if(!this.activeKeyboard) {
       return false;
     }
@@ -573,7 +573,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
    *                                    all matched keyboard rules
    */
-  performNewContextEvent(outputTarget: OutputTarget): RuleBehavior {
+  performNewContextEvent(outputTarget: OutputTargetBase): RuleBehavior {
     const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
 
     if(ruleBehavior) {
@@ -582,7 +582,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     return ruleBehavior;
   }
 
-  resetContext(target?: OutputTarget) {
+  resetContext(target?: OutputTargetBase) {
     this.layerId = 'default';
 
     // Make sure all deadkeys for the context get cleared properly.

@@ -1,6 +1,8 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer } from "@keymanapp/lexical-model-layer/web";
-import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
+// TODO-web-core: remove use of OutputTargetBase
+import { Transcription, Mock, OutputTargetBase } from "keyman/engine/js-processor";
+import { OutputTarget } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -121,8 +123,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // invalidateContext otherwise bypasses .predict()'s check against this.
     if(!this.isActive) {
       return Promise.resolve([]);
-    } else if(outputTarget) {
-      let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
+    } else if (outputTarget) {
+      // TODO-web-core
+      const transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom((outputTarget as OutputTargetBase), null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
       // if there's no active context source, there's nothing to
@@ -138,7 +141,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    let context = new ContextWindow(Mock.from(target, false), this.configuration, layerId);
+    // TODO-web-core
+    const context = new ContextWindow(Mock.from((target as OutputTargetBase), false), this.configuration, layerId);
     return this.lmEngine.wordbreak(context);
   }
 
@@ -190,14 +194,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       // Apply the Suggestion!
 
       // Step 1:  determine the final output text
-      let final = Mock.from(original.preInput, false);
+      const final = Mock.from(original.preInput, false);
       final.apply(suggestion.transform);
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
       // values as needed for use with their IME interfaces.
-      let transform = final.buildTransformFrom(outputTarget);
-      outputTarget.apply(transform);
+      // TODO-web-core
+      const transform = final.buildTransformFrom((outputTarget as OutputTargetBase));
+      // TODO-web-core
+      (outputTarget as OutputTargetBase).apply(transform);
 
       // Tell the banner that a suggestion was applied, so it can call the
       // keyboard's PostKeystroke entry point as needed
@@ -265,8 +271,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
     // values as needed for use with their IME interfaces.
-    let transform = final.buildTransformFrom(outputTarget);
-    outputTarget.apply(transform);
+    // TODO-web-core
+    const transform = final.buildTransformFrom(outputTarget as OutputTargetBase);
+    // TODO-web-core
+    (outputTarget as OutputTargetBase).apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
     let promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
@@ -282,7 +290,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
+    // TODO-web-core
+    const transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
     return this.predict(transcription, layerId);
   }
 

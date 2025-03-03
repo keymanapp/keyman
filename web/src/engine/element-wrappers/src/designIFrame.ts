@@ -1,4 +1,4 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 
 class SelectionCaret {
   node: Node;
@@ -31,7 +31,7 @@ class StyleCommand {
   }
 }
 
-export default class DesignIFrame extends OutputTarget<{}> {
+export class DesignIFrame extends OutputTargetElementWrapper<{}> {
   root: HTMLIFrameElement;
   doc: Document;
   docRoot: HTMLElement;
