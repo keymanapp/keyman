@@ -111,6 +111,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_OUTS token", () => {
       recogniseToken(TokenTypes.TT_OUTS, 'outs');
     });
+    it("can recognise a TT_PLATFORM token", () => {
+      recogniseToken(TokenTypes.TT_PLATFORM, 'platform');
+    });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');
     });
@@ -355,6 +358,24 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_USING,         'using'),
           new Token(TokenTypes.TT_WHITESPACE,    ' '),
           new Token(TokenTypes.TT_KEYS,          'keys'),
+        ]
+      );
+    });
+    it("can recognise a platform statement", () => {
+      recogniseTokens(
+        'platform(\'touch\') > use(detectStartOfSentence)',
+        [
+          new Token(TokenTypes.TT_PLATFORM,      'platform'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_STRING,        '\'touch\''),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CHEVRON,       '>'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_USE,           'use'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'detectStartOfSentence'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
         ]
       );
     });
