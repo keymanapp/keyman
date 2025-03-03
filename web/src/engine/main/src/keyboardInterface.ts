@@ -6,16 +6,16 @@ import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
-import KeymanEngine from "./keymanEngine.js";
+import { KeymanEngineBase } from "./keymanEngineBase.js";
 import { EngineConfiguration } from "./engineConfiguration.js";
 
 export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
-  protected readonly engine: KeymanEngine<EngineConfiguration, ContextManagerType, any>;
+  protected readonly engine: KeymanEngineBase<EngineConfiguration, ContextManagerType, any>;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
-    engine: KeymanEngine<any, ContextManagerType, any>,
+    engine: KeymanEngineBase<any, ContextManagerType, any>,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, engine, new VariableStoreCookieSerializer());
