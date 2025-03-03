@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.11 alpha 2025-03-03
+
+* chore(linux): Update debian changelog (#13347)
+* fix(common): improve resilience of build script trigger (#13402)
+
 ## 19.0.10 alpha 2025-03-01
 
 * chore: merge beta into master B18S2 (#13391)
