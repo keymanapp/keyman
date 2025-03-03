@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.206 beta 2025-03-03
+
+* fix(android): Control when system keyboard Keyboard Picker clears activity stack (#13313)
+* docs(android): document control flag for system keyboard picker and task (#13373)
+
 ## 18.0.205 beta 2025-03-02
 
 * chore(linux): Update debian changelog (#13346)
