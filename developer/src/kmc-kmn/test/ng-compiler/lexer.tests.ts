@@ -306,6 +306,19 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a store statement (khmer string)", () => {
+      recogniseTokens(
+        'store(ShiftOutSingle) \'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'',
+        [
+          new Token(TokenTypes.TT_STORE,         'store'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'ShiftOutSingle'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_STRING,        '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\''),
+        ]
+      );
+    });
   });
 });
 
