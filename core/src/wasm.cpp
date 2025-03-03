@@ -9,8 +9,9 @@
 #define EXTERN EMSCRIPTEN_KEEPALIVE
 #endif
 
-#include "processor.hpp"
 #include <keyman_core.h>
+#include "processor.hpp"
+#include "state.hpp"
 
 namespace em = emscripten;
 
@@ -137,6 +138,30 @@ km_core_keyboard_get_attrs_wasm(const km_core_keyboard* keyboard) {
   return new CoreReturn<km_core_keyboard_attrs_wasm>(retVal, attrs_wasm);
 }
 
+EMSCRIPTEN_KEEPALIVE const CoreReturn<km_core_state>*
+km_core_state_create_wasm(const km_core_keyboard* keyboard,
+                          const std::vector<km_core_option_item_wasm>& env) {
+  km_core_option_item* env_c = new km_core_option_item[env.size() + 1];
+  for (size_t i = 0; i < env.size(); ++i) {
+    env_c[i].key = env[i].key.c_str();
+    env_c[i].value = env[i].value.c_str();
+    env_c[i].scope = env[i].scope;
+  }
+  env_c[env.size()] = {nullptr, nullptr, 0};
+
+  km_core_state* state = nullptr;
+  km_core_status retVal = km_core_state_create(keyboard, env_c, &state);
+  delete[] env_c;
+  return new CoreReturn<km_core_state>(retVal, state);
+}
+
+EMSCRIPTEN_KEEPALIVE const CoreReturn<km_core_state>*
+km_core_state_clone_wasm(const km_core_state* state) {
+  km_core_state* new_state = nullptr;
+  km_core_status retVal = km_core_state_clone(state, &new_state);
+  return new CoreReturn<km_core_state>(retVal, new_state);
+}
+
 EMSCRIPTEN_BINDINGS(core_interface) {
 
   em::value_object<km_core_attr>("km_core_attr")
@@ -184,7 +209,17 @@ EMSCRIPTEN_BINDINGS(core_interface) {
     .property("id", &km_core_keyboard_attrs_wasm::id)
     .property("default_options", &km_core_keyboard_attrs_wasm::default_options);
 
+  em::class_<km_core_state>("km_core_state");
+  em::class_<CoreReturn<km_core_state>>("CoreStateReturn")
+      .property("status", &CoreReturn<km_core_state>::getStatus)
+      .property("object", &CoreReturn<km_core_state>::getObject, em::allow_raw_pointers());
+
   em::function("keyboard_load_from_blob", &km_core_keyboard_load_from_blob_wasm, em::allow_raw_pointers());
+  em::function("keyboard_dispose", &km_core_keyboard_dispose, em::allow_raw_pointers());
   em::function("keyboard_get_attrs", &km_core_keyboard_get_attrs_wasm, em::allow_raw_pointers());
+  em::function("state_create", &km_core_state_create_wasm, em::allow_raw_pointers());
+  em::function("state_clone", &km_core_state_clone_wasm, em::allow_raw_pointers());
+  em::function("state_dispose", &km_core_state_dispose, em::allow_raw_pointers());
+  em::function("process_event", &km_core_process_event, em::allow_raw_pointers());
 }
 #endif
