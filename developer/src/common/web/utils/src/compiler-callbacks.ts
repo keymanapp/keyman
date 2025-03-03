@@ -138,9 +138,6 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   constructor(private filename: string, private options: CompilerCallbackOptions, private parent: CompilerCallbacks) {
   }
-  setEventResolver(eventResolver: EventResolver): void {
-    throw new Error("Method not implemented.");
-  }
 
   /**
    * Returns `true` if any message in the `messages` array is a Fatal or Error
@@ -228,7 +225,18 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
     return this.parent.resolveFilename(baseFilename, filename);
   }
 
+  private eventResolver = new NullEventResolver();
+
+  setEventResolver(eventResolver: EventResolver): void {
+    this.eventResolver = eventResolver;
+  }
+
   reportMessage(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
+    this.handleReportMessage(event);
+  }
+
+  handleReportMessage(event: CompilerEvent): void {
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
     this.messages.push(event);
     if (!disable) {

@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, START_INDEX, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_START_INDEX_SYMBOL, CompilerEvent } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -271,27 +271,12 @@ export class LdmlCompilerMessages {
   /**
    * Get an offset from o and set e's offset field
    * @param event a compiler event, such as from functions in this class
-   * @param x any object parsed from XML or with the START_INDEX symbol copied over
+   * @param x any object parsed from XML or with the XML_START_INDEX_SYMBOL symbol copied over
    * @returns modified event object
    */
   static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
-      event.offset = (x as any)[START_INDEX as any];
-    }
-    return event;
-  }
-
-  /**
-   * Given an event with a column number but no line, resolve it into line:column
-   * @param event event to modify
-   * @param xml XML source
-   * @returns the modified event
-   */
-  static resolveLineNumber(event: CompilerEvent, xml: string) : CompilerEvent {
-    if (event.offset && !event.line && xml) {
-      const loc = KeymanXMLReader.offsetToLineColumn(event.offset, xml);
-      event.line = loc.line;
-      event.column = loc.column;
+      event.offset = (x as any)[XML_START_INDEX_SYMBOL as any];
     }
     return event;
   }

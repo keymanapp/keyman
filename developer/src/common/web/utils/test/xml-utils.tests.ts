@@ -12,7 +12,7 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, START_INDEX } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, XML_START_INDEX_SYMBOL } from '../src/xml-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 
 // if true, attempt to WRITE the fixtures
@@ -177,11 +177,11 @@ describe(`XML Reader line number test`, () => {
     assert.ok(actual, `Parser failed on ${xmlPath}`);
 
     // now, assert char offset
-    assert.equal(actual.keyboard3[START_INDEX as any], 40); // index of <keyboard3> element
-    assert.equal(actual.keyboard3.info[START_INDEX as any], 136);  // index of <info> etc
-    assert.equal(actual.keyboard3.transforms[START_INDEX as any], 186);
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[START_INDEX as any], xml), { line: 3, column: 0 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[START_INDEX as any], xml), { line: 4, column: 2 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[START_INDEX as any], xml), { line: 8, column: 2 });
+    assert.equal(actual.keyboard3[XML_START_INDEX_SYMBOL as any], 40); // index of <keyboard3> element
+    assert.equal(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], 136);  // index of <info> etc
+    assert.equal(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], 186);
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[XML_START_INDEX_SYMBOL as any], xml), { line: 3, column: 0 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], xml), { line: 4, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], xml), { line: 8, column: 2 });
   });
 });

@@ -1,21 +1,21 @@
-import { CompilerEvent, EventResolver } from "@keymanapp/developer-utils";
-import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
+import { CompilerEvent, EventResolver, KeymanXMLReader } from "@keymanapp/developer-utils";
 
 export class LdmlEventResolver implements EventResolver {
 
-  contentsCache: Map<string, string> = new Map();
+  contentsCache: Map<string, number[]> = new Map();
 
   /** add or update a file */
   addFile(filename: string, xml: any) {
-    if (typeof xml !== 'string') {
-      xml = xml.toString();
-    }
-    this.contentsCache.set(filename, xml);
+    this.contentsCache.set(filename, KeymanXMLReader.textToLines(xml));
   }
 
   resolve(event: CompilerEvent) {
     if (event.offset && !event.line && event.filename) {
-      LdmlCompilerMessages.resolveLineNumber(event, this.contentsCache.get(event.filename));
+      const lines = this.contentsCache.get(event.filename);
+      const loc = KeymanXMLReader.offsetToLineColumn(event.offset, lines);
+      event.line = loc.line;
+      event.column = loc.column;
     }
+    return event;
   }
 }

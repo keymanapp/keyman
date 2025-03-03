@@ -134,18 +134,21 @@ export interface LineColumn {
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
   }
-
-  public static offsetToLineColumn(offset: number, text: string) : LineColumn {
-    const lines: string[] = text.split("\n");
+  /** preprocess text to turn it into arrays of line lengths */
+  public static textToLines(text: string) : number[] {
+    return text.replaceAll("\r\n", "\n").split("\n")
+    .map(l => l.length + 1); // line length (counting the trailing newline)
+  }
+  public static offsetToLineColumn(offset: number, lines: number[]) : LineColumn {
     for (let line = 1; line < lines.length + 1; line++) { // 1-based
-      const linestr = lines[line - 1];
-      if (linestr.length < offset) {
-        offset = offset - (linestr.length + 1); // count newline at end
+      if (lines[line-1] < offset) {
+        offset = offset - (lines[line-1]); // count newline at end
         continue;
       }
       return { line, column: offset };
     }
-    return { line: lines.length + 1 };
+    // default: line 0, error
+    return { line: 0 }
   }
 
   /**
@@ -172,7 +175,7 @@ export class KeymanXMLReader {
     if (typeof from !== "object") return from;
     return Object.fromEntries(Object.entries(from).map(([k, v]) => ([k, KeymanXMLReader.removeSymbols(v)]))) as T;
   }
-  
+
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
   private static fixupDollarAttributes(data: any) : any {
     if (typeof data === 'object') {
