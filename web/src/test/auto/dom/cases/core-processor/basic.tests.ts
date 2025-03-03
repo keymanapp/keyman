@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { CoreFactory, KM_CORE_STATUS } from 'keyman/engine/core-processor';
+import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-processor';
 
 const coreurl = '/build/engine/core-processor/obj/import/core';
 
@@ -16,23 +16,35 @@ describe('CoreProcessor', function () {
   }
 
   it('can initialize without errors', async function () {
-    assert.isNotNull(await CoreFactory.createCoreProcessor(coreurl));
+    assert.isOk(await KM_Core.createCoreProcessor(coreurl));
   });
 
   it('can call temp function', async function () {
-    const km_core = await CoreFactory.createCoreProcessor(coreurl);
+    const km_core = await KM_Core.createCoreProcessor(coreurl);
     const a = km_core.tmp_wasm_attributes();
-    assert.isNotNull(a);
+    assert.isOk(a);
     assert.isNumber(a.max_context);
     console.dir(a);
   });
 
   it('can load a keyboard from blob', async function () {
-    const km_core = await CoreFactory.createCoreProcessor(coreurl);
+    const km_core = await KM_Core.createCoreProcessor(coreurl);
     const blob = await loadKeyboardBlob('/common/test/resources/keyboards/test_8568_deadkeys.kmx')
     const result = km_core.keyboard_load_from_blob('test', blob);
     assert.equal(result.status, KM_CORE_STATUS.OK);
-    assert.isNotNull(result.object);
+    assert.isOk(result.object);
+    result.delete();
+  });
+
+  it('can get version from keyboard', async function () {
+    const km_core = await KM_Core.createCoreProcessor(coreurl);
+    const blob = await loadKeyboardBlob('/common/test/resources/keyboards/test_8568_deadkeys.kmx')
+    const keyboard = km_core.keyboard_load_from_blob('test', blob);
+    const result = km_core.keyboard_get_attrs(keyboard.object);
+
+    assert.equal(result.status, KM_CORE_STATUS.OK);
+    assert.isOk(result.object);
+    assert.equal(result.object.version_string, '0.0');
     result.delete();
   });
 });

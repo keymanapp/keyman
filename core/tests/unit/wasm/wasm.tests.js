@@ -37,6 +37,22 @@ describe('Unit tests for wasm Core API', function () {
 
     // Verify
     assert.equal(result.status, 0);
-    assert.isNotNull(result.keyboard);
+    assert.isOk(result.object);
+  });
+
+  it('can get keyboard attributes', function () {
+    // Setup
+    const kmxdata = fs.readFileSync(path.join(__dirname, 'tests/unit/kmx/k_022___options_with_preset.kmx'));
+    const keyboard = km_core.keyboard_load_from_blob('k_022___options_with_preset', kmxdata).object;
+
+    // Execute
+    const result = km_core.keyboard_get_attrs(keyboard);
+
+    // Verify
+    assert.equal(result.status, 0);
+    assert.isOk(result.object);
+    assert.equal(result.object.id, 'k_022___options_with_preset');
+    assert.equal(result.object.version_string, '0.0');
+    assert.deepEqual(result.object.default_options, [{ key: 'foo', value: '0', scope: 1 }]);
   });
 });

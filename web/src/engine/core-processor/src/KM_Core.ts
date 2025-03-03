@@ -1,6 +1,6 @@
 // Keyman is copyright (C) SIL International. MIT License.
 
-import { type MainModule } from './import/core/keymancore.js';
+import { type MainModule as KMXCoreModule } from './import/core/keymancore.js';
 
 // Unfortunately embind has an open issue with enums and typescript where it
 // only generates a type for the enum, but not the values in a usable way.
@@ -20,14 +20,24 @@ export enum KM_CORE_STATUS {
   OS_ERROR = 0x80000000
 }
 
-export class CoreFactory {
-  public static async createCoreProcessor(baseurl: string): Promise<MainModule> {
+export class KM_Core {
+  private static km_core: KMXCoreModule = null;
+
+  static get instance(): KMXCoreModule {
+    return this.km_core;
+  }
+
+  public static async createCoreProcessor(baseurl: string): Promise<KMXCoreModule> {
     const module = await import(baseurl + '/km-core.js');
     const createCoreProcessor = module.default;
-    return await createCoreProcessor({
+    const km_core = createCoreProcessor({
       locateFile: function (path: string, scriptDirectory: string) {
         return baseurl + '/' + path;
       }
     });
+    km_core.then((core: KMXCoreModule) => {
+      this.km_core = core;
+    });
+    return km_core;
   }
 }

@@ -1,3 +1,3 @@
-export { CoreFactory, KM_CORE_STATUS } from './core-factory.js';
-import { type MainModule, type km_core_keyboard, type CoreKeyboardReturn } from './import/core/keymancore.js';
-export { MainModule, km_core_keyboard, CoreKeyboardReturn };
+export { KM_Core, KM_CORE_STATUS } from './KM_Core.js';
+import { type km_core_keyboard } from './import/core/keymancore.js';
+export { km_core_keyboard };
