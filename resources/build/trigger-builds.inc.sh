@@ -56,7 +56,7 @@ function triggerTeamCityBuild() {
 
   # adjust indentation for output of curl
   echo -n "     "
-  curl -s  --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
+  curl --no-progress-meter --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
@@ -81,7 +81,10 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    JSON=$(curl -s "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
+    # set -E: fail on errors in subshell
+    set -E
+    JSON=$(curl --no-progress-meter "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
+    set +E
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
@@ -109,7 +112,7 @@ function triggerGitHubActionsBuild() {
 
   # adjust indentation for output of curl
   echo -n "     "
-  curl --silent --write-out '\n' \
+  curl --no-progress-meter --write-out '\n' \
     --request POST \
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
