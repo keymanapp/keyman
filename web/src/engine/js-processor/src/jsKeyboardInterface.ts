@@ -7,11 +7,11 @@
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
-import type OutputTarget from './outputTarget.js';
+import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, type OutputTarget, VariableStoreDictionary } from "keyman/engine/keyboard";
+import { type OutputTargetBase }  from './outputTargetBase.js';
 import { type Deadkey } from './deadkeys.js';
 import { Mock } from "./mock.js";
-import RuleBehavior from "./ruleBehavior.js";
+import { RuleBehavior }  from "./ruleBehavior.js";
 import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, SystemStoreIDs, SystemStore, MutableSystemStore, PlatformSystemStore, VariableStore, VariableStoreSerializer } from "./systemStores.js";
 
 //#endregion
@@ -274,7 +274,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KC(10,10,Pelem) == "XXXXabcdef"  i.e. return as much as possible of the requested string, where X = \uFFFE
    */
   private KC_(n: number, ln: number, outputTarget: OutputTarget): string {
-    var tempContext = '';
+    let tempContext = '';
 
     // If we have a selection, we have an empty context
     tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
@@ -300,7 +300,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    *             KN(4,Pelem) == TRUE
    */
   nul(n: number, outputTarget: OutputTarget): boolean {
-    var cx=this.context(n+1, 1, outputTarget);
+    const cx=this.context(n+1, 1, outputTarget);
 
     // With #31, the result will be a replacement character if context is empty.
     return cx === "\uFFFE";
@@ -317,11 +317,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Test keyboard context for match
    */
   contextMatch(n: number, outputTarget: OutputTarget, val: string, ln: number): boolean {
-    var cx=this.context(n, ln, outputTarget);
+    const cx=this.context(n, ln, outputTarget);
     if(cx === val) {
       return true; // I3318
     }
-    outputTarget.deadkeys().resetMatched(); // I3318
+    (outputTarget as OutputTargetBase).deadkeys().resetMatched(); // I3318
     return false;
   }
 
@@ -333,7 +333,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}      Pelem   Element to work with (must be currently focused element)
    * @return      {Array}               Context array (of strings and numbers)
    */
-  private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTarget): CachedExEntry {
+  private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTargetBase): CachedExEntry {
     var cache: CachedExEntry = this.cachedContextEx.get(n, ln);
     if(cache !== null) {
       return cache;
@@ -390,7 +390,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
    * near-directly modeling (externally) the compiled form of Desktop rules' context section.
    */
-  fullContextMatch(n: number, outputTarget: OutputTarget, rule: ContextEntry[]): boolean {
+  fullContextMatch(n: number, outputTarget: OutputTargetBase, rule: ContextEntry[]): boolean {
     // Stage one:  build the context index map.
     var fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
     this.ruleContextEx = this.cachedContextEx.clone();
@@ -574,7 +574,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
       retVal = (keyCode == Lrulekey); // I3318, I3555
     }
     if(!retVal) {
-      this.activeTargetOutput.deadkeys().resetMatched();  // I3318
+      (this.activeTargetOutput as OutputTargetBase).deadkeys().resetMatched();  // I3318
     }
     return retVal; // I3318
   };
@@ -760,7 +760,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     // We want to control exactly which deadkeys get removed.
     if(dn > 0) {
-      context = this._BuildExtendedContext(dn, dn, outputTarget);
+      context = this._BuildExtendedContext(dn, dn, (outputTarget as OutputTargetBase));
       let nulCount = 0;
 
       for(var i=0; i < context.valContext.length; i++) {
@@ -768,7 +768,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
         if(dk) {
           // Remove deadkey in context.
-          outputTarget.deadkeys().remove(dk);
+          (outputTarget as OutputTargetBase).deadkeys().remove(dk);
 
           // Reduce our reported context size.
           dn--;
@@ -787,7 +787,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     }
 
     // If a matched deadkey hasn't been deleted, we don't WANT to delete it.
-    outputTarget.deadkeys().resetMatched();
+    (outputTarget as OutputTargetBase).deadkeys().resetMatched();
 
     // Why reinvent the wheel?  Delete the remaining characters by 'inserting a blank string'.
     this.output(dn, outputTarget, '');
@@ -806,7 +806,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     outputTarget.saveProperties();
     outputTarget.clearSelection();
-    outputTarget.deadkeys().deleteMatched(); // I3318
+    (outputTarget as OutputTargetBase).deadkeys().deleteMatched(); // I3318
     if(dn >= 0) {
       // Automatically manages affected deadkey positions.  Does not delete deadkeys b/c legacy behavior support.
       outputTarget.deleteCharsBeforeCaret(dn);
@@ -982,7 +982,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Calls the keyboard's `begin newContext` group
    * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin NewContext`
    */
-  processNewContextEvent(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+  processNewContextEvent(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
@@ -997,7 +997,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Calls the keyboard's `begin postKeystroke` group
    * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin PostKeystroke`
    */
-  processPostKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+  processPostKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
@@ -1012,14 +1012,14 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Encapsulates calls to keyboard input processing.
    * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin Unicode`
    */
-  processKeystroke(outputTarget: OutputTarget, keystroke: KeyEvent): RuleBehavior {
+  processKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
     return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke, false);
   }
 
-  private process(callee: (outputTarget: OutputTarget, keystroke: KeyEvent) => boolean, outputTarget: OutputTarget, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
+  private process(callee: (outputTarget: OutputTargetBase, keystroke: KeyEvent) => boolean, outputTarget: OutputTargetBase, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
     // Clear internal state tracking data from prior keystrokes.
     if(!outputTarget) {
       throw "No target specified for keyboard output!";
