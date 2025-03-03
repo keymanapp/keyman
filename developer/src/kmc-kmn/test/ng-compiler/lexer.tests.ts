@@ -105,6 +105,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_BEGIN token", () => {
       recogniseToken(TokenTypes.TT_BEGIN, 'begin');
     });
+    it("can recognise a TT_OUTS token", () => {
+      recogniseToken(TokenTypes.TT_OUTS, 'outs');
+    });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');
     });
@@ -143,6 +146,15 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_COMMA token", () => {
       recogniseToken(TokenTypes.TT_COMMA, ',');
+    });
+    it("can recognise a TT_U_CHAR token", () => {
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+1');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+A');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+1B');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+1CD');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+1EF0');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+23456');
+      recogniseToken(TokenTypes.TT_U_CHAR, 'U+789ABC');
     });
     it("can recognise a TT_STRING token (single quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '\'10.0\'');
@@ -302,6 +314,37 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_USE,           'use'),
           new Token(TokenTypes.TT_LEFT_BR,       '('),
           new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke'), // recognised as keyword
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+        ]
+      );
+    });
+    it("can recognise a store statement using outs", () => {
+      recogniseTokens(
+        'store(ShiftOutAll)  outs(ShiftOutSingle) outs(vCombo1) outs(vCombo2) outs(vCombo3)',
+        [
+          new Token(TokenTypes.TT_STORE,         'store'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,      'ShiftOutAll'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    '  '),
+          new Token(TokenTypes.TT_OUTS,          'outs'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,      'ShiftOutSingle'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_OUTS,          'outs'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,      'vCombo1'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_OUTS,          'outs'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,      'vCombo2'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_OUTS,          'outs'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,      'vCombo3'),
           new Token(TokenTypes.TT_RIGHT_BR,      ')'),
         ]
       );

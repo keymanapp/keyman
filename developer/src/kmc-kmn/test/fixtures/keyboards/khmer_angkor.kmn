@@ -30,8 +30,7 @@ store(whitespace) ' ' U+00A0 U+000D U+000A U+0009 U+2002 U+2003 U+2004 U+2005 U+
 group(NewContext) readonly
     c Any time we get a new context, by mouse click, tap,
     c cursor movement, new document, etc, we'll try and
-    c determine the best layer to use
-    platform('touch') > use(detectStartOfSentence)
+b    platform('touch') > use(detectStartOfSentence)
 
 group(PostKeystroke) readonly
     c We get here after every keystroke and model action is processed
