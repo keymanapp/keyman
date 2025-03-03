@@ -16,6 +16,7 @@ fi
 
 if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > /dev/null || ! which mutter > /dev/null; then
   echo "Please install Xvfb, Xephyr, metacity and mutter before running these tests!"
+  echo "sudo apt install xvfb xserver-xephyr metacity mutter"
   exit 1
 fi
 
@@ -43,7 +44,7 @@ function help() {
 function run_tests() {
   # Output these lines to stderr - the first line on stdout has to be the TAP version number
   # which running ${TESTFILE} outputs
-  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!" >&2
+  echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log, /tmp/ibus-daemon.log and /tmp/km-test-server.log!" >&2
   echo "" >&2
 
   echo "# Starting tests..." >&2
