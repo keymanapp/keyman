@@ -8,7 +8,7 @@
 
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
-export const START_INDEX = XMLParser.getStartIndexSymbol();
+export const XML_START_INDEX_SYMBOL = XMLParser.getStartIndexSymbol();
 
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
