@@ -1,4 +1,4 @@
-import KeymanEngine from './keymanEngine.js'
+import { KeymanEngine } from './keymanEngine.js'
 import { Worker } from '@keymanapp/lexical-model-layer/web'
 
  /**
