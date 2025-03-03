@@ -105,6 +105,9 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_BEGIN token", () => {
       recogniseToken(TokenTypes.TT_BEGIN, 'begin');
     });
+    it("can recognise a TT_GROUP token", () => {
+      recogniseToken(TokenTypes.TT_GROUP, 'group');
+    });
     it("can recognise a TT_OUTS token", () => {
       recogniseToken(TokenTypes.TT_OUTS, 'outs');
     });
@@ -128,6 +131,15 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_POSTKEYSTROKE token", () => {
       recogniseToken(TokenTypes.TT_POSTKEYSTROKE, 'postkeystroke');
+    });
+    it("can recognise a TT_READONLY token", () => {
+      recogniseToken(TokenTypes.TT_READONLY, 'readonly');
+    });
+    it("can recognise a TT_USING token", () => {
+      recogniseToken(TokenTypes.TT_USING, 'using');
+    });
+    it("can recognise a TT_KEYS token", () => {
+      recogniseToken(TokenTypes.TT_KEYS, 'keys');
     });
     it("can recognise a TT_ANSI token", () => {
       recogniseToken(TokenTypes.TT_ANSI, 'ansi');
@@ -318,6 +330,34 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a group statement (readonly)", () => {
+      recogniseTokens(
+        'group(NewContext) readonly',
+        [
+          new Token(TokenTypes.TT_GROUP,         'group'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_NEWCONTEXT,     'NewContext'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_READONLY,      'readonly'),
+        ]
+      );
+    });
+    it("can recognise a group statement (using keys)", () => {
+      recogniseTokens(
+        'group(main) using keys',
+        [
+          new Token(TokenTypes.TT_GROUP,         'group'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'main'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_USING,         'using'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_KEYS,          'keys'),
+        ]
+      );
+    });
     it("can recognise a store statement using outs", () => {
       recogniseTokens(
         'store(ShiftOutAll)  outs(ShiftOutSingle) outs(vCombo1) outs(vCombo2) outs(vCombo3)',
@@ -359,6 +399,25 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_RIGHT_BR,      ')'),
           new Token(TokenTypes.TT_WHITESPACE,    ' '),
           new Token(TokenTypes.TT_STRING,        '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\''),
+        ]
+      );
+    });
+    it("can recognise a store statement (unicode chars)", () => {
+      recogniseTokens(
+        'store(whitespace) \' \' U+00A0 U+000D U+000A',
+        [
+          new Token(TokenTypes.TT_STORE,         'store'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'whitespace'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_STRING,        '\' \''),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_U_CHAR,        'U+00A0'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_U_CHAR,        'U+000D'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_U_CHAR,        'U+000A'),
         ]
       );
     });
