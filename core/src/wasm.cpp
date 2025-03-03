@@ -81,6 +81,17 @@ public:
   std::vector<km_core_option_item_wasm> default_options;
 };
 
+class km_core_actions_wasm {
+public:
+  unsigned int code_points_to_delete;
+  std::u32string output;
+  std::vector<km_core_option_item_wasm> persist_options;
+  bool do_alert;
+  bool emit_keystroke;
+  int new_caps_lock_state;
+  std::u32string deleted_context;
+};
+
 template <typename T> class CoreReturn {
 public:
   CoreReturn(int status = 0, const T* obj = nullptr) : status(status), object(obj) {
@@ -162,6 +173,44 @@ km_core_state_clone_wasm(const km_core_state* state) {
   return new CoreReturn<km_core_state>(retVal, new_state);
 }
 
+EMSCRIPTEN_KEEPALIVE int
+km_core_state_context_set_if_needed_wasm(
+  km_core_state const* state,
+std::u16string application_context) {
+  return km_core_state_context_set_if_needed(const_cast<km_core_state*>(state), application_context.c_str());
+}
+
+EMSCRIPTEN_KEEPALIVE std::u16string
+km_core_state_context_debug_wasm(const km_core_state* state, int context_type) {
+  std::u16string context;
+  km_core_cu* context_c = km_core_state_context_debug(state, static_cast<km_core_debug_context_type>(context_type));
+  if (context_c) {
+    context = std::u16string(context_c);
+    km_core_cu_dispose(context_c);
+  }
+  return context;
+}
+
+EMSCRIPTEN_KEEPALIVE km_core_actions_wasm*
+km_core_state_get_actions_wasm(km_core_state const *state) {
+  km_core_actions const* actions = km_core_state_get_actions(state);
+  km_core_actions_wasm* actions_wasm = new km_core_actions_wasm();
+  actions_wasm->code_points_to_delete = actions->code_points_to_delete;
+  actions_wasm->output = std::u32string(actions->output);
+  actions_wasm->do_alert = actions->do_alert;
+  actions_wasm->emit_keystroke = actions->emit_keystroke;
+  actions_wasm->new_caps_lock_state = actions->new_caps_lock_state;
+  actions_wasm->deleted_context = std::u32string(actions->deleted_context);
+  for (const km_core_option_item* item = actions->persist_options; item->key; ++item) {
+    km_core_option_item_wasm item_wasm;
+    item_wasm.key = std::u16string(item->key);
+    item_wasm.value = std::u16string(item->value);
+    item_wasm.scope = item->scope;
+    actions_wasm->persist_options.push_back(item_wasm);
+  }
+  return actions_wasm;
+}
+
 EMSCRIPTEN_BINDINGS(core_interface) {
 
   em::value_object<km_core_attr>("km_core_attr")
@@ -208,6 +257,14 @@ EMSCRIPTEN_BINDINGS(core_interface) {
     .property("version_string", &km_core_keyboard_attrs_wasm::version_string)
     .property("id", &km_core_keyboard_attrs_wasm::id)
     .property("default_options", &km_core_keyboard_attrs_wasm::default_options);
+  em::class_<km_core_actions_wasm>("km_core_actions")
+    .property("code_points_to_delete", &km_core_actions_wasm::code_points_to_delete)
+    .property("output", &km_core_actions_wasm::output)
+    .property("persist_options", &km_core_actions_wasm::persist_options)
+    .property("do_alert", &km_core_actions_wasm::do_alert)
+    .property("emit_keystroke", &km_core_actions_wasm::emit_keystroke)
+    .property("new_caps_lock_state", &km_core_actions_wasm::new_caps_lock_state)
+    .property("deleted_context", &km_core_actions_wasm::deleted_context);
 
   em::class_<km_core_state>("km_core_state");
   em::class_<CoreReturn<km_core_state>>("CoreStateReturn")
@@ -221,5 +278,11 @@ EMSCRIPTEN_BINDINGS(core_interface) {
   em::function("state_clone", &km_core_state_clone_wasm, em::allow_raw_pointers());
   em::function("state_dispose", &km_core_state_dispose, em::allow_raw_pointers());
   em::function("process_event", &km_core_process_event, em::allow_raw_pointers());
+
+  em::function("state_context_set_if_needed", &km_core_state_context_set_if_needed_wasm, em::allow_raw_pointers());
+  em::function("state_context_clear", &km_core_state_context_clear, em::allow_raw_pointers());
+  em::function("state_context_debug", &km_core_state_context_debug_wasm, em::allow_raw_pointers());
+
+  em::function("state_get_actions", &km_core_state_get_actions_wasm, em::allow_raw_pointers());
 }
 #endif
