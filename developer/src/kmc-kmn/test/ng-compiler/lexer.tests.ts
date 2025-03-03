@@ -153,6 +153,18 @@ describe("Lexer Tests", () => {
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenTypes.TT_STRING, '"store"');
     });
+    it("can recognise a TT_COMMENT token", () => {
+      recogniseToken(TokenTypes.TT_COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
+    });
+    it("can recognise a TT_COMMENT token (followed by LF)", () => {
+      recogniseTokens(
+        'c This tells Keyman which keys should have casing behavior applied\n',
+        [
+          new Token(TokenTypes.TT_COMMENT,  'c This tells Keyman which keys should have casing behavior applied'),
+          new Token(TokenTypes.TT_NEWLINE,  '\n'),
+        ]
+      );
+    });
     it("can recognise a TT_WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.TT_WHITESPACE, ' ');
     });
