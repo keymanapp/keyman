@@ -7,11 +7,15 @@ export interface CompilerEvent {
   filename?: string;
   /** line where a message applies */
   line?: number;
-  /** 
+  /**
    * column where a message applies.
-   * where line is unset, column is a file offset
    */
   column?: number;
+  /**
+   * offset where a message applies.
+   * If set, encompasses line and column.
+   */
+  offset?: number;
   code: number;
   message: string;
   /**

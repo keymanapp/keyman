@@ -161,7 +161,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       this.messageFiletext = '';
     }
 
-    if (event.column && !event.line && event.filename) {
+    if (event.offset && !event.line && event.filename) {
       try {
         let text = '';
         if (this.messageFilename == event.filename) {

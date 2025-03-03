@@ -10,7 +10,7 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 const SevErrorTransform = SevError | 0xF00;
 
 // like m() but takes an XML object for line numbers
-const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => LdmlCompilerMessages.col(m(code, message, detail), x);
+const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => LdmlCompilerMessages.offset(m(code, message, detail), x);
 
 /**
  * @internal
@@ -269,14 +269,14 @@ export class LdmlCompilerMessages {
   );
 
   /**
-   * Get a column number from o and set e's column field
+   * Get an offset from o and set e's offset field
    * @param event a compiler event, such as from functions in this class
    * @param x any object parsed from XML or with the START_INDEX symbol copied over
    * @returns modified event object
    */
-  static col(event: CompilerEvent, x?: any): CompilerEvent {
+  static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
-      event.column = (x as any)[START_INDEX as any];
+      event.offset = (x as any)[START_INDEX as any];
     }
     return event;
   }
@@ -287,9 +287,9 @@ export class LdmlCompilerMessages {
    * @param xml XML source
    * @returns the modified event
    */
-  static resolveLineNumber(event: CompilerEvent, xml: string) : CompilerEvent { 
-    if (event.column && !event.line && xml) {
-      const loc = KeymanXMLReader.offsetToLineColumn(event.column, xml);
+  static resolveLineNumber(event: CompilerEvent, xml: string) : CompilerEvent {
+    if (event.offset && !event.line && xml) {
+      const loc = KeymanXMLReader.offsetToLineColumn(event.offset, xml);
       event.line = loc.line;
       event.column = loc.column;
     }
