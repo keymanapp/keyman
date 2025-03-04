@@ -46,7 +46,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     _lowLevelBackspaceCount = 0;
     _queuedText = nil;
  
-    os_log_debug([KMLogs testLog], "KMInputMethodEventHandler initWithClient [client: %p] [clientAppId: %{public}@]", sender, clientAppId);
     os_log_debug([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient [client: %p] [clientAppId: %{public}@]", sender, clientAppId);
     [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
 
@@ -212,17 +211,17 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   
   // test for three scenarios in which the api compliance is stale
   if (currentApiCompliance == nil) { // if we have no previous api compliance object
-    os_log_debug([KMLogs testLog], "*** stale: currentApiCompliance == nil");
+    os_log_debug([KMLogs complianceLog], "*** stale: currentApiCompliance == nil");
     stale = true;
   } else { // if we have one but for a different client
     stale = ![currentApiCompliance isMatchingClient:client applicationId:self.clientApplicationId];
     if (stale){
-      os_log_debug([KMLogs testLog], "*** stale: due to failed isMatchingClient");
+      os_log_debug([KMLogs complianceLog], "*** stale: due to failed isMatchingClient");
     }
   }
   if (self.contextChanged) { // if the context has changed
     if(!stale) {
-      os_log_debug([KMLogs testLog], "*** stale: due to contextChanged");
+      os_log_debug([KMLogs complianceLog], "*** stale: due to contextChanged");
     }
     stale = true;
   }

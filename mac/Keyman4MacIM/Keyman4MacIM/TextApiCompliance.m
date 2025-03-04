@@ -68,8 +68,6 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
     os_log_debug([KMLogs complianceLog], "%{public}@", message);
 
-    os_log_debug([KMLogs testLog], "### TextApiCompliance initWithClient [client: %p] [clientAppId: %{public}@]", client, appId);
-
     // if we do not have hard-coded noncompliance, then test the app
     if (appId && [self applyNoncompliantAppLists:appId]) {
       [self checkCompliance];
@@ -113,7 +111,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     matches = NO;
   }
   
-  os_log_debug([KMLogs testLog], "## isMatchingClient = %@", matches?@"YES":@"NO");
+  os_log_debug([KMLogs complianceLog], "## isMatchingClient = %@", matches?@"YES":@"NO");
   return matches;
 }
 
