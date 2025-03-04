@@ -105,8 +105,17 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_ANY token", () => {
       recogniseToken(TokenTypes.TT_ANY, 'any');
     });
+    it("can recognise a TT_BASELAYOUT token", () => {
+      recogniseToken(TokenTypes.TT_BASELAYOUT, 'baselayout');
+    });
+    it("can recognise a TT_BEEP token", () => {
+      recogniseToken(TokenTypes.TT_BEEP, 'beep');
+    });
     it("can recognise a TT_BEGIN token", () => {
       recogniseToken(TokenTypes.TT_BEGIN, 'begin');
+    });
+    it("can recognise a TT_CALL token", () => {
+      recogniseToken(TokenTypes.TT_CALL, 'call');
     });
     it("can recognise a TT_CONTEXT token", () => {
       recogniseToken(TokenTypes.TT_CONTEXT, 'context');
@@ -179,6 +188,9 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_CHEVRON token", () => {
       recogniseToken(TokenTypes.TT_CHEVRON, '>');
+    });
+    it("can recognise a TT_PLUS token", () => {
+      recogniseToken(TokenTypes.TT_PLUS, '+');
     });
     it("can recognise a TT_COMMA token", () => {
       recogniseToken(TokenTypes.TT_COMMA, ',');
