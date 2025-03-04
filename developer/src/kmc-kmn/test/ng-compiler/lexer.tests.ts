@@ -228,6 +228,22 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'CAPS');
       recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'NCAPS');
     });
+    it("can recognise a TT_KEY_CODE token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'K_K');
+      recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'K_COLON');
+      recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'T_17D2_1780');
+      recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'U_0030');
+    });
+    it("can recognise a TT_KEY_CODE token (followed by space)", () => {
+      recogniseTokens(
+        'K_K ]',
+        [
+          new Token(TokenTypes.TT_KEY_CODE,   'K_K'),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_RIGHT_SQ,   ']'),
+        ]
+      );
+    });
     it("can recognise a TT_COMMENT token", () => {
       recogniseToken(TokenTypes.TT_COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
@@ -580,8 +596,18 @@ function recogniseTokenFollowedBySpace(type: TokenTypes, text: String): void {
   recogniseTokens(
     `${text} `,
     [
-      new Token(TokenTypes.TT_SHIFT_CODE, text),
+      new Token(type, text),
       new Token(TokenTypes.TT_WHITESPACE, ' '),
+    ]
+  );
+}
+
+function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String): void {
+  recogniseTokens(
+    `${text}]`,
+    [
+      new Token(type, text),
+      new Token(TokenTypes.TT_RIGHT_SQ, ']'),
     ]
   );
 }
