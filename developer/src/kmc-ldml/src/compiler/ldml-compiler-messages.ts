@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_START_INDEX_SYMBOL, CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_START_INDEX_SYMBOL, XML_FILENAME_SYMBOL, CompilerEvent } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -91,8 +91,8 @@ export class LdmlCompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
-  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
-  m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`);
+  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x: any) => mx(x,
+    this.ERROR_KeyMissingToGapOrSwitch, `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`);
 
   static ERROR_ExcessHardware = SevError | 0x0012;
   static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,
@@ -277,6 +277,7 @@ export class LdmlCompilerMessages {
   static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
       event.offset = (x as any)[XML_START_INDEX_SYMBOL as any];
+      event.filename = event.filename || (x as any)[XML_FILENAME_SYMBOL as any];
     }
     return event;
   }

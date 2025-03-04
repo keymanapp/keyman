@@ -229,6 +229,7 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   setEventResolver(eventResolver: EventResolver): void {
     this.eventResolver = eventResolver;
+    this.parent.setEventResolver(eventResolver);
   }
 
   reportMessage(event: CompilerEvent): void {

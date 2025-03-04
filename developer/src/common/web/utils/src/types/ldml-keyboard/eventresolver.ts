@@ -1,4 +1,4 @@
-import { CompilerEvent, EventResolver, KeymanXMLReader } from "@keymanapp/developer-utils";
+import { CompilerEvent, EventResolver, KeymanXMLReader } from "../../index.js";
 
 export class LdmlEventResolver implements EventResolver {
 

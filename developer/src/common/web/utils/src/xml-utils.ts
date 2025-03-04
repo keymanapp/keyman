@@ -8,7 +8,10 @@
 
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
+/** Symbol giving the start offset, in chars, of the node */
 export const XML_START_INDEX_SYMBOL = XMLParser.getStartIndexSymbol();
+/** Symbol giving an override which file a node came from */
+export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>

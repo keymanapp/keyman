@@ -11,6 +11,8 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
 import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
+import { LdmlEventResolver } from './eventresolver.js';
+import { XML_FILENAME_SYMBOL } from 'src/xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -26,27 +28,39 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
 };
 
 export class LDMLKeyboardXMLSourceFileReader {
-  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  static eventResolver: LdmlEventResolver = new LdmlEventResolver();
+  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {  
+    callbacks.setEventResolver(LDMLKeyboardXMLSourceFileReader.eventResolver);
   }
 
   static get defaultImportsURL(): [string,string] {
     return ['../import/', import.meta.url];
   }
 
-  readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
-    return this.callbacks.loadFile(importPath);
+  /** bottleneck for reading keyboard XML files */
+  readFile(path: string): Uint8Array {
+    const data = this.callbacks.loadFile(path);
+    if (data) {
+      LDMLKeyboardXMLSourceFileReader.eventResolver.addFile(path, new TextDecoder().decode(data));
+    }
+    return data;
   }
 
-  readLocalImportFile(path: string): Uint8Array {
+  /** @returns [data, filename] */
+  readImportFile(version: string, subpath: string): [Uint8Array, string] {
+    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
+    return [this.readFile(importPath), importPath];
+  }
+
+  readLocalImportFile(path: string): [Uint8Array, string] {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
       const importPath = this.callbacks.path.join(localPath, path);
       if(this.callbacks.fs.existsSync(importPath)) {
-        return this.callbacks.loadFile(importPath);
+        return [this.readFile(importPath), importPath];
       }
     }
-    return null; // was not able to load from any of the paths
+    return [null, null]; // was not able to load from any of the paths
   }
 
   /**
@@ -223,6 +237,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       return false;
     }
     let importData: Uint8Array;
+    let importPath: string;
 
     if (base === constants.cldr_import_base) {
       // CLDR import
@@ -235,10 +250,10 @@ export class LDMLKeyboardXMLSourceFileReader {
         /** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
         paths[0] = constants.cldr_version_latest;
       }
-      importData = this.readImportFile(paths[0], paths[1]);
+      [importData, importPath] = this.readImportFile(paths[0], paths[1]);
     } else {
       // local import
-      importData = this.readLocalImportFile(path);
+      [importData, importPath] = this.readLocalImportFile(path);
     }
     if (!importData || !importData.length) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
@@ -246,6 +261,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
+    LDMLKeyboardXMLSourceFileReader.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
@@ -263,7 +279,11 @@ export class LDMLKeyboardXMLSourceFileReader {
         return false;
       }
       // Mark all children as an import
-      subsubval.forEach(o => o[ImportStatus.import] = basePath);
+      subsubval.forEach(o => {
+        o[ImportStatus.import] = basePath;
+        o[XML_FILENAME_SYMBOL] = importPath; // mark overriding import path
+      });
+
       if (implied) {
         // mark all children as an implied import
         subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);

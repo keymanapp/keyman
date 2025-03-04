@@ -485,7 +485,9 @@ export class KeysCompiler extends SectionCompiler {
         }
         if (!keydef.output && !keydef.gap && !keydef.layerId) {
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key })
+            LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key },
+              keydef
+            )
           );
           valid = false;
           continue;
