@@ -102,11 +102,20 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_WINDOWSLANGUAGES token", () => {
       recogniseToken(TokenTypes.TT_WINDOWSLANGUAGES, 'windowslanguages');
     });
+    it("can recognise a TT_ANY token", () => {
+      recogniseToken(TokenTypes.TT_ANY, 'any');
+    });
     it("can recognise a TT_BEGIN token", () => {
       recogniseToken(TokenTypes.TT_BEGIN, 'begin');
     });
+    it("can recognise a TT_CONTEXT token", () => {
+      recogniseToken(TokenTypes.TT_CONTEXT, 'context');
+    });
     it("can recognise a TT_GROUP token", () => {
       recogniseToken(TokenTypes.TT_GROUP, 'group');
+    });
+    it("can recognise a TT_IF token", () => {
+      recogniseToken(TokenTypes.TT_IF, 'if');
     });
     it("can recognise a TT_OUTS token", () => {
       recogniseToken(TokenTypes.TT_OUTS, 'outs');
@@ -162,6 +171,12 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_COMMA token", () => {
       recogniseToken(TokenTypes.TT_COMMA, ',');
     });
+    it("can recognise a TT_NOT_EQUAL token", () => {
+      recogniseToken(TokenTypes.TT_NOT_EQUAL, '!=');
+    });
+    it("can recognise a TT_EQUAL token", () => {
+      recogniseToken(TokenTypes.TT_EQUAL, '=');
+    });
     it("can recognise a TT_U_CHAR token", () => {
       recogniseToken(TokenTypes.TT_U_CHAR, 'U+1');
       recogniseToken(TokenTypes.TT_U_CHAR, 'U+A');
@@ -176,6 +191,16 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a TT_STRING token (double quote)", () => {
       recogniseToken(TokenTypes.TT_STRING, '"10.0"');
+    });
+    it("can recognise a TT_STRING token (repeated quotes)", () => {
+      recogniseTokens(
+        '\'hello\' \'world\'',
+        [
+          new Token(TokenTypes.TT_STRING,     '\'hello\''),
+          new Token(TokenTypes.TT_WHITESPACE, ' '),
+          new Token(TokenTypes.TT_STRING,     '\'world\''),
+        ]
+      );
     });
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenTypes.TT_STRING, '"store"');
@@ -358,6 +383,46 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_USING,         'using'),
           new Token(TokenTypes.TT_WHITESPACE,    ' '),
           new Token(TokenTypes.TT_KEYS,          'keys'),
+        ]
+      );
+    });
+    it("can recognise an if statement (using any, context, layer)", () => {
+      recogniseTokens(
+        'if(&newLayer = "") if(&layer = \'shift\') any(ShiftOutSingle) > context layer(\'default\')',
+        [
+          new Token(TokenTypes.TT_IF,            'if'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_AMPHASAND,     '&'),
+          new Token(TokenTypes.TT_NEWLAYER,      'newLayer'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_EQUAL,         '='),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_STRING,        '""'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_IF,            'if'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_AMPHASAND,     '&'),
+          new Token(TokenTypes.TT_LAYER,         'layer'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_EQUAL,         '='),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_STRING,        '\'shift\''),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_ANY,           'any'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'ShiftOutSingle'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CHEVRON,       '>'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CONTEXT,       'context'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_LAYER,         'layer'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_STRING,        '\'default\''),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
         ]
       );
     });
