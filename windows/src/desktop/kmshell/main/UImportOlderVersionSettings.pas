@@ -144,10 +144,9 @@ begin
       ResetAllHints;
   end;
 
-  if DoStartWithWindows then kmcom.Options['koStartWithWindows'].Value := True; // I2753
-  if DoCheckForUpdates then kmcom.Options['koCheckForUpdates'].Value := True;  // I2753
-  if DoAutomaticallyReportUsage then kmcom.Options['koAutomaticallyReportUsage'].Value := True;
-
+  kmcom.Options['koStartWithWindows'].Value := DoStartWithWindows; // I2753
+  kmcom.Options['koCheckForUpdates'].Value := DoCheckForUpdates;  // I2753
+  kmcom.Options['koAutomaticallyReportUsage'].Value := DoAutomaticallyReportUsage;
 
   if DoDefaults then
   begin
