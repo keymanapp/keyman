@@ -9,18 +9,22 @@
 
   <title>KeymanWeb Core Stress Test</title>
 
-  <script module="es6" type="module">
-    import { KM_Core } from '../../../../../build/engine/core-processor/lib/index.mjs';
-
-    async function loadKeyboardBlob(uri) {
-      const response = await fetch(uri);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status} ${response.statusText}`);
+  <!--
+    Import map defines where we can find KeymanWeb compiled modules; this must
+    be specified inline.
+  -->
+  <script type="importmap">
+    {
+      "imports": {
+        "keyman/": "../../../../../build/"
       }
-
-      const buffer = await response.arrayBuffer();
-      return new Uint8Array(buffer);
     }
+  </script>
+
+  <script module="es6" type="module">
+    import { KM_Core } from 'keyman/engine/core-processor/lib/index.mjs';
+    import { CORE_WASM } from './paths.js';
+    import { loadKeyboardBlob } from './load-keyboard-blob.js';
 
     let intervalId = null;
 
@@ -36,7 +40,7 @@
 
     async function doStress() {
       console.log('Starting to stress');
-      const km_core = await KM_Core.createCoreProcessor('../../../../../build/engine/core-processor/obj/import/core');
+      const km_core = await KM_Core.createCoreProcessor(CORE_WASM);
       const blob = await loadKeyboardBlob('./test_8568_deadkeys.kmx')
       const result = km_core.keyboard_load_from_blob('test', blob);
       result.delete();
@@ -51,7 +55,7 @@
 
 <body>
   <h2>KeymanWeb Sample Page - Core Testing</h2>
-  <p>This page is designed to stress-test the loading a KMX keyboard from blob.</p>
+  <p>This page is designed to stress-test the loading a KMX keyboard from blob. It will repeatedly load a .kmx using </p>
   <p>Be sure to reference the developer console for additional feedback. </p>
   <button id="stress">Stress Test</button>
   <hr />
