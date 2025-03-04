@@ -743,11 +743,11 @@
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">Βοήθεια γιὰ τὸ \"</string>
+  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">Βοήθεια γιὰ τὸ πληκτρολόγιο \"</string>
   <!-- Context: Help Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">πληκτρολόγιο \"</string>
+  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">\"</string>
   <!-- Context: Toolbar Context Help -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
