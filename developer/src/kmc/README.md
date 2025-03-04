@@ -1,8 +1,8 @@
 Keyman Developer - Command Line Compiler
 ================
 
-This package provides a command-line interface to the Keyman Developer compiler
-toolchain, `kmc`.
+This package provides a command-line interface to the
+[Keyman Developer](https://keyman.com/developer) compiler toolchain, `kmc`.
 
 ## Install kmc
 
@@ -116,7 +116,7 @@ keyman.addKeyboards({
     id:'km',                // A BCP 47 code uniquely identifying the language.
     name:'Khmer'            // The language's name.
   },
-  filename:'./khmer-angkor.js',
+  filename:'./khmer_angkor.js',
 });
 ```
 
