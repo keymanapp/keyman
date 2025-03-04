@@ -66,6 +66,7 @@ export enum TokenTypes {
   TT_STRING             = "TT_STRING",
   TT_COMMENT            = "TT_COMMENT",
   TT_WHITESPACE         = "TT_WHITESPACE",
+  TT_CONTINUATION       = "TT_CONTINUATION",
   TT_NEWLINE            = "TT_NEWLINE",
   TT_PARAMETER          = "TT_PARAMETER",
 };
@@ -152,6 +153,7 @@ export class Lexer {
       new ScanRecogniser(TokenTypes.TT_KEY_CODE,           new RegExp("^(((K_|T_|U_)[^\\]\\s]+)|[A-E]\\d\\d)(?=[^\\S\\r\\n]*\\])", "i")),
       new ScanRecogniser(TokenTypes.TT_COMMENT,            new RegExp("^c[^\\S\\r\\n][^\\r\\n]*", "i")),
       new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+")),
+      new ScanRecogniser(TokenTypes.TT_CONTINUATION,       new RegExp("^\\\\(?=([^\\S\\r\\n]*(\\r\\n|\\n|\\r)))")),
       new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)")),
       new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=([^\\S\\r\\n]*,?[^\\S\\r\\n]*[^,\\)\\s]+)*[^\\S\\r\\n]*\\))")),
     ];

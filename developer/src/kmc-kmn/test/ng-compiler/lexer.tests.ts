@@ -260,6 +260,105 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.TT_WHITESPACE, ' ');
     });
+    it("can recognise a TT_CONTINUATION token (no space after)", () => {
+      recogniseTokens(
+        '\\\n',
+        [
+          new Token(TokenTypes.TT_CONTINUATION, '\\'),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+        ]
+      );
+    });
+    it("can recognise a TT_CONTINUATION token (space after)", () => {
+      recogniseTokens(
+        '\\ \n',
+        [
+          new Token(TokenTypes.TT_CONTINUATION, '\\'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+        ]
+      );
+    });
+    it("can recognise multiple TT_CONTINUATION tokens", () => {
+      recogniseTokens(
+        'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n' +
+        '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n' +
+        '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n' +
+        '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n',
+        [
+          new Token(TokenTypes.TT_STORE,        'store'),
+          new Token(TokenTypes.TT_LEFT_BR,      '('),
+          new Token(TokenTypes.TT_PARAMETER,    'LaoConsonants'),
+          new Token(TokenTypes.TT_RIGHT_BR,     ')'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E81'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E82'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E84'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E87'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E88'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E8A'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E8D'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E94'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_CONTINUATION, '\\'),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E95'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E96'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E97'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E99'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9A'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9B'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9C'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9D'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_CONTINUATION, '\\'),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9E'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0E9F'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EA1'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EA2'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EA3'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EA5'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EA7'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EAA'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_CONTINUATION, '\\'),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EAB'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EAD'),
+          new Token(TokenTypes.TT_WHITESPACE,   ' '),
+          new Token(TokenTypes.TT_U_CHAR,       'U+0EAE'),
+          new Token(TokenTypes.TT_WHITESPACE,   '    '),
+          new Token(TokenTypes.TT_COMMENT,      'c list of all the Lao consonants'),
+          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+        ]
+      );
+    });
     it("can recognise a TT_NEWLINE token (LF)", () => {
       recogniseToken(TokenTypes.TT_NEWLINE, '\n');
     });
