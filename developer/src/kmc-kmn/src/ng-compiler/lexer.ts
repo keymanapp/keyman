@@ -149,7 +149,7 @@ export class Lexer {
       new ScanRecogniser(TokenTypes.TT_U_CHAR,             new RegExp("^U\\+[0-9A-F]{1,6}", "i")),
       new ScanRecogniser(TokenTypes.TT_STRING,             new RegExp("^('.*?'|\".*?\")")),
       new ScanRecogniser(TokenTypes.TT_SHIFT_CODE,         new RegExp("^(SHIFT|CTRL|LCTRL|RCTRL|ALT|LALT|RALT|CAPS|NCAPS)(?=[^\\S\\r\\n])", "i")),
-      new ScanRecogniser(TokenTypes.TT_KEY_CODE,           new RegExp("^((K_|T_|U_)[^\\]\\s]+)(?=[^\\S\\r\\n]*\\])", "i")), // add ISO9995
+      new ScanRecogniser(TokenTypes.TT_KEY_CODE,           new RegExp("^(((K_|T_|U_)[^\\]\\s]+)|[A-E]\\d\\d)(?=[^\\S\\r\\n]*\\])", "i")),
       new ScanRecogniser(TokenTypes.TT_COMMENT,            new RegExp("^c[^\\S\\r\\n][^\\r\\n]*", "i")),
       new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+")),
       new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)")),

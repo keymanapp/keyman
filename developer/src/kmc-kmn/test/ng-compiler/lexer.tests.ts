@@ -233,6 +233,7 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'K_COLON');
       recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'T_17D2_1780');
       recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'U_0030');
+      recogniseTokenFollowedByRightSquare(TokenTypes.TT_KEY_CODE, 'A21');
     });
     it("can recognise a TT_KEY_CODE token (followed by space)", () => {
       recogniseTokens(
