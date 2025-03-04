@@ -102,6 +102,15 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_WINDOWSLANGUAGES token", () => {
       recogniseToken(TokenTypes.TT_WINDOWSLANGUAGES, 'windowslanguages');
     });
+    it("can recognise a TT_CAPSALWAYSOFF token", () => {
+      recogniseToken(TokenTypes.TT_CAPSALWAYSOFF, 'capsalwaysoff');
+    });
+    it("can recognise a TT_CAPSONONLY token", () => {
+      recogniseToken(TokenTypes.TT_CAPSONONLY, 'capsononly');
+    });
+    it("can recognise a TT_SHIFTFREECAPS token", () => {
+      recogniseToken(TokenTypes.TT_SHIFTFREESCAPS, 'shiftfreescaps');
+    });
     it("can recognise a TT_ANY token", () => {
       recogniseToken(TokenTypes.TT_ANY, 'any');
     });
@@ -474,6 +483,15 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a visualkeyboard store", () => {
       recogniseStoreWithString(TokenTypes.TT_VISUALKEYBOARD, '10.0');
+    });
+    it("can recognise a capsalwaysoff store", () => {
+      recogniseStoreWithString(TokenTypes.TT_CAPSALWAYSOFF, "1");
+    });
+    it("can recognise a capsononly store", () => {
+      recogniseStoreWithString(TokenTypes.TT_CAPSONONLY, "1");
+    });
+    it("can recognise a shiftfreescaps store", () => {
+      recogniseStoreWithString(TokenTypes.TT_SHIFTFREESCAPS, "1");
     });
     it("can recognise a begin statement (unicode)", () => {
       recogniseTokens(
