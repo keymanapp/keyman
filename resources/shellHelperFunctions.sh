@@ -344,7 +344,7 @@ builder_do_typescript_tests() {
     THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
   fi
 
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
 
   if [[ ! -z "$C8_THRESHOLD" ]]; then
     builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
