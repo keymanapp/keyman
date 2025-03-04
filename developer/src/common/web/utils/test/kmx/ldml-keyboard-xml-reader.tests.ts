@@ -8,6 +8,7 @@ import { Constants } from '@keymanapp/common-types';
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import { XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -140,10 +141,16 @@ describe('ldml keyboard xml reader tests', function () {
           { id: 'interrobang', output: '‽' },
           { id: 'snail', output: '@' },
         ]);
+        const snailKey = source?.keyboard3?.keys.key.find(({ id }) => id === 'snail');
         // all of the keys are implied imports here
-        assert.isFalse(ImportStatus.isImpliedImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
-        assert.isTrue(ImportStatus.isImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
-        assert.isTrue(ImportStatus.isLocalImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
+        assert.isFalse(ImportStatus.isImpliedImport(snailKey));
+        assert.isTrue(ImportStatus.isImport(snailKey));
+        assert.isTrue(ImportStatus.isLocalImport(snailKey));
+        // get the actual filename of where the import was located
+        const snailFilename = (snailKey as any)[XML_FILENAME_SYMBOL as any];
+        assert.ok(snailFilename);
+        assert.ok(/\/keys-Zyyy-morepunctuation.xml$/.test(snailFilename)
+          , `snail key filename is ${snailFilename}`);
       },
     },
     {

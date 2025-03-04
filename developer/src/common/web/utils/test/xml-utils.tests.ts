@@ -174,14 +174,15 @@ describe(`XML Reader line number test`, () => {
 
     // now, parse. subsitute endings for Win
     const actual = reader.parse(xml);
+    const lines = KeymanXMLReader.textToLines(xml);
     assert.ok(actual, `Parser failed on ${xmlPath}`);
 
     // now, assert char offset
     assert.equal(actual.keyboard3[XML_START_INDEX_SYMBOL as any], 40); // index of <keyboard3> element
     assert.equal(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], 136);  // index of <info> etc
     assert.equal(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], 186);
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[XML_START_INDEX_SYMBOL as any], xml), { line: 3, column: 0 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], xml), { line: 4, column: 2 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], xml), { line: 8, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[XML_START_INDEX_SYMBOL as any], lines), { line: 3, column: 0 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], lines), { line: 4, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], lines), { line: 8, column: 2 });
   });
 });
