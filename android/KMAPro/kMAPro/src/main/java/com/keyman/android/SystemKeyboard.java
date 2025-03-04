@@ -4,6 +4,7 @@
 
 package com.keyman.android;
 
+import com.keyman.engine.util.DownloadFileUtils;
 import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
@@ -84,7 +85,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
-    KMManager.executeResourceUpdate(this);
+    // Checking for updates should never be allowed to crash the keyboard.
+    // Just silently fail if this occurs.
+    if(DownloadFileUtils.getDownloadManager(this) != null) {
+      // Will try to emit a toast if it fails - i.e., is not silent.
+      KMManager.executeResourceUpdate(this);
+    }
   }
 
   @Override
@@ -149,16 +155,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
-    // making it an important time to detect orientation changes.
     Context appContext = getApplicationContext();
-    int newOrientation = KMManager.getOrientation(appContext);
-    if(newOrientation != lastOrientation) {
-      lastOrientation = newOrientation;
-      Configuration newConfig = this.getResources().getConfiguration();
-      KMManager.onConfigurationChanged(newConfig);
-    }
-
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     int inputType = attribute.inputType;
     KMManager.setMayPredictOverride(inputType);
@@ -228,6 +225,16 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onComputeInsets(InputMethodService.Insets outInsets) {
     super.onComputeInsets(outInsets);
 
+    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
+    // making it an important time to detect orientation changes.
+    Context appContext = getApplicationContext();
+    int newOrientation = KMManager.getOrientation(appContext);
+    if(newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
+      KMManager.onConfigurationChanged(newConfig);
+    }
+
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
     Point size = KMManager.getWindowSize(getApplicationContext());
 
@@ -250,8 +257,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
-    // Initialize keyboard options
-    KMManager.sendOptionsToKeyboard();
   }
 
   @Override

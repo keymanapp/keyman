@@ -5,11 +5,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.keyman.engine.R;
 import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.DownloadFileUtils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -206,12 +210,34 @@ public class CloudDownloadMgr{
    * @param params the cloud api params for download
    * @param <ModelType> the target models type
    * @param <ResultType> the cloud requests result type
+   * @return `false` if the download request cannot be executed; `true` otherwise.
    */
-  public <ModelType,ResultType> void executeAsDownload(Context aContext, String aDownloadIdentifier,
+  public <ModelType,ResultType> boolean executeAsDownload(Context aContext, String aDownloadIdentifier,
                                 ModelType aTargetModel,
                                 ICloudDownloadCallback<ModelType,ResultType> aCallback,
-                                CloudApiTypes.CloudApiParam... params)
-  {
+                                CloudApiTypes.CloudApiParam... params) {
+    try {
+      executeAsDownloadInternal(aContext, aDownloadIdentifier, aTargetModel, aCallback, params);
+    } catch (DownloadManagerDisabledException e) {
+      Toast.makeText(aContext,
+        aContext.getString(R.string.update_check_download_manager_disabled),
+        Toast.LENGTH_SHORT).show();
+      return false;
+    } catch (Exception e) {
+      Toast.makeText(aContext,
+        aContext.getString(R.string.update_check_unavailable),
+        Toast.LENGTH_SHORT).show();
+      KMLog.LogException(TAG, "Unexpected exception occurred during download/query attempt", e);
+      return false;
+    }
+
+    return true;
+  }
+
+  private <ModelType,ResultType> void executeAsDownloadInternal(Context aContext, String aDownloadIdentifier,
+                                ModelType aTargetModel,
+                                ICloudDownloadCallback<ModelType,ResultType> aCallback,
+                                CloudApiTypes.CloudApiParam... params) throws DownloadManagerDisabledException {
     if(!isInitialized) {
       Log.w(TAG, "DownloadManager not initialized. Initializing CloudDownloadMgr.");
       initialize(aContext);
@@ -219,15 +245,21 @@ public class CloudDownloadMgr{
       KMLog.LogBreadcrumb("CloudDownloadMgr", "CloudDownloadMgr.executeAsDownload() called; already initialized", true);
     }
 
+    DownloadManager downloadManager = DownloadFileUtils.getDownloadManager(aContext);
+    if(downloadManager == null) {
+      // The callback object provided to us provides no way to directly signal a
+      // failure.  That said, we can also immediately detect that we WILL fail and
+      // corresponding error _now_, rather than later.
+      //
+      // Unique custom error so it's easy to explicitly filter.
+      throw new DownloadManagerDisabledException();
+    }
+
     synchronized (downloadSetByDownloadIdentifier) {
 
       if (alreadyDownloadingData(aDownloadIdentifier) || params == null) {
         return;
       }
-
-      DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
-      if(downloadManager==null)
-        throw new IllegalStateException("DownloadManager is not available");
 
       aCallback.initializeContext(aContext);
 

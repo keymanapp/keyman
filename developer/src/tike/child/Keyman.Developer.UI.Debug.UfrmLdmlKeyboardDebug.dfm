@@ -31,6 +31,7 @@ inherited frmLdmlKeyboardDebug: TfrmLdmlKeyboardDebug
     Font.Name = 'Arial'
     Font.Style = []
     ParentFont = False
+    PlainText = True
     PopupMenu = mnuPopup
     ScrollBars = ssVertical
     TabOrder = 0

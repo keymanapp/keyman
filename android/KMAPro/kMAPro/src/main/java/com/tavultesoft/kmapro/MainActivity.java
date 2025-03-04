@@ -43,7 +43,9 @@ import com.keyman.android.DownloadIntentService;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMPLink;
 import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 import com.keyman.engine.util.WebViewUtils.EngineWebViewVersionStatus;
+import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -153,7 +155,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.setDebugMode(true);
     }
 
+    // Verify WebView installed and enabled before attempting to initialize KMManager
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
+
     KMManager.executeResourceUpdate(this);
 
     DefaultLanguageResource.install(context);
@@ -181,8 +185,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setTextSize((float) textSize);
     textView.setSelection(textView.getText().length());
 
-    // Use in-app keyboard WebView to check the Chrome version
-    checkChromeVersion(KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP));
+    // Check WebView enabled and Chrome version
+    SystemWebViewStatus webViewStatus = WebViewUtils.getSystemWebViewStatus(context);
+    EngineWebViewVersionStatus chromeStatus = KMManager.getEngineWebViewVersionStatus();
+    updateWebViewIfNeeded(chromeStatus, webViewStatus);
+
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
     checkGetStarted();
   }
@@ -475,8 +482,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    // Initialize keyboard options
-    KMManager.sendOptionsToKeyboard();
+    // Do nothing
   }
 
   @Override
@@ -770,39 +776,114 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
   }
 
-  private void checkChromeVersion(WebView webView) {
-    if (KMManager.getEngineWebViewVersionStatus() != EngineWebViewVersionStatus.FULL) {
-      LinearLayout updateChromeLayout = (LinearLayout) findViewById(R.id.updateChromeLayout);
-      updateChromeLayout.setVisibility(View.VISIBLE);
-
-      Button updateChromeButton = (Button)findViewById(R.id.updateChromeButton);
-      updateChromeButton.setOnClickListener(new View.OnClickListener() {
-        public void onClick(View v) {
-          // Launch PlayStore to update Chrome
-          try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.android.chrome"));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-              startActivity(intent);
-            } else {
-              intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
-              if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-              } else {
-                Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
-              }
-            }
-          } catch (android.content.ActivityNotFoundException e) {
-            // Link to Chrome if user is not signed in to Play Store
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
-            if (intent.resolveActivity(getPackageManager()) != null) {
-              startActivity(intent);
-            } else {
-              Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
-            }
-          }
-        }
-      });
+  /**
+   * Based on whether Chrome and WebView are installed & enabled,
+   * display the corresponding update panel
+   * @param chromeStatus
+   * @param webViewStatus
+   */
+  private void updateWebViewIfNeeded(EngineWebViewVersionStatus chromeStatus, SystemWebViewStatus webViewStatus) {
+    if (chromeStatus == EngineWebViewVersionStatus.FULL && webViewStatus == SystemWebViewStatus.FULL) {
+      return;
     }
+
+    if (webViewStatus == SystemWebViewStatus.NOT_INSTALLED) {
+      displayInstallWebView();
+    } else if (webViewStatus == SystemWebViewStatus.DISABLED) {
+      displayEnableWebView();
+    } else {
+      // Otherwise, display update Chrome
+      displayUpdateChrome();
+    }
+  }
+
+  private void displayInstallWebView() {
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
+    textView.setText(getString(R.string.body_install_webview));
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.label_install_webview));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Play Store link to install WebView
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.webview"));
+
+        // Launch intent
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
+  }
+
+  private void displayEnableWebView() {
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
+    textView.setText(getString(R.string.body_enable_webview));
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.label_enable_webview));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Application settings to enable WebView
+        Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS",
+          Uri.parse("package:com.google.android.webview"));
+
+        // Launch intent
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
+  }
+
+  private void displayUpdateChrome() {
+    // TextView's default string is to update Chrome
+
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
+    button.setText(getString(R.string.button_update_chrome));
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // Primary Play Store link to install/update Chrome
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+          Uri.parse("market://details?id=com.android.chrome"));
+
+        try {
+          PackageManager packageManager = context.getPackageManager();
+          if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent);
+          } else {
+            // (alternate Play Store link to install/update Chrome)
+            intent = new Intent(Intent.ACTION_VIEW,
+              Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+
+            intent.resolveActivity(packageManager);
+            startActivity(intent);
+          }
+        } catch (android.content.ActivityNotFoundException e) {
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+
+    LinearLayout webViewChromeLayout = (LinearLayout) findViewById(R.id.checkWebViewChromeLayout);
+    webViewChromeLayout.setVisibility(View.VISIBLE);
   }
 
   private Uri requestPermissionIntentUri;

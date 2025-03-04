@@ -10,23 +10,21 @@
 #include <basu/sd-bus.h>
 #endif
 
+#include "KmDbusTestServer.h"
+
 #ifndef KEYMAN_TEST_SERVICE_PATH
 #warning KEYMAN_TEST_SERVICE_PATH is undefined
 #define KEYMAN_TEST_SERVICE_PATH "."
 #endif
 
-#define KEYMAN_TESTSVC_BUS_NAME "com.keyman.ExitTestService"
-#define KEYMAN_TESTSVC_INTERFACE_NAME "com.keyman.ExitTestService.Exit"
-#define KEYMAN_TESTSVC_OBJECT_PATH "/com/keyman/ExitTestService/Exit"
-
 using namespace std;
 
 class KmDbusTestServer
 {
-private:
+public:
   GTestDBus *dbus;
-  sd_bus_slot *slot = NULL;
   sd_bus *bus       = NULL;
+  gboolean exitFlag = FALSE;
 
 public:
   KmDbusTestServer();
@@ -38,13 +36,16 @@ public:
 static int32_t
 on_exit_method(sd_bus_message *msg, void *user_data, sd_bus_error *ret_error) {
   g_debug("%s called", __FUNCTION__);
-  guint *exitFlag = (guint *)user_data;
-  *exitFlag       = TRUE;
+  KmDbusTestServer* server = (KmDbusTestServer*)user_data;
+
+  *ret_error = SD_BUS_ERROR_NULL;
+
+  server->exitFlag = TRUE;
 
   return sd_bus_reply_method_return(msg, "");
 }
 
-static const sd_bus_vtable exit_test_service_vtable[] = {
+static const sd_bus_vtable test_service_vtable[] = {
   SD_BUS_VTABLE_START(0),
     SD_BUS_METHOD("Exit", "", "", on_exit_method, 0),
   SD_BUS_VTABLE_END
@@ -76,9 +77,8 @@ KmDbusTestServer::KmDbusTestServer()
 
 KmDbusTestServer::~KmDbusTestServer()
 {
-  if (bus)  sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
-  if (slot) sd_bus_slot_unref(slot);
   if (bus) {
+    sd_bus_release_name(bus, KEYMAN_TESTSVC_BUS_NAME);
     sd_bus_close(bus);
     sd_bus_unref(bus);
   }
@@ -101,8 +101,8 @@ void KmDbusTestServer::Loop()
   guint exitFlag = FALSE;
 
   // Install the object
-  ret = sd_bus_add_object_vtable(bus, &slot, KEYMAN_TESTSVC_OBJECT_PATH,
-    KEYMAN_TESTSVC_INTERFACE_NAME, exit_test_service_vtable, &exitFlag);
+  ret = sd_bus_add_object_vtable(bus, NULL, KEYMAN_TESTSVC_OBJECT_PATH,
+    KEYMAN_TESTSVC_INTERFACE_NAME, test_service_vtable, &exitFlag);
   if (ret < 0) {
     g_error("Failed to issue method call: %s", strerror(-ret));
     return;
