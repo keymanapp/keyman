@@ -522,7 +522,7 @@ export function longpressContactModel(params: FullGestureParams, enabledFlicks: 
          * The 'indexOf' allows 'n', 'nw', and 'ne' - approx 67.5 degrees on
          * each side of due N in total.
          */
-        if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
+        if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && ((stats.cardinalDirection ?? '').indexOf('n') != -1)) {
           const baseDistance = stats.netDistance;
           const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
           const verticalDistance = baseDistance * Math.cos(angle);
@@ -675,6 +675,9 @@ export function specialKeyEndModel(params: FullGestureParams): GestureModel<any>
           itemChangeAction: 'resolve'
         },
         endOnResolve: true,
+      }, {
+        model: instantContactResolutionModel(),
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {
