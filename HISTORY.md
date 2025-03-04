@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.207 beta 2025-03-04
+
+* fix(common): improve resilience of build script trigger (#13407)
+* fix(mac): improve compliance checking (#13337)
+* chore(common): add unit test for nul and context() in context part of rule (#13412)
+
 ## 18.0.206 beta 2025-03-03
 
 * fix(android): Control when system keyboard Keyboard Picker clears activity stack (#13313)
