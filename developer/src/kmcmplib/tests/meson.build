@@ -79,6 +79,7 @@ tests = [
   'k_051___if_and_context',
   'k_052___nul_and_index',
   'k_053___if_and_index',
+  'k_054___nul_and_contextex',
 ]
 
 foreach kbd : tests
