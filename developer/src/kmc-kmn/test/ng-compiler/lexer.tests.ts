@@ -168,6 +168,12 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_RIGHT_BR token", () => {
       recogniseToken(TokenTypes.TT_RIGHT_BR, ')');
     });
+    it("can recognise a TT_LEFT_SQ token", () => {
+      recogniseToken(TokenTypes.TT_LEFT_SQ, '[');
+    });
+    it("can recognise a TT_RIGHT_SQ token", () => {
+      recogniseToken(TokenTypes.TT_RIGHT_SQ, ']');
+    });
     it("can recognise a TT_AMPHASAND token", () => {
       recogniseToken(TokenTypes.TT_AMPHASAND, '&');
     });
@@ -210,6 +216,17 @@ describe("Lexer Tests", () => {
     });
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenTypes.TT_STRING, '"store"');
+    });
+    it("can recognise a TT_SHIFT_CODE token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'SHIFT');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'CTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'LCTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'RCTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'ALT');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'LALT');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'RALT');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'CAPS');
+      recogniseTokenFollowedBySpace(TokenTypes.TT_SHIFT_CODE, 'NCAPS');
     });
     it("can recognise a TT_COMMENT token", () => {
       recogniseToken(TokenTypes.TT_COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
@@ -557,6 +574,16 @@ function recogniseTokens(text: String, expected: Token[]): void {
   const lexer    = new Lexer(new String(text));
   const actual   = lexer.parse();
   assert.deepEqual(actual, expected);
+}
+
+function recogniseTokenFollowedBySpace(type: TokenTypes, text: String): void {
+  recogniseTokens(
+    `${text} `,
+    [
+      new Token(TokenTypes.TT_SHIFT_CODE, text),
+      new Token(TokenTypes.TT_WHITESPACE, ' '),
+    ]
+  );
 }
 
 function recogniseStoreWithString(type: TokenTypes, text: String) {
