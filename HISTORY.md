@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.12 alpha 2025-03-04
+
+* chore: remove legacy IIS setup notes (#13403)
+
 ## 19.0.11 alpha 2025-03-03
 
 * chore(linux): Update debian changelog (#13347)
