@@ -418,7 +418,7 @@ begin
   try
     with TRegistryErrorControlled.Create do  // I2890
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
       begin
         if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
         begin
@@ -520,7 +520,7 @@ begin
 
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKey(SRegKey_KeymanDesktop_CU, True) then
+    if OpenKey(SRegKey_KeymanEngine_CU, True) then
       WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
   finally
     Free;
