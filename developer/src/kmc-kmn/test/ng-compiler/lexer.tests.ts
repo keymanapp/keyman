@@ -117,6 +117,12 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_IF token", () => {
       recogniseToken(TokenTypes.TT_IF, 'if');
     });
+    it("can recognise a TT_MATCH token", () => {
+      recogniseToken(TokenTypes.TT_MATCH, 'match');
+    });
+    it("can recognise a TT_NOMATCH token", () => {
+      recogniseToken(TokenTypes.TT_NOMATCH, 'nomatch');
+    });
     it("can recognise a TT_OUTS token", () => {
       recogniseToken(TokenTypes.TT_OUTS, 'outs');
     });
@@ -418,6 +424,36 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.TT_CHEVRON,       '>'),
           new Token(TokenTypes.TT_WHITESPACE,    ' '),
           new Token(TokenTypes.TT_CONTEXT,       'context'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_LAYER,         'layer'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_STRING,        '\'default\''),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+        ]
+      );
+    });
+    it("can recognise a match statement", () => {
+      recogniseTokens(
+        'match > use(CombineDiacritics)',
+        [
+          new Token(TokenTypes.TT_MATCH,         'match'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CHEVRON,       '>'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_USE,           'use'),
+          new Token(TokenTypes.TT_LEFT_BR,       '('),
+          new Token(TokenTypes.TT_PARAMETER,     'CombineDiacritics'),
+          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+        ]
+      );
+    });
+    it("can recognise a nomatch statement", () => {
+      recogniseTokens(
+        'nomatch > layer(\'default\')',
+        [
+          new Token(TokenTypes.TT_NOMATCH,       'nomatch'),
+          new Token(TokenTypes.TT_WHITESPACE,    ' '),
+          new Token(TokenTypes.TT_CHEVRON,       '>'),
           new Token(TokenTypes.TT_WHITESPACE,    ' '),
           new Token(TokenTypes.TT_LAYER,         'layer'),
           new Token(TokenTypes.TT_LEFT_BR,       '('),
