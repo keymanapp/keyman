@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.208 beta 2025-03-05
+
+* fix(windows): Check registry report usage value in setup process (#13215)
+* fix(android): Don't report missing kmp.json (#13411)
+
 ## 18.0.207 beta 2025-03-04
 
 * fix(common): improve resilience of build script trigger (#13407)
