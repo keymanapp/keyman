@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
+  <!-- Context: Menu Action -->
+  <string name="action_share" comment="Menu action to send text content to another app">Chia sẻ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_web" comment="Menu action to open Keyman browser">Trình duyệt</string>
+  <!-- Context: Menu Action -->
+  <string name="action_text_size" comment="Menu action to adjust text size">Cỡ chữ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_overflow" comment="Show additional menu items">Thêm</string>
+  <!-- Context: Menu Action -->
+  <string name="action_clear_text" comment="Menu action to erase text">Xóa văn bản</string>
+  <!-- Context: Menu Action -->
+  <string name="action_info" comment="Menu action to display Keyman help page">Thông tin</string>
+  <!-- Context: Menu Action -->
+  <string name="action_settings" comment="Menu action to open Settings menu">Cài đặt</string>
+  <!-- Context: Menu Action -->
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Cài đặt Cập nhật</string>
+  <!-- Context: Title -->
+  <string name="title_version" comment="Title of Keyman for Android version">Phiên bản: %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">Keyman cần trình duyệt Chrome phiên bản 57 hoặc mới hơn.</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">Cập nhật Chrome</string>
+  <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
+  <string name="textview_hint" comment="Prompt to start typing">Bắt đầu nhập tại đây&#8230;</string>
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">Cỡ chữ: %1$d</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">Tăng cỡ chữ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_down" comment="Make text smaller">Giảm cỡ chữ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Thanh trượt kích thước văn bản</string>
+  <!-- Context: Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nTất cả văn bản sẽ bị xóa\n</string>
+  <!-- Context: Get Started menu -->
+  <string name="get_started" comment="Menu for getting started">Bắt đầu</string>
+  <!-- Context: Get Started menu -->
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">Thêm bàn phím cho ngôn ngữ của bạn</string>
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Đặt Keyman làm bàn phím hệ thống</string>
+  <!-- Context: Get Started menu -->
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Đặt Keyman làm bàn phím mặc định</string>
+  <!-- Context: Get Started menu -->
+  <string name="more_info" comment="Open the Keyman for Android help page">Thêm thông tin</string>
+  <!-- Context: Get Started menu -->
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">Hiển thị \"%1$s\" khi khởi động</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">Để cài đặt bàn phím, hãy cho phép Keyman đọc bộ nhớ ngoài</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">Yêu cầu cho phép bộ nhớ đã bị từ chối. Có khả năng không thể cài đặt bàn phím</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Yêu cầu cấp quyền bộ nhớ không thành công. Hãy vào cài đặt trong Keyman - Cài đặt từ tệp cục bộ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="keyman_settings" comment="Settings menu title">Cài đặt</string>
+  <!-- Context: Keyman Settings menu -->
+  <plurals name="installed_languages">
+    <item quantity="other">Ngôn ngữ đã cài đặt (%1$d)</item>
+  </plurals>
+  <!-- Context: Keyman Settings menu -->
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Cài đặt Bàn phím hay Từ điển</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">Ngôn ngữ hiển thị</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Điều chỉnh độ cao bàn phím</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Điều chỉnh độ trễ khi nhấn lâu</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Tên phím khoảng cách</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Bàn phím</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">Ngôn ngữ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">Ngôn ngữ + Bàn phím</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">Trống</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">Hiển thị tên bàn phím trên phím cách</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Hiển thị tên ngôn ngữ trên phím cách</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Ngôn ngữ và bàn phím trên phím cách</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Không hiển thị gì trên phím cách</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">Rung khi đánh máy</string>
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
+  <string name="show_banner" comment="text suggestions banner">Luôn hiển thị dòng biểu ngữ</string>
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
+  <string name="show_banner_on" comment="Description when toggle is on">Sắp được cài đặt</string>
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
+  <string name="show_banner_off" comment="Description when toggle is off">Khi tắt, chỉ hiển thị khi bật tính năng dự đoán chữ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">Cho phép gửi báo cáo vấn đề qua mạng</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">Khi mở, báo cáo vấn đề sẽ được gửi đi</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">Khi tắt, báo cáo vấn đề sẽ không được gửi đi</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Cài đặt từ keyman.com</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_local_file" comment="Install package file from local device">Cài đặt từ tệp cục bộ</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_other_device" comment="Scan QR Code">Cài đặt từ thiết bị khác</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_languages_to_installed_keyboard" comment="Install additional languages from a keyboard package">Thêm ngôn ngữ cho bàn phím đã cài đặt</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_subtext" comment="Additional information for adding another language">(từ gói bàn phím)</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">Chọn Gói bàn phím</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">Chọn ngôn ngữ cho %1$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">Đã thêm ngôn ngữ \'%1$s\' vào %2$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Tất cả ngôn ngữ đã được cài đặt rồi</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Kéo bàn phím để điều chỉnh độ cao</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Xoay thiết bị để điều chỉnh độ ngang độ dọc</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">Khôi phục mặc định</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Thời gian trễ: %1$.1f giây</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Thời gian trễ lâu hơn</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Thời gian trễ thấp hơn</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Thanh trượt thời gian trễ nhấn lâu</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_text" comment="Prompt to type in the browser search bar">Tìm kiếm hoặc nhập URL</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="title_bookmarks" comment="Title for bookmarks">Dấu trang</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">Không có dấu trang</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="add_bookmark" comment="Confirmation to add bookmark">Thêm dấu trang</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_title" comment="Page title for saved bookmark">Tiêu đề</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_url" comment="Page URL for saved bookmark">url</string>
+  <!-- Context: KMP Package strings -->
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">Cài đặt gói %1$s không thành công</string>
+  <!-- Context: KMP Package strings -->
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">Đang tải xuống gói bàn phím \n%1$s&#8230;</string>
+  <!-- Context: KMP Package strings -->
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">Giải nén thất bại</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_keyboard_package" comment="Title to install keyboard package">Cài đặt bàn phím</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">Cài đặt từ điển</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s không phải tệp gói bàn phím Keyman hợp lệ.\n%2$s</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Gói bàn phím không có bàn phím được tối ưu hóa để cài đặt</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">Không có văn bản dự đoán mới để cài đặt</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">Không có bàn phím hay văn bản dự đoán để cài đặt</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Gói bàn phím không có ngôn ngữ liên quan để cài đặt</string>
+  <!-- Context: KMP Package strings -->
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Siêu dữ liệu trong gói không hợp lệ/bị thiếu</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">Bàn phím cần phiên bản mới hơn của ứng dụng Keyman</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Không thể mở trình duyệt</string>
+</resources>

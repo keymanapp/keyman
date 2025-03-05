@@ -344,6 +344,7 @@
 		CEEF81B92673019600EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageBanner.xib; sourceTree = "<group>"; };
 		CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageBannerViewController.swift; sourceTree = "<group>"; };
+		D88EC3FC2D785C500022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -795,6 +796,7 @@
 				uk,
 				ru,
 				el,
+				vi,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1109,6 +1111,7 @@
 				298566D02980D354004ACA95 /* uk */,
 				298566DC2980E416004ACA95 /* ru */,
 				CEAC2A272C2A50E100C99ABD /* el */,
+				D88EC3FC2D785C500022CB80 /* vi */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
