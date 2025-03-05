@@ -1052,10 +1052,12 @@ begin
     try
       if OpenKeyReadOnly('\' + SRegKey_KeymanEngine_CU) then
       begin
-        // only update the the flag if the value exists in the registry, otherwise leave them as defaults
+        // only update the flag if the value exists in the registry, otherwise leave them as defaults
         // leave as the the default values
         if ValueExists(SRegValue_AutomaticallyReportUsage) then
-          FAutomaticallyReportUsage := ReadBool(SRegValue_AutomaticallyReportUsage)
+        begin
+          FAutomaticallyReportUsage := ReadBool(SRegValue_AutomaticallyReportUsage);
+        end;
         if ValueExists(SRegValue_CheckForUpdates) then
         begin
           FCheckForUpdates := ReadBool(SRegValue_CheckForUpdates);
