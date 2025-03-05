@@ -103,8 +103,9 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 //     test reviewRules
 // OK  test map_UkeleleKC_To_VK
 //     test writeData_Rules
-// OK  test createData_Stores
+// OK  test writeData_Stores
 //     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA
+// separate createRuleData and check for duplicates/amb rules 
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
 import { readFileSync } from 'fs';
@@ -183,6 +184,7 @@ export class KeylayoutToKmnConverter {
     const jsonO: object = this.read(inputFilename)
 
     if (!jsonO) {
+      throw new Error('read() not OK');      // new SAB
       return null;
     }
 
@@ -190,6 +192,7 @@ export class KeylayoutToKmnConverter {
     const outArray: convert_object = await this.convert(jsonO);
 
     if (!outArray) {
+      throw new Error('convert() not OK');      // new SAB
       return null;
     }
 
@@ -197,12 +200,14 @@ export class KeylayoutToKmnConverter {
 
     const out_text: boolean = this.write(outArray)
     if (!out_text) {
+      throw new Error('write() not OK');      // new SAB
       return null;
     }
 
     // TODO throws
     console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FINISHED OK ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;');
-    throw new Error('Not finished yet');
+    //throw new Error('Not finished yet');      // new SAB
+    return null      // new SAB
   }
 
   /**
@@ -235,7 +240,8 @@ export class KeylayoutToKmnConverter {
 
 
   /**
-   * @brief  member function to convert data of .keylayout-file to kmn-file This will convert/rename modifiers, position of Keys and deadkeys and save into an array 
+   * @brief  member function to convert data of .keylayout-file to kmn-file. This will convert/rename modifiers, position of Keys and deadkeys and save into an array 
+   *         if no tags are provided an empty data_object will be returned
    * @param  take data_ukelele and create a mapping from mac Keycodes to key-names and save to data_ukelele object
    * @param  data_ukelele (Uint8Array) data of the ukelele .keylayout-file
    * @return outArray Uint8Array keys_all_Layers, the converted data for kmn-files if all layers have been converted; else null
@@ -282,20 +288,24 @@ export class KeylayoutToKmnConverter {
 
     let data: string = "\n"
 
+    // TODO use path also
+    // const savename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn"
+
     // add top part of kmn file: STORES
-    data += this.createData_Stores(data_ukelele)
+    data += this.writeData_Stores(data_ukelele)
 
     // add bottom part of kmn file: RULES
     data += this.writeData_Rules(data_ukelele)
 
-    this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data))
-
-    // ToDo conditions?
-    if (data.length > 0) {
+    try {
+      this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data))
+      //this.callbacks.fs.writeFileSync(savename, new TextEncoder().encode(data))
       return true;
-    } else {
+    } catch (err) {
+      console.log('Error writing kmn file:' + err.message)
       return false
     }
+
   }
 
   //   TODO move outside of class?
@@ -616,7 +626,6 @@ export class KeylayoutToKmnConverter {
 
       }
     }
-    //console.log("list_of_unique_Text2_rules ", list_of_unique_Text2_rules)
 
     //----------------------------------- C3: prev-dk ----------------------------------
     let unique_dkA_count = 0
@@ -660,7 +669,6 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
-    //console.log("list_of_unique_Text2_rules ", list_of_unique_Text2_rules)
 
     // loop through object_array and mark first occurence each rule of list_of_unique_Text2_rules
     for (let i = 0; i < object_array.length; i++) {
@@ -688,6 +696,9 @@ export class KeylayoutToKmnConverter {
   * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
   */
   public get_KeyMap_Code_array__From__KeyMap_Action_array2D(data: any, search: string[][]): string[][] {
+
+    if ((search === undefined) || (search === null))
+      return []
 
     const returnarray2D: string[][] = []
     for (let k = 0; k < search.length; k++) {
@@ -1790,7 +1801,7 @@ export class KeylayoutToKmnConverter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  a list of stores
    */
-  public createData_Stores(data_ukelele: convert_object): string {
+  public writeData_Stores(data_ukelele: convert_object): string {
 
     let data: string = ""
     data += "c ......................................................................\n"
