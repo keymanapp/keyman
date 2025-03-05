@@ -3,7 +3,7 @@ import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
-import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
+import { DesignIFrame, OutputTargetElementWrapper, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
   type KeyboardInterface,
@@ -47,8 +47,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
-  private mostRecentTarget: OutputTarget<any>;
-  private currentTarget: OutputTarget<any>;
+  private mostRecentTarget: OutputTargetElementWrapper<any>;
+  private currentTarget: OutputTargetElementWrapper<any>;
 
   private globalKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
@@ -175,7 +175,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     });
   }
 
-  get activeTarget(): OutputTarget<any> {
+  get activeTarget(): OutputTargetElementWrapper<any> {
     /*
      * Assumption:  the maintainingFocus flag may only be set when there is a current target.
      * This is not enforced proactively at present, but the assumption should hold.  (2023-05-03)
@@ -184,7 +184,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
 
-  get lastActiveTarget(): OutputTarget<any> {
+  get lastActiveTarget(): OutputTargetElementWrapper<any> {
     return this.mostRecentTarget;
   }
 
@@ -229,7 +229,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public setActiveTarget(target: OutputTarget<any>, sendEvents?: boolean) {
+  public setActiveTarget(target: OutputTargetElementWrapper<any>, sendEvents?: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
@@ -369,7 +369,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *
    * This is based on the current `.activeTarget` and its related attachment metadata.
    */
-  protected currentKeyboardSrcTarget(): OutputTarget<any> {
+  protected currentKeyboardSrcTarget(): OutputTargetElementWrapper<any> {
     let target = this.currentTarget || this.mostRecentTarget;
 
     if(this.isTargetKeyboardIndependent(target)) {
@@ -379,7 +379,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
+  private isTargetKeyboardIndependent(target: OutputTargetElementWrapper<any>): boolean {
     let attachmentInfo = target?.getElement()._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
@@ -387,7 +387,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  activateKeyboardForTarget(kbd: {keyboard: JSKeyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
+  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: OutputTargetElementWrapper<any>) {
     let attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
@@ -421,7 +421,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @param target
    * @param metadata
    */
-  public setKeyboardForTarget(target: OutputTarget<any>, kbdId: string, langId: string) {
+  public setKeyboardForTarget(target: OutputTargetElementWrapper<any>, kbdId: string, langId: string) {
     if(target instanceof DesignIFrame) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -456,7 +456,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public getKeyboardStubForTarget(target: OutputTarget<any>) {
+  public getKeyboardStubForTarget(target: OutputTargetElementWrapper<any>) {
     if(!this.isTargetKeyboardIndependent(target)) {
       return this.globalKeyboard.metadata;
     } else {
@@ -614,7 +614,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *                      The return value indicates whether (true) or not (false) the calling event handler
    *                      should be terminated immediately after the call.
    */
-  _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
+  _CommonFocusHelper(outputTarget: OutputTargetElementWrapper<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
     let activeKeyboard = this.activeKeyboard?.keyboard;
@@ -738,7 +738,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return true;
   }
 
-  doChangeEvent(target: OutputTarget<any>) {
+  doChangeEvent(target: OutputTargetElementWrapper<any>) {
     if(target.changed) {
       let event = new Event('change', {"bubbles": true, "cancelable": false});
       target.getElement().dispatchEvent(event);
