@@ -238,10 +238,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Get *cached or uncached* keyboard context for a specified range, relative to caret
    *
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {string}              Context string
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @return      {string}                    Context string
    *
    * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
    *             KC(2,1,Pelem) == "e"
@@ -263,10 +263,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Get (uncached) keyboard context for a specified range, relative to caret
    *
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {string}              Context string
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @return      {string}                    Context string
    *
    * Example     [abcdef|ghi] as INPUT, with the caret position marked by |:
    *             KC(2,1,Pelem) == "e"
@@ -289,9 +289,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     nul           KN
    * Scope        Public
-   * @param       {number}      n       Length of context to check
-   * @param       {Object}      Ptarg   Element to work with (must be currently focused element)
-   * @return      {boolean}             True if length of context is less than or equal to n
+   * @param       {number}      n             Length of context to check
+   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @return      {boolean}                   True if length of context is less than or equal to n
    * Description  Test length of context, return true if the length of the context is less than or equal to n
    *
    * Example     [abc|def] as INPUT, with the caret position marked by |:
@@ -309,11 +309,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     contextMatch  KCM
    * Scope        Public
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {Object}      Ptarg   Focused element
-   * @param       {string}      val     String to match
-   * @param       {number}      ln      Number of characters to return
-   * @return      {boolean}             True if selected context matches val
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {Object}      outputTarget  Focused element
+   * @param       {string}      val           String to match
+   * @param       {number}      ln            Number of characters to return
+   * @return      {boolean}                   True if selected context matches val
    * Description  Test keyboard context for match
    */
   contextMatch(n: number, outputTarget: OutputTarget, val: string, ln: number): boolean {
@@ -328,10 +328,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Builds the *cached or uncached* keyboard context for a specified range, relative to caret
    *
-   * @param       {number}      n       Number of characters to move back from caret
-   * @param       {number}      ln      Number of characters to return
-   * @param       {Object}      Pelem   Element to work with (must be currently focused element)
-   * @return      {Array}               Context array (of strings and numbers)
+   * @param       {number}      n             Number of characters to move back from caret
+   * @param       {number}      ln            Number of characters to return
+   * @param       {Object}      outputTarget  Element to work with (must be currently focused element)
+   * @return      {Array}                     Context array (of strings and numbers)
    */
   private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTargetBase): CachedExEntry {
     var cache: CachedExEntry = this.cachedContextEx.get(n, ln);
@@ -382,10 +382,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function       fullContextMatch    KFCM
    * Scope          Private
-   * @param         {number}    n       Number of characters to move back from caret
-   * @param         {Object}    Ptarg   Focused element
-   * @param         {Array}     rule    An array of ContextEntries to match.
-   * @return        {boolean}           True if the fully-specified rule context matches the current KMW state.
+   * @param         {number}    n             Number of characters to move back from caret
+   * @param         {Object}    outputTarget  Focused element
+   * @param         {Array}     rule          An array of ContextEntries to match.
+   * @return        {boolean}                 True if the fully-specified rule context matches the current KMW state.
    *
    * A KMW 10+ function designed to bring KMW closer to Keyman Desktop functionality,
    * near-directly modeling (externally) the compiled form of Desktop rules' context section.
@@ -608,10 +608,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     deadkeyMatch  KDM
    * Scope        Public
-   * @param       {number}      n       offset from current cursor position
-   * @param       {Object}      Ptarg   target element
-   * @param       {number}      d       deadkey
-   * @return      {boolean}             True if deadkey found selected context matches val
+   * @param       {number}      n             offset from current cursor position
+   * @param       {Object}      outputTarget  target element
+   * @param       {number}      d             deadkey
+   * @return      {boolean}                   True if deadkey found selected context matches val
    * Description  Match deadkey at current cursor position
    */
   deadkeyMatch(n: number, outputTarget: OutputTarget, d: number): boolean {
@@ -621,7 +621,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     beep          KB
    * Scope        Public
-   * @param       {Object}      Pelem     element to flash
+   * @param       {Object}      outputTarget  element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
   beep(outputTarget: OutputTarget): void {
@@ -711,10 +711,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     indexOutput   KIO
    * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete)
-   * @param       {string}      Ps      string
-   * @param       {number}      Pn      index
-   * @param       {Object}      Pelem   element to output to
+   * @param       {number}      Pdn           no of character to overwrite (delete)
+   * @param       {string}      Ps            string
+   * @param       {number}      Pn            index
+   * @param       {Object}      outputTarget  element to output to
    * Description  Output a character selected from the string according to the offset in the index array
    */
   indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTarget): void {
@@ -750,9 +750,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     deleteContext KDC
    * Scope        Public
-   * @param       {number}      dn      number of context entries to overwrite
-   * @param       {Object}      Pelem   element to output to
-   * @param       {string}      s       string to output
+   * @param       {number}      dn            number of context entries to overwrite
+   * @param       {Object}      outputTarget  element to output to
    * Description  Keyboard output
    */
   deleteContext(dn: number, outputTarget: OutputTarget): void {
@@ -796,9 +795,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     output        KO
    * Scope        Public
-   * @param       {number}      dn      number of characters to overwrite
-   * @param       {Object}      Pelem   element to output to
-   * @param       {string}      s       string to output
+   * @param       {number}      dn            number of characters to overwrite
+   * @param       {Object}      outputTarget  element to output to
+   * @param       {string}      s             string to output
    * Description  Keyboard output
    */
   output(dn: number, outputTarget: OutputTarget, s:string): void {
@@ -849,9 +848,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * Function     deadkeyOutput KDO
    * Scope        Public
-   * @param       {number}      Pdn     no of character to overwrite (delete)
-   * @param       {Object}      Pelem   element to output to
-   * @param       {number}      Pd      deadkey id
+   * @param       {number}      Pdn           no of character to overwrite (delete)
+   * @param       {Object}      outputTarget  element to output to
+   * @param       {number}      Pd            deadkey id
    * Description  Record a deadkey at current cursor position, deleting Pdn characters first
    */
   deadkeyOutput(Pdn: number, outputTarget: OutputTarget, Pd: number): void {
@@ -868,10 +867,10 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * KIFS compares the content of a system store with a string value
    *
-   * @param       {number}      systemId    ID of the system store to test (only TSS_LAYER currently supported)
-   * @param       {string}      strValue    String value to compare to
-   * @param       {Object}      Pelem       Currently active element (may be needed by future tests)
-   * @return      {boolean}                 True if the test succeeds
+   * @param       {number}      systemId      ID of the system store to test (only TSS_LAYER currently supported)
+   * @param       {string}      strValue      String value to compare to
+   * @param       {Object}      outputTarget  Currently active element (may be needed by future tests)
+   * @return      {boolean}                   True if the test succeeds
    */
   ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
     var result=true;
@@ -885,11 +884,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
   /**
    * KSETS sets the value of a system store to a string
    *
-   * @param       {number}      systemId    ID of the system store to set (only TSS_LAYER currently supported)
-   * @param       {string}      strValue    String to set as the system store content
-   * @param       {Object}      Pelem       Currently active element (may be needed in future tests)
-   * @return      {boolean}                 True if command succeeds
-   *                                        (i.e. for TSS_LAYER, if the layer is successfully selected)
+   * @param       {number}      systemId      ID of the system store to set (only TSS_LAYER currently supported)
+   * @param       {string}      strValue      String to set as the system store content
+   * @param       {Object}      outputTarget  Currently active element (may be needed in future tests)
+   * @return      {boolean}                   True if command succeeds
+   *                                          (i.e. for TSS_LAYER, if the layer is successfully selected)
    *
    * Note that option/variable stores are instead set within keyboard script code, as they only
    * affect keyboard behavior.
