@@ -48,6 +48,14 @@ describe('Unit tests for wasm Core API', function () {
     return result.object;
   }
 
+  function createState(keyboardName) {
+    const keyboard = loadKeyboard(keyboardName);
+    const state = km_core.state_create(keyboard, []);
+    assert.equal(state.status, 0);
+    assert.isOk(state.object);
+    return state.object;
+  }
+
   it('can dispose keyboard', function () {
     // Setup
     const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
@@ -108,8 +116,7 @@ describe('Unit tests for wasm Core API', function () {
 
   it('can process event', function () {
     // Setup
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
-    const state = km_core.state_create(keyboard, []).object;
+    const state = createState('k_020___deadkeys_and_backspace');
 
     // Execute
     const status = km_core.process_event(state, 0x20, 0, 1, 0);
@@ -127,8 +134,8 @@ describe('Unit tests for wasm Core API', function () {
   });
 
   it('can set the context', function () {
-    const keyboard = loadKeyboard('k_020___deadkeys_and_backspace');
-    const state = km_core.state_create(keyboard, []).object;
+    // Setup
+    const state = createState('k_020___deadkeys_and_backspace');
 
     // Execute
     const status = km_core.state_context_set_if_needed(state, 'abc');
