@@ -63,6 +63,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // OK  check for keys < 50 whern working with keys
 // OK  NO OUTPUT FOR SPACE in C0C1 !!!
 // OK  check code for code styles keyman
+//     check  (string |number) <-> number
 //     tests for 3 functions read write convert
 //     Return conditions
 //     Tests throws
@@ -80,7 +81,30 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 //     remove all markers c0, 1-1, #### C2 ###, ...
 //     better function names for get......
 //     use cmdl parameters
-// check semocolon everywhere
+//     check semicolon everywhere
+// OK  test run
+// OK  test read
+// OK  test convert
+// OK  test write
+//     test createRuleData
+// OK  test get_KeyMap_Code_array__From__KeyMap_Action
+// OK  test get_KeyMap_Code_array__From__KeyMap_Action_array2D
+// OK  test get_ActionID_Index__From__ActionID_Id
+// OK  test get_ActionID_Id__From__ActionID_next
+// OK  test get_ActionID_Output_array__From__ActionID_State
+// OK  test get_Action2ID_NoneOutput__From__ActionID_Id
+// OK  test get_KeyMapModiKeyArray__from__array
+// OK  test get_Datat_array2D__From__ActionID_stateOutput
+// OK test get_KeyMap_Code_array__From__ActionID_Action
+// OK  test get_KeyMap_Modifier_array__From__behaviour_arr
+// OK  test create_kmn_modifier
+// OK  test checkIfCapsIsUsed
+// OK  test isAcceptableKeymanModifier
+//     test reviewRules
+// OK  test map_UkeleleKC_To_VK
+//     test writeData_Rules
+// OK  test createData_Stores
+//     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
 import { readFileSync } from 'fs';
@@ -220,28 +244,33 @@ export class KeylayoutToKmnConverter {
 
     const modifierBehavior: string[][] = []          // modifier for each keymapselect
     const rule_object: rule_object[] = []             // an array of objects which hold data for a kmn rule
-
     const jsonObj_any: any = jsonObj
-    const keylayout_file: string = jsonObj_any.keyboard['@_name'] + ".keylayout"
 
     const data_object: convert_object = {
-      keylayout_filename: keylayout_file,
-      arrayOf_Modifiers: modifierBehavior,   // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      arrayOf_Rules: rule_object
+      keylayout_filename: "",
+      arrayOf_Modifiers: [],
+      arrayOf_Rules: []
     };
 
-    // create an array of modifier combinations (e.g. shift? leftShift caps? ) and store in data_object
-    for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
-      const singleModifierSet: string[] = []
-      for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
-        singleModifierSet.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@_keys'])
-      }
-      modifierBehavior.push(singleModifierSet)
-    }
-    // fill rules into arrayOf_Rules of data_object
-    return this.createRuleData(data_object, jsonObj)
-  }
+    if (jsonObj_any.hasOwnProperty("keyboard")) {
 
+      data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout"
+      data_object.arrayOf_Modifiers = modifierBehavior  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
+      data_object.arrayOf_Rules = rule_object
+
+      // create an array of modifier combinations (e.g. shift? leftShift caps? ) and store in data_object
+      for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
+        const singleModifierSet: string[] = []
+        for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
+          singleModifierSet.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@_keys'])
+        }
+        modifierBehavior.push(singleModifierSet)
+      }
+      // fill rules into arrayOf_Rules of data_object
+      return this.createRuleData(data_object, jsonObj)
+    }
+    return data_object
+  }
 
   /**
    * @brief   member function to write data fro object to file
@@ -257,7 +286,7 @@ export class KeylayoutToKmnConverter {
     data += this.createData_Stores(data_ukelele)
 
     // add bottom part of kmn file: RULES
-    data += this.createData_Rules(data_ukelele)
+    data += this.writeData_Rules(data_ukelele)
 
     this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data))
 
@@ -367,6 +396,8 @@ export class KeylayoutToKmnConverter {
                   /*   key */                     b1_modifierKey_arr[m][4],
                   /*   output */                  new TextEncoder().encode(outputchar)
                 )
+                // ToDo "undefined" or undefined ????
+                // if (b1_modifierKey_arr[n4][4] !== "undefined") {
                 object_array.push(rule_obj)
               }
             }
@@ -437,7 +468,9 @@ export class KeylayoutToKmnConverter {
                         /*   key */                   b1_modifierKey_arr[n4][0],
                         /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n4][4]),
                       )
-                      if (b1_modifierKey_arr[n4][4] !== undefined) {
+                      // ToDo "undefined" or undefined ????
+                      if (b1_modifierKey_arr[n4][4] !== "undefined") {
+                        //if (b1_modifierKey_arr[n4][4] !== undefined) {
                         object_array.push(rule_obj)
                       }
                     }
@@ -473,7 +506,7 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 ........................................................................................................................................................................
               // with present action_id (a16) find all keycode-behaviour-pairs that use this action (a16) => (keymapIndex 3/keycode 32) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* e.g. [['32', 3]] */                      const b4_deadkey_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(action_id))
+              /* e.g. [['32', 3]] */                      const b4_deadkey_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, action_id)
               /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4_deadkeyModifier_arr: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr)
               // ...........................................................................................................................................................................................
 
@@ -485,13 +518,12 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 2  .......................................................................................................................................................................
               // with present action_id (a17) find all keynames and behaviours that use this action (a17) => (keymapIndex 3/keycode 28) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* eg: index=3 */                           const b2_prev_deadkey_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(b3_actionId))
+              /* eg: index=3 */                           const b2_prev_deadkey_arr: number[][] = this.get_KeyMap_Code_array__From__ActionID_Action(jsonObj, String(b3_actionId))   // concersion not neccessary
               /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2_prev_deadkeyModifier_arr: string[] = this.get_KeyMap_Modifier_array__From__behaviour_arr(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_arr)
               // ...........................................................................................................................................................................................
-
               // Data of Block Nr 6 ........................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5_value_next (e.g. use 1 in  <when state="1" output="â"/> ) .........................................
-              /*  eg: [ 'a9','1','â'] */                  const b6_actionId_arr: string[][] = this.get_ActionID_Output_array__From__ActionID_State(jsonObj, b5_value_next)
+              /*  eg:[ [ 'a9','1','â'] ]*/                const b6_actionId_arr: string[][] = this.get_ActionID_Output_array__From__ActionID_State(jsonObj, b5_value_next)
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 1  .......................................................................................................................................................................
@@ -524,6 +556,8 @@ export class KeylayoutToKmnConverter {
                               /*   key */                   b1_modifierKey_arr[n7][0],
                               /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n7][4]),
                             )
+
+                            // ToDo "undefined" or undefined ????
                             if (b1_modifierKey_arr[n7][4] !== undefined) {
                               object_array.push(rule_obj)
                             }
@@ -648,52 +682,13 @@ export class KeylayoutToKmnConverter {
   // ---------------------------------------------------------------------------------------------------------------------
 
   /**
-  * @brief  loop through data, find the actionID and and return array of keymanes
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string - an actionID
-  * @return a string[] of keynames
-  */
-  /*public get_KecCode_arr__From__ActionId(data: any, search: string): string[] {
-    const returnarray: string[] = []
-    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search
-          && data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-          returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
-
-        }
-      }
-    }
-    return returnarray
-  }*/
-
-  /**
-  * @brief  loop through data, find the actionID and and return array of keycodes
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string[][] - array of [ actionID,state,output]
-  * @return a string[] of keycodes
-  */
-  public get_KeyMap_Code_array__From__KeyMap_Action(data: any, search: string[]): string[] {
-    const returnarray: string[] = []
-    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search
-          && data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-          returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
-
-        }
-      }
-    }
-    return returnarray
-  }
-
-  /**
   * @brief  loop through data, find the actionID in search and and return array of [Keycode,Keyname,actionId,actionIDIndex, output]
   * @param  data   :any - an object containing all data read from a .keylayout file
   * @param  search :string[][] - array of [ actionID,state,output]
   * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
   */
   public get_KeyMap_Code_array__From__KeyMap_Action_array2D(data: any, search: string[][]): string[][] {
+
     const returnarray2D: string[][] = []
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
@@ -756,8 +751,9 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string a state to be found
    * @return an array: string[][] containing all [actionId, state, output] for a certain state
    */
-  public get_ActionID_Output_array__From__ActionID_State(data: any, search: string) {
+  public get_ActionID_Output_array__From__ActionID_State(data: any, search: string): string[][] {
     const returnarray2D: string[][] = []
+
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         const returnarray: string[] = []
@@ -802,7 +798,7 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
    * @return an array: string[][] containing [KeyName,actionId,behaviour,modifier,output]
    */
-  public get_KeyMapModiKeyArray__from__array(data: any, search: string[][], isCAPSused: boolean): string[][] {
+  public get_KeyMapModiKeyArray__from__array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
     const returnarray: string[][] = []
 
     for (let i = 0; i < search.length; i++) {
@@ -810,11 +806,11 @@ export class KeylayoutToKmnConverter {
 
       for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
         const returnarray1D: string[] = []
-        returnarray1D.push(search[i][1])  /* KeyName*/
-        returnarray1D.push(search[i][2])  /* actionId*/
-        returnarray1D.push(search[i][3])  /* behaviour*/
-        returnarray1D.push(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)) /* modifier */
-        returnarray1D.push(search[i][4])  /* char*/
+        returnarray1D.push(String(search[i][1]))  /* KeyName*/
+        returnarray1D.push(String(search[i][2])) /* actionId*/
+        returnarray1D.push(String(search[i][3]))  /* behaviour*/
+        returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused))) /* modifier */
+        returnarray1D.push(String(search[i][4])) /* char*/
         if (returnarray1D.length > 0) {
           returnarray.push(returnarray1D)
         }
@@ -845,6 +841,10 @@ export class KeylayoutToKmnConverter {
    */
   public get_Datat_array2D__From__ActionID_stateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): string[][] {
     const returnarray2D: string[][] = []
+
+    if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
+      return []
+    }
 
     // loop behaviors ( in ukelele it is possible to define multiple modifier combinations that behave in the same)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
@@ -892,36 +892,34 @@ export class KeylayoutToKmnConverter {
    * @return an array: number[][] containing [keycode,modifier]
    */
   public get_KeyMap_Code_array__From__ActionID_Action(data: any, search: string): number[][] {
-    const mapIndexArray_max: number[][] = []
+    const mapIndexArray_2D: number[][] = []
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-
         const mapIndexArrayperKey: number[] = []
-
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
           mapIndexArrayperKey.push(i)
         }
         if (mapIndexArrayperKey.length > 0) {
-          mapIndexArray_max.push(mapIndexArrayperKey)
+          mapIndexArray_2D.push(mapIndexArrayperKey)
         }
       }
     }
-    return mapIndexArray_max
+    return mapIndexArray_2D
   }
 
   /**
    * @brief  loop through data and create an array of modifier behaviours for a given keycode in [keycode,modifier]
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : number[][] - an array[keycode,modifier]  to be found
-   * @return an array: string[] containing behaviours
+   * @return an array: string[] containing modifiers
    */
-  public get_KeyMap_Modifier_array__From__behaviour_arr(data: any, search: number[][]): string[] {
-    const mapIndexArray_max: string[] = []
+  public get_KeyMap_Modifier_array__From__behaviour_arr(data: any, search: (string | number)[][]): string[] {
+    const mapIndexArray_2D: string[] = []
     for (let i = 0; i < search.length; i++) {
-      mapIndexArray_max.push(data[search[i][1]])
+      mapIndexArray_2D.push(data[search[i][1]])
     }
-    return mapIndexArray_max
+    return mapIndexArray_2D
   }
 
   /**
@@ -1023,6 +1021,9 @@ export class KeylayoutToKmnConverter {
   *         false if not
   */
   public isAcceptableKeymanModifier(keylayout_modifier: string): boolean {
+    if (keylayout_modifier === null)
+      return false
+
     let iskKeymanModifier: boolean = true
     const modifier_single: string[] = keylayout_modifier.split(" ");
 
@@ -1585,20 +1586,16 @@ export class KeylayoutToKmnConverter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  a list of rules
    */
-  public createData_Rules(data_ukelele: convert_object): string {
+  public writeData_Rules(data_ukelele: convert_object): string {
 
     let data: string = ""
 
-    // create array of all rules and remove duplicates
-    const data_rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
-      if ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
-        && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3")) {
-        return curr;
-      } else {
-        return ""
-      }
-    });
-    const unique_data_Rules: rule_object[] = data_rules.reduce((unique, o) => {
+    // filter array of all rules and remove duplicates
+
+    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
+      return ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
+        && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3"))
+    }).reduce((unique, o) => {
       if (!unique.some((obj: {
         modifier_prev_deadkey: string; prev_deadkey: string;
         modifier_deadkey: string; deadkey: string;
@@ -1624,9 +1621,9 @@ export class KeylayoutToKmnConverter {
 
     // ToDo remove
     //const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules
-    console.log("xx  data_ukelele.arrayOf_Rules", data_ukelele.arrayOf_Rules.length)
+    //console.log("xx  data_ukelele.arrayOf_Rules", data_ukelele.arrayOf_Rules.length)
     //console.log("xx  data_ukelele.arrayOf_Rules", this.writeDataset(data_ukelele.arrayOf_Rules))
-    console.log("xx  unique_data_Rules", unique_data_Rules.length)
+    // console.log("xx  unique_data_Rules", unique_data_Rules.length)
     //console.log("xx  unique_data_Rules", this.writeDataset(unique_data_Rules))
 
     //................................................ C0 C1 ................................................................
@@ -1728,46 +1725,55 @@ export class KeylayoutToKmnConverter {
       if (unique_data_Rules[k].rule_type === "C3") {
 
         const warn_text = this.reviewRules(unique_data_Rules, k)
-
+        // Todo somewhere (A12) <-> (C12)
         // ToDo include condition again
         // FIRSTTEXT print
-        //      if ((warn_text[0].indexOf("duplicate") < 0)) {
-        data +=
-          warn_text[0]
-          + " ["
-          + (unique_data_Rules[k].modifier_prev_deadkey + " " + unique_data_Rules[k].prev_deadkey).trim()
-          //+ "]   >   dk(A"
-          + "]   >   dk(C"
-          + String(unique_data_Rules[k].id_prev_deadkey) + ")\n"
-        //      }
+        if ((warn_text[0].indexOf("duplicate") < 0)
+          || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("ambiguous") >= 0))
+          || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("unavailable") >= 0))
+        ) {
+          data +=
+            warn_text[0]
+            + " ["
+            + (unique_data_Rules[k].modifier_prev_deadkey + " " + unique_data_Rules[k].prev_deadkey).trim()
+            //+ "]   >   dk(A"
+            + "]   >   dk(C"
+            + String(unique_data_Rules[k].id_prev_deadkey) + ")\n"
+        }
 
         // ToDo include condition again
         //SECONDTEXT print
-        //    if ((warn_text[1].indexOf("duplicate") < 0)) {
-        data +=
-          warn_text[1]
-          //+ "dk(A"
-          + "dk(C"
-          + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + [" + unique_data_Rules[k].modifier_deadkey).trim()
-          + " "
-          + unique_data_Rules[k].deadkey
-          + "]  >  dk(B"
-          + String(unique_data_Rules[k].id_deadkey)
-          + ")\n"
-        //  }
+        if ((warn_text[1].indexOf("duplicate") < 0)
+          || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("ambiguous") >= 0))
+          || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("unavailable") >= 0))
+        ) {
+          data +=
+            warn_text[1]
+            //+ "dk(A"
+            + "dk(C"
+            + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + [" + unique_data_Rules[k].modifier_deadkey).trim()
+            + " "
+            + unique_data_Rules[k].deadkey
+            + "]  >  dk(B"
+            + String(unique_data_Rules[k].id_deadkey)
+            + ")\n"
+        }
 
         // ToDo include condition again
         // THIRDTEXT print OK
-        //   if ((warn_text[2].indexOf("duplicate") < 0)) {
-        data +=
-          warn_text[2] + "dk(B"
-          + (String(unique_data_Rules[k].id_deadkey) + ") + [" + unique_data_Rules[k].modifier_key).trim()
-          + " "
-          + unique_data_Rules[k].key
-          + "]  >  \'"
-          + new TextDecoder().decode(unique_data_Rules[k].output)
-          + "\'\n"
-        //  }
+        if ((warn_text[2].indexOf("duplicate") < 0)
+          || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("ambiguous") >= 0))
+          || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("unavailable") >= 0))
+        ) {
+          data +=
+            warn_text[2] + "dk(B"
+            + (String(unique_data_Rules[k].id_deadkey) + ") + [" + unique_data_Rules[k].modifier_key).trim()
+            + " "
+            + unique_data_Rules[k].key
+            + "]  >  \'"
+            + new TextDecoder().decode(unique_data_Rules[k].output)
+            + "\'\n"
+        }
 
         // if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
         data += "\n"
