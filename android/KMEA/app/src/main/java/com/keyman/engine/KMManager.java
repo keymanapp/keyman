@@ -707,12 +707,13 @@ public final class KMManager {
         SystemKeyboard = new KMKeyboard(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } catch (AndroidRuntimeException e) {
         // Catch fatal error when WebView not installed/enabled
-        // Catch fatal error when WebView not installed/enabled
         // Only log exceptions unrelated to WebView
         if (e != null && !e.getMessage().contains("MissingWebViewPackageException")) {
-          KMLog.LogException(TAG, "initKeyboard for SYSTEM" , e);
+          KMLog.LogException(TAG, "initKeyboard for SYSTEM", e);
         }
-        // TODO: Send user to pick another system keyboard
+        // Direct user to pick another system keyboard
+        InputMethodManager imManager = (InputMethodManager) appContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imManager.showInputMethodPicker();
         return;
       }
       SystemKeyboardWebViewClient = new KMKeyboardWebViewClient(appContext, keyboardType);
@@ -789,6 +790,24 @@ public final class KMManager {
       KMLog.LogError(TAG, msg);
       return false;
     }
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function keeps the parent app running in the background
+   */
+  public static void dontCloseParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.dontCloseParentAppOnShowKeyboardPicker();
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function restores this default behavior
+   */
+  public static void closeParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.closeParentAppOnShowKeyboardPicker();
   }
 
   @SuppressLint("InflateParams")
@@ -2299,7 +2318,10 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      if (KeyboardPickerActivity.getCanCloseParentAppOnShowKeyboardPicker()) {
+        // Keyboard Picker Activity becomes root activity and clears Keyman app
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      }
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);

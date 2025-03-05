@@ -1,5 +1,67 @@
 # Keyman Version History
 
+## 18.0.207 beta 2025-03-04
+
+* fix(common): improve resilience of build script trigger (#13407)
+* fix(mac): improve compliance checking (#13337)
+* chore(common): add unit test for nul and context() in context part of rule (#13412)
+
+## 18.0.206 beta 2025-03-03
+
+* fix(android): Control when system keyboard Keyboard Picker clears activity stack (#13313)
+* docs(android): document control flag for system keyboard picker and task (#13373)
+
+## 18.0.205 beta 2025-03-02
+
+* chore(linux): Update debian changelog (#13346)
+
+## 18.0.204 beta 2025-03-01
+
+* chore(windows): ensure dependencies for keyman32 exclude core:wasm (#13379)
+
+## 18.0.203 beta 2025-02-28
+
+* feat(windows): keyman configuration icon refresh (#13294)
+* fix(windows): if kmshell is "silent" don't start a Keyman update (#13330)
+* chore(windows): Update crowdin strings for Khmer (#13364)
+* docs: clean up links in builder.md (#13328)
+* chore: add build.sh edit action for Delphi projects (#13327)
+* fix(developer): handle line breaks in debugger correctly (#13334)
+* fix(developer): use U+0001 for deadkey markers in the debugger (#13336)
+* feat(developer): use .kps folder as initial dir for Add Files (#13324)
+* fix(developer): verify `context(n)` offsets are valid in kmcmplib (#13308)
+* chore(core): add unit tests to validate `nul` with `index` and `context` (#13311)
+* fix(core): include `nul` in context offset calculations in kmx processor (#13314)
+* fix(developer): include `nul` in offset calculations for kmw v10 compiler (#13326)
+
+## 18.0.202 beta 2025-02-27
+
+* fix(android): Direct user to switch system IME when WebView fails (#13352)
+* fix(android): Filter out SocketTimeoutExceptions (#13353)
+* refactor(linux): extract method for setting up mocks in tests (#13355)
+* chore(linux): update to current Debian policy version (#13362)
+* fix(developer): prevent double action of editor hotkeys in debugger (#13345)
+* fix(linux): ignore DBusException during install and uninstall (#13356)
+* fix(linux): ignore exception when fcitx5-configtool is not found (#13363)
+* fix(developer): prevent simultaneous opening of the same project by two processes (#13341)
+* chore: add a workflow to automatically close linked issues (#13369)
+
+## 18.0.201 beta 2025-02-26
+
+* fix(web): prevent cookie-default behavior from mangling engine init (#13331)
+* chore(linux): adjust to renamed xdg module (#13354)
+
+## 18.0.200 beta 2025-02-25
+
+* fix(web): properly support workerless use of Web engine (#13290)
+* fix(web): reconnect, patch up engine/main headless unit tests (#13291)
+* change(ios): re-order host page script load so Sentry can report script load failures (#13332)
+* chore(linux): Update to new Debian policy version (#13325)
+
+## 18.0.199 beta 2025-02-24
+
+* fix(windows): Update Greek Polytonic for keyboard help (#13323)
+
 ## 18.0.198 beta 2025-02-21
 
 * fix(android): Update system keyboard height consistently (#13273)

@@ -9,7 +9,7 @@ builder_describe \
   "Keyman Developer Setup bootstrap executable" \
   @/common/include \
   @/common/windows/delphi \
-  clean configure build test publish
+  clean configure build test publish edit
 
 builder_parse "$@"
 
@@ -55,3 +55,4 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 builder_run_action publish:project      do_publish
 # builder_run_action test:project         do_test
+builder_run_action edit:project         start setup.dproj
