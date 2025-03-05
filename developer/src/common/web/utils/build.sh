@@ -49,5 +49,5 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   verify_npm_setup
 builder_run_action build       do_build
-builder_run_action test        builder_do_typescript_tests 50
+builder_run_action test        builder_do_typescript_tests 45
 builder_run_action publish     builder_publish_npm
