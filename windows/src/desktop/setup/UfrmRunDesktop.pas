@@ -1032,6 +1032,10 @@ end;
 
 procedure TfrmRunDesktop.GetDefaultSettings; // I2651
 begin
+  // Due to the way the TUtilKeymanOptionEntry.Save works it only
+  // saves the values that are different from the defaults.  So we
+  // need to set the defaults here. Two locations for the defaults is
+  // not ideal, but leave for now.
   FStartWithWindows := True; // I2607
   FCheckForUpdates := True;  // I2609
   FAutomaticallyReportUsage := True;
@@ -1048,7 +1052,10 @@ begin
     try
       if OpenKeyReadOnly('\' + SRegKey_KeymanEngine_CU) then
       begin
-        FAutomaticallyReportUsage := ValueExists(SRegValue_AutomaticallyReportUsage) and ReadBool(SRegValue_AutomaticallyReportUsage)
+        // only update the the flag if the value exists in the registry, otherwise leave them as defaults
+        // leave as the the default values
+        if ValueExists(SRegValue_AutomaticallyReportUsage) then
+          FAutomaticallyReportUsage := ReadBool(SRegValue_AutomaticallyReportUsage)
         if ValueExists(SRegValue_CheckForUpdates) then
         begin
           FCheckForUpdates := ReadBool(SRegValue_CheckForUpdates);
