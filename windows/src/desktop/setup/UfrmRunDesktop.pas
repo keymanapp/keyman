@@ -1043,10 +1043,10 @@ end;
 
 procedure TfrmRunDesktop.GetSavedSettings;
 var
-  CheckForUpdatesFound: Boolean;
+  CheckForUpdatesKeyFound: Boolean;
 begin
   GetDefaultSettings;
-  CheckForUpdatesFound := False;
+  CheckForUpdatesKeyFound := False;
   try
     with CreateHKCURegistry do  // I2749
     try
@@ -1061,12 +1061,12 @@ begin
         if ValueExists(SRegValue_CheckForUpdates) then
         begin
           FCheckForUpdates := ReadBool(SRegValue_CheckForUpdates);
-          CheckForUpdatesFound := True;
+          CheckForUpdatesKeyFound := True;
         end;
       end;
       if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
-        FCheckForUpdates := (not CheckForUpdatesFound) and ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
+        FCheckForUpdates := (not CheckForUpdatesKeyFound) and ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
       end
