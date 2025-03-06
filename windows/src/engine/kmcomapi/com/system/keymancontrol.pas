@@ -290,7 +290,7 @@ begin
   Result := (FindMasterControllerWindow <> 0);
 end;
 
-// Depricated interface needs to remain
+// Deprecated interface needs to remain
 function TKeymanControl.IsOnlineUpdateCheckOpen: WordBool;
 begin
   Result := False;
