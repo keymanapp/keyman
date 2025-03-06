@@ -121,6 +121,7 @@ type
     GroupName: string;
   end;
 
+// The Default options here need to be consistent with the defaults set in TfrmRunDesktop.GetDefaultSettings
 const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
   // Global options
 
