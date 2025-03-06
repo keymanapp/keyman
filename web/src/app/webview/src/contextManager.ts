@@ -1,5 +1,6 @@
-import { JSKeyboard, Keyboard  } from 'keyman/engine/keyboard';
-import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
+import { JSKeyboard, Keyboard, OutputTarget } from 'keyman/engine/keyboard';
+// TODO-web-core: remove usage of OutputTargetBase, use OutputTarget instead
+import { Mock, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform, OutputTargetBase } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -59,7 +60,8 @@ export class ContextHost extends Mock {
 
   restoreTo(original: OutputTarget): void {
     this.savedState = Mock.from(this);
-    super.restoreTo(original);
+    // TODO-web-core
+    super.restoreTo(original as OutputTargetBase);
   }
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
