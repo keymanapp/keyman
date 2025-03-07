@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.210 beta 2025-03-07
+
+* chore(common): Add crowdin localization for Vietnamese (#13322)
+* chore(linux): add link to fcitx5 issues to bug issue template (#13451)
+
 ## 18.0.209 beta 2025-03-06
 
 * fix(common): fail builds with low test coverage for all typescript projects (#13418)
