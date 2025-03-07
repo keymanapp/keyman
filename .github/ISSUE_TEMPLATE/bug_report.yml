@@ -18,7 +18,7 @@ body:
         You may also wish to discuss your bug report with the Keyman community at:
           https://community.software.sil.org/c/keyman
 
-        Are you using Linux and fcitx5? Then please create an issue at:
+        Are you using Linux and fcitx5? If so, please create issues at:
           https://github.com/fcitx/fcitx5-keyman/issues/new/choose
 
   - type: textarea
