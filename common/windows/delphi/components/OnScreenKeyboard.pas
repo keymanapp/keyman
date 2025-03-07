@@ -1418,7 +1418,7 @@ var
         //       but this requires a file format change, so a much bigger scope
 
         if not Enabled then      Font.Color := $808080
-        else                     Font.Color := clLime;
+        else                     Font.Color := KeyFontColor_Cap;
 
         FKeyboard.FDrawChar.DisplayQuality := ctCleartype;
         FKeyboard.FDrawChar.Color := Font.Color;
