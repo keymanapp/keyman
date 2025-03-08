@@ -11,7 +11,7 @@
 
 # Target operating system and platform versions
 KEYMAN_MIN_TARGET_VERSION_ANDROID=5.0         # Lollipop
-KEYMAN_MIN_TARGET_VERSION_IOS=12.2            # iOS 12.2
+KEYMAN_MIN_TARGET_VERSION_IOS=15.6            # iOS 15.6
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
 KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
 KEYMAN_MIN_TARGET_VERSION_UBUNTU=22.04        # Ubuntu 22.04 Jammy
