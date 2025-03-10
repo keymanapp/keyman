@@ -236,9 +236,21 @@ begin
       end;
     end;
 
-    xml.LoadFromFile(FTemplatePath + FRenderTemplate);
+    try
+      xml.LoadFromFile(FTemplatePath + FRenderTemplate);
+    except
+      on E: Exception do
+        raise EXMLRenderer.Create('Unexpected error while loading XSLT: ' + E.Message);
+    end;
 
-    doc.Node.transformNode(xml.Node, s);
+    try
+      doc.Node.transformNode(xml.Node, s);
+      Result := s;
+    except
+      on E: Exception do
+        raise EXMLRenderer.Create('Error transforming XML with XSLT: ' + E.Message);
+    end;
+
     Result := s;
 
     if KLEnabled or (GetDebugPath('Debug_XMLRenderer', '', False) <> '') then  // I3269   // I3545
