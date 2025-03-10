@@ -63,6 +63,7 @@ function triggerTeamCityBuild() {
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
     -d "$command"
+  echo
 }
 
 function triggerGitHubActionsBuild() {
@@ -120,7 +121,7 @@ function triggerGitHubActionsBuild() {
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
     --data "$DATA"
-
+  echo
 }
 
 #
