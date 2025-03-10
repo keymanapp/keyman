@@ -56,12 +56,12 @@ function triggerTeamCityBuild() {
 
   # adjust indentation for output of curl
   echo -n "     "
-  curl --no-progress-meter --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
+  call_curl "$TEAMCITY_SERVER/app/rest/buildQueue" \
+    --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
-    $TEAMCITY_SERVER/app/rest/buildQueue \
     -d "$command"
 }
 
@@ -81,10 +81,8 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    # set -E: fail on errors in subshell
-    set -E
-    JSON=$(curl --no-progress-meter "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
-    set +E
+    local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
+
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
@@ -110,12 +108,45 @@ function triggerGitHubActionsBuild() {
 
   echo "GitHub Action Data: $DATA"
 
+  if [[ "$GIT_BUILD_SHA" == null ]]; then
+    echo "Invalid GIT_BUILD_SHA"
+    exit 1
+  fi
+
   # adjust indentation for output of curl
   echo -n "     "
-  curl --no-progress-meter --write-out '\n' \
+  call_curl "${GITHUB_SERVER}/dispatches" \
+    --write-out '\n' \
     --request POST \
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
-    --data "$DATA" \
-    ${GITHUB_SERVER}/dispatches
+    --data "$DATA"
+
 }
+
+#
+# Error handling and reporting for curl + default parameters
+#
+function call_curl() {
+  local URL="$1"
+  shift
+
+  local DATA
+  local CURL_RESULT
+
+  set +e
+  if [[ $# -gt 0 ]]; then
+    DATA=$(curl --fail-with-body --no-progress-meter "$*" "$URL")
+  else
+    DATA=$(curl --fail-with-body --no-progress-meter "$URL")
+  fi
+  CURL_RESULT=$?
+  if [[ $CURL_RESULT != 0 ]]; then
+    echo "curl call to $URL failed with code $CURL_RESULT" >& 2
+    echo "$DATA" >& 2
+    exit $CURL_RESULT
+  fi
+  set -e
+  echo "$DATA"
+}
+
