@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.211 beta 2025-03-10
+
+* feat(windows): hide update header if no updates are available (#13442)
+* fix(ios): suppress Get Started dialog when closing help page (#13422)
+* docs(ios): update minimum supported ios version (#13452)
+
 ## 18.0.210 beta 2025-03-07
 
 * chore(common): Add crowdin localization for Vietnamese (#13322)
