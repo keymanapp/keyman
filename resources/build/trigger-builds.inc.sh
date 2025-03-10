@@ -126,27 +126,40 @@ function triggerGitHubActionsBuild() {
 
 #
 # Error handling and reporting for curl + default parameters
+# We cannot use --fail-with-body yet due to older curl versions
+# on infrastructure
 #
 function call_curl() {
   local URL="$1"
   shift
 
-  local DATA
   local CURL_RESULT
+  local HTTP_CODE
+  local OUTPUT_FILE=$(mktemp)
 
   set +e
   if [[ $# -gt 0 ]]; then
-    DATA=$(curl --fail-with-body --no-progress-meter "$*" "$URL")
+    HTTP_CODE=$(curl --silent --output $OUTPUT_FILE --no-progress-meter --write-out "%{http_code}" "$@" "$URL")
   else
-    DATA=$(curl --fail-with-body --no-progress-meter "$URL")
+    HTTP_CODE=$(curl --silent --output $OUTPUT_FILE --no-progress-meter --write-out "%{http_code}" "$URL")
   fi
   CURL_RESULT=$?
   if [[ $CURL_RESULT != 0 ]]; then
     echo "curl call to $URL failed with code $CURL_RESULT" >& 2
-    echo "$DATA" >& 2
+    >&2 cat $OUTPUT_FILE
+    rm -f $OUTPUT_FILE
     exit $CURL_RESULT
   fi
-  set -e
-  echo "$DATA"
-}
 
+  if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
+    echo "curl call to $URL failed with HTTP error code $HTTP_CODE" >& 2
+    >&2 cat $OUTPUT_FILE
+    rm -f $OUTPUT_FILE
+    exit 22
+  fi
+
+  set -e
+
+  cat $OUTPUT_FILE
+  rm -f $OUTPUT_FILE
+}
