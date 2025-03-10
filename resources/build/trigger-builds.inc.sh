@@ -57,7 +57,7 @@ function triggerTeamCityBuild() {
   # adjust indentation for output of curl
   echo -n "     "
   call_curl "$TEAMCITY_SERVER/app/rest/buildQueue" \
-    --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
+    --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
@@ -116,7 +116,6 @@ function triggerGitHubActionsBuild() {
   # adjust indentation for output of curl
   echo -n "     "
   call_curl "${GITHUB_SERVER}/dispatches" \
-    --write-out '\n' \
     --request POST \
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
@@ -130,36 +129,36 @@ function triggerGitHubActionsBuild() {
 # on infrastructure
 #
 function call_curl() {
-  local URL="$1"
+  local url="$1"
   shift
 
-  local CURL_RESULT
-  local HTTP_CODE
-  local OUTPUT_FILE=$(mktemp)
+  local curl_result
+  local http_code
+  local output_file=$(mktemp)
 
   set +e
   if [[ $# -gt 0 ]]; then
-    HTTP_CODE=$(curl --silent --output $OUTPUT_FILE --no-progress-meter --write-out "%{http_code}" "$@" "$URL")
+    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$@" "$url")
   else
-    HTTP_CODE=$(curl --silent --output $OUTPUT_FILE --no-progress-meter --write-out "%{http_code}" "$URL")
+    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$url")
   fi
-  CURL_RESULT=$?
-  if [[ $CURL_RESULT != 0 ]]; then
-    echo "curl call to $URL failed with code $CURL_RESULT" >& 2
-    >&2 cat $OUTPUT_FILE
-    rm -f $OUTPUT_FILE
-    exit $CURL_RESULT
+  curl_result=$?
+  if [[ ${curl_result} != 0 ]]; then
+    echo "curl call to '${url}' failed with code '${curl_result}'" >& 2
+    >&2 cat $output_file
+    rm -f $output_file
+    exit $curl_result
   fi
 
-  if [[ ${HTTP_CODE} -lt 200 || ${HTTP_CODE} -gt 299 ]] ; then
-    echo "curl call to $URL failed with HTTP error code $HTTP_CODE" >& 2
-    >&2 cat $OUTPUT_FILE
-    rm -f $OUTPUT_FILE
+  if [[ ${http_code} -lt 200 || ${http_code} -gt 299 ]] ; then
+    echo "curl call to '${url}' failed with HTTP error code '${http_code}'" >& 2
+    >&2 cat $output_file
+    rm -f $output_file
     exit 22
   fi
 
   set -e
 
-  cat $OUTPUT_FILE
-  rm -f $OUTPUT_FILE
+  cat $output_file
+  rm -f $output_file
 }
