@@ -28,7 +28,7 @@ export class KeymanSentry {
 
   static init(options?: SentryNodeOptions) {
     options = options ?? {};
-    let integrations = typeof options.integrations == 'function' ? options.integrations([]) : (options.integrations ?? []);
+    const integrations = typeof options.integrations == 'function' ? options.integrations([]) : (options.integrations ?? []);
     Sentry.init({
       ...options,
       registerEsmLoaderHooks: false,
