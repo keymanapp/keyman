@@ -56,7 +56,7 @@
     "build/unicode-license.txt"
   ],
   "devDependencies": {
-    "@sentry/cli": "^2.31.0",
+    "@sentry/cli": "^2.42.2",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",
