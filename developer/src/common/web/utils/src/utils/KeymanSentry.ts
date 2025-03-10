@@ -1,4 +1,5 @@
-import Sentry from "@sentry/node";
+import * as Sentry from "@sentry/node";
+import { wasmIntegration } from "@sentry/wasm";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { getOption } from "./options.js";
 
@@ -27,11 +28,17 @@ export class KeymanSentry {
 
   static init(options?: SentryNodeOptions) {
     options = options ?? {};
+    let integrations = typeof options.integrations == 'function' ? options.integrations([]) : (options.integrations ?? []);
     Sentry.init({
       ...options,
+      registerEsmLoaderHooks: false,
       dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
       environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
       release: KEYMAN_VERSION.VERSION_GIT_TAG,
+      integrations: [
+        ...integrations,
+        wasmIntegration()
+      ]
     });
     isInit = true;
   }

@@ -91,7 +91,10 @@ function do_bundle() {
     build/dist/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module
+  cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.js build/dist/ # TODO is this needed?
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
+  # cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm.map build/dist/
+  # cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm.debug.wasm build/dist/
 
   # Manually copy over templates
   cp -R ../kmc-generate/build/src/template/ build/dist/

@@ -36,10 +36,13 @@ if cpp_compiler.get_id() == 'emscripten'
 
   flags += ['-fwasm-exceptions'] + sanitize
 
-  lib_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH', '-sMODULARIZE', '-sEXPORT_ES6']
+  lib_links = ['-g', '--whole-archive', '-sALLOW_MEMORY_GROWTH', '-sMODULARIZE', '-sEXPORT_ES6', '-sASSERTIONS']
   links += [
     # Forcing inclusion of debug symbols
-    '-g', '-Wlimited-postlink-optimizations',
+    # '-gseparate-dwarf',
+    # '-gsource-map',
+    '-g',
+    '-Wlimited-postlink-optimizations',
     '-fwasm-exceptions', '--bind'] + sanitize
 
   # Alternative to sanitize is adding '-sASSERTIONS', '-sSAFE_HEAP' to lib_links:
