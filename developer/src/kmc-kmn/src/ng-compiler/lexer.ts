@@ -104,14 +104,13 @@ export class ScanRecogniser {
 }
 
 export class Lexer {
-  private static patternMatchers: Map<TokenTypes, ScanRecogniser> = null;
+  private static patternMatchers: Map<TokenTypes, ScanRecogniser>;
   private buffer: String;
   private lineNum: number;
   private charNum: number;
   private tokenList: Token[];
 
   public constructor(buffer: String) {
-    Lexer.loadPatternMatchers();
     this.buffer    = buffer;
     this.lineNum   = 1;
     this.charNum   = 1;
@@ -199,12 +198,10 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=([^\\S\\r\\n]*,?[^\\S\\r\\n]*[^,\\)\\s]+)*[^\\S\\r\\n]*\\))")),
   ];
 
-  private static loadPatternMatchers(): void  {
-    if (Lexer.patternMatchers === null) {
-      Lexer.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
-      for (const scanRecogniser of Lexer.scanRecognisers) {
-        Lexer.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
-      }
+  static {
+    Lexer.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
+    for (const scanRecogniser of Lexer.scanRecognisers) {
+      Lexer.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
     }
   }
 
