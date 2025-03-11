@@ -83,8 +83,8 @@ export class ScanRecogniser {
   regExp: RegExp;
 
   public constructor(tokenType: TokenTypes, regExp: RegExp) {
-    this.tokenType   = tokenType;
-    this.regExp      = regExp;
+    this.tokenType = tokenType;
+    this.regExp    = regExp;
   }
 
   public toString(): String {
@@ -93,12 +93,16 @@ export class ScanRecogniser {
 }
 
 export class Lexer {
-  patternMatchers: Map<TokenTypes, ScanRecogniser>;
-  buffer: String;
-  tokenList: Token[];
+  private patternMatchers: Map<TokenTypes, ScanRecogniser>;
+  private buffer: String;
+  private lineNum: number;
+  private charNum: number;
+  private tokenList: Token[];
 
-  constructor(buffer: String) {
+  public constructor(buffer: String) {
     this.buffer    = buffer;
+    this.lineNum   = 1;
+    this.charNum   = 1;
     this.tokenList = [];
     const scanRecognisers = [
       new ScanRecogniser(TokenTypes.TT_BITMAP,             new RegExp("^bitmap", "i")),
@@ -195,9 +199,15 @@ export class Lexer {
       match      = recogniser.regExp.exec(this.buffer.toString());
 
       if (match) {
-        this.tokenList.push(new Token(recogniser.tokenType, match[0]));
+        this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum));
         tokenMatch  = true;
         this.buffer = this.buffer.substring(match[0].length);
+        if (recogniser.tokenType === TokenTypes.TT_NEWLINE) {
+          this.lineNum += 1;
+          this.charNum  = 1;
+        } else {
+          this.charNum += match[0].length;
+        }
       }
     }
 
@@ -211,14 +221,22 @@ export class Lexer {
 export class Token {
   readonly tokenType: TokenTypes;
   private _text: String;
+  private _lineNum: number; // starts from 1
+  private _charNum: number; // starts from 1
 
-  public constructor(tokenType: TokenTypes, text: String) {
+  public constructor(tokenType: TokenTypes, text: String, lineNum: number=1, charNum: number=1) {
     this.tokenType = tokenType;
     this._text     = text;
+    this._lineNum  = lineNum;
+    this._charNum  = charNum;
   }
 
   get text(): String { return this._text; }
   set text(text: String) { this._text = text; }
+  get lineNum(): number { return this._lineNum; }
+  set lineNum(lineNum: number) { this._lineNum = lineNum; }
+  get charNum(): number { return this._charNum; }
+  set charNum(charNum: number) { this._charNum = charNum; }
 
   public toString(): String {
     return `[${this.tokenType},${this._text}]`;
