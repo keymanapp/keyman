@@ -129,11 +129,23 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_CONTEXT token", () => {
       recogniseToken(TokenTypes.TT_CONTEXT, 'context');
     });
+    it("can recognise a TT_DEADKEY token (deadkey)", () => {
+      recogniseToken(TokenTypes.TT_DEADKEY, 'deadkey');
+    });
+    it("can recognise a TT_DEADKEY token (dk)", () => {
+      recogniseToken(TokenTypes.TT_DEADKEY, 'dk');
+    });
     it("can recognise a TT_GROUP token", () => {
       recogniseToken(TokenTypes.TT_GROUP, 'group');
     });
     it("can recognise a TT_IF token", () => {
       recogniseToken(TokenTypes.TT_IF, 'if');
+    });
+    it("can recognise a TT_INDEX token", () => {
+      recogniseToken(TokenTypes.TT_INDEX, 'index');
+    });
+    it("can recognise a TT_LAYER token", () => {
+      recogniseToken(TokenTypes.TT_LAYER, 'layer');
     });
     it("can recognise a TT_MATCH token", () => {
       recogniseToken(TokenTypes.TT_MATCH, 'match');
@@ -141,11 +153,29 @@ describe("Lexer Tests", () => {
     it("can recognise a TT_NOMATCH token", () => {
       recogniseToken(TokenTypes.TT_NOMATCH, 'nomatch');
     });
+    it("can recognise a TT_NOTANY token", () => {
+      recogniseToken(TokenTypes.TT_NOTANY, 'notany');
+    });
+    it("can recognise a TT_NUL token", () => {
+      recogniseToken(TokenTypes.TT_NUL, 'nul');
+    });
     it("can recognise a TT_OUTS token", () => {
       recogniseToken(TokenTypes.TT_OUTS, 'outs');
     });
     it("can recognise a TT_PLATFORM token", () => {
       recogniseToken(TokenTypes.TT_PLATFORM, 'platform');
+    });
+    it("can recognise a TT_RESET token", () => {
+      recogniseToken(TokenTypes.TT_RESET, 'reset');
+    });
+    it("can recognise a TT_RETURN token", () => {
+      recogniseToken(TokenTypes.TT_RETURN, 'return');
+    });
+    it("can recognise a TT_SAVE token", () => {
+      recogniseToken(TokenTypes.TT_SAVE, 'save');
+    });
+    it("can recognise a TT_SET token", () => {
+      recogniseToken(TokenTypes.TT_SET, 'set');
     });
     it("can recognise a TT_STORE token", () => {
       recogniseToken(TokenTypes.TT_STORE, 'store');

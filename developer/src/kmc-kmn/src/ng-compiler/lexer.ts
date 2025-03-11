@@ -6,6 +6,9 @@
  * KMC KMN Next Generation Lexer
  */
 
+// For later: BITMAPS, CAPS, ON, ONLY, ALWAYS, OFF, SHIFT, FREES, COPYRIGHT
+//            LAYOUT
+
 export enum TokenTypes {
   TT_BITMAP             = "TT_BITMAP",
   TT_CASEDKEYS          = "TT_CASEDKEYS",
@@ -42,12 +45,20 @@ export enum TokenTypes {
   TT_BEGIN              = "TT_BEGIN",
   TT_CALL               = "TT_CALL",
   TT_CONTEXT            = "TT_CONTEXT",
+  TT_DEADKEY            = "TT_DEADKEY",
   TT_GROUP              = "TT_GROUP",
   TT_IF                 = "TT_IF",
+  TT_INDEX              = "TT_INDEX",
   TT_MATCH              = "TT_MATCH",
   TT_NOMATCH            = "TT_NOMATCH",
+  TT_NOTANY             = "TT_NOTANY",
+  TT_NUL                = "TT_NUL",
   TT_OUTS               = "TT_OUTS",
   TT_PLATFORM           = "TT_PLATFORM",
+  TT_RESET              = "TT_RESET",
+  TT_RETURN             = "TT_RETURN",
+  TT_SAVE               = "TT_SAVE",
+  TT_SET                = "TT_SET",
   TT_STORE              = "TT_STORE",
   TT_USE                = "TT_USE",
   TT_UNICODE            = "TT_UNICODE",
@@ -143,12 +154,21 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.TT_BEGIN,              new RegExp("^begin", "i")),
     new ScanRecogniser(TokenTypes.TT_CALL,               new RegExp("^call", "i")),
     new ScanRecogniser(TokenTypes.TT_CONTEXT,            new RegExp("^context", "i")),
+    new ScanRecogniser(TokenTypes.TT_DEADKEY,            new RegExp("^(deadkey|dk)", "i")),
     new ScanRecogniser(TokenTypes.TT_GROUP,              new RegExp("^group", "i")),
     new ScanRecogniser(TokenTypes.TT_IF,                 new RegExp("^if", "i")),
+    new ScanRecogniser(TokenTypes.TT_INDEX,              new RegExp("^index", "i")),
+    new ScanRecogniser(TokenTypes.TT_LAYER,              new RegExp("^layer", "i")),
     new ScanRecogniser(TokenTypes.TT_MATCH,              new RegExp("^match", "i")),
     new ScanRecogniser(TokenTypes.TT_NOMATCH,            new RegExp("^nomatch", "i")),
+    new ScanRecogniser(TokenTypes.TT_NOTANY,             new RegExp("^notany", "i")),
+    new ScanRecogniser(TokenTypes.TT_NUL,                new RegExp("^nul", "i")),
     new ScanRecogniser(TokenTypes.TT_OUTS,               new RegExp("^outs", "i")),
     new ScanRecogniser(TokenTypes.TT_PLATFORM,           new RegExp("^platform", "i")),
+    new ScanRecogniser(TokenTypes.TT_RESET,             new RegExp("^reset", "i")),
+    new ScanRecogniser(TokenTypes.TT_RETURN,             new RegExp("^return", "i")),
+    new ScanRecogniser(TokenTypes.TT_SAVE,               new RegExp("^save", "i")),
+    new ScanRecogniser(TokenTypes.TT_SET,                new RegExp("^set", "i")),
     new ScanRecogniser(TokenTypes.TT_STORE,              new RegExp("^store", "i")),
     new ScanRecogniser(TokenTypes.TT_USE,                new RegExp("^use", "i")),
     new ScanRecogniser(TokenTypes.TT_UNICODE,            new RegExp("^unicode", "i")),
