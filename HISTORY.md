@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.212 beta 2025-03-11
+
+* fix(oem/fv/android): Avoid resetting keyboard index (#13449)
+* fix(android/engine): Ignore key errors if user switched to another IME (#13466)
+* fix(android): Cache inputType to determine external keyboard handling (#13475)
+
 ## 18.0.211 beta 2025-03-10
 
 * feat(windows): hide update header if no updates are available (#13442)
