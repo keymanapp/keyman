@@ -209,16 +209,19 @@ export class Lexer {
 }
 
 export class Token {
-  tokenType: TokenTypes;
-  match: String;
+  readonly tokenType: TokenTypes;
+  private _text: String;
 
-  public constructor(tokenType: TokenTypes, match: String) {
+  public constructor(tokenType: TokenTypes, text: String) {
     this.tokenType = tokenType;
-    this.match     = match;
+    this._text     = text;
   }
 
+  get text(): String { return this._text; }
+  set text(text: String) { this._text = text; }
+
   public toString(): String {
-    return `[${this.tokenType},${this.match}]`;
+    return `[${this.tokenType},${this._text}]`;
   }
 }
 
