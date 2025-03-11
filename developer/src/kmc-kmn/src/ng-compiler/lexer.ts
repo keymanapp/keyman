@@ -93,91 +93,98 @@ export class ScanRecogniser {
 }
 
 export class Lexer {
-  private patternMatchers: Map<TokenTypes, ScanRecogniser>;
+  private static patternMatchers: Map<TokenTypes, ScanRecogniser> = null;
   private buffer: String;
   private lineNum: number;
   private charNum: number;
   private tokenList: Token[];
 
   public constructor(buffer: String) {
+    Lexer.loadPatternMatchers();
     this.buffer    = buffer;
     this.lineNum   = 1;
     this.charNum   = 1;
     this.tokenList = [];
-    const scanRecognisers = [
-      new ScanRecogniser(TokenTypes.TT_BITMAP,             new RegExp("^bitmap", "i")),
-      new ScanRecogniser(TokenTypes.TT_CASEDKEYS,          new RegExp("^casedkeys", "i")),
-      new ScanRecogniser(TokenTypes.TT_COPYRIGHT,          new RegExp("^copyright", "i")),
-      new ScanRecogniser(TokenTypes.TT_DISPLAYMAP,         new RegExp("^displaymap", "i")),
-      new ScanRecogniser(TokenTypes.TT_ETHNOLOGUECODE,     new RegExp("^ethnologuecode", "i")),
-      new ScanRecogniser(TokenTypes.TT_HOTKEY,             new RegExp("^hotkey", "i")),
-      new ScanRecogniser(TokenTypes.TT_INCLUDECODES,       new RegExp("^includecodes", "i")),
-      new ScanRecogniser(TokenTypes.TT_KEYBOARDVERSION,    new RegExp("^keyboardversion", "i")),
-      new ScanRecogniser(TokenTypes.TT_KMW_EMBEDCSS,       new RegExp("^kmw_embedcss", "i")),
-      new ScanRecogniser(TokenTypes.TT_KMW_EMBEDJS,        new RegExp("^kmw_embedjs", "i")),
-      new ScanRecogniser(TokenTypes.TT_KMW_HELPFILE,       new RegExp("^kmw_helpfile", "i")),
-      new ScanRecogniser(TokenTypes.TT_KMW_HELPTEXT,       new RegExp("^kmw_helptext", "i")),
-      new ScanRecogniser(TokenTypes.TT_KMW_RTL,            new RegExp("^kmw_rtl", "i")),
-      new ScanRecogniser(TokenTypes.TT_LANGUAGE,           new RegExp("^language", "i")),
-      new ScanRecogniser(TokenTypes.TT_LAYER,              new RegExp("^layer", "i")),
-      new ScanRecogniser(TokenTypes.TT_LAYOUTFILE,         new RegExp("^layoutfile", "i")),
-      new ScanRecogniser(TokenTypes.TT_MESSAGE,            new RegExp("^message", "i")),
-      new ScanRecogniser(TokenTypes.TT_MNEMONICLAYOUT,     new RegExp("^mnemoniclayout", "i")),
-      new ScanRecogniser(TokenTypes.TT_NAME,               new RegExp("^name", "i")),
-      new ScanRecogniser(TokenTypes.TT_NEWLAYER,           new RegExp("^newlayer", "i")),
-      new ScanRecogniser(TokenTypes.TT_OLDCHARPOSMATCHING, new RegExp("^oldcharposmatching", "i")),
-      new ScanRecogniser(TokenTypes.TT_OLDLAYER,           new RegExp("^oldlayer", "i")),
-      new ScanRecogniser(TokenTypes.TT_TARGETS,            new RegExp("^targets", "i")),
-      new ScanRecogniser(TokenTypes.TT_VERSION,            new RegExp("^version", "i")),
-      new ScanRecogniser(TokenTypes.TT_VISUALKEYBOARD,     new RegExp("^visualkeyboard", "i")),
-      new ScanRecogniser(TokenTypes.TT_WINDOWSLANGUAGES,   new RegExp("^windowslanguages", "i")),
-      new ScanRecogniser(TokenTypes.TT_CAPSALWAYSOFF,      new RegExp("^capsalwaysoff", "i")),
-      new ScanRecogniser(TokenTypes.TT_CAPSONONLY,         new RegExp("^capsononly", "i")),
-      new ScanRecogniser(TokenTypes.TT_SHIFTFREESCAPS,     new RegExp("^shiftfreescaps", "i")),
-      new ScanRecogniser(TokenTypes.TT_ANY,                new RegExp("^any", "i")),
-      new ScanRecogniser(TokenTypes.TT_BASELAYOUT,         new RegExp("^baselayout", "i")),
-      new ScanRecogniser(TokenTypes.TT_BEEP,               new RegExp("^beep", "i")),
-      new ScanRecogniser(TokenTypes.TT_BEGIN,              new RegExp("^begin", "i")),
-      new ScanRecogniser(TokenTypes.TT_CALL,               new RegExp("^call", "i")),
-      new ScanRecogniser(TokenTypes.TT_CONTEXT,            new RegExp("^context", "i")),
-      new ScanRecogniser(TokenTypes.TT_GROUP,              new RegExp("^group", "i")),
-      new ScanRecogniser(TokenTypes.TT_IF,                 new RegExp("^if", "i")),
-      new ScanRecogniser(TokenTypes.TT_MATCH,              new RegExp("^match", "i")),
-      new ScanRecogniser(TokenTypes.TT_NOMATCH,            new RegExp("^nomatch", "i")),
-      new ScanRecogniser(TokenTypes.TT_OUTS,               new RegExp("^outs", "i")),
-      new ScanRecogniser(TokenTypes.TT_PLATFORM,           new RegExp("^platform", "i")),
-      new ScanRecogniser(TokenTypes.TT_STORE,              new RegExp("^store", "i")),
-      new ScanRecogniser(TokenTypes.TT_USE,                new RegExp("^use", "i")),
-      new ScanRecogniser(TokenTypes.TT_UNICODE,            new RegExp("^unicode", "i")),
-      new ScanRecogniser(TokenTypes.TT_NEWCONTEXT,         new RegExp("^newcontext", "i")),
-      new ScanRecogniser(TokenTypes.TT_POSTKEYSTROKE,      new RegExp("^postkeystroke", "i")),
-      new ScanRecogniser(TokenTypes.TT_ANSI,               new RegExp("^ansi", "i")),
-      new ScanRecogniser(TokenTypes.TT_READONLY,           new RegExp("^readonly", "i")),
-      new ScanRecogniser(TokenTypes.TT_USING,              new RegExp("^using", "i")),
-      new ScanRecogniser(TokenTypes.TT_KEYS,               new RegExp("^keys", "i")),
-      new ScanRecogniser(TokenTypes.TT_LEFT_BR,            new RegExp("^\\(")),
-      new ScanRecogniser(TokenTypes.TT_RIGHT_BR,           new RegExp("^\\)")),
-      new ScanRecogniser(TokenTypes.TT_LEFT_SQ,            new RegExp("^\\[")),
-      new ScanRecogniser(TokenTypes.TT_RIGHT_SQ,           new RegExp("^\\]")),
-      new ScanRecogniser(TokenTypes.TT_AMPHASAND,          new RegExp("^&")),
-      new ScanRecogniser(TokenTypes.TT_CHEVRON,            new RegExp("^>")),
-      new ScanRecogniser(TokenTypes.TT_PLUS,               new RegExp("^\\+")),
-      new ScanRecogniser(TokenTypes.TT_COMMA,              new RegExp("^,")),
-      new ScanRecogniser(TokenTypes.TT_NOT_EQUAL,          new RegExp("^!=")),
-      new ScanRecogniser(TokenTypes.TT_EQUAL,              new RegExp("^=")),
-      new ScanRecogniser(TokenTypes.TT_U_CHAR,             new RegExp("^U\\+[0-9A-F]{1,6}", "i")),
-      new ScanRecogniser(TokenTypes.TT_STRING,             new RegExp("^('.*?'|\".*?\")")),
-      new ScanRecogniser(TokenTypes.TT_SHIFT_CODE,         new RegExp("^(SHIFT|CTRL|LCTRL|RCTRL|ALT|LALT|RALT|CAPS|NCAPS)(?=[^\\S\\r\\n])", "i")),
-      new ScanRecogniser(TokenTypes.TT_KEY_CODE,           new RegExp("^(((K_|T_|U_)[^\\]\\s]+)|[A-E]\\d\\d)(?=[^\\S\\r\\n]*\\])", "i")),
-      new ScanRecogniser(TokenTypes.TT_COMMENT,            new RegExp("^c[^\\S\\r\\n][^\\r\\n]*", "i")),
-      new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+")),
-      new ScanRecogniser(TokenTypes.TT_CONTINUATION,       new RegExp("^\\\\(?=([^\\S\\r\\n]*(\\r\\n|\\n|\\r)))")),
-      new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)")),
-      new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=([^\\S\\r\\n]*,?[^\\S\\r\\n]*[^,\\)\\s]+)*[^\\S\\r\\n]*\\))")),
-    ];
-    this.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
-    for (const scanRecogniser of scanRecognisers) {
-      this.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
+  }
+
+  private static scanRecognisers = [
+    new ScanRecogniser(TokenTypes.TT_BITMAP,             new RegExp("^bitmap", "i")),
+    new ScanRecogniser(TokenTypes.TT_CASEDKEYS,          new RegExp("^casedkeys", "i")),
+    new ScanRecogniser(TokenTypes.TT_COPYRIGHT,          new RegExp("^copyright", "i")),
+    new ScanRecogniser(TokenTypes.TT_DISPLAYMAP,         new RegExp("^displaymap", "i")),
+    new ScanRecogniser(TokenTypes.TT_ETHNOLOGUECODE,     new RegExp("^ethnologuecode", "i")),
+    new ScanRecogniser(TokenTypes.TT_HOTKEY,             new RegExp("^hotkey", "i")),
+    new ScanRecogniser(TokenTypes.TT_INCLUDECODES,       new RegExp("^includecodes", "i")),
+    new ScanRecogniser(TokenTypes.TT_KEYBOARDVERSION,    new RegExp("^keyboardversion", "i")),
+    new ScanRecogniser(TokenTypes.TT_KMW_EMBEDCSS,       new RegExp("^kmw_embedcss", "i")),
+    new ScanRecogniser(TokenTypes.TT_KMW_EMBEDJS,        new RegExp("^kmw_embedjs", "i")),
+    new ScanRecogniser(TokenTypes.TT_KMW_HELPFILE,       new RegExp("^kmw_helpfile", "i")),
+    new ScanRecogniser(TokenTypes.TT_KMW_HELPTEXT,       new RegExp("^kmw_helptext", "i")),
+    new ScanRecogniser(TokenTypes.TT_KMW_RTL,            new RegExp("^kmw_rtl", "i")),
+    new ScanRecogniser(TokenTypes.TT_LANGUAGE,           new RegExp("^language", "i")),
+    new ScanRecogniser(TokenTypes.TT_LAYER,              new RegExp("^layer", "i")),
+    new ScanRecogniser(TokenTypes.TT_LAYOUTFILE,         new RegExp("^layoutfile", "i")),
+    new ScanRecogniser(TokenTypes.TT_MESSAGE,            new RegExp("^message", "i")),
+    new ScanRecogniser(TokenTypes.TT_MNEMONICLAYOUT,     new RegExp("^mnemoniclayout", "i")),
+    new ScanRecogniser(TokenTypes.TT_NAME,               new RegExp("^name", "i")),
+    new ScanRecogniser(TokenTypes.TT_NEWLAYER,           new RegExp("^newlayer", "i")),
+    new ScanRecogniser(TokenTypes.TT_OLDCHARPOSMATCHING, new RegExp("^oldcharposmatching", "i")),
+    new ScanRecogniser(TokenTypes.TT_OLDLAYER,           new RegExp("^oldlayer", "i")),
+    new ScanRecogniser(TokenTypes.TT_TARGETS,            new RegExp("^targets", "i")),
+    new ScanRecogniser(TokenTypes.TT_VERSION,            new RegExp("^version", "i")),
+    new ScanRecogniser(TokenTypes.TT_VISUALKEYBOARD,     new RegExp("^visualkeyboard", "i")),
+    new ScanRecogniser(TokenTypes.TT_WINDOWSLANGUAGES,   new RegExp("^windowslanguages", "i")),
+    new ScanRecogniser(TokenTypes.TT_CAPSALWAYSOFF,      new RegExp("^capsalwaysoff", "i")),
+    new ScanRecogniser(TokenTypes.TT_CAPSONONLY,         new RegExp("^capsononly", "i")),
+    new ScanRecogniser(TokenTypes.TT_SHIFTFREESCAPS,     new RegExp("^shiftfreescaps", "i")),
+    new ScanRecogniser(TokenTypes.TT_ANY,                new RegExp("^any", "i")),
+    new ScanRecogniser(TokenTypes.TT_BASELAYOUT,         new RegExp("^baselayout", "i")),
+    new ScanRecogniser(TokenTypes.TT_BEEP,               new RegExp("^beep", "i")),
+    new ScanRecogniser(TokenTypes.TT_BEGIN,              new RegExp("^begin", "i")),
+    new ScanRecogniser(TokenTypes.TT_CALL,               new RegExp("^call", "i")),
+    new ScanRecogniser(TokenTypes.TT_CONTEXT,            new RegExp("^context", "i")),
+    new ScanRecogniser(TokenTypes.TT_GROUP,              new RegExp("^group", "i")),
+    new ScanRecogniser(TokenTypes.TT_IF,                 new RegExp("^if", "i")),
+    new ScanRecogniser(TokenTypes.TT_MATCH,              new RegExp("^match", "i")),
+    new ScanRecogniser(TokenTypes.TT_NOMATCH,            new RegExp("^nomatch", "i")),
+    new ScanRecogniser(TokenTypes.TT_OUTS,               new RegExp("^outs", "i")),
+    new ScanRecogniser(TokenTypes.TT_PLATFORM,           new RegExp("^platform", "i")),
+    new ScanRecogniser(TokenTypes.TT_STORE,              new RegExp("^store", "i")),
+    new ScanRecogniser(TokenTypes.TT_USE,                new RegExp("^use", "i")),
+    new ScanRecogniser(TokenTypes.TT_UNICODE,            new RegExp("^unicode", "i")),
+    new ScanRecogniser(TokenTypes.TT_NEWCONTEXT,         new RegExp("^newcontext", "i")),
+    new ScanRecogniser(TokenTypes.TT_POSTKEYSTROKE,      new RegExp("^postkeystroke", "i")),
+    new ScanRecogniser(TokenTypes.TT_ANSI,               new RegExp("^ansi", "i")),
+    new ScanRecogniser(TokenTypes.TT_READONLY,           new RegExp("^readonly", "i")),
+    new ScanRecogniser(TokenTypes.TT_USING,              new RegExp("^using", "i")),
+    new ScanRecogniser(TokenTypes.TT_KEYS,               new RegExp("^keys", "i")),
+    new ScanRecogniser(TokenTypes.TT_LEFT_BR,            new RegExp("^\\(")),
+    new ScanRecogniser(TokenTypes.TT_RIGHT_BR,           new RegExp("^\\)")),
+    new ScanRecogniser(TokenTypes.TT_LEFT_SQ,            new RegExp("^\\[")),
+    new ScanRecogniser(TokenTypes.TT_RIGHT_SQ,           new RegExp("^\\]")),
+    new ScanRecogniser(TokenTypes.TT_AMPHASAND,          new RegExp("^&")),
+    new ScanRecogniser(TokenTypes.TT_CHEVRON,            new RegExp("^>")),
+    new ScanRecogniser(TokenTypes.TT_PLUS,               new RegExp("^\\+")),
+    new ScanRecogniser(TokenTypes.TT_COMMA,              new RegExp("^,")),
+    new ScanRecogniser(TokenTypes.TT_NOT_EQUAL,          new RegExp("^!=")),
+    new ScanRecogniser(TokenTypes.TT_EQUAL,              new RegExp("^=")),
+    new ScanRecogniser(TokenTypes.TT_U_CHAR,             new RegExp("^U\\+[0-9A-F]{1,6}", "i")),
+    new ScanRecogniser(TokenTypes.TT_STRING,             new RegExp("^('.*?'|\".*?\")")),
+    new ScanRecogniser(TokenTypes.TT_SHIFT_CODE,         new RegExp("^(SHIFT|CTRL|LCTRL|RCTRL|ALT|LALT|RALT|CAPS|NCAPS)(?=[^\\S\\r\\n])", "i")),
+    new ScanRecogniser(TokenTypes.TT_KEY_CODE,           new RegExp("^(((K_|T_|U_)[^\\]\\s]+)|[A-E]\\d\\d)(?=[^\\S\\r\\n]*\\])", "i")),
+    new ScanRecogniser(TokenTypes.TT_COMMENT,            new RegExp("^c[^\\S\\r\\n][^\\r\\n]*", "i")),
+    new ScanRecogniser(TokenTypes.TT_WHITESPACE,         new RegExp("^[^\\S\\r\\n]+")),
+    new ScanRecogniser(TokenTypes.TT_CONTINUATION,       new RegExp("^\\\\(?=([^\\S\\r\\n]*(\\r\\n|\\n|\\r)))")),
+    new ScanRecogniser(TokenTypes.TT_NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)")),
+    new ScanRecogniser(TokenTypes.TT_PARAMETER,          new RegExp("^[^,\\)\\s]+(?=([^\\S\\r\\n]*,?[^\\S\\r\\n]*[^,\\)\\s]+)*[^\\S\\r\\n]*\\))")),
+  ];
+
+  private static loadPatternMatchers(): void  {
+    if (Lexer.patternMatchers === null) {
+      Lexer.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
+      for (const scanRecogniser of Lexer.scanRecognisers) {
+        Lexer.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
+      }
     }
   }
 
@@ -187,7 +194,7 @@ export class Lexer {
   }
 
   private matchToken() {
-    let patternIterator: Iterator<ScanRecogniser> = this.patternMatchers.values();
+    let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
     let match: RegExpExecArray | null;
