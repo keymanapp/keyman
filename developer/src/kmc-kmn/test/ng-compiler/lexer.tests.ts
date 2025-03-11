@@ -230,8 +230,8 @@ describe("Lexer Tests", () => {
         '\'hello\' \'world\'',
         [
           new Token(TokenTypes.TT_STRING,     '\'hello\''),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_STRING,     '\'world\''),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 8),
+          new Token(TokenTypes.TT_STRING,     '\'world\'', 1, 9),
         ]
       );
     });
@@ -260,9 +260,9 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'K_K ]',
         [
-          new Token(TokenTypes.TT_KEY_CODE,   'K_K'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_RIGHT_SQ,   ']'),
+          new Token(TokenTypes.TT_KEY_CODE, 'K_K'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 4),
+          new Token(TokenTypes.TT_RIGHT_SQ, ']', 1, 5),
         ]
       );
     });
@@ -273,8 +273,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
-          new Token(TokenTypes.TT_COMMENT,  'c This tells Keyman which keys should have casing behavior applied'),
-          new Token(TokenTypes.TT_NEWLINE,  '\n'),
+          new Token(TokenTypes.TT_COMMENT, 'c This tells Keyman which keys should have casing behavior applied'),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 1, 67),
         ]
       );
     });
@@ -286,7 +286,7 @@ describe("Lexer Tests", () => {
         '\\\n',
         [
           new Token(TokenTypes.TT_CONTINUATION, '\\'),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 1, 2),
         ]
       );
     });
@@ -295,8 +295,8 @@ describe("Lexer Tests", () => {
         '\\ \n',
         [
           new Token(TokenTypes.TT_CONTINUATION, '\\'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 2),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 1, 3),
         ]
       );
     });
@@ -307,76 +307,76 @@ describe("Lexer Tests", () => {
         '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n' +
         '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n',
         [
-          new Token(TokenTypes.TT_STORE,        'store'),
-          new Token(TokenTypes.TT_LEFT_BR,      '('),
-          new Token(TokenTypes.TT_PARAMETER,    'LaoConsonants'),
-          new Token(TokenTypes.TT_RIGHT_BR,     ')'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E81'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E82'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E84'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E87'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E88'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E8A'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E8D'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E94'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_CONTINUATION, '\\'),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
-          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E95'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E96'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E97'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E99'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9A'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9B'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9C'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9D'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_CONTINUATION, '\\'),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
-          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9E'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0E9F'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EA1'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EA2'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EA3'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EA5'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EA7'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EAA'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_CONTINUATION, '\\'),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
-          new Token(TokenTypes.TT_WHITESPACE,   '                     '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EAB'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EAD'),
-          new Token(TokenTypes.TT_WHITESPACE,   ' '),
-          new Token(TokenTypes.TT_U_CHAR,       'U+0EAE'),
-          new Token(TokenTypes.TT_WHITESPACE,   '    '),
-          new Token(TokenTypes.TT_COMMENT,      'c list of all the Lao consonants'),
-          new Token(TokenTypes.TT_NEWLINE,      '\n'),
+          new Token(TokenTypes.TT_STORE, 'store'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, 'LaoConsonants', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 20),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 21),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E81', 1, 22),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 28),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E82', 1, 29),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 35),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E84', 1, 36),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 42),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E87', 1, 43),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 49),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E88', 1, 50),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 56),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E8A', 1, 57),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 63),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E8D', 1, 64),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 70),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E94', 1, 71),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 77),
+          new Token(TokenTypes.TT_CONTINUATION, '\\', 1, 78),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 1, 79),
+          new Token(TokenTypes.TT_WHITESPACE, '                     ', 2, 1),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E95', 2, 22),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 28),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E96', 2, 29),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 35),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E97', 2, 36),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 42),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E99', 2, 43),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 49),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9A', 2, 50),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 56),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9B', 2, 57),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 63),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9C', 2, 64),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 70),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9D', 2, 71),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 2, 77),
+          new Token(TokenTypes.TT_CONTINUATION, '\\', 2, 78),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 2, 79),
+          new Token(TokenTypes.TT_WHITESPACE, '                     ', 3, 1),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9E', 3, 22),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 28),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0E9F', 3, 29),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 35),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EA1', 3, 36),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 42),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EA2', 3, 43),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 49),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EA3', 3, 50),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 56),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EA5', 3, 57),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 63),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EA7', 3, 64),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 70),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EAA', 3, 71),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 3, 77),
+          new Token(TokenTypes.TT_CONTINUATION, '\\', 3, 78),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 3, 79),
+          new Token(TokenTypes.TT_WHITESPACE, '                     ', 4, 1),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EAB', 4, 22),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 4, 28),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EAD', 4, 29),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 4, 35),
+          new Token(TokenTypes.TT_U_CHAR, 'U+0EAE', 4, 36),
+          new Token(TokenTypes.TT_WHITESPACE, '    ', 4, 42),
+          new Token(TokenTypes.TT_COMMENT, 'c list of all the Lao consonants', 4, 46),
+          new Token(TokenTypes.TT_NEWLINE, '\n', 4, 78),
         ]
       );
     });
@@ -393,8 +393,8 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'main)',
         [
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_PARAMETER, 'main'),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 5),
         ]
       );
     });
@@ -402,9 +402,9 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main)',
         [
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_LEFT_BR, '('),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 2),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 6),
         ]
       );
     });
@@ -412,10 +412,10 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '( main)',
         [
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_LEFT_BR, '('),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 2),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 3),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 7),
         ]
       );
     });
@@ -423,10 +423,10 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main )',
         [
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_LEFT_BR, '('),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 2),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 7),
         ]
       );
     });
@@ -434,11 +434,11 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main,2)',
         [
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_COMMA,      ','),
-          new Token(TokenTypes.TT_PARAMETER,  '2'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_LEFT_BR, '('),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 2),
+          new Token(TokenTypes.TT_COMMA, ',', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, '2', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 8),
         ]
       );
     });
@@ -446,11 +446,11 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         '(main 2)',
         [
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_PARAMETER,  '2'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_LEFT_BR, '('),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 2),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, '2', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR,   ')', 1, 8),
         ]
       );
     });
@@ -497,16 +497,16 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'begin Unicode > use(main)',
         [
-          new Token(TokenTypes.TT_BEGIN,      'begin'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_UNICODE,    'Unicode'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_CHEVRON,    '>'),
-          new Token(TokenTypes.TT_WHITESPACE, ' '),
-          new Token(TokenTypes.TT_USE,        'use'),
-          new Token(TokenTypes.TT_LEFT_BR,    '('),
-          new Token(TokenTypes.TT_PARAMETER,  'main'),
-          new Token(TokenTypes.TT_RIGHT_BR,   ')'),
+          new Token(TokenTypes.TT_BEGIN, 'begin'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.TT_UNICODE, 'Unicode', 1, 7),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 14),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 15),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 16),
+          new Token(TokenTypes.TT_USE, 'use', 1, 17),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 20),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 21),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 25),
         ]
       );
     });
@@ -514,16 +514,16 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'begin PostKeystroke > use(PostKeystroke)',
         [
-          new Token(TokenTypes.TT_BEGIN,         'begin'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CHEVRON,       '>'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_USE,           'use'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke'), // recognised as keyword
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_BEGIN, 'begin'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke', 1, 7),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 20),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 21),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 22),
+          new Token(TokenTypes.TT_USE, 'use', 1, 23),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 26),
+          new Token(TokenTypes.TT_POSTKEYSTROKE, 'PostKeystroke', 1, 27), // recognised as keyword
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 40),
         ]
       );
     });
@@ -531,12 +531,12 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'group(NewContext) readonly',
         [
-          new Token(TokenTypes.TT_GROUP,         'group'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_NEWCONTEXT,     'NewContext'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_READONLY,      'readonly'),
+          new Token(TokenTypes.TT_GROUP, 'group'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_NEWCONTEXT, 'NewContext', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 17),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 18),
+          new Token(TokenTypes.TT_READONLY, 'readonly', 1, 19),
         ]
       );
     });
@@ -544,14 +544,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'group(main) using keys',
         [
-          new Token(TokenTypes.TT_GROUP,         'group'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'main'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_USING,         'using'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_KEYS,          'keys'),
+          new Token(TokenTypes.TT_GROUP, 'group'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, 'main', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 11),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 12),
+          new Token(TokenTypes.TT_USING, 'using', 1, 13),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 18),
+          new Token(TokenTypes.TT_KEYS, 'keys', 1, 19),
         ]
       );
     });
@@ -559,39 +559,39 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'if(&newLayer = "") if(&layer = \'shift\') any(ShiftOutSingle) > context layer(\'default\')',
         [
-          new Token(TokenTypes.TT_IF,            'if'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_AMPHASAND,     '&'),
-          new Token(TokenTypes.TT_NEWLAYER,      'newLayer'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_EQUAL,         '='),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_STRING,        '""'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_IF,            'if'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_AMPHASAND,     '&'),
-          new Token(TokenTypes.TT_LAYER,         'layer'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_EQUAL,         '='),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_STRING,        '\'shift\''),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_ANY,           'any'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'ShiftOutSingle'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CHEVRON,       '>'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CONTEXT,       'context'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_LAYER,         'layer'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_STRING,        '\'default\''),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_IF, 'if'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 3),
+          new Token(TokenTypes.TT_AMPHASAND, '&', 1, 4),
+          new Token(TokenTypes.TT_NEWLAYER, 'newLayer', 1, 5),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 13),
+          new Token(TokenTypes.TT_EQUAL, '=', 1, 14),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 15),
+          new Token(TokenTypes.TT_STRING, '""', 1, 16),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 18),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 19),
+          new Token(TokenTypes.TT_IF, 'if', 1, 20),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 22),
+          new Token(TokenTypes.TT_AMPHASAND, '&', 1, 23),
+          new Token(TokenTypes.TT_LAYER, 'layer', 1, 24),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 29),
+          new Token(TokenTypes.TT_EQUAL, '=', 1, 30),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 31),
+          new Token(TokenTypes.TT_STRING, '\'shift\'', 1, 32),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 39),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 40),
+          new Token(TokenTypes.TT_ANY, 'any', 1, 41),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 44),
+          new Token(TokenTypes.TT_PARAMETER, 'ShiftOutSingle', 1, 45),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 59),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 60),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 61),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 62),
+          new Token(TokenTypes.TT_CONTEXT, 'context', 1, 63),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 70),
+          new Token(TokenTypes.TT_LAYER, 'layer', 1, 71),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 76),
+          new Token(TokenTypes.TT_STRING, '\'default\'', 1, 77),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 86),
         ]
       );
     });
@@ -599,14 +599,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'match > use(CombineDiacritics)',
         [
-          new Token(TokenTypes.TT_MATCH,         'match'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CHEVRON,       '>'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_USE,           'use'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'CombineDiacritics'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_MATCH, 'match'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 7),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 8),
+          new Token(TokenTypes.TT_USE, 'use', 1, 9),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 12),
+          new Token(TokenTypes.TT_PARAMETER, 'CombineDiacritics', 1, 13),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 30),
         ]
       );
     });
@@ -614,14 +614,14 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'nomatch > layer(\'default\')',
         [
-          new Token(TokenTypes.TT_NOMATCH,       'nomatch'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CHEVRON,       '>'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_LAYER,         'layer'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_STRING,        '\'default\''),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_NOMATCH, 'nomatch'),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 8),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 9),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 10),
+          new Token(TokenTypes.TT_LAYER, 'layer', 1, 11),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 16),
+          new Token(TokenTypes.TT_STRING, '\'default\'', 1, 17),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 26),
         ]
       );
     });
@@ -629,17 +629,17 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'platform(\'touch\') > use(detectStartOfSentence)',
         [
-          new Token(TokenTypes.TT_PLATFORM,      'platform'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_STRING,        '\'touch\''),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_CHEVRON,       '>'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_USE,           'use'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'detectStartOfSentence'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_PLATFORM, 'platform'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 9),
+          new Token(TokenTypes.TT_STRING, '\'touch\'', 1, 10),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 17),
+          new Token(TokenTypes.TT_WHITESPACE, ' ',1, 18),
+          new Token(TokenTypes.TT_CHEVRON, '>', 1, 19),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 20),
+          new Token(TokenTypes.TT_USE, 'use', 1, 21),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 24),
+          new Token(TokenTypes.TT_PARAMETER, 'detectStartOfSentence', 1, 25),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 46),
         ]
       );
     });
@@ -647,30 +647,30 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(ShiftOutAll)  outs(ShiftOutSingle) outs(vCombo1) outs(vCombo2) outs(vCombo3)',
         [
-          new Token(TokenTypes.TT_STORE,         'store'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,      'ShiftOutAll'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    '  '),
-          new Token(TokenTypes.TT_OUTS,          'outs'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,      'ShiftOutSingle'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_OUTS,          'outs'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,      'vCombo1'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_OUTS,          'outs'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,      'vCombo2'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_OUTS,          'outs'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,      'vCombo3'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
+          new Token(TokenTypes.TT_STORE, 'store'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, 'ShiftOutAll', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 18),
+          new Token(TokenTypes.TT_WHITESPACE, '  ', 1, 19),
+          new Token(TokenTypes.TT_OUTS, 'outs', 1, 21),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 25),
+          new Token(TokenTypes.TT_PARAMETER, 'ShiftOutSingle', 1, 26),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 40),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 41),
+          new Token(TokenTypes.TT_OUTS, 'outs', 1, 42),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 46),
+          new Token(TokenTypes.TT_PARAMETER, 'vCombo1', 1, 47),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 54),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 55),
+          new Token(TokenTypes.TT_OUTS, 'outs', 1, 56),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 60),
+          new Token(TokenTypes.TT_PARAMETER, 'vCombo2', 1, 61),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 68),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 69),
+          new Token(TokenTypes.TT_OUTS, 'outs', 1, 70),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 74),
+          new Token(TokenTypes.TT_PARAMETER, 'vCombo3', 1, 75),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 82),
         ]
       );
     });
@@ -678,12 +678,12 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(ShiftOutSingle) \'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'',
         [
-          new Token(TokenTypes.TT_STORE,         'store'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'ShiftOutSingle'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_STRING,        '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\''),
+          new Token(TokenTypes.TT_STORE, 'store'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, 'ShiftOutSingle', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 21),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 22),
+          new Token(TokenTypes.TT_STRING, '\'ឈ៊ទ៌ៗ៍ភ័គ៏អៀឯឲធឿឌឬឫឍះឃៈជពុំណំឡ\'', 1, 23),
         ]
       );
     });
@@ -691,18 +691,18 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'store(whitespace) \' \' U+00A0 U+000D U+000A',
         [
-          new Token(TokenTypes.TT_STORE,         'store'),
-          new Token(TokenTypes.TT_LEFT_BR,       '('),
-          new Token(TokenTypes.TT_PARAMETER,     'whitespace'),
-          new Token(TokenTypes.TT_RIGHT_BR,      ')'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_STRING,        '\' \''),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_U_CHAR,        'U+00A0'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_U_CHAR,        'U+000D'),
-          new Token(TokenTypes.TT_WHITESPACE,    ' '),
-          new Token(TokenTypes.TT_U_CHAR,        'U+000A'),
+          new Token(TokenTypes.TT_STORE, 'store'),
+          new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.TT_PARAMETER, 'whitespace', 1, 7),
+          new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 17),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 18),
+          new Token(TokenTypes.TT_STRING, '\' \'', 1, 19),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 22),
+          new Token(TokenTypes.TT_U_CHAR, 'U+00A0', 1, 23),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 29),
+          new Token(TokenTypes.TT_U_CHAR, 'U+000D', 1, 30),
+          new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 36),
+          new Token(TokenTypes.TT_U_CHAR, 'U+000A', 1, 37),
         ]
       );
     });
@@ -727,7 +727,7 @@ function recogniseTokenFollowedBySpace(type: TokenTypes, text: String): void {
     `${text} `,
     [
       new Token(type, text),
-      new Token(TokenTypes.TT_WHITESPACE, ' '),
+      new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 1+text.length),
     ]
   );
 }
@@ -737,7 +737,7 @@ function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String): vo
     `${text}]`,
     [
       new Token(type, text),
-      new Token(TokenTypes.TT_RIGHT_SQ, ']'),
+      new Token(TokenTypes.TT_RIGHT_SQ, ']', 1, 1+text.length),
     ]
   );
 }
@@ -747,13 +747,13 @@ function recogniseStoreWithString(type: TokenTypes, text: String) {
   recogniseTokens(
     `store(&${value}) '${text}'`,
     [
-      new Token(TokenTypes.TT_STORE,      'store'),
-      new Token(TokenTypes.TT_LEFT_BR,    '('),
-      new Token(TokenTypes.TT_AMPHASAND,  '&'),
-      new Token(type, value),
-      new Token(TokenTypes.TT_RIGHT_BR,   ')'),
-      new Token(TokenTypes.TT_WHITESPACE, ' '),
-      new Token(TokenTypes.TT_STRING,     `'${text}'`),
+      new Token(TokenTypes.TT_STORE, 'store'),
+      new Token(TokenTypes.TT_LEFT_BR, '(', 1, 6),
+      new Token(TokenTypes.TT_AMPHASAND, '&', 1, 7),
+      new Token(type, value, 1, 8),
+      new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 8+value.length),
+      new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 9+value.length),
+      new Token(TokenTypes.TT_STRING, `'${text}'`, 1, 10+value.length),
     ]
   );
 }
