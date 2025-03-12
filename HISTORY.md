@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.213 beta 2025-03-12
+
+* docs(developer): fix typos in readme and add link (#13414)
+* fix(developer): add folder text to Error_FileDoesNotExist message (#13457)
+* fix(developer): load Keyman Developer options in Server before use (#13459)
+* chore(core): add `clean` actions for `:mac` and `:win` targets (#13460)
+* chore(common): update langtags.json to 2025-02-18 release (#13461)
+* fix(developer): use '-' as placeholder for temp project name in cmdline (#13462)
+* chore: handle failure to retrieve GitHub PR status in build triggers (#13474)
+
 ## 18.0.212 beta 2025-03-11
 
 * fix(oem/fv/android): Avoid resetting keyboard index (#13449)
