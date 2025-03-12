@@ -104,8 +104,10 @@ struct TypeID<T,
 }  // namespace emscripten
 
 int kmcmp_testSentry() {
-  int *p = nullptr;
-  *p = 0;
+  throw 1;
+  // assert(false);
+  // int *p = nullptr;
+  // *p = 0;
   return 0;
 }
 

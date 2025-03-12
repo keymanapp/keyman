@@ -52,8 +52,10 @@ fi
 function copy_deps() {
   mkdir -p build/src/import/kmcmplib
   mkdir -p src/import/kmcmplib
-  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.js ./src/import/kmcmplib/wasm-host.js
-  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm ./build/src/import/kmcmplib/wasm-host.wasm
+  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.js ./src/import/kmcmplib/
+  cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm ./build/src/import/kmcmplib/
+  # cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm.debug.wasm ./build/src/import/kmcmplib/
+  # cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm.map ./build/src/import/kmcmplib/
 }
 
 function do_build() {
