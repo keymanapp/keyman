@@ -139,6 +139,8 @@ do_action() {
 # -------------------------------------------------------------------------------
 
 do_action clean
+builder_run_action clean:mac   rm -rf "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION"
+builder_run_action clean:win   rm -rf "$KEYMAN_ROOT/core/build/win/$BUILDER_CONFIGURATION"
 
 # -------------------------------------------------------------------------------
 
