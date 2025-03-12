@@ -18,7 +18,7 @@ export class InfrastructureMessages {
 
   static ERROR_FileDoesNotExist = SevError | 0x0003;
   static Error_FileDoesNotExist = (o:{filename:string}) => m(this.ERROR_FileDoesNotExist,
-    `File ${def(o.filename)} does not exist`);
+    `File or folder '${def(o.filename)}' does not exist`);
 
   static ERROR_FileTypeNotRecognized = SevError | 0x0004;
   static Error_FileTypeNotRecognized = (o:{filename: string, extensions: string}) => m(this.ERROR_FileTypeNotRecognized,
