@@ -6,11 +6,9 @@ Keyman requires access to your keyboard to translate input. For Keyman to work p
 
 * **System Settings** >  **Privacy & Security** > **Accessibility**
 
-When you run Keyman for the first time, it will prompt you to modify Accessibility to allow access for Keyman. 
+When you run Keyman for the first time, it will prompt you to enable Accessibility permission for Keyman. When you click the OK button to dismiss the dialog, the System Settings will be automatically be opened to the Accessibility setting.
 
-Follow the steps described below to use Keyman.
-
-   ![Keyman Security Prompt](../mac_images/keyman-security-prompt.png)
+   ![Keyman Security Prompt](../mac_images/keyman-security-prompt-ventura.png)
 
 **Note:** The above prompt may not appear until Keyman has been run at least once. If it does not appear and Keyman is not listed in the relevant panes in System Settings, select Keyman from the Input Sources menu and try typing in an app.
 
@@ -19,6 +17,8 @@ Without Accessibility enabled for Keyman, it may not function as expected:
 * Some key combinations may not create the correct output while typing
 * Some letters may be duplicated or not deleted as expected
 * The on-screen keyboard may not produce any output
+
+Follow the steps described below to ensure that Keyman functions properly.
 
 ## Enabling Keyman in macOS Privacy & Security Settings
 
@@ -32,7 +32,7 @@ Without Accessibility enabled for Keyman, it may not function as expected:
 
 3. In the Accessibility pane, move the control for **Keyman** to the 'on' position to enable access. You will be asked to enter you password to allow this change.
 
-   ![Accessibility](../mac_images/privacy-accessibility-pane-annotated.png)
+   ![Accessibility](../mac_images/privacy-accessibility-enabled.png)
 
 4. After changing these settings, you may need to restart your Mac for them to take effect
 
