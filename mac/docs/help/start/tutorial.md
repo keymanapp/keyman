@@ -34,9 +34,9 @@ Follow **Step 3** to add Keyman for macOS as an input source.
 
 To add Keyman for macOS as an input source:
 
-1. On the Apple menu, click System Preferences.
+1. On the Apple menu, click System Settings.
 
-   ![Apple menu](../mac_images/apple_menu.png)
+   ![Apple menu](../mac_images/open-apple-menu.png)
 
 2. Click Keyboard, select the **Input Sources** tab, and then click ![+](../mac_images/add.png).
 
