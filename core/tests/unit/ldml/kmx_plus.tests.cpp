@@ -245,6 +245,69 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
   }
 }
 
+TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withGoodStrings) {
+  const auto len = 10;
+  KMX_DWORD mystrs[len] = {
+    COMP_KMXPLUS_STRS::IDENT,
+    len * 4, // size
+    // ---
+    0x0002, // count
+
+    // #0
+    28, // offset
+    0x0000, // size
+
+    // #1
+    32, // offset
+    0x0001, // size
+
+    0x00000000,  // null
+
+    // data @ +7
+    0x0041,  // 'a'
+    0x0000,  // null
+  };
+
+  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
+  ASSERT_TRUE(header->valid(mystrs[1]));
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
+  ASSERT_TRUE(strs->valid(mystrs[1]));
+  KMX_DWORD_unaligned mycount = strs->count;
+  ASSERT_EQ(mycount, 2);
+  ASSERT_EQ(strs->get(0), u"");
+  ASSERT_EQ(strs->get(1), u"A");
+}
+
+
+TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withBadStrings) {
+  const auto len = 10;
+  KMX_DWORD mystrs[len] = {
+    COMP_KMXPLUS_STRS::IDENT,
+    len * 4, // size
+    // ---
+    0x0002, // count
+
+    // #0
+    28, // offset
+    0x0000, // size
+
+    // #1
+    32, // offset
+    0x0001, // size
+
+    0x00000000,  // null
+
+    // data @ +7
+    0xFFFF,  // illegal nonchar at end (not a valid marker sequence)
+    0x0000,  // null
+  };
+
+  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
+  ASSERT_TRUE(header->valid(mystrs[1]));
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
+  ASSERT_FALSE(strs->valid(mystrs[1]));
+}
+
 GTEST_API_ int
 main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

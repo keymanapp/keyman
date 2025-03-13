@@ -264,7 +264,6 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     DebugLoad("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
     if (!COMP_KMXPLUS_STRS::valid_string(start, length)) {
       DebugLog("#0x%X: String of length 0x%x invalid", i, length);
-      assert(false);
       return false;
     }
   }
@@ -272,66 +271,50 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
 }
 
 bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
-  for (KMX_DWORD n=0; n<length; n++) {
-    const auto &ch = start[n];
-    if(Uni_IsSurrogate2(ch)) {
-      DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is a trailing (unpaired) surrogate",
-        length, n, ch);
-      // assert(false);
+  for (KMX_DWORD n = 0; n < length; n++) {
+    const auto& ch = start[n];
+    if (Uni_IsSurrogate2(ch)) {
+      DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is a trailing (unpaired) surrogate", length, n, ch);
       return false;
-    } else if(Uni_IsSurrogate1(ch)) {
+    } else if (Uni_IsSurrogate1(ch)) {
       n++;
-      if (n==length) {
-        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X ends with leading (unpaired) surrogate",
-          length, n, ch);
-        // assert(false);
+      if (n == length) {
+        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X ends with leading (unpaired) surrogate", length, n, ch);
         return false;
       }
-      const auto &ch2 = start[n];
+      const auto& ch2 = start[n];
       if (!Uni_IsSurrogate2(ch2)) {
-        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X not a trailing surrogate",
-          length, n, ch2);
-        // assert(false);
+        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X not a trailing surrogate", length, n, ch2);
         return false;
       }
       const km_core_usv ch32 = Uni_SurrogateToUTF32(ch, ch2);
       if (!Uni_IsValid(ch32)) {
-        DebugLog("String of length 0x%x @ 0x%x: Char U+%08X is illegal char",
-          length, n, ch32);
-        // assert(false);
+        DebugLog("String of length 0x%x @ 0x%x: Char U+%08X is illegal char", length, n, ch32);
         return false;
       }
-    } else if(ch == LDML_UC_SENTINEL) {
+    } else if (ch == LDML_UC_SENTINEL) {
       n++;
-      if (n==length) {
-        DebugLog("String of length 0x%x @ 0x%x: Sentinel value U+%04X at end of string",
-          length, n, ch);
-        // assert(false);
+      if (n == length) {
+        DebugLog("String of length 0x%x @ 0x%x: Sentinel value U+%04X at end of string", length, n, ch);
         return false;
       }
-      const auto &ch2 = start[n];
+      const auto& ch2 = start[n];
       if (ch2 != LDML_MARKER_CODE) {
-        DebugLog("String of length 0x%x @ 0x%x: Sentinel value followed by U+%04X",
-          length, n, ch2);
-        // assert(false);
+        DebugLog("String of length 0x%x @ 0x%x: Sentinel value followed by U+%04X", length, n, ch2);
         return false;
       }
       n++;
       if (n == length) {
-        DebugLog("String of length 0x%x @ 0x%x: Sentinel value  followed by U+%04X at end of string",
-          length, n, ch);
-        // assert(false);
+        DebugLog("String of length 0x%x @ 0x%x: Sentinel value  followed by U+%04X at end of string", length, n, ch);
         return false;
       }
-      const auto &ch3 = start[n];
+      const auto& ch3 = start[n];
       if (!is_valid_marker(ch3)) {
-        DebugLog("String of length 0x%x @ 0x%x: Sentinel value + CODE followed by invalid marker U+%04X",
-          length, n, ch);
-        // assert(false);
+        DebugLog("String of length 0x%x @ 0x%x: Sentinel value + CODE followed by invalid marker U+%04X", length, n, ch);
         return false;
       }
       // else OK (good marker)
-    } // else OK (other char)
+    }  // else OK (other char)
   }
   return true;
 }
