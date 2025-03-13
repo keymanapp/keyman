@@ -10,27 +10,25 @@ import { Token, TokenTypes } from "./lexer.js";
 
 export class TokenBuffer {
   private list: Token[];
-  private _cp: number;
+  private _currentPosition: number;
   private eof: Token = new Token(TokenTypes.TT_EOF, "");
 
   public constructor(list: Token[]) {
-    this.list = list;
-    this._cp = 0;
+    this.list             = list;
+    this._currentPosition = 0;
   }
 
-  public get currentPosition() { return this._cp; }
+  public get currentPosition() { return this._currentPosition; }
 
   public nextToken(): Token {
-    return this._cp == this.list.length ? this.eof : this.list[this._cp];
+    return this._currentPosition == this.list.length ? this.eof : this.list[this._currentPosition];
   }
 
   public popToken(): void {
-    this._cp = this._cp + 1 <= this.list.length ? this._cp + 1 : this._cp;
+    this._currentPosition = Math.min(this._currentPosition + 1, this.list.length);
   }
 
   public resetCurrentPosition(save: number): void {
-    save     = save < 0 ? 0 : save;
-    save     = save > this.list.length ? this.list.length : save;
-    this._cp = save;
+    this._currentPosition = Math.min(Math.max(0, save), this.list.length);
   }
 }

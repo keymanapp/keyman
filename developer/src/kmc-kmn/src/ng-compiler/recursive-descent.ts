@@ -10,7 +10,7 @@ import { Token, TokenTypes } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export class Rule {
+export abstract class Rule {
   protected tokenBuffer: TokenBuffer;
   protected rule: Rule;
 
