@@ -6,6 +6,7 @@
  * KMC KMN Next Generation Parser (TokenBuffer)
  */
 
+import { Token, TokenTypes } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -105,4 +106,49 @@ export class OneOrManyRule extends Rule {
 
     return parseSuccess;
   }
+}
+
+export class KeywordRule extends Rule {
+  private tokenType: TokenTypes;
+
+  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes) {
+    super(tokenBuffer);
+    this.tokenType = tokenType;
+  }
+
+  public parse(node: ASTNode): boolean {
+    let parseSuccess: boolean = false;
+    const token: Token = this.tokenBuffer.nextToken();
+
+    if (token.isTokenType(this.tokenType)) {
+      parseSuccess = true;
+      this.tokenBuffer.popToken();
+    } else {
+      parseSuccess = false;
+    }
+
+    return parseSuccess;
+  }
+}
+
+export function parameterSequence(tokenBuffer: TokenBuffer, identifiers: Token[], numExpected: number): boolean {
+  let parseSuccess: boolean = true;
+  const save: number = tokenBuffer.currentPosition;
+  let token: Token = tokenBuffer.nextToken();
+
+  for (let num=0; num<numExpected; num++) {
+    if (token.isTokenType(TokenTypes.TT_PARAMETER)) {
+      tokenBuffer.popToken();
+      identifiers.push(token);
+      token = tokenBuffer.nextToken();
+    } else {
+      parseSuccess = false;
+      break;
+    }
+  }
+
+  if (!parseSuccess)
+    tokenBuffer.resetCurrentPosition(save);
+
+  return parseSuccess;
 }
