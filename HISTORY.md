@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.214 beta 2025-03-13
+
+* fix(mac): change text in privacy alert for macOS 13.0 and later (#13480)
+* docs(mac): update troubleshooting page for macOS security (#13476)
+* fix(core): unalign `usetCount` and `rangeCount` (#13450)
+* fix(developer): strip markers when generating KVK from LDML (#13479)
+
 ## 18.0.213 beta 2025-03-12
 
 * docs(developer): fix typos in readme and add link (#13414)
