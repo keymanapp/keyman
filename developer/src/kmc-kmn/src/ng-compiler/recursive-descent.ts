@@ -6,26 +6,49 @@
  * KMC KMN Next Generation Parser (TokenBuffer)
  */
 
-import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
+import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export class RecursiveDescent {
-  protected tokenBuffer: TokenBuffer ;
+export class Rule {
+  protected tokenBuffer: TokenBuffer;
+  protected rule: Rule;
 
-  protected constructor(list: Token[]) {
-    this.tokenBuffer = new TokenBuffer(list);
+  public constructor(tokenBuffer: TokenBuffer, rule: Rule=null) {
+    this.tokenBuffer = tokenBuffer;
+    this.rule        = rule;
+  }
+
+  public parse(node: ASTNode): boolean {
+    return this.rule.parse(node);
   }
 }
 
-export class Rule {
-  protected rule: Rule;
+export class SequenceRule extends Rule {
+  private rules: Rule[];
 
-  protected constructor(rule: Rule=null) {
-    this.rule = rule;
+  public constructor (tokenBuffer: TokenBuffer, rules: Rule[]) {
+    super(tokenBuffer);
+    this.rules = rules;
   }
 
-  protected parse(node: ASTNode): Boolean {
-    return this.rule.parse(node);
+  public parse(node: ASTNode): boolean {
+    let parseSuccess: boolean = true;
+    let save: number = this.tokenBuffer.currentPosition;
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+
+    for (const rule of this.rules) {
+      if (!rule.parse(tmp)) {
+        parseSuccess = false;
+        break;
+      }
+    }
+    if (parseSuccess) {
+      node.addChildren(tmp.getChildren());
+    } else {
+      this.tokenBuffer.resetCurrentPosition(save);
+    }
+
+    return parseSuccess;
   }
 }
 
