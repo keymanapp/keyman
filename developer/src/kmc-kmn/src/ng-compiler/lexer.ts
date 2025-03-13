@@ -87,6 +87,7 @@ export enum TokenTypes {
   TT_CONTINUATION       = "TT_CONTINUATION",
   TT_NEWLINE            = "TT_NEWLINE",
   TT_PARAMETER          = "TT_PARAMETER",
+  TT_EOF                = "TT_EOF",
 };
 
 export class ScanRecogniser {
