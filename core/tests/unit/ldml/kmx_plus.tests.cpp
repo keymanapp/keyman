@@ -164,6 +164,87 @@ TEST(KMXPlusTest, test_uset) {
   test_assert_equal(uempty.contains(0x127), false);
 }
 
+TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
+  EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(
+    u"Hello", 5));
+  {
+    // unpaired low surrogate
+    km_core_cu const s[] = {0xDC01, 0x0020};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1)); // at end of str
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2)); // not followed by trailing surrogate
+  }
+  {
+    // unpaired high surrogate
+    km_core_cu const s[] = { 0xD801, 0x0020};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2));
+  }
+  {
+    // valid str
+    km_core_cu const s[] = { 0xD83D, 0xDE40, 0x0020}; // 🙀
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 2));
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+  }
+    {
+    // invalid str - noncharacter U+2FFFF
+    km_core_cu const s[] = { u'a', u'b', 0xD87F, 0xDFFF, u'c'};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 5));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 4));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+  }
+
+  {
+    // valid str with a marker - 'ab\m{x}c'
+    km_core_cu const s[] = {u'a', u'b', 0xFFFF, 0x0008, 0x0001, u'c'};
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 6)); // whole thing
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 5)); // whole thing minus 'c'
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s+2, 3)); // just the marker
+    // if we slice the marker, invalid
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 4));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s+2, 2));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s+2, 1));
+  }
+  {
+    // valid str with a marker - 'ab\m{x}c'
+    km_core_cu const s[] = {u'a', u'b', 0xFFFF, 0x0008, 0x0001, u'c'};
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 6));      // whole thing
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 5));      // whole thing minus 'c'
+    EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s + 2, 3));  // just the marker
+    // if we slice the marker, invalid
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 4));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 2));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 1));
+  }
+
+  {
+    // invalid str - incorrect char 0009 instead of 0008
+    km_core_cu const s[] = {u'a', u'b', 0xFFFF, 0x0009, 0x0001, u'c'};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 6));      // whole thing
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 5));      // whole thing minus 'c'
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 3));  // just the marker
+    // if we slice the marker, invalid
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 4));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 2));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 1));
+  }
+
+  {
+    // invalid str - out of range merker 0xDDDD exceeds LDML_MARKER_MAX_INDEX
+    km_core_cu const s[] = {u'a', u'b', 0xFFFF, 0x0008, 0xDDDD, u'c'};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 6));      // whole thing
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 5));      // whole thing minus 'c'
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 3));  // just the marker
+    // if we slice the marker, invalid
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 4));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 2));
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 1));
+  }
+}
+
 GTEST_API_ int
 main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

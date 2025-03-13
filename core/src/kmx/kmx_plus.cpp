@@ -277,22 +277,28 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
     if(Uni_IsSurrogate2(ch)) {
       DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is a trailing (unpaired) surrogate",
         length, n, ch);
-      assert(false);
+      // assert(false);
       return false;
     } else if(Uni_IsSurrogate1(ch)) {
       n++;
       if (n==length) {
         DebugLog("String of length 0x%x @ 0x%x: Char U+%04X ends with leading (unpaired) surrogate",
           length, n, ch);
-        assert(false);
+        // assert(false);
         return false;
       }
       const auto &ch2 = start[n];
+      if (!Uni_IsSurrogate2(ch2)) {
+        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X not a trailing surrogate",
+          length, n, ch2);
+        // assert(false);
+        return false;
+      }
       const km_core_usv ch32 = Uni_SurrogateToUTF32(ch, ch2);
       if (!Uni_IsValid(ch32)) {
         DebugLog("String of length 0x%x @ 0x%x: Char U+%08X is illegal char",
           length, n, ch32);
-        assert(false);
+        // assert(false);
         return false;
       }
     } else if(ch == LDML_UC_SENTINEL) {
@@ -300,28 +306,28 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
       if (n==length) {
         DebugLog("String of length 0x%x @ 0x%x: Sentinel value U+%04X at end of string",
           length, n, ch);
-        assert(false);
+        // assert(false);
         return false;
       }
       const auto &ch2 = start[n];
       if (ch2 != LDML_MARKER_CODE) {
         DebugLog("String of length 0x%x @ 0x%x: Sentinel value followed by U+%04X",
           length, n, ch2);
-        assert(false);
+        // assert(false);
         return false;
       }
       n++;
       if (n == length) {
         DebugLog("String of length 0x%x @ 0x%x: Sentinel value  followed by U+%04X at end of string",
           length, n, ch);
-        assert(false);
+        // assert(false);
         return false;
       }
       const auto &ch3 = start[n];
       if (!is_valid_marker(ch3)) {
         DebugLog("String of length 0x%x @ 0x%x: Sentinel value + CODE followed by invalid marker U+%04X",
           length, n, ch);
-        assert(false);
+        // assert(false);
         return false;
       }
       // else OK (good marker)
