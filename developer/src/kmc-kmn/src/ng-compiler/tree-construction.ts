@@ -13,13 +13,13 @@ export enum NodeTypes {
 }
 
 export class ASTNode {
-  private nodeType: NodeTypes;
+  private _nodeType: NodeTypes;
   private token: Token;
   private children: ASTNode[] = [];
 
   public constructor(nodeType: NodeTypes, token: Token=null) {
-    this.nodeType = nodeType;
-    this.token    = token;
+    this._nodeType = nodeType;
+    this.token     = token;
   }
 
   public addChild(child: ASTNode): void {
@@ -36,6 +36,40 @@ export class ASTNode {
     this.addChild(new ASTNode(nodeType, token));
   }
 
+  public getDescendents(requiredType: NodeTypes) {
+    const result: ASTNode[] = [];
+    this.collectDescendents(result, requiredType);
+    return result;
+  }
+
+  private collectDescendents(result: ASTNode[], requiredType: NodeTypes): void {
+    if (this.nodeType == requiredType)
+      result.push(this);
+    for (const child of this.children)
+      child.collectDescendents(result, requiredType);
+  }
+
+  public hasChild(): boolean {
+    return this.children.length > 0;
+  }
+
+  public hasChildOfType(nodeType: NodeTypes): boolean  {
+    return this.getChildrenOfType(nodeType).length > 0;
+  }
+
+  public getText(): String {
+    return this.token.text;
+  }
+
+  public getTextOfType(nodeType: NodeTypes): String  {
+    return this.getSoleChild(nodeType).getText();
+  }
+
+  public getSoleChild(requiredType: NodeTypes): ASTNode {
+    const children: ASTNode[] = this.getChildrenOfType(requiredType);
+    return children[0];
+  }
+
   public getChildren(): ASTNode[] {
     const list = [];
     for (const child of this.children) {
@@ -43,4 +77,16 @@ export class ASTNode {
     }
     return list;
   }
+
+  public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
+    const list = [];
+    for (const child of this.children) {
+      if (child.nodeType === requiredType) {
+        list.push(child);
+      }
+    }
+    return list;
+  }
+
+  public get nodeType() { return this._nodeType; }
 }
