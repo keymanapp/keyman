@@ -7,6 +7,7 @@
 invalid_tests = [
   'ik_000_null_invalid',
   'ik_001_bad_key',
+  'ik_002_no_keys',
 ]
 
 # Build all keyboards in output folder

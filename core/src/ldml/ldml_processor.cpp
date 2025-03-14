@@ -83,30 +83,39 @@ ldml_processor::ldml_processor(std::u16string const& kb_name, const std::vector<
       }
       keys.add((km_core_virtual_key)kmapEntry->vkey, kmapEntry->mod, str);
     }
-  } // else: no keys! but still valid. Just, no keys.
+  } else {
+    DebugLog("Error, this keyboard has no 'key2' section on it!");
+    return;
+  }
 
   // load transforms
   if (kplus.tran != nullptr && kplus.tran->groupCount > 0) {
+    // Note that transforms::load depends on several other sections,
+    // and this loading will fail if they are missing.
     transforms.reset(km::core::ldml::transforms::load(kplus, kplus.tran, kplus.tranHelper));
     if (!transforms) {
       DebugLog("Failed to load tran transforms");
       return; // failed to load
     }
-  }
+  } // else: no transforms
 
   // load bksp transforms
   if (kplus.bksp != nullptr && kplus.bksp->groupCount > 0) {
+    // Note that transforms::load depends on several other sections,
+    // and this loading will fail if they are missing.
     bksp_transforms.reset(km::core::ldml::transforms::load(kplus, kplus.bksp, kplus.bkspHelper));
     if (!bksp_transforms) {
       DebugLog("Failed to load bksp transforms");
       return; // failed to load
     }
-  }
+  } // else: no bksp transforms
+
   if (kplus.meta != nullptr) {
     if (kplus.meta->settings & LDML_META_SETTINGS_NORMALIZATION_DISABLED) {
       normalization_disabled = true;
     }
-  }
+  } // else: no metadata
+
   // Only valid if we reach here
   DebugLog("_valid = true");
   _valid = true;
