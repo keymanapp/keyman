@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.215 beta 2025-03-14
+
+* docs(common): Update Sentry links to keyman.sentry.io (#13491)
+* chore(android,windows): Update Crowdin for Spanish and Spanish (Latin America) (#13499)
+* chore(common): update crowdin strings for Italian (#13500)
+
 ## 18.0.214 beta 2025-03-13
 
 * fix(mac): change text in privacy alert for macOS 13.0 and later (#13480)
