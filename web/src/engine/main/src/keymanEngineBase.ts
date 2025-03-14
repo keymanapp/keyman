@@ -1,5 +1,6 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
-import { OutputTarget, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
+// TODO-web-core: remove usage of OutputTargetBase
+import { OutputTargetBase, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
@@ -34,7 +35,7 @@ function determineBaseLayout(): string {
 export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
 export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
-export default class KeymanEngine<
+export class KeymanEngineBase<
   Configuration extends EngineConfiguration,
   ContextManager extends ContextManagerBase<any>,
   HardKeyboard extends HardKeyboardBase
@@ -77,7 +78,8 @@ export default class KeymanEngine<
     outputTarget.invalidateSelection();
     // Deadkey matching continues to be troublesome.
     // Deleting matched deadkeys here seems to correct some of the issues.   (JD 6/6/14)
-    outputTarget.deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
+    // TODO-web-core
+    (outputTarget as OutputTargetBase).deadkeys().deleteMatched();      // Delete any matched deadkeys before continuing
 
     if(event.isSynthetic) {
       const oskLayer = this.osk.vkbd.layerId;
@@ -116,7 +118,7 @@ export default class KeymanEngine<
     workerFactory: WorkerFactory,
     config: Configuration,
     contextManager: ContextManager,
-    processorConfigInitializer: (engine: KeymanEngine<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
+    processorConfigInitializer: (engine: KeymanEngineBase<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
   ) {
     this.config = config;
     this.contextManager = contextManager;
@@ -275,10 +277,12 @@ export default class KeymanEngine<
       keyboardProcessor.newLayerStore.set('');
       keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
-      keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTarget)
+      // TODO-web-core
+      keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTargetBase)
         // If we have a RuleBehavior as a result, run it on the target. This should
         // only change system store and variable store values.
-        ?.finalize(keyboardProcessor, predictionContext.currentTarget as OutputTarget, true);
+        // TODO-web-core
+        ?.finalize(keyboardProcessor, predictionContext.currentTarget as OutputTargetBase, true);
     });
 
     // #region Event handler wiring
@@ -289,7 +293,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('stubadded', (stub) => {
-      let eventRaiser = () => {
+      const eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
           internalName: stub.KI,

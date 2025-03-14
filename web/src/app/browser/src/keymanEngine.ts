@@ -1,7 +1,7 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
-import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
+import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
-import { OutputTarget } from 'keyman/engine/element-wrappers';
+import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
 import {
   TwoStateActivator,
   VisualKeyboard
@@ -29,7 +29,7 @@ import { BeepHandler } from './beepHandler.js';
 import KeyboardInterface from './keyboardInterface.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 
-export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
+export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 
@@ -76,7 +76,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target) => {
-      const e = (target as OutputTarget<any>)?.getElement();
+      const e = (target as OutputTargetElementWrapper<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }
