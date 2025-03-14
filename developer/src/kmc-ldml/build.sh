@@ -47,7 +47,7 @@ function do_build() {
 }
 
 function do_build_abnf() {
-  # we convert over all abnf files found. 
+  # we convert over all abnf files found.
   local file
   for file in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards"/*/abnf/*.abnf; do
     local cldrver="$(basename $(dirname $(dirname "$file")))"
@@ -82,7 +82,7 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            builder_do_typescript_tests
+builder_run_action test            builder_do_typescript_tests  75
 
 #-------------------------------------------------------------------------------------------------------------------
 
