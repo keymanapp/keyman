@@ -8,6 +8,11 @@
 
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
+/** Symbol giving the start offset, in chars, of the node */
+export const XML_START_INDEX_SYMBOL = XMLParser.getStartIndexSymbol();
+/** Symbol giving an override which file a node came from */
+export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
+
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
@@ -123,9 +128,61 @@ const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
   },
 };
 
+export interface LineColumn {
+  line: number;
+  column?: number;
+}
+
 /** wrapper for XML parsing support */
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
+  }
+  /** 
+   * preprocess text to turn it into arrays of line lengths.
+   * This is effectively a 1-based line length, since line 0 has length of
+   * 0.
+   */
+  public static textToLines(text: string) : number[] {
+    return [
+      0, // "line 0" is empty
+      ...text.replaceAll("\r\n", "\n").split("\n")
+      .map(l => l.length + 1) // line length (counting the trailing newline)
+    ];
+  }
+  public static offsetToLineColumn(offset: number, lines: number[]) : LineColumn {
+    for (let line = 1; line < lines.length; line++) { // 1-based (assume the first row is 0)
+      if (lines[line] > offset) {
+        return { line, column: offset };
+      }
+      offset = offset - (lines[line]); // count newline at end
+    }
+    // default: line 0, error
+    return { line: 0 }
+  }
+
+  /**
+   * Copy symbols from 'from' onto 'onto'
+   * This is used to propagate special symbols
+   * and XML
+   * @param onto object to copy onto
+   * @param from source for symbols
+   * @returns the onto object
+   */
+  public static copySymbols<T>(onto: T, from: any): T {
+    const o = onto as any;
+    for (const sym of Object.getOwnPropertySymbols(from)) {
+      o[sym] = from[sym];
+    }
+    return onto;
+  }
+
+  /** use Object.entries to remove all symbols */
+  public static removeSymbols<T>(from: T): T {
+    if (Array.isArray(from)) {
+      return from.map(o => KeymanXMLReader.removeSymbols(o)) as T;
+    }
+    if (typeof from !== "object") return from;
+    return Object.fromEntries(Object.entries(from).map(([k, v]) => ([k, KeymanXMLReader.removeSymbols(v)]))) as T;
   }
 
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
@@ -146,9 +203,9 @@ export class KeymanXMLReader {
         }
       });
       if (attrs.length) {
-        e.push(['$', Object.fromEntries(attrs)]);
+        e.push(['$', this.copySymbols(Object.fromEntries(attrs), data)]);
       }
-      return Object.fromEntries(e);
+      return this.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -184,7 +241,7 @@ export class KeymanXMLReader {
           }
         }
       });
-      return Object.fromEntries(e);
+      return this.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
