@@ -1,8 +1,8 @@
 ---
-title: Keyman Engine for Windows 18.0
+title: Keyman Engine for Windows
 ---
 
-Keyman Engine for Windows 18.0 gives you the tools to build a customised
+Keyman Engine for Windows gives you the tools to build a customised
 desktop keyboarding product for Windows.
 
 **Note:** This documentation applies to Keyman Engine for Windows

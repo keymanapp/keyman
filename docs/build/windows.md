@@ -162,8 +162,19 @@ SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 * KeymanWeb
 
 **Requirements**:
-* Emscripten
 * node.js
+* Emscripten
+
+#### node.js
+
+Our recommended way to install node.js is to use
+[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
+easy to switch between versions of node.js.
+
+```bat
+nvm install 20.16.0
+nvm use 20.16.0
+```
 
 #### Emscripten
 
@@ -214,17 +225,6 @@ installed on your computer:
 
 ```bat
 SETX KEYMAN_USE_EMSDK 1
-```
-
-#### node.js
-
-Our recommended way to install node.js is to use
-[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
-easy to switch between versions of node.js.
-
-```bat
-nvm install 20.16.0
-nvm use 20.16.0
 ```
 
 **Optional environment variables**:
