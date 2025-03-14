@@ -35,7 +35,7 @@ import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
-import { type KeyElement, getKeyFrom } from './keyElement.js';
+import { type KeyElement } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
@@ -944,53 +944,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
-
-  /**
-   * Get the current key target from the touch point element within the key
-   *
-   * @param   {Object}  t   element at touch point
-   * @return  {Object}      the key element (or null)
-   **/
-  keyTarget(target: HTMLElement | EventTarget): KeyElement {
-    let t = <HTMLElement>target;
-
-    try {
-      if (t) {
-        if (t.classList.contains('kmw-key')) {
-          return getKeyFrom(t);
-        }
-        if (t.parentNode && (t.parentNode as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.parentNode);
-        }
-        if (t.firstChild && (t.firstChild as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.firstChild);
-        }
-      }
-    } catch (ex) { }
-    return null;
-  }
-
-  /**
-   *  Repeat backspace as long as the backspace key is held down
-   **/
-  repeatDelete: () => void = function (this: VisualKeyboard) {
-    if (this.deleting) {
-      this.modelKeyClick(this.deleteKey);
-      this.deleting = window.setTimeout(this.repeatDelete, 100);
-    }
-  }.bind(this);
-
-  /**
-   * Cancels any active repeatDelete() timeouts, ensuring that
-   * repeating backspace operations are properly terminated.
-   */
-  cancelDelete() {
-    // Clears the delete-repeating timeout.
-    if (this.deleting) {
-      window.clearTimeout(this.deleting);
-    }
-    this.deleting = 0;
-  }
   //#endregion
 
   modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
@@ -1026,12 +979,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
-    //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
-
     // Start:  mirrors _GetKeyEventProperties
 
     // First check the virtual key, and process shift, control, alt or function keys
-    //let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
     let Lkc = this.layoutKeyboard.constructKeyEvent(keySpec, this.device, this.stateKeys);
 
     /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
@@ -1060,7 +1010,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    */
   _UpdateVKShiftStyle(layerId?: string) {
     var i;
-    //let core = com.keyman.singleton.core;
 
     if (!layerId) {
       layerId = this.layerId;
@@ -1305,48 +1254,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     };
   }
 
-  // Appears to be abandoned now - candidate for removal in future.
-  /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-    if (!this.layerGroup) {
-      return allottedHeight;
-    }
-
-    /*
-      Note:  these may not be fully preprocessed yet!
-
-      However, any "empty row bug" preprocessing has been applied, and that's
-      what we care about here.
-    */
-    const layers = this.layerGroup.spec.layer;
-    let oskHeight = 0;
-
-    // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-    for (const layerID in layers) {
-      const layer = layers[layerID];
-      let nRows = layer.row.length;
-      let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
-      let layerHeight = nRows * rowHeight;
-
-      if (layerHeight > oskHeight) {
-        oskHeight = layerHeight;
-      }
-    }
-
-    // This isn't set anywhere else; it's a legacy part of the original methods.
-    const oskPad = 0;
-    let oskPaddedHeight = oskHeight + oskPad;
-
-    return oskPaddedHeight;
-  }
-
   /**
    *  Append a style sheet for the current keyboard if needed for specifying an embedded font
    *  or to re-apply the default element font
    *
    **/
   appendStyleSheet() {
-    //let util = com.keyman.singleton.util;
-
     var activeKeyboard = this.layoutKeyboard;
     var activeStub = this.layoutKeyboardProperties;
 
