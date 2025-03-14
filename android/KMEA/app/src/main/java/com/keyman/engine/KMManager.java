@@ -792,6 +792,24 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function keeps the parent app running in the background
+   */
+  public static void dontCloseParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.dontCloseParentAppOnShowKeyboardPicker();
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function restores this default behavior
+   */
+  public static void closeParentAppOnShowKeyboardPicker() {
+    KeyboardPickerActivity.closeParentAppOnShowKeyboardPicker();
+  }
+
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
     //final Context context = appContext;
@@ -2300,7 +2318,10 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      if (KeyboardPickerActivity.getCanCloseParentAppOnShowKeyboardPicker()) {
+        // Keyboard Picker Activity becomes root activity and clears Keyman app
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+      }
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);

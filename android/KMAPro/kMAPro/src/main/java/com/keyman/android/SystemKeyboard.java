@@ -45,6 +45,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
+  private int inputType = InputType.TYPE_NULL;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
 
   private static final String TAG = "SystemKeyboard";
@@ -157,7 +158,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     Context appContext = getApplicationContext();
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
-    int inputType = attribute.inputType;
+    inputType = attribute.inputType;
     KMManager.setMayPredictOverride(inputType);
     if (KMManager.getMayPredictOverride()) {
       KMManager.setBannerOptions(false);
@@ -204,6 +205,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
     setInputView(onCreateInputView());
+
+    // Update the input type
+    inputType = attribute.inputType;
   }
 
   @Override
@@ -276,6 +280,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
+    // Determine if Physical keystroke should be passed off
+    if (inputType == InputType.TYPE_NULL) {
+      return false; // Revert to default handling
+    }
+
     if (event.getAction() == KeyEvent.ACTION_DOWN) {
       switch (keyCode) {
         case KeyEvent.KEYCODE_BACK:

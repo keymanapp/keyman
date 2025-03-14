@@ -56,7 +56,13 @@ describe('disp', function () {
     assert.equal(disp?.baseCharacter?.value, 'x');
     assert.ok(disp?.disps);
   });
-
+  it('should compile disp without converting markers', async function() {
+    let disp = await loadSectionFixture(DispCompiler, 'sections/disp/not-a-marker.xml', compilerTestCallbacks) as Disp;
+    assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.ok(disp?.disps);
+    assert.equal(disp.disps.length, 1);
+    assert.equal(disp.disps[0].display?.value, '\\m{hat}');
+  });
   it('should reject duplicate tos', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupto.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);

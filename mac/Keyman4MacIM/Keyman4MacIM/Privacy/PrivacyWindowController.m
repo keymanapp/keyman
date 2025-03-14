@@ -13,6 +13,7 @@
  */
 
 #import "PrivacyWindowController.h"
+#import "KMLogs.h"
 
 @interface PrivacyWindowController ()
 @end
@@ -25,7 +26,14 @@
   NSString *bundleDisplayName = [[[NSBundle mainBundle] localizedInfoDictionary]
                                  objectForKey:@"CFBundleDisplayName"];
   [self.window setTitle:bundleDisplayName];
-  [_alertText setStringValue:NSLocalizedString(@"privacy-alert-text", nil)];
+
+  if (@available(macOS 13.0, *)) {
+    os_log_info([KMLogs privacyLog], "setting privacy window text for ventura and later");
+    [_alertText setStringValue:NSLocalizedString(@"privacy-alert-text-ventura", nil)];
+  } else {
+    os_log_info([KMLogs privacyLog], "setting privacy window text for pre-ventura");
+   [_alertText setStringValue:NSLocalizedString(@"privacy-alert-text", nil)];
+  }
   
   NSImage *keymanLogo = [NSImage imageNamed:NSImageNameApplicationIcon];
   if (keymanLogo) {
