@@ -840,6 +840,15 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
         is_valid = false;
         assert(is_valid);
       }
+      if (!(key.flags & LDML_KEYS_KEY_FLAGS_EXTEND)) {
+        // if extend flag is clear, then the 'to' field is a UTF-32 char
+        km_core_usv to = key.to;
+        if (!Uni_IsValid(to)) {
+          DebugLog("key[%d] has invalid non-extended UChar to U+%04X", i, key.to);
+          is_valid = false;
+          assert(is_valid);
+        }
+      }
     }
     for(KMX_DWORD i = 0; is_valid && i < key2->flicksCount; i++) {
       const auto &e = flickLists[i];

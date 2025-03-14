@@ -479,7 +479,7 @@ ldml_event_state::emit_text( km_core_usv ch) {
   // assert that no noncharacter gets through (which includes UC_SENTINEL)
   // markers will go through emit_marker() and not through this function.
   assert(km::core::kmx::Uni_IsValid(ch));
-  if(!km::core::kmx::Uni_IsValid(ch)) ch = 0x0020; // release build: replace invalid with space character
+  if(!km::core::kmx::Uni_IsValid(ch)) ch = 0xFFFD; // release build: replace invalid with substitution character
   state->context().push_character(ch);
   text.push_back(ch);
 }
