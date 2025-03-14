@@ -1,0 +1,288 @@
+#
+# Keyman is copyright (C) SIL International. MIT License.
+#
+# like basic.txt, but has a bad (illegal unicode) non-extended key
+#
+# For the format of this file, see “hextobin.ts”
+#
+# P.S. surprisingly, the Dart language highlighter in VSCode does a helpful job on this file.
+
+block(kmxheader)  #  struct COMP_KEYBOARD {
+  4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
+
+  00 11 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+
+  00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 deprecated in 16.0, always 0
+  00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
+  00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
+
+  sizeof(stores,12) #    KMX_DWORD cxStoreArray;   // 0018 in array entries
+  00 00 00 00       #    KMX_DWORD cxGroupArray;   // 001C in array entries
+
+  offset(stores)   #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  00 00 00 00      #    KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
+
+  ff ff ff ff      #    KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
+  ff ff ff ff      #
+
+  20 00 00 00      #    KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
+
+  00 00 00 00      #    KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+  00 00 00 00      #    KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
+  00 00 00 00      #    KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
+                   #  };
+
+block(kmxplusinfo)                  #  struct COMP_KEYBOARD_KMXPLUSINFO {
+  offset(sect)                      #    KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data from BOF, <sect> header is first
+  diff(sect,eof)                    #    KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+                                    #  };
+
+block(stores)                          #  struct COMP_STORE {
+  07 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_NAME
+  offset(store_name_name)              #  KMX_DWORD dpName;
+  offset(store_name_string)            #  KMX_DWORD dpString;
+                                       #  };
+  # excluding this so we don’t have compiled version changes
+  # 14 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_COMPILEDVERSION
+  # offset(store_compiledversion_name)   #  KMX_DWORD dpName;
+  # offset(store_compiledversion_string) #  KMX_DWORD dpString;
+                                       #  };
+  24 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_KEYBOARDVERSION
+  offset(store_keyboardversion_name)   #  KMX_DWORD dpName;
+  offset(store_keyboardversion_string) #  KMX_DWORD dpString;
+                                       #  };
+  26 00 00 00                          #  KMX_DWORD dwSystemID; - TSS_TARGETS
+  offset(store_targets_name)           #  KMX_DWORD dpName;
+  offset(store_targets_string)         #  KMX_DWORD dpString;
+                                       #  };
+
+block(store_name_name)
+  26 00 4e 00 41 00 4d 00 45 00 00 00  # '&NAME'
+block(store_name_string)
+  54 00 65 00 73 00 74 00 4b 00 62 00 64 00 00 00 # 'TestKbd'
+
+block(store_keyboardversion_name)
+  26 00 4b 00 45 00 59 00 42 00 4f 00 41 00 52 00
+  44 00 56 00 45 00 52 00 53 00 49 00 4f 00 4e 00
+  00 00                                # '&KEYBOARDVERSION'
+block(store_keyboardversion_string)
+  31 00 2e 00 30 00 2e 00 30 00 00 00  # '1.0.0'
+
+block(store_targets_name)
+  26 00 54 00 41 00 52 00 47 00 45 00 54 00 53 00 00 00 # '&TARGETS'
+block(store_targets_string)
+  64 00 65 00 73 00 6b 00 74 00 6f 00 70 00 00 00 # 'desktop'
+
+block(sect)                         #  struct COMP_KMXPLUS_SECT {
+  73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
+  diff(sect,endsect)                #    KMX_DWORD header.size;    // 0004 Section length
+  diff(sect,eof)                    #    KMX_DWORD total;          // 0008 KMXPlus entire length
+  sizeof(sectitems,8)               #    KMX_DWORD count;          // 000C number of section headers
+                                    #  };
+  # Next sections are sect entries
+  #    KMX_DWORD sect;           // 0010+ Section identity
+  #    KMX_DWORD offset;         // 0014+ Section offset relative to dpKMXPlus of section
+
+block(sectitems)
+  6b 65 79 73
+  diff(sect,keys)
+
+  6c 61 79 72
+  diff(sect,layr)
+
+  6c 6f 63 61
+  diff(sect,loca)
+
+  6d 65 74 61
+  diff(sect,meta)
+
+  73 74 72 73
+  diff(sect,strs)
+
+block(endsect)
+
+# ----------------------------------------------------------------------------------------------------
+# keys
+# ----------------------------------------------------------------------------------------------------
+
+block(keys)                         # struct COMP_KMXPLUS_KEYS {
+  6b 65 79 73                       #   KMX_DWORD header.ident;   // 0000 Section name - keys
+  sizeof(keys)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD keyCount
+  01 00 00 00                       #   KMX_DWORD flicksCount
+  00 00 00 00                       #   KMX_DWORD flickCount
+  00 00 00 00                       #   KMX_DWORD kmapCount;          // 0008 number of kmap - #48, one per key
+  # keys
+  # (#0000) BAD
+  FF FF 00 00                       #  U+FFFF
+  00 00 00 00                       #   KMX_DWORD flags = 0
+  index(strNull,strA,2)             #   KMXPLUS_STR 'a' (key id)
+  00 00 00 00                       #   KMXPLUS_STR switch
+  0A 00 00 00                       #   KMX_DWORD width*10
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST longPress
+  00 00 00 00                       #   STR longPressDefault
+  00 00 00 00                       # TODO: index(listNull,listNull,4)        #   LIST multiTap
+  00 00 00 00                       #  flicks
+
+  # flicks
+  #  flicks 0 - null
+  00 00 00 00                       #   KMX_DWORD count
+  00 00 00 00                       #   KMX_DWORD flick
+  00 00 00 00                       #   KMX_STR id
+  # flick
+  # Right now there aren’t any flick elements.
+  #00 00 00 00                       #   LIST directions
+  #00 00 00 01                       #   flags
+  #00 00 00 00                       #   str: to
+
+  # kmapdata:
+
+  # none,no kmaps
+
+
+
+# ----------------------------------------------------------------------------------------------------
+# layr
+# ----------------------------------------------------------------------------------------------------
+
+block(layr)                         # struct COMP_KMXPLUS_LAYR {
+  6c 61 79 72                       #   KMX_DWORD header.ident;   // 0000 Section name - layr
+  sizeof(layr)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD listCount
+  01 00 00 00                       #   KMX_DWORD layerCount
+  01 00 00 00                       #   KMX_DWORD rowCount
+  01 00 00 00                       #   KMX_DWORD keyCount
+  # list 0
+  index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
+  00 00 00 00                       #   KMX_DWORD layer;
+  01 00 00 00 # count
+  7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
+  # layers 0
+  00 00 00 00                       #   KMXPLUS_STR id;
+  00 00 00 00                       #   KMX_DWORD mod
+  00 00 00 00                       #   KMX_DWORD row index
+  01 00 00 00                       #   KMX_DWORD  count
+  # rows 0
+  00 00 00 00                       #   KMX_DWORD key index
+  01 00 00 00                       #   KMX_DWORD count
+  # keys
+  index(strNull,strA,2)          #   KMXPLUS_STR locale;       // 'that'
+
+# ----------------------------------------------------------------------------------------------------
+# loca
+# ----------------------------------------------------------------------------------------------------
+
+block(loca)                         # struct COMP_KMXPLUS_LOCA {
+  6c 6f 63 61                       #   KMX_DWORD header.ident;   // 0000 Section name - loca
+  sizeof(loca)                      #   KMX_DWORD header.size;    // 0004 Section length
+  01 00 00 00                       #   KMX_DWORD count;          // 0008 number of locales
+  index(strNull,strLocale,2)        #   KMXPLUS_STR locale;       // 000C+ locale string entry = 'mt'
+                                    # };
+# ----------------------------------------------------------------------------------------------------
+# meta
+# ----------------------------------------------------------------------------------------------------
+
+block(meta)                         # struct COMP_KMXPLUS_META {
+  6d 65 74 61                       #   KMX_DWORD header.ident;   // 0000 Section name - meta
+  sizeof(meta)                      #   KMX_DWORD header.size;    // 0004 Section length
+  index(strNull,strAuthor,2)        #   KMXPLUS_STR author;
+  index(strNull,strConformsTo,2)    #   KMXPLUS_STR conform;
+  index(strNull,strLayout,2)        #   KMXPLUS_STR layout;
+  index(strNull,strName,2)          #   KMXPLUS_STR name;
+  index(strNull,strIndicator,2)     #   KMXPLUS_STR indicator;
+  index(strNull,strVersion,2)       #   KMXPLUS_STR version;
+  00 00 00 00                       #   KMX_DWORD settings;
+                                    # };
+
+# ----------------------------------------------------------------------------------------------------
+# strs
+# ----------------------------------------------------------------------------------------------------
+
+# TODO: it’s the whole strs table from basic. could pare this down.
+# 
+
+block(strs)                         #  struct COMP_KMXPLUS_STRS {
+  73 74 72 73                       #    KMX_DWORD header.ident;   // 0000 Section name - strs
+  diff(strs,endstrs)                #    KMX_DWORD header.size;    // 0004 Section length
+  index(strNull,endstrs,2)          #    KMX_DWORD count;          // 0008 count of str entries
+                                    # };
+
+  # Next sections are string entries
+  #    KMX_DWORD offset;         // 0010+ offset from this blob
+  #    KMX_DWORD length;         // 0014+ str length (UTF-16LE units)
+
+  diff(strs,strNull)       sizeof(strNull,2)
+  diff(strs,strVersion)    sizeof(strVersion,2)
+  diff(strs,strConformsTo) sizeof(strConformsTo,2)
+  diff(strs,strName)       sizeof(strName,2)
+  diff(strs,strFromSet)     sizeof(strFromSet,2)
+  diff(strs,strUSet)       sizeof(strUSet,2)
+  diff(strs,strAmarker)     sizeof(strAmarker,2)
+  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
+  diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
+  diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
+  diff(strs,strElemTranFrom1b) sizeof(strElemTranFrom1b,2)
+  diff(strs,strA)   sizeof(strA,2)
+  diff(strs,strSet)   sizeof(strSet,2)
+  diff(strs,strSet2)   sizeof(strSet2,2)
+  diff(strs,strTranTo)          sizeof(strTranTo,2)
+  diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
+  diff(strs,strGapReserved) sizeof(strGapReserved,2)
+  diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
+  diff(strs,strLocale)     sizeof(strLocale,2)
+  diff(strs,strLayout)     sizeof(strLayout,2)
+  diff(strs,strAuthor)     sizeof(strAuthor,2)
+  diff(strs,strThat)   sizeof(strThat,2)
+  diff(strs,strUs)    sizeof(strUs,2)
+  diff(strs,strVse)   sizeof(strVse,2)
+  diff(strs,strVst)   sizeof(strVst,2)
+  diff(strs,strVus)   sizeof(strVus,2)
+  diff(strs,strKeys)       sizeof(strKeys,2)
+  diff(strs,strIndicator)  sizeof(strIndicator,2)
+  diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
+
+  # String table -- block(x) is used to store the null u16char at end of each string
+  #                 without interfering with sizeof() calculation above
+
+#str #00
+  block(strNull)             block(x) 00 00                                             # the zero-length string
+  block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
+  block(strConformsTo)       34 00 35 00 block(x) 00 00                         # '45'
+  block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
+  block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
+  block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
+  block(strAmarker)          5C 00 6D 00 7B 00 61 00 7D 00 block(x) 00 00               # '\m{a}'
+  block(strSentinel0001r)    5c 00 75 00 66 00 66 00 66 00 66 00 5c 00 75 00 30 00 30 00 30 00 38 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
+  block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
+  block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
+  block(strElemTranFrom1b)   5E 00 65 00 block(x) 00 00                                       # '^e'
+  block(strA)    61 00 block(x) 00 00                                       # 'a'
+  block(strSet)              61 00 20 00 62 00 20 00 63 00 block(x) 00 00               # 'a b c'
+#str #0A
+  block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
+  block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
+  block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
+  block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
+  block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'
+#str #10
+  block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
+  block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 'qwerty'
+  block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'
+  block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
+  block(strUs)               75 00 73 00 block(x) 00 00                           # 'us' (layout)
+  block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
+  block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
+  block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
+#str #1a
+  block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
+  # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
+  block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
+  block(strSentinel0001)    FF FF 08 00 01 00 block(x) 00 00                         # UC_SENTINEL CODE_DEADKEY U+0001
+
+
+block(endstrs)                      # end of strs block
+
+
+block(eof)   # end of file

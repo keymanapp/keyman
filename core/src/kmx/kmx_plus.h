@@ -237,6 +237,8 @@ struct COMP_KMXPLUS_STRS {
 
   /** convert a single char to a string*/
   static std::u16string str_from_char(KMX_DWORD v);
+
+  static bool valid_string(const KMX_WCHAR *start, KMX_DWORD length);
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_STRS) % 0x4 == 0, "Structs prior to variable part should align to 32-bit boundary");

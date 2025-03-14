@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+@@keys: [K_BKQUOTE]
+@@expect-error: This keyboard is invalid (U+FFFF), so it will fail to load
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd-UTF32"/>
+
+  <keys>
+    <key id="a" output="\u{FFFF}" /> <!-- invalid -->
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="a" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard3>
