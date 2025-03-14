@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.14 alpha 2025-03-14
+
+* chore: B18S3 merge beta to master (#13498)
+* feat(core): move kmx_plus.tests.cpp to GTest (#13494)
+
 ## 19.0.13 alpha 2025-03-12
 
 * feat(windows): hard code key cap colour (#13444)
