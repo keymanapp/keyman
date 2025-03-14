@@ -6,7 +6,8 @@ import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptio
 import { compareXml } from './helpers/compareXml.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, mkdtempSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -44,6 +45,20 @@ describe('compiler-tests', function() {
     const asXml = kmxToXml(kmx);
     writeFileSync(outputFilename, asXml, 'utf-8');
 
+    // now compare it to use with run()
+    // Let's build basic.xml
+    // It should match basic.kmx (built from basic.txt)
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+
+    const tempdir = mkdtempSync('basic-compiler-run');
+    const outputFilename2 = join(tempdir, 'basic-run.kmx');
+
+    await k.run(inputFilename, outputFilename);
+
+    const outputFile2 = readFileSync(outputFilename2);
+    const array2 = Uint8Array.from(outputFile2); 
+    assert.deepEqual<Uint8Array>(array2, expected, "output of run() did not match");
   });
 
   it('should-serialize-kmx', async function() {
