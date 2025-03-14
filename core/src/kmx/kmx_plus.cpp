@@ -846,7 +846,6 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
         if (!Uni_IsValid(to)) {
           DebugLog("key[%d] has invalid non-extended UChar to U+%04X", i, key.to);
           is_valid = false;
-          assert(is_valid);
         }
       }
     }
@@ -899,7 +898,6 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
   }
   // Return results
   DebugLog("COMP_KMXPLUS_KEYS_Helper.setKeys(): %s", is_valid ? "valid" : "invalid");
-  assert(is_valid);
   return is_valid;
 }
 
