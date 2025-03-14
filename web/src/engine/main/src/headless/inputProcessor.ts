@@ -2,15 +2,16 @@
 
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
-import type { ModelSpec }  from "keyman/engine/interfaces";
+import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
-import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
+import { KM_Core } from 'keyman/engine/core-processor';
+
+import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
   isEmptyTransform,
-  KeyboardInterface,
-  KeyboardProcessor,
+  JSKeyboardProcessor,
   Mock,
   type OutputTarget,
   RuleBehavior,
@@ -33,8 +34,9 @@ export class InputProcessor {
    * entry points.
    */
   private contextDevice: DeviceSpec;
-  private kbdProcessor: KeyboardProcessor;
+  private kbdProcessor: JSKeyboardProcessor;
   private lngProcessor: LanguageProcessor;
+
 
   private readonly contextCache = new TranscriptionCache();
 
@@ -48,19 +50,23 @@ export class InputProcessor {
     }
 
     this.contextDevice = device;
-    this.kbdProcessor = new KeyboardProcessor(device, options);
+    this.kbdProcessor = new JSKeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
+  }
+
+  public async init(paths: PathConfiguration): Promise<void> {
+    await KM_Core.createCoreProcessor(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
     return this.lngProcessor;
   }
 
-  public get keyboardProcessor(): KeyboardProcessor {
+  public get keyboardProcessor(): JSKeyboardProcessor {
     return this.kbdProcessor;
   }
 
-  public get keyboardInterface(): KeyboardInterface {
+  public get keyboardInterface(): KeyboardMinimalInterface {
     return this.keyboardProcessor.keyboardInterface;
   }
 
@@ -146,7 +152,7 @@ export class InputProcessor {
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
+    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || (this.activeKeyboard instanceof JSKeyboard && this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && fromOSK) {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
       if(this.keyboardProcessor.selectLayer(keyEvent)) {

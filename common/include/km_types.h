@@ -14,12 +14,20 @@
 
 #if defined(__LP64__) || defined(_LP64)
 /* 64-bit, g++ */
-#define KMX_64BIT
+#define KMX_REQUIRES_REALIGNMENT
 #endif
 
 #if defined(_WIN64) && !defined(USE_64)
 /* 64-bit, Windows */
-#define KMX_64BIT
+#define KMX_REQUIRES_REALIGNMENT
+#endif
+
+#if defined(__EMSCRIPTEN__)
+// Emscripten/WASM. Emscripten even though it uses 32-bit (and not 64-bit
+// pointers like the 64-bit architectures above) requires 32-bit alignment
+// for pointers which we don't always have in the KMX data from file
+// (see #12844).
+#define KMX_REQUIRES_REALIGNMENT
 #endif
 
 typedef uint32_t   KMX_DWORD;

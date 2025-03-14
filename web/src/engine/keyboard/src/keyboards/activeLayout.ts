@@ -3,7 +3,7 @@ import KeyEvent, { KeyEventSpec } from "../keyEvent.js";
 import KeyMapping from "../keyMapping.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
-import type Keyboard from "./keyboard.js";
+import { type JSKeyboard } from "./jsKeyboard.js";
 
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
@@ -776,7 +776,7 @@ export class ActiveLayout implements LayoutFormFactor{
   font: string;
   keyLabels: boolean;
   isDefault?: boolean;
-  keyboard: Keyboard;
+  keyboard: JSKeyboard;
   formFactor: DeviceSpec.FormFactor;
   defaultHint: TouchLayoutDefaultHint;
   displayUnderlying?: boolean;
@@ -851,7 +851,7 @@ export class ActiveLayout implements LayoutFormFactor{
    * @param layout
    * @param formFactor
    */
-  static polyfill(layout: TouchLayoutSpec, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
+  static polyfill(layout: TouchLayoutSpec, keyboard: JSKeyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
     /* c8 ignore start */
     if(layout == null) {
       throw new Error("Cannot build an ActiveLayout for a null specification.");
