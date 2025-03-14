@@ -10,7 +10,6 @@
 // needed for streaming operators
 #include "utfcodec.hpp"
 
-
 using namespace km::core::kmx;
 
 TEST(KMXPlusTest, test_COMP_KMXPLUS_KEYS_KEY) {

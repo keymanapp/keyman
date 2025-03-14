@@ -59,6 +59,70 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.214 beta 2025-03-13
+
+* fix(mac): change text in privacy alert for macOS 13.0 and later (#13480)
+* docs(mac): update troubleshooting page for macOS security (#13476)
+* fix(core): unalign `usetCount` and `rangeCount` (#13450)
+* fix(developer): strip markers when generating KVK from LDML (#13479)
+
+## 18.0.213 beta 2025-03-12
+
+* docs(developer): fix typos in readme and add link (#13414)
+* fix(developer): add folder text to Error_FileDoesNotExist message (#13457)
+* fix(developer): load Keyman Developer options in Server before use (#13459)
+* chore(core): add `clean` actions for `:mac` and `:win` targets (#13460)
+* chore(common): update langtags.json to 2025-02-18 release (#13461)
+* fix(developer): use '-' as placeholder for temp project name in cmdline (#13462)
+* chore: handle failure to retrieve GitHub PR status in build triggers (#13474)
+
+## 18.0.212 beta 2025-03-11
+
+* fix(oem/fv/android): Avoid resetting keyboard index (#13449)
+* fix(android/engine): Ignore key errors if user switched to another IME (#13466)
+* fix(android): Cache inputType to determine external keyboard handling (#13475)
+
+## 18.0.211 beta 2025-03-10
+
+* feat(windows): hide update header if no updates are available (#13442)
+* fix(ios): suppress Get Started dialog when closing help page (#13422)
+* docs(ios): update minimum supported ios version (#13452)
+
+## 18.0.210 beta 2025-03-07
+
+* chore(common): Add crowdin localization for Vietnamese (#13322)
+* chore(linux): add link to fcitx5 issues to bug issue template (#13451)
+
+## 18.0.209 beta 2025-03-06
+
+* fix(common): fail builds with low test coverage for all typescript projects (#13418)
+* fix(windows): Check for updates registry value stored under the one Key (#13413)
+* fix(windows): remove online update deadcode (#13421)
+
+## 18.0.208 beta 2025-03-05
+
+* fix(windows): Check registry report usage value in setup process (#13215)
+* fix(android): Don't report missing kmp.json (#13411)
+
+## 18.0.207 beta 2025-03-04
+
+* fix(common): improve resilience of build script trigger (#13407)
+* fix(mac): improve compliance checking (#13337)
+* chore(common): add unit test for nul and context() in context part of rule (#13412)
+
+## 18.0.206 beta 2025-03-03
+
+* fix(android): Control when system keyboard Keyboard Picker clears activity stack (#13313)
+* docs(android): document control flag for system keyboard picker and task (#13373)
+
+## 18.0.205 beta 2025-03-02
+
+* chore(linux): Update debian changelog (#13346)
+
+## 18.0.204 beta 2025-03-01
+
+* chore(windows): ensure dependencies for keyman32 exclude core:wasm (#13379)
+
 ## 18.0.203 beta 2025-02-28
 
 * feat(windows): keyman configuration icon refresh (#13294)
