@@ -25,6 +25,7 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 - All offsets are 32-bit little-endian values.  For all sections except for the
   `'sect'` section (which see), offsets are relative to the beginning of each
   section and must fall within the `size` of the section.
+- Data fields are not necessarily aligned to 32-bit or 64-bit boundaries.
 
 ## C7043.2 Sections
 
@@ -35,8 +36,8 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 - Other than the `sect` table itself, the rest of the sections follow in binary
   order in the file.  In other words, the binary ordering of the section
   identifiers determines the order of the file layout.
-- All sections other than the `sect` table are optional for the file 
-  format to be valid, however, a valid keyboard will need most or 
+- All sections other than the `sect` table are optional for the file
+  format to be valid, however, a valid keyboard will need most or
   all of the sections present to be usable.
 
 ### C7043.2.1 `sect`—Section Table of contents

@@ -34,5 +34,4 @@ The following code illustrates the use of `getLongpressDelay()`:
 Keyman Engine for Android 18.0: New function.
 
 ## See also
-* [sendOptionsToKeyboard](sendOptionsToKeyboard)
 * [setLongpressDelay](setLongpressDelay)

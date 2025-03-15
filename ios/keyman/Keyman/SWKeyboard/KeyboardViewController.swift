@@ -81,28 +81,26 @@ class KeyboardViewController: InputViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     guard let previousTraitCollection = previousTraitCollection else {return}
-    if #available(iOS 13.0, *) {
-      if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
-        /* Ensure that the keyboard banner image transitions!  Noting that the backing view isn't in the view hierarchy,
-         * and that manipulating said hierarchy is key for triggering the appearance change
-         * (see https://developer.apple.com/documentation/uikit/uiappearance)...
-         *
-         * We have to reload the banner's backing view to trigger the change.  Thanks, Apple.
-         * The only other alternative - creating a new instance of the view & its controller.
-         *
-         * With loadView, at least we can reuse the old instance, which would serve far better
-         * for engine API calls if we decide to let the base InputViewController perform UIView
-         * render functionality (as a KMEI offering) instead of having it only in our app.
-         * That said, note https://developer.apple.com/documentation/uikit/uiviewcontroller/1621454-loadview:
-         *
-         * > You should never call this method directly.
-         *
-         * Well... I wouldn't, if it weren't the only way to trigger this without requiring a new instance.
-         * We should be fine since we never place the banner's backing view into the actual hierarchy.
-         */
-        topBarImageSource.loadView()
-        setupTopBarImage(size: view.frame.size)
-      }
+    if previousTraitCollection.hasDifferentColorAppearance(comparedTo: traitCollection) {
+      /* Ensure that the keyboard banner image transitions!  Noting that the backing view isn't in the view hierarchy,
+       * and that manipulating said hierarchy is key for triggering the appearance change
+       * (see https://developer.apple.com/documentation/uikit/uiappearance)...
+       *
+       * We have to reload the banner's backing view to trigger the change.  Thanks, Apple.
+       * The only other alternative - creating a new instance of the view & its controller.
+       *
+       * With loadView, at least we can reuse the old instance, which would serve far better
+       * for engine API calls if we decide to let the base InputViewController perform UIView
+       * render functionality (as a KMEI offering) instead of having it only in our app.
+       * That said, note https://developer.apple.com/documentation/uikit/uiviewcontroller/1621454-loadview:
+       *
+       * > You should never call this method directly.
+       *
+       * Well... I wouldn't, if it weren't the only way to trigger this without requiring a new instance.
+       * We should be fine since we never place the banner's backing view into the actual hierarchy.
+       */
+      topBarImageSource.loadView()
+      setupTopBarImage(size: view.frame.size)
     }
   }
 }
