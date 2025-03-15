@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
@@ -93,7 +93,7 @@ describe('InputProcessor', function() {
       }
 
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -188,7 +188,7 @@ describe('InputProcessor', function() {
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness;
       keyboardWithHarness.activeKeyboard = keyboard;
