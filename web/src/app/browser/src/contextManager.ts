@@ -759,7 +759,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     var v = cookie.load(decodeURIComponent);
 
     if(typeof(v.current) != 'string') {
-      return 'Keyboard_us:en';
+      return null;
     } else if(v.current == 'Keyboard_us:eng') {
       // 16.0 used the :eng variant!
       return 'Keyboard_us:en';
@@ -820,11 +820,14 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Find the matching stub; if it doesn't exist, default to the first available stub.
-    let stub = this.keyboardCache.getStub(t[0], t[1]) || this.keyboardCache.defaultStub;
+    let stub = this.keyboardCache.getStub(t[0], t[1]);
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {
       this.activateKeyboard(t[0], t[1]);
+    } else {
+      const {id, langId} = this.getFallbackStubKey()
+      this.activateKeyboard(id, langId);
     }
   }
 

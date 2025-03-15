@@ -67,8 +67,8 @@ end;
 
 procedure TCanonicalLanguageCodeUtilsTest.TestSomeTags;
 begin
-  Assert.AreEqual('sa-Latn', TCanonicalLanguageCodeUtils.FindBestTag('sa-Latn', True, True));
-  Assert.AreEqual('he-Latn', TCanonicalLanguageCodeUtils.FindBestTag('he-Latn', True, True));
+  Assert.AreEqual('sa-Latn', TCanonicalLanguageCodeUtils.FindBestTag('sa-Latn', False, True)); // don't add region for this test
+  Assert.AreEqual('he-Latn', TCanonicalLanguageCodeUtils.FindBestTag('he-Latn', False, True)); // don't add region for this test
   Assert.AreEqual('hi-Latn-IN', TCanonicalLanguageCodeUtils.FindBestTag('hi-Latn', True, True));
 end;
 

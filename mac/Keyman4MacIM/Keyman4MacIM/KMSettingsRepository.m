@@ -148,8 +148,10 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 }
 
 - (void)writeSelectedKeyboard:(NSString *)selectedKeyboard {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
+  if (selectedKeyboard != nil) {
+    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+    [userData setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
+  }
 }
 
 - (NSMutableArray *)activeKeyboards {

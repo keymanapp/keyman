@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Keyman Setup bootstrap" \
   @/common/include \
   @/common/windows/delphi \
-  clean configure build test publish debug-manifest
+  clean configure build test publish debug-manifest edit
 
 builder_parse "$@"
 
@@ -71,3 +71,4 @@ builder_run_action build:project        do_build
 builder_run_action publish:project      do_publish
 
 builder_run_action debug-manifest:project  do_build_debug_manifest
+builder_run_action edit:project         start setup.dproj

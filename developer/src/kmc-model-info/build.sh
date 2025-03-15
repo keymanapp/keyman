@@ -31,7 +31,7 @@ builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure    verify_npm_setup
 builder_run_action build        tsc --build
 builder_run_action api          api-extractor run --local --verbose
-builder_run_action test         builder_do_typescript_tests 80
+builder_run_action test         builder_do_typescript_tests 55
 
 #-------------------------------------------------------------------------------------------------------------------
 

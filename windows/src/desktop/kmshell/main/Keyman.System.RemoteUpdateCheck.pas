@@ -216,7 +216,7 @@ begin
 
   Registry := TRegistryErrorControlled.Create; // I2890
   try
-    if Registry.OpenKey(SRegKey_KeymanDesktop_CU, True) then
+    if Registry.OpenKey(SRegKey_KeymanEngine_CU, True) then
       Registry.WriteDateTime(SRegValue_LastUpdateCheckTime, Now);
   finally
     Registry.Free;
@@ -232,7 +232,7 @@ begin
   try
     Registry := TRegistryErrorControlled.Create; // I2890
     try
-      if Registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
       begin
         if Registry.ValueExists(SRegValue_CheckForUpdates) and
           not Registry.ReadBool(SRegValue_CheckForUpdates) then

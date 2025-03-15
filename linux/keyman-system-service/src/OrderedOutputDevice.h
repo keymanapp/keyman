@@ -13,12 +13,14 @@ public:
   OrderedOutputDevice();
   virtual ~OrderedOutputDevice();
 
-  bool Initialize();
-  bool PressSentinelKey();
+  virtual bool Initialize();
+  virtual bool PressSentinelKey();
 
-private:
-  void Close();
+protected:
+  virtual void Close();
   struct libevdev_uinput *uinput_dev;
 };
+
+OrderedOutputDevice* CreateOrderedOutputDevice();
 
 #endif // __ORDEROUTPUTDEVICE_H__

@@ -11,7 +11,7 @@
 
 # Target operating system and platform versions
 KEYMAN_MIN_TARGET_VERSION_ANDROID=5.0         # Lollipop
-KEYMAN_MIN_TARGET_VERSION_IOS=12.2            # iOS 12.2
+KEYMAN_MIN_TARGET_VERSION_IOS=15.6            # iOS 15.6
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
 KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
 KEYMAN_MIN_TARGET_VERSION_UBUNTU=22.04        # Ubuntu 22.04 Jammy
@@ -45,6 +45,6 @@ KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER=noble # Ubuntu 24.04 Noble
 # Data versions -- see resources/standards-data/readme.md
 KEYMAN_VERSION_CLDR=45                        # LDML Keyboards version
 KEYMAN_VERSION_ISO639_3=2024-05-22            # Date of last import
-KEYMAN_VERSION_LANGTAGS=2024-05-22            # Date of last import
-KEYMAN_VERSION_LANGTAGS_SUBTAG_REGISTRY=2024-05-16  # Date of last import
+KEYMAN_VERSION_LANGTAGS=2025-02-18            # Date of last import
+KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY=2024-05-16  # Date of last import
 KEYMAN_VERSION_UNICODE=16.0.0                 # UCD + related data

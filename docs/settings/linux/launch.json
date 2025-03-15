@@ -40,7 +40,7 @@
       "valuesFormatting": "parseText"
     },
     {
-      // start: gdbserver 10.3.0.58:2345 /media/sf_Develop/keyman/keyman/linux/build/x86_64/debug/tests/ibus-keyman-tests
+      // start: linux/ibus-keyman/tests/scripts/run-tests.sh --remote-debug --no-surrounding-text --no-wayland -- k_001___basic_input_unicodei
       // then attach debugger in vscode
       "type": "gdb",
       "request": "attach",

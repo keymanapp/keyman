@@ -13,11 +13,7 @@ import UIKit
 extension Colors {
   public static var systemBackground: UIColor {
     get {
-      if #available(iOS 13.0, *) {
-        return UIColor.systemBackground
-      } else {
-        return UIColor.white
-      }
+      return UIColor.systemBackground
     }
   }
 

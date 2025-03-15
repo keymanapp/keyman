@@ -230,7 +230,7 @@ builder_describe \
 
 ## Constraining build targets by platform or tooling
 
-You can use [`builder_describe_platform`](#builderdescribeplatform-function) to
+You can use [`builder_describe_platform`] to
 constrain certain targets to only run on specific platforms or if specific
 toolchains are installed.
 
@@ -244,8 +244,8 @@ builder_parse "$@"
 ```
 
 If any parameters are invalid, the script will be terminated by
-[`builder_parse`](#builderparse-function) with an error and will print the
-script usage help using [`builder_display_usage`](#builderdisplayusage-function).
+[`builder_parse`] with an error and will print the script usage help using
+[`builder_display_usage`].
 
 # Build script actions
 
@@ -1069,7 +1069,7 @@ builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
 
 ### Parameters
 
-* **coverage_threshold** optional, minimum coverage for c8 to pass tests, 
+* **coverage_threshold** optional, minimum coverage for c8 to pass tests,
   defaults to 90 (percent)
 
 --------------------------------------------------------------------------------
@@ -1098,22 +1098,23 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 `${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
 [standard builder parameters]: #standard-builder-parameters
-[`builder_describe`]: #builderdescribe-function
-[`builder_describe_outputs`]: #builderdescribeoutputs-function
-[`builder_describe_internal_dependency`]: #builderdescribeinternaldependency-function
-[`builder_display_usage`]: #builderdisplayusage-function
-[`$builder_extra_params`]: #builderextraparams-variable
-[`builder_finish_action`]: #builderfinishaction-function
-[`builder_has_action`]: #builderhasaction-function
-[`builder_has_option`]: #builderhasoption-function
-[`builder_parse`]: #builderparse-function
-[`builder_start_action`]: #builderstartaction-function
-[`builder_use_color`]: #builderusecolor-function
-[`$builder_verbose`]: #builderverbose-variable
+[`builder_describe`]: #builder_describe-function
+[`builder_describe_internal_dependency`]: #builder_describe_internal_dependency-function
+[`builder_describe_outputs`]: #builder_describe_outputs-function
+[`builder_describe_platform`]: #builder_describe_platform-function
+[`builder_display_usage`]: #builder_display_usage-function
+[`$builder_extra_params`]: #builder_extra_params-variable
+[`builder_finish_action`]: #builder_finish_action-function
+[`builder_has_action`]: #builder_has_action-function
+[`builder_has_option`]: #builder_has_option-function
+[`builder_parse`]: #builder_parse-function
+[`builder_start_action`]: #builder_start_action-function
+[`builder_use_color`]: #builder_use_color-function
+[`$builder_verbose`]: #builder_verbose-variable
 [formatting variables]: #formatting-variables
-[`builder_run_action`]: #builderrunaction-function
-[`builder_run_child_actions`]: #builderrunchildactions-function
-[`builder_echo`]: #builderecho-function
-[`builder_die`]: #builderdie-function
-[`builder_echo_debug`]: #builderechodebug-function
-[`builder_is_debug_build`]: #builderisdebugbuild-function
+[`builder_run_action`]: #builder_run_action-function
+[`builder_run_child_actions`]: #builder_run_child_actions-function
+[`builder_echo`]: #builder_echo-function
+[`builder_die`]: #builder_die-function
+[`builder_echo_debug`]: #builder_echo_debug-function
+[`builder_is_debug_build`]: #builder_is_debug_build-function

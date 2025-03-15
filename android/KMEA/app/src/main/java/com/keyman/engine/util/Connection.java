@@ -3,6 +3,7 @@ package com.keyman.engine.util;
 import java.io.InputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public final class Connection {
@@ -99,6 +100,9 @@ public final class Connection {
           attempt++;
         }
       }
+    } catch (SocketTimeoutException e) {
+      KMLog.LogBreadcrumb(TAG, "Connection.initialize timeout for: " + originalUrl, true);
+      KMLog.LogInfo(TAG, "SocketTimeoutException");
     } catch (Exception e) {
       KMLog.LogException(TAG, "Initialization failed:", e);
     }

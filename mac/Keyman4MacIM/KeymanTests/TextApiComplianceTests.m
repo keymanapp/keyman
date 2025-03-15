@@ -37,6 +37,93 @@
   // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
+- (void)testInitComplianceObject_nilClient_returnsInstance {
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:nil applicationId:clientAppId];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is not nil");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testInitComplianceObject_nilApplicationId_returnsInstance {
+  id client = [[AppleCompliantTestClient alloc] init];
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:nil];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testInitComplianceObject_nilInputs_returnsInstance {
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:nil applicationId:nil];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testCheckCompliance_nilClient_returnsNoncompliant {
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:nil applicationId:clientAppId];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  
+  [apiCompliance checkCompliance];
+  XCTAssertFalse(apiCompliance.isComplianceUncertain, @"ApiCompliance with nil client is uncertain");
+  XCTAssertFalse(apiCompliance.canReadText, @"ApiCompliance with nil client is compliant");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testCheckComplianceAfterInsert_nilClient_returnsNoncompliant {
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:nil applicationId:clientAppId];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  
+  [apiCompliance checkComplianceAfterInsert:@"a" deleted:@"x"];
+  XCTAssertFalse(apiCompliance.isComplianceUncertain, @"ApiCompliance with nil client is uncertain");
+  XCTAssertFalse(apiCompliance.canReadText, @"ApiCompliance with nil client is compliant");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testCheckCompliance_nilApplicationId_returnsUncertain {
+  id client = [[AppleCompliantTestClient alloc] init];
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:nil];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  
+  [apiCompliance checkCompliance];
+  XCTAssertTrue(apiCompliance.isComplianceUncertain, @"New apiCompliance is not uncertain");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testCheckComplianceAfterInsert_nilApplicationId_returnsNotUncertain {
+  id client = [[AppleCompliantTestClient alloc] init];
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:nil];
+  XCTAssertNotNil(apiCompliance, @"New apiCompliance is nil");
+  
+  [apiCompliance checkComplianceAfterInsert:@"a" deleted:@"x"];
+  XCTAssertFalse(apiCompliance.isComplianceUncertain, @"New apiCompliance is uncertain");
+  os_log_debug([KMLogs testLog], "apiCompliance = %@", apiCompliance);
+}
+
+- (void)testMatchingClient_sameClient_returnsTrue {
+  id client = [[AppleCompliantTestClient alloc] init];
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
+  
+  XCTAssertTrue([apiCompliance isMatchingClient:client applicationId:clientAppId], @"Clients do not match");
+}
+
+- (void)testMatchingClient_differentClients_returnsFalse {
+  id client = [[AppleCompliantTestClient alloc] init];
+  id noContextClient = [[NoContextTestClient alloc] init];
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
+  
+  XCTAssertFalse([apiCompliance isMatchingClient:noContextClient applicationId:clientAppId], @"Unique clients match unexpectedly");
+}
+
+- (void)testMatchingClient_differentClientApplicationIDs_returnsFalse {
+  id client = [[AppleCompliantTestClient alloc] init];
+  NSString *clientAppId = @"com.compliant.app";
+  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
+  
+  XCTAssertFalse([apiCompliance isMatchingClient:client applicationId:@"com.imaginary.app"], @"Unique client application IDs match unexpectedly");
+}
+
 - (void)testValidateNewLocation_locationNotFound_returnsNo {
   id client = [[AppleCompliantTestClient alloc] init];
   NSString *clientAppId = @"com.compliant.app";

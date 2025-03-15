@@ -9,6 +9,8 @@ plugins {
 ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
+String tier = new File('../../TIER.md').getText('UTF-8').trim();
+
 android {
     compileSdk 34
     namespace="com.tavultesoft.kmapro"
@@ -75,7 +77,7 @@ android {
         //  - PR builds also have "-test-1234" suffix (where 1234 is PR#)
         // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
-        String tag = VERSION_TAG ? VERSION_TAG : '-' + new File('../../TIER.md').getText('UTF-8');
+        String tag = VERSION_TAG ? VERSION_TAG : '-' + tier;
         if (tag.startsWithAny("-beta", "beta")) {
             appSuffix = ' Beta';
         } else if (tag.startsWithAny("-alpha", "alpha")) {
@@ -127,7 +129,7 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        switch (System.env.TIER) {
+        switch (tier) {
             case 'beta':
                 track.set("beta")
                 println "TIER set to beta"

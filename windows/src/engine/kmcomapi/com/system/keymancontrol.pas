@@ -202,8 +202,6 @@ const
 const
   SWnd_MasterController = 'TfrmKeyman7Main';
   SWnd_VisualKeyboard = 'TfrmVisualKeyboard';
-  SWnd_OnlineUpdateIcon = 'TfrmOnlineUpdateIcon';
-  SWnd_OnlineUpdateNewVersion = 'TfrmOnlineUpdateNewVersion';
 
 function TKeymanControl.GetAutoApply: Boolean;
 begin
@@ -292,10 +290,10 @@ begin
   Result := (FindMasterControllerWindow <> 0);
 end;
 
+// Deprecated interface needs to remain
 function TKeymanControl.IsOnlineUpdateCheckOpen: WordBool;
 begin
-  Result := (FindWindow(SWnd_OnlineUpdateIcon, nil) <> 0) or
-    (FindWindow(SWnd_OnlineUpdateNewVersion, nil) <> 0);
+  Result := False;
 end;
 
 function TKeymanControl.IsTextEditorOpen: WordBool;

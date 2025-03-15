@@ -159,6 +159,7 @@ type
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleFirstRun; override;
   end;
 
   UpdateAvailableState = class(TState)
@@ -667,6 +668,14 @@ end;
 procedure IdleState.HandleInstallNow;
 begin
   // Do Nothing
+end;
+
+procedure IdleState.HandleFirstRun;
+begin
+  // This would be the case if it was a clean first time install of Keyman
+  // and not an update. However, incase it was some sort of failed update
+  // clean any cached files.
+  bucStateContext.RemoveCachedFiles;
 end;
 
 { UpdateAvailableState }

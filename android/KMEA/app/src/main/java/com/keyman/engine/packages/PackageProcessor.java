@@ -122,8 +122,8 @@ public class PackageProcessor {
    */
   public File unzipKMP(File path) throws IOException {
     File tempKeyboardPath = constructPath(path, true);
-    if (!tempKeyboardPath.exists()) {
-      tempKeyboardPath.mkdir();
+    if (!tempKeyboardPath.exists() && !tempKeyboardPath.mkdir()) {
+      KMLog.LogBreadcrumb(TAG, "Unable to mkdir for: " + tempKeyboardPath.toString(), true);
     }
     ZipUtils.unzip(path, tempKeyboardPath);
 
@@ -165,7 +165,6 @@ public class PackageProcessor {
       JSONParser parser = new JSONParser();
       return parser.getJSONObjectFromFile(infoFile);
     } else {
-      KMLog.LogError(TAG, "kmp.json does not exist");
       return null;
     }
   }
@@ -421,7 +420,6 @@ public class PackageProcessor {
    */
   public String getPackageTarget(JSONObject json) {
     if (json == null) {
-      KMLog.LogError(TAG, "kmp.json is null");
       return PP_TARGET_INVALID;
     }
     try {
