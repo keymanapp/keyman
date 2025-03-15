@@ -60,7 +60,8 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'-'/);
       assert.match(code, /'\+'/);
       assert.match(code, /'\^'/);
-      assert.match(code, /§/);
+      // From searchTermToKey:
+      assert.match(code, /'§'/);
 
       let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
       let modelInitCode = code.substring(modelInitIndex);
@@ -74,7 +75,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
 
       // Instead, our custom keyer should ensure that the following symbol DOES appear.
       // Verifies that the compiler uses the custom searchTermToKey definition.
-      assert.match(modelInitCode, /['"]§['"]/);
+      assert.match(modelInitCode, /[^ ]§/);
 
       // Make sure it compiles!
       let compilation = compileModelSourceCode(code);
@@ -119,7 +120,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       // Check that the prepended lowercase "-" DOES appear within the Trie, as keying
       // does not remove it in this variant.  Verifies that the compiler actually
       // used the custom applyCasing definition!
-      assert.match(modelInitCode, /['"]-['"]/);
+      assert.match(modelInitCode, /[^ ]-/); // ' -' is indicative of a compressed number
 
       // Make sure it compiles!
       let compilation = compileModelSourceCode(code);
@@ -158,7 +159,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       // Check that the prepended lowercase "-" DOES appear within the Trie, as keying
       // does not remove it in this variant.  Verifies that the compiler actually
       // used the custom applyCasing definition!
-      assert.match(modelInitCode, /['"]-['"]/);
+      assert.match(modelInitCode, /[^ ]-/); // ' -' is indicative of a compressed number
 
       // Make sure it compiles!
       let compilation = compileModelSourceCode(code);
