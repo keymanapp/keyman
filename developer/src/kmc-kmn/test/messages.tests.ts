@@ -185,7 +185,6 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate WARN_IndexStoreShort if a store referenced in index() is shorter than the corresponding any() store', async function() {
     await testForMessage(this, ['keyboards', 'warn_index_store_short.kmn'], KmnCompilerMessages.WARN_IndexStoreShort);
-    callbacks.clear();
     await testForMessage(this, ['keyboards', 'warn_index_store_short_key.kmn'], KmnCompilerMessages.WARN_IndexStoreShort);
   });
 
@@ -193,8 +192,28 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate HINT_IndexStoreLong if a store referenced in index() is longer than the corresponding any() store', async function() {
     await testForMessage(this, ['keyboards', 'hint_index_store_long.kmn'], KmnCompilerMessages.HINT_IndexStoreLong);
-    callbacks.clear();
     await testForMessage(this, ['keyboards', 'hint_index_store_long_key.kmn'], KmnCompilerMessages.HINT_IndexStoreLong);
+  });
+
+  // ERROR_ContextExHasInvalidOffset
+
+  it('should generate ERROR_ContextExHasInvalidOffset if the offset is lower than 1 or greater than the context length', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_has_invalid_offset_if.kmn'], KmnCompilerMessages.ERROR_ContextExHasInvalidOffset);
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_has_invalid_offset_long.kmn'], KmnCompilerMessages.ERROR_ContextExHasInvalidOffset);
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_has_invalid_offset_nul.kmn'], KmnCompilerMessages.ERROR_ContextExHasInvalidOffset);
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_has_invalid_offset_zero.kmn'], KmnCompilerMessages.ERROR_ContextExHasInvalidOffset);
+  });
+
+  // ERROR_ContextExCannotReferenceIf
+
+  it('should generate ERROR_ContextExCannotReferenceIf if the offset points to an if() statement', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_cannot_reference_if.kmn'], KmnCompilerMessages.ERROR_ContextExCannotReferenceIf);
+  });
+
+  // ERROR_ContextExCannotReferenceNul
+
+  it('should generate ERROR_ContextExCannotReferenceNul if the offset points to a nul statement', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_contextex_cannot_reference_nul.kmn'], KmnCompilerMessages.ERROR_ContextExCannotReferenceNul);
   });
 
 });

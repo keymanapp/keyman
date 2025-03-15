@@ -31,10 +31,12 @@
         </div>
 
         <div class="grid_container_update" id="update_details">
+          <!-- hide header if no updates but keep the grid layout -->
+          <xsl:if test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_ComponentHead']"/></div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_OldVersionHead']"/></div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_SizeHead']"/></div>
-
+          </xsl:if>
             <xsl:apply-templates select="/Keyman/Updates/Update" />
 
         </div>

@@ -1,16 +1,16 @@
-import { environment } from './environment.js';
-import { KeymanSentry } from '@keymanapp/developer-utils';
-import express from 'express';
-import * as ws from 'ws';
-import * as os from 'os';
-import multer from 'multer';
-import * as fs from 'fs';
-import * as path from 'path';
-import setupRoutes from './routes.js';
-import { configuration } from './config.js';
-import { initTray } from './tray.js';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import chalk from 'chalk';
+import express from 'express';
+import multer from 'multer';
+import * as ws from 'ws';
+import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
+import { configuration } from './config.js';
+import { environment } from './environment.js';
+import setupRoutes from './routes.js';
 import { shutdown } from './shutdown.js';
+import { initTray } from './tray.js';
 
 const options = {
   ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console
@@ -19,6 +19,11 @@ const options = {
 /* Lock file - report on PID and prevent multiple instances cleanly */
 
 console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${configuration.port}.`);
+
+// We need to load the Keyman Developer options before attempting to initialize
+// Sentry. `loadOptions` silently suppresses exceptions and returns a default
+// set of options if an error occurs.
+await loadOptions();
 
 KeymanSentry.init();
 try {
