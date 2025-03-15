@@ -1,0 +1,18 @@
+store(&NAME) '053 - if_and_index'
+c Description: Tests that index() has the right offset when used with if
+c keys: [K_T][K_D]
+c expected: 4T5
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+store(cons) 'mnpqrstv'
+store(outs) 'MNPQRSTV'
+store(ifx) '1'
+
+group(Main) using keys
+
+if(ifx = '1') any(cons) + 'd' > '4' index(outs, 2) '5'
+

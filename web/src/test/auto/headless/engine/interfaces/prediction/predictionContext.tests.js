@@ -64,18 +64,17 @@ function dummiedGetLayer() {
 }
 
 describe("PredictionContext", () => {
-  let worker;
+  let langProcessor;
 
   beforeEach(function() {
-    worker = LMWorker.constructInstance();
+    langProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
   });
 
   afterEach(function() {
-    worker.terminate();
+    langProcessor.shutdown();
   });
 
   it('receives predictions as they are generated', async function () {
-    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -115,7 +114,6 @@ describe("PredictionContext", () => {
   });
 
   it('ignores outdated predictions', async function () {
-    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -172,7 +170,6 @@ describe("PredictionContext", () => {
   });
 
   it('sendUpdateState retrieves the most recent suggestion set', async function() {
-    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -197,7 +194,6 @@ describe("PredictionContext", () => {
   });
 
   it('suggestion application logic & triggered effects', async function () {
-    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
@@ -264,7 +260,6 @@ describe("PredictionContext", () => {
   });
 
   it('reversion application logic & triggered effects', async function () {
-    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);

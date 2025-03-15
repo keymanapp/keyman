@@ -60,7 +60,7 @@ type
         Result[n].ch := Uni_SurrogateToUTF32(text[x+1], text[x+2]);
         Inc(x);
       end
-      else if text[x+1] = #$FFFC then
+      else if text[x+1] = DeadKey_Marker then
       begin
         Result[n].CellType := ctDeadkey;
         Result[n].dk := deadkeys.GetFromPosition(x);
@@ -177,66 +177,6 @@ begin
   if SelAnchor <> SelStart then
     FillGridCursor(X);
   FillGrid(After, 0, X);
-
-(*
-  J := 0; I := SelStart + SelLength; // I is 1-based Delphi string index
-  while (J < MaxCols) and (I > SelStart) do
-  begin
-    if (I > 1) and Uni_IsSurrogate2(s[I]) and Uni_IsSurrogate1(s[I-1]) then
-      Dec(I);
-    Inc(J); Dec(I);
-  end;
-
-  if J = 0 then
-  begin
-    sgChars.ColCount := 1;
-    sgChars.Objects[0,0] := Pointer(0);
-    sgChars.Cells[0,0] := '';
-    sgChars.Cells[0,1] := '';
-    Exit;
-  end
-  else
-    sgChars.ColCount := J + 1;
-
-  Inc(I);
-  J := 0;
-  while J < sgChars.ColCount do
-  begin
-    if I = memo.SelStart + 1 then
-    begin
-      sgChars.Objects[J, 0] := Pointer(2);
-      sgChars.Cells[J, 0] := '|';
-      sgChars.Cells[J, 1] := 'Cursor';
-      Inc(J);
-    end;
-    if Ord(S[I]) = $FFFC then
-    begin
-      sgChars.Objects[J, 0] := Pointer(1);
-      sgChars.Cells[J, 0] := '???';
-      for K := 0 to FDeadkeys.Count-1 do
-        if FDeadkeys[K].Position = I-1 then
-        begin
-          sgChars.Cells[J, 0] := FDeadkeys[K].Deadkey.Name;
-          break;
-        end;
-      sgChars.Cells[J, 1] := 'Deadkey';
-    end
-    else if Uni_IsSurrogate1(s[I]) and (I < Length(s)) and Uni_IsSurrogate2(s[I+1]) then
-    begin
-      sgChars.Objects[J, 0] := Pointer(0);
-      sgChars.Cells[J, 0] := Copy(s, I ,2);
-      sgChars.Cells[J, 1] := 'U+'+IntToHex(Uni_SurrogateToUTF32(s[I], s[I+1]), 5);
-      Inc(I);
-    end
-    else
-    begin
-      sgChars.Objects[J, 0] := Pointer(0);
-      sgChars.Cells[J, 0] := s[I];
-      sgChars.Cells[J, 1] := 'U+'+IntToHex(Ord(s[i]), 4);
-    end;
-    Inc(J); Inc(I);
-  end;
-*)
 end;
 
 class procedure TCharacterGridRenderer.Render(grid: TStringGrid; ACol,
