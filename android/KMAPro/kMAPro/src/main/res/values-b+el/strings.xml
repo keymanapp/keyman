@@ -16,7 +16,7 @@
   <!-- Context: Menu Action -->
   <string name="action_settings" comment="Menu action to open Settings menu">Ρυθμίσεις</string>
   <!-- Context: Menu Action -->
-  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Εγκατάσταση Ενημερώσεων</string>
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">Ἐγκατάσταση Ἐνημερώσεων</string>
   <!-- Context: Title -->
   <string name="title_version" comment="Title of Keyman for Android version">Ἔκδοση %1$s</string>
   <!-- Context: Text label when old Chrome version installed -->
@@ -38,11 +38,11 @@
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nΤὸ κείμενο θὰ ἐκκαθαρισθεῖ πλήρως\n</string>
   <!-- Context: Get Started menu -->
-  <string name="get_started" comment="Menu for getting started">Μικρύνετε τὸ κείμενο</string>
+  <string name="get_started" comment="Menu for getting started">Ξεκινῆστε</string>
   <!-- Context: Get Started menu -->
   <string name="add_a_keyboard" comment="Menu item to add a keyboard">Προσθέστε πληκτρολόγιο γιὰ τὴν γλῶσσα σας</string>
   <!-- Context: Get Started menu -->
-  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Ὁρίστε τὸ Κῆμαν ὡς παν-συστημικὸ πληκτρολόγιο</string>
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Ὁρίστε τὸ Keyman ὡς πληκτρολόγιο συστήματος</string>
   <!-- Context: Get Started menu -->
   <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Ὁρίστε τὸ Κῆμαν ὡς προεπιλεγμένο πληκτρολόγιο</string>
   <!-- Context: Get Started menu -->
@@ -68,6 +68,8 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Μεταβολὴ ὕψους πληκτρολογίου</string>
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Καθυστέρηση παρατεταμένου πατήματος</string>
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Λεζάντα πλήκτρου διαστήματος</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Πληκτρολόγιο</string>
@@ -87,11 +89,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Καμμία λεζάντα στὸ πλῆκτρο διαστήματος</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Δὸνηση κατὰ τὴν πληκτρολόγηση</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Νὰ ἐμφανίζεται πάντα banner</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">Πρὸς ὑλοποίησιν</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">OFF: ἐμφάνιση μόνον ὅταν ἔχει ἐνεργοποιηθεῖ ἡ πρόβλεψη κειμένου</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Ἐπιτρέψτε τὴν ἀποστολὴ ἀναφορῶν κατάρρευσης μέσῳ δικτύου</string>
@@ -123,6 +125,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Περιστρέψτε τὴν συσκευὴ γιὰ προσαρμογὴ τοῦ ὕψους σὲ λειτουργία πορτραίτου καὶ τοπίου</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Ἐπαναφέρετε τὶς προεπιλεγμένες ρυθμίσεις</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Χρόνος καθυστέρησης: %1$.1f δευτ</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Μεγαλύτερος χρόνος καθυστέρησης</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Μικρότερος χρόνος καθυστέρησης</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Ρυθμιστής καθυστέρησης πατήματος</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Ἀναζητῆστε ἢ πληκτρολογῆστε URL</string>
   <!-- Context: Keyman Web Browser -->

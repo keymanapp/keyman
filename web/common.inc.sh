@@ -99,30 +99,17 @@ function test-headless() {
   fi
 
   TEST_OPTS=
-  TEST_CD_REQD=false
   if builder_has_option --ci; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
   if [[ -n "$TEST_EXTENSIONS" ]]; then
     TEST_OPTS="$TEST_OPTS --extension $TEST_EXTENSIONS"
-    TEST_CD_REQD=true
-  fi
-
-  if [ $TEST_CD_REQD ]; then
-    # The mocha config needed to live-compile TS-based tests only applies
-    # if the command is started within the appropriate subfolder.
-    pushd "${TEST_BASE}" > /dev/null
-    TEST_BASE=
   fi
 
   if [[ -e .c8rc.json ]]; then
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
   else
     mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
-  fi
-
-  if [ $TEST_CD_REQD ]; then
-    popd > /dev/null
   fi
 }
 
