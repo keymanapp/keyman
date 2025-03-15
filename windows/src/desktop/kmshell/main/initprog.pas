@@ -533,8 +533,8 @@ begin
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.TakeOwnership 
-          then OpenTextEditor 
+        if FMutex.TakeOwnership
+          then OpenTextEditor
           else FocusTextEditor;
       end;
 
@@ -662,11 +662,35 @@ begin
     end;
 end;
 
+function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine; FMode: TKMShellMode): Boolean;
+// The following logic around the WaitingRestartState should be
+// encapsulated in the state machine however as we want separation of
+// UI elements from the state machine we have bring some of logic here.
+var
+  frmStartInstall: TfrmStartInstall;
+begin
+  if not FSilent and BUpdateSM.ReadyToInstall and
+     (FMode in [fmStart, fmSplash, fmMain, fmAbout,
+                fmHelp, fmShowHelp, fmSettings, fmBoot]) then
+  begin
+    frmStartInstall := TfrmStartInstall.Create(nil);
+    try
+      Result := frmStartInstall.ShowModal = mrOk;
+    finally
+      frmStartInstall.Free;
+    end;
+  end
+  else if FSilent and BUpdateSM.ReadyToInstall then
+    Result := False
+  else
+    Result := True;
+end;
+
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
 var
   BUpdateSM : TUpdateStateMachine;
   frmStartInstall: TfrmStartInstall;
-  UserCanceled : Boolean;
+  SendToBUpdateSM: Boolean;
   SkipBUpdate : Boolean;
 begin
   BUpdateSM := TUpdateStateMachine.Create(False);
@@ -704,25 +728,10 @@ begin
         SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
         fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
         fmUpgradeMnemonicLayout]));
-        // The following logic around the WaitingRestartState should be
-        // encapsulated in the state machine however as we want separation of
-        // UI elements from the state machine we have bring some of logic here.
-        UserCanceled := False;
-        if BUpdateSM.ReadyToInstall and
-          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout,
-          fmHelp, fmShowHelp, fmSettings, fmBoot])) then
-        begin
-          frmStartInstall := TfrmStartInstall.Create(nil);
-          try
-            if frmStartInstall.ShowModal = mrOk then
-              UserCanceled := False
-            else
-              UserCanceled := True
-          finally
-            frmStartInstall.Free;
-          end;
-        end;
-        if not UserCanceled and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
+
+        SendToBUpdateSM := ShouldSendToBUpdateSM(FSilent, BUpdateSM, FMode);
+
+        if SendToBUpdateSM and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
         begin
           Result := True;
           Exit;

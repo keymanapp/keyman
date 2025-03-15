@@ -119,7 +119,7 @@ public final class KMTextView extends AppCompatEditText {
       public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
           activeView = v;
-          if (KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) {
+          if (KMManager.InAppKeyboard != null && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) {
             updateTextContext();
           }
           showKeyboard();
@@ -165,7 +165,7 @@ public final class KMTextView extends AppCompatEditText {
   protected void onSelectionChanged(int selStart, int selEnd) {
     super.onSelectionChanged(selStart, selEnd);
     if (activeView != null && activeView.equals(this)) {
-      if (KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      if (KMManager.InAppKeyboard != null && KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_INAPP)) {
         KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_INAPP);
       }
     }
@@ -176,7 +176,7 @@ public final class KMTextView extends AppCompatEditText {
     AppCompatActivity activity = (AppCompatActivity)context;
 
     Window mainWindow = activity.getWindow();
-    if (hasWindowFocus) {
+    if (hasWindowFocus && KMManager.InAppKeyboard != null) {
       KMManager.InAppKeyboardWebViewClient.setContext(context);
       activeView = mainWindow.getCurrentFocus();
 

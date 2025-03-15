@@ -9,8 +9,9 @@ uses
 
 type
   TKeymanDeveloperPaths = class sealed
-  private
   public
+    class function LockFilePath: string; static;
+
     class function NodePath: string; static;
 
     const S_LexicalModelCompiler = 'kmlmc.cmd';
@@ -54,6 +55,11 @@ end;
 class function TKeymanDeveloperPaths.ServerDataPath: string;
 begin
   Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\server\';
+end;
+
+class function TKeymanDeveloperPaths.LockFilePath: string;
+begin
+  Result := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper + '\lock\';
 end;
 
 class function TKeymanDeveloperPaths.ServerPath: string;
