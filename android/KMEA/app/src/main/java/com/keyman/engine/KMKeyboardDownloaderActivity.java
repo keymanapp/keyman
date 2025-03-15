@@ -72,7 +72,7 @@ public class KMKeyboardDownloaderActivity extends BaseActivity {
 
   //TODO: move to keyboard manager class
   private static ArrayList<KeyboardEventHandler.OnKeyboardDownloadEventListener> kbDownloadEventListeners = null;
-  
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

@@ -43,7 +43,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 @interface TextApiCompliance()
 
-@property (readonly) id client;
+@property (readonly, weak) id client;
 @property BOOL complianceUncertain;
 @property BOOL hasCompliantSelectionApi;
 @property NSRange initialSelection;
@@ -67,13 +67,52 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     NSString *message = [NSString stringWithFormat:@"TextApiCompliance initWithClient, client: %p applicationId: %@", client, appId];
     [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
     os_log_debug([KMLogs complianceLog], "%{public}@", message);
-    
+
     // if we do not have hard-coded noncompliance, then test the app
-    if (![self applyNoncompliantAppLists:appId]) {
-      [self checkCompliance:client];
+    if (appId && [self applyNoncompliantAppLists:appId]) {
+      [self checkCompliance];
     }
   }
   return self;
+}
+
+- (BOOL)isEqual:(id)other {
+  // this is the same object
+  if (other == self) {
+    return YES;
+  }
+  // this is an object of another type
+  if (!other || ![other isKindOfClass:[self class]]) {
+    return NO;
+  }
+  // both are unique TextApiCompliance objects, compare what matters
+  return [self isEqualToObject:other];
+}
+
+- (BOOL)isEqualToObject:(TextApiCompliance *)complianceObject {
+  if (self == complianceObject) {
+    return YES;
+  }
+  if (![(id)[self client] isEqual:[complianceObject client]]) {
+    return NO;
+  }
+  if (![[self clientApplicationId] isEqual:[complianceObject clientApplicationId]]) {
+    return NO;
+  }
+  return YES;
+}
+
+-(BOOL)isMatchingClient:(nullable id) otherClient applicationId:(nullable NSString *)otherAppId {
+  BOOL matches = YES;
+  if (![(id)[self client] isEqual:otherClient]) {
+    matches = NO;
+  }
+  if (![[self clientApplicationId] isEqual:otherAppId]) {
+    matches = NO;
+  }
+  
+  os_log_debug([KMLogs complianceLog], "## isMatchingClient = %@", matches?@"YES":@"NO");
+  return matches;
 }
 
 -(NSString *)description
@@ -92,20 +131,22 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
--(void) checkCompliance:(id) client {
-  // confirm that the API actually exists (this always seems to return true)
-  self.hasCompliantSelectionApi = [client respondsToSelector:@selector(selectedRange)];
+-(void) checkCompliance {
+  // confirm that the API actually exists (always seems to return true unless client is nil)
+  self.hasCompliantSelectionApi = [self.client respondsToSelector:@selector(selectedRange)];
   
   if (!self.hasCompliantSelectionApi) {
     self.complianceUncertain = NO;
   }
   else {
     // if API exists, call it and see if it works as expected
-    self.initialSelection = [client selectedRange];
+    self.initialSelection = [self.client selectedRange];
     os_log_debug([KMLogs complianceLog], "checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length);
     [self checkComplianceUsingInitialSelection];
   }
-  os_log_debug([KMLogs complianceLog], "checkCompliance workingSelectionApi for app %{public}@: set to %{public}@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO");
+  NSString *message = [NSString stringWithFormat:@"checkCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
   [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 
@@ -132,10 +173,10 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 /**
  * If complianceUncertain is true, checking the location after an insert can confirm whether the app is compliant.
- * Delete and insert are what core instructed us to do.
+ * insertedText and deletedText contain the text that Keyman Core instructed us to insert and delete
  * Text that was selected in the client when the key was processed is irrelevant as it does not affect the location.
  */
--(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert {
+-(void) checkComplianceAfterInsert:(NSString *)insertedText deleted:(NSString *)deletedText {
   
   // return if compliance is already certain
   if(!self.complianceUncertain) {
@@ -143,14 +184,16 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     return;
   }
   
-  NSRange selectionRange = [client selectedRange];
-  if ([self validateNewLocation:selectionRange.location delete:textToDelete]) {
-    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:textToDelete insert:textToInsert];
+  NSRange selectionRange = [self.client selectedRange];
+  if ([self validateNewLocation:selectionRange.location delete:deletedText]) {
+    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:deletedText insert:insertedText];
     BOOL locationChanged = [self hasLocationChanged:selectionRange];
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
   
-  os_log_info([KMLogs complianceLog], "checkComplianceAfterInsert, self.hasWorkingSelectionApi = %{public}@ for app %{public}@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId);
+  NSString *message = [NSString stringWithFormat:@"checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
   [KMSentryHelper addApiComplianceTag:self.shortSentryTagDescription];
 }
 
