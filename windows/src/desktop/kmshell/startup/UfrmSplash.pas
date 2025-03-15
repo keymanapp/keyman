@@ -265,10 +265,6 @@ begin
 
     until False;
 
-    if kmcom.Options[KeymanOptionName(TUtilKeymanOption.koCheckForUpdates)].Value then
-    begin
-      RunConfiguration(0, '-buc -s');
-    end;
   end;
 end;
 

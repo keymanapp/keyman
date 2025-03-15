@@ -13,12 +13,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TextApiCompliance : NSObject
-@property (readonly) NSString *clientApplicationId;
+@property (readonly, copy) NSString *clientApplicationId;
 
--(instancetype)initWithClient:(id) client applicationId:(NSString *)appId;
+-(instancetype)initWithClient:(nullable id) client applicationId:(nullable NSString *)appId;
+-(BOOL)isMatchingClient:(nullable id) otherClient applicationId:(nullable NSString *)otherAppId;
 -(NSString *)description;
--(void)checkCompliance:(id) client;
--(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert;
+-(void)checkCompliance;
+-(void) checkComplianceAfterInsert:(NSString *)insertedText deleted:(NSString *)deletedText;
 -(BOOL)isComplianceUncertain;
 -(BOOL)canReadText;
 -(BOOL)mustBackspaceUsingEvents;

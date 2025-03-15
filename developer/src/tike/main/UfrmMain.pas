@@ -547,6 +547,8 @@ end;
 
 
 procedure TfrmKeymanDeveloper.FormCreate(Sender: TObject);
+var
+  newProject: TProjectUI;
 begin
   inherited;
 
@@ -605,7 +607,13 @@ begin
   if TikeCommandLine.StartupProjectPath <> '' then
   begin
     try
-      LoadGlobalProjectUI(ptUnknown, TikeCommandLine.StartupProjectPath);
+      if TikeCommandLine.StartupProjectPath = '-'
+        then newProject := CreateTempGlobalProjectUI(ptUnknown)
+        else newProject := LoadGlobalProjectUI(ptUnknown, TikeCommandLine.StartupProjectPath);
+      if newProject = nil then
+      begin
+        raise EProjectLoader.Create('Project is already open in another process');
+      end;
     except
       on E:EProjectLoader do
       begin
@@ -1291,7 +1299,10 @@ begin
       // We need to create a temporary project to host this file
       // This can happen if we get a file opened via Explorer without a
       // corresonding project file
-      CreateTempGlobalProjectUI(ptUnknown);
+      if CreateTempGlobalProjectUI(ptUnknown) = nil then
+      begin
+        raise Exception.Create('Keyman Developer was unable to create a temporary project');
+      end;
       UpdateCaption;
     end;
 
@@ -1371,7 +1382,10 @@ begin
   end;
 
   try
-    LoadGlobalProjectUI(ptUnknown, FileName);   // I4687
+    if LoadGlobalProjectUI(ptUnknown, FileName) = nil then   // I4687
+    begin
+      raise EProjectLoader.Create('Project is open in another process');
+    end;
   except
     on E:EProjectLoader do
     begin

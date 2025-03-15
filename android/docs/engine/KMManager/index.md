@@ -50,6 +50,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`canRemoveKeyboard()`](canRemoveKeyboard)
 : returns whether removing a keyboard is enabled, like in the keyboard picker menu
 
+[`closeParentAppOnShowKeyboardPicker()`](closeParentAppOnShowKeyboardPicker)
+: restores keyboard picker task flag so keyboard picker dismisses the parent app
+
 [`copyHTMLBannerAssets()`](copyHTMLBannerAssets)
 : copies a folder of HTML banner assets so it's available for your keyboard app's resources
 
@@ -58,6 +61,9 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`deregisterLexicalModel()`](deregisterLexicalModel)
 : deregisters the specified lexical model from the LMLayer so it isn't used
+
+[`dontCloseParentAppOnShowKeyboardPicker()`](dontCloseParentAppOnShowKeyboardPicker)
+: disables keyboard picker task flag so keyboard picker doesn't dismiss the parent app
 
 [`executeHardwareKeystroke()`](executeHardwareKeystroke)
 : process the keystroke generated from a physical keyboard
@@ -211,9 +217,6 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`removeKeyboardEventListener()`](removeKeyboardEventListener)
 : removes the specified listener from the list of keyboard event listeners
-
-[`sendOptionsToKeyboard()`](sendOptionsToKeyboard)
-: sends options like longpress delay to the KeymanWeb keyboard
 
 [`setCanAddNewKeyboard()`](setCanAddNewKeyboard)
 : sets whether adding a new keyboard is allowed

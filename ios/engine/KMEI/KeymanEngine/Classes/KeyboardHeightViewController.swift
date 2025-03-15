@@ -355,14 +355,8 @@ class KeyboardHeightViewController: UIViewController {
     var arrowSymbolImage: UIImage? = nil
     keyboardResizer.isUserInteractionEnabled = true
     
-    // if using iOS earlier than 13.0, use bitmap image of arrow and non-dynamic gray
-    if #available(iOSApplicationExtension 13.0, *) {
-      arrowSymbolImage = UIImage(systemName: "arrow.up.and.down.square.fill")
-      keyboardResizer.backgroundColor = UIColor.systemGray3 // adapts for light/dark mode
-    } else {
-      arrowSymbolImage = UIImage(named:"arrow.up.and.down", in:engineBundle, compatibleWith:nil)
-      keyboardResizer.backgroundColor = UIColor.systemGray
-    }
+    arrowSymbolImage = UIImage(systemName: "arrow.up.and.down.square.fill")
+    keyboardResizer.backgroundColor = UIColor.systemGray3 // adapts for light/dark mode
     keyboardResizer.image = arrowSymbolImage
     keyboardResizer.layer.cornerRadius = 5
     contentView.addSubview(keyboardResizer)

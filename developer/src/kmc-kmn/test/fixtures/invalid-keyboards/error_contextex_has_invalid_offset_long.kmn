@@ -1,0 +1,11 @@
+﻿store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+store(cons) 'bcd'
+
+group(main) using keys
+
+c ERROR_ContextExHasInvalidOffset: `context(2)` is longer than range
+any(cons) + 'a' > 'x' context(2) 'z'
+

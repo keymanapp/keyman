@@ -140,12 +140,12 @@ function _setup_test_dbus_server() {
   CLEANUP_FILE=$2
 
   # Start test dbus server. This will create `/tmp/km-test-server.env`.
-  "${TOP_BINDIR}/tests/km-dbus-test-server" &> /tmp/km-test-server.log &
+  "${TOP_BINDIR}/tests/dbus-test-server/km-dbus-test-server" &> /tmp/km-test-server.log &
   sleep 1
 
   cat /tmp/km-test-server.env >> "$ENV_FILE"
   cat /tmp/km-test-server.env >> "$CLEANUP_FILE"
-  echo "${TOP_BINDIR}/tests/stop-test-server" >> "$CLEANUP_FILE"
+  echo "${TOP_BINDIR}/tests/dbus-test-server/stop-test-server" >> "$CLEANUP_FILE"
 
   source /tmp/km-test-server.env
   echo "# DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
@@ -256,7 +256,7 @@ function _setup_ibus() {
     echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   else
     # test run as part of the build
-    echo "kill -9 ${PID} || true" >> "${CLEANUP_FILE}"
+    echo "kill -9 ${PID} || true # ibus-daemon" >> "${CLEANUP_FILE}"
   fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s

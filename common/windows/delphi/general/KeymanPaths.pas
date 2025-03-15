@@ -19,6 +19,9 @@ type
     const S_CustomisationFilename = 'desktop_pro.pxx';
 
     const S_KeymanAppData_UpdateCache = 'Keyman\UpdateCache\';
+
+    class var FHaveCachedKeymanRoot: Boolean;
+    class var FCachedKeymanRoot: string;
   public
     const S_KMShell = 'kmshell.exe';
     const S_TSysInfoExe = 'tsysinfo.exe';
@@ -434,12 +437,21 @@ end;
 
 class function TKeymanPaths.RunningFromSource(var keyman_root: string): Boolean;
 begin
+  if FHaveCachedKeymanRoot then
+  begin
+    keyman_root := FCachedKeymanRoot;
+    Exit(keyman_root <> '');
+  end;
   // On developer machines, if we are running within the source repo, then use
   // those paths
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT').Replace('/', '\', [rfReplaceAll]);
   if keyman_root <> '' then
     keyman_root := IncludeTrailingPathDelimiter(keyman_root);
   Result := (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length));
+
+  FHaveCachedKeymanRoot := True;
+  if Result then
+    FCachedKeymanRoot := keyman_root;
 end;
 
 class function TKeymanPaths.KeymanCoreLibraryPath(const Filename: string): string;

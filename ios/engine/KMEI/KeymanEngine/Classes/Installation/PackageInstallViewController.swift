@@ -208,13 +208,6 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
       edgesForExtendedLayout = []
 
       rightNavigationMode = .next
-
-      if #available(*, iOS 13.4) {
-        // No icon issues here.
-      } else {
-        tabVC.tabBar.items![0].titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -16)
-        tabVC.tabBar.items![1].titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -16)
-      }
     }
 
     // If there's only one language in the package, hide the language picker.
@@ -357,9 +350,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     self.pickingCompletionHandler(selectedResources.map { $0.typedFullID })
 
     // Prevent swipe dismissal.
-    if #available(iOS 13.0, *) {
-      self.isModalInPresentation = true
-    }
+    self.isModalInPresentation = true
 
     // No more selection-manipulation allowed.
     // This matters when there's no welcome page available.
@@ -376,9 +367,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
     // First, show the package's welcome - if it exists.
     if let welcomeVC = PackageWebViewController(for: package, page: .welcome) {
       // Prevent swipe dismissal.
-      if #available(iOS 13.0, *) {
-        welcomeVC.isModalInPresentation = true
-      }
+      welcomeVC.isModalInPresentation = true
 
       let subNavVC = UINavigationController(rootViewController: welcomeVC)
       _ = subNavVC.view
@@ -502,11 +491,7 @@ public class PackageInstallViewController<Resource: LanguageResource>: UIViewCon
 
   private func setCellStyle(_ cell: UITableViewCell, style: CellStyle) {
     var textColor: UIColor
-    if #available(*, iOS 13.0) {
-      textColor = .label
-    } else {
-      textColor = .black
-    }
+    textColor = .label
 
     switch style {
       case .none:

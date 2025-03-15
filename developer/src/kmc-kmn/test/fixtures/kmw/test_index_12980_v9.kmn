@@ -1,0 +1,22 @@
+﻿c test_index_12980 generated from template at 2025-01-22 13:25:35
+c Validates index() offsets when used with if() - see #12980
+c Test with v9 KMW compiler (does not support notany)
+
+store(&VERSION) '9.0'
+store(&NAME) 'test_index_12980_v9'
+store(&TARGETS) 'web'
+
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(a) '1'
+store(b) '2'
+store(e) '5'
+store(f) '6'
+
+if(&platform = 'web') any(a) + 'a' > context 'A'
+if(&platform = 'web') any(b) + 'b' > context(2) 'B'
+nul any(e) + 'e' > context 'E'
+nul any(f) + 'f' > context(2) 'F'

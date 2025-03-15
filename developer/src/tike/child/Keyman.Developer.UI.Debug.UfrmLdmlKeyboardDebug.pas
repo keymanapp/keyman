@@ -412,7 +412,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
       if dk.SavedPosition < 0 then
       begin
         dk.Position := L + dk.SavedPosition;
-        if (dk.Position < 0) or (dk.Position >= L) or (s[dk.Position + 1] <> #$FFFC) then
+        if (dk.Position < 0) or (dk.Position >= L) or (s[dk.Position + 1] <> DeadKey_Marker) then
           // This can happen if the deadkey was in a replaced selection
           dk.Delete;
       end;
@@ -481,7 +481,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
 
 
   // Returns the length of the context items in UTF16, treating markers as a
-  // single UTF16 code unit (U+FFFC)
+  // single UTF16 code unit (DeadKey_Marker)
   function ContextItemsLengthUTF16(pc: pkm_core_context_item): Integer;
   begin
     Result := 0;
@@ -519,7 +519,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
         dk.Position := Result.Length + offset;
         dk.SavedPosition := Result.Length + offset;
         FDeadkeys.Add(dk);
-        Result := Result + #$FFFC;
+        Result := Result + DeadKey_Marker;
       end;
       Inc(pc);
     end;

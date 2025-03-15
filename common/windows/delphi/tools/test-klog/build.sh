@@ -5,7 +5,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Tool for validating klog is disabled for release builds" clean configure build test prepublish
+builder_describe "Tool for validating klog is disabled for release builds" \
+  clean configure build test prepublish edit
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -33,3 +34,4 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action prepublish:project  "$WIN32_TARGET_PATH/test_klog.exe"
+builder_run_action edit:project         start test_klog.dproj

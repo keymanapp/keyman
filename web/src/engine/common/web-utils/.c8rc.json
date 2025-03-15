@@ -10,7 +10,7 @@
   ],
   "exclude-after-remap": true,
   "reporter": ["text", "text-summary"],
-  "reports-dir": "build/coverage",
+  "reports-dir": "../../../build/coverage/raw/raw/engine/common/web-utils",
   "src": [
     "src/"
   ]

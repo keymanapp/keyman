@@ -1,18 +1,18 @@
 (*
   Name:             debugdeadkeys
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      18 May 2012
 
   Modified Date:    18 May 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          18 May 2012 - mcdurdin - I3323 - V9.0 - Change from Plus-MemoU to Plus-Memo
 *)
 unit debugdeadkeys;
@@ -48,6 +48,11 @@ type
     procedure FillDeadkeys(startpos: Integer; var s: WideString);
   end;
 
+const
+  // This is not an ideal marker -- we were using U+FFFC previously, but
+  // richedit silently converts it to U+0020.
+  DeadKey_Marker = #$0001;
+
 implementation
 
 uses
@@ -80,7 +85,7 @@ begin
   i := 1;
   while i <= Length(s) do
   begin
-    if s[i] = #$FFFC then
+    if s[i] = DeadKey_Marker then
     begin
       for dk in Self do
       begin

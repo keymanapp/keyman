@@ -4,7 +4,7 @@ title: KMManager.setLongpressDelay()
 
 ## Summary
 
-The `setLongpressDelay()` method sets the number of milliseconds to trigger a longpress gesture as a stored preference.
+The `setLongpressDelay()` method sets the number of milliseconds to trigger a longpress gesture, applies to the keyboard, and stores preference.
 
 ## Syntax
 
@@ -27,11 +27,8 @@ The following code illustrates the use of `setLongpressDelay()`:
 ```java
     int currentDelayTimeMS = 300;
 
-    // Store currentDelayTimeMS
+    // Store currentDelayTimeMS and applies
     KMManager.setLongpressDelay(currentDelayTimeMS);
-
-    // Apply the keyboard options
-    KMManager.sendOptionsToKeyboard();
 ```
 
 ## History
@@ -39,4 +36,3 @@ Keyman Engine for Android 18.0: New function.
 
 ## See also
 * [getLongpressDelay](getLongpressDelay)
-* [sendOptionsToKeyboard](sendOptionsToKeyboard)

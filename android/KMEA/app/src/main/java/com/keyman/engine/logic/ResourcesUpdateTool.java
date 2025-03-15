@@ -122,6 +122,8 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
           return;
         }
 
+        // Warning:  can be run by our system keyboard, which will attempt to
+        // display the toast if it or the app is visible!
         BaseActivity.makeToast(currentContext, R.string.update_check_unavailable, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         updateCheckFailed = true;

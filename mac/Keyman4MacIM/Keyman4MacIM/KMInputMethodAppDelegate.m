@@ -894,7 +894,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setKeyboardName:nil];
   [self setKeyboardIcon:nil];
   [self setContextBuffer:nil];
-  [self setSelectedKeyboard:nil];
+  [self setSelectedKeyboard:@""];
 }
 
 - (void)selectKeyboardFromMenu:(NSInteger)tag {

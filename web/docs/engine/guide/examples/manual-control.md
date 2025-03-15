@@ -14,13 +14,12 @@ Include the following script in the HEAD of your page:
   function SetupDocument()
   {
     /* Make sure that Keyman is initialized (we can't guarantee initialization order) */
-    keyman.init();
-
-    KWControl = document.getElementById('KWControl');
-    /* Prevents automatic display of the onscreen keyboard. (default automatic) */
-    keyman.osk.hide();
-    /* Select the LaoKeys keyboard */
-    keyman.setActiveKeyboard('laokeys');
+    keyman.init().then(function () {
+      /* Prevents automatic display of the onscreen keyboard. (default automatic) */
+      keyman.osk.hide();
+      /* Select the LaoKeys keyboard */
+      keyman.setActiveKeyboard('laokeys');
+    });
   }
 
   /* KWControlClick: Called when user clicks on the KWControl IMG */
@@ -56,7 +55,7 @@ And finally, include the control img for KeymanWeb:
 
 ```html
 <!-- Display the KeymanWeb icon for the user to click on -->
-<img style="border: solid 1px black; padding: 2px 2px 3px 2px" src='kmicon.png' alt='KeymanWeb' onclick='KWControlClick()' id='KWControl' />
+<img style="border: solid 1px black; padding: 2px 2px 3px 2px" src='kmicon.png' alt='KeymanWeb' onclick='KWControlClick()' />
 ```
 
 ## API References

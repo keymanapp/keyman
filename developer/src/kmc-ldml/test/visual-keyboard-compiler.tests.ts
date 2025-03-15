@@ -184,6 +184,26 @@ describe('visual-keyboard-compiler', function() {
     assert.equal(vk.keys[0].text, '2');
   });
 
+  it('should strip markers from key.output', async function() {
+    const xml = stripIndent`
+      <?xml version="1.0" encoding="UTF-8"?>
+      <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+        <info name="minimal"/>
+        <keys>
+          <key id="x" output="1\\m{hat}2" />
+        </keys>
+        <layers formId="us">
+          <layer modifiers="none"><row keys="x" /></layer>
+        </layers>
+      </keyboard3>
+    `;
+
+    const vk = await loadVisualKeyboardFromXml(xml, 'test');
+
+    assert.equal(vk.keys.length, 1);
+    assert.equal(vk.keys[0].text, '12'); // marker stripped from `1<marker>2`
+  });
+
   it('should read string variables in display.display', async function() {
     const xml = stripIndent`
       <?xml version="1.0" encoding="UTF-8"?>

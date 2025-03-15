@@ -327,6 +327,10 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">បង្ហាញ​អេក្រង់​ស្វាគមន៍</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Modified: 18.0.96.0 -->
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">ពិនិត្យ​រក​អាប់ដេត និងទាញយកដោយស្វ័យប្រវត្តិ​</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">តេស្ត​រក​កម្មវិធីដែល​ប្រឆាំងគ្នា ពេល Keyman ចាប់ផ្ដើម</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -454,6 +458,22 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">ការវិភាគ</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_No_Updates_Available" comment="Update tab - no updates are available">គ្មានការអាប់ដេត</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">មាន​ការអាប់ដេតដែលនឹងអនុវត្ពពេលវីនដូដំណើរការជាថ្មី</string>
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">អាប់ដេតឥឡូវនឹងត្រូវឲកុំព្យូទ័រដំណើរការជាថ្មី</string>
+  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.168 -->
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">ការអាប់ដេត Keyman ត្រៀមរួចរាល់សម្រាប់ដំឡើង។</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -545,6 +565,10 @@
   <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">គ្រាប់​ចុច​ផ្លូវ​កាត់ %1$s ប្រឆាំង​គ្នា​ជា​មួយ​គ្រាប់​ចុច​ផ្លូវ​កាត់​មួយ​ផ្សេងទៀត។ បើ​បន្ត គ្រាប់​ចុច​ផ្លូវ​កាត់​មួយ​ផ្សេង​ទៀត​នោះ​នឹង​ត្រូវ​​លុបចោល។ បន្ត?</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update" comment="Update tab name">អាប់ដេត</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">មាន​សមាសភាគ Keyman ដែល​បាន​អាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
@@ -614,6 +638,14 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">បិទ​ការ​ពិនិត្យ​រក​ការអាប់ដេត​អនឡាញ</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">អនុវត្ដការអាប់ដេតឥឡូវ</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Button_Update_CheckNow" comment="Check for updates now button - update dialog">ពិនិត្យ​រក​ការអាប់ដេតថ្មីៗ</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->

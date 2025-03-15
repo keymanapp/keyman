@@ -119,7 +119,9 @@ public class KMKeyboardJSHandler {
 
         InputConnection ic = KMManager.getInputConnection(k.keyboardType);
         if (ic == null) {
-          KMLog.LogError(TAG, "insertText failed: InputConnection is null");
+          // current active InputConnection is no longer bound to the Keyman Engine input method
+          // (user switched to another IME) so disregard the keystroke.
+          // https://developer.android.com/reference/android/inputmethodservice/InputMethodService#getCurrentInputConnection()
           return;
         }
 
@@ -273,7 +275,9 @@ public class KMKeyboardJSHandler {
 
         InputConnection ic = KMManager.getInputConnection(k.keyboardType);
         if (ic == null) {
-          KMLog.LogError(TAG, "dispatchKey failed: InputConnection is null");
+          // current active InputConnection is no longer bound to the Keyman Engine input method
+          // (user switched to another IME) so disregard the keystroke.
+          // https://developer.android.com/reference/android/inputmethodservice/InputMethodService#getCurrentInputConnection()
           return;
         }
 

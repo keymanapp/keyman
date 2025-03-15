@@ -33,12 +33,17 @@ function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
 implementation
 
 uses
+  System.Hash,
   System.SysUtils,
   Winapi.Windows,
 
+  Keyman.Developer.System.KeymanDeveloperPaths,
   Keyman.Developer.System.TikeMultiProcess,
   Keyman.Developer.System.Project.Project,
   utildir;
+
+function LockProject(const AFilename: string): Boolean; forward;
+procedure UnlockProject; forward;
 
 function GetGlobalProjectUI: TProjectUI;
 begin
@@ -52,8 +57,12 @@ end;
 
 procedure FreeGlobalProjectUI;
 begin
-  FreeAndNil(FGlobalProject);
-  TikeMultiProcess.CloseProject;
+  try
+    FreeAndNil(FGlobalProject);
+    TikeMultiProcess.CloseProject;
+  finally
+    UnlockProject;
+  end;
 end;
 
 function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
@@ -65,6 +74,11 @@ begin
 
   AFileName := KGetTempFileName('.kpj');
   System.SysUtils.DeleteFile(AFileName);
+
+  if not LockProject(AFilename) then
+  begin
+    Exit(nil);
+  end;
 
   kpj := TProject.Create(pt, AFilename, False);
   try
@@ -93,6 +107,12 @@ end;
 function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 begin
   Assert(not Assigned(FGlobalProject));
+
+  if not LockProject(AFilename) then
+  begin
+    Exit(nil);
+  end;
+
   Result := TProjectUI.Create(pt, AFilename, True);   // I4687
   FGlobalProject := Result;
   TikeMultiProcess.OpenProject(
@@ -100,6 +120,37 @@ begin
     FGlobalProject.GetTargetFilename(FGlobalProject.Options.SourcePath,
       '', '')
   );
+end;
+
+var
+  hLockFile: THandle = INVALID_HANDLE_VALUE;
+
+function LockProject(const AFilename: string): Boolean;
+var
+  LockFilename: string;
+begin
+  Assert(hLockFile = INVALID_HANDLE_VALUE);
+
+  if not ForceDirectories(TKeymanDeveloperPaths.LockFilePath) then
+  begin
+    Exit(False);
+  end;
+
+  LockFilename := TKeymanDeveloperPaths.LockFilePath + THashSHA1.GetHashString(AFilename.ToLower) + '.lock';
+
+  hLockFile := CreateFile(PChar(LockFilename), GENERIC_READ or GENERIC_WRITE, 0, nil, CREATE_ALWAYS, FILE_FLAG_DELETE_ON_CLOSE, 0);
+  Result := hLockFile <> INVALID_HANDLE_VALUE;
+end;
+
+procedure UnlockProject;
+begin
+  if not hLockFile = INVALID_HANDLE_VALUE then
+  begin
+    Exit;
+  end;
+
+  CloseHandle(hLockFile);
+  hLockFile := INVALID_HANDLE_VALUE;
 end;
 
 end.

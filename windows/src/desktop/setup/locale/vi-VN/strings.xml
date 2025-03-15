@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Tiếng Việt</string>
+  <string name="ssApplicationTitle">Trình cài đặt $APPNAME $VERSION</string>
+  <string name="ssTitle">Cài đặt $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION đã được cài đặt xong.</string>
+  <string name="ssCancelQuery">Bạn có muốn huỷ cài đặt $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Đang giải nén gói...</string>
+  <string name="ssBootstrapCheckingPackages">Đang kiểm tra gói phần mềm...</string>
+  <string name="ssBootstrapCheckingForUpdates">Đang kiểm tra cập nhật trực tuyến...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Đang kiểm tra các phiên bản đã được cài đặt...</string>
+  <string name="ssBootstrapReady">Đang hoàn tất...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s cho %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Không có gì để cài đặt.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s tải xuống)</string>
+  <string name="ssActionInstall">Trình cài đặt sẽ cài đặt:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION là miễn phí và mã nguồn mở</string>
+  <string name="ssLicenseLink">&amp;Đọc giấy phép</string>
+  <string name="ssInstallOptionsLink">&amp;Tuỳ chọn cài đặt</string>
+  <string name="ssMessageBoxTitle">Trình cài đặt $APPNAME</string>
+  <string name="ssOkButton">Vâng</string>
+  <string name="ssInstallButton">&amp;Cài đặt</string>
+  <string name="ssCancelButton">Huỷ</string>
+  <string name="ssExitButton">&amp;Thoát</string>
+  <string name="ssStatusInstalling">Đang tải $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Xóa phiên bản cũ</string>
+  <string name="ssStatusComplete">Cài đặt thành công</string>
+  <string name="ssQueryRestart">Bạn cần khởi động lại Windows trước khi trình cài đặt hoàn tất. Khi bạn khởi động lại Windows, trình cài đặt sẽ tiếp tục.
+
+Khởi động lại ngay bay giờ không?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows không thể tự động khởi động lại. Bạn nên khởi động lại Windows trước khi bạn thử và bắt đầu $APPNAME.</string>
+  <string name="ssMustRestart">Bạn phải khởi động lại Windows để hoàn thành trình cài đặt. Khi bạn khởi động lại Windows, trình cài đặt sẽ hoàn tất.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION cần Windows 7 trở lên để tải xuống. Tuy nhiên, Keyman Desktop 7, 8 hoặc 9 đã được phát hiện. Bạn có muốn cài đặt các bàn phím trong trình cài đặt này vào phiên bản Keyman Desktop đã cài đặt hay không?</string>
+  <string name="ssOldOsVersionDownload">Phiên bản này $APPNAME cần Windows 7 trở lên để cài đặt. Bạn có muốn tải Keyman Desktop 8 hay không?</string>
+  <string name="ssOptionsTitle">Tuỳ chọn cài đặt</string>
+  <string name="ssOptionsTitleInstallOptions">Tuỳ chọn cài đặt</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Làm mặc định cấu hình $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Các mô-đun để cài đặt hoặc nâng cấp</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Ngôn ngữ gắn liền với bàn phím</string>
+  <string name="ssOptionsTitleLocation">Phiên bản để cài đặt</string>
+  <string name="ssOptionsStartWithWindows">Chạy $APPNAME khi Windows khởi động</string>
+  <string name="ssOptionsStartAfterInstall">Chạy $APPNAME khi hoàn tất cài đặt</string>
+  <string name="ssOptionsCheckForUpdates">Tự động kiểm tra trực tuyến phiên bản mới</string>
+  <string name="ssOptionsUpgradeKeyboards">Nâng cấp bàn phím được cài đặt với phiên bản cũ hơn lên phiên bản $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Chia sẻ thống kê sử dụng ẩn danh với keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Phiên bản cài đặt: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Cài đặt $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Nâng cấp $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s đã được cài đặt.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Tải về phiên bản %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Phiên bản %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Cài đặt %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Tải về phiên bản %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Phiên bản %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Chọn ngôn ngữ mà bạn muốn liên kết với bàn phím %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Ngôn ngữ mặc định</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Đang tải %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Đang tải %0:s</string>
+  <string name="ssOffline">Trình cài đặt $APPNAME không thể kết nối tới keyman.com để tải về các tài nguyên bổ sung.</string>
+  <string name="ssOffline2">Vui lòng kiểm tra bạn có đang trực tuyến hay không, và cấp phép Trình cài đặt $APPNAME để kết nối Internet trong thiết lập tường lửa.</string>
+  <string name="ssOffline3">Nhấp vào Huỷ bỏ để thoát trình cài đặt, Thử lại để thử tải lại tài nguyên, hoặc Từ chối để tiếp tục ngoại tuyến.</string>
+</resources>

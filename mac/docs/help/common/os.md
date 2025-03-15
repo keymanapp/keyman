@@ -13,3 +13,4 @@ Keyman supports the following Mac operating systems:
 * macOS Monterey (12.0)
 * macOS Ventura (13.0)
 * macOS Sonoma (14.0)
+* macOS Sequoia (15.0)

@@ -3,13 +3,14 @@ test_service_files = files(
   '../src/KeymanSystemService.cpp',
   '../src/OrderedOutputDevice.cpp',
   'KeyboardDeviceMock.cpp',
+  'OrderedOutputDeviceMock.cpp',
 )
 
 deps = [evdev, systemd]
 
 test_c_args = [
   '-DKEYMAN_TESTING',
-  '-DKeyboardDevice=KeyboardDeviceMock'
+  '-DKeyboardDevice=KeyboardDeviceMock',
 ]
 
 exe = executable(
