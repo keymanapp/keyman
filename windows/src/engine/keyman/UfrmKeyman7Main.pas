@@ -1842,7 +1842,7 @@ procedure TfrmKeyman7Main.tmrBackgroundUpdateCheckTimer(Sender: TObject);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
-    if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+    if OpenKeyReadOnly(SRegKey_KeymanEngine_CU) then
     begin
       if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) then Exit;
       if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) then Exit;

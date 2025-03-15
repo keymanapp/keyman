@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.AndroidRuntimeException;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,7 +71,13 @@ public class KMPBrowserActivity extends BaseActivity {
       }
     }
 
-    setContentView(R.layout.activity_kmp_browser);
+    try {
+      setContentView(R.layout.activity_kmp_browser);
+    } catch (AndroidRuntimeException e) {
+      // WebView not enabled
+      finish();
+      return;
+    }
 
     webView = (WebView) findViewById(R.id.kmpBrowserWebView);
     webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
