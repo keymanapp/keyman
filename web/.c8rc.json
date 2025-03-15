@@ -7,7 +7,17 @@
   "reporter": ["text", "text-summary"],
   "reports-dir": "build/coverage",
   "src": [
-    "**/src/",
+    "src/**",
     "../common/**/src"
+  ],
+  "include": [
+    "src/**"
+  ],
+  "exclude": [
+    "src/test/**",
+    "**/src/tests/**",
+    "**/build/**",
+    "src/tools/**",
+    "../node_modules/*"
   ]
 }

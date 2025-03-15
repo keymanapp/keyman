@@ -67,6 +67,8 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">ချိၚ်ဆသမၠုၚ်ကဳဗုဒ်ညိ</string>
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">ချိၚ်အခိၚ် ဍဵုလအ်အ်</string>
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">က္တိုပ်လိက် Spacebar</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">ကဳဗုဒ်</string>
@@ -87,11 +89,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">လ္ပဓမံက်ထ္ၜးမလိက်ပ္ဍဲspacebarညိ</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">ပ္ဍဲကာလမတက်လိက် ချဳဒတဝ်ညိ</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">ဓမံက်ထ္ၜးbannerလၟိုန်ညိ</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">သွက်ဂွံဓမံက်ရုပ်ရဴ</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">ကၟာတ်လဝ်မ္ဂး မလိက်ချိၚ်ဆလဝ်တံဂှ် ထ္ၜးအဃောပံက်လဝ်ဟေၚ်</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">ကဵုအခေါၚ် ပၠံၚ်လိက်စဳရေၚ်လ္တူ အေန်တာနက်ညိ</string>
@@ -123,6 +125,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ဂွံချိၚ် လံက်သတိက် လံက်ဇမၠိၚ်ဂှ် ဗဂေတ်ကဵုစက်ပိုဲညိ။</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ကလေၚ်သ္ပနူပကတိ</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">အခိၚ်ဖအိၚ်: %1$.1f စက္က</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">ဖအိၚ်အခိၚ်လအ်အ်</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">ဖအိၚ်အခိၚ်အောန်န်</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">ဍဵုလအ်အ်သွက် မသရေတ််ဖအိၚ်အခိၚ်</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">ဂၠာဲ ဟွံသေၚ် တက် URL</string>
   <!-- Context: Keyman Web Browser -->

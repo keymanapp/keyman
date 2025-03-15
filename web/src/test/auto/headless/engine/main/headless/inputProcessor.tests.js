@@ -5,7 +5,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
@@ -34,12 +35,11 @@ describe('InputProcessor', function() {
     });
 
     it('has expected default values after initialization', function () {
-      // Can construct without the second parameter; if so, the final assertion - .mayPredict
-      // will be invalidated.  (No worker, no ability to predict.)
-      let worker = Worker.constructInstance();
-
+      let core;
       try {
-        let core = new InputProcessor(device, worker);
+        // Can construct without the second parameter; if so, the final assertion - .mayPredict
+        // will be invalidated.  (No worker, no ability to predict.)
+        core = new InputProcessor(device, Worker);
 
         assert.isOk(core.keyboardProcessor);
         assert.isDefined(core.keyboardProcessor.contextDevice);
@@ -60,7 +60,7 @@ describe('InputProcessor', function() {
         assert.isFalse(core.languageProcessor.isActive);
         assert.isTrue(core.languageProcessor.mayPredict);
       } finally {
-        worker.terminate();
+        core?.languageProcessor?.shutdown();
       }
     });
   });
@@ -69,8 +69,10 @@ describe('InputProcessor', function() {
     let testDistribution = [];
     let keyboardWithHarness;
 
-    // Easy peasy long context:  use the input processor's full source!
-    let coreSourceCode = fs.readFileSync('build/lib/index.mjs', 'utf-8');
+    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
+
+    // Easy peasy long context:  use the unminified main script for the predictive-text worker!
+    let coreSourceCode = fs.readFileSync(mainWebScriptURL, 'utf-8');
 
     // At the time this test block was written...  810485 chars.
     // Let's force it to the same order of magnitude, even if the codebase grows.

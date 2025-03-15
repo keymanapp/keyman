@@ -129,6 +129,7 @@ type
     procedure SetupMSI;  // I2644
     procedure BackupKey(Root: HKEY; Path: WideString);  // I2642
     procedure GetDefaultSettings;
+    procedure GetSavedSettings;
     procedure FillActionText;
     procedure FillLanguageList;
     procedure FillStrings;
@@ -547,7 +548,6 @@ procedure TfrmRunDesktop.FormCreate(Sender: TObject);
 var
   oldHeight: Integer;
 begin
-  FAutomaticallyReportUsage := True;
 
   FillStrings;
 
@@ -564,7 +564,7 @@ begin
   CheckVersion9Upgrade;
   CheckVersion10Upgrade;
 
-  GetDefaultSettings;  // I2651
+  GetSavedSettings;
 
   FillLanguageList;
   FillStrings;
@@ -693,6 +693,7 @@ begin
     CanUpgradeKeyman := FCanUpgrade6 or FCanUpgrade7 or FCanUpgrade8 or FCanUpgrade9 or FCanUpgrade10;   // I4293
     if ShowModal = mrOk then
     begin
+      FAutomaticallyReportUsage := AutomaticallyReportUsage;
       FStartWithWindows := StartWithWindows;
       FStartAfterInstall := StartAfterInstall;
       FCheckForUpdates := CheckForUpdates;
@@ -1031,18 +1032,43 @@ end;
 
 procedure TfrmRunDesktop.GetDefaultSettings; // I2651
 begin
+  // Due to the way the TUtilKeymanOptionEntry.Save works it only
+  // saves the values that are different from the defaults.  So we
+  // need to set the defaults here. Two locations for the defaults is
+  // not ideal, but leave for now.
   FStartWithWindows := True; // I2607
   FCheckForUpdates := True;  // I2609
+  FAutomaticallyReportUsage := True;
+end;
 
+procedure TfrmRunDesktop.GetSavedSettings;
+var
+  CheckForUpdatesKeyFound: Boolean;
+begin
+  GetDefaultSettings;
+  CheckForUpdatesKeyFound := False;
   try
     with CreateHKCURegistry do  // I2749
     try
+      if OpenKeyReadOnly('\' + SRegKey_KeymanEngine_CU) then
+      begin
+        // only update the flag if the value exists in the registry, otherwise leave them as defaults
+        // leave as the the default values
+        if ValueExists(SRegValue_AutomaticallyReportUsage) then
+        begin
+          FAutomaticallyReportUsage := ReadBool(SRegValue_AutomaticallyReportUsage);
+        end;
+        if ValueExists(SRegValue_CheckForUpdates) then
+        begin
+          FCheckForUpdates := ReadBool(SRegValue_CheckForUpdates);
+          CheckForUpdatesKeyFound := True;
+        end;
+      end;
       if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
-        FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
+        FCheckForUpdates := (not CheckForUpdatesKeyFound) and ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
-
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin
