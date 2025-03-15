@@ -81,6 +81,14 @@ public final class KeyboardPickerActivity extends BaseActivity {
   }
 
   private boolean dismissOnSelect = true;
+
+  /*
+  // When the System Keyboard launches the keyboard picker while this flag is set,
+  // the intent includes Intent.FLAG_ACTIVITY_CLEAR_TASK which clears the activity stack.
+  // Disable this to keep the keyboard picker from clearing the parent app.
+   */
+  private static boolean canCloseParentAppOnShowKeyboardPicker = true;
+
   protected static boolean canAddNewKeyboard = true;
   protected static boolean canRemoveKeyboard = true;
   protected static boolean shouldCheckKeyboardUpdates = true;
@@ -472,6 +480,32 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     notifyKeyboardsUpdate(context);
+  }
+
+  /**
+   * Returns canCloseParentAppOnShowKeyboardPicker
+   * @return boolean
+   */
+  public static boolean getCanCloseParentAppOnShowKeyboardPicker() {
+    return canCloseParentAppOnShowKeyboardPicker;
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function keeps the parent app running in the background
+   */
+  protected static void dontCloseParentAppOnShowKeyboardPicker() {
+    canCloseParentAppOnShowKeyboardPicker = false;
+  }
+
+  /**
+   * Normally, launching the KeyboardPickerActivity from a system keyboard closes the parent app
+   * (The keyboard picker becomes the root of the activity stack)
+   * Calling this function restores this default behavior
+   */
+  protected static void closeParentAppOnShowKeyboardPicker() {
+    canCloseParentAppOnShowKeyboardPicker = true;
   }
 
   /**

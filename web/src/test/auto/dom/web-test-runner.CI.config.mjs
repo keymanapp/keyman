@@ -9,5 +9,6 @@ export default {
   reporters: [
     teamcityReporter(), /* custom-written, for CI-friendly reports */
     sessionStabilityReporter({ciMode: true})
-  ]
+  ],
+  concurrency: 1
 }

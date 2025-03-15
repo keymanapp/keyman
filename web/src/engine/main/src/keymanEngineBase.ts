@@ -2,6 +2,7 @@ import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeyman
 // TODO-web-core: remove usage of OutputTargetBase
 import { OutputTargetBase, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
+import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView, JSKeyboardData } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/keyboard-storage";
@@ -114,7 +115,7 @@ export class KeymanEngineBase<
    *                                   the superclass constructor.
    */
   constructor(
-    worker: Worker,
+    workerFactory: WorkerFactory,
     config: Configuration,
     contextManager: ContextManager,
     processorConfigInitializer: (engine: KeymanEngineBase<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
@@ -125,7 +126,7 @@ export class KeymanEngineBase<
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
-    this.core = new InputProcessor(config.hostDevice, worker, processorConfiguration);
+    this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,
