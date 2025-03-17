@@ -3,7 +3,7 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-03-13
  *
- * KMC KMN Next Generation Parser (TokenBuffer)
+ * KMC KMN Next Generation Parser (Kleene Operator Rules)
  */
 
 import { Token, TokenTypes } from "./lexer.js";
@@ -60,6 +60,33 @@ export class SequenceRule extends MultiChildRule {
     for (const rule of this.rules) {
       if (!rule.parse(tmp)) {
         parseSuccess = false;
+        break;
+      }
+    }
+    if (parseSuccess) {
+      node.addChildren(tmp.getChildren());
+    } else {
+      this.tokenBuffer.resetCurrentPosition(save);
+    }
+
+    return parseSuccess;
+  }
+}
+
+export class AlternateRule extends MultiChildRule {
+  public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
+    super(tokenBuffer, rules);
+  }
+
+  public parse(node: ASTNode): boolean {
+    let parseSuccess: boolean = false;
+    const save: number = this.tokenBuffer.currentPosition;
+    let tmp: ASTNode;
+
+    for (const rule of this.rules) {
+      tmp = new ASTNode(NodeTypes.TMP);
+      if (rule.parse(tmp)) {
+        parseSuccess = true;
         break;
       }
     }
