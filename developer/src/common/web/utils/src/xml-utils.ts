@@ -21,7 +21,7 @@ type KeymanXMLParserOptionsBag = {
   [key in KeymanXMLType]?: X2jOptions;
 };
 
-const commonKeymanXmlParserOptions: X2jOptions = {
+const PARSER_COMMON_OPTIONS: X2jOptions = {
   attributeNamePrefix: '$', // causes remapping into $: { … } objects
   htmlEntities: true,
   ignoreAttributes: false,
@@ -58,14 +58,14 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     preserveOrder: true,     // Gives us a 'special' format
   },
   'kps': {
-    ...commonKeymanXmlParserOptions,
+    ...PARSER_COMMON_OPTIONS,
   },
   'kpj': {
-    ...commonKeymanXmlParserOptions,
+    ...PARSER_COMMON_OPTIONS,
     attributeNamePrefix: '', // to avoid '@_' prefixes
   },
   'kvks': {
-    ...commonKeymanXmlParserOptions,
+    ...PARSER_COMMON_OPTIONS,
     tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
@@ -81,7 +81,7 @@ type KeymanXMLGeneratorOptionsBag = {
   [key in KeymanXMLType]?: XmlBuilderOptions
 };
 
-const commonKeymanXmlGeneratorOptions: XmlBuilderOptions = {
+const GENERATOR_COMMON_OPTIONS: XmlBuilderOptions = {
   attributeNamePrefix: '$',
   ignoreAttributes: false,
   format: true,
@@ -91,13 +91,13 @@ const commonKeymanXmlGeneratorOptions: XmlBuilderOptions = {
 
 const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   kvks: {
-    ...commonKeymanXmlGeneratorOptions,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kpj: {
-    ...commonKeymanXmlGeneratorOptions,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kps: {
-    ...commonKeymanXmlGeneratorOptions,
+    ...GENERATOR_COMMON_OPTIONS,
   },
 };
 
