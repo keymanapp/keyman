@@ -31,8 +31,20 @@ class TrueRule extends Rule {
   }
 
   public parse(node: ASTNode): boolean {
+    this.tokenBuffer.popToken();
     node.addChild(new ASTNode(NodeTypes.TMP));
     return true;
+  }
+}
+
+class FalseRule extends Rule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+  }
+
+  public parse(node: ASTNode): boolean {
+    this.tokenBuffer.popToken();
+    return false;
   }
 }
 
@@ -53,6 +65,16 @@ describe("Recursive Descent Tests", () => {
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeTypes.TMP));
       assert.equal(root.getChildren().length, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
+    });
+    it("can parse with an unsuccessful child Rule", () => {
+      const tokenBuffer     = new TokenBuffer(LIST);
+      const child: Rule     = new FalseRule(tokenBuffer);
+      const optional: Rule  = new OptionalRule(tokenBuffer, child);
+      const root: ASTNode   = new ASTNode(NodeTypes.TMP);
+      assert.isTrue(optional.parse(root));
+      assert.isFalse(root.hasChild());
+      assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
 });
