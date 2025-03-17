@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.216 beta 2025-03-17
+
+* change(android): re-order host page script load so Sentry can report script load failures (#13333)
+* chore(web): remove dead osk code (#13358)
+* fix(web): cancel held backspace on new key input (#13359)
+* fix(developer): handle non bmp numeric entities in xml reader (#13365)
+
 ## 18.0.215 beta 2025-03-14
 
 * docs(common): Update Sentry links to keyman.sentry.io (#13491)
