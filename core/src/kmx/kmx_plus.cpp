@@ -305,7 +305,7 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
       }
       const km_core_usv ch32 = Uni_SurrogateToUTF32(ch, ch2);
       if (!Uni_IsValid(ch32)) {
-        DebugLog("String of length 0x%x @ 0x%x: Char U+%08X is illegal char", length, n, ch32);
+        DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is illegal char", length, n, ch32);
         return false;
       }
     } else if (ch == LDML_UC_SENTINEL) {
@@ -330,7 +330,10 @@ bool COMP_KMXPLUS_STRS::valid_string(const KMX_WCHAR* start, KMX_DWORD length) {
         return false;
       }
       // else OK (good marker)
-    }  // else OK (other char)
+    } else if(!Uni_IsValid(ch)) {
+      DebugLog("String of length 0x%x @ 0x%x: Char U+%04X is illegal char", length, n, ch);
+      return false;    
+    } // else OK (other char)
   }
   return true;
 }

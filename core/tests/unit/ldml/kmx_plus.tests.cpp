@@ -242,6 +242,18 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 2));
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 1));
   }
+  {
+    // noncharacter FDD4
+    km_core_cu const s[] = {0xFDD4, 0x0020};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1)); // at end of str
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2)); // not followed by trailing surrogate
+  }
+  {
+    // FFFE nonchar (mismatched BOM)
+    km_core_cu const s[] = {0xFFFE, 0x0020};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1)); // at end of str
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2)); // not followed by trailing surrogate
+  }
 }
 
 TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withGoodStrings) {
