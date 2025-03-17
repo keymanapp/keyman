@@ -106,8 +106,7 @@ install_action() {
   if [ -n "${SUDO_USER:-}" ]; then
     # with sudo install into /usr/local
     pip3 install qrcode sentry-sdk
-    # eventually change this to: pip3 install .
-    python3 setup.py install
+    pip3 install .
     # install icons
     mkdir -p /usr/local/share/keyman/icons
     cp keyman_config/icons/* /usr/local/share/keyman/icons
@@ -117,9 +116,7 @@ install_action() {
   else
     # without sudo install into /tmp/keyman (or $DESTDIR)
     mkdir -p "/tmp/keyman/$(python3 -c 'import sys;import os;pythonver="python%d.%d" % (sys.version_info[0], sys.version_info[1]);sitedir = os.path.join("lib", pythonver, "site-packages");print(sitedir)')"
-    # when we no longer have to support old pip version (python > 3.6) change this to:
-    # pip3 install --prefix /tmp/keyman .
-    PYTHONUSERBASE=${DESTDIR:-/tmp/keyman} python3 setup.py install --user
+    pip3 install --prefix /tmp/keyman .
   fi
 }
 
