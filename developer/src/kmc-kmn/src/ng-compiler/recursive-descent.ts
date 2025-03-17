@@ -10,13 +10,26 @@ import { Token, TokenTypes } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export abstract class Rule {
+export abstract class Rule { // equivalent to a no-child rule
   protected tokenBuffer: TokenBuffer;
+
+  public constructor(tokenBuffer: TokenBuffer) {
+    // TODO error if tokenBuffer is null
+    this.tokenBuffer = tokenBuffer;
+  }
+
+  public parse(node: ASTNode): boolean {
+    return false;
+  }
+}
+
+export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
 
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule=null) {
-    this.tokenBuffer = tokenBuffer;
-    this.rule        = rule;
+  public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
+    // TODO error if rule is null
+    super(tokenBuffer);
+    this.rule = rule;
   }
 
   public parse(node: ASTNode): boolean {
@@ -24,12 +37,19 @@ export abstract class Rule {
   }
 }
 
-export class SequenceRule extends Rule {
-  private rules: Rule[];
+export abstract class MultiChildRule extends Rule {
+  protected rules: Rule[];
 
   public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
+    // TODO error if rules is null
     super(tokenBuffer);
     this.rules = rules;
+  }
+}
+
+export class SequenceRule extends MultiChildRule {
+  public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
+    super(tokenBuffer, rules);
   }
 
   public parse(node: ASTNode): boolean {
@@ -53,7 +73,7 @@ export class SequenceRule extends Rule {
   }
 }
 
-export class OptionalRule extends Rule {
+export class OptionalRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
     super(tokenBuffer, rule);
   }
@@ -75,7 +95,7 @@ export class OptionalRule extends Rule {
   }
 }
 
-export class ManyRule extends Rule {
+export class ManyRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
     super(tokenBuffer, rule);
   }
@@ -86,7 +106,7 @@ export class ManyRule extends Rule {
   }
 }
 
-export class OneOrManyRule extends Rule {
+export class OneOrManyRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
     super(tokenBuffer, rule);
   }
