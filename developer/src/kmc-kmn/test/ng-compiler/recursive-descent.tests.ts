@@ -48,19 +48,23 @@ class FalseRule extends Rule {
   }
 }
 
+let tokenBuffer: TokenBuffer = null;
+let root: ASTNode            = null;
+
 describe("Recursive Descent Tests", () => {
+  beforeEach(() => {
+    tokenBuffer = new TokenBuffer(LIST);
+    root        = new ASTNode(NodeTypes.TMP);
+  });
   describe("OptionalRule Tests", () => {
     it("can construct an OptionalRule", () => {
-      const tokenBuffer    = new TokenBuffer(LIST);
       const child: Rule    = new TrueRule(tokenBuffer);
       const optional: Rule = new OptionalRule(tokenBuffer, child);
       assert.isNotNull(optional);
     });
     it("can parse with a successful child Rule", () => {
-      const tokenBuffer     = new TokenBuffer(LIST);
-      const child: Rule     = new TrueRule(tokenBuffer);
-      const optional: Rule  = new OptionalRule(tokenBuffer, child);
-      const root: ASTNode   = new ASTNode(NodeTypes.TMP);
+      const child: Rule    = new TrueRule(tokenBuffer);
+      const optional: Rule = new OptionalRule(tokenBuffer, child);
       assert.isTrue(optional.parse(root));
       assert.isTrue(root.hasChild());
       assert.isTrue(root.hasChildOfType(NodeTypes.TMP));
@@ -68,10 +72,8 @@ describe("Recursive Descent Tests", () => {
       assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const tokenBuffer     = new TokenBuffer(LIST);
       const child: Rule     = new FalseRule(tokenBuffer);
       const optional: Rule  = new OptionalRule(tokenBuffer, child);
-      const root: ASTNode   = new ASTNode(NodeTypes.TMP);
       assert.isTrue(optional.parse(root));
       assert.isFalse(root.hasChild());
       assert.equal(tokenBuffer.currentPosition, 0);
