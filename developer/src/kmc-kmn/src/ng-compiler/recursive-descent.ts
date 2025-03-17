@@ -132,7 +132,7 @@ export class ManyRule extends SingleChildRule {
     while (parseSuccess) {
       let save: number = this.tokenBuffer.currentPosition;
       let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-      parseSuccess = this.rule.parse(tmp);
+      parseSuccess     = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
       } else {
@@ -152,17 +152,27 @@ export class OneOrManyRule extends SingleChildRule {
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
     let save: number = this.tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
 
-    if (this.rule.parse(tmp)) {
-      parseSuccess = true;
-      while (this.rule.parse(tmp));
+    parseSuccess = this.rule.parse(tmp);
+    if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
       this.tokenBuffer.resetCurrentPosition(save);
+      return false;
     }
 
-    return parseSuccess;
+    while (parseSuccess) {
+      save         = this.tokenBuffer.currentPosition;
+      tmp          = new ASTNode(NodeTypes.TMP);
+      parseSuccess = this.rule.parse(tmp);
+      if (parseSuccess) {
+        node.addChildren(tmp.getChildren());
+      } else {
+        this.tokenBuffer.resetCurrentPosition(save);
+      }
+    }
+    return true;
   }
 }
 
