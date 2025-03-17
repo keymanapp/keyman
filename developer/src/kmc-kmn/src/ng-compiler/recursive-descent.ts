@@ -137,7 +137,6 @@ export class ManyRule extends SingleChildRule {
         node.addChildren(tmp.getChildren());
       } else {
         this.tokenBuffer.resetCurrentPosition(save);
-        // TODO generate warning
       }
     };
     return true;
