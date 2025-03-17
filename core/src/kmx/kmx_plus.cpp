@@ -129,59 +129,57 @@ header_from_bytes(const uint8_t *data, KMX_DWORD length, uint32_t ident) {
  * @brief Accessor for a section based on bytes
  *
  * @tparam T
- * @param data
- * @param length
- * @param was_valid on exit, set to false if section was not valid
+ * @param data input pointer to the section to be validated. If nullptr, 'sect' will be nullptr, but will return true (valid).
+ * @param length length of input data. This function will not read past the end of this length.
+ * @param out on exit, will be set to the new section. On any failure, null data, or invalidity, will be nullptr.
+ * @return true if section is missing (nullptr) or valid
  * @return const T*
  */
-template <class T>
-const T *section_from_bytes(const uint8_t *data, KMX_DWORD length, bool &was_valid) {
-  if (length < sizeof(T)) { // Does not include dynamic data. First check.
+template <class T> bool section_from_bytes(const uint8_t* data, KMX_DWORD length, const T*& out) {
+  out = nullptr; // null unless valid.
+  if (data == nullptr) {
+    // missing section - not an error.
+    DebugLog("data was null (missing section)");
+    return true;
+  } else if (length < sizeof(T)) { // Does not include dynamic data. First check.
     DebugLog("length < sizeof(section)");
     assert(false);
-    return nullptr;
+    return false;
   }
+  // verify the kmx+ header
   const COMP_KMXPLUS_HEADER *header = header_from_bytes(data, length, T::IDENT);
+  // now it is safe to cast this to a T
   const T *section = reinterpret_cast<const T *>(header);
-  if (section != nullptr) {
-    if (!section->valid(length)) {
-      was_valid = false;
-      return nullptr;
-    } else {
-      // valid!
-      return section;
-    }
-  } else {
-    // not found
+  if (section == nullptr) {
+    // should not happen.
+    DebugLog("reinterpret_cast<> failed.");
     assert(false);
-    return nullptr;
+    return false;
+  } else if (!section->valid(length)) {
+    return false; // validation failed.
+  } else {
+    out = section;
+    return true;
   }
 }
 
 /**
  * @param sect this is the pointer to the 'sect' section table. Should not be null!
- * @param was_valid on exit, this is set to false if an invalid section was found. otherwise not modified
- * @returns the new section pointer, else nullptr if missing or invalid
+ * @param out on exit, will be set to the requested section, or nullptr if missing or invalid
+ * @returns true if section is valid or missing, false only if invalid
  */
 template <class T>
-const T *section_from_sect(const COMP_KMXPLUS_SECT* sect, bool &was_valid) {
-  const uint8_t *rawbytes = reinterpret_cast<const uint8_t *>(sect);
-  if (rawbytes == nullptr) {
-    DebugLog("section_from_sect(nullptr) == nullptr");
-    assert(false);
-    return nullptr;
+bool get_section_from_sect(const COMP_KMXPLUS_SECT* sect, const T*& out) {
+  KMX_DWORD entryLength;
+  const uint8_t *rawbytes = sect->get(T::IDENT, entryLength);
+  if (rawbytes == nullptr)  {
+    // just missing, not invalid
+    out = nullptr;
+    return true;
+  } else {
+    return section_from_bytes<T>(rawbytes, entryLength, out);
   }
-  KMX_DWORD offset = sect->find(T::IDENT);
-  if (!offset) {
-    DebugLog("section_from_sect() - not found. section %c%c%c%c (0x%X)", DEBUG_IDENT(T::IDENT), T::IDENT);
-    return nullptr;
-    // not a validation error, just missing
-  }
-  KMX_DWORD entrylength = sect->total - offset;
-  const T *ret = section_from_bytes<T>(rawbytes+offset, entrylength, was_valid);
-  return ret;
 }
-
 
 bool
 COMP_KMXPLUS_HEADER::valid(KMX_DWORD length) const {
@@ -385,6 +383,39 @@ COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
     }
   }
   return overall_valid;
+}
+
+KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
+  for (KMX_DWORD i = 0; i < count; i++) {
+    if (ident == entries[i].sect) {
+        return entries[i].offset;
+    }
+  }
+  return 0;
+}
+
+const uint8_t *COMP_KMXPLUS_SECT::get(KMX_DWORD ident, KMX_DWORD &entryLength) const {
+  entryLength = 0;
+  // the section table is also the beginning of the file.
+  const uint8_t *rawbytes = reinterpret_cast<const uint8_t *>(this);
+  if (rawbytes == nullptr) {
+    // should not get here - null this pointer.
+    DebugLog("section_from_sect(nullptr) == nullptr");
+    assert(false);
+    return nullptr;
+  }
+  // lookup the offset from teh table
+  KMX_DWORD offset = find(ident);
+  if (!offset) {
+    DebugLog("section_from_sect() - not found. section %c%c%c%c (0x%X)", DEBUG_IDENT(ident), ident);
+    return nullptr;
+  }
+  // return the potential length, based on table.
+  // we approximate the entryLength here, to at least not run off the end of the file.
+  // we could take the offset of the next section, as an improvement.
+  entryLength = total - offset;
+  // return the pointer to the raw bytes
+  return rawbytes+offset;
 }
 
 // ---- transform related fcns
@@ -1263,25 +1294,25 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
 
   const uint8_t* rawdata = reinterpret_cast<const uint8_t*>(keyboard);
   valid = true;
-  sect = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata+ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize, valid);
+  valid = section_from_bytes<COMP_KMXPLUS_SECT>(rawdata+ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize, sect) && valid;
   if (sect == nullptr) {
     DebugLog("kmx_plus(): 'sect' missing or did not validate");
     valid = false;
   } else {
     // load other sections, validating as we go
     // each field will be set to nullptr if validation fails or if the section is missing
-    bksp = section_from_sect<COMP_KMXPLUS_BKSP>(sect, valid);
-    disp = section_from_sect<COMP_KMXPLUS_DISP>(sect, valid);
-    elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect, valid);
-    key2 = section_from_sect<COMP_KMXPLUS_KEYS>(sect, valid);
-    layr = section_from_sect<COMP_KMXPLUS_LAYR>(sect, valid);
-    list = section_from_sect<COMP_KMXPLUS_LIST>(sect, valid);
-    loca = section_from_sect<COMP_KMXPLUS_LOCA>(sect, valid);
-    meta = section_from_sect<COMP_KMXPLUS_META>(sect, valid);
-    strs = section_from_sect<COMP_KMXPLUS_STRS>(sect, valid);
-    tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect, valid);
-    uset = section_from_sect<COMP_KMXPLUS_USET>(sect, valid);
-    vars = section_from_sect<COMP_KMXPLUS_VARS>(sect, valid);
+    valid = get_section_from_sect<COMP_KMXPLUS_BKSP>(sect, bksp) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_DISP>(sect, disp) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_ELEM>(sect, elem) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_KEYS>(sect, key2) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_LAYR>(sect, layr) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_LIST>(sect, list) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_LOCA>(sect, loca) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_META>(sect, meta) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_STRS>(sect, strs) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_TRAN>(sect, tran) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_USET>(sect, uset) && valid;
+    valid = get_section_from_sect<COMP_KMXPLUS_VARS>(sect, vars) && valid;
 
     // Initialize the helper objects for sections with dynamic parts.
     // Note: all of these setters will be passed 'nullptr'
@@ -1296,15 +1327,6 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     valid = tranHelper.setTran(tran) && valid;
     valid = usetHelper.setUset(uset) && valid;    
   }
-}
-
-KMX_DWORD COMP_KMXPLUS_SECT::find(KMX_DWORD ident) const {
-  for (KMX_DWORD i = 0; i < count; i++) {
-    if (ident == entries[i].sect) {
-        return entries[i].offset;
-    }
-  }
-  return 0;
 }
 
 std::u16string
