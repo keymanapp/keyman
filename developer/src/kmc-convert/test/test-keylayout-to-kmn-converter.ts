@@ -283,7 +283,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
   })
 
-  describe("get_KeyMap_Modifier_array__From__behaviour_arr ", function () {
+  describe("get_Modifier_array__From__KeyModifier_array ", function () {
     [[[['0', 0]], [['', 'shift? caps? ']]],
     [[['0', 1]], [['anyShift caps?', 'shift? rightShift caps? ', 'shift? leftShift caps? ', 'shift leftShift caps ']]],
     [[['0', 999]], [null]],
@@ -292,9 +292,9 @@ describe('KeylayoutToKmnConverter', function () {
     [[['0']], [null]],
     ].forEach(function (values) {
       it((values[1][0] !== null) ?
-        ("get_KeyMap_Modifier_array__From__behaviour_arr(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0][0] + "', '" + values[1][0][1] + "']" :
-        ("get_KeyMap_Modifier_array__From__behaviour_arr(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
-          const result = sut.get_KeyMap_Modifier_array__From__behaviour_arr(converted.arrayOf_Modifiers, values[0])
+        ("get_Modifier_array__From__KeyModifier_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0][0] + "', '" + values[1][0][1] + "']" :
+        ("get_Modifier_array__From__KeyModifier_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
+          const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0])
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -303,14 +303,14 @@ describe('KeylayoutToKmnConverter', function () {
     [[[undefined]], [null]],
     [[[]], [null]],
     ].forEach(function (values) {
-      it(("get_KeyMap_Modifier_array__From__behaviour_arr([" + values[0][0] + "])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
-        const result = sut.get_KeyMap_Modifier_array__From__behaviour_arr(converted.arrayOf_Modifiers, values[0])
+      it(("get_Modifier_array__From__KeyModifier_array([" + values[0][0] + "])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
+        const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0])
         assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
       });
     })
   })
 
-  describe("get_KeyMap_Code_array__From__ActionID_Action ", function () {
+  describe("get_KeyModifier_array__From__ActionID ", function () {
     [
       ["a16", [['32', 3]]],
       ["a19", [['45', 3]]],
@@ -327,14 +327,14 @@ describe('KeylayoutToKmnConverter', function () {
         outstring = outstring + "[ '" + values[1][i][0] + "', " + values[1][i][1].toString() + "], "
       }
 
-      it(("get_KeyMap_Code_array__From__ActionID_Action('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
-        const result = sut.get_KeyMap_Code_array__From__ActionID_Action(read, String(values[0]));
+      it(("get_KeyModifier_array__From__ActionID('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
+        const result = sut.get_KeyModifier_array__From__ActionID(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     })
   })
 
-  describe("get_ActionID_Id__From__ActionID_next ", function () {
+  describe("get_ActionID__From__ActionNext ", function () {
     [
       ["none", ""],
       ["a18", ""],
@@ -349,14 +349,14 @@ describe('KeylayoutToKmnConverter', function () {
       [undefined, ""],
       ["unknown", ""],
     ].forEach(function (values) {
-      it(("get_ActionID_Id__From__ActionID_next('" + values[0] + "')").padEnd(49, " ") + ' should return ' + "'" + values[1] + "'", async function () {
-        const result = sut.get_ActionID_Id__From__ActionID_next(read, String(values[0]));
+      it(("get_ActionID__From__ActionNext('" + values[0] + "')").padEnd(49, " ") + ' should return ' + "'" + values[1] + "'", async function () {
+        const result = sut.get_ActionID__From__ActionNext(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     })
   })
 
-  describe("get_ActionID_Index__From__ActionID_Id ", function () {
+  describe("get_ActionIndex__From__ActionId ", function () {
     [
       ["none", 0],
       ["a16", 8],
@@ -369,14 +369,14 @@ describe('KeylayoutToKmnConverter', function () {
       [undefined, 0],
       ["unknown", 0],
     ].forEach(function (values) {
-      it(("get_ActionID_Index__From__ActionID_Id('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
-        const result = sut.get_ActionID_Index__From__ActionID_Id(read, String(values[0]));
+      it(("get_ActionIndex__From__ActionId('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
+        const result = sut.get_ActionIndex__From__ActionId(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     })
   })
 
-  describe("get_Action2ID_NoneOutput__From__ActionID_Id ", function () {
+  describe("get_Output__From__ActionId_None ", function () {
     [["a14", "u"],
     ["", ""],
     [" ", ""],
@@ -384,8 +384,8 @@ describe('KeylayoutToKmnConverter', function () {
     ["unknown", ""],
     ].forEach(function (values) {
       it(
-        ("get_Action2ID_NoneOutput__From__ActionID_Id('" + values[0] + "')").padEnd(56, " ") + ' should return ' + "'" + values[1] + "'", async function () {
-          const result = sut.get_Action2ID_NoneOutput__From__ActionID_Id(read, String(values[0]));
+        ("get_Output__From__ActionId_None('" + values[0] + "')").padEnd(56, " ") + ' should return ' + "'" + values[1] + "'", async function () {
+          const result = sut.get_Output__From__ActionId_None(read, String(values[0]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -394,14 +394,14 @@ describe('KeylayoutToKmnConverter', function () {
     [undefined, ""],
     [99, ""],
     ].forEach(function (values) {
-      it(("get_Action2ID_NoneOutput__From__ActionID_Id('" + values[0] + "')").padEnd(56, " ") + ' should return ' + values[1], async function () {
-        const result = sut.get_Action2ID_NoneOutput__From__ActionID_Id(read, String(values[0]));
+      it(("get_Output__From__ActionId_None('" + values[0] + "')").padEnd(56, " ") + ' should return ' + values[1], async function () {
+        const result = sut.get_Output__From__ActionId_None(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     })
   })
 
-  describe("get_KeyMapModiKeyArray__from__array ", function () {
+  describe("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array ", function () {
 
     const b1_keycode_arr = [
       ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
@@ -472,12 +472,12 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (values) {
 
       const isCaps_used = true
-      const string_in = "get_KeyMapModiKeyArray__from__array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
+      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
       const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']"
 
       it((JSON.stringify(values[1]).length > 60) ? 'an array of objects should return an array of objectss' :
         string_in.padEnd(74, " ") + ' should return ' + string_out, async function () {
-          const result = sut.get_KeyMapModiKeyArray__from__array(read, values[0], isCaps_used);
+          const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps_used);
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -490,11 +490,11 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (values) {
 
       const isCaps_used = false
-      const string_in = "get_KeyMapModiKeyArray__from__array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
+      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
       const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']"
 
       it(string_in.padEnd(74, " ") + ' should return ' + string_out, async function () {
-        const result = sut.get_KeyMapModiKeyArray__from__array(read, values[0], isCaps_used);
+        const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps_used);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -505,8 +505,8 @@ describe('KeylayoutToKmnConverter', function () {
     [null, []],
     ].forEach(function (values) {
       const isCaps = true
-      it(("get_KeyMapModiKeyArray__from__array([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
-        const result = sut.get_KeyMapModiKeyArray__from__array(read, values[0], isCaps);
+      it(("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
+        const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -550,7 +550,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
   })
 
-  describe("get_ActionID_Output_array__From__ActionID_State ", function () {
+  describe("get_ActionStateOutput_array__From__ActionState ", function () {
     [["1", [
       ['a0', '1', 'ˆ'],
       ['a1', '1', 'Â'],
@@ -583,15 +583,15 @@ describe('KeylayoutToKmnConverter', function () {
     [undefined, [],],
     ].forEach(function (values) {
       it((JSON.stringify(values[1]).length > 30) ?
-        ("get_ActionID_Output_array__From__ActionID_State('" + values[0] + "')").padEnd(60, " ") + ' should return an array of objects' :
-        ("get_ActionID_Output_array__From__ActionID_State('" + values[0] + "')").padEnd(60, " ") + ' should return ' + "'" + JSON.stringify(values[1]) + "'", async function () {
-          const result = sut.get_ActionID_Output_array__From__ActionID_State(read, String(values[0]));
+        ("get_ActionStateOutput_array__From__ActionState('" + values[0] + "')").padEnd(60, " ") + ' should return an array of objects' :
+        ("get_ActionStateOutput_array__From__ActionState('" + values[0] + "')").padEnd(60, " ") + ' should return ' + "'" + JSON.stringify(values[1]) + "'", async function () {
+          const result = sut.get_ActionStateOutput_array__From__ActionState(read, String(values[0]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     })
   })
 
-  describe("get_Datat_array2D__From__ActionID_stateOutput ", function () {
+  describe("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput ", function () {
     [
       ["a1", "A", true, [
         ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT NCAPS'],
@@ -614,15 +614,15 @@ describe('KeylayoutToKmnConverter', function () {
 
     ].forEach(function (values) {
       it((JSON.stringify(values[3]).length > 35) ?
-        ("get_Datat_array2D__From__ActionID_stateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
-        ("get_Datat_array2D__From__ActionID_stateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
-          const result = sut.get_Datat_array2D__From__ActionID_stateOutput(read, converted.arrayOf_Modifiers, String(values[0]), String(values[1]), Boolean(values[2]))
+        ("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
+        ("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
+          const result = sut.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(read, converted.arrayOf_Modifiers, String(values[0]), String(values[1]), Boolean(values[2]))
           assert.equal(JSON.stringify(result), JSON.stringify(values[3]));
         });
     })
   })
 
-  describe("get_KeyMap_Code_array__From__KeyMap_Action_array2D ", function () {
+  describe("get_KeyActionOutput_array__From__ActionStateOutput_array ", function () {
 
     const b6_actionId_arr = [
       ['a0', '1', 'ˆ'],
@@ -664,8 +664,8 @@ describe('KeylayoutToKmnConverter', function () {
 
     [[b6_actionId_arr, b1_keycode_arr],
     ].forEach(function (values) {
-      it(("get_KeyMap_Code_array__From__KeyMap_Action_array2D([['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'],..])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.get_KeyMap_Code_array__From__KeyMap_Action_array2D(read, values[0])
+      it(("get_KeyActionOutput_array__From__ActionStateOutput_array([['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'],..])").padEnd(73, " ") + ' should return an array of objects', async function () {
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -694,8 +694,8 @@ describe('KeylayoutToKmnConverter', function () {
     [[['a0', '1', '']], oneEntryResultNoOutput],
     [[['a0', '', 'ˆ']], oneEntryResult],
     ].forEach(function (values) {
-      it(("get_KeyMap_Code_array__From__KeyMap_Action_array2D(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.get_KeyMap_Code_array__From__KeyMap_Action_array2D(read, values[0])
+      it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -705,8 +705,8 @@ describe('KeylayoutToKmnConverter', function () {
     [[['', '', '']], []],
     [[[' ', ' ', '']], []],
     ].forEach(function (values) {
-      it(("get_KeyMap_Code_array__From__KeyMap_Action_array2D(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
-        const result = sut.get_KeyMap_Code_array__From__KeyMap_Action_array2D(read, values[0])
+      it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -716,11 +716,17 @@ describe('KeylayoutToKmnConverter', function () {
     [undefined, []],
     [null, []],
     ].forEach(function (values) {
-      it(("get_KeyMap_Code_array__From__KeyMap_Action_array2D(" + values[0] + ")").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
-        const result = sut.get_KeyMap_Code_array__From__KeyMap_Action_array2D(read, values[0])
+      it(("get_KeyActionOutput_array__From__ActionStateOutput_array(" + values[0] + ")").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
   })
+
+
+  // Todo remove
+  after(function () {
+    console.log("\nTESTS OK ##########################################################################")
+  });
 
 });
