@@ -210,8 +210,8 @@ describe('KeylayoutToKmnConverter', function () {
       ['riGhtsHift', true, 'NCAPS SHIFT'],
       ['LEFTCONTROL', true, 'NCAPS LCTRL'],
       ['RCONTROL', true, 'NCAPS RCTRL'],
-      ['leftoption', true, 'NCAPS RALT'],
-      ['loption', true, 'NCAPS RALT'],
+      ['leftoption', true, 'NCAPS LALT'],
+      ['loption', true, 'NCAPS LALT'],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(36, " ") + 'to "' + values[2] + '"', async function () {
         const result = sut.create_kmn_modifier(values[0] as string, values[1] as boolean);

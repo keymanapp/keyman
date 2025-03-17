@@ -812,18 +812,20 @@ export class KeylayoutToKmnConverter {
   public get_KeyMapModiKeyArray__from__array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
     const returnarray: string[][] = []
 
-    for (let i = 0; i < search.length; i++) {
-      const behaviour: number = Number(search[i][3])
+    if (!((search === undefined) || (search === null) || (search.length === 0))) {
+      for (let i = 0; i < search.length; i++) {
+        const behaviour: number = Number(search[i][3])
 
-      for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
-        const returnarray1D: string[] = []
-        returnarray1D.push(String(search[i][1]))  /* KeyName*/
-        returnarray1D.push(String(search[i][2])) /* actionId*/
-        returnarray1D.push(String(search[i][3]))  /* behaviour*/
-        returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused))) /* modifier */
-        returnarray1D.push(String(search[i][4])) /* char*/
-        if (returnarray1D.length > 0) {
-          returnarray.push(returnarray1D)
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
+          const returnarray1D: string[] = []
+          returnarray1D.push(String(search[i][1]))  /* KeyName*/
+          returnarray1D.push(String(search[i][2])) /* actionId*/
+          returnarray1D.push(String(search[i][3]))  /* behaviour*/
+          returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused))) /* modifier */
+          returnarray1D.push(String(search[i][4])) /* char*/
+          if (returnarray1D.length > 0) {
+            returnarray.push(returnarray1D)
+          }
         }
       }
     }
@@ -993,7 +995,7 @@ export class KeylayoutToKmnConverter {
         add_modifier = "RCTRL ";
       }
       else if ((modifier_state[i].toUpperCase() === "LEFTOPTION") || (modifier_state[i].toUpperCase() === "LOPTION")) {
-        add_modifier = "RALT ";
+        add_modifier = "LALT ";
       }
       else if ((modifier_state[i].toUpperCase() === "RIGHTOPTION") || (modifier_state[i].toUpperCase() === "ROPTION")) {
         add_modifier = "RALT ";
@@ -1133,6 +1135,52 @@ export class KeylayoutToKmnConverter {
         && idx < index
       );
 
+      // 4-1 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      const amb_4_1 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C3"))
+        && curr.modifier_prev_deadkey === rule[index].modifier_key
+        && curr.prev_deadkey === rule[index].key
+      );
+      if (amb_4_1.length > 0) {
+        this.writeDataset(amb_4_1)
+
+      if (amb_4_1.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("XXXXX NEW C01 ThirdTEXT "
+            + "ambiguous 4-1 rule: later: ["
+            + amb_4_1[0].modifier_prev_deadkey
+            + " "
+            + amb_4_1[0].prev_deadkey
+            + "]  >  dk(C"
+            + amb_4_1[0].unique_prev_deadkey
+            + ") here: ")
+      }
+        console.log("warningTextArray ", warningTextArray);
+     }
+
+         // 2-1 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+         const amb_2_1 = rule.filter((curr, idx) =>
+          ((curr.rule_type === "C2"))
+          && curr.modifier_deadkey === rule[index].modifier_key
+          && curr.deadkey === rule[index].key
+        );
+        if (amb_2_1.length > 0) {
+          this.writeDataset(amb_2_1)
+
+        if (amb_2_1.length > 0) {
+          warningTextArray[2] = warningTextArray[2]
+            + ("XXXXX NEW C01 ThirdTEXT "
+              + "ambiguous 2-1 rule: later: ["
+              + amb_2_1[0].modifier_deadkey
+              + " "
+              + amb_2_1[0].deadkey
+              + "]  >  dk(A"
+              + amb_2_1[0].unique_deadkey
+              + ") here: ")
+        }
+          console.log("warningTextArray ", warningTextArray);
+       }
+// Todo 1-1 text [
       if (amb_1_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
           + ("C1 ambiguous 1-1 rule: earlier: ["
@@ -1198,14 +1246,37 @@ export class KeylayoutToKmnConverter {
         && idx < index
       );
 
-      //1-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+     /* //1-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
       const amb_1_2 = rule.filter((curr, idx) =>
         ((curr.rule_type === "C0") || (curr.rule_type === "C1"))
         && curr.modifier_key === rule[index].modifier_deadkey
         && curr.key === rule[index].deadkey
         //&& rule[index].unique_deadkey === 0  // include and the first occurance will be printed
         //&& (idx < index)              // include and the first occurance will be printed
+      );*/
+
+      // 4-2 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
+      const amb_4_2 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C3"))
+        && curr.modifier_prev_deadkey === rule[index].modifier_deadkey
+        && curr.prev_deadkey === rule[index].deadkey
+        && curr.id_prev_deadkey === rule[index].id_deadkey
+        // && rule[index].unique_prev_deadkey === 0    // include and the first occurance will be printed
+        // && (idx < index)
       );
+
+      if (amb_4_2.length > 0) {
+        warningTextArray[0] = warningTextArray[0]
+          + ("C2 XXX FIRSTTEXT "
+            + "ambiguous 4-2 rule: later: ["
+            + amb_4_2[0].modifier_prev_deadkey
+            + " "
+            + amb_4_2[0].prev_deadkey
+            + "]  >  dk(C"
+            + amb_4_2[0].id_prev_deadkey
+            + ") here: ")
+      }
+
 
       if (amb_2_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
@@ -1255,7 +1326,7 @@ export class KeylayoutToKmnConverter {
             + new TextDecoder().decode(dup_3_3[0].output)
             + "\' here: ")
       }
-      if (amb_1_2.length > 0) {
+     /* if (amb_1_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
           + ("C2 SECONDTEXT "
             + "ambiguous 1-2 rule: earlier: ["
@@ -1265,19 +1336,19 @@ export class KeylayoutToKmnConverter {
             + "]  >  \'"
             + new TextDecoder().decode(amb_1_2[0].output)
             + "\' here: ")
-      }
+      }*/
     }
 
     if (rule[index].rule_type === "C3") {
 
-      // 1-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+     /* // 1-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
       const amb_1_4 = rule.filter((curr, idx) =>
         ((curr.rule_type === "C0") || (curr.rule_type === "C1"))
         && curr.modifier_key === rule[index].modifier_prev_deadkey
         && curr.key === rule[index].prev_deadkey
         //&& rule[index].unique_prev_deadkey === 0 // include and the first occurance will be printed
         //&& (idx < index)
-      );
+      );*/
 
       // 2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
       const amb_2_4 = rule.filter((curr, idx) =>
@@ -1375,7 +1446,7 @@ export class KeylayoutToKmnConverter {
         //&& idx < index
       );
 
-      if (amb_1_4.length > 0) {
+      /*if (amb_1_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
           + ("C3 FIRSTTEXT "
             + "ambiguous 1-4 rule: earlier(Todo check if print out or not): ["
@@ -1385,7 +1456,7 @@ export class KeylayoutToKmnConverter {
             + "]  >  \'"
             + new TextDecoder().decode(amb_1_4[0].output)
             + "\' here: ")
-      }
+      }*/
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
@@ -1745,7 +1816,7 @@ export class KeylayoutToKmnConverter {
         ) {
           data +=
             warn_text[0]
-            + " ["
+            + "+ ["
             + (unique_data_Rules[k].modifier_prev_deadkey + " " + unique_data_Rules[k].prev_deadkey).trim()
             //+ "]   >   dk(A"
             + "]   >   dk(C"
