@@ -128,7 +128,18 @@ export class ManyRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    while (this.rule.parse(node));
+    let parseSuccess: boolean = true;
+    while (parseSuccess) {
+      let save: number = this.tokenBuffer.currentPosition;
+      let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      parseSuccess = this.rule.parse(tmp);
+      if (parseSuccess) {
+        node.addChildren(tmp.getChildren());
+      } else {
+        this.tokenBuffer.resetCurrentPosition(save);
+        // TODO generate warning
+      }
+    };
     return true;
   }
 }
