@@ -106,12 +106,6 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             refreshSampleKeyboard(context);
             break;
           case MotionEvent.ACTION_UP:
-            // Save the currentHeight when the user releases
-            int orientation = KMManager.getOrientation(context);
-            String keyboardHeightKey = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
-              KMManager.KMKey_KeyboardHeightLandscape : KMManager.KMKey_KeyboardHeightPortrait;
-            editor.putInt(keyboardHeightKey, currentHeight);
-            editor.commit();
             break;
         }
         return true;
