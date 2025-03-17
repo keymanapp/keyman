@@ -94,6 +94,7 @@ describe("Recursive Descent Tests", () => {
         new Token(TokenTypes.TT_STRING, ''),
         new Token(TokenTypes.TT_STRING, ''),
       ]);
+      trueRule         = new TrueRule(tokenBuffer);
       const many: Rule = new ManyRule(tokenBuffer, trueRule);
       assert.isTrue(many.parse(root));
       assert.isTrue(root.hasChild());
@@ -127,6 +128,7 @@ describe("Recursive Descent Tests", () => {
         new Token(TokenTypes.TT_STRING, ''),
         new Token(TokenTypes.TT_STRING, ''),
       ]);
+      trueRule              = new TrueRule(tokenBuffer);
       const oneOrMany: Rule = new OneOrManyRule(tokenBuffer, trueRule);
       assert.isTrue(oneOrMany.parse(root));
       assert.isTrue(root.hasChild());
