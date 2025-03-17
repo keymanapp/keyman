@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 18.0.215 beta 2025-03-14
+
+* docs(common): Update Sentry links to keyman.sentry.io (#13491)
+* chore(android,windows): Update Crowdin for Spanish and Spanish (Latin America) (#13499)
+* chore(common): update crowdin strings for Italian (#13500)
+
+## 18.0.214 beta 2025-03-13
+
+* fix(mac): change text in privacy alert for macOS 13.0 and later (#13480)
+* docs(mac): update troubleshooting page for macOS security (#13476)
+* fix(core): unalign `usetCount` and `rangeCount` (#13450)
+* fix(developer): strip markers when generating KVK from LDML (#13479)
+
+## 18.0.213 beta 2025-03-12
+
+* docs(developer): fix typos in readme and add link (#13414)
+* fix(developer): add folder text to Error_FileDoesNotExist message (#13457)
+* fix(developer): load Keyman Developer options in Server before use (#13459)
+* chore(core): add `clean` actions for `:mac` and `:win` targets (#13460)
+* chore(common): update langtags.json to 2025-02-18 release (#13461)
+* fix(developer): use '-' as placeholder for temp project name in cmdline (#13462)
+* chore: handle failure to retrieve GitHub PR status in build triggers (#13474)
+
+## 18.0.212 beta 2025-03-11
+
+* fix(oem/fv/android): Avoid resetting keyboard index (#13449)
+* fix(android/engine): Ignore key errors if user switched to another IME (#13466)
+* fix(android): Cache inputType to determine external keyboard handling (#13475)
+
+## 18.0.211 beta 2025-03-10
+
+* feat(windows): hide update header if no updates are available (#13442)
+* fix(ios): suppress Get Started dialog when closing help page (#13422)
+* docs(ios): update minimum supported ios version (#13452)
+
 ## 18.0.210 beta 2025-03-07
 
 * chore(common): Add crowdin localization for Vietnamese (#13322)

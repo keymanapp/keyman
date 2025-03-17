@@ -9,4 +9,4 @@ This keyboard is used only to test the crash reporting.
 5. Type **Sentry force now**
    - With each keystroke, Console messages should indicate that the character is being added to the Easter egg string.
    - When the final **w** is typed, a Console message should indicate: **Forcing crash now!**
-   - After some delay (you may need to switch Keyman off and on again in order for the report to upload), the new crash should appear in the console on sentry.keyman.com.
+   - After some delay (you may need to switch Keyman off and on again in order for the report to upload), the new crash should appear in the console on Sentry.
