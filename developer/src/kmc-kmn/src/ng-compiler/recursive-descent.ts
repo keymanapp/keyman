@@ -3,7 +3,7 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-03-13
  *
- * KMC KMN Next Generation Parser (Kleene Operator Rules)
+ * KMC KMN Next Generation Parser (Recursive Descent/Kleene Operator Rules)
  */
 
 import { Token, TokenTypes } from "./lexer.js";
