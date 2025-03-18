@@ -162,6 +162,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.setMayPredictOverride(inputType);
     if (KMManager.getMayPredictOverride()) {
       KMManager.setBannerOptions(false);
+      // Set the system keyboard HTML banner
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
