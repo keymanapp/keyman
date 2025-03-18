@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.217 beta 2025-03-18
+
+* fix(windows): cherry pick hard code key cap (#13526)
+* fix(android,windows): Update Russian language strings to use Cyrillic script (#13527)
+* docs(web): add internal documentation for context state and keystroke processing (#13520)
+* docs(common): add link to schemas (#13521)
+* chore(linux): update URL for lcov package (#13535)
+* chore(linux): allow to build and use Debian docker image (#13536)
+
 ## 18.0.216 beta 2025-03-17
 
 * change(android): re-order host page script load so Sentry can report script load failures (#13333)
