@@ -21,7 +21,7 @@ On-screen keyboard modules and hardware-keyboard event interception modules will
 
 ## Output:  RuleBehavior
 
-Once keystroke processing is completed, the outward-facing components of the engine expect to receive a `RuleBehavior` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/js-processor/src/ruleBehavior.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/ruleBehavior.ts), all of its fields aside from `transcription` are specific to existing JS-keyboard side effects.
+Once keystroke processing is completed, the outward-facing components of the engine expect to receive a `RuleBehavior` object describing all primary and side effects of the keystroke.  Defined at [web/src/engine/js-processor/src/ruleBehavior.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/ruleBehavior.ts), all of its fields aside from `transcription` are specific to existing JS-keyboard side effects.  (Certain Keyman language features can make permanent side-effect changes to state that should only be persisted for the "true" keystroke - not for any predictive-text 'alternative' keys.)
 
 See also:  [context-state-management.md](context-state-management.md#js-keyboard-keystroke-processing)
 
@@ -59,7 +59,17 @@ This is likely the top-level class that `epic/web-core` would likely need to rep
 
 https://github.com/keymanapp/keyman/blob/b4df4ab80862bc90da42bcdbd333df0a14da01ca/common/web/keyboard-processor/src/text/keyboardProcessor.ts#L217
 
-The method linked above is the primary entrypoint for rule processing of individual, preprocessed `KeyEvent`s.
+The method linked above is the primary entrypoint for rule processing of individual, preprocessed `KeyEvent`s.  There's a little infrastructure between it and the actual keyboard-script for JS keyboards, but it is the sole entry point in `KeyboardProcessor` responsible for keyboard rule evaluation.
+- `epic/web-core` note:  renamed to `JSKeyboardProcessor`.
+
+#### JS-keyboard interfacing
+
+Certain Keyman language features can make permanent side-effect changes to state.  In order to prevent these from taking place for every keystroke, the method that interfaces with JS keyboards - `KeyboardInterface.process` - saves the context state (as a `Mock`) and current variable store values, then prepares a fresh `RuleBehavior` instance, before passing control off to the keyboard's backing script.  (Note that `KeyboardInterface` itself primarily consists of keyboard-script API called by JS-keyboard script.)
+- `epic/web-core` note:  renamed to `JSKeyboardInterface`.
+
+A few of the keyboard-script API methods will mark `RuleBehavior` properties directly when called, but the bulk of its data will be set once the keyboard-script returns control to Keyman Engine for Web.  At this time, variable store values will also be reverted to prevent possible cross-contamination effects when predictive text is active - they're reapplied later if `RuleBehavior.finalize` is leveraged on the resulting instance.  Components documented in [context-state-management.md](./context-state-management.md) are then leveraged to determine the total change to context caused by the keystroke.
+
+Note that for JS-keyboards, in 18.0 and before the true keystroke is processed against the _true_ context state, not a cloned copy, and thus its changes are applied immediately.
 
 #### Keystroke-default emulation
 
