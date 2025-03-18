@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { KeywordRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
@@ -73,7 +73,7 @@ describe("Recursive Descent Tests", () => {
         new Token(TokenTypes.TT_STRING, ''),
         new Token(TokenTypes.TT_STRING, ''),
       ]);
-      trueRule         = new TrueRule(tokenBuffer);
+      trueRule             = new TrueRule(tokenBuffer);
       const sequence: Rule = new SequenceRule(tokenBuffer, [trueRule, trueRule, trueRule]);
       assert.isTrue(sequence.parse(root));
       assert.isTrue(root.hasChild());
@@ -87,10 +87,51 @@ describe("Recursive Descent Tests", () => {
         new Token(TokenTypes.TT_STRING, ''),
         new Token(TokenTypes.TT_STRING, ''),
       ]);
-      trueRule         = new TrueRule(tokenBuffer);
-      falseRule        = new FalseRule(tokenBuffer);
+      trueRule             = new TrueRule(tokenBuffer);
+      falseRule            = new FalseRule(tokenBuffer);
       const sequence: Rule = new SequenceRule(tokenBuffer, [trueRule, falseRule, trueRule]);
       assert.isFalse(sequence.parse(root));
+      assert.isFalse(root.hasChild());
+      assert.equal(tokenBuffer.currentPosition, 0);
+    });
+  });
+  describe("AlternateRule Tests", () => {
+    it("can construct an AlternateRule", () => {
+      const alternate: Rule = new AlternateRule(tokenBuffer, [falseRule, falseRule, trueRule]);
+      assert.isNotNull(alternate);
+    });
+    it("can parse with a successful child Rule (single child Rule)", () => {
+      const alternate: Rule = new AlternateRule(tokenBuffer, [trueRule]);
+      assert.isTrue(alternate.parse(root));
+      assert.isTrue(root.hasChild());
+      assert.isTrue(root.hasChildOfType(NodeTypes.TMP));
+      assert.equal(root.getChildren().length, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
+    });
+    it("can parse with a successful child Rule (three child Rules)", () => {
+      tokenBuffer = new TokenBuffer([
+        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.TT_STRING, ''),
+      ]);
+      trueRule              = new TrueRule(tokenBuffer);
+      falseRule             = new FalseRule(tokenBuffer);
+      const alternate: Rule = new AlternateRule(tokenBuffer, [trueRule, trueRule, falseRule]);
+      assert.isTrue(alternate.parse(root));
+      assert.isTrue(root.hasChild());
+      assert.isTrue(root.hasChildOfType(NodeTypes.TMP));
+      assert.equal(root.getChildren().length, 1);
+      assert.equal(tokenBuffer.currentPosition, 1);
+    });
+    it("can parse with an unsuccessful child Rule (three child Rules)", () => {
+      tokenBuffer = new TokenBuffer([
+        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.TT_STRING, ''),
+      ]);
+      falseRule             = new FalseRule(tokenBuffer);
+      const alternate: Rule = new AlternateRule(tokenBuffer, [falseRule, falseRule, falseRule]);
+      assert.isFalse(alternate.parse(root));
       assert.isFalse(root.hasChild());
       assert.equal(tokenBuffer.currentPosition, 0);
     });
