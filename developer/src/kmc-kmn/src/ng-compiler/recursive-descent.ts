@@ -196,15 +196,16 @@ export class KeywordRule extends Rule {
   }
 }
 
-export function parameterSequence(tokenBuffer: TokenBuffer, identifiers: Token[], numExpected: number): boolean {
+export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[], numExpected: number): boolean {
   let parseSuccess: boolean = true;
   const save: number = tokenBuffer.currentPosition;
   let token: Token = tokenBuffer.nextToken();
+  const tmpParams: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
     if (token.isTokenType(TokenTypes.TT_PARAMETER)) {
       tokenBuffer.popToken();
-      identifiers.push(token);
+      tmpParams.push(token);
       token = tokenBuffer.nextToken();
     } else {
       parseSuccess = false;
@@ -212,7 +213,9 @@ export function parameterSequence(tokenBuffer: TokenBuffer, identifiers: Token[]
     }
   }
 
-  if (!parseSuccess) {
+  if (parseSuccess) {
+    parameters.push(...tmpParams);
+  } else {
     tokenBuffer.resetCurrentPosition(save);
   }
 

@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, parameterSequence, Rule, SequenceRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
@@ -46,6 +46,7 @@ let tokenBuffer: TokenBuffer = null;
 let root: ASTNode            = null;
 let trueRule: Rule           = null;
 let falseRule: Rule          = null;
+let parameters: Token[]      = null;
 
 describe("Recursive Descent Tests", () => {
   beforeEach(() => {
@@ -53,6 +54,7 @@ describe("Recursive Descent Tests", () => {
     root        = new ASTNode(NodeTypes.TMP);
     trueRule    = new TrueRule(tokenBuffer);
     falseRule   = new FalseRule(tokenBuffer);
+    parameters  = [];
   });
   describe("SequenceRule Tests", () => {
     it("can construct a SequenceRule", () => {
@@ -238,6 +240,33 @@ describe("Recursive Descent Tests", () => {
     it("can parse with an unsuccessful child Rule", () => {
       const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.TT_STORE);
       assert.isFalse(keywordRule.parse(root));
+      assert.equal(tokenBuffer.currentPosition, 0);
+    });
+  });
+  describe("parameterSequence() Tests", () => {
+    it("can parse a single parameter", () => {
+      const tokens = [
+        new Token(TokenTypes.TT_PARAMETER, ''),
+      ];
+      tokenBuffer = new TokenBuffer(tokens);
+      assert.isTrue(parameterSequence(tokenBuffer, parameters, 1));
+      assert.deepEqual(parameters, tokens);
+      assert.equal(tokenBuffer.currentPosition, 1);
+    });
+    it("can parse three parameters", () => {
+      const tokens = [
+        new Token(TokenTypes.TT_PARAMETER, ''),
+        new Token(TokenTypes.TT_PARAMETER, ''),
+        new Token(TokenTypes.TT_PARAMETER, ''),
+      ];
+      tokenBuffer = new TokenBuffer(tokens);
+      assert.isTrue(parameterSequence(tokenBuffer, parameters, 3));
+      assert.deepEqual(parameters, tokens);
+      assert.equal(tokenBuffer.currentPosition, 3);
+    });
+    it("can handle a missing parameter", () => {
+      assert.isFalse(parameterSequence(tokenBuffer, parameters, 1));
+      assert.deepEqual(parameters, []);
       assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
