@@ -102,7 +102,7 @@ describe('KeylayoutToKmnConverter', function () {
       }
       assert.isTrue(!threw);
     });
-  })
+  });
 
   describe("read() ", function () {
     it('read() should return filled array on correct input', async function () {
@@ -134,7 +134,7 @@ describe('KeylayoutToKmnConverter', function () {
       const result = sut.read('../data|Italian_copy.keylayout');
       assert.isEmpty(result);
     });
-  })
+  });
 
   describe("write() ", function () {
     it('write() should return true (no error) if no inputfile', async function () {
@@ -146,7 +146,7 @@ describe('KeylayoutToKmnConverter', function () {
       const result = sut.write(converted);
       assert.isTrue(result);
     });
-  })
+  });
 
   describe("convert() ", function () {
 
@@ -190,7 +190,7 @@ describe('KeylayoutToKmnConverter', function () {
         && converted_rule.arrayOf_Modifiers.length === 0
         && converted_rule.arrayOf_Rules.length === 0));
     });
-  })
+  });
 
   describe('create_kmn_modifier ', function () {
     [
@@ -217,8 +217,61 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.create_kmn_modifier(values[0] as string, values[1] as boolean);
         assert.equal(result, values[2]);
       });
-    })
-  })
+    });
+  });
+
+  describe('getHexFromString ', function () {
+    [
+      ['0009', '0009'],
+      ['000027', '001B'],
+      ['00027', '001B'],
+      ['0027', '001B'],
+      ['027', '001B'],
+      ['27', '001B'],
+      ['001C', '0NAN'],
+      ['0000', '0000'],
+      ['X', '0NAN'],
+      ['', '0000'],
+      [' ', '0000'],
+      [123, '007B'],
+      [null, '0000'],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sut.getHexFromString(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    });
+  });
+
+  describe('checkOutputChar ', function () {
+    [
+      ["&#x10F601;", 'U+10F601'],
+      ["&#x1F601;", 'U+1F601'],
+      ["&#x9;", 'U+0009'],
+      ["&#x99;", 'U+0099'],
+      ["&#x999;", 'U+0999'],
+      ["&#x9999;", 'U+9999'],
+      ["&#x99999;", 'U+99999'],
+      ["&#1111553;", 'U+10F601'],
+      ["&#128513;", 'U+1F601'],
+      ["&#9;", 'U+0009'],
+      ["&#99;", 'U+0063'],
+      ["&#999;", 'U+03E7'],
+      ["&#9999;", 'U+270F'],
+      ["&#99999;", 'U+1869F'],
+      ['0000;', '0000;'],
+      ['X;', 'X;'],
+      ['123;', '123;'],
+      [';', ';'],
+      [' ;', ' ;']
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sut.checkOutputChar(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    });
+  });
+
 
   describe("isAcceptableKeymanModifier ", function () {
     [
@@ -240,8 +293,8 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.isAcceptableKeymanModifier(values[0] as string);
         assert.equal(result, values[1]);
       });
-    })
-  })
+    });
+  });
 
   describe("map_UkeleleKC_To_VK ", function () {
     [
@@ -259,8 +312,8 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.map_UkeleleKC_To_VK(values[0] as number);
         assert.equal(result, values[1]);
       });
-    })
-  })
+    });
+  });
 
   describe("checkIfCapsIsUsed ", function () {
 
@@ -281,7 +334,7 @@ describe('KeylayoutToKmnConverter', function () {
       const result = sut.checkIfCapsIsUsed([null]);
       assert.isFalse(result);
     });
-  })
+  });
 
   describe("get_Modifier_array__From__KeyModifier_array ", function () {
     [[[['0', 0]], [['', 'shift? caps? ']]],
@@ -294,7 +347,7 @@ describe('KeylayoutToKmnConverter', function () {
       it((values[1][0] !== null) ?
         ("get_Modifier_array__From__KeyModifier_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0][0] + "', '" + values[1][0][1] + "']" :
         ("get_Modifier_array__From__KeyModifier_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "'])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
-          const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0])
+          const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0]);
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -304,11 +357,11 @@ describe('KeylayoutToKmnConverter', function () {
     [[[]], [null]],
     ].forEach(function (values) {
       it(("get_Modifier_array__From__KeyModifier_array([" + values[0][0] + "])").padEnd(68, " ") + " should return ['" + values[1][0] + "']", async function () {
-        const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0])
+        const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0]);
         assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    })
-  })
+    });
+  });
 
   describe("get_KeyModifier_array__From__ActionID ", function () {
     [
@@ -324,15 +377,15 @@ describe('KeylayoutToKmnConverter', function () {
 
       let outstring = "[ ";
       for (let i = 0; i < values[1].length; i++) {
-        outstring = outstring + "[ '" + values[1][i][0] + "', " + values[1][i][1].toString() + "], "
+        outstring = outstring + "[ '" + values[1][i][0] + "', " + values[1][i][1].toString() + "], ";
       }
 
       it(("get_KeyModifier_array__From__ActionID('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
         const result = sut.get_KeyModifier_array__From__ActionID(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    })
-  })
+    });
+  });
 
   describe("get_ActionID__From__ActionNext ", function () {
     [
@@ -353,8 +406,8 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.get_ActionID__From__ActionNext(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    })
-  })
+    });
+  });
 
   describe("get_ActionIndex__From__ActionId ", function () {
     [
@@ -373,8 +426,8 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.get_ActionIndex__From__ActionId(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    })
-  })
+    });
+  });
 
   describe("get_Output__From__ActionId_None ", function () {
     [["a14", "u"],
@@ -398,8 +451,8 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.get_Output__From__ActionId_None(read, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    })
-  })
+    });
+  });
 
   describe("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array ", function () {
 
@@ -471,9 +524,9 @@ describe('KeylayoutToKmnConverter', function () {
     [[['', '', '', '', '']], [['', '', '', 'NCAPS', '']]],
     ].forEach(function (values) {
 
-      const isCaps_used = true
-      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
-      const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']"
+      const isCaps_used = true;
+      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])";
+      const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']";
 
       it((JSON.stringify(values[1]).length > 60) ? 'an array of objects should return an array of objectss' :
         string_in.padEnd(74, " ") + ' should return ' + string_out, async function () {
@@ -489,9 +542,9 @@ describe('KeylayoutToKmnConverter', function () {
     [[['', '', '', '', '']], [['', '', '', '', '']]],
     ].forEach(function (values) {
 
-      const isCaps_used = false
-      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])"
-      const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']"
+      const isCaps_used = false;
+      const string_in = "get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(['" + "', '" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "', '" + values[0][0][3] + "', '" + values[0][0][4] + "'])";
+      const string_out = "['" + "', '" + values[1][0][0] + "', '" + values[1][0][1] + "', '" + values[1][0][2] + "', '" + values[1][0][3] + "', '" + values[1][0][4] + "']";
 
       it(string_in.padEnd(74, " ") + ' should return ' + string_out, async function () {
         const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps_used);
@@ -504,13 +557,13 @@ describe('KeylayoutToKmnConverter', function () {
     [undefined, []],
     [null, []],
     ].forEach(function (values) {
-      const isCaps = true
+      const isCaps = true;
       it(("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
         const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
-  })
+  });
 
   describe("writeData_Stores() ", function () {
 
@@ -518,7 +571,7 @@ describe('KeylayoutToKmnConverter', function () {
       "c ......................................................................\n"
       + "c ......................................................................\n"
       + "c Keyman keyboard generated by kmn-convert\n"
-      + "c from Ukelele file: "
+      + "c from Ukelele file: ";
 
     const out_expected_last: string =
       "\n"
@@ -532,23 +585,23 @@ describe('KeylayoutToKmnConverter', function () {
       + "\n"
       + "begin Unicode > use(main)\n\n"
       + "group(main) using keys\n\n"
-      + "\n"
+      + "\n";
 
     it(('writeData_Stores should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
-      const written_correctName = sut.writeData_Stores(converted)
+      const written_correctName = sut.writeData_Stores(converted);
       assert.equal(written_correctName, (out_expected_first + converted.keylayout_filename + out_expected_last));
     });
 
     it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
-      const written_emptyName = sut.writeData_Stores(converted_empty)
+      const written_emptyName = sut.writeData_Stores(converted_empty);
       assert.equal(written_emptyName, (out_expected_first + out_expected_last));
     });
 
     it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
-      const written_onlyName = sut.writeData_Stores(converted_unavailable)
+      const written_onlyName = sut.writeData_Stores(converted_unavailable);
       assert.equal(written_onlyName, (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last));
     });
-  })
+  });
 
   describe("get_ActionStateOutput_array__From__ActionState ", function () {
     [["1", [
@@ -588,8 +641,8 @@ describe('KeylayoutToKmnConverter', function () {
           const result = sut.get_ActionStateOutput_array__From__ActionState(read, String(values[0]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
-    })
-  })
+    });
+  });
 
   describe("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput ", function () {
     [
@@ -616,11 +669,11 @@ describe('KeylayoutToKmnConverter', function () {
       it((JSON.stringify(values[3]).length > 35) ?
         ("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
         ("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
-          const result = sut.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(read, converted.arrayOf_Modifiers, String(values[0]), String(values[1]), Boolean(values[2]))
+          const result = sut.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(read, converted.arrayOf_Modifiers, String(values[0]), String(values[1]), Boolean(values[2]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[3]));
         });
-    })
-  })
+    });
+  });
 
   describe("get_KeyActionOutput_array__From__ActionStateOutput_array ", function () {
 
@@ -665,7 +718,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[b6_actionId_arr, b1_keycode_arr],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array([['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'],..])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -695,7 +748,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[['a0', '', 'ˆ']], oneEntryResult],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -706,7 +759,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[[' ', ' ', '']], []],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + values[0][0][0] + "', '" + values[0][0][1] + "', '" + values[0][0][2] + "'])").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -717,16 +770,16 @@ describe('KeylayoutToKmnConverter', function () {
     [null, []],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(" + values[0] + ")").padEnd(73, " ") + ' should return ' + "'[" + values[1] + "]'", async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0])
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
-  })
+  });
 
 
   // Todo remove
   after(function () {
-    console.log("\nTESTS OK ##########################################################################")
+    console.log("\nTESTS OK ##########################################################################");
   });
 
 });

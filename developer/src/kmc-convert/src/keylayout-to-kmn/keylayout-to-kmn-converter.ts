@@ -161,6 +161,7 @@ export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly USED_KEYS_COUNT = 51;
+  static readonly MAX_CTRL_CHARACTER = 32;
 
   // TODO use callbacks what about /*private*/ for options
   //constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
@@ -259,6 +260,7 @@ export class KeylayoutToKmnConverter {
       arrayOf_Rules: []
     };
 
+    // todo check for tags
     if (jsonObj_any.hasOwnProperty("keyboard")) {
 
       data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
@@ -975,8 +977,6 @@ export class KeylayoutToKmnConverter {
         add_modifier = "NCAPS ";
       }
 
-      // Keyman does not use the right or left version of a modifier (e.g. rightshift, leftshift). If those are used in keylayout files
-      // they will not be changed but written to the kmn as they are with a warning placed in front of them
       else if ((modifier_state[i].toUpperCase() === 'ANYSHIFT') || (modifier_state[i].toUpperCase() === 'SHIFT')) {
         add_modifier = "SHIFT ";
       }
@@ -986,6 +986,7 @@ export class KeylayoutToKmnConverter {
       else if ((modifier_state[i].toUpperCase() === "RIGHTSHIFT") || (modifier_state[i].toUpperCase() === "RSHIFT")) {
         add_modifier = "SHIFT ";
       }
+
       else if ((modifier_state[i].toUpperCase() === 'ANYCONTROL') || (modifier_state[i].toUpperCase() === 'CONTROL')) {
         add_modifier = "CTRL ";
       }
@@ -995,6 +996,7 @@ export class KeylayoutToKmnConverter {
       else if ((modifier_state[i].toUpperCase() === "RIGHTCONTROL") || (modifier_state[i].toUpperCase() === "RCONTROL")) {
         add_modifier = "RCTRL ";
       }
+
       else if ((modifier_state[i].toUpperCase() === "LEFTOPTION") || (modifier_state[i].toUpperCase() === "LOPTION")) {
         add_modifier = "LALT ";
       }
@@ -1004,6 +1006,7 @@ export class KeylayoutToKmnConverter {
       else if ((modifier_state[i].toUpperCase() === 'ANYOPTION') || (modifier_state[i].toUpperCase() === 'OPTION')) {
         add_modifier = "RALT ";
       }
+
       else {
         add_modifier = String(modifier_state[i]) + " ";
       }
@@ -1181,7 +1184,7 @@ export class KeylayoutToKmnConverter {
             + amb_1_1[0].key
             + "]  >  \'"
             + new TextDecoder().decode(amb_1_1[0].output)
-            + "\' here: [");
+            + "\' here: ");
       }
 
       if (dup_1_1.length > 0) {
@@ -1192,7 +1195,7 @@ export class KeylayoutToKmnConverter {
             + dup_1_1[0].key
             + "]  >  \'"
             + new TextDecoder().decode(dup_1_1[0].output)
-            + "\' here: [");
+            + "\' here: ");
       }
     }
 
@@ -1650,6 +1653,40 @@ export class KeylayoutToKmnConverter {
     else if (pos === 0x24) return "K_ENTER";
     else return "";
   }
+
+  /**
+     * @brief  member function to return the unicode value
+     * @param  instr the string that will converted
+     * @return headecimal value of a character
+     */
+  public getHexFromString(instr: string): string {
+    return Number(instr).toString(16).slice(-6).toUpperCase().padStart(4, "0");
+  }
+
+  /**
+      * @brief  member function to convert a numeric character reference to a unicode codepoint
+      * @param  instr the value that will converted
+      * @return a unicode codepoint if instr is a numeric character reference
+      *         else instr if instr is not a numeric character reference
+      */
+  public checkOutputChar(instr: string): string {
+
+    if (instr.substring(0, 3) === "&#x") {
+      const num_length = instr.length - instr.indexOf("x") - 1;
+      const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
+      return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
+    }
+
+    // if not hex: convert to hex
+    if ((instr.substring(0, 2) === "&#")) {
+      const num_length = instr.length - instr.indexOf("#") - 1;
+      const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
+      return ("U+" + this.getHexFromString(num_str.slice(-num_length)).padStart(4, "0"));
+    }
+
+    else
+      return instr;
+  }
   //----------------------------------------------------------------------------------------------------
   //----------------------------------------------------------------------------------------------------
   //----------------------------------------------------------------------------------------------------
@@ -1665,7 +1702,6 @@ export class KeylayoutToKmnConverter {
     let data: string = "";
 
     // filter array of all rules and remove duplicates
-
     const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       return ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
         && (curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2") || (curr.rule_type === "C3"));
@@ -1731,6 +1767,19 @@ export class KeylayoutToKmnConverter {
 
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.checkOutputChar(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
+
+
         // add a warning in front of rules that use unavailable modifiers or ambiguous rules
         // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
 
@@ -1741,7 +1790,7 @@ export class KeylayoutToKmnConverter {
             + "+ ["
             + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
             + `]  > \'`
-            + new TextDecoder().decode(unique_data_Rules[k].output)
+            + output_character_unicode
             + '\'\n';
         }
       }
@@ -1758,6 +1807,18 @@ export class KeylayoutToKmnConverter {
       if (unique_data_Rules[k].rule_type === "C2") {
 
         const warn_text = this.reviewRules(unique_data_Rules, k);
+
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.checkOutputChar(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
 
         //SECONDTEXT print
         // ToDo include condition again
@@ -1781,7 +1842,7 @@ export class KeylayoutToKmnConverter {
             + (String(unique_data_Rules[k].id_deadkey) + ") + [" + unique_data_Rules[k].modifier_key).trim()
             + " "
             + unique_data_Rules[k].key + "]  >  \'"
-            + new TextDecoder().decode(unique_data_Rules[k].output)
+            + output_character_unicode
             + "\'\n";
 
           data += "\n";
@@ -1799,12 +1860,25 @@ export class KeylayoutToKmnConverter {
       if (unique_data_Rules[k].rule_type === "C3") {
 
         const warn_text = this.reviewRules(unique_data_Rules, k);
+
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.checkOutputChar(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
+
         // Todo somewhere (A12) <-> (C12)
         // ToDo include condition again
         // FIRSTTEXT print
         if ((warn_text[0].indexOf("duplicate") < 0)
-          || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("ambiguous") >= 0))
-          || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("unavailable") >= 0))
+          //    || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("ambiguous") >= 0))
+          //    || ((warn_text[0].indexOf("duplicate") >= 0) && (warn_text[0].indexOf("unavailable") >= 0))
         ) {
           data +=
             warn_text[0]
@@ -1818,8 +1892,8 @@ export class KeylayoutToKmnConverter {
         // ToDo include condition again
         //SECONDTEXT print
         if ((warn_text[1].indexOf("duplicate") < 0)
-          || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("ambiguous") >= 0))
-          || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("unavailable") >= 0))
+          //      || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("ambiguous") >= 0))
+          //      || ((warn_text[1].indexOf("duplicate") >= 0) && (warn_text[1].indexOf("unavailable") >= 0))
         ) {
           data +=
             warn_text[1]
@@ -1836,8 +1910,8 @@ export class KeylayoutToKmnConverter {
         // ToDo include condition again
         // THIRDTEXT print OK
         if ((warn_text[2].indexOf("duplicate") < 0)
-          || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("ambiguous") >= 0))
-          || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("unavailable") >= 0))
+          //    || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("ambiguous") >= 0))
+          //     || ((warn_text[2].indexOf("duplicate") >= 0) && (warn_text[2].indexOf("unavailable") >= 0))
         ) {
           data +=
             warn_text[2] + "dk(B"
@@ -1845,13 +1919,13 @@ export class KeylayoutToKmnConverter {
             + " "
             + unique_data_Rules[k].key
             + "]  >  \'"
-            + new TextDecoder().decode(unique_data_Rules[k].output)
+            + output_character_unicode
             + "\'\n";
         }
 
-        // if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
-        data += "\n";
-        //   }
+        if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
+          data += "\n";
+        }
 
       }
     }
