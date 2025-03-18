@@ -53,9 +53,13 @@ The `LanguageProcessor` class, whose instances are owned within the engine by `I
 Found within [web/src/engine/js-processor/src/keyboardProcessor.ts](https://github.com/keymanapp/keyman/blob/master/web/src/engine/js-processor/src/keyboardProcessor.ts), the `KeyboardProcessor` class is the top-level class responsible for processing keystrokes targeting JS-based keyboards.  It is also responsible for providing default output for OSK-based keystrokes not explicitly handled by the keyboard that should receive browser-default handling (when JS-based keyboards are active).
 - `epic/web-core` note:  renamed to `JSKeyboardProcessor`, moved to `jsKeyboardProcessor.ts` within the same folder.
 
+This is likely the top-level class that `epic/web-core` would likely need to replace wholesale with a Keyman Core wrapper - hopefully with a mutual abstraction providing a similar interface for both.  (`KeyboardProcessor` was originally named after Core's equivalent class, as it pretty much fills the same role.)  `InputProcessor` could then leverage that mutual abstraction for its functions without needing a specialized version per keystroke interpreting engine.
+
+#### The `processKeystroke` method
+
 https://github.com/keymanapp/keyman/blob/b4df4ab80862bc90da42bcdbd333df0a14da01ca/common/web/keyboard-processor/src/text/keyboardProcessor.ts#L217
 
-The method linked above is the primary entrypoint for rule processing of individual, preprocessed `KeyEvent`s.  It's named after Core's equivalent class, as it pretty much fills the same role.  This is likely the top-level class that `epic/web-core` would likely need to replace wholesale with a Keyman Core wrapper - hopefully with a mutual abstraction providing a similar interface for both, which `InputProcessor` could then continue to leverage for its functions.
+The method linked above is the primary entrypoint for rule processing of individual, preprocessed `KeyEvent`s.
 
 #### Keystroke-default emulation
 

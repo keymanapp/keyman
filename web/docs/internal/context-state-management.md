@@ -18,7 +18,7 @@ Specifics for the implementation of JS-keyboard deadkeys can be found here:  htt
 `ordinal`:  if two deadkeys are in the same "virtual" position, this field resolves which came first.
 `matched`: used during keyboard-rule processing.
 
-Note that we do NOT actually insert the deadkeys into the raw text-context!  Web's pattern here is different than that of Keymman Core.
+Note that we do NOT actually insert the deadkeys into the raw text-context!  Web's pattern here is different than that of Keyman Core.
 
 ## Manipulating context-states
 
