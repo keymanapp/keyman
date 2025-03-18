@@ -82,7 +82,7 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            builder_do_typescript_tests  75
+builder_run_action test            builder_do_typescript_tests  90
 
 #-------------------------------------------------------------------------------------------------------------------
 
