@@ -12,17 +12,30 @@ import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { BitmapStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+
+let root: ASTNode = null;
 
 describe("KMN Analyser Tests", () => {
+  beforeEach(() => {
+    root = new ASTNode(NodeTypes.TMP);
+  });
   describe("BitmapStoreRule Tests", () => {
     it("can construct a BitmapStoreRule", () => {
-      const buffer: String = "store(&VERSION) '10.0'";
-      const lexer = new Lexer(buffer);
-      const tokens: Token[] = lexer.parse();
-      const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
       const bitmap: Rule = new BitmapStoreRule(tokenBuffer);
       assert.isNotNull(bitmap);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
+      const bitmap: Rule = new BitmapStoreRule(tokenBuffer);
+      assert.isTrue(bitmap.parse(root));
     });
   });
 });
 
+function stringToTokenBuffer(buffer: String): TokenBuffer {
+  const lexer = new Lexer(buffer);
+  const tokens: Token[] = lexer.parse();
+  return new TokenBuffer(tokens);
+}
