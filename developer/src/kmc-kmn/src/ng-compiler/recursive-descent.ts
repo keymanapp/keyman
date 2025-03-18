@@ -214,8 +214,9 @@ export function parameterSequence(tokenBuffer: TokenBuffer, identifiers: Token[]
     }
   }
 
-  if (!parseSuccess)
+  if (!parseSuccess) {
     tokenBuffer.resetCurrentPosition(save);
+  }
 
   return parseSuccess;
 }
