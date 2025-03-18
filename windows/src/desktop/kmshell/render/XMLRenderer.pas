@@ -243,7 +243,7 @@ begin
       xml.LoadFromFile(FTemplatePath + FRenderTemplate);
     except
       on E: Exception do
-        raise EXMLRenderer.Create('Unexpected error while loading XSLT: ' + E.Message);
+        raise EXMLRenderer.Create('Unexpected error while loading XSLT: ' + E.ClassName+': ' + E.Message);
     end;
 
     try
@@ -251,7 +251,7 @@ begin
       Result := s;
     except
       on E: Exception do
-        raise EXMLRenderer.Create('Error transforming XML with XSLT: ' + E.Message);
+        raise EXMLRenderer.Create('Error transforming XML with XSLT: ' + E.ClassName+': ' + E.Message);
     end;
 
     Result := s;
