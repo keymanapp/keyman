@@ -31,4 +31,12 @@ export class TokenBuffer {
   public resetCurrentPosition(save: number): void {
     this._currentPosition = Math.min(Math.max(0, save), this.list.length);
   }
+
+  public toText(): String {
+    let text: String = "";
+    for (let token of this.list) {
+      text = text.concat(token.text.toString())
+    }
+    return text;
+  }
 }

@@ -8,8 +8,9 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
+import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
+import { readFileSync } from 'fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -154,6 +155,16 @@ describe("TokenBuffer Tests", () => {
       tb.resetCurrentPosition(-1);
       assert.equal(tb.currentPosition, 0);
       assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+    });
+  });
+  describe("TokenBuffer toText()", () => {
+    it("can provide round trip text", () => {
+      const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      const lexer = new Lexer(buffer);
+      const tokens: Token[] = lexer.parse();
+      const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+      const output: String = tokenBuffer.toText();
+      assert.deepEqual(output.toString(), buffer.toString());
     });
   });
 });
