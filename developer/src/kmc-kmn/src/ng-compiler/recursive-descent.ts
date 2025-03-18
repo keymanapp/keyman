@@ -18,9 +18,7 @@ export abstract class Rule { // equivalent to a no-child rule
     this.tokenBuffer = tokenBuffer;
   }
 
-  public parse(node: ASTNode): boolean {
-    return false;
-  }
+  public abstract parse(node: ASTNode): boolean;
 }
 
 export abstract class SingleChildRule extends Rule {
