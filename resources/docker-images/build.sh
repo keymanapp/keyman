@@ -34,7 +34,7 @@ build_action() {
   builder_echo debug "Building image for ${platform}"
 
   if [[ "${platform}" == "base" ]]; then
-    # shellcheck disable=SC2154 # set by _convert_parameters_to_build_args
+    # shellcheck disable=SC2154 # set by convert_parameters_to_args
     docker pull --platform "amd64" "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
