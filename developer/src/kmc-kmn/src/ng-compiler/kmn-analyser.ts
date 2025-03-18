@@ -10,7 +10,7 @@ import { TokenTypes } from "./lexer.js";
 import { KeywordRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 
-class BitmapStoreRule extends SingleChildRule {
+export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const store: Rule        = new KeywordRule(tokenBuffer, TokenTypes.TT_STORE);
