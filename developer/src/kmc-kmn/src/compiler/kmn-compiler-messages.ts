@@ -747,9 +747,28 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_ContextExCannotReferenceNul                    = SevError | 0x0B2;
-  static Error_ContextExCannotReferenceNul                     = () => m(
+  static Error_ContextExCannotReferenceNul                    = () => m(
     this.ERROR_ContextExCannotReferenceNul,
     `The offset in context() points to a non-character nul statement in the context`,
+  );
+
+  static ERROR_TextBeforeOrAfterNulInOutput                   = SevError | 0x0B3;
+  static Error_TextBeforeOrAfterNulInOutput                    = () => m(
+    this.ERROR_TextBeforeOrAfterNulInOutput,
+    `A rule with a nul statement in the output cannot also output text or text-emitting statements`,
+    `If a rule has [\`nul\`](https://help.keyman.com/developer/language/reference/nul)
+    in the output, it means that it deletes any context referenced on the left-hand
+    side of the rule, and has no other output, so it does not make sense to have any
+    content apart from the \`nul\` statement in the output.
+
+    The following statements can still be used with \`nul\` in the output:
+    * [\`beep()\`](https://help.keyman.com/developer/language/reference/beep)
+    * [\`call()\`](https://help.keyman.com/developer/language/reference/call)
+    * [\`reset()\`](https://help.keyman.com/developer/language/reference/reset)
+    * [\`return\`](https://help.keyman.com/developer/language/reference/return)
+    * [\`save()\`](https://help.keyman.com/developer/language/reference/save)
+    * [\`set()\`](https://help.keyman.com/developer/language/reference/set)
+    * [\`use()\`](https://help.keyman.com/developer/language/reference/use)`
   );
 
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
