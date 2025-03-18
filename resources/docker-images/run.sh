@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+. "${KEYMAN_ROOT}/resources/docker-images/docker-build.inc.sh"
 
 ################################ Main script ################################
 
@@ -20,6 +21,17 @@ builder_describe \
   "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})"
 
 builder_parse "$@"
+
+check_for_default_values
+convert_parameters_to_args
+
+if is_default_values; then
+  image_version=default
+  build_dir=default
+else
+  image_version=${build_version:-}
+  build_dir="${DISTRO:-}-${DISTRO_VERSION:-}"
+fi
 
 run_android() {
   docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
@@ -53,14 +65,6 @@ run_web() {
     "keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
-
-if [[ -z "${DISTRO_VERSION:-}" ]]; then
-  image_version=default
-  build_dir=default
-else
-  image_version="${DISTRO:-}-${DISTRO_VERSION}-java${KEYMAN_VERSION_JAVA}-node$(_print_expected_node_version)-emsdk${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
-  build_dir="${DISTRO:-}-${DISTRO_VERSION}"
-fi
 
 mkdir -p "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}"
 
