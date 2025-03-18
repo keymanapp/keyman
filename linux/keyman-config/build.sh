@@ -83,7 +83,14 @@ build_action() {
   builder_echo "Building man and help pages"
   build_man_and_help_pages
   builder_echo "Building keyman-config"
-  python3 setup.py build
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  if dpkg --compare-versions "$(lsb_release -r -s)" lt 24.04; then
+    # Ubuntu 22.04 Jammy has a buggy version of python3-build which doesn't work
+    # TODO: remove once we drop support for Ubuntu 22.04 Jammy
+    python3 setup.py build
+  else
+    python3 -m build --outdir build .
+  fi
 }
 
 test_action() {
