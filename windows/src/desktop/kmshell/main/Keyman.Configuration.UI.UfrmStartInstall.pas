@@ -19,13 +19,14 @@ uses
   Winapi.Messages,
   Winapi.Windows,
   UfrmKeymanBase,
-  UserMessages;
+  UserMessages, Vcl.Imaging.pngimage;
 
 type
   TfrmStartInstall = class(TfrmKeymanBase)
     cmdInstall: TButton;
     cmdLater: TButton;
     lblInstallUpdate: TLabel;
+    imgKeymanLogo: TImage;
     procedure FormCreate(Sender: TObject);
   private
   public
@@ -42,8 +43,8 @@ uses
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
 begin
   inherited;
-  cmdInstall.Caption := MsgFromId(S_Update);
-  cmdLater.Caption := MsgFromId(S_Button_Close);
+  cmdInstall.Caption := MsgFromId(S_Update_Now);
+  cmdLater.Caption := MsgFromId(S_Later);
   lblInstallUpdate.Caption := MsgFromId(S_Ready_To_Install);
 end;
 
