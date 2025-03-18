@@ -24,14 +24,13 @@ export abstract class Rule { // equivalent to a no-child rule
 export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
 
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
-    // TODO error if rule is null
+  public constructor(tokenBuffer: TokenBuffer, rule: Rule=null) {
     super(tokenBuffer);
     this.rule = rule;
   }
 
   public parse(node: ASTNode): boolean {
-    return this.rule.parse(node);
+    return this.rule === null ? false : this.rule.parse(node);
   }
 }
 
