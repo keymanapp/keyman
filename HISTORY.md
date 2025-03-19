@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.16 alpha 2025-03-19
+
+* feat(core): check on load for valid kmx_plus unicode (#13486)
+
 ## 19.0.15 alpha 2025-03-18
 
 * chore: merge master into linux-mcompile (#13506)
