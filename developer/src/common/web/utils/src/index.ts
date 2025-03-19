@@ -42,6 +42,8 @@ export {
   CompilerPathCallbacks,
   CompilerFileSystemCallbacksFolderEntry as FileSystemFolderEntry,
   DefaultCompilerFileSystemAsyncCallbacks,
+  EventResolver,
+  NullEventResolver,
 } from './compiler-callbacks.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
@@ -65,7 +67,7 @@ export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.j
 
 export { CommonTypesMessages } from './common-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
-export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
+export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader, XML_START_INDEX_SYMBOL, XML_FILENAME_SYMBOL } from './xml-utils.js';
 
 export * as GitHubUrls from './github-urls.js';
 export * as CloudUrls from './cloud-urls.js';

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { platform } from 'os';
-import { CompilerCallbacks, CompilerEvent,
+import { CompilerCallbacks, CompilerEvent, EventResolver, NullEventResolver,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
@@ -45,6 +45,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  /** cache of the contentes of the text */
+  messageFiletext: string = '';
   maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
@@ -55,6 +57,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.messages = [];
     this.messageCount = 0;
     this.messageFilename = '';
+    this.messageFiletext = '';
   }
 
   /**
@@ -145,7 +148,18 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     return fileURLToPath(url);
   }
 
+  private eventResolver = new NullEventResolver();
+
+  setEventResolver(eventResolver: EventResolver): void {
+    this.eventResolver = eventResolver;
+  }
+
   reportMessage(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
+    this.handleReportMessage(event);
+  }
+
+  handleReportMessage(event: CompilerEvent): void {
     if(!event.filename) {
       event.filename = this.messageFilename;
     }
@@ -154,6 +168,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Reset max message limit when a new file is being processed
       this.messageFilename = event.filename;
       this.messageCount = 0;
+      this.messageFiletext = '';
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
