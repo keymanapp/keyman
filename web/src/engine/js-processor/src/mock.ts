@@ -1,6 +1,6 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetBase } from './outputTargetBase.js';
 
-export class Mock extends OutputTarget {
+export class Mock extends OutputTargetBase {
   text: string;
 
   selStart: number;
@@ -25,7 +25,7 @@ export class Mock extends OutputTarget {
   }
 
   // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(outputTarget: OutputTarget, readonly?: boolean) {
+  static from(outputTarget: OutputTargetBase, readonly?: boolean) {
     let clone: Mock;
 
     if (outputTarget instanceof Mock) {

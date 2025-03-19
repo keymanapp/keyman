@@ -22,7 +22,7 @@ global.keyman = {}; // So that keyboard-based checks against the global `keyman`
 // Initialize supplementary plane string extensions
 String.kmwEnableSupplementaryPlane(false);
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let languageProcessor;
   const callbacks = new TestCompilerCallbacks();
