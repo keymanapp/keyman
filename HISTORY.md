@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.218 beta 2025-03-19
+
+* fix(developer): add validation of `nul` usage in output part of rule (#13532)
+* fix(web): model unload and load should use consistent, canEnable check (#13534)
+* feat(web): adds gesture 'traces' for warning/error logging (#13360)
+* fix(linux): fix building in Docker with different Ubuntu/Debian version (#13537)
+* chore(linux): replace deprecated setup.py (#13524)
+* chore(linux): rename "Debian packaging" to "Ubuntu packaging" (#13523)
+
 ## 18.0.217 beta 2025-03-18
 
 * fix(windows): cherry pick hard code key cap (#13526)
