@@ -46,6 +46,24 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(bitmapStore.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
     });
+    it("can parse correctly (whitespace after left bracket)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store( &bitmap)');
+      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
+      assert.isTrue(bitmapStore.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+    });
+    it("can parse correctly (whitespace before right bracket)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap )');
+      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
+      assert.isTrue(bitmapStore.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+    });
+    it("can parse correctly (whitespace after left and before right brackets)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store( &bitmap )');
+      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
+      assert.isTrue(bitmapStore.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+    });
   });
 });
 

@@ -7,7 +7,7 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { KeywordRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { KeywordRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -38,13 +38,22 @@ export class BitmapStoreAssignRule extends SingleChildRule {
 export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule        = new KeywordRule(tokenBuffer, TokenTypes.STORE);
-    const leftBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const amphasand: Rule    = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
-    const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
-    const rightBracket: Rule = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    const store: Rule         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
+    const leftBracket: Rule   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpace(tokenBuffer);
+    const amphasand: Rule     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
+    const bitmap: Rule        = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
+    const rightBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, amphasand, bitmap, rightBracket,
+      store, leftBracket, optWhitespace, amphasand, bitmap, optWhitespace, rightBracket,
     ]);
+  }
+}
+
+export class OptionalWhiteSpace extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const whitespace: Rule  = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.rule = new OptionalRule(tokenBuffer, whitespace);
   }
 }
