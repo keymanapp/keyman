@@ -10,6 +10,8 @@ import { Token } from "./lexer.js";
 
 export enum NodeTypes {
   BITMAP,
+  COPYRIGHT,
+  INCLUDECODES,
   STRING,
   TMP,
 }

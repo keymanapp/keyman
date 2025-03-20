@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, CopyrightStoreAssignRule, CopyrightStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
@@ -63,6 +63,33 @@ describe("KMN Analyser Tests", () => {
       const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
       assert.isTrue(bitmapStore.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+    });
+  });
+  describe("CopyrightStoreAssignRule Tests", () => {
+    it("can construct a CopyrightStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
+      const copyrightStoreAssign: Rule = new CopyrightStoreAssignRule(tokenBuffer);
+      assert.isNotNull(copyrightStoreAssign);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
+      const copyrightStoreAssign: Rule = new CopyrightStoreAssignRule(tokenBuffer);
+      assert.isTrue(copyrightStoreAssign.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+  });
+  describe("CopyrightStoreRule Tests", () => {
+    it("can construct a CopyrightStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright)');
+      const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
+      assert.isNotNull(copyrightStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright)');
+      const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
+      assert.isTrue(copyrightStore.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
     });
   });
 });

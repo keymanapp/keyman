@@ -9,4 +9,4 @@ bitmapStore: store leftBracket whitespace? amphasand bitmap whitespace? rightBra
 copyrightStoreAssign: copyrightStore whitespace string
 copyrightStore: store leftBracket whitespace? amphasand copyright whitespace? rightBracket
 includecodesStoreAssign: includecodesStore whitespace string
-copyrightStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket
+includecodesStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket

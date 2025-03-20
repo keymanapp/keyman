@@ -184,8 +184,10 @@ export class KeywordRule extends Rule {
   }
 
   private static tokenToNode = [
-    {tokenType: TokenTypes.BITMAP, nodeType: NodeTypes.BITMAP},
-    {tokenType: TokenTypes.STRING, nodeType: NodeTypes.STRING},
+    {tokenType: TokenTypes.BITMAP,       nodeType: NodeTypes.BITMAP},
+    {tokenType: TokenTypes.COPYRIGHT,    nodeType: NodeTypes.COPYRIGHT},
+    {tokenType: TokenTypes.INCLUDECODES, nodeType: NodeTypes.INCLUDECODES},
+    {tokenType: TokenTypes.STRING,       nodeType: NodeTypes.STRING},
   ];
 
   static {

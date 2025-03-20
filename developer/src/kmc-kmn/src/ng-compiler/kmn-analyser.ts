@@ -73,20 +73,26 @@ export class BitmapStoreRule extends SystemStoreRule {
   }
 }
 
-// export class BitmapStoreRule extends SingleChildRule {
-//   public constructor(tokenBuffer: TokenBuffer) {
-//     super(tokenBuffer);
-//     const store: Rule         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
-//     const leftBracket: Rule   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
-//     const optWhitespace: Rule = new OptionalWhiteSpace(tokenBuffer);
-//     const amphasand: Rule     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
-//     const bitmap: Rule        = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
-//     const rightBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
-//     this.rule = new SequenceRule(tokenBuffer, [
-//       store, leftBracket, optWhitespace, amphasand, bitmap, optWhitespace, rightBracket,
-//     ]);
-//   }
-// }
+export class CopyrightStoreAssignRule extends SystemStoreAssignRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    this.storeType = NodeTypes.COPYRIGHT;
+    const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [
+      copyrightStore, this.whitespace, this.stringRule,
+    ]);
+  }
+}
+
+export class CopyrightStoreRule extends SystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const copyright: Rule = new KeywordRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      this.store, this.leftBracket, this.optWhitespace, this.amphasand, copyright, this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
 
 export class OptionalWhiteSpace extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
