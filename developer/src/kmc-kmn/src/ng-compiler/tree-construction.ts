@@ -25,13 +25,17 @@ export class ASTNode {
   }
 
   public addChild(child: ASTNode): ASTNode {
-    this.children.push(child);
+    if (child != null) {
+      this.children.push(child);
+    }
     return this;
   }
 
   public addChildren(children: ASTNode[]): ASTNode {
-    for (const child of children) {
-      this.addChild(child);
+    if (children != null) {
+      for (const child of children) {
+        this.addChild(child);
+      }
     }
     return this;
   }
@@ -48,7 +52,7 @@ export class ASTNode {
   }
 
   private collectDescendents(result: ASTNode[], requiredType: NodeTypes): void {
-    if (this.nodeType == requiredType)
+    if (this.nodeType === requiredType)
       result.push(this);
     for (const child of this.children)
       child.collectDescendents(result, requiredType);
@@ -63,28 +67,27 @@ export class ASTNode {
   }
 
   public getText(): String {
-    return this.token.text;
+    return (this.token != null) ? this.token.text : '';
   }
 
   public getTextOfType(nodeType: NodeTypes): String  {
-    return this.getSoleChildOfType(nodeType).getText();
+    const child: ASTNode = this.getSoleChildOfType(nodeType);
+    return (child != null) ? child.getText() : '';
   }
 
   public getSoleChild(): ASTNode {
     const children: ASTNode[] = this.getChildren();
-    return children[0];
+    return (children.length == 1) ? children[0] : null;
   }
 
   public getSoleChildOfType(requiredType: NodeTypes): ASTNode {
     const children: ASTNode[] = this.getChildrenOfType(requiredType);
-    return children[0];
+    return (children.length == 1) ? children[0] : null;
   }
 
   public getChildren(): ASTNode[] {
     const list: ASTNode[] = [];
-    for (const child of this.children) {
-      list.push(child);
-    }
+    list.push(...this.children);
     return list;
   }
 
@@ -100,7 +103,7 @@ export class ASTNode {
 
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
     const children: ASTNode[] = this.removeChildrenOfType(requiredType);
-    return children[0];
+    return (children.length == 1) ? children[0] : null;
   }
 
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
