@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, parameterSequence, Rule, SequenceRule } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule, parameterSequence } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';

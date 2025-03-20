@@ -9,6 +9,8 @@
 import { Token } from "./lexer.js";
 
 export enum NodeTypes {
+  BITMAP,
+  STRING,
   TMP,
 }
 
@@ -62,10 +64,15 @@ export class ASTNode {
   }
 
   public getTextOfType(nodeType: NodeTypes): String  {
-    return this.getSoleChild(nodeType).getText();
+    return this.getSoleChildOfType(nodeType).getText();
   }
 
-  public getSoleChild(requiredType: NodeTypes): ASTNode {
+  public getSoleChild(): ASTNode {
+    const children: ASTNode[] = this.getChildren();
+    return children[0];
+  }
+
+  public getSoleChildOfType(requiredType: NodeTypes): ASTNode {
     const children: ASTNode[] = this.getChildrenOfType(requiredType);
     return children[0];
   }

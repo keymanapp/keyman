@@ -9,6 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { KeywordRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
+import { NodeTypes } from "./tree-construction.js";
 
 export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
@@ -16,10 +17,10 @@ export class BitmapStoreRule extends SingleChildRule {
     const store: Rule        = new KeywordRule(tokenBuffer, TokenTypes.STORE);
     const leftBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
     const amphasand: Rule    = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
-    const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.BITMAP);
+    const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, NodeTypes.BITMAP);
     const rightBracket: Rule = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
     const whitespace: Rule   = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const stringRule: Rule   = new KeywordRule(tokenBuffer, TokenTypes.STRING);
+    const stringRule: Rule   = new KeywordRule(tokenBuffer, TokenTypes.STRING, NodeTypes.STRING);
     this.rule = new SequenceRule(tokenBuffer, [
       store, leftBracket, amphasand, bitmap, rightBracket, whitespace, stringRule,
     ]);

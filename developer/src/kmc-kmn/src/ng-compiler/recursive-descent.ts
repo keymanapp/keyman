@@ -174,10 +174,12 @@ export class OneOrManyRule extends SingleChildRule {
 
 export class KeywordRule extends Rule {
   private tokenType: TokenTypes;
+  private nodeType: NodeTypes;
 
-  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes) {
+  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes, nodeType: NodeTypes=null) {
     super(tokenBuffer);
     this.tokenType = tokenType;
+    this.nodeType  = nodeType;
   }
 
   public parse(node: ASTNode): boolean {
@@ -187,6 +189,9 @@ export class KeywordRule extends Rule {
     if (token.isTokenType(this.tokenType)) {
       parseSuccess = true;
       this.tokenBuffer.popToken();
+      if (this.nodeType !== null) {
+        node.addChild(new ASTNode(this.nodeType, token));
+      }
     } else {
       parseSuccess = false;
     }
@@ -196,15 +201,19 @@ export class KeywordRule extends Rule {
 }
 
 export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[], numExpected: number): boolean {
+  return tokenSequence(tokenBuffer, parameters, TokenTypes.PARAMETER, numExpected);
+}
+
+export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenType: TokenTypes, numExpected: number): boolean {
   let parseSuccess: boolean = true;
   const save: number = tokenBuffer.currentPosition;
   let token: Token = tokenBuffer.nextToken();
-  const tmpParams: Token[] = [];
+  const tmpTokens: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
-    if (token.isTokenType(TokenTypes.PARAMETER)) {
+    if (token.isTokenType(tokenType)) {
       tokenBuffer.popToken();
-      tmpParams.push(token);
+      tmpTokens.push(token);
       token = tokenBuffer.nextToken();
     } else {
       parseSuccess = false;
@@ -213,7 +222,7 @@ export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[],
   }
 
   if (parseSuccess) {
-    parameters.push(...tmpParams);
+    tokens.push(...tmpTokens);
   } else {
     tokenBuffer.resetCurrentPosition(save);
   }
