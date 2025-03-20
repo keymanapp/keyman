@@ -1,1 +1,2 @@
-bitmapStore: store leftBracket amphasand bitmap rightBracket whitespace string
+bitmapStoreAssign: bitmapStore whitespace string
+bitmapStore: store leftBracket amphasand bitmap rightBracket

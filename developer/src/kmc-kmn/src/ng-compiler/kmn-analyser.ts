@@ -11,6 +11,30 @@ import { KeywordRule, Rule, SequenceRule, SingleChildRule } from "./recursive-de
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
+export class BitmapStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
+    const whitespace: Rule  = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const stringRule: Rule  = new KeywordRule(tokenBuffer, TokenTypes.STRING, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      bitmapStore, whitespace, stringRule,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const bitmapNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.BITMAP);
+      const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
+      bitmapNode.addChild(stringNode);
+      node.addChild(bitmapNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
@@ -19,22 +43,8 @@ export class BitmapStoreRule extends SingleChildRule {
     const amphasand: Rule    = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
     const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
     const rightBracket: Rule = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    const whitespace: Rule   = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const stringRule: Rule   = new KeywordRule(tokenBuffer, TokenTypes.STRING, true);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, amphasand, bitmap, rightBracket, whitespace, stringRule,
+      store, leftBracket, amphasand, bitmap, rightBracket,
     ]);
   }
-
-    public parse(node: ASTNode): boolean {
-      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-      const parseSuccess: boolean = this.rule.parse(tmp);
-      if (parseSuccess) {
-        const bitmapNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.BITMAP);
-        const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
-        bitmapNode.addChild(stringNode);
-        node.addChild(bitmapNode);
-      }
-      return parseSuccess;
-    }
 }
