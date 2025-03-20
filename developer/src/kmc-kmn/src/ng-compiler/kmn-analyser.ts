@@ -9,7 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { KeywordRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTNode } from "./tree-construction.js";
+import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
@@ -27,7 +27,14 @@ export class BitmapStoreRule extends SingleChildRule {
   }
 
     public parse(node: ASTNode): boolean {
-      let parseSuccess: boolean = this.rule.parse(node);
+      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const parseSuccess: boolean = this.rule.parse(tmp);
+      if (parseSuccess) {
+        const bitmapNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.BITMAP);
+        const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
+        bitmapNode.addChild(stringNode);
+        node.addChild(bitmapNode);
+      }
       return parseSuccess;
     }
 }

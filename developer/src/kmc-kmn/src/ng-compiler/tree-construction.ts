@@ -24,18 +24,21 @@ export class ASTNode {
     this.token     = token;
   }
 
-  public addChild(child: ASTNode): void {
+  public addChild(child: ASTNode): ASTNode {
     this.children.push(child);
+    return this;
   }
 
-  public addChildren(children: ASTNode[]): void {
+  public addChildren(children: ASTNode[]): ASTNode {
     for (const child of children) {
       this.addChild(child);
     }
+    return this;
   }
 
-  public addToken(nodeType: NodeTypes, token: Token): void {
+  public addToken(nodeType: NodeTypes, token: Token): ASTNode {
     this.addChild(new ASTNode(nodeType, token));
+    return this;
   }
 
   public getDescendents(requiredType: NodeTypes) {

@@ -30,6 +30,8 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
       const bitmap: Rule = new BitmapStoreRule(tokenBuffer);
       assert.isTrue(bitmap.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
     });
   });
 });
