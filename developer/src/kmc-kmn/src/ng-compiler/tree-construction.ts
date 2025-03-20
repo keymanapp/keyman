@@ -78,7 +78,7 @@ export class ASTNode {
   }
 
   public getChildren(): ASTNode[] {
-    const list = [];
+    const list: ASTNode[] = [];
     for (const child of this.children) {
       list.push(child);
     }
@@ -86,12 +86,28 @@ export class ASTNode {
   }
 
   public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
-    const list = [];
+    const list: ASTNode[] = [];
     for (const child of this.children) {
       if (child.nodeType === requiredType) {
         list.push(child);
       }
     }
+    return list;
+  }
+
+  public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
+    const children: ASTNode[] = this.removeChildrenOfType(requiredType);
+    return children[0];
+  }
+
+  public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
+    const list: ASTNode[] = [];
+    this.children.forEach((child, idx) => {
+      if (child.nodeType === requiredType) {
+        list.push(child);
+        this.children.splice(idx, 1);
+      }
+    });
     return list;
   }
 

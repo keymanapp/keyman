@@ -173,13 +173,26 @@ export class OneOrManyRule extends SingleChildRule {
 }
 
 export class KeywordRule extends Rule {
+  private static tokenToNodeMap: Map<TokenTypes, NodeTypes>;
   private tokenType: TokenTypes;
-  private nodeType: NodeTypes;
+  private addNode: boolean;
 
-  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes, nodeType: NodeTypes=null) {
+  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes, addNode: boolean=false) {
     super(tokenBuffer);
     this.tokenType = tokenType;
-    this.nodeType  = nodeType;
+    this.addNode   = addNode;
+  }
+
+  private static tokenToNode = [
+    {tokenType: TokenTypes.BITMAP, nodeType: NodeTypes.BITMAP},
+    {tokenType: TokenTypes.STRING, nodeType: NodeTypes.STRING},
+  ];
+
+  static {
+    KeywordRule.tokenToNodeMap = new Map<TokenTypes, NodeTypes>();
+    for (const map of KeywordRule.tokenToNode) {
+      KeywordRule.tokenToNodeMap.set(map.tokenType, map.nodeType);
+    }
   }
 
   public parse(node: ASTNode): boolean {
@@ -189,8 +202,11 @@ export class KeywordRule extends Rule {
     if (token.isTokenType(this.tokenType)) {
       parseSuccess = true;
       this.tokenBuffer.popToken();
-      if (this.nodeType !== null) {
-        node.addChild(new ASTNode(this.nodeType, token));
+      if (this.addNode) {
+        const nodeType: NodeTypes = KeywordRule.tokenToNodeMap.get(token.tokenType);
+        if (nodeType != undefined) {
+          node.addChild(new ASTNode(nodeType, token));
+        }
       }
     } else {
       parseSuccess = false;
