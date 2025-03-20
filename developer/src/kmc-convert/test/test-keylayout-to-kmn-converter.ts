@@ -26,7 +26,21 @@ describe('KeylayoutToKmnConverter', function () {
   const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
   // convert_object from usable file name
-  const inputFilename = makePathToFixture('../data/Italian_copy.keylayout');
+  //copy into C:\Projects\keyman\keyman\developer\src\kmc-convert\test\DATA then they run OK
+  //const inputFilename = makePathToFixture('../data/US_complete.keylayout');               // OKOK
+  const inputFilename =  makePathToFixture('../data/Italian_copy.keylayout');             // OKOK
+  //const inputFilename = makePathToFixture('../data/German_complete.keylayout');           // OK NO NCAPS SHIFT <-> SHIFT NCAPS
+  //const inputFilename  = makePathToFixture('../data/German_Standard_copy.keylayout');     // OK NO NCAPS SHIFT <-> SHIFT NCAPS
+  //const inputFilename  = makePathToFixture('../data/German_Standard2.keylayout');         // OKOK   small
+  //const inputFilename  = makePathToFixture('../data/Spanish_copy.keylayout');             // OKOK
+  //const inputFilename  = makePathToFixture('../data/Latin_American_copy.keylayout');      // OKOK
+  //const inputFilename  = makePathToFixture('../data/Swiss_French_copy.keylayout');        // OKOK
+  //const inputFilename  = makePathToFixture('../data/Swiss_German_copy.keylayout');        // OKOK
+  //const inputFilename  = makePathToFixture('../data/US_copy.keylayout');                  // OKOK
+
+  //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');           // No
+  //const inputFilename  = makePathToFixture('../data/German_StandardTweaked.keylayout');   // NO C3
+
   const read = sut.read(inputFilename);
   const converted = sut.convert(read);
 
@@ -75,20 +89,6 @@ describe('KeylayoutToKmnConverter', function () {
 
 
     it('run() should return true if ran OK', async function () {
-
-      //copy into C:\Projects\keyman\keyman\developer\src\kmc-convert\test\DATA then they run OK
-      //const inputFilename = makePathToFixture('../data/US_complete.keylayout');               // OK
-      //const inputFilename  = makePathToFixture('../data/German_complete.keylayout');          // OK
-      const inputFilename = makePathToFixture('../data/Italian_copy.keylayout');                // OK
-      //const inputFilename  = makePathToFixture('../data/German_Standard_copy.keylayout');     // OK
-      //const inputFilename  = makePathToFixture('../data/German_Standard2.keylayout');         // OK
-      //const inputFilename  = makePathToFixture('../data/German_StandardTweaked.keylayout');   // NO C3
-      //const inputFilename  = makePathToFixture('../data/Spanish_copy.keylayout');             // OK
-      //const inputFilename  = makePathToFixture('../data/Latin_American_copy.keylayout');      // OK
-      //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');           // No
-      //const inputFilename  = makePathToFixture('../data/Swiss_French_copy.keylayout');        // OK
-      //const inputFilename  = makePathToFixture('../data/Swiss_German_copy.keylayout');        // OK
-      //const inputFilename  = makePathToFixture('../data/US_copy.keylayout');                  // OK
 
       // TODO use path also
       // const outputFilename = "data//" +inputFilename.substring(0, inputFilename.lastIndexOf(".")) + ".kmn"
@@ -271,7 +271,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
 
   describe("isAcceptableKeymanModifier ", function () {
     [
