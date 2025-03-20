@@ -11,44 +11,82 @@ import { KeywordRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export class BitmapStoreAssignRule extends SingleChildRule {
+export abstract class SystemStoreAssignRule extends SingleChildRule {
+  protected whitespace: Rule     = null;
+  protected stringRule: Rule     = null;
+  protected storeType: NodeTypes = null;
+
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-    const whitespace: Rule  = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const stringRule: Rule  = new KeywordRule(tokenBuffer, TokenTypes.STRING, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      bitmapStore, whitespace, stringRule,
-    ]);
+    this.whitespace = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.stringRule = new KeywordRule(tokenBuffer, TokenTypes.STRING, true);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const bitmapNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.BITMAP);
+      const storeNode: ASTNode  = tmp.getSoleChildOfType(this.storeType);
       const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
-      bitmapNode.addChild(stringNode);
-      node.addChild(bitmapNode);
+      storeNode.addChild(stringNode);
+      node.addChild(storeNode);
     }
     return parseSuccess;
   }
 }
 
-export class BitmapStoreRule extends SingleChildRule {
+export abstract class SystemStoreRule extends SingleChildRule {
+  protected store: Rule           = null;
+  protected leftBracket: Rule     = null;
+  protected optWhitespace: Rule   = null;
+  protected amphasand: Rule       = null;
+  protected rightBracket: Rule    = null;
+
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
-    const leftBracket: Rule   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpace(tokenBuffer);
-    const amphasand: Rule     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
-    const bitmap: Rule        = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
-    const rightBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.store         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
+    this.leftBracket   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
+    this.optWhitespace = new OptionalWhiteSpace(tokenBuffer);
+    this.amphasand     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
+    this.rightBracket  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+  }
+}
+
+export class BitmapStoreAssignRule extends SystemStoreAssignRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    this.storeType = NodeTypes.BITMAP;
+    const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, optWhitespace, amphasand, bitmap, optWhitespace, rightBracket,
+      bitmapStore, this.whitespace, this.stringRule,
     ]);
   }
 }
+
+export class BitmapStoreRule extends SystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const bitmap: Rule = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      this.store, this.leftBracket, this.optWhitespace, this.amphasand, bitmap, this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
+
+// export class BitmapStoreRule extends SingleChildRule {
+//   public constructor(tokenBuffer: TokenBuffer) {
+//     super(tokenBuffer);
+//     const store: Rule         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
+//     const leftBracket: Rule   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
+//     const optWhitespace: Rule = new OptionalWhiteSpace(tokenBuffer);
+//     const amphasand: Rule     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
+//     const bitmap: Rule        = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
+//     const rightBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+//     this.rule = new SequenceRule(tokenBuffer, [
+//       store, leftBracket, optWhitespace, amphasand, bitmap, optWhitespace, rightBracket,
+//     ]);
+//   }
+// }
 
 export class OptionalWhiteSpace extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
