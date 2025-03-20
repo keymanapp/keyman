@@ -13,6 +13,12 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import USVString = LexicalModelTypes.USVString;
 
+/**
+ * Indicates that the owning token's 'replacement' represents part of an
+ * actually-applied suggestion.
+ */
+export const APPLIED_SUGGESTION_COMPONENT = -2;
+
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
@@ -56,6 +62,7 @@ export class TrackedContextToken {
   transformDistributions: Distribution<Transform>[] = [];
   replacements: TrackedContextSuggestion[] = [];
   activeReplacementId: number = -1;
+  replacementTransformId: number = -1;
 
   constructor();
   constructor(instance: TrackedContextToken);
@@ -86,6 +93,7 @@ export class TrackedContextToken {
   clearReplacements() {
     this.activeReplacementId = -1;
     this.replacements = []
+    this.replacementTransformId = -1;
   }
 
   /**
@@ -349,8 +357,17 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
     tokenizedContext: Token[],
     matchState: TrackedContextState,
-    transformSequenceDistribution?: Distribution<Transform[]>
+    transformSequenceDistribution?: Distribution<Transform[]>,
+    preserveMatchState?: boolean
   ): ContextMatchResult {
+    // By default, we just edit the prior state's tokens and keep 'em.
+    // - If it's an old token, it shouldn't be altered; why use extra memory?
+    // - If we're editing the current token via typing, we only wish to consider the new
+    //   version of the matched context.
+    //
+    // This changes when applying suggestions, as THEN we wish to remember 'before' vs 'after'.
+    preserveMatchState ??= false;
+
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -387,6 +404,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // If mutations HAVE happened, we have work to do.
     let state = matchState;
+    if(preserveMatchState) {
+      state = new TrackedContextState(state);
+    }
 
     let priorEdit: typeof editPath[0];
     let poppedTokenCount = 0;
@@ -488,7 +508,11 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           }
 
           const sourceToken = matchState.tokens[i];
-          state.tokens[i - poppedTokenCount] = sourceToken;
+          if(preserveMatchState) {
+            state.tokens[i - poppedTokenCount] = new TrackedContextToken(sourceToken);
+          } else {
+            state.tokens[i - poppedTokenCount] = sourceToken;
+          }
           const token = state.tokens[i - poppedTokenCount];
 
           // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
@@ -740,7 +764,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           continue;
         }
 
-        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution);
+        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution, preserveMatchState);
 
         if(result?.state) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
