@@ -255,12 +255,16 @@ export class Token {
     this._charNum  = charNum;
   }
 
-  get text(): String { return this._text; }
-  set text(text: String) { this._text = text; }
-  get lineNum(): number { return this._lineNum; }
-  set lineNum(lineNum: number) { this._lineNum = lineNum; }
-  get charNum(): number { return this._charNum; }
-  set charNum(charNum: number) { this._charNum = charNum; }
+  public isTokenType(tokenType: TokenTypes): boolean {
+    return this.tokenType === tokenType;
+  }
+
+  public get text(): String { return this._text; }
+  public set text(text: String) { this._text = text; }
+  public get lineNum(): number { return this._lineNum; }
+  public set lineNum(lineNum: number) { this._lineNum = lineNum; }
+  public get charNum(): number { return this._charNum; }
+  public set charNum(charNum: number) { this._charNum = charNum; }
 
   public toString(): String {
     return `[${this.tokenType},${this._text}]`;
