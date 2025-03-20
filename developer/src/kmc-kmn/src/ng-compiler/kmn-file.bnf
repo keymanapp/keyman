@@ -1,2 +1,12 @@
+multiLine: continuationLine+ soloLine
+soloLine: content commentEnd? newline
+continuationLine: content continuationEnd newline
+commentEnd: whitespace comment
+continationEnd: whitespace continuation whitespace?
+content: bitmapAssign
 bitmapStoreAssign: bitmapStore whitespace string
-bitmapStore: store leftBracket optWhitespace amphasand bitmap optWhitespace rightBracket
+bitmapStore: store leftBracket whitespace? amphasand bitmap whitespace? rightBracket
+copyrightStoreAssign: copyrightStore whitespace string
+copyrightStore: store leftBracket whitespace? amphasand copyright whitespace? rightBracket
+includecodesStoreAssign: includecodesStore whitespace string
+copyrightStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket
