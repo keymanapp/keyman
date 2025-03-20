@@ -244,29 +244,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   protected void onResume() {
     super.onResume();
-    KMManager.onResume();
-    KMManager.hideSystemKeyboard();
 
     if (textView != null) {
       // Reset mayPredictOverride
-      KMManager.setMayPredictOverride(textView.getInputType());
+      KMManager.setMayPredictOverride(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
     }
 
-    if (KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP) != null) {
-      // Reset banner
-      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
-      if (kbInfo != null) {
-        String langId = kbInfo.getLanguageID();
-        HashMap<String, String> currentLexicalModel = KMManager.getAssociatedLexicalModel(langId);
-        if (currentLexicalModel != null) {
-          SharedPreferences prefs = context.getSharedPreferences(context.getString(com.keyman.engine.R.string.kma_prefs_name), Context.MODE_PRIVATE);
-          boolean modelPredictionPref = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(
-            currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion)
-            != KMManager.SuggestionType.SUGGESTIONS_DISABLED.toInt();
-          KMManager.setBannerOptions(modelPredictionPref);
-        }
-      }
-    }
+    KMManager.onResume();
+    KMManager.hideSystemKeyboard();
 
     // Reset keyboard picker Activity Task flag
     KMManager.closeParentAppOnShowKeyboardPicker();
