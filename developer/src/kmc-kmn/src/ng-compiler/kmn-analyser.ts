@@ -13,13 +13,13 @@ import { TokenBuffer } from "./token-buffer.js";
 export class BitmapStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule        = new KeywordRule(tokenBuffer, TokenTypes.TT_STORE);
-    const leftBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.TT_LEFT_BR);
-    const amphasand: Rule    = new KeywordRule(tokenBuffer, TokenTypes.TT_AMPHASAND);
-    const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.TT_BITMAP);
-    const rightBracket: Rule = new KeywordRule(tokenBuffer, TokenTypes.TT_RIGHT_BR);
-    const whitespace: Rule   = new KeywordRule(tokenBuffer, TokenTypes.TT_WHITESPACE);
-    const stringRule: Rule   = new KeywordRule(tokenBuffer, TokenTypes.TT_STRING);
+    const store: Rule        = new KeywordRule(tokenBuffer, TokenTypes.STORE);
+    const leftBracket: Rule  = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const amphasand: Rule    = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
+    const bitmap: Rule       = new KeywordRule(tokenBuffer, TokenTypes.BITMAP);
+    const rightBracket: Rule = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    const whitespace: Rule   = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const stringRule: Rule   = new KeywordRule(tokenBuffer, TokenTypes.STRING);
     this.rule = new SequenceRule(tokenBuffer, [
       store, leftBracket, amphasand, bitmap, rightBracket, whitespace, stringRule,
     ]);

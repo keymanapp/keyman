@@ -11,7 +11,7 @@ import { Token, TokenTypes } from "./lexer.js";
 export class TokenBuffer {
   private list: Token[];
   private _currentPosition: number;
-  private eof: Token = new Token(TokenTypes.TT_EOF, "");
+  private eof: Token = new Token(TokenTypes.EOF, "");
 
   public constructor(list: Token[]) {
     this.list             = list;

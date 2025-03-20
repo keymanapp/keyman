@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 
 const LIST_OF_ONE: Token[] = [
-  new Token(TokenTypes.TT_STRING, ''),
+  new Token(TokenTypes.STRING, ''),
 ];
 
 class TrueRule extends Rule {
@@ -23,7 +23,7 @@ class TrueRule extends Rule {
   }
 
   public parse(node: ASTNode): boolean {
-    if (this.tokenBuffer.nextToken().isTokenType(TokenTypes.TT_EOF))
+    if (this.tokenBuffer.nextToken().isTokenType(TokenTypes.EOF))
       return false;
     this.tokenBuffer.popToken();
     node.addChild(new ASTNode(NodeTypes.TMP));
@@ -71,9 +71,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       trueRule             = new TrueRule(tokenBuffer);
       const sequence: Rule = new SequenceRule(tokenBuffer, [trueRule, trueRule, trueRule]);
@@ -85,9 +85,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       trueRule             = new TrueRule(tokenBuffer);
       falseRule            = new FalseRule(tokenBuffer);
@@ -112,9 +112,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three child Rules)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       trueRule              = new TrueRule(tokenBuffer);
       falseRule             = new FalseRule(tokenBuffer);
@@ -127,9 +127,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with an unsuccessful child Rule (three child Rules)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       falseRule             = new FalseRule(tokenBuffer);
       const alternate: Rule = new AlternateRule(tokenBuffer, [falseRule, falseRule, falseRule]);
@@ -174,9 +174,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       trueRule         = new TrueRule(tokenBuffer);
       const many: Rule = new ManyRule(tokenBuffer, trueRule);
@@ -208,9 +208,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse with a successful child Rule (three Tokens)", () => {
       tokenBuffer = new TokenBuffer([
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
-        new Token(TokenTypes.TT_STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
+        new Token(TokenTypes.STRING, ''),
       ]);
       trueRule              = new TrueRule(tokenBuffer);
       const oneOrMany: Rule = new OneOrManyRule(tokenBuffer, trueRule);
@@ -229,16 +229,16 @@ describe("Recursive Descent Tests", () => {
   });
   describe("KeywordRule Tests", () => {
     it("can construct a KeywordRule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.TT_STRING);
+      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STRING);
       assert.isNotNull(keywordRule);
     });
     it("can parse with a successful child Rule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.TT_STRING);
+      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STRING);
       assert.isTrue(keywordRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.TT_STORE);
+      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STORE);
       assert.isFalse(keywordRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 0);
     });
@@ -246,7 +246,7 @@ describe("Recursive Descent Tests", () => {
   describe("parameterSequence() Tests", () => {
     it("can parse a single parameter", () => {
       const tokens = [
-        new Token(TokenTypes.TT_PARAMETER, ''),
+        new Token(TokenTypes.PARAMETER, ''),
       ];
       tokenBuffer = new TokenBuffer(tokens);
       assert.isTrue(parameterSequence(tokenBuffer, parameters, 1));
@@ -255,9 +255,9 @@ describe("Recursive Descent Tests", () => {
     });
     it("can parse three parameters", () => {
       const tokens = [
-        new Token(TokenTypes.TT_PARAMETER, ''),
-        new Token(TokenTypes.TT_PARAMETER, ''),
-        new Token(TokenTypes.TT_PARAMETER, ''),
+        new Token(TokenTypes.PARAMETER, ''),
+        new Token(TokenTypes.PARAMETER, ''),
+        new Token(TokenTypes.PARAMETER, ''),
       ];
       tokenBuffer = new TokenBuffer(tokens);
       assert.isTrue(parameterSequence(tokenBuffer, parameters, 3));

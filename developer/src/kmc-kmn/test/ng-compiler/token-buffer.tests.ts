@@ -14,14 +14,14 @@ import { readFileSync } from 'fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
-  new Token(TokenTypes.TT_NOMATCH, 'nomatch'),
-  new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 8),
-  new Token(TokenTypes.TT_CHEVRON, '>', 1, 9),
-  new Token(TokenTypes.TT_WHITESPACE, ' ', 1, 10),
-  new Token(TokenTypes.TT_LAYER, 'layer', 1, 11),
-  new Token(TokenTypes.TT_LEFT_BR, '(', 1, 16),
-  new Token(TokenTypes.TT_STRING, '\'default\'', 1, 17),
-  new Token(TokenTypes.TT_RIGHT_BR, ')', 1, 26),
+  new Token(TokenTypes.NOMATCH, 'nomatch'),
+  new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
+  new Token(TokenTypes.CHEVRON, '>', 1, 9),
+  new Token(TokenTypes.WHITESPACE, ' ', 1, 10),
+  new Token(TokenTypes.LAYER, 'layer', 1, 11),
+  new Token(TokenTypes.LEFT_BR, '(', 1, 16),
+  new Token(TokenTypes.STRING, '\'default\'', 1, 17),
+  new Token(TokenTypes.RIGHT_BR, ')', 1, 26),
 ];
 
 describe("TokenBuffer Tests", () => {
@@ -52,109 +52,109 @@ describe("TokenBuffer Tests", () => {
     it("provides the correct initial Token", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
     });
   });
   describe("TokenBuffer popToken()", () => {
     it("can handle a single pop", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.popToken()
       assert.equal(tb.currentPosition, 1);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
     });
     it("can handle popping the whole buffer", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.popToken()
       assert.equal(tb.currentPosition, 1);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
       tb.popToken()
       assert.equal(tb.currentPosition, 2);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_CHEVRON);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.CHEVRON);
       tb.popToken()
       assert.equal(tb.currentPosition, 3);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
       tb.popToken()
       assert.equal(tb.currentPosition, 4);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_LAYER);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.LAYER);
       tb.popToken()
       assert.equal(tb.currentPosition, 5);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_LEFT_BR);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.LEFT_BR);
       tb.popToken()
       assert.equal(tb.currentPosition, 6);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_STRING);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.STRING);
       tb.popToken()
       assert.equal(tb.currentPosition, 7);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_RIGHT_BR);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.RIGHT_BR);
     });
     it("can handle popping beyond the whole buffer", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.popToken()
       assert.equal(tb.currentPosition, 1);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
       tb.popToken()
       assert.equal(tb.currentPosition, 2);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_CHEVRON);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.CHEVRON);
       tb.popToken()
       assert.equal(tb.currentPosition, 3);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
       tb.popToken()
       assert.equal(tb.currentPosition, 4);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_LAYER);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.LAYER);
       tb.popToken()
       assert.equal(tb.currentPosition, 5);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_LEFT_BR);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.LEFT_BR);
       tb.popToken()
       assert.equal(tb.currentPosition, 6);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_STRING);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.STRING);
       tb.popToken()
       assert.equal(tb.currentPosition, 7);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_RIGHT_BR);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.RIGHT_BR);
       tb.popToken()
       assert.equal(tb.currentPosition, 8);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_EOF);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.EOF);
     });
   });
   describe("TokenBuffer resetCurrentPosition()", () => {
     it("can handle resetting to zero", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.popToken()
       assert.equal(tb.currentPosition, 1);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_WHITESPACE);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.WHITESPACE);
       tb.resetCurrentPosition(0);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
     });
     it("can handle resetting to buffer length", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.resetCurrentPosition(8);
       assert.equal(tb.currentPosition, 8);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_EOF);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.EOF);
     });
     it("can handle resetting to beyond buffer length", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.resetCurrentPosition(9);
       assert.equal(tb.currentPosition, 8);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_EOF);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.EOF);
     });
     it("can handle resetting to a negative value", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
       tb.resetCurrentPosition(-1);
       assert.equal(tb.currentPosition, 0);
-      assert.equal(tb.nextToken().tokenType,TokenTypes.TT_NOMATCH);
+      assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
     });
   });
   describe("TokenBuffer toText()", () => {

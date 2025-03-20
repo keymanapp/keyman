@@ -202,7 +202,7 @@ export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[],
   const tmpParams: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
-    if (token.isTokenType(TokenTypes.TT_PARAMETER)) {
+    if (token.isTokenType(TokenTypes.PARAMETER)) {
       tokenBuffer.popToken();
       tmpParams.push(token);
       token = tokenBuffer.nextToken();
