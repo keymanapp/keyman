@@ -72,6 +72,10 @@ block(stores)                          #  struct COMP_STORE {
   offset(store_targets_string)         #  KMX_DWORD dpString;
                                        #  };
 
+  18 00 00 00                           # TSS_VISUALKEYBOARD
+  00 00 00 00                           #  KMX_DWORD dpName;
+  offset(store_vk_path_string)               #  KMX_DWORD dpString;
+
 block(store_name_name)
   26 00 4e 00 41 00 4d 00 45 00 00 00  # '&NAME'
 block(store_name_string)
@@ -88,6 +92,8 @@ block(store_targets_name)
   26 00 54 00 41 00 52 00 47 00 45 00 54 00 53 00 00 00 # '&TARGETS'
 block(store_targets_string)
   64 00 65 00 73 00 6b 00 74 00 6f 00 70 00 00 00 # 'desktop'
+block(store_vk_path_string)
+  62 00 61 00 73 00 69 00 63 00 2d 00 78 00 6d 00 6c 00 2e 00 6b 00 76 00 6b 00 00 00 # 'basic-xml.kvk'
 
 block(sect)                         #  struct COMP_KMXPLUS_SECT {
   73 65 63 74                       #    KMX_DWORD header.ident;   // 0000 Section name
