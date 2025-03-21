@@ -75,12 +75,20 @@ struct COMP_KMXPLUS_SECT {
   KMX_DWORD_unaligned count;          // 000C number of section headers
   COMP_KMXPLUS_SECT_ENTRY entries[];  // 0010 section entries
   /**
-   * @brief Get the offset of a section, or 0
-   *
-   * @param ident section id such as 'strs'. Never 'sect'
-   * @return KMX_DWORD offset from beginning of kmxplus
+   * @brief Get the offset of a section
+   * 
+   * @param ident section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
+   * @return KMX_DWORD offset from beginning of kmxplus, or 0 if not found
    */
   KMX_DWORD find(KMX_DWORD ident) const;
+  /**
+   * @brief Get the pointer to a specific section
+   * 
+   * @param ident section id such as 'strs'. Never 'sect' (the sect table does not list itself!)
+   * @param entryLength on exit, will be set to the possible length of the section (based on the remainder of the KMX+ file)
+   * @return pointer to raw bytes of requested section, or nullptr if not found
+   */
+  const uint8_t *get(KMX_DWORD ident, KMX_DWORD &entryLength) const;
   /**
    * @brief True if section is valid.
    * Does not validate the entire file.

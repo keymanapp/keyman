@@ -163,28 +163,34 @@ TEST(KMXPlusTest, test_uset) {
   test_assert_equal(uempty.contains(0x127), false);
 }
 
+/** tests of the COMP_KMXPLUS_STRS::valid_string() */
 TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
+  // one simple case
   EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(
     u"Hello", 5));
+
   {
     // unpaired low surrogate
     km_core_cu const s[] = {0xDC01, 0x0020};
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1)); // at end of str
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2)); // not followed by trailing surrogate
   }
+
   {
     // unpaired high surrogate
     km_core_cu const s[] = { 0xD801, 0x0020};
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1));
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 2));
   }
+
   {
     // valid str
     km_core_cu const s[] = { 0xD83D, 0xDE40, 0x0020}; // 🙀
     EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 2));
     EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(s, 3));
   }
-    {
+
+  {
     // invalid str - noncharacter U+2FFFF
     km_core_cu const s[] = { u'a', u'b', 0xD87F, 0xDFFF, u'c'};
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 5));
@@ -204,6 +210,7 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s+2, 2));
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s+2, 1));
   }
+
   {
     // valid str with a marker - 'ab\m{x}c'
     km_core_cu const s[] = {u'a', u'b', 0xFFFF, 0x0008, 0x0001, u'c'};
@@ -241,6 +248,18 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 3));
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 2));
     EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s + 2, 1));
+  }
+
+  {
+    // noncharacter FDD4
+    km_core_cu const s[] = {0xFDD4};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1));
+  }
+
+  {
+    // FFFE nonchar (mismatched BOM)
+    km_core_cu const s[] = {0xFFFE};
+    EXPECT_FALSE(COMP_KMXPLUS_STRS::valid_string(s, 1));
   }
 }
 
