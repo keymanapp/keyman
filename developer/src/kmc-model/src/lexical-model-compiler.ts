@@ -83,6 +83,8 @@ export class LexicalModelCompiler implements KeymanCompiler {
     try {
       let modelSource = this.loadFromFilename(inputFilename);
       let containingDirectory = callbacks.path.dirname(inputFilename);
+      // TODO:  Min-version detection will likely be needed as an 'artifact' in some form.
+      // Then passed along to the package-builder and annotated therein somehow.
       let code = this.generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
       const result: LexicalModelCompilerResult = {
         artifacts: {
@@ -196,11 +198,24 @@ export class LexicalModelCompiler implements KeymanCompiler {
         let definitions = new ModelDefinitions(modelSource);
         func += definitions.compileDefinitions();
 
+        // TODO:  When merged with epic/model-encoding, we should decompress the outermost layer first
+        // as part of the assignment if the model requests use of the dictionary-based wordbreaker.
+        // We need a common object-reference to facilitate Trie aliasing among the dict-breaker and the
+        // main lexical model when that scenario arises.  (No harm in doing that even if we don't use
+        // a dict-breaker, actually...)
         func += `const rawTrie = ${createTrieDataStructure(filenames, definitions.searchTermToKey)};\n`
+
+        if(modelSource.wordBreaker == 'dict') {
+          // If the model requests use of the dict-breaker, construct the LexiconTraversal it'll need here
+          // as a scoped variable that `compileInnerWordBreaker` may reference in its emitted code.
+          func += `const rootTraversal = new models.Trie(rawTrie.root, rawTrie.totalWeight, trieOptions.searchTermToKey).traverseFromRoot();`
+        }
+
+        // START: Build the trie-options object.
 
         // Needs the actual searchTermToKey closure...
         // Which needs the actual applyCasing closure as well.
-        func += `LMLayerWorker.loadModel(new models.TrieModel(rawTrie, {\n`; // start of the 'options' object
+        func += `const trieOptions = {\n`
 
         let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
@@ -220,7 +235,15 @@ export class LexicalModelCompiler implements KeymanCompiler {
         if (modelSource.punctuation) {
           func += `  punctuation: ${JSON.stringify(modelSource.punctuation)},\n`;
         }
-        func += `}));\n`;
+        func += `};\n`;
+        // END: Build the trie-options object.
+
+        // TODO:  When using the dict-breaker, we'll need to alias the same core Trie the dict-breaker
+        // uses.  As long as the root is uncompressed initiallly (re: epic/model-encoding), two or more
+        // separate wrappers for the root will play nicely together and can share decompression progress.
+        // Could also use the "TraversalModel" found in epic/user-dict and just reuse the `rootTraversal`
+        // from above.
+        func += `LMLayerWorker.loadModel(new models.TrieModel(rawTrie, trieOptions));\n`;
         break;
       default:
         throw new ModelCompilerError(ModelCompilerMessages.Error_UnknownModelFormat({format: modelSource.format}));
@@ -289,8 +312,13 @@ function compileScriptOverrides(spec: WordBreakerSpec, existingWordBreakerCode: 
  */
 function compileInnerWordBreaker(spec: SimpleWordBreakerSpec): string {
   if (typeof spec === "string") {
-    // It must be a builtin word breaker, so just instantiate it.
-    return `wordBreakers['${spec}']`;
+    switch(spec) {
+      case 'dict':
+        return `(text) => wordBreakers['dict'](text, rootTraversal)`;
+      default:
+        // It must be a builtin word breaker, so just instantiate it.
+        return `wordBreakers['${spec}']`;
+    }
   } else {
     // It must be a function:
     return spec.toString()
