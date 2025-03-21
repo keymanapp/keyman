@@ -28,6 +28,8 @@ export interface ConverterResult extends KeymanCompilerResult {
  * compiler does not read or write from filesystem or network directly, but
  * relies on callbacks for all external IO.
  */
+
+// _S2 this is Base class of all converters
 // _S2 method init: uses Interface CompilerCallbacks( loadfile,...)
 // _S2 method run: uses Interface CompilerCallbacks( loadfile,...)
 export class Converter implements KeymanCompiler {
@@ -59,34 +61,32 @@ export class Converter implements KeymanCompiler {
    *                  {@link Converter.write}.
    * @returns         Source artifacts on success, null on failure.
    */
-  // _S2 this is Base class of all converters
-  // _S2 check for things( file available,...) then
+  // _S2 check for ( file available,...) then
   // _S2 finds converter e.g.keylayout->kmn  ( uses converter-class-factory)
-  // _S2 factory uses/instanciates chiled class ( ~ in C++ virtual function in base class <-> use fun of derived class)
+  // _S2 factory uses/instanciates child class ( ~ in C++ virtual function in base class <-> use fun of derived class)
   // _S2 loads file
   // _S2 creates a new converter (-object)
   // _S2 runs conversion for this object ( run-method of this converter of keylayout-to-kmn-tonverter.ts  )
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
-console.log('use run of converter.ts')
     const converterOptions: CompilerOptions = {
       ...defaultCompilerOptions,
       ...this.options,
     };
 
-    if(!outputFilename) {
+    if (!outputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
       return null;
     }
 
     const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename);
-    if(!ConverterClass) {
-      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({inputFilename, outputFilename}));
+    if (!ConverterClass) {
+      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename }));
       return null;
     }
 
     const binaryData = this.callbacks.loadFile(inputFilename);
-    if(!binaryData) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({inputFilename}));
+    if (!binaryData) {
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
 
@@ -109,8 +109,8 @@ console.log('use run of converter.ts')
    * @returns true on success
    */
   async write(artifacts: ConverterArtifacts): Promise<boolean> {
-    for(const key of Object.keys(artifacts)) {
-      if(artifacts[key]) {
+    for (const key of Object.keys(artifacts)) {
+      if (artifacts[key]) {
         this.callbacks.fs.writeFileSync(artifacts[key].filename, artifacts[key].data);
       }
     }
