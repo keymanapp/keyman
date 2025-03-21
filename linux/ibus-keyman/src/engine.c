@@ -703,18 +703,19 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
 
 static void
 process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
-  if (!emit_keystroke) {
-    return;
-  }
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (client_supports_surrounding_text(engine)) {
     // compliant app
+    if (!emit_keystroke) {
+      return;
+    }
     ibus_engine_forward_key_event(engine, keyman->commit_item->keyval,
       keyman->commit_item->keycode, keyman->commit_item->state);
     return;
   }
+
   // non-compliant app
-  keyman->commit_item->emitting_keystroke = TRUE;
+  keyman->commit_item->emitting_keystroke = emit_keystroke;
 }
 
 static void
