@@ -257,10 +257,11 @@ public final class KMManager {
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
 
-  // Special override for when keyboard is entering a password text field.
+  // Special overrides for when the inapp/system keyboards are entering a password text field.
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
-  private static boolean mayPredictOverride = false;
+  private static boolean inAppMayPredictOverride = false;
+  private static boolean systemMayPredictOverride = false;
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -1409,25 +1410,67 @@ public final class KMManager {
   }
 
   /**
-   * Sets mayPredictOverride true if the InputType field is a hidden password text field
+   * Determine the override if the InputType field is a hidden password text field
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Also true for numeric text fields
+   * @param inputType android.text.InputType
+   * @return boolean
+   */
+  private static boolean determinePredictOverride(int inputType) {
+    return ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
+      (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
+      isNumericField(inputType));
+  }
+
+  /**
+   * This API call existed prior to 18.0. Preferred call specifies the KeyboardType.
+   * Sets systemMayPredictOverride true if the InputType field for system keyboard is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
    * Also true for numeric text fields
    * @param inputType android.text.InputType
    */
   public static void setMayPredictOverride(int inputType) {
-    mayPredictOverride =
-      ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
-       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
-       isNumericField(inputType));
+    systemMayPredictOverride = determinePredictOverride(inputType);
   }
 
   /**
-   * Get the value of mayPredictOverride
+   * Sets mayPredictOverride true if the InputType field for the keyboard is a hidden password text field
+   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
+   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Also true for numeric text fields
+   * @param inputType android.text.InputType
+   * @param {KeyboardType} keyboard
+   */
+  public static void setMayPredictOverride(int inputType, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      inAppMayPredictOverride = determinePredictOverride(inputType);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      systemMayPredictOverride = determinePredictOverride(inputType);
+    }
+  }
+
+  /**
+   * This API call existed prior to 18.0. Preferred call specifies the KeyboardType.
+   * Get the value of systemMayPredictOverride
    * @return boolean
    */
   public static boolean getMayPredictOverride() {
-    return mayPredictOverride;
+    return systemMayPredictOverride;
+  }
+
+  /**
+   * Get the value of mayPredictOverride based on KeyboardType
+   * @param {KeyboardType} keyboard
+   * @return boolean
+   */
+  public static boolean getMayPredictOverride(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return inAppMayPredictOverride;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return systemMayPredictOverride;
+    }
+    return false;
   }
 
   /**
@@ -1556,20 +1599,23 @@ public final class KMManager {
 
     // When entering password field, maySuggest should override to disabled
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int maySuggest = mayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
-      prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
+    int suggestionPreference = prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
+      int inappMaySuggest = inAppMayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+        suggestionPreference;
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, inappMaySuggest));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
+      int maySuggest = systemMayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+        suggestionPreference;
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
     return true;
@@ -1612,15 +1658,36 @@ public final class KMManager {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
+      Log.d(TAG, "InApp.setBannerOptions(mayPredict: " + mayPredict + ")");
     }
 
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
+      Log.d(TAG, "System.setBannerOptions(mayPredict: " + mayPredict + ")");
     }
 
     return true;
   }
 
+  /**
+   * setBannerOptions - Update KMW for inapp/system keyboard whether to generate predictions.
+   *                    For now, also display banner
+   * @param mayPredict - boolean whether KMW should generate predictions
+   * @param {KeyboardType} keyboard
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(boolean mayPredict, KeyboardType keyboard) {
+    String url = KMString.format("setBannerOptions(%s)", mayPredict);
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(url);
+    }
+
+    return true;
+  }
   /**
    * Update KeymanWeb banner type
    * @param {KeyboardType} keyboard
