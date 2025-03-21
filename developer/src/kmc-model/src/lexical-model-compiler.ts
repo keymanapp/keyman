@@ -194,14 +194,13 @@ export class LexicalModelCompiler implements KeymanCompiler {
         let filenames = modelSource.sources.map(filename => callbacks.path.join(sourcePath, filename));
 
         let definitions = new ModelDefinitions(modelSource);
-
         func += definitions.compileDefinitions();
+
+        func += `const rawTrie = ${createTrieDataStructure(filenames, definitions.searchTermToKey)};\n`
 
         // Needs the actual searchTermToKey closure...
         // Which needs the actual applyCasing closure as well.
-        func += `LMLayerWorker.loadModel(new models.TrieModel(${
-          createTrieDataStructure(filenames, definitions.searchTermToKey)
-        }, {\n`;
+        func += `LMLayerWorker.loadModel(new models.TrieModel(rawTrie, {\n`; // start of the 'options' object
 
         let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
