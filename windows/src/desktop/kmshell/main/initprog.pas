@@ -433,6 +433,9 @@ begin
   Application.HelpFile := GetCHMPath; // may change if language changes
   Application.Title := MsgFromId(SKApplicationTitle);
 
+  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
+  else FIcon := 'cfgicon.ico';
+
   if GetOS in [osOther] then
   begin
     ShowMessage(MsgFromId(SKOSNotSupported));
@@ -459,9 +462,6 @@ begin
   end;
 
   // I1818 - remove start mode change
-
-  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
-  else FIcon := 'cfgicon.ico';
 
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
   if FileExists(FIcon) then
