@@ -33,8 +33,8 @@
         <div class="grid_container_update" id="update_details">
           <!-- hide header if no updates but keep the grid layout -->
           <xsl:if test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
-            <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_ComponentHead']"/></div>
-            <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_OldVersionHead']"/></div>
+            <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_New_Version']"/></div>
+            <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_Current_Version']"/></div>
             <div class='grid_item'><xsl:value-of select="$locale/string[@name='S_Update_SizeHead']"/></div>
           </xsl:if>
             <xsl:apply-templates select="/Keyman/Updates/Update" />
@@ -46,14 +46,14 @@
           <xsl:choose>
             <xsl:when test="$isNewKeymanVersionAvailable or $isNewKeyboardVersionAvailable">
               <xsl:call-template name="button">
-                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_ApplyNow']"/></xsl:with-param>
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_InstallNow']"/></xsl:with-param>
                 <xsl:with-param name="command">keyman:update_applynow</xsl:with-param>
                 <xsl:with-param name="width">220px</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="button">
-                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_ApplyNow']"/></xsl:with-param>
+                <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_InstallNow']"/></xsl:with-param>
                 <xsl:with-param name="command"></xsl:with-param>
                 <xsl:with-param name="width">220px</xsl:with-param>
                 <xsl:with-param name="disabled">1</xsl:with-param>

@@ -465,7 +465,7 @@
   <!-- Context: Configuration Dialog - Update tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">K dispozici jsou aktualizace, které budou aplikovány při příštím restartu Windows.</string>
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">K dispozici jsou aktualizace, které budou aplikovány při příštím restartu Windows:</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
