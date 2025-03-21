@@ -4,8 +4,8 @@ object frmStartInstall: TfrmStartInstall
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Keyman Update'
-  ClientHeight = 201
-  ClientWidth = 393
+  ClientHeight = 240
+  ClientWidth = 435
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,10 +17,10 @@ object frmStartInstall: TfrmStartInstall
   PixelsPerInch = 96
   TextHeight = 13
   object lblInstallUpdate: TLabel
-    Left = 87
-    Top = 81
-    Width = 218
-    Height = 65
+    Left = 111
+    Top = 113
+    Width = 205
+    Height = 34
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -146,8 +146,8 @@ object frmStartInstall: TfrmStartInstall
       426082}
   end
   object cmdInstall: TButton
-    Left = 188
-    Top = 168
+    Left = 229
+    Top = 200
     Width = 75
     Height = 25
     Caption = 'Update now'
@@ -155,8 +155,8 @@ object frmStartInstall: TfrmStartInstall
     TabOrder = 0
   end
   object cmdLater: TButton
-    Left = 298
-    Top = 168
+    Left = 343
+    Top = 200
     Width = 75
     Height = 25
     Caption = 'Later'
