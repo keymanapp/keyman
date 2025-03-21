@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.219 beta 2025-03-21
+
+* fix(windows): add exception handling for loading xml file in XSL Rendering (#13530)
+* refactor(linux): rename `initialize_queue` method (#13554)
+
 ## 18.0.218 beta 2025-03-19
 
 * fix(developer): add validation of `nul` usage in output part of rule (#13532)
