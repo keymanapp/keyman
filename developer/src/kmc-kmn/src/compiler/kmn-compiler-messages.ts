@@ -227,40 +227,40 @@ export class KmnCompilerMessages {
   static ERROR_InvalidToken                                   = SevError | 0x00A;
   static Error_InvalidToken                                   = () => m(this.ERROR_InvalidToken, `Invalid token found`);
 
-  // kmcmplib: static Error_InvalidBegin                                  = () => m(this.ERROR_InvalidBegin, `Invalid 'begin' command`);
+  // kmcmplib: static Error_InvalidBegin                                  = () => m(this.ERROR_InvalidBegin, `Invalid 'begin' statement`);
   static ERROR_InvalidBegin                                   = SevError | 0x00B;
   static Error_InvalidBegin = () => mw(this.ERROR_InvalidBegin,
     `A "begin unicode" statement is required to compile a KeymanWeb keyboard`);
 
   static ERROR_InvalidName                                    = SevError | 0x00C;
-  static Error_InvalidName                                    = () => m(this.ERROR_InvalidName, `Invalid 'name' command`);
+  static Error_InvalidName                                    = () => m(this.ERROR_InvalidName, `Invalid 'name' statement`);
 
   static ERROR_InvalidVersion                                 = SevError | 0x00D;
-  static Error_InvalidVersion                                 = () => m(this.ERROR_InvalidVersion, `Invalid 'version' command`);
+  static Error_InvalidVersion                                 = () => m(this.ERROR_InvalidVersion, `Invalid 'version' statement`);
 
   static ERROR_InvalidLanguageLine                            = SevError | 0x00E;
-  static Error_InvalidLanguageLine                            = () => m(this.ERROR_InvalidLanguageLine, `Invalid 'language' command`);
+  static Error_InvalidLanguageLine                            = () => m(this.ERROR_InvalidLanguageLine, `Invalid 'language' statement`);
 
   static ERROR_LayoutButNoLanguage                            = SevError | 0x00F;
-  static Error_LayoutButNoLanguage                            = () => m(this.ERROR_LayoutButNoLanguage, `Layout command found but no language command`);
+  static Error_LayoutButNoLanguage                            = () => m(this.ERROR_LayoutButNoLanguage, `Layout statement found but no language statement`);
 
   static ERROR_InvalidLayoutLine                              = SevError | 0x010;
-  static Error_InvalidLayoutLine                              = () => m(this.ERROR_InvalidLayoutLine, `Invalid 'layout' command`);
+  static Error_InvalidLayoutLine                              = () => m(this.ERROR_InvalidLayoutLine, `Invalid 'layout' statement`);
 
   static ERROR_NoVersionLine                                  = SevError | 0x011;
   static Error_NoVersionLine                                  = () => m(this.ERROR_NoVersionLine, `No version line found for file`);
 
   static ERROR_InvalidGroupLine                               = SevError | 0x012;
-  static Error_InvalidGroupLine                               = () => m(this.ERROR_InvalidGroupLine, `Invalid 'group' command`);
+  static Error_InvalidGroupLine                               = () => m(this.ERROR_InvalidGroupLine, `Invalid 'group' statement`);
 
   static ERROR_InvalidStoreLine                               = SevError | 0x013;
-  static Error_InvalidStoreLine                               = () => m(this.ERROR_InvalidStoreLine, `Invalid 'store' command`);
+  static Error_InvalidStoreLine                               = () => m(this.ERROR_InvalidStoreLine, `Invalid 'store' statement`);
 
   static ERROR_InvalidCodeInKeyPartOfRule                     = SevError | 0x014;
-  static Error_InvalidCodeInKeyPartOfRule                     = () => m(this.ERROR_InvalidCodeInKeyPartOfRule, `Invalid command or code found in key part of rule`);
+  static Error_InvalidCodeInKeyPartOfRule                     = () => m(this.ERROR_InvalidCodeInKeyPartOfRule, `Invalid statement or code found in key part of rule`);
 
   static ERROR_InvalidDeadkey                                 = SevError | 0x015;
-  static Error_InvalidDeadkey                                 = () => m(this.ERROR_InvalidDeadkey, `Invalid 'deadkey' or 'dk' command`);
+  static Error_InvalidDeadkey                                 = () => m(this.ERROR_InvalidDeadkey, `Invalid 'deadkey' or 'dk' statement`);
 
   static ERROR_InvalidValue                                   = SevError | 0x016;
   static Error_InvalidValue                                   = () => m(this.ERROR_InvalidValue, `Invalid value in extended string`);
@@ -269,7 +269,7 @@ export class KmnCompilerMessages {
   static Error_ZeroLengthString                               = () => m(this.ERROR_ZeroLengthString, `A string of zero characters was found`);
 
   static ERROR_TooManyIndexToKeyRefs                          = SevError | 0x018;
-  static Error_TooManyIndexToKeyRefs                          = () => m(this.ERROR_TooManyIndexToKeyRefs, `Too many index commands refering to key string`);
+  static Error_TooManyIndexToKeyRefs                          = () => m(this.ERROR_TooManyIndexToKeyRefs, `Too many index statements refering to key string`);
 
   static ERROR_UnterminatedString                             = SevError | 0x019;
   static Error_UnterminatedString                             = () => m(this.ERROR_UnterminatedString, `Unterminated string in line`);
@@ -278,34 +278,34 @@ export class KmnCompilerMessages {
   // static Error_StringInVirtualKeySection                      = () => m(this.ERROR_StringInVirtualKeySection, `extend string illegal in virtual key section`);
 
   // static ERROR_AnyInVirtualKeySection                         = SevError | 0x01B; // no longer used, see #12612
-  // static Error_AnyInVirtualKeySection                         = () => m(this.ERROR_AnyInVirtualKeySection, `'any' command is illegal in virtual key section`);
+  // static Error_AnyInVirtualKeySection                         = () => m(this.ERROR_AnyInVirtualKeySection, `'any' statement is illegal in virtual key section`);
 
   static ERROR_InvalidAny                                     = SevError | 0x01C;
-  static Error_InvalidAny                                     = () => m(this.ERROR_InvalidAny, `Invalid 'any' command`);
+  static Error_InvalidAny                                     = () => m(this.ERROR_InvalidAny, `Invalid 'any' statement`);
 
   static ERROR_StoreDoesNotExist                              = SevError | 0x01D;
   static Error_StoreDoesNotExist                              = () => m(this.ERROR_StoreDoesNotExist, `Store referenced does not exist`);
 
   // static ERROR_BeepInVirtualKeySection                        = SevError | 0x01E; // no longer used, see #12612
-  // static Error_BeepInVirtualKeySection                        = () => m(this.ERROR_BeepInVirtualKeySection, `'beep' command is illegal in virtual key section`);
+  // static Error_BeepInVirtualKeySection                        = () => m(this.ERROR_BeepInVirtualKeySection, `'beep' statement is illegal in virtual key section`);
 
   // static ERROR_IndexInVirtualKeySection                       = SevError | 0x01F; // no longer used, see #12612
-  // static Error_IndexInVirtualKeySection                       = () => m(this.ERROR_IndexInVirtualKeySection, `'index' command is illegal in virtual key section`);
+  // static Error_IndexInVirtualKeySection                       = () => m(this.ERROR_IndexInVirtualKeySection, `'index' statement is illegal in virtual key section`);
 
   static ERROR_InvalidIndex                                   = SevError | 0x020;
-  static Error_InvalidIndex                                   = () => m(this.ERROR_InvalidIndex, `Invalid 'index' command`);
+  static Error_InvalidIndex                                   = () => m(this.ERROR_InvalidIndex, `Invalid 'index' statement`);
 
   // static ERROR_OutsInVirtualKeySection                        = SevError | 0x021; // no longer used, see #12612
-  // static Error_OutsInVirtualKeySection                        = () => m(this.ERROR_OutsInVirtualKeySection, `'outs' command is illegal in virtual key section`);
+  // static Error_OutsInVirtualKeySection                        = () => m(this.ERROR_OutsInVirtualKeySection, `'outs' statement is illegal in virtual key section`);
 
   static ERROR_InvalidOuts                                    = SevError | 0x022;
-  static Error_InvalidOuts                                    = () => m(this.ERROR_InvalidOuts, `Invalid 'outs' command`);
+  static Error_InvalidOuts                                    = () => m(this.ERROR_InvalidOuts, `Invalid 'outs' statement`);
 
   // static ERROR_ContextInVirtualKeySection                     = SevError | 0x024; // no longer used, see #12612
-  // static Error_ContextInVirtualKeySection                     = () => m(this.ERROR_ContextInVirtualKeySection, `'context' command is illegal in virtual key section`);
+  // static Error_ContextInVirtualKeySection                     = () => m(this.ERROR_ContextInVirtualKeySection, `'context' statement is illegal in virtual key section`);
 
   static ERROR_InvalidUse                                     = SevError | 0x025;
-  static Error_InvalidUse                                     = () => m(this.ERROR_InvalidUse, `Invalid 'use' command`);
+  static Error_InvalidUse                                     = () => m(this.ERROR_InvalidUse, `Invalid 'use' statement`);
 
   static ERROR_GroupDoesNotExist                              = SevError | 0x026;
   static Error_GroupDoesNotExist                              = () => m(this.ERROR_GroupDoesNotExist, `Group does not exist`);
@@ -314,7 +314,7 @@ export class KmnCompilerMessages {
   static Error_VirtualKeyNotAllowedHere                       = () => m(this.ERROR_VirtualKeyNotAllowedHere, `Virtual key is not allowed here`);
 
   static ERROR_InvalidSwitch                                  = SevError | 0x028;
-  static Error_InvalidSwitch                                  = () => m(this.ERROR_InvalidSwitch, `Invalid 'switch' command`);
+  static Error_InvalidSwitch                                  = () => m(this.ERROR_InvalidSwitch, `Invalid 'switch' statement`);
 
   static ERROR_NoTokensFound                                  = SevError | 0x029;
   static Error_NoTokensFound                                  = () => m(this.ERROR_NoTokensFound, `No tokens found in line`);
@@ -326,19 +326,19 @@ export class KmnCompilerMessages {
   static Error_LineTooLong                                    = () => m(this.ERROR_LineTooLong, `Line too long`);
 
   static ERROR_InvalidCopyright                               = SevError | 0x02C;
-  static Error_InvalidCopyright                               = () => m(this.ERROR_InvalidCopyright, `Invalid 'copyright' command`);
+  static Error_InvalidCopyright                               = () => m(this.ERROR_InvalidCopyright, `Invalid 'copyright' statement`);
 
   static ERROR_CodeInvalidInThisSection                       = SevError | 0x02D;
   static Error_CodeInvalidInThisSection                       = () => m(this.ERROR_CodeInvalidInThisSection, `This line is invalid in this section of the file`);
 
   static ERROR_InvalidMessage                                 = SevError | 0x02E;
-  static Error_InvalidMessage                                 = () => m(this.ERROR_InvalidMessage, `Invalid 'message' command`);
+  static Error_InvalidMessage                                 = () => m(this.ERROR_InvalidMessage, `Invalid 'message' statement`);
 
   static ERROR_InvalidLanguageName                            = SevError | 0x02F;
-  static Error_InvalidLanguageName                            = () => m(this.ERROR_InvalidLanguageName, `Invalid 'languagename' command`);
+  static Error_InvalidLanguageName                            = () => m(this.ERROR_InvalidLanguageName, `Invalid 'languagename' statement`);
 
   static ERROR_InvalidBitmapLine                              = SevError | 0x030;
-  static Error_InvalidBitmapLine                              = () => m(this.ERROR_InvalidBitmapLine, `Invalid 'bitmaps' command`);
+  static Error_InvalidBitmapLine                              = () => m(this.ERROR_InvalidBitmapLine, `Invalid 'bitmaps' statement`);
 
   static ERROR_CannotReadBitmapFile                           = SevError | 0x031;
   static Error_CannotReadBitmapFile                           = () => m(this.ERROR_CannotReadBitmapFile, `Cannot open the bitmap or icon file for reading`);
@@ -353,13 +353,13 @@ export class KmnCompilerMessages {
   static Error_InvalidCharacter                               = () => m(this.ERROR_InvalidCharacter, `A character was found that is outside the valid Unicode range (U+0000 - U+10FFFF)`);
 
   static ERROR_InvalidCall                                    = SevError | 0x035;
-  static Error_InvalidCall                                    = () => m(this.ERROR_InvalidCall, `The 'call' command is invalid`);
+  static Error_InvalidCall                                    = () => m(this.ERROR_InvalidCall, `The 'call' statement is invalid`);
 
   // static ERROR_CallInVirtualKeySection                        = SevError | 0x036; // no longer used, see #12612
-  // static Error_CallInVirtualKeySection                        = () => m(this.ERROR_CallInVirtualKeySection, `'call' command is illegal in virtual key section`);
+  // static Error_CallInVirtualKeySection                        = () => m(this.ERROR_CallInVirtualKeySection, `'call' statement is illegal in virtual key section`);
 
   static ERROR_CodeInvalidInKeyStore                          = SevError | 0x037;
-  static Error_CodeInvalidInKeyStore                          = () => m(this.ERROR_CodeInvalidInKeyStore, `The command is invalid inside a store that is used in a key part of the rule`);
+  static Error_CodeInvalidInKeyStore                          = () => m(this.ERROR_CodeInvalidInKeyStore, `The statement is invalid inside a store that is used in a key part of the rule`);
 
   static ERROR_CannotLoadIncludeFile                          = SevError | 0x038;
   static Error_CannotLoadIncludeFile                          = () => m(this.ERROR_CannotLoadIncludeFile, `Cannot load the included file: it is either invalid or does not exist`);
