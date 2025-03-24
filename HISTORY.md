@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.220 beta 2025-03-24
+
+* fix(windows,mac): Update Spanish configuration string and mac strings (#13564)
+* chore(developer): use 'statement' instead of 'command' for messages about kmn statements (#13562)
+
 ## 18.0.219 beta 2025-03-21
 
 * fix(windows): add exception handling for loading xml file in XSL Rendering (#13530)
