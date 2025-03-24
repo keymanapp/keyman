@@ -89,7 +89,7 @@ export class KeylayoutToKmnConverter {
    * @brief  member function to run read/convert/write
    * @param  inputFilename the ukelele .keylayout-file to be converted
    * @param  outputFilename the resulting keyman .kmn-file
-   * @return
+   * @return null on success
    */
   async run(inputFilename: string, outputFilename: string): Promise<ConverterToKmnArtifacts> {
 
@@ -119,11 +119,11 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  take filename, open and read data from .keylayout-file and store in several arrays of  the data object
-   *         member function to read filename ( a .keylayout-file) and write contents into Uint8Array keys_all_Layers
-   * @param  filename the ukelele .keylayout-file to be converted
-   * @return in case of success Uint8Array keys_all_Layers; else null
-   */ public read(filename: string): Object {
+   * @brief  member function to parse data from a .keylayout-file and store to a json object
+   * @param  filename the ukelele .keylayout-file to be parsed
+   * @return in case of success: json object containing data of the .keylayout file; else null
+   */
+  public read(filename: string): Object {
     let xmlFile;
     let jsonObj = [];
 
@@ -137,7 +137,7 @@ export class KeylayoutToKmnConverter {
       xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);  // get plain Object
-      boxArrays(jsonObj.keyboard);      // jsonObj now contains only arrays; no single fields
+      boxArrays(jsonObj.keyboard);      // jsonObj now contains arrays; no single fields
     }
     catch (err) {
       console.log(err.message);
@@ -145,13 +145,10 @@ export class KeylayoutToKmnConverter {
     return jsonObj;
   }
 
-
   /**
-   * @brief  member function to convert data of .keylayout-file to kmn-file. This will convert/rename modifiers, position of Keys and deadkeys and save into an array 
-   *         if no tags are provided an empty data_object will be returned
-   * @param  take data_ukelele and create a mapping from mac Keycodes to key-names and save to data_ukelele object
-   * @param  data_ukelele (Uint8Array) data of the ukelele .keylayout-file
-   * @return outArray Uint8Array keys_all_Layers, the converted data for kmn-files if all layers have been converted; else null
+   * @brief  member function to read filename and behaviour of a json object into a convert_object
+   * @param  jsonObj containing filename, behaviour and rules of a json object
+   * @return an convert_object containing all data ready to print out
    */
   public convert(jsonObj: any): convert_object {
 
@@ -186,32 +183,12 @@ export class KeylayoutToKmnConverter {
     return data_object;
   }
 
-  /**
-   * @brief  member function to write data from object to file
-   * @param  data_ukelele the array holding keyboard data
-   * @return true if data has been written; false if not
-   */
-  public write(data_ukelele: convert_object): boolean {
-
-    let data: string = "\n";
-    //const save_filename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn";
-
-    // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data));
-      //this.callbacks.fs.writeFileSync(save_filename, new TextEncoder().encode(data));
-      return true;
-    } catch (err) {
-      console.log('Error writing kmn file:' + err.message);
-      return false;
-    }
-  }
-
+/**
+  * @brief  member function to read the rules contained in a json object and add array of Rules[] to an convert_object
+  * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an (empty) array of Rules
+  * @param  jsonObj: json Object containing all data read from a keylayout file
+  * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
+  */
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
 
     const object_array: rule_object[] = [];
@@ -492,6 +469,17 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
+    data_ukelele.arrayOf_Rules = object_array;
+
+    return this.reviewRuleInputData(data_ukelele);
+  }
+
+/**
+  * @brief  member function to review data in array of Rules[] of data_ukelele: remove duplicate rules and mark first occurace of a rule in object_array
+  * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an array of Rules
+  * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
+  */
+  public reviewRuleInputData(data_ukelele: convert_object): convert_object {
 
     // --------------------------------------------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------------------------------------------------------------------------
@@ -502,6 +490,7 @@ export class KeylayoutToKmnConverter {
     let unique_dkB_count = 0;
     const list_of_unique_Text2_rules: string[][] = [];
 
+    const object_array: rule_object[] = data_ukelele.arrayOf_Rules;
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
     object_array[0].unique_deadkey = unique_dkB_count;
@@ -591,10 +580,35 @@ export class KeylayoutToKmnConverter {
     return data_ukelele;
   }
 
+  /**
+   * @brief  member function to write data from object to a kmn file
+   * @param  data_ukelele the array holding all keyboard data
+   * @return true if data has been written; false if not
+   */
+  public write(data_ukelele: convert_object): boolean {
+
+    let data: string = "\n";
+    //const save_filename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn";
+
+    // add top part of kmn file: STORES
+    data += this.writeData_Stores(data_ukelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeData_Rules(data_ukelele);
+
+    try {
+      this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data));
+      //this.callbacks.fs.writeFileSync(save_filename, new TextEncoder().encode(data));
+      return true;
+    } catch (err) {
+      console.log('Error writing kmn file:' + err.message);
+      return false;
+    }
+  }
   // ---------------------------------------------------------------------------------------------------------------------
 
   /**
-  * @brief  loop through data and and return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID
+  * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
   * @param  data   :any - an object containing all data read from a .keylayout file
   * @param  search :string[][] - array of [ actionID,state,output]
   * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
@@ -627,10 +641,10 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  loop through data, find the actionID and return its index
+  * @brief  member function to return an index for a given actionID
   * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string - value next to be found
-  * @return a number containing the index of an actionId
+  * @param  search :string - value 'id' to be found
+  * @return a number specifying the index of an actionId
   */
   public get_ActionIndex__From__ActionId(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
@@ -642,9 +656,9 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  loop through data, find the actionID of a certain state-next pair
+  * @brief  member function to  find the actionID of a certain state-next pair
   * @param  data   :any an object containing all data read from a .keylayout file
-  * @param  search :string value next to be found
+  * @param  search :string value 'next' to be found
   * @return a string containing the actionId of a certain state-next pair
   */
   public get_ActionID__From__ActionNext(data: any, search: string): string {
@@ -661,9 +675,9 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data, find all actionId-output pairs for a certain state and store in an array
+   * @brief  member function to get an array of all actionId-output pairs for a certain state
    * @param  data    : any an object containing all data read from a .keylayout file
-   * @param  search  : string a state to be found
+   * @param  search  : string a 'state' to be found
    * @return an array: string[][] containing all [actionId, state, output] for a certain state
    */
   public get_ActionStateOutput_array__From__ActionState(data: any, search: string): string[][] {
@@ -686,7 +700,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data, find the output for a certain actionID for state none
+   * @brief  member function to find the output for a certain actionID for state 'none'
    * @param  data   :any an object containing all data read from a .keylayout file
    * @param  search :string an actionId to be found
    * @return a string containing the output character
@@ -707,7 +721,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data and create an 2D array of [KeyName,actionId,behaviour,modifier,output]
+   * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
    * @param  data    : any an object containing all data read from a .keylayout file
    * @param  search  : array of [keycode,keyname,actionId,behaviour,output] to be found
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
@@ -754,7 +768,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data and create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
+   * @brief  member function to create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  modi    : any - an array of modifiers
    * @param  search  : string - an actionId to be found
@@ -809,7 +823,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data and create an array of [keycode,behaviour] for a given actionId
+   * @brief  member function to create an array of [keycode,behaviour] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : string - an actionId to be found
    * @return an array: number[][] containing [keycode,behaviour]
@@ -832,9 +846,9 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  loop through data and create an array of modifier behaviours for a given keycode in [keycode,modifier]
+   * @brief  member function to create an array of modifier behaviours for a given keycode in [keycode,modifier]
    * @param  data    : any - an object containing all data read from a .keylayout file
-   * @param  search  : number[][] - an array[keycode,modifier]  to be found
+   * @param  search  : (string | number)[][] - an array[keycode,modifier]  to be found
    * @return an array: string[] containing modifiers
    */
   public get_Modifier_array__From__KeyModifier_array(data: any, search: (string | number)[][]): string[] {
@@ -846,10 +860,10 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  create a kmn modifier from a keylayout modifier
+   * @brief  member function to create a kmn modifier from a keylayout modifier
    * @param  keylayout_modifier :string - modifier used in a .keylayout file
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
-   * @return string - a modifier value suitable to use in a .kmn-file
+   * @return string - a modifier value suitable for use in a .kmn-file
    */
   public create_kmn_modifier(keylayout_modifier: string, isCAPSused: boolean): string {
     let add_modifier: string = "";
@@ -928,19 +942,18 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  check if CAPS is used in a keylayout file or not
-   * @param  keylayout_modifier the modifier value used in the .keylayout-file
-   * @return kmn_modifier the modifier value used in the .kmn-file
+   * @brief  member function to check if CAPS is used throughout a keylayout file or not
+   * @param  keylayout_modifier the modifier string used in the .keylayout-file
+   * @return kmn_modifier the modifier string used in the .kmn-file
    */
   public checkIfCapsIsUsed(keylayout_modifier: string[][]): boolean {
     return JSON.stringify(keylayout_modifier).toUpperCase().includes("CAPS");
   }
 
   /**
-  * @brief  check if CAPS is used in a keylayout file or not
-  * @param  keylayout_modifier the modifier value used in the .keylayout-file
-  * @return true if a modifier can be used in keyman
-  *         false if not
+  * @brief  member function to check if a modifier can be used in keyman
+  * @param  keylayout_modifier the modifier string used in the .keylayout-file
+  * @return true if the modifier can be used in keyman; false if not
   */
   public isAcceptableKeymanModifier(keylayout_modifier: string): boolean {
     if (keylayout_modifier === null)
@@ -971,7 +984,7 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-    * @brief  check rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings
+    * @brief  member function to reviev rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings
     *         definition of comparisons e.g. 1-1, 2-4, 6-6
     *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
     * @param  rule : rule_object[] - an array of all rules
@@ -1411,13 +1424,13 @@ export class KeylayoutToKmnConverter {
     }
 
     if (warningTextArray[0] !== "") {
-      warningTextArray[0] = "c WARNING: " + warningTextArray[0]+"here: ";
+      warningTextArray[0] = "c WARNING: " + warningTextArray[0] + "here: ";
     }
     if (warningTextArray[1] !== "") {
-      warningTextArray[1] = "c WARNING: " + warningTextArray[1]+"here: ";
+      warningTextArray[1] = "c WARNING: " + warningTextArray[1] + "here: ";
     }
     if (warningTextArray[2] !== "") {
-      warningTextArray[2] = "c WARNING: " + warningTextArray[2]+"here: ";
+      warningTextArray[2] = "c WARNING: " + warningTextArray[2] + "here: ";
     }
 
     return warningTextArray;
@@ -1502,7 +1515,7 @@ export class KeylayoutToKmnConverter {
       * @brief  member function to convert a numeric character reference to a unicode codepoint
       * @param  instr the value that will converted
       * @return a unicode codepoint if instr is a numeric character reference
-      *         else instr if instr is not a numeric character reference
+      *         instr if instr is not a numeric character reference
       */
   public convertToUnicodeCodePoint(instr: string): string {
 
@@ -1524,9 +1537,9 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  member function to create a list of rule that will be printed to the resulting kmn file
+   * @brief  member function to create data from rules that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  a list of rules
+   * @return string -  all rules to be printed
    */
   public writeData_Rules(data_ukelele: convert_object): string {
 
@@ -1733,9 +1746,9 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  member function to create list of stores that will be printed to the resulting kmn file
+   * @brief  member function to create data for stores that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  a list of stores
+   * @return string -  all stores to be printed
    */
   public writeData_Stores(data_ukelele: convert_object): string {
 
@@ -1760,6 +1773,7 @@ export class KeylayoutToKmnConverter {
     data += "\n";
     return data;
   }
+
 }
 
 /**
