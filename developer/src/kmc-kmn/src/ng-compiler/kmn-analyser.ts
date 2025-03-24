@@ -7,11 +7,23 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { KeywordRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { AlternateRule, KeywordRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export abstract class SystemStoreAssignRule extends SingleChildRule {
+export class SystemStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const bitmapStoreAssign: Rule       = new BitmapStoreAssignRule(tokenBuffer);
+    const copyrightStoreAssign: Rule    = new CopyrightStoreAssignRule(tokenBuffer);
+    const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [
+      bitmapStoreAssign, copyrightStoreAssign, includecodesStoreAssign,
+    ]);
+  }
+}
+
+abstract class SystemStoreAssignAbstractRule extends SingleChildRule {
   protected whitespace: Rule     = null;
   protected stringRule: Rule     = null;
   protected storeType: NodeTypes = null;
@@ -35,7 +47,7 @@ export abstract class SystemStoreAssignRule extends SingleChildRule {
   }
 }
 
-export abstract class SystemStoreRule extends SingleChildRule {
+abstract class SystemStoreAbstractRule extends SingleChildRule {
   protected store: Rule           = null;
   protected leftBracket: Rule     = null;
   protected optWhitespace: Rule   = null;
@@ -52,7 +64,7 @@ export abstract class SystemStoreRule extends SingleChildRule {
   }
 }
 
-export class BitmapStoreAssignRule extends SystemStoreAssignRule {
+export class BitmapStoreAssignRule extends SystemStoreAssignAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     this.storeType = NodeTypes.BITMAP;
@@ -63,7 +75,7 @@ export class BitmapStoreAssignRule extends SystemStoreAssignRule {
   }
 }
 
-export class BitmapStoreRule extends SystemStoreRule {
+export class BitmapStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const bitmap: Rule = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
@@ -73,7 +85,7 @@ export class BitmapStoreRule extends SystemStoreRule {
   }
 }
 
-export class CopyrightStoreAssignRule extends SystemStoreAssignRule {
+export class CopyrightStoreAssignRule extends SystemStoreAssignAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     this.storeType = NodeTypes.COPYRIGHT;
@@ -84,7 +96,7 @@ export class CopyrightStoreAssignRule extends SystemStoreAssignRule {
   }
 }
 
-export class CopyrightStoreRule extends SystemStoreRule {
+export class CopyrightStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const copyright: Rule = new KeywordRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
@@ -94,7 +106,7 @@ export class CopyrightStoreRule extends SystemStoreRule {
   }
 }
 
-export class IncludecodesStoreAssignRule extends SystemStoreAssignRule {
+export class IncludecodesStoreAssignRule extends SystemStoreAssignAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     this.storeType = NodeTypes.INCLUDECODES;
@@ -105,7 +117,7 @@ export class IncludecodesStoreAssignRule extends SystemStoreAssignRule {
   }
 }
 
-export class IncludecodesStoreRule extends SystemStoreRule {
+export class IncludecodesStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const includecodes: Rule = new KeywordRule(tokenBuffer, TokenTypes.INCLUDECODES, true);

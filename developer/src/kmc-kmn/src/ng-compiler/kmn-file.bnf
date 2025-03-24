@@ -3,7 +3,8 @@ soloLine: content commentEnd? newline
 continuationLine: content continuationEnd newline
 commentEnd: whitespace comment
 continationEnd: whitespace continuation whitespace?
-content: bitmapAssign
+content: systemStoreAssign
+systemStoreAssign: bitmapStoreAssign|copyrightStoreAssign|includecodesStoreAssign
 bitmapStoreAssign: bitmapStore whitespace string
 bitmapStore: store leftBracket whitespace? amphasand bitmap whitespace? rightBracket
 copyrightStoreAssign: copyrightStore whitespace string
