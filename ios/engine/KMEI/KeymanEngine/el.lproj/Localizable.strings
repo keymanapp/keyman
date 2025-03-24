@@ -226,6 +226,24 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "Γλῶσσα καὶ πληκτρολόγιο";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "Προσαρμογὴ ὕψους πληκτρολογίου";
+
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "Προσαρμογὴ πληκτρολογίου";
+
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "Ἐπαναφορὰ προεπιλεγμένων ρυθμίσεων";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "Σύρετε τὰ βέλη γιὰ νὰ προσαρμόσετε τὸ πληκτρολόγιο.";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "Περιστρέψτε τὴν συσκευὴ γιὰ νὰ ἔλθει σὲ ὁριζόντια θέση.";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "Περιστρέψτε τὴν συσκευὴ γιὰ νὰ ἔλθει σὲ κάθετη θέση.";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Ἡ μεταφόρτωση τοῦ πληκτρολογίου ἀπέτυχε";
 

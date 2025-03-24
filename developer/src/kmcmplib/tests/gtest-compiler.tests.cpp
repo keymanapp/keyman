@@ -1281,10 +1281,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     const KMX_WCHAR tstr_context_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_offset_valid, tstr));
 
-    // context, CERR_InvalidToke, offset < 1
+    // context, ERROR_ContextExHasInvalidOffset, offset < 1
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(0)");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_ContextExHasInvalidOffset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, large offset < 0xF000, valid
     fileKeyboard.version = VERSION_60;
@@ -1293,10 +1293,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     const KMX_WCHAR tstr_context_large_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 61439, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_large_offset_valid, tstr));
 
-    // context, KmnCompilerMessages::ERROR_InvalidToken, too large offset == 0xF000
+    // context, KmnCompilerMessages::ERROR_ContextExHasInvalidOffset, too large offset == 0xF000
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(61440)"); //0xF000
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_ContextExHasInvalidOffset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
     fileKeyboard.version = VERSION_50;

@@ -300,11 +300,12 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
     it("can recognise a COMMENT token (followed by LF)", () => {
+      const comment: String = 'c This tells Keyman which keys should have casing behavior applied';
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
-          new Token(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied'),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 67),
+          new Token(TokenTypes.COMMENT, comment),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 67, `${comment}\n`),
         ]
       );
     });
@@ -316,7 +317,7 @@ describe("Lexer Tests", () => {
         '\\\n',
         [
           new Token(TokenTypes.CONTINUATION, '\\'),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 2),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 2, '\\\n'),
         ]
       );
     });
@@ -326,16 +327,17 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.CONTINUATION, '\\'),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 2),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 3),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 3, '\\ \n'),
         ]
       );
     });
     it("can recognise multiple CONTINUATION tokens", () => {
+      const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
+      const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
+      const line3 = '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n';
+      const line4 = '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n';
       recogniseTokens(
-        'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n' +
-        '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n' +
-        '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n' +
-        '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n',
+        `${line1}${line2}${line3}${line4}`,
         [
           new Token(TokenTypes.STORE, 'store'),
           new Token(TokenTypes.LEFT_BR, '(', 1, 6),
@@ -359,7 +361,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+0E94', 1, 71),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 77),
           new Token(TokenTypes.CONTINUATION, '\\', 1, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 1, 79),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 79, line1),
           new Token(TokenTypes.WHITESPACE, '                     ', 2, 1),
           new Token(TokenTypes.U_CHAR, 'U+0E95', 2, 22),
           new Token(TokenTypes.WHITESPACE, ' ', 2, 28),
@@ -378,7 +380,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+0E9D', 2, 71),
           new Token(TokenTypes.WHITESPACE, ' ', 2, 77),
           new Token(TokenTypes.CONTINUATION, '\\', 2, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 2, 79),
+          new Token(TokenTypes.NEWLINE, '\n', 2, 79, line2),
           new Token(TokenTypes.WHITESPACE, '                     ', 3, 1),
           new Token(TokenTypes.U_CHAR, 'U+0E9E', 3, 22),
           new Token(TokenTypes.WHITESPACE, ' ', 3, 28),
@@ -397,7 +399,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+0EAA', 3, 71),
           new Token(TokenTypes.WHITESPACE, ' ', 3, 77),
           new Token(TokenTypes.CONTINUATION, '\\', 3, 78),
-          new Token(TokenTypes.NEWLINE, '\n', 3, 79),
+          new Token(TokenTypes.NEWLINE, '\n', 3, 79, line3),
           new Token(TokenTypes.WHITESPACE, '                     ', 4, 1),
           new Token(TokenTypes.U_CHAR, 'U+0EAB', 4, 22),
           new Token(TokenTypes.WHITESPACE, ' ', 4, 28),
@@ -406,7 +408,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+0EAE', 4, 36),
           new Token(TokenTypes.WHITESPACE, '    ', 4, 42),
           new Token(TokenTypes.COMMENT, 'c list of all the Lao consonants', 4, 46),
-          new Token(TokenTypes.NEWLINE, '\n', 4, 78),
+          new Token(TokenTypes.NEWLINE, '\n', 4, 78, line4),
         ]
       );
     });
@@ -736,19 +738,29 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can handle no newline at end of file", () => {
+      const lexer    = new Lexer('beep');
+      const actual   = lexer.parse(true);
+      const expected = [
+        new Token(TokenTypes.BEEP, 'beep'),
+        new Token(TokenTypes.EOF, '', 1, 1, 'beep'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
 function recogniseToken(type: TokenTypes, text: String): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse();
-  const expected = [new Token(type, text)];
+  const actual   = lexer.parse(false);
+  const line     = (type === TokenTypes.NEWLINE) ? text : null;
+  const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
 }
 
 function recogniseTokens(text: String, expected: Token[]): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse();
+  const actual   = lexer.parse(false);
   assert.deepEqual(actual, expected);
 }
 

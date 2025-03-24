@@ -236,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption = 
+          Caption =
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -1342,7 +1342,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption = 
+          Caption =
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end
@@ -1616,12 +1616,5 @@ inherited frmPackageEditor: TfrmPackageEditor
     Title = 'Add Files'
     Left = 32
     Top = 492
-  end
-  object dlgNewCustomisation: TSaveDialog
-    DefaultExt = 'kct'
-    Filter = 'Customisation file (*.kct)|*.kct|All files (*.*)|*.*'
-    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-    Left = 32
-    Top = 532
   end
 end
