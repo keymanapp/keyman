@@ -16,11 +16,7 @@ binary_tests = [
 ]
 
 foreach kbd : binary_tests
-  configure_file(
-    input: kbd + '.kmn',
-    output: kbd + '.kmn',
-    copy: true
-  )
+  fs.copyfile(kbd + '.kmn', kbd + '.kmn')
 
   configure_file(
     command: hextobin_cmd + ['@INPUT@', '@OUTPUT@'],

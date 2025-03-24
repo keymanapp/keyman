@@ -32,13 +32,13 @@ builder_parse "$@"
 
 function do_build() {
   tsc -b ./tools/tsconfig.json
-  npm run build
+  tsc -b
 }
 
 builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure    verify_npm_setup
 builder_run_action build        do_build
 builder_run_action api          api-extractor run --local --verbose
-builder_run_action test         npm test
+builder_run_action test         builder_do_typescript_tests
 builder_run_action publish      builder_publish_npm
 

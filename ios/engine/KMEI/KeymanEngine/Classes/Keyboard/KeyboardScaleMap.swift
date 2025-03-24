@@ -217,6 +217,8 @@ class KeyboardScaleMap {
                                             screenSize: CGSize = UIScreen.main.bounds.size,
                                             asPhone: Bool? = nil) -> KeyboardSize? {
     if let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: device)] {
+      let kbHeight = (forPortrait ? scaling.portrait : scaling.landscape).keyboardHeight
+      os_log("KeyboardScaleMap getDeviceDefaultKeyboardScale keyboard height: %f", log:KeymanEngineLogger.ui, type: .debug, kbHeight)
       return forPortrait ? scaling.portrait : scaling.landscape
     }
 
@@ -239,6 +241,9 @@ class KeyboardScaleMap {
         // As noted in the scalings data-map, devices of the same dimensions tend to have the same
         // keyboard dimensions.  It's not a perfect rule, but should suffice for a stop-gap solution.
         let scaling = shared.scalings[KeyboardScaleMap.hashKey(for: mappedDevice)]!
+
+        let kbHeight = (forPortrait ? scaling.portrait : scaling.landscape).keyboardHeight
+        os_log("KeyboardScaleMap getDeviceDefaultKeyboardScale keyboard height for missing device: %f", log:KeymanEngineLogger.ui, type: .debug, kbHeight)
 
         return forPortrait ? scaling.portrait : scaling.landscape
     }

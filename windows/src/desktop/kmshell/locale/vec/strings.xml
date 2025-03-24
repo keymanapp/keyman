@@ -11,7 +11,6 @@
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">Ìmita AltGr co' Ctrl+Alt</string>
   <string name="koAutoOpenOSK" comment="/FormatString: ">Mostra senpre ƚa finèstra de ƚa Mapa Tastièra co xé desernìo ƚa tastièra Keyman</string>
   <string name="koAutoSwitchOSKPages" comment="/FormatString: ">Pasa a ƚa pàxena pì pròpia de Mapa Tastièra so Schèrmo co xé desernìo na tastièra</string>
-  <string name="koCheckForUpdates" comment="/FormatString: ">Serca axornamenti so www.tavultesoft.com da to pòsta ògni stimana</string>
   <string name="koDebugging" comment="/FormatString: ">Debugging</string>
   <string name="kogAdvanced" comment="/FormatString: ">Avansà</string>
   <string name="kogGeneral" comment="/FormatString: ">Xeneral</string>

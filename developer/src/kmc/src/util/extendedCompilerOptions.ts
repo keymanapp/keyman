@@ -1,4 +1,4 @@
-import { CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/developer-utils';
+import { CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 
@@ -27,7 +27,7 @@ export interface ExtendedCompilerOptions extends CompilerOptions {
  * @returns  CompilerMessageOverride map with the new severity level for the
  * message; or `null` if parameter is invalid.
  */
-function commandOptionsMessageToCompilerOptionsMessage(message: string, callbacks: CompilerCallbacks): CompilerMessageOverride {
+function commanderOptionsMessageToCompilerOptionsMessage(message: string, callbacks: CompilerCallbacks): CompilerMessageOverride {
   const pattern = /^(KM)?([0-9a-f]+)(:(D|Disable|I|Info|H|Hint|W|Warn|E|Error))?$/i;
   const result = message.match(pattern);
   if(!result) {
@@ -50,14 +50,14 @@ function commandOptionsMessageToCompilerOptionsMessage(message: string, callback
   return override;
 }
 
-function commandOptionsMessagesToCompilerOptionsMessages(messages: any, callbacks: CompilerCallbacks): CompilerMessageOverrideMap {
+function commanderOptionsMessagesToCompilerOptionsMessages(messages: any, callbacks: CompilerCallbacks): CompilerMessageOverrideMap {
   if(!messages || !Array.isArray(messages)) {
     return {};
   }
 
   const result: CompilerMessageOverrideMap = {};
   for(let message of messages) {
-    const override = commandOptionsMessageToCompilerOptionsMessage(message, callbacks);
+    const override = commanderOptionsMessageToCompilerOptionsMessage(message, callbacks);
     if(!override) {
       return null;
     }
@@ -165,14 +165,23 @@ function checkMessageOverride(override: CompilerMessageOverride, callbacks: Comp
   return true;
 }
 
+export function commanderOptionsToBaseOptions(options: any): CompilerBaseOptions {
+  return {
+    // CompilerBaseOptions
+    logLevel: options.logLevel,
+    logFormat: options.logFormat,
+    color: options.color,
+  };
+}
+
 /**
  * Maps command line compiler options to the compiler API options.
  * @param options
  * @param callbacks
  * @returns
  */
-export function commandOptionsToCompilerOptions(options: any, callbacks: CompilerCallbacks): ExtendedCompilerOptions {
-  const overrides = commandOptionsMessagesToCompilerOptionsMessages(options.message, callbacks);
+export function commanderOptionsToCompilerOptions(options: any, callbacks: CompilerCallbacks): ExtendedCompilerOptions {
+  const overrides = commanderOptionsMessagesToCompilerOptionsMessages(options.message, callbacks);
   if(!overrides) {
     return null;
   }
@@ -181,10 +190,7 @@ export function commandOptionsToCompilerOptions(options: any, callbacks: Compile
   // properties that we have in CompilerOptions, but nor do we want to rename
   // CompilerOptions properties...
   return {
-    // CompilerBaseOptions
-    logLevel: options.logLevel,
-    logFormat: options.logFormat,
-    color: options.color,
+    ...commanderOptionsToBaseOptions(options),
     // CompilerOptions
     shouldAddCompilerVersion: options.compilerVersion,
     saveDebug: options.debug,
@@ -202,5 +208,5 @@ export function commandOptionsToCompilerOptions(options: any, callbacks: Compile
  */
 export const unitTestEndpoints = {
   checkMessageOverride,
-  commandOptionsMessageToCompilerOptionsMessage
+  commanderOptionsMessageToCompilerOptionsMessage
 };

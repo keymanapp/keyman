@@ -1,0 +1,11 @@
+{
+  "name": "check-markdown",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "build/index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "marked": "^14.1.2",
+    "chalk": "^2.4.2"
+  }
+}

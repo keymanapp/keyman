@@ -24,6 +24,9 @@ KeyboardDeviceMock::KeyboardDeviceMock() {
 KeyboardDeviceMock::~KeyboardDeviceMock() {
 }
 
+void KeyboardDeviceMock::Close() {
+}
+
 bool
 KeyboardDeviceMock::Initialize(const char* name) {
   return true;

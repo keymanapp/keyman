@@ -129,7 +129,8 @@ const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I36
   (opt: koAltGrCtrlAlt;                      RegistryName: SRegValue_AltGrCtrlAlt;                     OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koRightModifierHK;                   RegistryName: SRegValue_AllowRightModifierHotKey;           OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koShowHints;                         RegistryName: SRegValue_EnableHints;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
-  (opt: koBaseLayout;                        RegistryName: SRegValue_UnderlyingLayout;                 OptionType: kotLong; IntValue: 0;      GroupName: 'kogGeneral'),
+  (opt: koBaseLayout;                        RegistryName: SRegValue_UnderlyingLayout;                 OptionType: kotLong; IntValue:  0;     GroupName: 'kogGeneral'),
+  (opt: koCheckForUpdates;                   RegistryName: SRegValue_CheckForUpdates;                 OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
 
   (opt: koAutomaticallyReportErrors;         RegistryName: SRegValue_AutomaticallyReportErrors;        OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
   (opt: koAutomaticallyReportUsage;          RegistryName: SRegValue_AutomaticallyReportUsage;         OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),   // I4393
@@ -144,7 +145,6 @@ const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I36
 
   (opt: koStartWithWindows;                  RegistryName: '';                                         OptionType: kotBool; BoolValue: False; GroupName: 'kogStartup'),
   (opt: koShowStartup;                       RegistryName: SRegValue_ShowStartup;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogStartup'),
-  (opt: koCheckForUpdates;                   RegistryName: SRegValue_CheckForUpdates;                  OptionType: kotBool; BoolValue: True;  GroupName: 'kogStartup'),
   (opt: koTestKeymanFunctioning;             RegistryName: SRegValue_TestKeymanFunctioning;            OptionType: kotBool; BoolValue: True;  GroupName: 'kogStartup'),
 
   // Advanced options
@@ -322,7 +322,7 @@ begin
       if OpenKey('\'+SRegKey_WindowsRun_CU, True) then
       begin
         if FBoolValue then
-          WriteString(SRegValue_WindowsRun_Keyman, '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -s')
+          WriteString(SRegValue_WindowsRun_Keyman, '"'+TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell)+'" -boot')
         else if ValueExists(SRegValue_WindowsRun_Keyman) then
           DeleteValue(SRegValue_WindowsRun_Keyman);
       end;

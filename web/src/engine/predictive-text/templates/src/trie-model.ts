@@ -31,7 +31,21 @@ import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";
-import { Capabilities, CasingFunction, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, LexiconTraversal, Suggestion, TextWithProbability, Transform, USVString, WithOutcome, WordBreakingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from "@keymanapp/common-types";
+import Capabilities = LexicalModelTypes.Capabilities;
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import Configuration = LexicalModelTypes.Configuration;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
+import Suggestion = LexicalModelTypes.Suggestion;
+import TextWithProbability = LexicalModelTypes.TextWithProbability;
+import Transform = LexicalModelTypes.Transform;
+import USVString = LexicalModelTypes.USVString;
+import WithOutcome = LexicalModelTypes.WithOutcome;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 
 extendString();
 

@@ -126,7 +126,6 @@ public class KMManagerTest {
     HashMap<String, String> kmInfo = new HashMap<String, String>();
     kmInfo.put(KMManager.KMKey_PackageID, "khmer_angkor");
     kmInfo.put(KMManager.KMKey_KeyboardID, "khmer_angkor");
-    kmInfo.put(KMManager.KMKey_CustomKeyboard, "Y");
     kmInfo.put(KMManager.KMKey_LanguageID, "km");
     kmInfo.put(KMManager.KMKey_KeyboardName, "Khmer Angkor");
     kmInfo.put(KMManager.KMKey_LanguageName, "Central Khmer");

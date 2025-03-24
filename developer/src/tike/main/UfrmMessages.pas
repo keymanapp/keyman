@@ -33,7 +33,7 @@ interface
 
 uses
   System.Classes,
-  System.Contnrs,
+  System.Generics.Collections,
   System.SysUtils,
   Vcl.Controls,
   Vcl.Dialogs,
@@ -54,11 +54,23 @@ uses
   UfrmTike, Vcl.ComCtrls;
 
 type
+  TMessageItemSegment = record
+    text: string;
+    color: TColor;
+    underline: Boolean;
+    index: Integer;
+  end;
+
   TMessageItem = class
     FileName: string;
     Msg: string;
     MsgCode, Line: Integer;
+
+    Segments: TArray<TMessageItemSegment>;
+    LineLength: Integer;
   end;
+
+  TMessageItemList = class(TObjectList<TMessageItem>);
 
   TfrmMessages = class(TTikeDockForm)
     dlgSave: TSaveDialog;
@@ -71,6 +83,7 @@ type
     cmdmNextMessage: TMenuItem;
     mnuViewItem: TMenuItem;
     mnuSeparator1: TMenuItem;
+    mnuOpenDocumentation: TMenuItem;
     procedure memoMessageDblClick(Sender: TObject);
     procedure cmdmSaveToFileClick(Sender: TObject);
     procedure cmdmClearClick(Sender: TObject);
@@ -83,8 +96,13 @@ type
     procedure mnuPopupPopup(Sender: TObject);
     procedure mnuViewItemClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure memoMessageMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
+    procedure mnuOpenDocumentationClick(Sender: TObject);
+    procedure memoMessageMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
-    FMessageItems: TObjectList;
+    FMessageItems: TMessageItemList;
     function GetSelLine: Integer;
     procedure SetSelLine(Value: Integer);
   protected
@@ -107,6 +125,8 @@ var
 implementation
 
 uses
+  System.RegularExpressions,
+  System.Types,
   Winapi.RichEdit,
 
   UfrmMain,
@@ -116,7 +136,9 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectFileUI,
-  Keyman.Developer.UI.Project.ProjectUI;
+  Keyman.Developer.UI.Project.ProjectUI,
+  Upload_Settings,
+  utilexecute;
 
 {$R *.DFM}
 
@@ -149,24 +171,29 @@ const // ABGR - text on white bg, Colors similar to Light+ VSCode color theme
   INFO_ProjectBuiltSuccessfully = NAMESPACE_Infrastructure or $000B;
   INFO_ProjectNotBuiltSuccessfully = NAMESPACE_Infrastructure or $000C;
 
+  Segment_Filename           = 0;
+  Segment_Filename_Separator = 1;
+  Segment_Line               = 2;
+  Segment_Line_Separator     = 3;
+  Segment_State              = 4;
+  Segment_Code               = 5;
+  Segment_Code_Separator     = 6;
+  Segment_Message            = 7;
 
 procedure TfrmMessages.Add(state: TProjectLogState; filename, msg: WideString; MsgCode, line: Integer);
-type
-  TSegment = record
-    text: string;
-    color: TColor;
-  end;
 var
   mi: TMessageItem;
   FColor: TColor;
   FTextColor: TColor;
-  Segments: array of TSegment;
+  Segments: TArray<TMessageItemSegment>;
+  i, x: Integer;
 
-  procedure AddText(const text: string; color: TColor);
+  procedure AddText(const text: string; color: TColor; underline: Boolean = false);
   var
-    s: TSegment;
+    s: TMessageItemSegment;
   begin
     s.text := text;
+    s.underline := underline;
     s.color := color;
     SetLength(Segments, Length(Segments)+1);
     Segments[High(Segments)] := s;
@@ -175,7 +202,7 @@ var
   procedure AddLine;
   var
     t: string;
-    s: TSegment;
+    s: TMessageItemSegment;
     cr: TCharRange;
     cf: TCharFormat;
     gtle: TGetTextLengthEx;
@@ -184,7 +211,7 @@ var
     // use direct messages to the RichEdit control to emit formatted text
     FillChar(cf, sizeof(TCharFormat), 0);
     cf.cbSize := sizeof(TCharFormat);
-    cf.dwMask := CFM_COLOR;
+    cf.dwMask := CFM_COLOR or CFM_UNDERLINE;
 
     gtle.flags := GTL_PRECISE or GTL_NUMCHARS;
     gtle.codepage := 1200;
@@ -198,10 +225,13 @@ var
 
     for s in Segments do
     begin
+      if s.Text.Length = 0 then
+        Continue;
       cr.cpMin := cr.cpMax;
       cr.cpMax := cr.cpMax + s.text.Length;
       SendMessage(memoMessage.Handle, EM_EXSETSEL, 0, NativeUint(@cr));
       cf.crTextColor := ColorToRGB(s.color);
+      if s.underline then cf.dwEffects := CFE_UNDERLINE else cf.dwEffects := 0;
       SendMessage(memoMessage.Handle, EM_SETCHARFORMAT, SCF_SELECTION, NativeUint(@cf));
     end;
     cr.cpMin := cr.cpMax;
@@ -251,15 +281,45 @@ begin
     begin
       AddText(':', Color_Text);
       AddText(IntToStr(Line), Color_Line);
+    end
+    else
+    begin
+      // Keep same number of segments
+      AddText('', Color_Text);
+      AddText('', Color_Text);
     end;
     AddText(' - ', Color_Text);
-    AddText(ProjectLogStateTitle[state], FColor);
-    AddText(' KM'+IntToHex(MsgCode, 5), Color_Code);
+
+    if MsgCode = 0 then
+    begin
+      AddText(ProjectLogStateTitle[state], FColor);
+      AddText('', Color_Text);
+    end
+    else
+    begin
+      AddText(ProjectLogStateTitle[state]+' ', FColor);
+      AddText('KM'+IntToHex(MsgCode, 5), Color_Code, True);
+    end;
+
     AddText(': ', Color_Text);
     AddText(StringReplace(msg, #13#10, '   ', [rfReplaceAll]), FTextColor);
 
     AddText(#13#10, clBlack);
+
+    // Calculate segment lengths for later cursor + link calculations
+
+    x := 0;
+    for i := 0 to High(Segments) - 1 do
+    begin
+      Segments[i].index := x; Inc(x, Segments[i].text.Length);
+    end;
+    mi.Segments := Segments;
+    mi.LineLength := x;
+
     AddLine;
+
+    // Strip #$D#$A from segments for further calculations
+    SetLength(mi.Segments, Length(mi.Segments) - 1);
   finally
     SendMessage(memoMessage.Handle, WM_SETREDRAW, 1, 0);
     SendMessage(memoMessage.Handle, EM_SETEVENTMASK, 0, eventMask);
@@ -293,7 +353,7 @@ begin
 
   SelLine := line;
 
-  mi := FMessageItems[line] as TMessageItem;
+  mi := FMessageItems[line];
   FFilename := mi.FileName;
 
   if FFileName = FGlobalProject.FileName then
@@ -331,6 +391,74 @@ begin
   else
     Exit;
   Key := 0;
+end;
+
+procedure TfrmMessages.memoMessageMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  pt: TPointL;
+  ch: Integer;
+  px: TPoint;
+begin
+  if Button = mbRight then
+  begin
+    pt.x := X;
+    pt.y := Y;
+    ch := SendMessage(memoMessage.Handle, EM_CHARFROMPOS, 0, NativeInt(@pt));
+    memoMessage.SelStart := ch;
+    memoMessage.SelLength := 0;
+    px := memoMessage.ClientToScreen(Point(X, Y));
+    mnuPopup.Popup(px.X, px.Y);
+  end;
+end;
+
+procedure TfrmMessages.memoMessageMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
+var
+  pt: TPOINTL;
+  ch: Integer;
+  Row, Col, i: Integer;
+  mi: TMessageItem;
+  seg: TMessageItemSegment;
+begin
+  pt.x := X;
+  pt.y := Y;
+  ch := SendMessage(memoMessage.Handle, EM_CHARFROMPOS, 0, NativeInt(@pt));
+
+  x := 0;
+  Row := -1;
+  for I := 0 to FMessageItems.Count - 1 do
+  begin
+    if x + FMessageItems[i].LineLength >= ch then
+    begin
+      Row := i;
+      Break;
+    end;
+    Inc(x, FMessageItems[i].LineLength + 1);
+  end;
+
+  if Row < 0 then
+  begin
+    // Mouse is outside bounds of text
+    memoMessage.Cursor := crDefault;
+    Exit;
+  end;
+
+  Col := ch - x;
+  mi := FMessageItems[Row];
+
+  if Length(mi.Segments) <= Segment_Code then
+  begin
+    // Safety check
+    memoMessage.Cursor := crDefault;
+    Exit;
+  end;
+
+  seg := mi.Segments[Segment_Code];
+
+  if (Col >= seg.index) and (Col < seg.index + seg.text.Length)
+    then memoMessage.Cursor := crHandPoint
+    else memoMessage.Cursor := crDefault;
 end;
 
 procedure TfrmMessages.cmdmSaveToFileClick(Sender: TObject);
@@ -433,16 +561,37 @@ begin
   memoMessage.SelLength := Length(memoMessage.Lines[Value]);
 end;
 
+procedure TfrmMessages.mnuOpenDocumentationClick(Sender: TObject);
+var
+  line: Integer;
+  mi: TMessageItem;
+begin
+  line := SelLine;
+  if line < 0 then Exit;
+  mi := FMessageItems[line];
+  if Length(mi.Segments) <= Segment_Code then
+    Exit;
+
+  TUtilExecute.URL(URL_KmcMessage(mi.Segments[Segment_Code].text));
+end;
+
 procedure TfrmMessages.mnuPopupPopup(Sender: TObject);
 var
   e: Boolean;
+  line: Integer;
 begin
   e := memoMessage.Lines.Count > 0;
-  cmdmNextMessage.Enabled := e and (SelLine < memoMessage.Lines.Count - 1);
-  cmdmPreviousMessage.Enabled := e and (SelLine > 0);
+  if e
+    then line := SelLine
+    else line := -1;
+  cmdmNextMessage.Enabled := e and (line < memoMessage.Lines.Count - 1);
+  cmdmPreviousMessage.Enabled := e and (line > 0);
+  e := e and (line >= 0) and (line < FMessageItems.Count);
+
   mnuViewItem.Enabled := e;
-  cmdmClear.Enabled := e;
-  cmdmSaveToFile.Enabled := e;
+  mnuOpenDocumentation.Enabled := e;
+  cmdmClear.Enabled := FMessageItems.Count > 0;
+  cmdmSaveToFile.Enabled := FMessageItems.Count > 0;
 end;
 
 procedure TfrmMessages.mnuViewItemClick(Sender: TObject);
@@ -451,14 +600,30 @@ begin
 end;
 
 procedure TfrmMessages.memoMessageClick(Sender: TObject);
+var
+  p: TPoint;
+  mi: TMessageItem;
+  seg: TMessageItemSegment;
 begin
-  ;
+  p := memoMessage.CaretPos;
+  if (p.Y < 0) or (p.Y >= FMessageItems.Count) then
+    Exit;
+
+  mi := FMessageItems[p.Y];
+  if Length(mi.Segments) <= Segment_Code then
+    Exit;
+
+  seg := mi.Segments[Segment_Code];
+  if (p.X >= seg.index) and (p.X < seg.index + seg.text.Length) then
+  begin
+    TUtilExecute.URL(URL_KmcMessage(seg.text));
+  end;
 end;
 
 procedure TfrmMessages.FormCreate(Sender: TObject);
 begin
   inherited;
-  FMessageItems := TObjectList.Create;
+  FMessageItems := TMessageItemList.Create;
 end;
 
 procedure TfrmMessages.FormDestroy(Sender: TObject);

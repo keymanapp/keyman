@@ -175,8 +175,10 @@ const
 
   SRegValue_CharMapSourceData = 'charmap source data';              // LM
 
-  SRegValue_AvailableLanguages = 'available languages'; //CU
-  SRegValue_CurrentLanguage    = 'current language';    //CU
+  SRegValue_AvailableLanguages = 'available languages'; // CU
+  SRegValue_CurrentLanguage    = 'current language';    // CU
+
+  SRegValue_Update_State               = 'update state'; // CU
 
   { Privacy }
 
@@ -314,6 +316,7 @@ const
 
   SRegValue_CheckForUpdates   = 'check for updates'; // CU
   SRegValue_LastUpdateCheckTime = 'last update check time'; // CU
+  SRegValue_ApplyNow = 'apply now';  // CU    Start the install now even though it will require an restart
 
   SRegValue_UpdateCheck_UseProxy = 'update check use proxy'; // CU
   SRegValue_UpdateCheck_ProxyHost = 'update check proxy host'; // CU

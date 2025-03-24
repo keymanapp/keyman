@@ -2,3 +2,4 @@
 c = ['$EMSCRIPTEN_BASE/emcc']
 cpp = ['$EMSCRIPTEN_BASE/em++']
 ar = ['$EMSCRIPTEN_BASE/emar']
+strip = ['$EMSCRIPTEN_BASE/emstrip']

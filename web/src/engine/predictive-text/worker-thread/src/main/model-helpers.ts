@@ -1,4 +1,8 @@
-import { CasingForm, Context, LexicalModel, LexicalModelPunctuation } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import Context = LexicalModelTypes.Context;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import * as models from '@keymanapp/models-templates';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 

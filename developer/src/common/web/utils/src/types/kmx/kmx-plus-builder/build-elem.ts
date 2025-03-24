@@ -1,5 +1,5 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, ElementString } from "@keymanapp/common-types";
+import { KMXPlus, LdmlKeyboardTypes } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 import { build_uset_index, BUILDER_USET, BUILDER_USET_REF } from "./build-uset.js";
@@ -23,7 +23,7 @@ interface BUILDER_ELEM_STRING {
   offset: number;
   length: number;
   items: BUILDER_ELEM_ELEMENT[];
-  _value: ElementString;
+  _value: LdmlKeyboardTypes.ElementString;
 };
 
 /**
@@ -102,8 +102,8 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
   return result;
 }
 
-export function build_elem_index(sect_elem: BUILDER_ELEM, value: ElementString) : BUILDER_ELEM_REF{
-  if(!(value instanceof ElementString)) {
+export function build_elem_index(sect_elem: BUILDER_ELEM, value: LdmlKeyboardTypes.ElementString) : BUILDER_ELEM_REF{
+  if(!(value instanceof LdmlKeyboardTypes.ElementString)) {
     throw new Error('unexpected value '+value);
   }
 

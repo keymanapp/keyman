@@ -520,10 +520,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onPackageInstalled(List<Map<String, String>> keyboardsInstalled) {
-    if (!isContextAvailable()) {
-      KMLog.LogError(TAG, "onPackageInstalled where context is null.");
-    }
-
     if (! openUpdates.isEmpty() && keyboardsInstalled != null) {
       for (Map<String, String> k : keyboardsInstalled) {
         String _langid = k.get(KMManager.KMKey_LanguageID);
@@ -537,10 +533,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   @Override
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
-    if (!isContextAvailable()) {
-      KMLog.LogError(TAG, "onLexicalModelInstalled where context is null.");
-    }
-
     if (! openUpdates.isEmpty()) {
       for(Map<String,String> _lm:lexicalModelsInstalled) {
         String _langid = _lm.get(KMManager.KMKey_LanguageID);
@@ -566,8 +558,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
       // TODO: make it smoother.  Documented as #11097.
       KMManager.clearKeyboardCache();
 
+      Context appContext = currentContext.getApplicationContext();
       if (failedUpdateCount > 0) {
-        BaseActivity.makeToast(currentContext, R.string.update_failed, Toast.LENGTH_SHORT);
+        BaseActivity.makeToast(appContext, R.string.update_failed, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         updateFailed = true;
         checkingUpdates = false;

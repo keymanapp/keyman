@@ -217,6 +217,7 @@ begin
     f := TPackageContentFile.Create(kps);
     f.FileName := BasePath + ID + '\' + SFolder_Source + '\' + SFile_WelcomeHTM;
     kps.Files.Add(f);
+    kps.Options.WelcomeFile := f;
 
     // Add readme
     f := TPackageContentFile.Create(kps);

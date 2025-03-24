@@ -1,0 +1,215 @@
+<!--
+Copyright © 1991-2024 Unicode, Inc.
+For terms of use, see http://www.unicode.org/copyright.html
+SPDX-License-Identifier: Unicode-3.0
+CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
+-->
+<!-- Note: This DTD is not compatible with prior versions of the keyboard data.
+     See ldmlKeyboard.dtd  and CLDR v43 and prior. -->
+
+<!ELEMENT keyboard3 ( import*, locales?, version?, info, settings?, displays?, keys?, flicks?, forms?, layers*, variables?, transforms*, special* ) >
+<!ATTLIST keyboard3 locale CDATA #REQUIRED >
+    <!--@MATCH:validity/bcp47-wellformed-->
+<!ATTLIST keyboard3 conformsTo (45 | 46) #REQUIRED >
+    <!--@MATCH:version-->
+    <!--@METADATA-->
+<!ATTLIST keyboard3 xmlns CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@METADATA-->
+
+<!ELEMENT import EMPTY >
+<!ATTLIST import path CDATA #REQUIRED >
+    <!--@MATCH:any-->
+<!ATTLIST import base (cldr) #IMPLIED >
+
+<!ELEMENT locales ( locale* ) >
+
+<!ELEMENT locale EMPTY >
+<!ATTLIST locale id CDATA #REQUIRED >
+    <!--@MATCH:validity/bcp47-wellformed-->
+
+<!ELEMENT version EMPTY >
+<!ATTLIST version number CDATA #IMPLIED >
+    <!--@MATCH:semver-->
+    <!--@VALUE-->
+<!ATTLIST version cldrVersion CDATA #FIXED "46" >
+    <!--@MATCH:version-->
+    <!--@METADATA-->
+
+<!ELEMENT info EMPTY >
+<!ATTLIST info name CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST info author CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST info layout CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST info indicator CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT settings EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST settings normalization (disabled) #IMPLIED >
+    <!--@VALUE-->
+
+<!ELEMENT displays ( import*, display*, displayOptions*, special* ) >
+
+<!ELEMENT display EMPTY >
+<!ATTLIST display keyId NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+<!ATTLIST display output CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@ALLOWS_UESC-->
+<!ATTLIST display display CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+
+<!ELEMENT displayOptions EMPTY >
+<!ATTLIST displayOptions baseCharacter CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+
+<!ELEMENT special ANY >
+
+<!ELEMENT keys ( import*, key*, special* ) >
+
+<!ELEMENT key EMPTY >
+<!ATTLIST key id NMTOKEN #REQUIRED >
+    <!--@MATCH:any-->
+<!ATTLIST key flickId NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+<!ATTLIST key gap (true) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key output CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+<!ATTLIST key longPressKeyIds NMTOKENS #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key longPressDefaultKeyId NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key multiTapKeyIds NMTOKENS #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key stretch (true) #IMPLIED >
+    <!--@VALUE-->
+<!ATTLIST key layerId NMTOKEN #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST key width CDATA #IMPLIED >
+    <!--@MATCH:range/0.01~100.0-->
+    <!--@VALUE-->
+
+<!ELEMENT flicks ( import*, flick*, special* ) >
+
+<!ELEMENT flick ( flickSegment+, special* ) >
+<!ATTLIST flick id NMTOKEN #REQUIRED >
+    <!--@MATCH:any-->
+
+<!ELEMENT flickSegment EMPTY >
+<!ATTLIST flickSegment directions NMTOKENS #REQUIRED >
+    <!--@MATCH:regex/(n|e|s|w|ne|nw|se|sw)([ ]+(n|e|s|w|ne|nw|se|sw))*-->
+<!ATTLIST flickSegment keyId NMTOKEN #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT forms ( import*, form*, special* ) >
+
+<!ELEMENT form ( scanCodes+, special* ) >
+<!ATTLIST form id NMTOKEN #IMPLIED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9_-]*-->
+
+<!ELEMENT scanCodes EMPTY >
+<!ATTLIST scanCodes codes NMTOKENS #REQUIRED >
+    <!--@MATCH:regex/[0-9a-fA-F]{2}( [0-9a-fA-F]{2})*-->
+    <!--@VALUE-->
+
+<!ELEMENT layers ( import*, layer*, special* ) >
+<!ATTLIST layers formId NMTOKEN #REQUIRED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9_-]*-->
+<!ATTLIST layers minDeviceWidth CDATA #IMPLIED >
+    <!--@MATCH:range/1~999-->
+
+<!ELEMENT layer ( row+, special* ) >
+<!ATTLIST layer id NMTOKEN #IMPLIED >
+    <!--@MATCH:regex/[A-Za-z0-9][A-Za-z0-9_-]*-->
+<!ATTLIST layer modifiers NMTOKENS #IMPLIED >
+    <!--@MATCH:regex/(none|([A-Za-z0-9]+)( [A-Za-z0-9]+)*)-->
+
+<!ELEMENT row EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST row keys NMTOKENS #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT variables ( import*, string*, set*, uset*, special* ) >
+
+<!ELEMENT string EMPTY >
+<!ATTLIST string id NMTOKEN #REQUIRED >
+    <!--@MATCH:regex/[0-9A-Za-z_]{1,32}-->
+<!ATTLIST string value CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+
+<!ELEMENT set EMPTY >
+<!ATTLIST set id NMTOKEN #REQUIRED >
+    <!--@MATCH:regex/[0-9A-Za-z_]{1,32}-->
+<!ATTLIST set value CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+
+<!ELEMENT uset EMPTY >
+<!ATTLIST uset id NMTOKEN #REQUIRED >
+    <!--@MATCH:regex/[0-9A-Za-z_]{1,32}-->
+<!ATTLIST uset value CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+
+<!ELEMENT transforms ( import*, transformGroup*, special* ) >
+<!ATTLIST transforms type (simple | backspace) #REQUIRED >
+    <!--@MATCH:literal/simple, backspace-->
+
+<!ELEMENT transformGroup ( import*, ( transform* | reorder* ), special* ) >
+
+<!ELEMENT transform EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST transform from CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+<!ATTLIST transform to CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+
+<!ELEMENT reorder EMPTY >
+    <!--@ORDERED-->
+<!ATTLIST reorder before CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+<!ATTLIST reorder from CDATA #REQUIRED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+    <!--@ALLOWS_UESC-->
+<!ATTLIST reorder order CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST reorder tertiary CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST reorder tertiaryBase CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->
+<!ATTLIST reorder preBase CDATA #IMPLIED >
+    <!--@MATCH:any-->
+    <!--@VALUE-->

@@ -10,19 +10,26 @@ using namespace std;
 
 KeyboardDevice::KeyboardDevice()
 {
-  dev = nullptr;
-  fd  = -1;
+  dev            = nullptr;
+  fd             = -1;
   hasCapsLockLed = -1;
   debug          = false;
 }
 
 KeyboardDevice::~KeyboardDevice()
 {
+  Close();
+}
+
+void KeyboardDevice::Close()
+{
   if (dev) {
     libevdev_free(dev);
+    dev = nullptr;
   }
   if (fd != -1) {
     close(fd);
+    fd = -1;
   }
 }
 
@@ -34,14 +41,14 @@ bool KeyboardDevice::Initialize(const char* name)
   fd = open(path.c_str(), O_RDWR);
   if (fd < 0) {
     std::cerr << "Failed to open device " << path << ": " << strerror(errno) << std::endl;
+    Close();
     return false;
   }
 
   int rc = libevdev_new_from_fd(fd, &dev);
   if (rc < 0) {
     std::cerr << "Failed to init libevdev for " << path << ": " << strerror(-rc) << std::endl;
-    close(fd);
-    fd = -1;
+    Close();
     return false;
   }
 

@@ -1,21 +1,8 @@
-import { KmpJsonFile, KeymanFileTypes } from '@keymanapp/common-types';
+import { KmpJsonFile, KeymanFileTypes,  } from '@keymanapp/common-types';
+import { SourceFilenamePatterns } from '@keymanapp/developer-utils';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
 import { isValidEmail, CompilerCallbacks, CompilerOptions } from '@keymanapp/developer-utils';
-
-// The keyboard ID SHOULD adhere to this pattern:
-const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
-
-// The model ID SHOULD adhere to this pattern:
-//                                 author           .bcp47             .uniq
-const MODEL_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.(kps|kmp)$/;
-// const MODEL_ID_PATTERN_JS      = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.js$/;
-// const MODEL_ID_PATTERN_TS      = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$/;
-// const MODEL_ID_PATTERN_PROJECT = /^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.kpj$/;
-
-// "Content files" within the package should adhere to these pattern:
-const CONTENT_FILE_BASENAME_PATTERN = /^[a-z0-9_+.-]+$/i; // base names can be case insensitive
-const CONTENT_FILE_EXTENSION_PATTERN = /^(\.[a-z0-9_-]+)?$/;  // extensions should be lower-case or empty
 
 /**
  * @internal
@@ -25,7 +12,7 @@ export class PackageValidation {
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) {
   }
 
-  public validate(filename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
+  public validate(filename: string, outputFilename: string, kmpJson: KmpJsonFile.KmpJsonFile) {
     if(!this.checkForModelsAndKeyboardsInSamePackage(kmpJson)) {
       return false;
     }
@@ -35,7 +22,7 @@ export class PackageValidation {
     if(!this.checkLexicalModels(filename, kmpJson)) {
       return false;
     }
-    if(!this.checkContentFiles(kmpJson)) {
+    if(!this.checkContentFiles(kmpJson, outputFilename)) {
       return false;
     }
     if(!this.checkPackageInfo(kmpJson)) {
@@ -108,7 +95,7 @@ export class PackageValidation {
 
     filename = this.callbacks.path.basename(filename);
 
-    if(!MODEL_ID_PATTERN_PACKAGE.test(filename)) {
+    if(!SourceFilenamePatterns.MODEL_ID_PATTERN_PACKAGE.test(filename)) {
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowLexicalModelConventions({filename}));
     }
 
@@ -128,7 +115,7 @@ export class PackageValidation {
 
     filename = this.callbacks.path.basename(filename);
 
-    if(!KEYBOARD_ID_PATTERN_PACKAGE.test(filename)) {
+    if(!SourceFilenamePatterns.KEYBOARD_ID_PATTERN_PACKAGE.test(filename)) {
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
     }
 
@@ -143,9 +130,9 @@ export class PackageValidation {
     return true;
   }
 
-  private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
+  private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile, outputFilename: string): boolean {
     for(let file of kmpJson.files) {
-      if(!this.checkContentFile(file)) {
+      if(!this.checkContentFile(file, outputFilename)) {
         return false;
       }
     }
@@ -153,12 +140,13 @@ export class PackageValidation {
     return true;
   }
 
-  private checkContentFile(file: KmpJsonFile.KmpJsonFileContentFile): boolean {
+  private checkContentFile(file: KmpJsonFile.KmpJsonFileContentFile, outputFilename: string): boolean {
     const filename = this.callbacks.path.basename(file.name);
     const ext = this.callbacks.path.extname(filename);
     const base = filename.substring(0, filename.length-ext.length);
     if(this.options.checkFilenameConventions) {
-      if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
+      if(!SourceFilenamePatterns.CONTENT_FILE_BASENAME_PATTERN.test(base) ||
+          !SourceFilenamePatterns.CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
         this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
       }
     }
@@ -167,7 +155,18 @@ export class PackageValidation {
       return false;
     }
 
+    if(this.doesContentFileEqualOutputFilename(file, outputFilename)) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageMustNotContainItself({outputFilename}));
+      return false;
+    }
+
     return true;
+  }
+
+  private doesContentFileEqualOutputFilename(file: KmpJsonFile.KmpJsonFileContentFile, outputFilename: string): boolean {
+    // case-insensitive comparison because Windows has case-insensitive filenames
+    return this.callbacks.path.basename(file.name).toLowerCase() ==
+      this.callbacks.path.basename(outputFilename).toLowerCase();
   }
 
   private checkIfContentFileIsDangerous(file: KmpJsonFile.KmpJsonFileContentFile): boolean {

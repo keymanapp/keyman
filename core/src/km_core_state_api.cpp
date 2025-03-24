@@ -225,7 +225,7 @@ km_core_status km_core_state_to_json(km_core_state const *state,
   {
     // Pretty print the document.
     jo << json::object
-        << "$schema" << "keyman/core/doc/introspection.schema"
+        << "$schema" << "keyman/core/docs/introspection.schema"
         << "keyboard" << state->processor().keyboard()
 //        << "options" << state->options()  TODO: Fix
         << "context" << state->context()

@@ -40,59 +40,59 @@
   "files": [
     {
       "name": "ahom_star.kvk",
-      "description": "File ahom_star.kvk"
+      "description": ""
     },
     {
       "name": "ahom_star.kmx",
-      "description": "Keyboard ahom_star"
+      "description": ""
     },
     {
       "name": "ahom_star.js",
-      "description": "File ahom_star.js"
+      "description": ""
     },
     {
       "name": "welcome.htm",
-      "description": "File welcome.htm"
+      "description": ""
     },
     {
       "name": "desktop_layout_default.png",
-      "description": "File desktop_layout_default.png"
+      "description": ""
     },
     {
       "name": "desktop_layout_shift.png",
-      "description": "File desktop_layout_shift.png"
+      "description": ""
     },
     {
       "name": "phone_default.png",
-      "description": "File phone_default.png"
+      "description": ""
     },
     {
       "name": "phone_longpress.png",
-      "description": "File phone_longpress.png"
+      "description": ""
     },
     {
       "name": "phone_numeric.png",
-      "description": "File phone_numeric.png"
+      "description": ""
     },
     {
       "name": "phone_shift.png",
-      "description": "File phone_shift.png"
+      "description": ""
     },
     {
       "name": "readme.htm",
-      "description": "File readme.htm"
+      "description": ""
     },
     {
       "name": "NotoSerifAhom-Regular.ttf",
-      "description": "Font Noto Serif Ahom Regular"
+      "description": ""
     },
     {
       "name": "kmp.inf",
-      "description": "Package information"
+      "description": ""
     },
     {
       "name": "kmp.json",
-      "description": "Package information (JSON)"
+      "description": ""
     }
   ],
   "keyboards": [

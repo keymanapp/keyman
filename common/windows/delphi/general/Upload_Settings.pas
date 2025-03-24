@@ -58,6 +58,8 @@ const
   URLPath_KeymanDeveloper_KeymanForAndroidDownload = '/go/developer/'+SKeymanVersion+'/android-app';
   URLPath_KeymanDeveloper_KeymanForIosDownload = '/go/developer/'+SKeymanVersion+'/ios-app';
 
+  URLPath_KeymanDeveloper_KeyboardSearchForCloneKeymanCloud = '/go/developer/'+SKeymanVersion+'/clone-keyboard';
+
   URLPath_Support = '/go/'+SKeymanVersion+'/support';
   URLPath_Privacy = '/go/'+SKeymanVersion+'/privacy';
   URLPath_Privacy_Presentation = '/privacy';
@@ -70,6 +72,10 @@ const
                                // e.g. http://keyman.com.local/keyboards/foo
   UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/go/windows/[^/]+/download-keyboards';
                              // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
+
+  // Cloning keyboards - Keyman Developer
+  URLSubPath_KeymanDeveloper_Clone_Keyboards = '/keyboards/';
+  URLSubPath_KeymanDeveloper_Clone_Keyboards_Custom = '/keyboards/h/';
 
 function URLPath_PackageDownload(const PackageID, BCP47: string; IsUpdate: Boolean): string;
 
@@ -85,6 +91,8 @@ function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 function MakeAPIURL(path: string): string;
 
 function MakeKeymanURL(const path: string): string;
+
+function URL_KmcMessage(const id: string): string;
 
 implementation
 
@@ -102,6 +110,7 @@ const
   S_UserAgent_Developer = 'Keyman Developer';
   S_UserAgent_Diagnostics = 'Keyman for Windows Diagnostics';
 
+  S_Host_KmnSh = 'https://kmn.sh';
   S_KeymanCom = 'https://keyman.com';
   S_APIProtocol = 'https';
   S_APIServer = 'api.keyman.com';
@@ -114,6 +123,7 @@ const
 
 const
   URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
+  URL_KeymanDeveloper_HelpKmcMessage_Format = S_Host_KmnSh+'/%0:s';
 
 function API_UserAgent: string;
 begin
@@ -129,7 +139,6 @@ function API_UserAgent_Diagnostics: string;
 begin
   Result := S_UserAgent_Diagnostics + '/' + GetVersionString;
 end;
-
 
 function MakeKeymanURL(const path: string): string;
 begin
@@ -171,6 +180,11 @@ begin
   if IsUpdate then IsUpdateInt := 1 else IsUpdateInt := 0;
 
   Result := Format(URLPath_PackageDownload_Format, [URLEncode(PackageID), URLEncode(CKeymanVersionInfo.Tier), URLEncode(BCP47), IsUpdateInt]);
+end;
+
+function URL_KmcMessage(const id: string): string;
+begin
+   Result := Format(URL_KeymanDeveloper_HelpKmcMessage_Format, [id.ToLower]);
 end;
 
 end.

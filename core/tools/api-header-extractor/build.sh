@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 CORE_ROOT="$KEYMAN_ROOT/core"
 CORE_H_FILE="$CORE_ROOT/include/keyman/keyman_core_api.h"
 CORE_H_DOC="index.md"
-OUTPATH="$CORE_ROOT/build/doc"
+OUTPATH="$CORE_ROOT/build/docs/internal"
 
 ################################ Main script ################################
 

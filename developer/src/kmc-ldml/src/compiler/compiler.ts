@@ -1,4 +1,9 @@
-import { KMXPlus, UnicodeSetParser, KvkFileWriter } from '@keymanapp/common-types';
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Compiles a LDML XML keyboard file into a Keyman KMXPlus file
+ */
+import { KMXPlus, LdmlKeyboardTypes, KvkFileWriter, KMX } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
   defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
@@ -25,7 +30,6 @@ import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
 import { LinterKeycaps } from './linter-keycaps.js';
-//KMW17.0: import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
@@ -68,11 +72,6 @@ export interface LdmlKeyboardCompilerArtifacts extends KeymanCompilerArtifacts {
    * desktop projects alongside .kmx
    */
   kvk?: KeymanCompilerArtifactOptional;
-  /**
-   * Javascript keyboard filedata and filename - installable into KeymanWeb,
-   * Keyman mobile products
-   */
-  js?: KeymanCompilerArtifactOptional;
 };
 
 export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
@@ -85,7 +84,7 @@ export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
 
 /**
  * @public
- * Compiles a LDML keyboard .xml file to a .kmx (KMXPlus), .kvk, and/or .js. The
+ * Compiles a LDML keyboard .xml file to a .kmx (KMXPlus), .kvk. The
  * compiler does not read or write from filesystem or network directly, but
  * relies on callbacks for all external IO.
  */
@@ -94,7 +93,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   private options: LdmlCompilerOptions;
 
   // uset parser
-  private usetparser?: UnicodeSetParser = undefined;
+  private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
 
   /**
    * Initialize the compiler, including loading the WASM host for uset parsing.
@@ -111,7 +110,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   /**
-   * Compiles a LDML keyboard .xml file to .kmx, .kvk, and/or .js files. Returns
+   * Compiles a LDML keyboard .xml file to .kmx, .kvk files. Returns
    * an object containing binary artifacts on success. The files are passed in
    * by name, and the compiler will use callbacks as passed to the
    * {@link LdmlKeyboardCompiler.init} function to read any input files by disk.
@@ -137,18 +136,34 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       return null;
     }
 
+    outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
+
     // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
     // to duplicate some of the metadata
     KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
 
     // Use the builder to generate the binary output file
-    const builder = new KMXBuilder(kmx, compilerOptions.saveDebug);
-    const kmx_binary = builder.compile();
+    const kmxBuilder = new KMXBuilder(kmx, compilerOptions.saveDebug);
+    const keyboardId = this.callbacks.path.basename(outputFilename, '.kmx');
+    const vkCompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
+    const vkCompilerResult = vkCompiler.compile(kmx.kmxplus, keyboardId);
+    if(vkCompilerResult === null) {
+      return null;
+    }
+    const vkData = typeof vkCompilerResult == 'object' ? vkCompilerResult : null;
 
-    const vkcompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
-    const vk = vkcompiler.compile(source);
-    const writer = new KvkFileWriter();
-    const kvk_binary = writer.write(vk);
+    if(vkData) {
+      kmx.keyboard.stores.push({
+        dpName: '',
+        dpString: keyboardId + '.kvk',
+        dwSystemID: KMX.KMXFile.TSS_VISUALKEYBOARD
+      });
+    }
+
+    const kmxBinary = kmxBuilder.compile();
+
+    const kvkWriter = new KvkFileWriter();
+    const kvkBinary = vkData ? kvkWriter.write(vkData) : null;
 
     // Note: we could have a step of generating source files here
     // KvksFileWriter()...
@@ -161,13 +176,10 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     //KMW17.0: const encoder = new TextEncoder();
     //KMW17.0: const kmw_binary = encoder.encode(kmw_string);
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
-
     return {
       artifacts: {
-        kmx: { data: kmx_binary, filename: outputFilename },
-        kvk: { data: kvk_binary, filename: outputFilename.replace(/\.kmx$/, '.kvk') },
-        //KMW17.0: js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
+        kmx: { data: kmxBinary, filename: outputFilename },
+        kvk: kvkBinary ? { data: kvkBinary, filename: outputFilename.replace(/\.kmx$/, '.kvk') } : null,
       }
     };
   }
@@ -178,7 +190,6 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    *
    * - .kmx file - binary keyboard used by Keyman on desktop platforms
    * - .kvk file - binary on screen keyboard used by Keyman on desktop platforms
-   * - .js file - Javascript keyboard for web and touch platforms
    *
    * @param artifacts - object containing artifact binary data to write out
    * @returns true on success
@@ -192,10 +203,6 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       this.callbacks.fs.writeFileSync(artifacts.kvk.filename, artifacts.kvk.data);
     }
 
-    if (artifacts.js) {
-      this.callbacks.fs.writeFileSync(artifacts.js.filename, artifacts.js.data);
-    }
-
     return true;
   }
 
@@ -204,7 +211,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Construct or return a UnicodeSetParser, aka KmnCompiler
    * @returns the held UnicodeSetParser
    */
-  async getUsetParser(): Promise<UnicodeSetParser> {
+  async getUsetParser(): Promise<LdmlKeyboardTypes.UnicodeSetParser> {
     if (this.usetparser === undefined) {
       // initialize
       const compiler = new KmnCompiler();

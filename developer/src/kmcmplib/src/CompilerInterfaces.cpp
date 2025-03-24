@@ -13,7 +13,6 @@ EXTERN bool kmcmp_CompileKeyboard(
   const void* procContext,
   KMCMP_COMPILER_RESULT& result
 ) {
-
   FILE_KEYBOARD fk;
   fk.extra = new KMCMP_COMPILER_RESULT_EXTRA;
   fk.extra->kmnFilename = pszInfile;

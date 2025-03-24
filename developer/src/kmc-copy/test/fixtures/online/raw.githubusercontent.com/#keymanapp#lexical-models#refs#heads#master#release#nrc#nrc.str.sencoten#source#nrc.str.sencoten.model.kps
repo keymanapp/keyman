@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>12.0.1500.0</KeymanDeveloperVersion>
+    <FileVersion>12.0</FileVersion>
+  </System>
+  <Options>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+  </Options>
+  <Info>
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
+    <Copyright URL="">© 2019-2023 Timothy Montler and the W̱SÁNEĆ School Board</Copyright>
+    <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
+    <Version>1.0.7</Version>
+    <Description>SENĆOŦEN (Saanich Dialect)</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\nrc.str.sencoten.model.js</Name>
+      <Description>Lexical model nrc.str.sencoten.model.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.model.js</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>SENĆOŦEN dictionary</Name>
+      <ID>nrc.str.sencoten</ID>
+      <Languages>
+        <Language ID="str">North Straits Salish</Language>
+        <Language ID="str-Latn">SENĆOŦEN</Language>
+      </Languages>
+    </LexicalModel>
+  </LexicalModels>
+</Package>

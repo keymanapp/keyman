@@ -29,7 +29,8 @@ type
   public
     constructor Create(FName: string);
     destructor Destroy; override;
-    function MutexOwned: Boolean;
+    function TakeOwnership: Boolean;
+    function ReleaseOwnership: Boolean;
   end;
 
 implementation
@@ -52,9 +53,14 @@ begin
   inherited Destroy;
 end;
 
-function TKeymanMutex.MutexOwned: Boolean;
+function TKeymanMutex.TakeOwnership: Boolean;
 begin
   Result := WaitForSingleObject(hMutex, 0) = WAIT_OBJECT_0;
+end;
+
+function TKeymanMutex.ReleaseOwnership: Boolean;
+begin
+  Result := ReleaseMutex(hMutex);
 end;
 
 end.

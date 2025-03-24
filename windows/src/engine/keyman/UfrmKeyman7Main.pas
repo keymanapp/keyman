@@ -198,13 +198,13 @@ type
   TfrmKeyman7Main = class(TForm)
     mnu: TPopupMenu;
     tmrTestKeymanFunctioning: TTimer;
-    tmrOnlineUpdateCheck: TTimer;
+    tmrBackgroundUpdateCheck: TTimer;
     tmrCheckInputPane: TTimer;
     tmrRefresh: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrTestKeymanFunctioningTimer(Sender: TObject);
-    procedure tmrOnlineUpdateCheckTimer(Sender: TObject);
+    procedure tmrBackgroundUpdateCheckTimer(Sender: TObject);
     procedure tmrCheckInputPaneTimer(Sender: TObject);
     procedure tmrRefreshTimer(Sender: TObject);
   private
@@ -1838,7 +1838,7 @@ begin
   end;
 end;
 
-procedure TfrmKeyman7Main.tmrOnlineUpdateCheckTimer(Sender: TObject);
+procedure TfrmKeyman7Main.tmrBackgroundUpdateCheckTimer(Sender: TObject);
 begin
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -1846,7 +1846,7 @@ begin
     begin
       if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) then Exit;
       if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) then Exit;
-      TKeymanDesktopShell.RunKeymanConfiguration('-ouc');
+      TKeymanDesktopShell.RunKeymanConfiguration('-buc');
     end;
   finally
     Free;

@@ -1,4 +1,4 @@
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**
  * A **VERY** dumb word breaker that simply splits at words. Do not use this
@@ -7,7 +7,7 @@ import { Span } from '@keymanapp/common-types';
  * @param phrase The phrase in which to break words.
  * @deprecated Use a word breaker tailored to your language instead!
  */
-export default function placeholder(phrase: string): Span[] {
+export default function placeholder(phrase: string): LexicalModelTypes.Span[] {
   let nextStart = 0;
   return phrase.split(/\s+/).map(utterance => {
     // XXX: The indices are NOT accurate to the original phrase!

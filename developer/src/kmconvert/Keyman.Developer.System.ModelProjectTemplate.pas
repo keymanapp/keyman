@@ -19,13 +19,11 @@ type
     procedure WriteWordlist;
     procedure WriteKPS;
     procedure WriteKPJ;
-    procedure WriteModelInfo;
     function GetModelFilename: string;
     function GetWordlistFilename: string;
 
   protected
     const
-      SFileTemplate_ModelInfo = '%s.model_info'; // in root
       SFileTemplate_Package = '%s.model.kps';
       SFilename_Model = 'model.ts'; // Only for source
       SFilename_Wordlist = 'wordlist.tsv';
@@ -82,8 +80,6 @@ begin
   WriteKPJ;
 
   WriteRepositoryMetadata;
-
-  WriteModelInfo;
 end;
 
 function TModelProjectTemplate.GetModelFilename: string;
@@ -107,15 +103,6 @@ begin
     Format(SFolder_Source + '\' + SFileTemplate_Model, [ID]));
 end;
 
-procedure TModelProjectTemplate.WriteModelInfo;
-begin
-  // Write modelid.model_info
-  Transform(
-    Format(SFileTemplate_ModelInfo, ['model']),
-    Format(SFileTemplate_ModelInfo, [ID])
-  );
-end;
-
 procedure TModelProjectTemplate.WriteWordlist;
 begin
   Transform(SFolder_Source + '\' + SFilename_Wordlist);
@@ -127,10 +114,13 @@ var
 begin
   kpj := TProject.Create(ptLexicalModel, GetProjectFilename, False);
   try
+    kpj.Options.Version := pv20;
     kpj.Options.BuildPath := '$PROJECTPATH\' + SFolder_Build;
+    kpj.Options.SourcePath := '$PROJECTPATH\' + SFolder_Source;
     kpj.Options.WarnDeprecatedCode := True;
     kpj.Options.CompilerWarningsAsErrors := True;
     kpj.Options.CheckFilenameConventions := True;
+    kpj.Options.SkipMetadataFiles := False;
 
     // Add model and package to project
     kpj.Files.Add(TmodelTsProjectFile.Create(kpj, GetModelFilename, nil));
@@ -140,7 +130,6 @@ begin
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_HistoryMD, nil));
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_LicenseMD, nil));
     kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + SFile_ReadmeMD, nil));
-    kpj.Files.Add(TOpenableProjectFile.Create(kpj, BasePath + ID + '\' + Format(SFileTemplate_ModelInfo, [ID]), nil));
 
     kpj.Save;
   finally
@@ -173,6 +162,7 @@ begin
     f := TPackageContentFile.Create(kps);
     f.FileName := BasePath + ID + '\' + SFolder_Source + '\' + SFile_WelcomeHTM;
     kps.Files.Add(f);
+    kps.Options.WelcomeFile := f;
 
     // Add readme
     f := TPackageContentFile.Create(kps);

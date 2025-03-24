@@ -323,10 +323,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Montrer l\'écran de bienvenue</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Rechercher automatiquement chaque semaine les mises à jour sur www.tavultesoft.com </string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Vérifier qu\'il n\'y a pas d\'applications en conflit lorsque Keyman démarre</string>
   <!-- Context: Configuration Dialog - Options tab -->

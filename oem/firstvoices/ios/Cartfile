@@ -1,4 +1,4 @@
 github "weichsel/ZIPFoundation" ~> 0.9
 github "devicekit/DeviceKit" ~> 5.0
 github "ashleymills/Reachability.swift"
-github "getsentry/sentry-cocoa" ~> 8.7.0
+github "getsentry/sentry-cocoa" ~> 8.38.0

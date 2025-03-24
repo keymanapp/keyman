@@ -200,7 +200,7 @@ LANGUAGE=de ./km-config
   "python.testing.unittestArgs": [
     "-v",
     "-s", "linux/keyman-config/tests",
-    "-p", "test_*.py"
+    "-p", "*_tests.py"
   ],
   "python.testing.unittestEnabled": true,
   ```

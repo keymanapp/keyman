@@ -21,7 +21,8 @@ unit KeyboardFonts;
 interface
 
 type
-  TKeyboardFont = (kfontCode, kfontChar, kfontOSK, kfontTouchLayoutPhone, kfontTouchLayoutTablet, kfontTouchLayoutDesktop);
+  TKeyboardFont = (kfontCode, kfontChar, kfontOSK, kfontTouchLayoutPhone, kfontTouchLayoutTablet, kfontTouchLayoutDesktop,
+    kfontDisplayMap);
 
   TKeyboardFontArray = array[TKeyboardFont] of string;   // I4409
 
@@ -34,7 +35,7 @@ type
 
 const
   KeyboardFontId: array[TKeyboardFont] of string = (
-    'Code', 'Char', 'Osk', 'TouchLayoutPhone', 'TouchLayoutTablet', 'TouchLayoutDesktop'
+    'Code', 'Char', 'Osk', 'TouchLayoutPhone', 'TouchLayoutTablet', 'TouchLayoutDesktop', 'DisplayMap'
   );
 implementation
 

@@ -16,11 +16,11 @@
 #pragma once
 
 #define LDML_BKSP_FLAGS_ERROR 0x1
-#define LDML_CLDR_IMPLIED_FORMS_IMPORT "45/scanCodes-implied.xml"
-#define LDML_CLDR_IMPLIED_KEYS_IMPORT "45/keys-Latn-implied.xml"
+#define LDML_CLDR_IMPLIED_FORMS_IMPORT "46/scanCodes-implied.xml"
+#define LDML_CLDR_IMPLIED_KEYS_IMPORT "46/keys-Latn-implied.xml"
 #define LDML_CLDR_IMPORT_BASE "cldr"
 #define LDML_CLDR_TEST_VERSION_LATEST "techpreview"
-#define LDML_CLDR_VERSION_LATEST "45"
+#define LDML_CLDR_VERSION_LATEST "46"
 #define LDML_ELEM_FLAGS_ORDER_BITSHIFT 0x10
 #define LDML_ELEM_FLAGS_ORDER_MASK 0xFF0000
 #define LDML_ELEM_FLAGS_PREBASE 0x8

@@ -12,6 +12,7 @@
 #import "TextApiCompliance.h"
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "KMSentryHelper.h"
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
@@ -22,6 +23,7 @@
 @property (nonatomic, retain) NSString* clientApplicationId;
 @property NSString *queuedText;
 @property BOOL contextChanged;
+@property BOOL sentryTestingEnabled;
 @end
 
 @implementation KMInputMethodEventHandler
@@ -33,9 +35,6 @@ const NSTimeInterval kQueuedTextEventDelayInSeconds = 0.1;
 CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 CGEventSourceRef _sourceForGeneratedEvent = nil;
-NSMutableString* _easterEggForSentry = nil;
-NSString* const kEasterEggText = @"Sentry force now";
-NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 // This is the public initializer.
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender {
@@ -44,21 +43,12 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   _generatedBackspaceCount = 0;
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
-  
-  // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
-  // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
-  // test reporting to sentry.keyman.com
-  if ([self.appDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    os_log_debug([KMLogs testLog], "Sentry - Preparing to detect Easter egg.");
-    _easterEggForSentry = [[NSMutableString alloc] init];
-  }
-  else
-    _easterEggForSentry = nil;
-  
-  [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-      [scope setTagValue:clientAppId forKey:@"clientAppId"];
-  }];
 
+  _apiCompliance = [[TextApiCompliance alloc]initWithClient:sender applicationId:clientAppId];
+  os_log_info([KMLogs lifecycleLog], "KMInputMethodEventHandler initWithClient, clientAppId: %{public}@", clientAppId);
+  [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:[NSString stringWithFormat:@"KMInputMethodEventHandler initWithClient, clientAppId '%@'", clientAppId]];
+
+  [KMSentryHelper addClientAppIdTag:clientAppId];
   return self;
 }
 
@@ -66,9 +56,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (_generatedBackspaceCount > 0 || (_queuedText != nil && _queuedText.length > 0) ||
       _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
   {
-    if ([self.appDelegate debugMode]) {
-      os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
-    }
+    os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
     _keyCodeOfOriginalEvent = 0;
     _generatedBackspaceCount = 0;
     _queuedText = nil;
@@ -109,9 +97,15 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput *output = nil;
   
+  if ([self.appDelegate canForceSentryEvents]) {
+    if ([self forceSentryEvent:event]) {
+      return NO;
+    }
+  }
+  
   output = [self processEventWithKeymanEngine:event in:sender];
+
   if (output == nil) {
-    [self checkEventForSentryEasterEgg:event];
     return NO;
   }
   
@@ -121,42 +115,45 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-    coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags: %lu / 0x%lX, instead of event.modifiers = %lu / 0x%lX", self.appDelegate.currentModifierFlags, self.appDelegate.currentModifierFlags, event.modifierFlags, event.modifierFlags);
+    NSEventModifierFlags modifierFlags = [self.appDelegate determineModifiers];
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using modifierFlags 0x%lX, instead of event.modifiers 0x%lX", modifierFlags, event.modifierFlags);
+
+    NSEvent *eventWithAppropriateModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:modifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    coreKeyOutput = [self.kme processEvent:eventWithAppropriateModifierFlags];
   }
   else {
-    // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
-    // Keyboards that depend on chirality support will not work. And command-key actions that change the
-    // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+    /** 
+     * Without the low level event tap, there will be no way to distinguish left and right option keys.
+     * Also command-key actions that should invalidate the context may go undetected.
+     * Have yet to determine which scenarios prevent an event tap from be created
+     */
     coreKeyOutput = [self.kme processEvent:event];
   }
-  //os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
   return coreKeyOutput;
 }
 
-- (void)checkEventForSentryEasterEgg:(NSEvent *)event {
-  if (_easterEggForSentry != nil) {
-    NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-    os_log_debug([KMLogs testLog], "Sentry - KMX name: %{public}@", kmxName);
-    if ([kmxName isEqualToString:kEasterEggKmxName]) {
-      NSUInteger len = [_easterEggForSentry length];
-      os_log_debug([KMLogs testLog], "Sentry - Processing character(s): %{public}@", [event characters]);
-      if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-        os_log_debug([KMLogs testLog], "Sentry - Adding character to Easter Egg code string: %{public}@", characterToAdd);
-        [_easterEggForSentry appendString:characterToAdd];
-        if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
-          os_log_debug([KMLogs testLog], "Sentry - Forcing crash now");
-          [SentrySDK crash];
-        }
-      }
-      else if (len > 0) {
-        os_log_debug([KMLogs testLog], "Sentry - Clearing Easter Egg code string.");
-        [_easterEggForSentry setString:@""];
-      }
-    }
+/**
+ * When in the mode to test sentry, this method will force certain Sentry APIs to be called,
+ * such as forcing a crash or capturing a message, depending on the key being typed.
+ */
+- (BOOL)forceSentryEvent:(NSEvent *)event {
+  BOOL forcedEvent = YES;
+  
+  NSString *sentryCommand = event.characters;
+  if ([sentryCommand isEqualToString:@"{"]) {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: forcing crash now");
+    NSBeep();
+    [SentrySDK crash];
+  } else if ([sentryCommand isEqualToString:@"["]) {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: forcing message now");
+    NSBeep();
+    [SentrySDK captureMessage:@"Forced test message"];
+  } else {
+    os_log_debug([KMLogs testLog], "forceSentryEvent: unrecognized command");
+    forcedEvent = NO;
   }
+  
+  return forcedEvent;
 }
 
 /**
@@ -170,7 +167,8 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  */
 - (void)handleBackspace:(NSEvent *)event {
   os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
-  
+  [KMSentryHelper addInfoBreadCrumb:@"user" message:@"handle backspace for non-compliant app"];
+
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
     self.lowLevelBackspaceCount++;
@@ -190,19 +188,43 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 //MARK: Core-related key processing
 
 - (void)checkTextApiCompliance:(id)client {
-  // If the TextApiCompliance object is nil or the app or the context has changed,
-  // then create a new object for the current application and context.
+  // If the TextApiCompliance object is stale, create a new one for the current application and context.
   // The text api compliance may vary from one text field to another of the same app.
   
-  if ((self.apiCompliance == nil) ||
-      (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId]) ||
-      self.contextChanged) {
+  if ([self textApiComplianceIsStale]) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
     os_log_debug([KMLogs complianceLog], "KMInputMethodHandler initWithClient checkTextApiCompliance: %{public}@", _apiCompliance);
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
     [self.apiCompliance checkCompliance:client];
   }
+}
+
+- (BOOL)textApiComplianceIsStale {
+  BOOL stale = false;
+  NSString *complianceAppId = nil;
+  TextApiCompliance *currentApiCompliance = self.apiCompliance;
+  
+  // test for three scenarios in which the api compliance is stale
+  if (currentApiCompliance == nil) { // if we have no previous api compliance object
+    stale = true;
+  } else { // if we have one but for a different client
+    complianceAppId = self.apiCompliance.clientApplicationId;
+    if ([complianceAppId isNotEqualTo:self.clientApplicationId]) {
+      stale = true;
+    } else {
+      stale = false;
+    }
+  }
+  if (self.contextChanged) { // if the context has changed
+    stale = true;
+  }
+
+  NSString *message = [NSString stringWithFormat:@"textApiComplianceIsStale = %@ for appId: %@, apiCompliance: %p, complianceAppId: %@", stale?@"true":@"false", self.clientApplicationId, currentApiCompliance, complianceAppId];
+  [KMSentryHelper addDebugBreadCrumb:@"compliance" message:message];
+  os_log_debug([KMLogs complianceLog], "%{public}@", message);
+
+  return stale;
 }
 
 - (void) handleContextChangedByLowLevelEvent {
@@ -226,6 +248,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   [self handleContextChangedByLowLevelEvent];
   
   if (event.type == NSEventTypeKeyDown) {
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:@"handling keydown event"];
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
@@ -418,6 +441,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSString *value = [options objectForKey:key];
     if(key && value) {
       os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
+      [KMSentryHelper addInfoBreadCrumb:@"event" message:@"persist options"];
       [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {

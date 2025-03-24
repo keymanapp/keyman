@@ -23,7 +23,6 @@
   #define _kmn_unused(x)        UNUSED_ ## x __attribute__((__unused__))
 #else
   #define _kmn_unused(x)        UNUSED_ ## x
-
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
@@ -36,7 +35,7 @@
     #undef _kmn_static_flag
   #else  // How MSVC sepcifies function level attributes adn deprecation
     #define _kmn_and
-    #define _kmn_tag_fn(a)       __declspec(a)
+    #define _kmn_tag_fn(a)     __declspec(a)
     #define _kmn_deprecated_flag deprecated
   #endif
   #define _kmn_export_flag     dllexport
@@ -47,6 +46,8 @@
   #define _KM_CORE_PATH_SEPARATOR ('/')
   #define _KM_CORE_EXT_SEPARATOR ('.')
 #endif
+
+#define KMN_DEPRECATED        _kmn_tag_fn(_kmn_deprecated_flag)
 
 #if defined KM_CORE_LIBRARY_STATIC
   #define KMN_API             _kmn_tag_fn(_kmn_static_flag)

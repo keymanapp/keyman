@@ -85,6 +85,8 @@ if (data.title.endsWith('ldmlKeyboard3.xsd')) {
       delete item.items.type;
       item.items['$ref'] = `#/definitions/${newName}`;
     }
+    // Workaround CLDR-18138 by not making 'cldr' the default for the base
+    delete data.definitions?.import?.properties?.base?.enum;
 }
 
 if (data.title.endsWith('ldmlKeyboardTest3.xsd')) {

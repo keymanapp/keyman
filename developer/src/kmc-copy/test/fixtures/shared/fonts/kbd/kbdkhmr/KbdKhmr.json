@@ -1,0 +1,2171 @@
+{
+  "map": [
+    {
+      "pua": "F100",
+      "str": "0",
+      "unicode": "0030",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F101",
+      "str": "1",
+      "unicode": "0031",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F102",
+      "str": "2",
+      "unicode": "0032",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F103",
+      "str": "3",
+      "unicode": "0033",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F104",
+      "str": "4",
+      "unicode": "0034",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F105",
+      "str": "5",
+      "unicode": "0035",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F106",
+      "str": "6",
+      "unicode": "0036",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F107",
+      "str": "7",
+      "unicode": "0037",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F108",
+      "str": "8",
+      "unicode": "0038",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F109",
+      "str": "9",
+      "unicode": "0039",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10A",
+      "str": "ឞ",
+      "unicode": "179E",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10B",
+      "str": "ឝ",
+      "unicode": "179D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10C",
+      "str": "ៈ",
+      "unicode": "17C8",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10D",
+      "str": "ឳ",
+      "unicode": "17B3",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10E",
+      "str": "ឨ",
+      "unicode": "17A8",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F10F",
+      "str": "ឩ",
+      "unicode": "17A9",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F110",
+      "str": "ឰ",
+      "unicode": "17B0",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F111",
+      "str": "ឫ",
+      "unicode": "17AB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F112",
+      "str": "ឦ",
+      "unicode": "17A6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F113",
+      "str": "ឱ",
+      "unicode": "17B1",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F114",
+      "str": "ឯ",
+      "unicode": "17AF",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F115",
+      "str": "៑",
+      "unicode": "17D1",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F116",
+      "str": "៝",
+      "unicode": "17DD",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F117",
+      "str": "ៜ",
+      "unicode": "17DC",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F118",
+      "str": "៎",
+      "unicode": "17CE",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F119",
+      "str": "៖",
+      "unicode": "17D6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11A",
+      "str": "៙",
+      "unicode": "17D9",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11B",
+      "str": "៚",
+      "unicode": "17DA",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11C",
+      "str": "៓",
+      "unicode": "17D3",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11D",
+      "str": "៘",
+      "unicode": "17D8",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11E",
+      "str": "‌",
+      "unicode": "200C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F11F",
+      "str": "‍",
+      "unicode": "200D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F120",
+      "str": "]",
+      "unicode": "005D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F121",
+      "str": "[",
+      "unicode": "005B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F122",
+      "str": "/",
+      "unicode": "002F",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F123",
+      "str": ".",
+      "unicode": "002E",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F124",
+      "str": "‘",
+      "unicode": "2018",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F125",
+      "str": "+",
+      "unicode": "002B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F126",
+      "str": "&",
+      "unicode": "0026",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F127",
+      "str": "’",
+      "unicode": "2019",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F128",
+      "str": "*",
+      "unicode": "002A",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F129",
+      "str": "@",
+      "unicode": "0040",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12A",
+      "str": "\\",
+      "unicode": "005C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12B",
+      "str": "}",
+      "unicode": "007D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12C",
+      "str": "{",
+      "unicode": "007B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12D",
+      "str": "-",
+      "unicode": "002D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12E",
+      "str": "÷",
+      "unicode": "00F7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F12F",
+      "str": ":",
+      "unicode": "003A",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F130",
+      "str": ",",
+      "unicode": "002C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F131",
+      "str": "≈",
+      "unicode": "2248",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F132",
+      "str": ";",
+      "unicode": "003B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F133",
+      "str": "<",
+      "unicode": "003C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F134",
+      "str": "#",
+      "unicode": "0023",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F135",
+      "str": ">",
+      "unicode": "003E",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F136",
+      "str": "×",
+      "unicode": "00D7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F137",
+      "str": "$",
+      "unicode": "0024",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F138",
+      "str": "€",
+      "unicode": "20AC",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F139",
+      "str": "",
+      "unicode": "",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F13A",
+      "str": "៸",
+      "unicode": "17F8",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F13B",
+      "str": "៰",
+      "unicode": "17F0",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F13C",
+      "str": "៱",
+      "unicode": "17F1",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F13D",
+      "str": "៲",
+      "unicode": "17F2",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F13E",
+      "str": "៳",
+      "unicode": "17F3",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F13F",
+      "str": "៴",
+      "unicode": "17F4",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F140",
+      "str": "៵",
+      "unicode": "17F5",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F141",
+      "str": "៶",
+      "unicode": "17F6",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F142",
+      "str": "៷",
+      "unicode": "17F7",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F143",
+      "str": "៹",
+      "unicode": "17F9",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F144",
+      "str": "᧿",
+      "unicode": "19FF",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F145",
+      "str": "᧾",
+      "unicode": "19FE",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F146",
+      "str": "᧪",
+      "unicode": "19EA",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F147",
+      "str": "᧫",
+      "unicode": "19EB",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F148",
+      "str": "᧶",
+      "unicode": "19F6",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F149",
+      "str": "᧵",
+      "unicode": "19F5",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14A",
+      "str": "᧬",
+      "unicode": "19EC",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14B",
+      "str": "᧷",
+      "unicode": "19F7",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14C",
+      "str": "᧥",
+      "unicode": "19E5",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14D",
+      "str": "᧸",
+      "unicode": "19F8",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14E",
+      "str": "᧡",
+      "unicode": "19E1",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F14F",
+      "str": "᧻",
+      "unicode": "19FB",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F150",
+      "str": "᧹",
+      "unicode": "19F9",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F151",
+      "str": "᧮",
+      "unicode": "19EE",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F152",
+      "str": "᧢",
+      "unicode": "19E2",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F153",
+      "str": "᧯",
+      "unicode": "19EF",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F154",
+      "str": "᧰",
+      "unicode": "19F0",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F155",
+      "str": "᧦",
+      "unicode": "19E6",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F156",
+      "str": "᧱",
+      "unicode": "19F1",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F157",
+      "str": "᧤",
+      "unicode": "19E4",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F158",
+      "str": "᧭",
+      "unicode": "19ED",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F159",
+      "str": "᧣",
+      "unicode": "19E3",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15A",
+      "str": "᧧",
+      "unicode": "19E7",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15B",
+      "str": "᧠",
+      "unicode": "19E0",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15C",
+      "str": "᧺",
+      "unicode": "19FA",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15D",
+      "str": "᧲",
+      "unicode": "19F2",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15E",
+      "str": "᧳",
+      "unicode": "19F3",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F15F",
+      "str": "᧴",
+      "unicode": "19F4",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F160",
+      "str": "᧩",
+      "unicode": "19E9",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F161",
+      "str": "᧨",
+      "unicode": "19E8",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F162",
+      "str": "᧼",
+      "unicode": "19FC",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F163",
+      "str": "᧽",
+      "unicode": "19FD",
+      "usages": [
+        "khmer_angkor.kvks"
+      ]
+    },
+    {
+      "pua": "F164",
+      "str": "​",
+      "unicode": "200B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F165",
+      "str": "់",
+      "unicode": "17CB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F166",
+      "str": "ុំ",
+      "unicode": "17BB 17C6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F167",
+      "str": "ឥ",
+      "unicode": "17A5",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F168",
+      "str": "។",
+      "unicode": "17D4",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F169",
+      "str": "៊",
+      "unicode": "17CA",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16A",
+      "str": "០",
+      "unicode": "17E0",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16B",
+      "str": "១",
+      "unicode": "17E1",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16C",
+      "str": "២",
+      "unicode": "17E2",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16D",
+      "str": "៣",
+      "unicode": "17E3",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16E",
+      "str": "៤",
+      "unicode": "17E4",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F16F",
+      "str": "៥",
+      "unicode": "17E5",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F170",
+      "str": "៦",
+      "unicode": "17E6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F171",
+      "str": "៧",
+      "unicode": "17E7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F172",
+      "str": "៨",
+      "unicode": "17E8",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F173",
+      "str": "៩",
+      "unicode": "17E9",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F174",
+      "str": "ើ",
+      "unicode": "17BE",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F175",
+      "str": "ឲ",
+      "unicode": "17B2",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F176",
+      "str": "ៀ",
+      "unicode": "17C0",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F177",
+      "str": "ឮ",
+      "unicode": "17AE",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F178",
+      "str": "ឪ",
+      "unicode": "17AA",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F179",
+      "str": "«",
+      "unicode": "00AB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17A",
+      "str": "ា",
+      "unicode": "17B6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17B",
+      "str": "ប",
+      "unicode": "1794",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17C",
+      "str": "ច",
+      "unicode": "1785",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17D",
+      "str": "ដ",
+      "unicode": "178A",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17E",
+      "str": "េ",
+      "unicode": "17C1",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F17F",
+      "str": "ថ",
+      "unicode": "1790",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F180",
+      "str": "ង",
+      "unicode": "1784",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F181",
+      "str": "ហ",
+      "unicode": "17A0",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F182",
+      "str": "ិ",
+      "unicode": "17B7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F183",
+      "str": "្",
+      "unicode": "17D2",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F184",
+      "str": "ក",
+      "unicode": "1780",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F185",
+      "str": "ល",
+      "unicode": "179B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F186",
+      "str": "ម",
+      "unicode": "1798",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F187",
+      "str": "ន",
+      "unicode": "1793",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F188",
+      "str": "ោ",
+      "unicode": "17C4",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F189",
+      "str": "ផ",
+      "unicode": "1795",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18A",
+      "str": "ឆ",
+      "unicode": "1786",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18B",
+      "str": "រ",
+      "unicode": "179A",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18C",
+      "str": "ស",
+      "unicode": "179F",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18D",
+      "str": "ត",
+      "unicode": "178F",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18E",
+      "str": "ុ",
+      "unicode": "17BB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F18F",
+      "str": "វ",
+      "unicode": "179C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F190",
+      "str": "ឹ",
+      "unicode": "17B9",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F191",
+      "str": "ខ",
+      "unicode": "1781",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F192",
+      "str": "យ",
+      "unicode": "1799",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F193",
+      "str": "ឋ",
+      "unicode": "178B",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F194",
+      "str": "!",
+      "unicode": "0021",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F195",
+      "str": "៉",
+      "unicode": "17C9",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F196",
+      "str": "\"",
+      "unicode": "0022",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F197",
+      "str": "៛",
+      "unicode": "17DB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F198",
+      "str": "%",
+      "unicode": "0025",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F199",
+      "str": "័",
+      "unicode": "17D0",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19A",
+      "str": "(",
+      "unicode": "0028",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19B",
+      "str": ")",
+      "unicode": "0029",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19C",
+      "str": "៏",
+      "unicode": "17CF",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19D",
+      "str": "=",
+      "unicode": "003D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19E",
+      "str": "ោះ",
+      "unicode": "17C4 17C7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F19F",
+      "str": "ុះ",
+      "unicode": "17BB 17C7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A0",
+      "str": "៕",
+      "unicode": "17D5",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A1",
+      "str": "?",
+      "unicode": "003F",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A2",
+      "str": "ៗ",
+      "unicode": "17D7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A3",
+      "str": "ាំ",
+      "unicode": "17B6 17C6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A4",
+      "str": "ព",
+      "unicode": "1796",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A5",
+      "str": "ជ",
+      "unicode": "1787",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A6",
+      "str": "ឌ",
+      "unicode": "178C",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A7",
+      "str": "ែ",
+      "unicode": "17C2",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A8",
+      "str": "ធ",
+      "unicode": "1792",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1A9",
+      "str": "អ",
+      "unicode": "17A2",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AA",
+      "str": "ះ",
+      "unicode": "17C7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AB",
+      "str": "ី",
+      "unicode": "17B8",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AC",
+      "str": "ញ",
+      "unicode": "1789",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AD",
+      "str": "គ",
+      "unicode": "1782",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AE",
+      "str": "ឡ",
+      "unicode": "17A1",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1AF",
+      "str": "ំ",
+      "unicode": "17C6",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B0",
+      "str": "ណ",
+      "unicode": "178E",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B1",
+      "str": "ៅ",
+      "unicode": "17C5",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B2",
+      "str": "ភ",
+      "unicode": "1797",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B3",
+      "str": "ឈ",
+      "unicode": "1788",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B4",
+      "str": "ឬ",
+      "unicode": "17AC",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B5",
+      "str": "ៃ",
+      "unicode": "17C3",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B6",
+      "str": "ទ",
+      "unicode": "1791",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B7",
+      "str": "ូ",
+      "unicode": "17BC",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B8",
+      "str": "េះ",
+      "unicode": "17C1 17C7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1B9",
+      "str": "ឺ",
+      "unicode": "17BA",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BA",
+      "str": "ឃ",
+      "unicode": "1783",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BB",
+      "str": "ួ",
+      "unicode": "17BD",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BC",
+      "str": "ឍ",
+      "unicode": "178D",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BD",
+      "str": "៍",
+      "unicode": "17CD",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BE",
+      "str": "៌",
+      "unicode": "17CC",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1BF",
+      "str": "ឿ",
+      "unicode": "17BF",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C0",
+      "str": "ឭ",
+      "unicode": "17AD",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C1",
+      "str": "ឧ",
+      "unicode": "17A7",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C2",
+      "str": "»",
+      "unicode": "00BB",
+      "usages": [
+        "khmer_angkor.kvks",
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C3",
+      "str": "្ឆ",
+      "unicode": "17D2 1786",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C4",
+      "str": "្ឈ",
+      "unicode": "17D2 1788",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C5",
+      "str": "្រ",
+      "unicode": "17D2 179A",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C6",
+      "str": "្ត",
+      "unicode": "17D2 178F",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C7",
+      "str": "្ទ",
+      "unicode": "17D2 1791",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C8",
+      "str": "្យ",
+      "unicode": "17D2 1799",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1C9",
+      "str": "្ផ",
+      "unicode": "17D2 1795",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CA",
+      "str": "្ភ",
+      "unicode": "17D2 1797",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CB",
+      "str": "្ស",
+      "unicode": "17D2 179F",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CC",
+      "str": "្ដ",
+      "unicode": "17D2 178A",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CD",
+      "str": "្ឌ",
+      "unicode": "17D2 178C",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CE",
+      "str": "្ថ",
+      "unicode": "17D2 1790",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1CF",
+      "str": "្ធ",
+      "unicode": "17D2 1792",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D0",
+      "str": "្ង",
+      "unicode": "17D2 1784",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D1",
+      "str": "្អ",
+      "unicode": "17D2 17A2",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D2",
+      "str": "្ហ",
+      "unicode": "17D2 17A0",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D3",
+      "str": "្ញ",
+      "unicode": "17D2 1789",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D4",
+      "str": "្ក",
+      "unicode": "17D2 1780",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D5",
+      "str": "្គ",
+      "unicode": "17D2 1782",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D6",
+      "str": "្ល",
+      "unicode": "17D2 179B",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D7",
+      "str": "្ឋ",
+      "unicode": "17D2 178B",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D8",
+      "str": "្ឍ",
+      "unicode": "17D2 178D",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1D9",
+      "str": "្ខ",
+      "unicode": "17D2 1781",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DA",
+      "str": "្ឃ",
+      "unicode": "17D2 1783",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DB",
+      "str": "្ច",
+      "unicode": "17D2 1785",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DC",
+      "str": "្ជ",
+      "unicode": "17D2 1787",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DD",
+      "str": "្វ",
+      "unicode": "17D2 179C",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DE",
+      "str": "្ប",
+      "unicode": "17D2 1794",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1DF",
+      "str": "្ព",
+      "unicode": "17D2 1796",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E0",
+      "str": "្ន",
+      "unicode": "17D2 1793",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E1",
+      "str": "្ណ",
+      "unicode": "17D2 178E",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E2",
+      "str": "្ម",
+      "unicode": "17D2 1798",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E3",
+      "str": "១២៣",
+      "unicode": "17E1 17E2 17E3",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E4",
+      "str": "©",
+      "unicode": "00A9",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E5",
+      "str": "®",
+      "unicode": "00AE",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E6",
+      "str": "№",
+      "unicode": "2116",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E7",
+      "str": "~",
+      "unicode": "007E",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E8",
+      "str": "฿",
+      "unicode": "0E3F",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1E9",
+      "str": "¢",
+      "unicode": "00A2",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1EA",
+      "str": "£",
+      "unicode": "00A3",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1EB",
+      "str": "¥",
+      "unicode": "00A5",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1EC",
+      "str": "‰",
+      "unicode": "2030",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1ED",
+      "str": "‱",
+      "unicode": "2031",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1EE",
+      "str": "±",
+      "unicode": "00B1",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1EF",
+      "str": "_",
+      "unicode": "005F",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F0",
+      "str": "≠",
+      "unicode": "2260",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F1",
+      "str": "^",
+      "unicode": "005E",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F2",
+      "str": "¿",
+      "unicode": "00BF",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F3",
+      "str": "¡",
+      "unicode": "00A1",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F4",
+      "str": "“",
+      "unicode": "201C",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F5",
+      "str": "”",
+      "unicode": "201D",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F6",
+      "str": "|",
+      "unicode": "007C",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F7",
+      "str": "¦",
+      "unicode": "00A6",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F8",
+      "str": "§",
+      "unicode": "00A7",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1F9",
+      "str": "Ø",
+      "unicode": "00D8",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1FA",
+      "str": "≤",
+      "unicode": "2264",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1FB",
+      "str": "≥",
+      "unicode": "2265",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    },
+    {
+      "pua": "F1FC",
+      "str": "…",
+      "unicode": "2026",
+      "usages": [
+        "khmer_angkor.keyman-touch-layout"
+      ]
+    }
+  ]
+}

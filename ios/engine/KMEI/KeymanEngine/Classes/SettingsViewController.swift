@@ -12,6 +12,8 @@ import os.log
 open class SettingsViewController: UITableViewController {
   private var itemsArray = [[String: String]]()
   private var userLanguages: [String: Language] = [:]
+  private var previousPortraitKeyboardHeight: Double = 0.0
+  private var previousLandscapeKeyboardHeight: Double = 0.0
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
@@ -32,9 +34,16 @@ open class SettingsViewController: UITableViewController {
   }
   
   @objc func doneClicked(_ sender: Any) {
-    // While the called method might should be renamed, it does the job well enough.
     // This resets KMW so that any new and/or updated resources can be properly loaded.
+    os_log("SettingsViewController doneClicked", log:KeymanEngineLogger.settings, type: .info)
     Manager.shared.dismissKeyboardPicker(self)
+    
+    let newPortraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
+    let newLandscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+
+    if ((previousPortraitKeyboardHeight != newPortraitHeight) || (previousLandscapeKeyboardHeight != newLandscapeHeight)) {
+      Manager.shared.keyboardHeightChanged()
+    }
   }
   
   open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
@@ -53,7 +62,8 @@ open class SettingsViewController: UITableViewController {
   public init(/*storage: Storage*/) {
 //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
-    
+    os_log("init settings", log:KeymanEngineLogger.settings, type: .default)
+
     itemsArray = [[String: String]]()
     itemsArray.append([
       "title": NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: ""),
@@ -77,6 +87,12 @@ open class SettingsViewController: UITableViewController {
       "title": NSLocalizedString("menu-settings-spacebar-text", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid": "spacebartext"
+      ])
+    
+    itemsArray.append([
+      "title": NSLocalizedString("menu-settings-adjust-keyboard-height", bundle: engineBundle, comment: ""),
+      "subtitle": "",
+      "reuseid": "adjustkeyboardheight"
       ])
     
     if let _ = URL(string: UIApplication.openSettingsURLString) {
@@ -176,7 +192,7 @@ open class SettingsViewController: UITableViewController {
         enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         
-      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
+      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext", "adjustkeyboardheight":
         break
       default:
         let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
@@ -233,6 +249,10 @@ open class SettingsViewController: UITableViewController {
         cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.rawValue, bundle: engineBundle, comment: "")
         cell.detailTextLabel?.isEnabled = true
         break
+      case "adjustkeyboardheight":
+        cell.accessoryType = .disclosureIndicator
+        cell.detailTextLabel?.isEnabled = false
+        break
       case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
       default:
@@ -280,6 +300,8 @@ open class SettingsViewController: UITableViewController {
           SentryManager.forceError()
         case "spacebartext":
           showSpacebarText()
+        case "adjustkeyboardheight":
+          showAdjustKeyboardHeight()
         default:
           break
       }
@@ -429,4 +451,21 @@ open class SettingsViewController: UITableViewController {
     }
   }
   
+  func showAdjustKeyboardHeight() {
+    let vc = KeyboardHeightViewController()
+    if let nc = navigationController {
+      self.previousPortraitKeyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
+      self.previousLandscapeKeyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+      
+      let message = "selected Adjust Keyboard Height, previousPortraitKeyboardHeight: \(previousPortraitKeyboardHeight), previousLandscapeKeyboardHeight: \(previousLandscapeKeyboardHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .default, message)
+      
+      nc.pushViewController(vc, animated: true)
+      setIsDoneButtonEnabled(nc, true)
+    } else {
+      let message = ("No navigation controller for showing keyboard height view")
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(message)
+    }
+  }
 }

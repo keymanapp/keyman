@@ -61,7 +61,9 @@ bool km::core::action_item_list_to_actions_object(
             if(output.empty()) {
               actions->code_points_to_delete++;
             } else {
+#ifndef NDEBUG
               auto last_context_item = output.back();
+#endif
               output.pop_back();
               assert(last_context_item.type == KM_CORE_CT_CHAR);
               assert(last_context_item.character == action_items->backspace.expected_value);
@@ -71,7 +73,9 @@ bool km::core::action_item_list_to_actions_object(
             if(output.empty()) {
               // deleting a marker has no effect on the application
             } else {
+#ifndef NDEBUG
               auto last_context_item = output.back();
+#endif
               output.pop_back();
               assert(last_context_item.type == KM_CORE_CT_MARKER);
               assert(last_context_item.marker == action_items->backspace.expected_value);

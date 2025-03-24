@@ -75,7 +75,7 @@ export type LanguageAPIPropertySpec = {
  * Corresponds to the documented API for the Web engine's `addKeyboards` function
  * when a single language object is specified - not an array.
  *
- * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/15.0/reference/core/addKeyboards,
+ * See https://help.keyman.com/developer/engine/web/15.0/reference/core/addKeyboards,
  * "Using an `object`".
  */
 export type KeyboardAPIPropertySpec = {
@@ -93,7 +93,7 @@ export type KeyboardAPIPropertySpec = {
  * Corresponds to the documented API for the Web engine's `addKeyboards` function
  * when a language array is specified for the object.
  *
- * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/15.0/reference/core/addKeyboards,
+ * See https://help.keyman.com/developer/engine/web/15.0/reference/core/addKeyboards,
  * "Using an `object`".
  */
 export type KeyboardAPIPropertyMultilangSpec = {

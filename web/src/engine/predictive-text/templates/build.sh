@@ -42,7 +42,7 @@ function do_test() {
     FLAGS="-reporter mocha-teamcity-reporter"
   fi
 
-  c8 mocha $FLAGS --require test/helpers.js --recursive test
+  c8 mocha $FLAGS --require tests/helpers.js --recursive tests
 }
 
 builder_run_action configure  verify_npm_setup

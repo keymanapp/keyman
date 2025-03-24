@@ -171,9 +171,6 @@
         <DCCReference Include="..\..\global\delphi\general\InterfaceHotkeys.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilsystem.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Upload_Settings.pas"/>
-        <DCCReference Include="main\UfrmOnlineUpdateNewVersion.pas">
-            <Form>frmOnlineUpdateNewVersion</Form>
-        </DCCReference>
         <DCCReference Include="main\OnlineUpdateCheck.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\utilxml.pas"/>
         <DCCReference Include="install\UfrmInstallKeyboardFromWeb.pas">
@@ -223,9 +220,6 @@
         <DCCReference Include="util\UILanguages.pas"/>
         <DCCReference Include="main\UfrmKeyboardOptions.pas">
             <Form>frmKeyboardOptions</Form>
-        </DCCReference>
-        <DCCReference Include="main\UfrmOnlineUpdateIcon.pas">
-            <Form>frmOnlineUpdateIcon</Form>
         </DCCReference>
         <DCCReference Include="..\..\engine\keyman\KeymanTrayIcon.pas"/>
         <DCCReference Include="main\UImportOlderVersionKeyboards10.pas"/>
@@ -354,6 +348,18 @@
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.Locale.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
         <DCCReference Include="main\Keyman.Configuration.System.Main.pas"/>
+        <DCCReference Include="render\UpdateXMLRenderer.pas"/>
+        <DCCReference Include="main\Keyman.System.UpdateCheckStorage.pas"/>
+        <DCCReference Include="main\Keyman.System.RemoteUpdateCheck.pas"/>
+        <DCCReference Include="main\Keyman.System.UpdateStateMachine.pas"/>
+        <DCCReference Include="main\Keyman.System.DownloadUpdate.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas"/>
+        <DCCReference Include="main\Keyman.Configuration.UI.UfrmStartInstallNow.pas">
+            <Form>frmInstallNow</Form>
+        </DCCReference>
+        <DCCReference Include="main\Keyman.Configuration.UI.UfrmStartInstall.pas">
+            <Form>frmStartInstall</Form>
+        </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -415,13 +421,19 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
@@ -1228,6 +1240,7 @@
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
             </Deployment>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

@@ -1,5 +1,5 @@
 keymanutil_sources = [
-  'keymanutil_tests.c',
+  'keymanutil.tests.c',
   util_files,
 ]
 
@@ -55,7 +55,7 @@ print_kmp_test = executable(
 bcp47_util_tests = executable(
   'bcp47-util-tests',
   sources: [
-    'bcp47util_tests.c',
+    'bcp47util.tests.c',
     '../bcp47util.c'
   ],
   dependencies: [ gtk, icu ],

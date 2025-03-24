@@ -41,8 +41,8 @@ type -t nvm >/dev/null || {
   }
 }
 
-nvm install "$REQUIRED_NODE_VERSION"
-nvm use "$REQUIRED_NODE_VERSION"
+nvm use "$REQUIRED_NODE_VERSION" || \
+  (nvm install "$REQUIRED_NODE_VERSION" && nvm use "$REQUIRED_NODE_VERSION")
 
 # Beware the hardcoded path below -- it should already be in the system PATH
 

@@ -1,0 +1,642 @@
+store(&VERSION) '10.0'
+store(&NAME) "Khmer Angkor"
+store(&COPYRIGHT) '© SIL International'
+store(&MESSAGE) "More than just a Khmer Unicode keyboard."
+store(&TARGETS) 'any'
+store(&DISPLAYMAP) '.../KbdKhmr.json'
+store(&LAYOUTFILE) 'khmer_angkor_2024.keyman-touch-layout'
+store(&KEYBOARDVERSION) '1.5'
+store(&BITMAP) 'khmer_angkor_2024.ico'
+store(&VISUALKEYBOARD) 'khmer_angkor_2024.kvks'
+
+begin Unicode > use(main)
+
+
+
+c ==============================================STORES==============================================
+
+ 
+
+c 33 consonants and two deprecated consonants
+
+store(c_key)           [K_K] [K_X] [SHIFT K_K] [SHIFT K_X] [K_G] \
+                       [K_C] [K_Q] [SHIFT K_C] [SHIFT K_Q] [SHIFT K_J] \
+                       [K_D] [K_Z] [SHIFT K_D] [SHIFT K_Z] [SHIFT K_N] \
+                       [K_T] [K_F] [SHIFT K_T] [SHIFT K_F] [K_N] \
+                       [K_B] [K_P] [SHIFT K_B] [SHIFT K_P] [K_M] \
+                       [K_Y] [K_R] [K_L] [K_V] [K_S] [K_H] [SHIFT K_L] [SHIFT K_G] \
+                       [RALT K_K] [RALT K_B]
+store(c_out)           U+1780 U+1781 U+1782 U+1783 U+1784 \
+    	   	   	       U+1785 U+1786 U+1787 U+1788 U+1789 \
+    	   	   	       U+178A U+178B U+178C U+178D U+178E \
+    	   	   	       U+178F U+1790 U+1791 U+1792 U+1793 \
+    	   	   	       U+1794 U+1795 U+1796 U+1797 U+1798 \
+    	   	   	       U+1799 U+179A U+179B U+179C U+179F U+17A0 U+17A1 U+17A2 \
+    	   	   	       U+179D U+179E c deprecated, but they are used in minority languages
+
+c All genuine dependent vowels
+
+store(v_gen_key)       [K_A] [K_I] [SHIFT K_I] [K_W] [SHIFT K_W] [K_U] [SHIFT K_U] [SHIFT K_Y] \
+                       [K_COLON] [SHIFT K_LBRKT] [K_LBRKT] [K_E] [SHIFT K_E] [SHIFT K_S] [K_O] [SHIFT K_O]
+store(v_gen)           U+17B6 U+17B7 U+17B8 U+17B9 U+17BA U+17BB U+17BC U+17BD \
+                       U+17BE U+17BF U+17C0 U+17C1 U+17C2 U+17C3 U+17C4 U+17C5
+                       
+c All pseudo dependent vowels
+
+store(v_pseudo_key)       [SHIFT K_M] [SHIFT K_H] [RALT K_QUOTE]
+store(v_pseudo)           U+17C6 U+17C7 U+17C8
+
+c Both genuine and pseudo vowels
+
+store(v_key)           outs(v_gen_key) outs(v_pseudo_key)     
+store(v_out)           outs(v_gen)     outs(v_pseudo)
+store(v_any)           outs(v_out)
+
+c These seven vowels can be concatenated with Reahmuk (U+17C7) to make េះ  ោះ  ុះ  ិះ  ីះ  ឹះ  and ែះ.
+
+store(v_combo_R)       U+17C1 U+17C4 U+17BB U+17B7 U+17B8 U+17B9 U+17C2
+
+c these two vowels can be concatenated with Nikahit (U+17C6) to make ាំ and ុំ.
+
+store(v_combo_N)       U+17B6 U+17BB
+store(v_combo)         outs(v_combo_R) outs(v_combo_N)
+
+c Independent vowels
+
+store(ind_v_key)       [K_HYPHEN] [RALT K_I] [SHIFT K_RBRKT] [RALT K_T] [RALT K_LBRKT] [K_RBRKT] [RALT K_R] [SHIFT K_R] \
+                       [SHIFT K_BKSLASH] [K_BKSLASH] [RALT K_E] [RALT K_P] [RALT K_O] [K_EQUAL] [RALT K_RBRKT]   
+store(ind_v_out)       U+17A5 U+17A6 U+17A7 U+17A8 U+17A9 U+17AA U+17AB U+17AC \
+                       U+17AD U+17AE U+17AF U+17B0 U+17B1 U+17B2 U+17B3
+
+c Diacritics
+
+store(diacritic_key)       [K_QUOTE] [SHIFT K_7] [SHIFT K_HYPHEN] [SHIFT K_8] [SHIFT K_6] [RALT K_QUOTE] \  
+                           [RALT K_EQUAL] [RALT K_3] [RALT K_W] [RALT K_Q] [K_J] 
+store(diacritic_out)       U+17CB U+17D0 U+17CC U+17CF U+17CD U+17C8 \
+                           U+17CE U+17D1 U+17DD U+17DC U+17D2
+
+c Consonant shifter--Muusikatoan(U+17C9) and Triisap(U+17CA)
+
+store(c_shifter_key)   [SHIFT K_QUOTE] [K_SLASH]
+store(c_shifter)       U+17C9          U+17CA
+
+c punctuations
+
+store(punct_key)       [K_PERIOD] [SHIFT K_PERIOD] [RALT K_COLON] [SHIFT K_2] [RALT K_L] [RALT K_6] [RALT K_7] [RALT K_M]  
+store(punct_out)       U+17D4     U+17D5           U+17D6         U+17D7      U+17D8     U+17D9     U+17DA  U+17D3
+
+store(latin_punct_key)       [K_BKQUOTE] [SHIFT K_BKQUOTE] [SHIFT K_9] [SHIFT K_0] [SHIFT K_1] [SHIFT K_3] \
+                             [SHIFT K_5] [SHIFT K_EQUAL] [SHIFT K_SLASH] [RALT K_9] [RALT K_0] [RALT K_BKSLASH] \
+                             [RALT K_2] [RALT K_8] [RALT K_COMMA] [RALT K_D] [RALT K_PERIOD] [RALT K_SLASH] \
+                             [RALT K_Y] [RALT K_U] [RALT K_BKQUOTE] [RALT K_1] [RALT K_A] [RALT K_S] \
+                             [RALT K_F] [RALT K_G] [RALT K_HYPHEN] [RALT K_H] [RALT K_J] [RALT K_N] \
+                             [RALT K_Z] [RALT K_X] [RALT K_C] [RALT K_V]
+store(latin_punct_out)       U+00AB U+00BB U+0028 U+0029 U+0021 U+0022 \
+                             U+0025 U+003D U+003F U+007B U+007D U+005C \
+                             U+0040 U+002A U+002C U+00D7 U+002E U+002F \
+    	                     U+005B U+005D U+200D U+200C U+002B U+002D \
+    	                     U+00F7 U+003A U+2248 U+2018 U+2019 U+003B \
+    	                     U+003C U+003E U+0023 U+0026
+c white space, ZWSP, ZWJ
+store(spaces_key)   	   	 [K_SPACE] [SHIFT K_SPACE] [RALT K_SPACE]
+store(spaces_out)    	     U+200B U+0020 U+00A0
+
+c Currency: Riel, Dollar and Euro
+
+store(currency_key)       [SHIFT K_4] [RALT K_4] [RALT K_5]
+store(currency_out)       U+17DB      U+0024     U+20AC
+
+c Khmer digits 0 through 9
+
+store(digit_key)       [K_0]  [K_1]  [K_2]  [K_3]  [K_4]  [K_5]  [K_6]  [K_7]  [K_8]  [K_9]
+store(digit_out)       U+17E0 U+17E1 U+17E2 U+17E3 U+17E4 U+17E5 U+17E6 U+17E7 U+17E8 U+17E9
+
+c Khmer Lek Attak (a.k.a. divination lore)
+store(lek_attak_key)   [SHIFT RALT K_0] [SHIFT RALT K_1] [SHIFT RALT K_2] [SHIFT RALT K_3] [SHIFT RALT K_4] \
+                       [SHIFT RALT K_5] [SHIFT RALT K_6] [SHIFT RALT K_7] [SHIFT RALT K_8] [SHIFT RALT K_9]         
+store(lek_attak_out)   U+17F0 U+17F1 U+17F2 U+17F3 U+17F4 \
+                       U+17F5 U+17F6 U+17F7 U+17F8 U+17F9
+
+c Lunar date format (Khmer style)
+
+store(lunar_date_key)  [SHIFT RALT K_A] [SHIFT RALT K_B] [SHIFT RALT K_C] [SHIFT RALT K_D] [SHIFT RALT K_E] \
+                       [SHIFT RALT K_F] [SHIFT RALT K_G] [SHIFT RALT K_H] [SHIFT RALT K_I] [SHIFT RALT K_J] \
+                       [SHIFT RALT K_K] [SHIFT RALT K_L] [SHIFT RALT K_M] [SHIFT RALT K_N] [SHIFT RALT K_O] \
+    	               [SHIFT RALT K_P] [SHIFT RALT K_Q] [SHIFT RALT K_R] [SHIFT RALT K_S] [SHIFT RALT K_T] \
+    	               [SHIFT RALT K_U] [SHIFT RALT K_V] [SHIFT RALT K_W] [SHIFT RALT K_X] [SHIFT RALT K_Y] \
+    	               [SHIFT RALT K_Z] [SHIFT RALT K_COLON] [SHIFT RALT K_COMMA] [SHIFT RALT K_PERIOD] [SHIFT RALT K_LBRKT] \
+    	               [SHIFT RALT K_RBRKT] [SHIFT RALT K_QUOTE]
+store(lunar_date_out)  U+19EC U+19FB U+19F9 U+19EE U+19E2 \
+                       U+19EF U+19F0 U+19F1 U+19E7 U+19F2 \
+                       U+19F3 U+19F4 U+19FD U+19FC U+19E8 \
+    	               U+19E9 U+19E0 U+19E3 U+19ED U+19E4 \
+    	               U+19E6 U+19FA U+19E1 U+19F8 U+19E5 \
+    	               U+19F7 U+19F5 U+19FE U+19FF U+19EA \
+    	               U+19EB U+19F6
+
+c Subscripts​ for mobile/table layouts
+
+store(input_subcons) \
+                       [T_17D2_1780] [T_17D2_1781] [T_17D2_1782] [T_17D2_1783] [T_17D2_1784] [T_17D2_1785] [T_17D2_1786] [T_17D2_1787] \
+                       [T_17D2_1788] [T_17D2_1789] [T_17D2_178A] [T_17D2_178B] [T_17D2_178C] [T_17D2_178D] [T_17D2_178E] [T_17D2_178F] \
+                       [T_17D2_1790] [T_17D2_1791] [T_17D2_1792] [T_17D2_1793] [T_17D2_1794] [T_17D2_1795] [T_17D2_1796] [T_17D2_1797] \
+                       [T_17D2_1798] [T_17D2_1799] [T_17D2_179A] [T_17D2_179B] [T_17D2_179C] [T_17D2_179D] [T_17D2_179E] [T_17D2_179F] \
+                       [T_17D2_17A0] [T_17D2_17A1] [T_17D2_17A2]
+
+store(subcons) \
+                       U+1780 U+1781 U+1782 U+1783 U+1784 U+1785 U+1786 U+1787 \
+                       U+1788 U+1789 U+178F U+178B U+178C U+178D U+178E U+178F \
+                       U+1790 U+1791 U+1792 U+1793 U+1794 U+1795 U+1796 U+1797 \
+                       U+1798 U+1799 U+179A U+179B U+179C U+179D U+179E U+179F \
+                       U+17A0 U+17A1 U+17A2
+                       
+c Arabic digits 0 through 9
+
+store(arabic_digit_key) [U_0030] [U_0031] [U_0032] [U_0033] [U_0034] [U_0035] [U_0036] [U_0037] [U_0038] [U_0039]
+store(arabic_digit_out) U+0030   U+0031   U+0032   U+0033   U+0034   U+0035   U+0036   U+0037   U+0038   U+0039                        
+                    
+c These stores are for consonant (cluster) and consonant shifter configuration
+
+store(v_above)         U+17B7 U+17B8 U+17B9 U+17BA \
+                       U+17BE U+17D0               c These vowels are rendered above the base consonant.
+store(shiftable_c_1st) U+179F U+17A0 U+17A2        c These consonants shift to the 2nd series when adding U+17CA to them. 
+store(shiftable_BA)    U+1794                      c BA is unique because it can be used with both U+17CA (shift to 2nd) and and U+179C (shift to PA, still in 1st series). 
+store(shiftable_c_2nd) U+1784 U+1789 U+1798 U+1799 \
+                       U+179A U+179C U+1793 U+179B c These consonants shift to the 1st series when adding U+17C9 to them.   
+store(shiftable_c_2nd_with_BA)  outs(shiftable_c_2nd) outs(shiftable_BA)                                           
+store(c_2nd_combo_LO)  U+1799 U+1798 U+1784 U+1794 \
+                       U+179C                      c These can be combined with U+179B to make a 2nd series consonant cluster.
+store(c_2nd_combo_MO)  U+1799 U+179B U+1784 U+179A c These can be combined with U+1798 to make a 2nd series consonant cluster. 
+store(c_1st_combo_LO)  U+1794 U+17A0 U+17A2        c they can be combined with U+179B to make a 1st series consonant cluster.  
+store(c_1st_combo_MO)  U+17A0 U+179F U+17A2        c they can be combined with U+1798 to make a 1st series consonant cluster.  
+store(c_combo_SA)      U+1794 U+1799 U+179B U+1798 \
+                       U+1793 U+1789 U+1784 U+179A \
+                       U+179C U+17A2               c they can be combined with U+179F to make a 1st series consonant cluster.
+store(c_combo_QA)      U+1786 U+1788 U+1794 U+1795 \
+                       U+178F U+1791               c they can be combined with U+17A2 to make a 1st series consonant cluster.
+store(c_combo_HA)      U+179C U+17A3               c they can be combined with U+17A0 to make a 1st series consonant cluster.        
+
+
+
+c ==============================================BASIC RULES & CONSTRAINTS/ROTATIONS==============================================
+    
+
+
+group(main) using keys
+
+c Basic rules with RALT key
+
+ + any(c_key)           > index(c_out,1)
+ + any(v_key)           > index(v_out,1)
+ + any(ind_v_key)       > index(ind_v_out,1)
+ + any(diacritic_key)   > index(diacritic_out,1)
+ + any(c_shifter_key)   > index(c_shifter,1)
+ + any(punct_key)       > index(punct_out,1)
+ + any(latin_punct_key) > index(latin_punct_out,1)
+ + any(currency_key)    > index(currency_out,1)
+ + any(digit_key)       > index(digit_out,1)
+ + any(lek_attak_key)   > index(lek_attak_out,1)
+ + any(lunar_date_key)  > index(lunar_date_out,1)
+ + any(spaces_key)  	> index(spaces_out,1)
+
+c two-unicode-code-point vowels
+
++ [SHIFT K_A]          > U+17B6 U+17C6
++ [SHIFT K_V]          > U+17C1 U+17C7
++ [SHIFT K_COLON]      > U+17C4 U+17C7
++ [K_COMMA]            > U+17BB U+17C6
++ [SHIFT K_COMMA]      > U+17BB U+17C7
+
+c Constraints
+
+any(v_gen) + [K_QUOTE]              > context beep c no Bantoc after any genuine vowel  
+any(v_pseudo) + [K_QUOTE]           > context beep c no Bantoc after any pseudo vowel
+any(c_shifter) + [K_QUOTE]          > context beep c no Bantoc after Triisap/Muusikatoan 
+U+17D2 any(c_out) + [K_QUOTE]       > context beep c no Bantoc on a subscript 
+any(c_shifter) + any(c_shifter_key) > context beep c no two Triisap/Muusikatoan
+
+c Unify identical subscripts - use U+18D2 U+178F always - see page 35 of https://www.unicode.org/L2/L2022/22290-khmer-encoding.pdf
+ 
+U+17D2 + [K_D] > context(1) U+178F
+
+c Rotation
+
+U+17C7 + [SHIFT K_H]            > U+17C8       	   c U+17C7 is changed to U+17C8 when pressing [SHIFT K_H].
+U+17C8 + [SHIFT K_H]            > U+17C7       	   c U+17C8 is changed to U+17C7 when K_H is pressed.
+c any(v_gen) U+17C7 + [SHIFT K_H] > context beep     c Don't rotate between U+17C7 and U+17C8.
+
+c Press Space twice to get a White Space
+
+U+200B + [K_SPACE]  	> U+0020
+
+c One backspace deletes a two-part vowels (i.e. psuedoVowel + U+17C7)
+
+any(v_combo_N) U+17C6 + [K_BKSP] > nul
+any(v_combo_R) U+17C7 + [K_BKSP] > nul 
+
+c When pressing [K_U] after ាំ and ុំ, the U+17BB is converted to a respective consonant shifter placing before them (ាំ and ុំ).
+
+any(shiftable_c_1st) U+17B6 U+17C6 + [K_U] > context(1) U+17CA context(2) context(3) c fix ស ាំ ុ > ស៊ាំ
+any(shiftable_c_2nd_with_BA) U+17B6 U+17C6 + [K_U] > context(1) U+17C9 context(2) context(3) c fix ម ាំ  ុ > ម៉ាំ   
+
+c Consonant shifter constraints (beep when the consonant shifter is used in inappropriate environment)
+
+any(shiftable_c_1st) + [SHIFT K_QUOTE] > context U+17C9 beep 
+any(shiftable_c_2nd_with_BA) + [K_SLASH]       > context U+17CA beep
+
+c 1st series consonant clusters
+
+any(c_combo_QA) U+17D2 U+17A2 + [SHIFT K_QUOTE]     > context U+17C9 beep  
+U+179B U+17D2 any(c_1st_combo_LO) + [SHIFT K_QUOTE] > context U+17C9 beep
+U+1798 U+17D2 any(c_1st_combo_MO) + [SHIFT K_QUOTE] > context U+17C9 beep
+U+179F U+17D2 any(c_combo_SA) + [SHIFT K_QUOTE]     > context U+17C9 beep
+any(c_combo_HA) U+17D2 U+17A0 + [SHIFT K_QUOTE]     > context U+17C9 beep
+U+17A2 U+17D2 U+1784 + [SHIFT K_QUOTE]  	   	    > context U+17C9 beep
+U+17A2 U+17D2 U+179C + [SHIFT K_QUOTE]              > context U+17C9 beep
+
+c 2nd series consonant clusters
+
+U+179B U+17D2 any(c_2nd_combo_LO) + [K_SLASH] > context U+17CA beep
+U+1798 U+17D2 any(c_2nd_combo_MO) + [K_SLASH] > context U+17CA beep
+
+
+c ==============================================MOBILE/TABLET TOUCH LAYOUT==============================================
+
+
+
++ any(input_subcons) > U+17D2 index(subcons, 1)
+
+c delete a subscript (a subscript sign + a consonant) upon a backspace
+
+platform('touch') U+17D2 any(c_out) + [K_BKSP] > nul 	c working OK 
+
+ + [K_NPSTAR]        > U+002A
+ + [SHIFT K_NPSTAR]  > U+002A
+ + [K_NPPLUS]        > U+002B
+ + [SHIFT K_NPPLUS]  > U+002B
+ + [K_NPMINUS]       > U+002D
+ + [SHIFT K_NPMINUS] > U+002D
+ + [K_NPDOT]  	   	 > U+002E 
+ + [SHIFT K_NPDOT]   > U+002E      
+ + [K_NPSLASH]  	 > U+002F 
+ + [SHIFT K_NPSLASH] > U+002F
+ 
+
+
+c ==============================================NORMALIZATION==============================================
+            
+           
+
+match > use(normalise)
+
+group(normalise)
+
+c Illegitimate vowel combinations should be transformed to the legitimate ones (Case #6 and #7).
+
+U+17C1 U+17B6 > U+17C4   c when type េ and ា, tranform them to ោ
+U+17B6 U+17C1 > U+17C4   c when type ា and េ, tranform them to ោ
+U+17C1 U+17B8 > U+17BE   c when type េ and ី , tranform them to ើ
+U+17B8 U+17C1 > U+17BE   c when type ី  and េ, tranform them to ើ 
+
+c Illegitimate vowel combinations should be transformed to the legitimate ones (Case #5).
+
+U+17C6 U+17BB > U+17BB U+17C6   c when type ំ and ុ , tranform them to ុំ
+U+17C6 U+17B6 > U+17B6 U+17C6   c when type ំ and ា, tranform them to ាំ
+
+
+c Rotate vowels
+
+any(v_gen) any(v_gen)                     > context(2) c the last vowel stroke replaces the previous one.    
+
+c Rotation of two-part vowels
+
+any(v_gen) any(v_pseudo) any(v_gen)               > context(3)            c a two-part vowel rotates to a genuine vowel.
+any(v_gen) any(v_pseudo) any(v_pseudo)            > context(3)            c a two-part vowel rotates to a pseudo vowel.
+any(v_gen) any(v_gen) any(v_pseudo)               > context(2) context(3) c a genuine vowel rotates to a two-part vowel.
+any(v_pseudo) any(v_gen) any(v_pseudo)            > context(2) context(3) c a pseudo vowel roates to a two-part vowel.
+any(v_gen) any(v_pseudo) any(v_gen) any(v_pseudo) > context(3) context(4) c a two-part vowel rotates to another two-part vowel.
+any(v_pseudo) any(v_pseudo)                       > context(2)            c a pseudo vowel rotates to another pseudo vowel.
+c any(v_pseudo) any(v_gen)                          > context(2)            c a pseudo vowel roates to a genuine vowel.
+                
+c Delete extraneous coeng markers
+
+U+17D2 U+17D2                   > context(1)            c no two coengs are allowed.
+U+17D2 any(v_any)               > context(2)            c The coeng is deleted when a vowel is put after it. 
+U+17D2 any(v_gen) any(v_pseudo) > context(2) context(3) c The coeng is deleted when a pseudo vowel is put after it.
+
+c Case #1: when a subscript is typed after a vowel, the subscript should be automatically moved to before the vowel.
+
+any(v_any) U+17D2 any(subcons)            > context(2) context(3) context(1)            c a vowel has to come after a subscript.
+any(v_combo_N) U+17C6 U+17D2 any(subcons) > context(3) context(4) context(1) context(2) c these two-part vowels have to come after a subscript.
+any(v_combo_R) U+17C7 U+17D2 any(subcons) > context(3) context(4) context(1) context(2) c these two-part vowels have to come after a subscript.
+
+c a subscript placed after a shifter and a vowel (a genuine/pseudo vowel or a two-part vowel) has to move to before them.
+
+any(c_shifter) any(v_any) U+17D2 any(subcons)            > context(3) context(4) context(1) context(2)            c after a genuine/pseudo vowel
+any(c_shifter) any(v_combo_N) U+17C6 U+17D2 any(subcons) > context(4) context(5) context(1) context(2) context(3) c after a two-part vowel
+any(c_shifter) any(v_combo_R) U+17C7 U+17D2 any(subcons) > context(4) context(5) context(1) context(2) context(3) c after a two-part vowel
+
+c Case #2: when [D2+9A] is typed before a subscript, it should be moved to after it.
+
+U+17D2 U+178A U+17D2 U+179A                             > context(1) U+178F context(3) context(4)                           c change subscript ្ដ to ្ត after ្រ
+U+17D2 U+179A U+17D2 U+178A                             > context(3) U+178F context(1) context(2)                           c  ្ដ placed after ្រ has to be changed to ្ត  and placed before ្រ 
+
+U+17D2 U+178A any(v_any) U+17D2 U+179A                  > context(1) U+178F context(4) context(5) context(3)                c fixed 6e
+U+17D2 U+178A any(v_combo_N) U+17C6 U+17D2 U+179A       > context(1) U+178F context(5) context(6) context(3) context(4)
+U+17D2 U+178A any(v_combo_R) U+17C7 U+17D2 U+179A       > context(1) U+178F context(5) context(6) context(3) context(4)
+
+U+17D2 U+179A any(v_any) U+17D2 U+178A                  > context(1) U+178F context(4) context(2) context(3)                c fixed 6g
+U+17D2 U+179A any(v_combo_N) U+17C6 U+17D2 U+178A       > context(1) U+178F context(5) context(2) context(3) context(4)
+U+17D2 U+179A any(v_combo_R) U+17C7 U+17D2 U+178A       > context(1) U+178F context(5) context(2) context(3) context(4)
+
+U+17D2 U+179A any(c_shifter) U+17D2 any(subcons)        > context(4) context(5) context(1) context(2) context(3)            c when a shifter intervenes, move it to the end.
+U+17D2 U+179A U+17D2 any(subcons)                       > context(3) context(4) context(1) context(2)                       c move any subscript placed after [D2+DA] to before them  
+U+17D2 U+179A any(v_any) U+17D2 any(subcons)            > context(4) context(5) context(1) context(2) context(3)            c when a vowel intervenes, move it to the end 
+U+17D2 U+179A any(v_combo_N) U+17C6 U+17D2 any(subcons) > context(5) context(6) context(1) context(2) context(3) context(4) c when a two-part vowel intervenes, move it to the end too.
+U+17D2 U+179A any(v_combo_R) U+17C7 U+17D2 any(subcons) > context(5) context(6) context(1) context(2) context(3) context(4) c (same as stated right above)
+
+c when a subscript is placed after a consonant shifter, they should be reversed.  (Case #3)
+
+any(c_shifter) U+17D2 any(subcons) > context(2) context(3) context(1)  
+
+c Reordering - Triisap and Muusikatoan store before a vowel and a vowelcomboR and pseudo vowel.
+
+any(v_any) any(c_shifter)                              > context(2) context(1)            c place either a enguine or pseudo vowel after a consonant shifter
+any(v_gen) any(v_pseudo) any(c_shifter)                > context(3) context(1) context(2) c place a two-part vowel after a consonant shifter(i.e. មោះ៉ )
+any(c_shifter) any(v_any) any(c_shifter)               > context(3) context(2)            c when either a genuine or pseudo vowel is in between two consonant shifters, replace the one on the left with the one on the right.
+any(c_shifter) any(v_gen) any(v_pseudo) any(c_shifter) > context(2) context(3) context(4) c when a two-part vowel is in between two consonants shifter, replace the one on the left with the one the right.
+
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+c + when [BB] is place either before or after an above vowel (ិ ី ឹ ឺ ើ and ាំ) and a Samyok Sannya (Case #4)   +
+c + the [BB] should transform to a respective consonant shifter placed before the vowel.                  +
+c + the consonant shifter is a Trisap if the base consonant is ស ហ អ                                     +
+c + the consonant shifter is a Muusikatoan if the base consonant is ង ញ ម យ រ វ ប and ន ល               +
+c +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+c consonant clusters --1st > 2nd series (with U+17BB)
+
+any(c_combo_QA) U+17D2 U+17A2 U+17BB any(v_above)             > context(1) context(2) context(3) U+17CA context(5)                  
+any(c_combo_QA) U+17D2 U+17A2 U+17BB U+17B6 U+17C6            > context(1) context(2) context(3) U+17CA context(5) context(6)       
+any(c_combo_QA) U+17D2 U+17A2 any(v_above) U+17BB             > context(1) context(2) context(3) U+17CA context(4)                                         
+any(c_combo_QA) U+17D2 U+17A2 U+17BB U+17C6 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(6) context(7)
+
+U+179B U+17D2 any(c_1st_combo_LO) U+17BB any(v_above)         > context(1) context(2) context(3) U+17CA context(5)                  
+U+179B U+17D2 any(c_1st_combo_LO) U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17CA context(5) context(6)       
+U+179B U+17D2 any(c_1st_combo_LO) any(v_above) U+17BB         > context(1) context(2) context(3) U+17CA context(4)                                   
+U+179B U+17D2 any(c_1st_combo_LO) U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17CA context(6) context(7) 
+
+U+1798 U+17D2 any(c_1st_combo_MO) U+17BB any(v_above)         > context(1) context(2) context(3) U+17CA context(5)           
+U+1798 U+17D2 any(c_1st_combo_MO) U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+1798 U+17D2 any(c_1st_combo_MO) any(v_above) U+17BB         > context(1) context(2) context(3) U+17CA context(4)                      
+U+1798 U+17D2 any(c_1st_combo_MO) U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17CA context(6) context(7)
+
+U+179F U+17D2 U+1794 U+17BB any(v_above)             > context(1) context(2) context(3) U+17C9 context(5) c prevent ស្បុិ from transforming to ស្ប៊ិ​​​, but produce ស្ប៉ិ instead because ប never have Triisap shifted down.         
+U+179F U+17D2 U+1794 U+17BB U+17B6 U+17C6            > context(1) context(2) context(3) U+17C9 context(5) context(6)
+U+179F U+17D2 U+1794 any(v_above) U+17BB             > context(1) context(2) context(3) U+17C9 context(4)                      
+U+179F U+17D2 U+1794 U+17BB U+17C6 U+17B6 U+17C6     > context(1) context(2) context(3) U+17C9 context(6) context(7) 
+
+U+179F U+17D2 any(c_combo_SA) U+17BB any(v_above)             > context(1) context(2) context(3) U+17CA context(5)           
+U+179F U+17D2 any(c_combo_SA) U+17BB U+17B6 U+17C6            > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+179F U+17D2 any(c_combo_SA) any(v_above) U+17BB             > context(1) context(2) context(3) U+17CA context(4)                      
+U+179F U+17D2 any(c_combo_SA) U+17BB U+17C6 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(6) context(7) 
+
+any(c_combo_HA) U+17D2 U+17A0 U+17BB any(v_above)             > context(1) context(2) context(3) U+17CA context(5)           
+any(c_combo_HA) U+17D2 U+17A0 U+17BB U+17B6 U+17C6            > context(1) context(2) context(3) U+17CA context(5) context(6)
+any(c_combo_HA) U+17D2 U+17A0 any(v_above) U+17BB             > context(1) context(2) context(3) U+17CA context(4)                     
+any(c_combo_HA) U+17D2 U+17A0 U+17BB U+17C6 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(6) context(7) 
+
+U+17A2 U+17D2 U+1784 U+17BB any(v_above)                      > context(1) context(2) context(3) U+17CA context(5)           
+U+17A2 U+17D2 U+1784 U+17BB U+17B6 U+17C6                     > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+17A2 U+17D2 U+1784 any(v_above) U+17BB                      > context(1) context(2) context(3) U+17CA context(4)                      
+U+17A2 U+17D2 U+1784 U+17BB U+17C6 U+17B6 U+17C6              > context(1) context(2) context(3) U+17CA context(6) context(7) 
+
+U+17A2 U+17D2 U+179C U+17BB any(v_above)                      > context(1) context(2) context(3) U+17CA context(5)           
+U+17A2 U+17D2 U+179C U+17BB U+17B6 U+17C6                     > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+17A2 U+17D2 U+179C any(v_above) U+17BB                      > context(1) context(2) context(3) U+17CA context(4)                      
+U+17A2 U+17D2 U+179C U+17BB U+17C6 U+17B6 U+17C6              > context(1) context(2) context(3) U+17CA context(6) context(7)
+
+U+17A0 U+17D2 U+1794 U+17BB any(v_above)         > context(1) context(2) context(3) U+17C9 context(5)                   c change U+17BB preceded by HA and coeng BA to U+17C9 before the above vowel
+U+17A0 U+17D2 U+1794 U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17C9 context(3) context(6)        c change U+17BB preceded by HA and coeng BA to U+17C9 before ាំ 
+U+17A0 U+17D2 U+1794 any(v_above) U+17BB         > context(1) context(2) context(3) U+17C9 context(4)                   c change U+17BB preceded by HA and coeng BA to U+17C9 before the above vowel  
+U+17A0 U+17D2 U+1794 U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17C9 context(6) context(7)        c change U+17BB preceded by HA and coeng BA to U+17C9 before U+17B6 U+17C6
+
+
+U+17A0 U+17D2 any(shiftable_c_2nd_with_BA) U+17BB any(v_above)         > context(1) context(2) context(3) U+17CA context(5)                   c change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before the above vowel
+U+17A0 U+17D2 any(shiftable_c_2nd_with_BA) U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17CA context(3) context(6)        c change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before ាំ 
+U+17A0 U+17D2 any(shiftable_c_2nd_with_BA) any(v_above) U+17BB         > context(1) context(2) context(3) U+17CA context(4)                   c change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before the above vowel  
+U+17A0 U+17D2 any(shiftable_c_2nd_with_BA) U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17CA context(6) context(7)        c change U+17BB preceded by HA and coeng shiftable_c_2nd to U+17CA before U+17B6 U+17C6
+
+c consonant clusters --2nd > 1st series (with U+17BB)
+
+U+179B U+17D2 any(c_2nd_combo_LO) U+17BB any(v_above)         > context(1) context(2) context(3) U+17C9 context(5)
+U+179B U+17D2 any(c_2nd_combo_LO) U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17C9 context(5) context(6)
+U+179B U+17D2 any(c_2nd_combo_LO) any(v_above) U+17BB         > context(1) context(2) context(3) U+17C9 context(4)  
+U+179B U+17D2 any(c_2nd_combo_LO) U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17C9 context(6) context(7)
+
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17BB any(v_above)         > context(1) context(2) context(3) U+17C9 context(5)
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17BB U+17B6 U+17C6        > context(1) context(2) context(3) U+17C9 context(5) context(6)
+U+1798 U+17D2 any(c_2nd_combo_MO) any(v_above) U+17BB         > context(1) context(2) context(3) U+17C9 context(4) 
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17BB U+17C6 U+17B6 U+17C6 > context(1) context(2) context(3) U+17C9 context(6) context(7)
+
+c single consonants --1st > 2nd series (with U+17BB)
+
+any(shiftable_c_1st) U+17BB any(v_above)         > context(1) U+17CA context(3)                   c change U+17BB to U+17CA before the above vowel 
+any(shiftable_c_1st) U+17BB U+17B6 U+17C6        > context(1) U+17CA context(3) context(4)        c change U+17BB to U+17CA before ាំ 
+any(shiftable_c_1st) any(v_above) U+17BB         > context(1) U+17CA context(2)                   c change U+17BB to U+17CA and place it before the above vowel
+any(shiftable_c_1st) U+17BB U+17C6 U+17B6 U+17C6 > context(1) U+17CA context(4) context(5) c change U+17BB U+17C6 to U+17CA 
+
+c single consonants --2nd > 1st series (with U+17BB)
+
+any(shiftable_c_2nd_with_BA) U+17BB any(v_above)         > context(1) U+17C9 context(3)                   c change U+17BB to U+17C9 before the above vowel
+any(shiftable_c_2nd_with_BA) U+17BB U+17B6 U+17C6        > context(1) U+17C9 context(3) context(4)        c change U+17BB to U+17C9 before ាំ 
+any(shiftable_c_2nd_with_BA) any(v_above) U+17BB         > context(1) U+17C9 context(2)                   c change U+17BB to U+17C9 before the above vowel  
+any(shiftable_c_2nd_with_BA) U+17BB U+17C6 U+17B6 U+17C6 > context(1) U+17C9 context(4) context(5) c change U+17BB U+17C6 to U+17C9 
+                                                                                                       
+c prevent incorrect use of consonant shifter with 2nd series consonant clusters (without U+17BB)
+
+U+179B U+17D2 any(c_2nd_combo_LO) U+17CA any(v_above)             > context(1) context(2) context(3) U+17C9 context(5)
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17CA any(v_above)             > context(1) context(2) context(3) U+17C9 context(5)
+U+179B U+17D2 any(c_2nd_combo_LO) U+17CA any(v_gen) any(v_pseudo) > context(1) context(2) context(3) U+17C9 context(5) context(6)
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17CA any(v_gen) any(v_pseudo) > context(1) context(2) context(3) U+17C9 context(5) context(6)
+
+c single consonants --2nd > 1st series (without U+17BB)
+
+any(shiftable_c_2nd) U+17CA any(v_above)             > context(1) U+17C9 context(3)                   c change U+17CA to U+17C9 before the above vowel
+any(shiftable_c_2nd) U+17CA any(v_gen) any(v_pseudo) > context(1) U+17C9 context(3) context(4)        c change U+17CA to U+17C9 before ាំ
+
+U+17D2 any(shiftable_c_2nd) U+17CA any(v_above)             > context   c stop ស្រ៊ី  from becoming ស្រ៉ី
+U+17D2 any(shiftable_c_2nd) U+17CA any(v_gen) any(v_pseudo) > context
+
+c SPECIAL CASE -- the following clusters may accept either of the two consonant shifters.
+
+U+1794 U+17D2 U+1799 any(c_shifter) > context
+U+179F U+17D2 U+1794 any(c_shifter) > context
+U+1786 U+17D2 U+1794 any(c_shifter) > context
+U+1794 U+17D2 U+1799 any(c_shifter) > context
+U+179F U+17D2 U+1794 any(c_shifter) > context
+U+1786 U+17D2 U+1794 any(c_shifter) > context
+
+c single --1st > 2nd series (without U+17BB)
+
+any(shiftable_c_1st) U+17C9 any(v_above)             > context(1) U+17CA context(3)                   c change U+17C9 to U+17CA before the above vowel
+any(shiftable_c_1st) U+17C9 any(v_gen) any(v_pseudo) > context(1) U+17CA context(3) context(4)        c change U+17C9 to U+17CA before ាំ  
+
+c consonant clusters --1st > 2nd series (without U+17BB)
+
+any(c_combo_QA) U+17D2 U+17A2 U+17C9 any(v_above)      > context(1) context(2) context(3) U+17CA context(5)  
+U+179B U+17D2 any(c_1st_combo_LO) U+17C9 any(v_above)  > context(1) context(2) context(3) U+17CA context(5) 
+U+1798 U+17D2 any(c_1st_combo_MO) U+17C9 any(v_above)  > context(1) context(2) context(3) U+17CA context(5)
+U+179F U+17D2 U+1794 U+17C9 any(v_above)               > context(1) context(2) context(3) U+17C9 context(5)  c prevent ស្ប៉ី from transforming to ស្ប៊ី
+U+179F U+17D2 any(c_combo_SA) U+17C9 any(v_above)      > context(1) context(2) context(3) U+17CA context(5)  
+any(c_combo_HA) U+17D2 U+17A0 U+17C9 any(v_above)      > context(1) context(2) context(3) U+17CA context(5)  
+U+17A2 U+17D2 U+1784 U+17C9 any(v_above)               > context(1) context(2) context(3) U+17CA context(5)   	   	  
+U+17A2 U+17D2 U+179C U+17C9 any(v_above)               > context(1) context(2) context(3) U+17CA context(5)
+any(c_combo_QA) U+17D2 U+17A2 U+17C9 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+179B U+17D2 any(c_1st_combo_LO) U+17C9 U+17B6 U+17C6 > context(1) context(2) context(3) U+17CA context(5) context(6)       
+U+1798 U+17D2 any(c_1st_combo_MO) U+17C9 U+17B6 U+17C6 > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+179F U+17D2 U+1794 U+17C9 U+17B6 U+17C6              > context(1) context(2) context(3) U+17C9 context(5) context(6) c prevent ស្ប៉ាំ from transforming to ស្ប៊ាំ
+U+179F U+17D2 any(c_combo_SA) U+17C9 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(5) context(6)
+any(c_combo_HA) U+17D2 U+17A0 U+17C9 U+17B6 U+17C6     > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+17A2 U+17D2 U+1784 U+17C9 U+17B6 U+17C6              > context(1) context(2) context(3) U+17CA context(5) context(6)
+U+17A2 U+17D2 U+179C U+17C9 U+17B6 U+17C6              > context(1) context(2) context(3) U+17CA context(5) context(6)
+
+c U+17B6 U+17BB and U+17C6 in that order preceeded by any first series consonant (cluster) are transformed to U+17CA U+17B6 and U+17C6
+
+any(shiftable_c_1st) U+17B6 U+17BB U+17C6              > context(1) U+17CA context(2) context(4) 
+any(shiftable_c_1st) U+17BB U+17C6 U+17B6              > context(1) U+17CA context(4) context(3)  
+
+any(c_combo_QA) U+17D2 U+17A2 U+17B6 U+17BB U+17C6     > context(1) context(2) context(3) U+17CA context(4) context(6)
+any(c_combo_QA) U+17D2 U+17A2 U+17BB U+17C6 U+17B6     > context(1) context(2) context(3) U+17CA context(6) context(5)
+  
+U+179B U+17D2 any(c_1st_combo_LO) U+17B6 U+17BB U+17C6 > context(1) context(2) context(3) U+17CA context(4) context(6) 
+U+179B U+17D2 any(c_1st_combo_LO) U+17BB U+17C6 U+17B6 > context(1) context(2) context(3) U+17CA context(6) context(5) 
+
+U+1798 U+17D2 any(c_1st_combo_MO) U+17B6 U+17BB U+17C6 > context(1) context(2) context(3) U+17CA context(4) context(6) 
+U+1798 U+17D2 any(c_1st_combo_MO) U+17BB U+17C6 U+17B6 > context(1) context(2) context(3) U+17CA context(6) context(5) 
+
+U+179F U+17D2 any(c_combo_SA) U+17B6 U+17BB U+17C6     > context(1) context(2) context(3) U+17CA context(4) context(6)   
+U+179F U+17D2 any(c_combo_SA) U+17BB U+17C6 U+17B6     > context(1) context(2) context(3) U+17CA context(6) context(5)   
+
+any(c_combo_HA) U+17D2 U+17A0 U+17B6 U+17BB U+17C6     > context(1) context(2) context(3) U+17CA context(4) context(6)   
+any(c_combo_HA) U+17D2 U+17A0 U+17BB U+17C6 U+17B6     > context(1) context(2) context(3) U+17CA context(6) context(5)   
+
+U+17A2 U+17D2 U+1784 U+17B6 U+17BB U+17C6              > context(1) context(2) context(3) U+17CA context(4) context(6)    	   	  
+U+17A2 U+17D2 U+1784 U+17BB U+17C6 U+17B6              > context(1) context(2) context(3) U+17CA context(6) context(5)    	   	  
+
+U+17A2 U+17D2 U+179C U+17B6 U+17BB U+17C6              > context(1) context(2) context(3) U+17CA context(4) context(6)  
+U+17A2 U+17D2 U+179C U+17BB U+17C6 U+17B6              > context(1) context(2) context(3) U+17CA context(4) context(6)  
+
+c U+17B6 U+17BB and U+17C6 in that order preceeded by any second series consonant (cluster) are transformed to U+17C9 U+17B6 and U+17C6
+
+any(shiftable_c_2nd_with_BA) U+17B6 U+17BB U+17C6 > context(1) U+17C9 context(2) context(4) 
+any(shiftable_c_2nd_with_BA) U+17BB U+17C6 U+17B6 > context(1) U+17C9 context(4) context(3) 
+
+U+179B U+17D2 any(c_2nd_combo_LO) U+17B6 U+17BB U+17C6 > context(1) context(2) context(3) U+17C9 context(4) context(6)
+U+179B U+17D2 any(c_2nd_combo_LO) U+17BB U+17C6 U+17B6 > context(1) context(2) context(3) U+17C9 context(6) context(5)
+
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17B6 U+17BB U+17C6 > context(1) context(2) context(3) U+17C9 context(4) context(6)
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17BB U+17C6 U+17B6 > context(1) context(2) context(3) U+17C9 context(6) context(5)
+
+c េុី/ុេី/៉េី  > ៊ើ
+
+any(shiftable_c_1st) U+17C1 U+17BB U+17B8               > context(1) U+17CA U+17BE    c cancel out by vowel rotation
+any(shiftable_c_1st) U+17BB U+17C1 U+17B8               > context(1) U+17CA U+17BE    c cancel out by vowel rotation
+any(shiftable_c_1st) U+17C9 U+17C1 U+17B8               > context(1) U+17CA U+17BE  
+
+any(c_combo_QA) U+17D2 U+17A2 U+17C1 U+17BB U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+any(c_combo_QA) U+17D2 U+17A2 U+17BB U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+any(c_combo_QA) U+17D2 U+17A2 U+17C9 U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE 
+
+U+179B U+17D2 any(c_1st_combo_LO) U+17C1 U+17BB U+17B8 > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+179B U+17D2 any(c_1st_combo_LO) U+17BB U+17C1 U+17B8 > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+179B U+17D2 any(c_1st_combo_LO) U+17C9 U+17C1 U+17B8 > context(1) context(2) context(3) U+17CA U+17BE
+
+U+1798 U+17D2 any(c_1st_combo_MO) U+17C1 U+17BB U+17B8 > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+1798 U+17D2 any(c_1st_combo_MO) U+17BB U+17C1 U+17B8 > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+1798 U+17D2 any(c_1st_combo_MO) U+17C9 U+17C1 U+17B8 > context(1) context(2) context(3) U+17CA U+17BE  
+
+U+179F U+17D2 any(c_combo_SA) U+17C1 U+17BB U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+179F U+17D2 any(c_combo_SA) U+17BB U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+179F U+17D2 any(c_combo_SA) U+17C9 U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE   
+
+any(c_combo_HA) U+17D2 U+17A0 U+17C1 U+17BB U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+any(c_combo_HA) U+17D2 U+17A0 U+17BB U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+any(c_combo_HA) U+17D2 U+17A0 U+17C9 U+17C1 U+17B8     > context(1) context(2) context(3) U+17CA U+17BE   
+
+U+17A2 U+17D2 U+1784 U+17C1 U+17BB U+17B8              > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation	   	  
+U+17A2 U+17D2 U+1784 U+17BB U+17C1 U+17B8              > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+17A2 U+17D2 U+1784 U+17C9 U+17C1 U+17B8              > context(1) context(2) context(3) U+17CA U+17BE   
+
+U+17A2 U+17D2 U+179C U+17C1 U+17BB U+17B8              > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+17A2 U+17D2 U+179C U+17BB U+17C1 U+17B8              > context(1) context(2) context(3) U+17CA U+17BE    c cancel out by vowel rotation
+U+17A2 U+17D2 U+179C U+17C9 U+17C1 U+17B8              > context(1) context(2) context(3) U+17CA U+17BE  
+
+c េុី/ុេី/៊េី  > ៉ើ
+
+any(shiftable_c_2nd) U+17C1 U+17BB U+17B8 > context(1) U+17C9 U+17BE  c cancel out by vowel rotation
+any(shiftable_c_2nd) U+17BB U+17C1 U+17B8 > context(1) U+17C9 U+17BE  c cancel out by vowel rotation
+any(shiftable_c_2nd) U+17CA U+17C1 U+17B8 > context(1) U+17C9 U+17BE 
+
+U+179B U+17D2 any(c_2nd_combo_LO) U+17C1 U+17BB U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE    c cancel out by vowel rotation
+U+179B U+17D2 any(c_2nd_combo_LO) U+17BB U+17C1 U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE    c cancel out by vowel rotation
+U+179B U+17D2 any(c_2nd_combo_LO) U+17CA U+17C1 U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE 
+
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17C1 U+17BB U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE    c cancel out by vowel rotation
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17BB U+17C1 U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE    c cancel out by vowel rotation
+U+1798 U+17D2 any(c_2nd_combo_MO) U+17CA U+17C1 U+17B8 > context(1) context(2) context(3) U+17C9 U+17BE
+
+c place Robat after a base before any vowel
+
+any(c_out) any(v_gen) U+17CC    > context(1) context(3) context(2)
+
+c BONUSES​(note that these combinations are invalid and they can't be found in the CN dictionary 1967 nor RH 1997, but users think they are)
+
+U+1791 U+17D2 U+1794 > U+17A1 c ទ្ប transforms to ឡ 
+
+U+1794 U+17D2 U+1789 > U+17AB c ប្ញ transforms to ឫ
+U+17AB U+17BB        > U+17AC c ឫុ transforms to ឬ
+
+U+17AD U+17B6        > U+1789 c ឭា transforms to ញ 
+U+17AE U+17B6        > U+1789 c ឮា transforms to ញ 
+
+U+1796 U+17D2 U+1789 > U+17AD c ព្ញ transforms to ឭ
+U+17AD U+17BB        > U+17AE c ឭុ transforms to ឮ
+
+U+1796 U+17D2 U+178B > U+17B0 c ព្ឋ transforms to ឰ  
+
+U+17A7 U+17B7        > U+17B1 c ឧិ transforms to ឱ
+U+17A7 U+17CC        > U+17B1 c ឧ៌  transforms to ឱ   
+U+17A7 U+17CD        > U+17B1 c ឧ៍ transforms to ឱ   
+
+c U+17D4 U+179B U+17D4 > U+17D8 c ។ល។  transforms to U+17D8
+
+U+178A U+17D2 U+1792 > U+178A U+17D2 U+178B  c ដ្ធ > ដ្ឋ
+U+1791 U+17D2 U+178B > U+1791 U+17D2 U+1792  c ទ្ឋ  > ទ្ធ
+
+c additional rules
+
+U+1796 U+1793 U+17D2 U+178B > context(1) context(2) context(3) U+1792 c ពន្ឋ > ពន្ធ
+U+1796 U+17D0 U+1793 U+17D2 U+178B > context(1) context(2) context(3) context(4) U+1792 c ព័ន្ឋ > ព័ន្ធ
+
+
+U+17AA U+17D2 U+1799 > U+17B1 context(2) context(3)  c ឪ្យ > ឱ្យ
+U+17B3 U+17D2 U+1799 > U+17B1 context(2) context(3)  c ឳ្យ > ឱ្យ
+
+U+1789 U+17D2 U+179C > U+1796 context(2) context(3) U+17B6 c ញ្វ (as in សញ្វវុធ) > ព្វា as in សញ្វវុធ
+
+U+17D2 U+1799 U+17C1 U+17BA > U+17BF c េ្យឺ > ឿ
+U+17D2 U+1799 U+17C1 U+17B9 > U+17BF c េ្យឹ > ឿ
+U+17D2 U+1799 U+17C1 U+17B8 > U+17BF c េ្យី > ឿ
+
+U+17D2 U+1799 U+17D2 any(c_out) U+17C1 U+17BA > context(3) context(4) U+17BF c គ្រេ្យឺង > គ្រឿង
+U+17D2 U+1799 U+17D2 any(c_out) U+17C1 U+17B9 > context(3) context(4) U+17BF c គ្រេ្យឹង > គ្រឿង
+U+17D2 U+1799 U+17D2 any(c_out) U+17C1 U+17B8 > context(3) context(4) U+17BF c គ្រេ្យីង > គ្រឿង
+
+c In everyday practice, both 'regular space' and 'no-break space' are not used before punctuation, i.e. ។ ! etc. 
+c An annoying issue of having line broken up at the end of the line dropping the punctuation (។, ! and also ៗ) to the next line.
+c It may be helpful to include a rule where a 'Zero Width No-Break Space' should be output together with those punct.
+c ref: https://www.unicode.org/L2/L2020/20008-core-text.pdf
+c ref: https://www.unicode.org/versions/Unicode12.0.0/ch23.pdf#G12985
+c ref: https://www.compart.com/en/unicode/U+FEFF
+
+c EOF

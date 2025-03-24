@@ -1,0 +1,65 @@
+{
+  "id": "khmer_angkor",
+  "name": "Khmer Angkor",
+  "license": "mit",
+  "authorName": "Makara Sok",
+  "authorEmail": "makara_sok@sil.org",
+  "description": "<p>Khmer Unicode keyboard layout based on the NiDA keyboard layout.\nAutomatically corrects many common keying errors.</p>",
+  "languages": {
+    "km": {
+      "examples": [
+        {
+          "keys": "x j m E r",
+          "note": "Name of language",
+          "text": "ខ្មែរ"
+        }
+      ],
+      "font": {
+        "family": "Khmer Mondulkiri",
+        "source": [
+          "Mondulkiri-R.ttf"
+        ]
+      },
+      "oskFont": {
+        "family": "KbdKhmr",
+        "source": [
+          "KbdKhmr.ttf"
+        ]
+      },
+      "languageName": "Khmer",
+      "displayName": "Khmer"
+    }
+  },
+  "lastModifiedDate": "2024-07-03T15:47:38.000Z",
+  "packageFilename": "khmer_angkor.kmp",
+  "packageFileSize": 4259005,
+  "jsFilename": "khmer_angkor.js",
+  "jsFileSize": 70494,
+  "packageIncludes": [
+    "visualKeyboard",
+    "welcome",
+    "fonts",
+    "documentation"
+  ],
+  "version": "1.5",
+  "encodings": [
+    "unicode"
+  ],
+  "platformSupport": {
+    "windows": "full",
+    "macos": "full",
+    "linux": "full",
+    "desktopWeb": "full",
+    "ios": "full",
+    "android": "full",
+    "mobileWeb": "full"
+  },
+  "minKeymanVersion": "10.0",
+  "sourcePath": "release/k/khmer_angkor",
+  "helpLink": "https://help.keyman.com/keyboard/khmer_angkor",
+  "related": {
+    "khmer10": {
+      "deprecates": true
+    }
+  }
+}

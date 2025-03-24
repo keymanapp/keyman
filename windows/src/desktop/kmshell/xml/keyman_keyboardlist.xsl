@@ -394,7 +394,7 @@
 
               <div class="list_languages">
                 <div class="popup_header"><xsl:value-of select="$locale/string[@name='S_Languages_Addremove']"/></div>
-                <div>
+                <div class="keyboard_language_list">
                   <xsl:apply-templates select="KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]">
                     <xsl:with-param name="modify">1</xsl:with-param>
                   </xsl:apply-templates>

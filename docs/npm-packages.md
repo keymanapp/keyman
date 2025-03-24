@@ -19,6 +19,7 @@ Packages are **never** published from a developer's machine.
 * `@keymanapp/kmc-model` -- located at `developer/src/kmc-model`
 * `@keymanapp/kmc-model-info` -- located at `developer/src/kmc-model-info`
 * `@keymanapp/kmc-package` -- located at `developer/src/kmc-package`
+* `@keymanapp/langtags` -- located at `common/web/langtags`
 
 ### Deprecated npm packages
 

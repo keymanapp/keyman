@@ -69,10 +69,9 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   return length;
 }
 
--(instancetype)initWithDebugMode:(BOOL)debugMode {
+-(instancetype)init {
   self = [super init];
   if (self) {
-    _debugMode = debugMode;
     [self initVirtualKeyMapping];
   }
   return self;

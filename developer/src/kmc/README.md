@@ -25,7 +25,7 @@ configuration or installation is required.
 kmc is also available as an npm package,
 [@keymanapp/kmc](https://npmjs.com/package/@keymanapp/kmc).
 
-You'll need [node.js](https://nodejs.org/), version 18.0 or later.
+You'll need [node.js](https://nodejs.org/), version 20.0 or later.
 
 ```shell
 npm install -g @keymanapp/kmc

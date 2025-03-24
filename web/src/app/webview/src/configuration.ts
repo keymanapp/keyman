@@ -3,14 +3,14 @@ import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { type OnInsertTextFunc } from "./contextManager.js";
-import { Transform } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export class WebviewConfiguration extends EngineConfiguration {
   private _embeddingApp: string;
   private _oninserttext: OnInsertTextFunc;
   private _hostInsert: OnInsertTextFunc;
 
-  private pendingInserts: Transform[] = [];
+  private pendingInserts: LexicalModelTypes.Transform[] = [];
 
   initialize(options: Required<WebviewInitOptionSpec>) {
     super.initialize(options);
@@ -45,6 +45,10 @@ export class WebviewConfiguration extends EngineConfiguration {
 
   get embeddingApp() {
     return this._embeddingApp;
+  }
+
+  set embeddingApp(name: string) {
+    this._embeddingApp = name;
   }
 
   get oninserttext() {

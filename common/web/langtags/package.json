@@ -1,0 +1,39 @@
+{
+  "name": "@keymanapp/langtags",
+  "description": "Keyman bundling of language tags from langtags.json",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "ldml",
+    "unicode"
+  ],
+  "type": "module",
+  "types": "./build/src/main.d.ts",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/main.ts",
+      "types": "./build/src/main.d.ts",
+      "default": "./build/src/main.js"
+    }
+  },
+  "files": [
+    "/build/src/"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "echo no tests for langtags"
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "sideEffects": false
+}

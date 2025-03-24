@@ -137,10 +137,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Klávesnice %1$s nainstalována</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Klávesnice smazána</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Povolit opravy</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Povolit predikce</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Vypnout návrhy</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Pouze predikce</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Predikce s opravami</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Predikce s automatickými opravami</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Slovník</string>
     <plurals name="model_count">

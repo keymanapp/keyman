@@ -331,7 +331,27 @@ public extension UserDefaults {
       set(prefs, forKey: Key.userCorrectSettings)
     }
   }
-  
+
+  var portraitKeyboardHeight: Double {
+    get {
+      return double(forKey: Key.portraitKeyboardHeight)
+    }
+
+    set(height) {
+      set(height, forKey: Key.portraitKeyboardHeight)
+    }
+  }
+
+  var landscapeKeyboardHeight: Double {
+    get {
+      return double(forKey: Key.landscapeKeyboardHeight)
+    }
+
+    set(height) {
+      set(height, forKey: Key.landscapeKeyboardHeight)
+    }
+  }
+
   func predictSettingForLanguage(languageID: String) -> Bool {
     if let dict = predictionEnablements {
       return dict[languageID] ?? true

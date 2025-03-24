@@ -133,10 +133,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s tastiera installata</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Tastiera eliminata</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Abilita correzioni</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Abilita previsioni</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Disabilita suggerimenti</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Solo previsioni</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Previsioni con correzioni</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Previsioni con correzioni automatiche</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dizionario</string>
     <plurals name="model_count">

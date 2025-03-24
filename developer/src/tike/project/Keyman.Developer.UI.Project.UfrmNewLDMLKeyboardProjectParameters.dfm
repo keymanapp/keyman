@@ -94,7 +94,7 @@ inherited frmNewLDMLKeyboardProjectParameters: TfrmNewLDMLKeyboardProjectParamet
     Top = 260
     Width = 102
     Height = 13
-    Caption = 'Supported &languages'
+    Caption = '&Supported languages'
     FocusControl = memoLanguages
   end
   object Label4: TLabel

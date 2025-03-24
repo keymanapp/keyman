@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <set>
 
 #include "keyman_core.h"
 
@@ -37,6 +38,7 @@ typedef std::pair<km_core_virtual_key, km_core_ldml_modifier_state> vkey_id;
 class vkeys {
 private:
   std::map<vkey_id, std::u16string> vkey_to_string;
+  std::set<vkey_id> all_vkeys;
 
 public:
   vkeys();
@@ -52,6 +54,11 @@ public:
    */
   std::u16string
   lookup(km_core_virtual_key vk, uint16_t modifier_state, bool &found) const;
+
+  /**
+   * For implementing ldml_processor::get_key_list()
+   */
+  km_core_keyboard_key* get_key_list() const;
 
 private:
   /**

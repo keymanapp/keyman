@@ -1,0 +1,190 @@
+{
+ "KeymanDeveloperProject": {
+  "Options": {
+   "BuildPath": "$PROJECTPATH\\build",
+   "CompilerWarningsAsErrors": "True",
+   "WarnDeprecatedCode": "True",
+   "CheckFilenameConventions": "False",
+   "ProjectType": "keyboard"
+  },
+  "Files": {
+   "File": [
+    {
+     "ID": "id_f347675c33d2e6b1c705c787fad4941a",
+     "Filename": "khmer_angkor.kmn",
+     "Filepath": "source\\khmer_angkor.kmn",
+     "FileVersion": "1.3",
+     "FileType": ".kmn",
+     "Details": {
+      "Name": "Khmer Angkor",
+      "Copyright": "© 2015-2022 SIL International",
+      "Message": "More than just a Khmer Unicode keyboard."
+     }
+    },
+    {
+     "ID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456",
+     "Filename": "khmer_angkor.kps",
+     "Filepath": "source\\khmer_angkor.kps",
+     "FileVersion": "",
+     "FileType": ".kps",
+     "Details": {
+      "Name": "Khmer Angkor",
+      "Copyright": "© 2015-2022 SIL International"
+     }
+    },
+    {
+     "ID": "id_8a1efc7c4ab7cfece8aedd847679ca27",
+     "Filename": "khmer_angkor.ico",
+     "Filepath": "source\\khmer_angkor.ico",
+     "FileVersion": "",
+     "FileType": ".ico",
+     "ParentFileID": "id_f347675c33d2e6b1c705c787fad4941a"
+    },
+    {
+     "ID": "id_8dc195db32d1fd0514de0ad51fff5df0",
+     "Filename": "khmer_angkor.js",
+     "Filepath": "source\\..\\build\\khmer_angkor.js",
+     "FileVersion": "",
+     "FileType": ".js",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_10596632fcbf4138d24bcccf53e6ae01",
+     "Filename": "khmer_angkor.kvk",
+     "Filepath": "source\\..\\build\\khmer_angkor.kvk",
+     "FileVersion": "",
+     "FileType": ".kvk",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_0a851f95ce553ecd62cbee6c32ced68f",
+     "Filename": "khmer_angkor.kmx",
+     "Filepath": "source\\..\\build\\khmer_angkor.kmx",
+     "FileVersion": "",
+     "FileType": ".kmx",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_d8b6eb05f4b7e2945c10e04c1f49e4c8",
+     "Filename": "keyboard_layout.png",
+     "Filepath": "source\\welcome\\keyboard_layout.png",
+     "FileVersion": "",
+     "FileType": ".png",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_724e5b4c63f10bc0abf7077f7c3172fc",
+     "Filename": "welcome.htm",
+     "Filepath": "source\\welcome\\welcome.htm",
+     "FileVersion": "",
+     "FileType": ".htm",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_35857cb2b54f123612735ec948400082",
+     "Filename": "FONTLOG.txt",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\FONTLOG.txt",
+     "FileVersion": "",
+     "FileType": ".txt",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_7e3afe5bb59b888b08b48cd5817d8de4",
+     "Filename": "Mondulkiri-B.ttf",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\Mondulkiri-B.ttf",
+     "FileVersion": "",
+     "FileType": ".ttf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_b9734e80f86c69ea5ae4dfa9f0083d09",
+     "Filename": "Mondulkiri-BI.ttf",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\Mondulkiri-BI.ttf",
+     "FileVersion": "",
+     "FileType": ".ttf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_25abe4d2b0abc03a5be5b666a8de776e",
+     "Filename": "Mondulkiri-I.ttf",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\Mondulkiri-I.ttf",
+     "FileVersion": "",
+     "FileType": ".ttf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_b766568498108eee46ed1601ff69c47d",
+     "Filename": "Mondulkiri-R.ttf",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\Mondulkiri-R.ttf",
+     "FileVersion": "",
+     "FileType": ".ttf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_84544d04133cab3dbfc86b91ad1a4e17",
+     "Filename": "OFL.txt",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\OFL.txt",
+     "FileVersion": "",
+     "FileType": ".txt",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_0c33fbefd1c20f487b1bea2343b3bb2c",
+     "Filename": "OFL-FAQ.txt",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\mondulkiri\\OFL-FAQ.txt",
+     "FileVersion": "",
+     "FileType": ".txt",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_a59d89fca36a310147645fa2604e521b",
+     "Filename": "KAK_Documentation_EN.pdf",
+     "Filepath": "source\\welcome\\KAK_Documentation_EN.pdf",
+     "FileVersion": "",
+     "FileType": ".pdf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_5643c4cd3933b3ada0b4af6579305ec4",
+     "Filename": "KAK_Documentation_KH.pdf",
+     "Filepath": "source\\welcome\\KAK_Documentation_KH.pdf",
+     "FileVersion": "",
+     "FileType": ".pdf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_8da344c4cea6f467013357fe099006f5",
+     "Filename": "readme.htm",
+     "Filepath": "source\\readme.htm",
+     "FileVersion": "",
+     "FileType": ".htm",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_acb0dd94c60e345d999670e999cbd159",
+     "Filename": "image002.png",
+     "Filepath": "source\\welcome\\image002.png",
+     "FileVersion": "",
+     "FileType": ".png",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_4edf70bc019f05b5ad39a2ea727ad547",
+     "Filename": "khmer_busra_kbd.ttf",
+     "Filepath": "source\\..\\..\\..\\shared\\fonts\\khmer\\busrakbd\\khmer_busra_kbd.ttf",
+     "FileVersion": "",
+     "FileType": ".ttf",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    },
+    {
+     "ID": "id_bc823844e4399751e1867016801f7327",
+     "Filename": "splash.gif",
+     "Filepath": "source\\splash.gif",
+     "FileVersion": "",
+     "FileType": ".gif",
+     "ParentFileID": "id_8d4eb765f80c9f2b0f769cf4e4aaa456"
+    }
+   ]
+  }
+ }
+}

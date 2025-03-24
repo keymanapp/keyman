@@ -29,7 +29,7 @@ namespace core
       );
 
   public:
-    kmx_processor(path);
+    kmx_processor(std::u16string const& kb_name, const std::vector<uint8_t>& data);
 
     km_core_status
     process_event(
@@ -84,6 +84,8 @@ namespace core
     supports_normalization() const override {
       return false;
     }
+
+    static bool is_handled(const std::vector<uint8_t>& buf);
   };
 
 } // namespace core

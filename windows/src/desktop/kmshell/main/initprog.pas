@@ -80,8 +80,12 @@ type
                     fmUninstallPackage, fmRegistryAdd, fmRegistryRemove,
                     fmMain, fmHelp, fmHelpKMShell,
                     fmMigrate, fmSplash, fmStart,
-                    fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
-                    fmOnlineUpdateAdmin, fmTextEditor,
+                    fmUpgradeKeyboards, // I2548
+                    fmTextEditor,
+                    fmInstallKeyboardPackageAdmin,
+                    fmBackgroundUpdateCheck,
+                    fmBackgroundDownload,
+                    fmApplyInstallNow,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
@@ -90,6 +94,7 @@ type
                     fmRepair,
                     fmKeepInTouch,
                     fmSettings,
+                    fmBoot,
 
                     // Commands from Keyman Engine
                     fmShowHint,
@@ -113,13 +118,14 @@ uses
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
   Keyman.Configuration.UI.UfrmSettingsManager,
+  Keyman.Configuration.UI.UfrmStartInstall,
   Keyman.System.KeymanStartTask,
   KeymanPaths,
   KLog,
   kmint,
   KMShellHints,
   KeymanMutex,
-  OnlineUpdateCheck,
+  Keyman.System.RemoteUpdateCheck,
   RegistryKeys,
   UfrmBaseKeyboard,
   UfrmKeymanBase,
@@ -141,6 +147,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  Keyman.System.UpdateStateMachine,
 
   KeyboardTIPCheck,
 
@@ -155,6 +162,7 @@ uses
 function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean; forward;  // I2562
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
 procedure Main(Owner: TComponent = nil);
 var
@@ -225,6 +233,7 @@ begin
         // package installation. See https://superuser.com/a/1395288/521575 and
         // https://github.com/keymanapp/keyman/issues/2467
       else if s = '-f' then FForce := True
+      else if s = '-boot' then FMode := fmBoot
       else if s = '-c' then   FMode := fmMain
       else if s = '-m' then   FMode := fmMigrate
       else if s = '-i' then   FMode := fmInstall
@@ -240,7 +249,7 @@ begin
       else if s = '-uk' then  FMode := fmUninstallKeyboard     { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
       else if s = '-ukl' then FMode := fmUninstallKeyboardLanguage   // I3624
       else if s = '-up' then  FMode := fmUninstallPackage          { I1201 - Fix crash uninstalling admin-installed keyboards and packages }
-      else if s = '-ou' then  FMode := fmOnlineUpdateAdmin     { I1730 - Check update of keyboards (admin elevation) }
+      else if s = '-ikp' then  FMode := fmInstallKeyboardPackageAdmin
       else if s = '-a' then   FMode := fmAbout
       else if s = '-ra' then  FMode := fmRegistryAdd
       else if s = '-rr' then  FMode := fmRegistryRemove
@@ -248,7 +257,9 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
-      else if s = '-ouc' then FMode := fmOnlineUpdateCheck
+      else if s = '-buc' then FMode := fmBackgroundUpdateCheck
+      else if s = '-bd' then FMode := fmBackgroundDownload
+      else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -428,6 +439,11 @@ begin
     Exit;
   end;
 
+  if ProcessBackgroundUpdate(FMode, FSilent) then
+  begin
+    Exit;
+  end;
+
   if not FSilent or (FMode = fmUpgradeMnemonicLayout) then   // I4553
   begin
     // Note: will elevate and re-run if required
@@ -444,7 +460,7 @@ begin
 
   // I1818 - remove start mode change
 
-  if FMode = fmStart then FIcon := 'appicon.ico'
+  if (FMode in [fmStart, fmBoot]) then FIcon := 'appicon.ico'
   else FIcon := 'cfgicon.ico';
 
   FIcon := GetDebugPath(FIcon, ExtractFilePath(ParamStr(0)) + FIcon, False);
@@ -468,17 +484,6 @@ begin
       if FirstRun(FQuery, FDisablePackages, FDefaultUILanguage)
         then ExitCode := 0
         else ExitCode := 2;
-
-    fmOnlineUpdateAdmin:
-      OnlineUpdateAdmin(nil, FirstKeyboardFileName);
-
-    fmOnlineUpdateCheck:
-      with TOnlineUpdateCheck.Create(nil, FForce, FSilent) do
-      try
-        Run;
-      finally
-        Free;
-      end;
 
     fmUpgradeKeyboards:// I2548
       begin
@@ -506,6 +511,11 @@ begin
 
 ////TODO:          TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
 
+    fmBoot:
+      begin
+        // on boot splash should be suppressed therefore Silent = True
+        StartKeyman(False, True, FStartWithConfiguration);
+      end;
     fmStart:
       begin  // I2720
         StartKeyman(False, FSilent, FStartWithConfiguration);
@@ -516,12 +526,16 @@ begin
     fmMain, fmAbout:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanConfiguration');
-        if FMutex.MutexOwned then Main else FocusConfiguration;
+        if FMutex.TakeOwnership
+          then Main
+          else FocusConfiguration;
       end;
     fmTextEditor:
       begin  // I2720
         FMutex := TKeymanMutex.Create('KeymanTextEditor');
-        if FMutex.MutexOwned then OpenTextEditor else FocusTextEditor;
+        if FMutex.TakeOwnership 
+          then OpenTextEditor 
+          else FocusTextEditor;
       end;
 
     fmBaseKeyboard:   // I4169
@@ -645,6 +659,77 @@ begin
       PrintKeyboard(kmcom.Keyboards[n]);
     finally
       Free;
+    end;
+end;
+
+function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
+var
+  BUpdateSM : TUpdateStateMachine;
+  frmStartInstall: TfrmStartInstall;
+  UserCanceled : Boolean;
+  SkipBUpdate : Boolean;
+begin
+  BUpdateSM := TUpdateStateMachine.Create(False);
+  Result := False;
+    try
+      if (FMode = fmBackgroundUpdateCheck) then
+      begin
+        BUpdateSM.HandleCheck;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmApplyInstallNow) then
+      begin
+        BUpdateSM.HandleInstallNow;
+        Result := True;
+        Exit;
+      end
+      else if (FMode = fmInstallKeyboardPackageAdmin) then
+      begin
+        BUpdateSM.HandleInstallPackages;
+        Result := True;
+        Exit;
+      end
+      else
+      begin
+        // Since Package upgrade and Keyman upgrade share the installing state
+        // the following package related switches are valid in the installing
+        // state.
+        SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
+        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
+        fmUpgradeMnemonicLayout]));
+        // The following logic around the WaitingRestartState should be
+        // encapsulated in the state machine however as we want separation of
+        // UI elements from the state machine we have bring some of logic here.
+        UserCanceled := False;
+        if BUpdateSM.ReadyToInstall and
+          (not FSilent and (FMode in [fmStart, fmSplash, fmMain, fmAbout,
+          fmHelp, fmShowHelp, fmSettings, fmBoot])) then
+        begin
+          frmStartInstall := TfrmStartInstall.Create(nil);
+          try
+            if frmStartInstall.ShowModal = mrOk then
+              UserCanceled := False
+            else
+              UserCanceled := True
+          finally
+            frmStartInstall.Free;
+          end;
+        end;
+        if not UserCanceled and not SkipBUpdate and (BUpdateSM.HandleKmShell = 1) then
+        begin
+          Result := True;
+          Exit;
+        end;
+      end;
+    finally
+      BUpdateSM.Free;
     end;
 end;
 

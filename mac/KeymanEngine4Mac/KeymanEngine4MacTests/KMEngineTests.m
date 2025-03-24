@@ -32,7 +32,7 @@ NSString * names[nCombinations];
 }
 
 - (void)testinitWithKMX_NilKmx_ProcessEventReturnsNil {
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:nil context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:nil context:@""];
   NSEvent *event = [[NSEvent alloc] init];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output == nil, @"Expected processEvent to return nil for nil kmx");
@@ -40,7 +40,7 @@ NSString * names[nCombinations];
 
 - (void)testinitWithKMX_ValidKmxEmptyContext_InitializedWithEmptyContext {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   XCTAssert(engine != nil, @"Expected non-nil engine");
   // Note: relying on km_core_state_context_debug output format is just barely
   // acceptable for a unit test
@@ -49,7 +49,7 @@ NSString * names[nCombinations];
 
 - (void)testinitWithKMX_ValidKmxNonEmptyContext_InitializedWithContext {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"abc" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"abc"];
   XCTAssert(engine != nil, @"Expected non-nil engine");
   // Note: relying on km_core_state_context_debug output format is just barely
   // acceptable for a unit test
@@ -58,7 +58,7 @@ NSString * names[nCombinations];
 
 - (void)testsetCoreContextIfNeeded_NonEmptyContext_InitialContextUpdated {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"a" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"a"];
   [engine setCoreContextIfNeeded:@"xyz"];
   // Note: relying on km_core_state_context_debug output format is just barely
   // acceptable for a unit test
@@ -69,7 +69,7 @@ NSString * names[nCombinations];
 /*
  - (void)testsetCoreContextIfNeeded_EmptyContext_InitialContextUpdated {
  KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
- KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+ KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
  [engine setCoreContextIfNeeded:@"xyz"];
  // Note: relying on km_core_state_context_debug output format is just barely
  // acceptable for a unit test
@@ -79,7 +79,7 @@ NSString * names[nCombinations];
 
 - (void)testprocessEvent_eventForCommandKey_ReturnsNilOutput {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagCommand timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output == nil, @"expected nil output from core");
@@ -87,7 +87,7 @@ NSString * names[nCombinations];
 
 - (void)testprocessEvent_eventWithoutKeycode_ReturnsNilOutput {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeMouseMoved location:NSMakePoint(29, 21) modifierFlags:NSEventModifierFlagShift timestamp:0 windowNumber:0 context:nil eventNumber:23 clickCount:0 pressure:0];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output == nil, @"nil CoreKeyOutput");
@@ -96,7 +96,7 @@ NSString * names[nCombinations];
 // TODO: shouldn't this return emitKeystroke = YES?
 - (void)testprocessEvent_eventForUnmappedKey_ReturnsNoActions {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"z" charactersIgnoringModifiers:@"z" isARepeat:NO keyCode:kVK_ANSI_Z];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output == nil, @"Expected nil array of actions");
@@ -104,7 +104,7 @@ NSString * names[nCombinations];
 
 - (void)testprocessEvent_eventForLowercaseA_ReturnsCharacterActionWithExpectedCharacterBasedOnKmx {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
   CoreKeyOutput *output = [engine processEvent:event];
   os_log_debug([KMELogs testLog], "output = %{public}@", output);
@@ -116,7 +116,7 @@ NSString * names[nCombinations];
 /*
  -(void)testprocessEvent_eventForCtrlShiftNumeralWithCipherMusicKmx_ReturnsQstrActionForCorrectUnicodeSurrogatePair {
  KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
- KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"" verboseLogging:YES];
+ KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
  for (int i = 1; i <= 6; i++)
  {
  unsigned short ansiCode = kVK_ANSI_1 + i - 1;
@@ -152,7 +152,7 @@ NSString * names[nCombinations];
 
 - (void)testprocessEvent_eventsForOpenCurlyBraceWithCipherMusicKmx_ReturnsCharacterForStartSlide {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   UTF32Char expectedUtf32Char = 0x1D177;
   NSString * expectedStartSlideSurrogatePair = [[NSString alloc] initWithBytes:&expectedUtf32Char length:4 encoding:NSUTF32LittleEndianStringEncoding];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagShift timestamp:0 windowNumber:0 context:nil characters:@"{" charactersIgnoringModifiers:@"[" isARepeat:NO keyCode:kVK_ANSI_LeftBracket];
@@ -165,7 +165,7 @@ NSString * names[nCombinations];
  // TODO: fails with core, investigate
  - (void)testprocessEvent_eventForUnshiftedNumeralWithCipherMusicKmx_ReturnsCharacterActionToInsertNumeral {
  KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
- KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@"" verboseLogging:YES];
+ KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile contextBuffer:@""];
  for (int i = 1; i <= 9; i++)
  {
  unsigned short ansiCode = kVK_ANSI_1 + i - 1;
@@ -185,7 +185,7 @@ NSString * names[nCombinations];
 // TODO: fails with core, returns CharacterAction
 - (void)testprocessEvent_eventForShiftNumeralsWithoutRulesInCipherMusicKmx_ReturnsNoAction {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   for (int i = 0; i <= 9; i++)
   {
     if (i == 6)
@@ -228,7 +228,7 @@ NSString * names[nCombinations];
 // TODO: fails with core, returns CharacterAction
 - (void)testprocessEvent_eventForPeriodWithCipherMusicKmx_ReturnsNoAction {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"." charactersIgnoringModifiers:@"." isARepeat:NO keyCode:kVK_ANSI_Period];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(!output.hasTextToInsert, @"expected no text to insert");
@@ -236,7 +236,7 @@ NSString * names[nCombinations];
 
 - (void)testprocessEvent_eventForCtrl8WithCipherMusicKmx_ReturnsEmit {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForCipherMusicTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:NSEventModifierFlagControl timestamp:0 windowNumber:0 context:nil characters:@"8" charactersIgnoringModifiers:@"8" isARepeat:NO keyCode:kVK_ANSI_8];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output.emitKeystroke, @"emitKeystroke == YES");
@@ -279,7 +279,7 @@ NSString * names[nCombinations];
   [KMEngineTests fillInNamesAndModifiersForAllChiralCombinations];
   
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   
   for (i = 0; i < nCombinations; i++) {
     [engine clearCoreContext];
@@ -346,7 +346,7 @@ NSString * names[nCombinations];
   [KMEngineTests fillInNamesAndModifiersForAllChiralCombinations];
   
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   
   for (i = 0; i < nCombinations; i++) {
     [engine clearCoreContext];
@@ -419,7 +419,7 @@ NSString * names[nCombinations];
 
 - (NSString *)checkPlatform_getOutputForKeystroke: (NSString*) character modifierFlags: (NSEventModifierFlags) flag keyCode:(unsigned short)code {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForPlatformTest];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSString *lcChar = [character lowercaseString];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:flag timestamp:0 windowNumber:0 context:nil characters:character charactersIgnoringModifiers:lcChar isARepeat:NO keyCode:code];
   CoreKeyOutput *output = [engine processEvent:event];
@@ -516,7 +516,7 @@ NSString * names[nCombinations];
 
 - (void)testEngine_ipaKeyboardAction_DoesNotCrash_Issue1892 {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForIndexOffsetTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"z" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"z"];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output.hasCodePointsToDelete, @"output hasCodePointsToDelete == YES");
@@ -525,7 +525,7 @@ NSString * names[nCombinations];
 
 - (void)testCoreProcessEvent_eventForFWithElNuerKmx_ReturnsCorrectCharacter {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"f" charactersIgnoringModifiers:@"f" isARepeat:NO keyCode:kVK_ANSI_F];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert([output.textToInsert isEqualToString:@"ɣ"], @"Expected output to be 'ɣ'.");
@@ -535,7 +535,7 @@ NSString * names[nCombinations];
 
 - (void)testArmenianMnemonic_triggerPersistOptions_ReturnsOptions {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForArmenianMnemonicTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"√" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"√"];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"w" charactersIgnoringModifiers:@"w" isARepeat:NO keyCode:kVK_ANSI_W];
   CoreKeyOutput *output = [engine processEvent:event];
   NSString *key = @"option_ligature_ew";
@@ -546,7 +546,7 @@ NSString * names[nCombinations];
 
 - (void)testCoreProcessEvent_backspaceElNuerEmptyContext_PassesThrough {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@""];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
   CoreKeyOutput *output = [engine processEvent:event];
   os_log_debug([KMELogs testLog], "output = %{public}@", output);
@@ -557,7 +557,7 @@ NSString * names[nCombinations];
 
 - (void)testCoreProcessEvent_backspaceElNuerWithContext_EmptiesContextReturnsDelete {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ"];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
   CoreKeyOutput *output = [engine processEvent:event];
   os_log_debug([KMELogs testLog], "output = %{public}@", output);
@@ -571,7 +571,7 @@ NSString * names[nCombinations];
 
 - (void)testCoreProcessEvent_eventReturnWithElNuerKmx_EmitWithContextEmpty {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ"];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\n" charactersIgnoringModifiers:@"\n" isARepeat:NO keyCode:kVK_Return];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output.emitKeystroke, @"Expected emitKeystroke==YES");
@@ -583,7 +583,7 @@ NSString * names[nCombinations];
 
 - (void)testCoreProcessEvent_eventTabWithElNuerKmx_EmitWithContextEmpty {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ" verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ"];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\t" charactersIgnoringModifiers:@"\t" isARepeat:NO keyCode:kVK_Tab];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output.emitKeystroke, @"Expected emitKeystroke==YES");
@@ -596,7 +596,7 @@ NSString * names[nCombinations];
 - (void)testCoreProcessEvent_eventSingleQuoteWithElNuerKmx_ReturnsDiacritic {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileForElNuerTests];
   NSString *context = @"ɛ";
-  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:context verboseLogging:YES];
+  KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:context];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"'" charactersIgnoringModifiers:@"'" isARepeat:NO keyCode:kVK_ANSI_Quote];
   CoreKeyOutput *output = [engine processEvent:event];
   XCTAssert(output.hasTextToInsert, @"returns text to insert");

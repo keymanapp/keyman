@@ -1,13 +1,13 @@
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**
  * Splits ASCII words.
  *
  * @param phrase
  */
-export default function ascii(phrase: string): Span[] {
+export default function ascii(phrase: string): LexicalModelTypes.Span[] {
   let matchWord = /[A-Za-z0-9']+/g;
-  let words: Span[] = [];
+  let words: LexicalModelTypes.Span[] = [];
   let match: RegExpExecArray | null;
   while ((match = matchWord.exec(phrase)) !== null) {
     words.push(new RegExpDerivedSpan(match[0], match.index));
@@ -20,7 +20,7 @@ export default function ascii(phrase: string): Span[] {
  * A concrete span class that derives its properties from the result of
  * RegExp.exec() array.
  */
-class RegExpDerivedSpan implements Span {
+class RegExpDerivedSpan implements LexicalModelTypes.Span {
   readonly text: string;
   readonly start: number;
 

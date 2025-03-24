@@ -1,4 +1,4 @@
-import { MarkerParser } from "@keymanapp/common-types";
+import { LdmlKeyboardTypes } from "@keymanapp/common-types";
 import { Linter } from "./linter.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
@@ -20,7 +20,7 @@ export class LinterKeycaps extends Linter {
     }
 
     public async lint(): Promise<boolean> {
-        const ANY_MARKER_REGEX = new RegExp(MarkerParser.ANY_MARKER_MATCH,'g');
+        const ANY_MARKER_REGEX = new RegExp(LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH,'g');
         // Are there any keys which:
         // 0. Are present in the layout, flicks or gestures, AND
         // 1. Consist entirely of marker output, AND

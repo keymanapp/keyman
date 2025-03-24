@@ -36,7 +36,7 @@ for proj in ${projects}; do
         EXTRA_ARGS="--distribution ${DIST} --force-distribution"
     fi
     # shellcheck disable=SC2086
-    dch --newversion "${version}-${DEBREVISION-1}" ${EXTRA_ARGS} "Re-release to Debian"
+    dch --newversion "${version}-${DEBREVISION-1}" ${EXTRA_ARGS} ""
     debuild -d -S -sa -Zxz
     cd "${BASEDIR}"
 done

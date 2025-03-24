@@ -12,6 +12,9 @@ extern "C" {
   BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
     PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved);
 
+  BOOL WINAPI TIPProcessKeyEx(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
+    PKEYMANGETCONTEXTISSELECTEDFUNC ctfunc, BOOL Updateable, BOOL Preserved);
+
   BOOL WINAPI GetKeyboardPreservedKeys(PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 
   BOOL WINAPI TIPIsKeymanRunning();
@@ -41,6 +44,11 @@ BOOL Keyman32Interface::TIPActivateKeyboard(GUID *profile) {
 BOOL Keyman32Interface::TIPProcessKey(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
     PKEYMANGETCONTEXTFUNC ctfunc, BOOL Updateable, BOOL Preserved) {
   return ::TIPProcessKey(wParam, lParam, outfunc, ctfunc, Updateable, Preserved);
+}
+
+BOOL Keyman32Interface::TIPProcessKeyEx(WPARAM wParam, LPARAM lParam, PKEYMANPROCESSOUTPUTFUNC outfunc,
+    PKEYMANGETCONTEXTISSELECTEDFUNC ctfunc, BOOL Updateable, BOOL Preserved) {
+  return ::TIPProcessKeyEx(wParam, lParam, outfunc, ctfunc, Updateable, Preserved);
 }
 
 BOOL Keyman32Interface::GetKeyboardPreservedKeys(PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {

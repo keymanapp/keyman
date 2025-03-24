@@ -35,8 +35,8 @@ public class CheckPermissions {
         checkPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
     } else {
       // API 33+
-      //https://developer.android.com/about/versions/13/behavior-changes-13#granular-media-permissions
-      // Manifest.permission.READ_MEDIA_AUDIO doesn't seem to be needed
+      // We had to remove these MEDIA permissions from AndroidManifest.xml so these will end up failing
+      // https://support.google.com/googleplay/android-developer/answer/14115180?hl=en
       permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_IMAGES);
       permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_VIDEO);
     }

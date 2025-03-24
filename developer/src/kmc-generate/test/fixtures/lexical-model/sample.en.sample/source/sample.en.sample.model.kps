@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>17.0.292.0</KeymanDeveloperVersion>
+    <FileVersion>12.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+  </Options>
+  <Info>
+    <Name URL="">Sample Project</Name>
+    <Copyright URL="">© TheAuthor</Copyright>
+    <Author URL="">Sample Author</Author>
+    <Version URL="">1.0</Version>
+    <Description URL=""># A mighty description</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\sample.en.sample.model.js</Name>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+    </File>
+  </Files>
+  <Keyboards/>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>Sample Project</Name>
+      <ID>sample.en.sample</ID>
+            <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </LexicalModel>
+  </LexicalModels>
+  <RelatedPackages/>
+</Package>

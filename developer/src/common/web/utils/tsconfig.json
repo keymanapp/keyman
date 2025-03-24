@@ -5,9 +5,12 @@
       "rootDir": ".",
       "outDir": "./build/",
       "baseUrl": ".",
+
+      /** for ttfmeta */
+      "allowJs": true,
     },
   "include": [
     "src/**/*.ts",
-    "src/deps/xml2js/*.js",
+    "src/ttfmeta/lib/*.js",
   ],
 }

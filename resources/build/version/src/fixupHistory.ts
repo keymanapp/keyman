@@ -184,7 +184,7 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
  */
 
 export const fixupHistory = async (
-  octokit: GitHub, base: string, force: boolean, writeGithubComment: boolean, from?: string, to?: string
+  octokit: GitHub, base: string, force: boolean, writeGithubComment: boolean, useGitHubPRInfo: boolean, from?: string, to?: string
 ): Promise<number> => {
 
   //
@@ -194,7 +194,7 @@ export const fixupHistory = async (
   let pulls: PRInformation[] = [];
 
   try {
-    pulls = await reportHistory(octokit, base, force, false, from, to);
+    pulls = await reportHistory(octokit, base, force, useGitHubPRInfo, from, to);
   } catch(e) {
     logWarning(String(e));
     return -1;

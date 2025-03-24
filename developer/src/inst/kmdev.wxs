@@ -59,7 +59,7 @@
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
               <Directory Id="dir_import" Name="import">
-                <Directory Id="dir_import_45" Name="45" />
+                <Directory Id="dir_import_46" Name="46" />
               </Directory>
             </Directory>
           </Directory>
@@ -198,7 +198,7 @@
     </ComponentGroup>
 
     <!-- LDML Imports -->
-    <ComponentGroup Id="LdmlImports" Directory="dir_import_45" Source="..\..\..\resources\standards-data\ldml-keyboards\45\import">
+    <ComponentGroup Id="LdmlImports" Directory="dir_import_46" Source="..\..\..\resources\standards-data\ldml-keyboards\46\import">
       <Component>
         <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
       </Component>

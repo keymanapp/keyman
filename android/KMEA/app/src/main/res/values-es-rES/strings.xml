@@ -107,7 +107,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">La descarga del diccionario inició en segundo plano</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">El diccionario seleccionado ya se está descargando; ¡por favor, inténtalo de nuevo en un momento!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">La descarga del diccionario ha finalizado.</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">Descargar falló</string>
@@ -119,7 +119,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"¡Todos los recursos están actualizados!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">¡Uno o más recursos no se han actualizado!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">¡Recursos actualizados con éxito!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Versión del diccionario</string>
@@ -133,10 +133,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Teclado %1$s instalado</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Teclado eliminado</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Habilitar correcciones</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">Habilitar predicciones</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">Desactivar sugerencias</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">Sólo predicciones</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">Predicciones con correcciones</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">Predicciones con autocorrecciones</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Diccionario</string>
     <plurals name="model_count">

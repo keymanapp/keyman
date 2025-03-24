@@ -7,8 +7,8 @@ const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
-const m = (code: number, message: string) : CompilerEvent => ({
-  ...CompilerMessageSpec(code, message),
+const m = (code: number, message: string, detail?: string) : CompilerEvent => ({
+  ...CompilerMessageSpec(code, message, detail),
   line: ModelCompilerMessageContext.line,
   filename: ModelCompilerMessageContext.filename,
 });
@@ -70,6 +70,24 @@ export class ModelCompilerMessages {
   static ERROR_UnsupportedScriptOverride = SevError | 0x000A;
   static Error_UnsupportedScriptOverride = (o:{option:string}) => m(this.ERROR_UnsupportedScriptOverride,
     `Unsupported script override: ${def(o.option)}`);
+
+  static ERROR_ModelFileNotFound = SevError | 0x000B;
+  static Error_ModelFileNotFound = (o:{filename:string}) => m(
+    this.ERROR_ModelFileNotFound,
+    `Lexical model source file ${def(o.filename)} was not found`,
+    `The model source file was not found on the disk. Verify that you have
+    the correct path to the file.`
+  );
+
+  static ERROR_WordlistFileNotFound = SevError | 0x000C;
+  static Error_WordlistFileNotFound = (o:{filename:string}) => m(
+    this.ERROR_WordlistFileNotFound,
+    `Wordlist file ${def(o.filename)} was not found`,
+    `The wordlist file was not found on the disk. Verify that you have
+    the correct path to the file.`
+  );
+
+
 };
 
 /**

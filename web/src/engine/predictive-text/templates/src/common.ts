@@ -1,5 +1,11 @@
 // Allows the kmwstring bindings to resolve.
-import { CasingForm, Context, Outcome, Suggestion, Transform, WithOutcome } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import Context = LexicalModelTypes.Context;
+import Outcome = LexicalModelTypes.Outcome;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
+import WithOutcome = LexicalModelTypes.WithOutcome;
 import { extendString } from "@keymanapp/web-utils";
 
 extendString();

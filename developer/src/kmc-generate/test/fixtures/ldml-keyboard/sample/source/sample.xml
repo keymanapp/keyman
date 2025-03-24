@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="Sample Author" name="Sample Project"/>
+  <version number="1.0.0"/>
+
+  <keys>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-currency.xml"/>
+  </keys>
+  <layers formId="us">
+    <layer modifiers="none">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>
+      <row keys="q w e r t y u i o p open-square close-square backslash"/>
+      <row keys="a s d f g h j k l semi-colon apos"/>
+      <row keys="z x c v b n m comma period slash"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="shift">
+      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>
+      <row keys="Q W E R T Y U I O P open-curly close-curly pipe"/>
+      <row keys="A S D F G H J K L colon double-quote"/>
+      <row keys="Z X C V B N M open-angle close-angle question"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="caps">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal"/>
+      <row keys="Q W E R T Y U I O P open-square close-square backslash"/>
+      <row keys="A S D F G H J K L semi-colon apos"/>
+      <row keys="Z X C V B N M comma period slash"/>
+      <row keys="space"/>
+    </layer>
+    <layer modifiers="shift caps">
+      <row keys="tilde bang at hash dollar percent caret amp asterisk open-paren close-paren underscore plus"/>
+      <row keys="q w e r t y u i o p open-curly close-curly pipe"/>
+      <row keys="a s d f g h j k l colon double-quote"/>
+      <row keys="z x c v b n m open-angle close-angle question"/>
+      <row keys="space"/>
+    </layer>
+  </layers>
+</keyboard3>

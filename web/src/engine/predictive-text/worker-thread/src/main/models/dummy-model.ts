@@ -1,6 +1,17 @@
 /// <reference types="@keymanapp/lm-message-types" />
 
-import { Capabilities, CasingForm, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, Outcome, Suggestion, Transform, WordBreakingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import CasingForm = LexicalModelTypes.CasingForm;
+import Configuration = LexicalModelTypes.Configuration;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import Outcome = LexicalModelTypes.Outcome;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 
 /*
  * Copyright (c) 2018 National Research Council Canada (author: Eddie A. Santos)

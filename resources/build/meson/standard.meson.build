@@ -84,3 +84,10 @@ if cpp_compiler.get_id() == 'emscripten'
     links += ['-O2']
   endif
 endif
+
+# Disable assertions on release builds
+if get_option('buildtype') != 'debug'
+  defns += [
+    '-DNDEBUG'
+  ]
+endif

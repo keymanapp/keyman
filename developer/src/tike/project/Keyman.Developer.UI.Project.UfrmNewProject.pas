@@ -81,6 +81,9 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.Project.UfrmCloneGitHubProjectParameters,
+  Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters,
+  Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters,
   Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
   Keyman.Developer.UI.Project.UfrmNewModelProjectParameters,
@@ -115,6 +118,12 @@ begin
       Result := ShowNewModelProjectParameters(Owner);
     kptImportWindowsKeyboard:
       Result := ShowImportWindowsKeyboard(Owner);
+    kptCloneLocalProject:
+      Result := ShowCloneLocalProjectParameters(Owner);
+    kptCloneKeymanCloudProject:
+      Result := ShowCloneKeymanCloudProjectParameters(Owner);
+    kptCloneGitHubProject:
+      Result := ShowCloneGitHubProjectParameters(Owner);
   end;
 end;
 
@@ -143,14 +152,20 @@ begin
   // Overly wordy but clarifies that we may have other types later
   if not Assigned(lvItems.Selected) then
     Result := kptUnknown
-  else if lvItems.Selected.Caption = 'Keyman Keyboard' then
+  else if lvItems.Selected.Caption = 'Keyman keyboard' then
     Result := kptBasic
-  else if lvItems.Selected.Caption = 'LDML Keyboard' then
+  else if lvItems.Selected.Caption = 'LDML keyboard' then
     Result := kptLDMLKeyboard
-  else if lvItems.Selected.Caption = 'Import Windows Keyboard' then
+  else if lvItems.Selected.Caption = 'Import Windows keyboard' then
     Result := kptImportWindowsKeyboard
-  else if lvItems.Selected.Caption = 'Wordlist Lexical Model' then
+  else if lvItems.Selected.Caption = 'Wordlist lexical model' then
     Result := kptWordlistLexicalModel
+  else if lvItems.Selected.Caption = 'Clone local project' then
+    Result := kptCloneLocalProject
+  else if lvItems.Selected.Caption = 'Clone project from Keyman Cloud'  then
+    Result := kptCloneKeymanCloudProject
+  else if lvItems.Selected.Caption = 'Clone project from GitHub' then
+    Result := kptCloneGitHubProject
   else
     Result := kptUnknown;
 end;
@@ -192,6 +207,16 @@ begin
       'Creates a new lexical model project that matches the folder structure used in '+
       'the Keyman lexical-models repository and includes all basic files '+
       'needed for a wordlist lexical model.';
+    kptCloneLocalProject: lblDescription.Caption :=
+      'Copies a Keyman keyboard or lexical model project on your local filesystem '+
+      'into a new folder, giving the project and included files a new name.';
+    kptCloneKeymanCloudProject: lblDescription.Caption :=
+      'Copies a Keyman keyboard or lexical model project from keyman.com '+
+      'into a new folder, giving the project and included files a new name.';
+    kptCloneGitHubProject: lblDescription.Caption :=
+      'Copies a Keyman keyboard or lexical model project from a GitHub '+
+      'repository into a new folder, giving the project and included files a '+
+      'new name.';
   end;
 end;
 

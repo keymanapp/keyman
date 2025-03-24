@@ -16,18 +16,18 @@ endif
 
 local_defns = ['-DKM_CORE_LIBRARY_STATIC']
 tests = [
-  ['action-api', 'action_api.cpp'],
-  ['action-set-api', 'action_set_api.cpp'],
-  ['context-api', 'context_api.cpp'],
-  ['keyboard-api', 'keyboard_api.cpp'],
-  ['options-api', 'options_api.cpp'],
-  ['state-api', 'state_api.cpp'],
-  ['state-context-api', 'state_context_api.cpp'],
-  ['debug-api', 'debug_api.cpp'],
-  ['kmx_xstring', 'test_kmx_xstring.cpp'],
-  ['kmx_context', 'test_kmx_context.cpp'],
-  ['test_actions_normalize', 'test_actions_normalize.cpp'],
-  ['test_actions_get_api', 'test_actions_get_api.cpp'],
+  ['action-api-tests', 'action_api.tests.cpp'],
+  ['action-set-api-tests', 'action_set_api.tests.cpp'],
+  ['context-api-tests', 'context_api.tests.cpp'],
+  ['keyboard-api-tests', 'keyboard_api.tests.cpp'],
+  ['options-api-tests', 'options_api.tests.cpp'],
+  ['state-api-tests', 'state_api.tests.cpp'],
+  ['state-context-api-tests', 'state_context_api.tests.cpp'],
+  ['debug-api-tests', 'debug_api.tests.cpp'],
+  ['kmx_xstring-tests', 'kmx_xstring.tests.cpp'],
+  ['kmx_context-tests', 'kmx_context.tests.cpp'],
+  ['actions_normalize-tests', 'actions_normalize.tests.cpp'],
+  ['actions_get_api-tests', 'actions_get_api.tests.cpp'],
 ]
 
 test_path = join_paths(meson.current_build_dir(), '..', 'kmx')

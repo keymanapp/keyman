@@ -1,4 +1,4 @@
-import { LexicalModelPunctuation } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export enum QuoteBehavior {
   noQuotes  = "no-quotes",
@@ -14,7 +14,7 @@ export namespace QuoteBehavior {
    * @param punctuation  The active `LexicalModelPunctuation` settings
    * @param defaultTo    The default quote behavior to use (in case the current value is `.default`)
    */
-  export function apply(behavior: QuoteBehavior, text: string, punctuation: LexicalModelPunctuation, defaultTo: QuoteBehavior): string {
+  export function apply(behavior: QuoteBehavior, text: string, punctuation: LexicalModelTypes.LexicalModelPunctuation, defaultTo: QuoteBehavior): string {
     if(defaultTo == QuoteBehavior.default || !defaultTo) {
       throw "Specified quote behavior may be ambiguous - default behavior not specified (may not be .default)";
     }

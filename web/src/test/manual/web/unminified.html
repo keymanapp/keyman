@@ -46,6 +46,10 @@
 
     <!-- Add keyboard management script for local selection of keyboards to use -->
     <script src="commonHeader.js"></script>
+    <script src="kmpHeader.js"></script>
+
+    <!-- Add local KMP loading script -->
+    <script src="../../../../build/tools/testing/bulk_rendering/lib/zip.min.js" type="application/javascript"></script>
 
   </head>
 
@@ -79,6 +83,9 @@
     <h3>Add a keyboard by language name(s):</h3>
     <input type='input' id='kbd_id3' class='kmw-disabled' onkeypress="clickOnEnter(event,3);"/>
     <input type='button' id='btn3' onclick='addKeyboard(3);' value='Add' />
+
+    <h3>Add a keyboard via local KMP:</h3>
+    <p> <input type="file" id="package-file-select" accept=".kmp"/> </p>
 
     <h3><a href="./">Return to testing home page</a></h3>
   </div>

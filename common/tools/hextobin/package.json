@@ -15,5 +15,8 @@
   "main": "build/index.js",
   "bin": {
     "hextobin": "build/hextobin.js"
+  },
+  "scripts": {
+    "postinstall": "echo configured > .configured"
   }
 }

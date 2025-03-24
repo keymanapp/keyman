@@ -1,0 +1,35 @@
+{
+ "keyboard3": {
+  "xmlns": "https://schemas.unicode.org/cldr/45/keyboard3",
+  "locale": "mt",
+  "conformsTo": "45",
+  "info": {
+   "name": "disp-maximal"
+  },
+  "displays": {
+   "display": [
+    {
+     "keyId": "g",
+     "display": "(g)"
+    },
+    {
+     "output": "f",
+     "display": "(f)"
+    },
+    {
+     "output": "${eee}",
+     "display": "(${eee})"
+    }
+   ],
+   "displayOptions": {
+    "baseCharacter": "x"
+   }
+  },
+  "variables": {
+   "string": {
+    "id": "eee",
+    "value": "e"
+   }
+  }
+ }
+}

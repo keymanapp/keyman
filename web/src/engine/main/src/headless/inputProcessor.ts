@@ -19,7 +19,7 @@ import {
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
-import { Transform } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
@@ -355,7 +355,7 @@ export class InputProcessor {
           //
           // Also possible that this set of conditions fail for all evaluated alternates.
           if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
-            let transform: Transform = alternateBehavior.transcription.transform;
+            let transform: LexicalModelTypes.Transform = alternateBehavior.transcription.transform;
 
             // Ensure that the alternate's token id matches that of the current keystroke, as we only
             // record the matched rule's context (since they match)

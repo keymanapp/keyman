@@ -1,0 +1,64 @@
+{
+ "Package": {
+  "System": {
+   "KeymanDeveloperVersion": "10.0.1024.0",
+   "FileVersion": "7.0"
+  },
+  "Options": {
+   "ExecuteProgram": "",
+   "MSIFileName": "",
+   "MSIOptions": ""
+  },
+  "StartMenu": {
+   "Folder": "",
+   "Items": ""
+  },
+  "Info": {
+   "Version": {
+    "_": "1.0",
+    "$": {
+     "URL": ""
+    }
+   },
+   "Name": {
+    "_": "Test Valid",
+    "$": {
+     "URL": ""
+    }
+   }
+  },
+  "Files": {
+   "File": [
+    {
+     "Name": "test_valid.kmx",
+     "Description": "Keyboard Test Valid",
+     "CopyLocation": "0",
+     "FileType": ".kmx"
+    },
+    {
+     "Name": "test_valid.js",
+     "Description": "Keyboard Test Valid",
+     "CopyLocation": "0",
+     "FileType": ".js"
+    }
+   ]
+  },
+  "Keyboards": {
+   "Keyboard": {
+    "Name": "Test Valid",
+    "ID": "test_valid",
+    "Version": "1.0",
+    "RTL": "True",
+    "Languages": {
+     "Language": {
+      "_": "English",
+      "$": {
+       "ID": "en"
+      }
+     }
+    }
+   }
+  },
+  "Strings": ""
+ }
+}

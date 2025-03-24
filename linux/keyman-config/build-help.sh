@@ -72,11 +72,11 @@ fi
 
 if [ -n "$generate_help" ]; then
     echo "Generating markdown help pages..."
-    mkdir -p ../help/reference
-    buildtools/help2md ./km-package-get -o ../help/reference/km-package-get.md -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
-    buildtools/help2md ./km-package-install -o ../help/reference/km-package-install.md -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
-    buildtools/help2md ./km-config -o ../help/reference/km-config.md -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
-    buildtools/help2md ./km-kvk2ldml -o ../help/reference/km-kvk2ldml.md -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
-    buildtools/help2md ./km-package-list-installed -o ../help/reference/km-package-list-installed.md -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
-    buildtools/help2md ./km-package-uninstall -o ../help/reference/km-package-uninstall.md -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
+    mkdir -p ../docs/help/reference
+    buildtools/help2md ./km-package-get -o ../docs/help/reference/km-package-get.md -n "Download a Keyman keyboard package" -I maninc/km-package-get.inc
+    buildtools/help2md ./km-package-install -o ../docs/help/reference/km-package-install.md -n "Install a Keyman keyboard package" -I maninc/km-package-install.inc
+    buildtools/help2md ./km-config -o ../docs/help/reference/km-config.md -n "Launches Keyman Configuration for installing and showing information about Keyman keyboards" -I maninc/km-config.inc
+    buildtools/help2md ./km-kvk2ldml -o ../docs/help/reference/km-kvk2ldml.md -n "Convert a Keyman on-screen keyboard file to LDML" -I maninc/km-kvk2ldml.inc
+    buildtools/help2md ./km-package-list-installed -o ../docs/help/reference/km-package-list-installed.md -n "List installed Keyman keyboard packages" -I maninc/km-package-list-installed.inc
+    buildtools/help2md ./km-package-uninstall -o ../docs/help/reference/km-package-uninstall.md -n "Uninstall a Keyman keyboard package" -I maninc/km-package-uninstall.inc
 fi

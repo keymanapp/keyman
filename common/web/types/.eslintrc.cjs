@@ -1,13 +1,13 @@
 module.exports = {
   parserOptions: {
-    project: ["./tsconfig.json", "./test/tsconfig.json"],
+    project: ["./tsconfig.json", "./tests/tsconfig.json"],
   },
   ignorePatterns: [
     ".*/*",
     "build/*",
     "coverage/*",
     "node_modules/*",
-    "test/fixtures/*",
+    "tests/fixtures/*",
     "tools/*",
     "src/schemas/*"
   ],

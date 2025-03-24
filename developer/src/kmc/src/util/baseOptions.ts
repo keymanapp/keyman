@@ -10,9 +10,10 @@ export interface CommandLineBaseOptions {
   logLevel?: CompilerLogLevel;
   logFormat?: CompilerLogFormat;
   color?: boolean;
+};
 
-  // This option is not in CompilerBaseOptions
-  outFile?:string;
+export interface CommandLineBuildBaseOptions extends CommandLineBaseOptions {
+  outFile?: string;
 }
 
 /**
@@ -27,6 +28,22 @@ export class BaseOptions {
     return program.addOption(new Option('--log-format <logFormat>', 'Log format').choices(ALL_COMPILER_LOG_FORMATS).default('formatted'));
   }
 
+  public static addColor(program: Command) {
+    return program
+      .option('--color', 'Force colorization for log messages')
+      .option('--no-color', 'No colorization for log messages; if both omitted, detects from console');
+  }
+
+  public static addAll(program: Command) {
+    return [
+      this.addLogLevel,
+      this.addLogFormat,
+      this.addColor,
+    ].reduce((p,f) => f(p), program);
+  }
+}
+
+export class BuildBaseOptions extends BaseOptions {
   public static addOutFile(program: Command) {
     return program.option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
   }
@@ -35,6 +52,7 @@ export class BaseOptions {
     return [
       this.addLogLevel,
       this.addLogFormat,
+      this.addColor,
       this.addOutFile,
     ].reduce((p,f) => f(p), program);
   }

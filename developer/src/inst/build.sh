@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 builder_describe "Installation files for Keyman Developer" \
   @/common/windows/data \
@@ -51,6 +52,7 @@ function do_clean() {
 
 function do_publish() {
   verify-program-signatures
+  verify-node-installer-version
 
   "$KEYMAN_ROOT/common/windows/cef-checkout.sh"
 
@@ -81,6 +83,10 @@ function do_publish() {
   verify-installer-signatures
 }
 
+function do_test() {
+  verify-node-installer-version
+}
+
 function copy-kmdev() {
   builder_heading copy-kmdev
 
@@ -103,6 +109,20 @@ function verify-installer-signatures() {
   builder_heading verify-installer-signatures
 
   verify-all-executable-signatures-in-folder "$DEVELOPER_ROOT/release/${VERSION}"
+}
+
+function verify-node-installer-version() {
+  builder_heading verify-node-installer-version
+
+  local REQUIRED_NODE_VERSION=$("$JQ" -r .engines.node < "$KEYMAN_ROOT/package.json")
+  local INSTALLER_NODE_VERSION="$("$THIS_SCRIPT_PATH/node/dist/node.exe" --version)"
+  INSTALLER_NODE_VERSION="${INSTALLER_NODE_VERSION##v}"
+
+  if [[ "$REQUIRED_NODE_VERSION" != "$INSTALLER_NODE_VERSION" ]]; then
+    builder_echo error "Installer node version in /developer/src/inst/node/dist/node.exe is '$INSTALLER_NODE_VERSION',"
+    builder_echo error "but the expected version per /package.json is '$REQUIRED_NODE_VERSION'."
+    builder_die "Version mismatch for bundled node.exe version"
+  fi
 }
 
 function test-releaseexists() {
@@ -264,5 +284,5 @@ function copy-schemas() {
 builder_run_action clean     do_clean
 # builder_run_action configure do_configure
 # builder_run_action build     do_build
-# builder_run_action test      do_test
+builder_run_action test      do_test
 builder_run_action publish   do_publish

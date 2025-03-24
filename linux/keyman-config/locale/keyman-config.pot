@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR SIL International
+# Copyright (C) YEAR SIL Global
 # This file is distributed under the same license as the keyman package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #

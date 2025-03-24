@@ -9,7 +9,7 @@
       "strictNullChecks": false, // TODO: get rid of this as some point
     },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "./helpers/index.ts"
   ],
   "references": [

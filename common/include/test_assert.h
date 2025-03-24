@@ -12,10 +12,10 @@
 #include <string>
 #include "test_color.h"
 
-#ifdef _assert_failed
-#undef _assert_failed
+#ifdef _test_assert_failed
+#undef _test_assert_failed
 #endif
-#define _assert_failed(result, exprText) { \
+#define _test_assert_failed(result, exprText) { \
   std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
              << "Test failed with " << (result) \
              << " at " << __FILE__ << ":" << __LINE__ << ":" \
@@ -31,23 +31,23 @@
 #define try_status(expr) { \
   auto __s = (expr); \
   if (__s != KM_CORE_STATUS_OK) { \
-    _assert_failed(__s, u ## #expr); \
+    _test_assert_failed(__s, u ## #expr); \
   } \
 }
 
-#ifdef assert
-#undef assert
+#ifdef test_assert
+#undef test_assert
 #endif
-#define assert(expr) { \
+#define test_assert(expr) { \
   if (!(expr)) { \
-    _assert_failed(0, u ## #expr); \
+    _test_assert_failed(0, u ## #expr); \
   } \
 }
 
-#ifdef assert_equal
-#undef assert_equal
+#ifdef test_assert_equal
+#undef test_assert_equal
 #endif
-#define assert_equal(actual, expected) { \
+#define test_assert_equal(actual, expected) { \
   if ((actual) != (expected)) { \
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
              << "Test failed at " << __FILE__ << ":" << __LINE__ << ":" \
@@ -59,10 +59,10 @@
   } \
 }
 
-#ifdef assert_string_equal
-#undef assert_string_equal
+#ifdef test_assert_string_equal
+#undef test_assert_string_equal
 #endif
-#define assert_string_equal(actual, expected) { \
+#define test_assert_string_equal(actual, expected) { \
   if (u16cmp((actual), (expected)) != 0) { \
     std::wcerr << console_color::fg(console_color::BRIGHT_RED) \
              << "Test failed at " << __FILE__ << ":" << __LINE__ << ":" \

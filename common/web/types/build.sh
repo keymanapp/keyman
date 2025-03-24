@@ -30,8 +30,8 @@ builder_parse "$@"
 function compile_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/45/ldml-keyboard3.schema.json"
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/45/ldml-keyboardtest3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboard3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboardtest3.schema.json"
     "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"
@@ -80,17 +80,27 @@ function do_configure() {
 }
 
 function do_test() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
+
   eslint .
-  tsc --build test
-  readonly C8_THRESHOLD=50
-  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
+  tsc --build tests
+
+  readonly C8_THRESHOLD=60
+
+  # Excludes are defined in package.json
+  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
 #-------------------------------------------------------------------------------------------------------------------
 
-builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schemas/ ./node_modules/ ./obj/
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       do_test

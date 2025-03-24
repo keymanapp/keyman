@@ -1,0 +1,19 @@
+{
+  "extends": "../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    /*
+      following two settings allow us to import langtags.js. It cannot be a .ts
+      because the type is too complex for TypeScript to infer.
+    */
+    "allowJs": true,
+    "noImplicitAny": false,
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/imports/*.js", // Import  langtags.json
+  ],
+}

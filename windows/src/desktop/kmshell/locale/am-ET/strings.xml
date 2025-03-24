@@ -321,10 +321,7 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">የእንኳን ደህና መጡ ምስልን አሳይ</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">የተሻሻሉ መረጃዎችን ለማግኘት በየሳምንቱ keyman.com ይመልከቱ</string>
+
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->

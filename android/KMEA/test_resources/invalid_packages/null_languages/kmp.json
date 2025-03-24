@@ -1,0 +1,127 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "11.0.1304.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "graphicFile": "splash.bmp"
+  },
+  "info": {
+    "name": {
+      "description": "Cameroon QWERTY"
+    },
+    "version": {
+      "description": "6.0.2"
+    },
+    "copyright": {
+      "description": "\u00A92018 SIL Cameroon"
+    },
+    "author": {
+      "description": "Matthew Lee",
+      "url": "mailto:keyboards_cameroon@sil.org"
+    },
+    "website": {
+      "description": "LangTechCameroon.info",
+      "url": "LangTechCameroon.info"
+    }
+  },
+  "files": [
+    {
+      "name": "Cameroon.ico",
+      "description": "File Cameroon.ico"
+    },
+    {
+      "name": "sil_cameroon_qwerty.css",
+      "description": "File sil_cameroon_qwerty.css"
+    },
+    {
+      "name": "AndikaAfr-R.ttf",
+      "description": "Font Andika Afr"
+    },
+    {
+      "name": "sil_cameroon_qwerty.kvk",
+      "description": "File sil_cameroon_qwerty.kvk"
+    },
+    {
+      "name": "sil_cameroon_qwerty.kmx",
+      "description": "Keyboard Cameroon QWERTY"
+    },
+    {
+      "name": "splash.bmp",
+      "description": "File splash.bmp"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "e_chart.png",
+      "description": "File e_chart.png"
+    },
+    {
+      "name": "e_tableau.png",
+      "description": "File e_tableau.png"
+    },
+    {
+      "name": "helpIcon.png",
+      "description": "File helpIcon.png"
+    },
+    {
+      "name": "ic_launcher.png",
+      "description": "File ic_launcher.png"
+    },
+    {
+      "name": "icon.png",
+      "description": "File icon.png"
+    },
+    {
+      "name": "QwertyColor.png",
+      "description": "File QwertyColor.png"
+    },
+    {
+      "name": "sil-logo-blue.png",
+      "description": "File sil-logo-blue.png"
+    },
+    {
+      "name": "kb.css",
+      "description": "File kb.css"
+    },
+    {
+      "name": "sil_cameroon_qwerty.js",
+      "description": "File sil_cameroon_qwerty.js"
+    },
+    {
+      "name": "globe.png",
+      "description": "File globe.png"
+    },
+    {
+      "name": "longpress-qwerty.png",
+      "description": "File longpress-qwerty.png"
+    },
+    {
+      "name": "modkeys-en-q.png",
+      "description": "File modkeys-en-q.png"
+    },
+    {
+      "name": "modkeys-fr-q.png",
+      "description": "File modkeys-fr-q.png"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "Cameroon QWERTY",
+      "id": "sil_cameroon_qwerty",
+      "version": "6.0.2",
+      "oskFont": "AndikaAfr-R.ttf",
+      "displayFont": "AndikaAfr-R.ttf"
+    }
+  ]
+}

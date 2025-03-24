@@ -303,10 +303,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">Kuga ncha welcome screen</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Kuga kutu keyman.com u kowani magu gadibar su bilin yer</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">Ngilaba jili application kuku nanda acitu iu thlir anwa tutuku u latu mai ma Keyman a baditsini</string>
   <!-- Context: Configuration Dialog - Options tab -->

@@ -36,14 +36,5 @@ builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
-
-if builder_start_action test; then
-  eslint .
-  cd test
-  tsc --build
-  cd ..
-  c8 --reporter=lcov --reporter=text mocha
-  builder_finish_action success test
-fi
-
+builder_run_action test       builder_do_typescript_tests
 builder_run_action publish     builder_publish_npm

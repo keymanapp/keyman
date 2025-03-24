@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+    <info name="tran-minimal" />
+
+    <keys>
+        <key id="w" output="w"/>
+    </keys>
+
+    <variables>
+        <uset id="triisap" value="[\u{17CA}]" /> <!-- unused. -->
+    </variables>
+    <transforms type="simple">
+        <transformGroup>
+            <!-- this test is identical to fail-IllegalTransformUsetRHS-1.xml except for the backslash before the dollarsign. -->
+            <transform from="w" to="\$[triisap]" /> <!-- Strange but OK- the dollarsign is escaped. -->
+        </transformGroup>
+    </transforms>
+</keyboard3>

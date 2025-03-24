@@ -36,7 +36,7 @@ function _build_help_build() {
   local CSS="$KEYMAN_ROOT/resources/build/offline-help-style-spec.txt"
   local PLATFORM="$1"
 
-  cd "$KEYMAN_ROOT/$PLATFORM/help"
+  cd "$KEYMAN_ROOT/$PLATFORM/docs/help"
   local MD=`find . -name "*.md"`
   local DESTHTM="$KEYMAN_ROOT/$PLATFORM/$2"
 
@@ -53,9 +53,9 @@ function _build_help_build() {
   #
   # Copy Images
   #
-  cd "$KEYMAN_ROOT/$PLATFORM/help/"
+  cd "$KEYMAN_ROOT/$PLATFORM/docs/help/"
   mkdir -p "$DESTHTM/${PLATFORM}_images"
-  cp $KEYMAN_ROOT/$PLATFORM/help/${PLATFORM}_images/* "$DESTHTM/${PLATFORM}_images/"
+  cp $KEYMAN_ROOT/$PLATFORM/docs/help/${PLATFORM}_images/* "$DESTHTM/${PLATFORM}_images/"
 }
 
 #
@@ -74,7 +74,7 @@ function _build_help_build() {
 #
 # ### Description
 #
-# Expects to find .md source under $KEYMAN_ROOT/$platform/help/, and
+# Expects to find .md source under $KEYMAN_ROOT/$platform/docs/help/, and
 # will write the output .html to $KEYMAN_ROOT/$platform/$output_path.
 #
 function build_help_html() {

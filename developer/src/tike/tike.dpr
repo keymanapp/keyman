@@ -228,7 +228,7 @@ uses
   Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter in '..\kmconvert\Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in 'project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
-  Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
+  Keyman.Developer.UI.Project.UfrmCloneGitHubProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneGitHubProjectParameters.pas' {frmCloneGitHubProjectParameters},
   Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters.pas' {frmNewLDMLKeyboardProjectParameters},
   Keyman.Developer.UI.Project.UfrmNewProject in 'project\Keyman.Developer.UI.Project.UfrmNewProject.pas' {frmNewProject},
   Keyman.Developer.System.KeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas',
@@ -299,7 +299,11 @@ uses
   Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas',
   Keyman.Developer.System.Main in 'main\Keyman.Developer.System.Main.pas',
   Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas',
-  Keyman.System.Debug.DebugUtils in 'debug\Keyman.System.Debug.DebugUtils.pas';
+  Keyman.System.Debug.DebugUtils in 'debug\Keyman.System.Debug.DebugUtils.pas',
+  Keyman.Developer.UI.RichEdit41 in '..\common\delphi\components\Keyman.Developer.UI.RichEdit41.pas',
+  Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
+  Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneLocalProjectParameters.pas' {frmCloneLocalProjectParameters},
+  Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmCloneKeymanCloudProjectParameters.pas' {frmCloneKeymanCloudProjectParameters};
 
 {$R *.RES}
 {$R ICONS.RES}

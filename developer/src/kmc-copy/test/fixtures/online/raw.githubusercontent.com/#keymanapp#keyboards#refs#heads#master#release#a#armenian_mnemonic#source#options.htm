@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+  <title>«Armenian Mnemonic» ստեղնաշարի կարգավորումները</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <style type='text/css'>
+    html, body { font-family: Calibri,Arial,Sylfaen,Tahoma,helvetica,sans-serif; padding: 0; margin: 0; overflow: hidden }
+    #size { padding: 12px; border: solid 1px black; background: #ffffff }
+    p, label { font-size: 12pt }
+    h3 { font: bold 14pt; margin-top: 4px; }
+    #ok_button, #cancel_button { width: 100px }
+    #buttons { text-align: right; }
+    #formopt { padding: 2px 24px }
+  </style>
+</head>
+<body>
+<div id='size'>
+  <form method='get' action='keyman:ok'>
+    <div id='formopt'>
+      <fieldset>
+        <label>Կարգավորեք R, T, P ստեղները.</label>
+        <p>
+          <input type='checkbox' value='1' name='option_key_r_letter_ra' id='option_key_r_letter_ra' />
+          <label for='option_key_r_letter_ra'> R ստեղնով մուտքագրել <i>Ռ, ռ</i> տառերը</label> <br />
+          <input type='checkbox' value='1' name='option_key_t_letter_tyun' id='option_key_t_letter_tyun' />
+          <label for='option_key_t_letter_tyun'> T ստեղնով մուտքագրել <i>Տ, տ</i> տառերը</label> <br />
+          <input type='checkbox' value='1' name='option_key_p_letter_peh' id='option_key_p_letter_peh' />
+          <label for='option_key_p_letter_peh'> P ստեղնով մուտքագրել <i>Պ, պ</i> տառերը</label>
+        </p>
+      </fieldset>
+      <fieldset>
+        <label>Ընտրեք կցագրերի օգտագործումը.</label>
+        <p>
+          <input type='checkbox' value='1' name='option_ligature_ew' id='option_ligature_ew' />
+          <label for='option_ligature_ew'> Միացնել <i>ե ւ</i> կից տառերի համար</label> <br />
+          <input type='checkbox' value='1' name='option_ligature_mv' id='option_ligature_mv' />
+          <label for='option_ligature_mv'> Միացնել <i>մ ն, մ ե, մ ի, վ ն, մ խ</i> կից տառերի համար</label>
+        </p>
+      </fieldset>
+
+    </div>
+    <p id='buttons'><input id='ok_button' type='submit' value='OK' /> <input id='cancel_button' type='reset' onclick='location.href="keyman:cancel"; return false;' value='Cancel' /></p>
+  </form>
+
+</div>
+
+  <script type='text/javascript'>
+  //<![CDATA[
+    (function() {
+      var loc = window.location.search.substr(1).split('&');
+      for(var i = 0; i < loc.length; i++)
+      {
+        var param = loc[i].split('=');
+        var key = decodeURIComponent(param[0]);
+        var val = decodeURIComponent(param[1]);
+        var elem = document.forms[0].elements[key];
+        if(elem)
+        {
+          if(typeof elem !== 'object' || typeof elem.length !== 'number') elem = [elem];
+
+          for(var j = 0; j < elem.length; j++)
+            if(elem[j].type == 'checkbox' || elem[j].type == 'radio')
+              elem[j].checked = elem[j].value == val;
+            else
+              elem[j].value = val;
+        }
+      }
+    })();
+  //]]>
+  </script>
+
+</body>
+</html>

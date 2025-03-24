@@ -57,12 +57,13 @@ function do_build() {
 function do_test() {
   local TEST_OPTIONS=
   if builder_has_option --ci; then
-    TEST_OPTIONS=--ci
+    # We'll test the included libraries here for now.  At some point, we may wish
+    # to establish a ci.sh script for predictive-text to handle this instead.
+    ./unit_tests/test.sh test:libraries test:headless test:browser --ci
+  else
+    # If we're not in --ci mode, then this doesn't need to trigger the sibling projects' tests.
+    ./unit_tests/test.sh test:headless test:browser
   fi
-
-  # We'll test the included libraries here for now.  At some point, we may wish
-  # to establish a ci.sh script for predictive-text to handle this instead.
-  ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 }
 
 builder_run_action configure  do_configure

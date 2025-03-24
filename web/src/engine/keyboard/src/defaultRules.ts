@@ -131,6 +131,13 @@ export default class DefaultRules {
 
   // Should not be used for mnenomic keyboards.  forAny()'s use of this method checks first.
   public forNumpadKeys(Lkc: KeyEvent) {
+    // Do not provide output if modifiers other than Shift are held.
+    // There may be associated shortcuts we might otherwise block.
+    // See #12483 - zooming shortcuts can trigger from CTRL & + or - on the numpad
+    if(Lkc.Lmodifiers != ModifierKeyConstants.K_SHIFTFLAG && Lkc.Lmodifiers != 0) {
+      return null;
+    }
+
     // Translate numpad keystrokes into their non-numpad equivalents
     if(Lkc.Lcode >= Codes.keyCodes["K_NP0"]  &&  Lkc.Lcode <= Codes.keyCodes["K_NPSLASH"]) {
       // Number pad, numlock on

@@ -323,10 +323,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">ಸ್ವಾಗತ ಪರದೆಯನ್ನು ತೋರಿಸು</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">ಸ್ವಯಂಚಾಲಿತವಾಗಿ ನವೀಕರಣಗಳನ್ನು www.keyman.com ನಲ್ಲಿ ಸಾಪ್ತಾಹಿಕವಾಗಿ ಪರಿಶೀಲಿಸು</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭವಾದಾಗ ವೈಫಲ್ಯದ ಅನ್ವಯಗಳನ್ನು ಪರೀಕ್ಷಿಸು</string>
   <!-- Context: Configuration Dialog - Options tab -->

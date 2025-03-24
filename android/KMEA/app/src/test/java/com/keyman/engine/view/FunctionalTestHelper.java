@@ -66,7 +66,21 @@ public class FunctionalTestHelper {
 
     Assert.assertEquals(installedKbds.size(),1);
 
-    KMManager.addKeyboard(ApplicationProvider.getApplicationContext(),(HashMap<String, String>) installedKbds.get(0));
+    HashMap<String, String> map = (HashMap<String, String>)installedKbds.get(0);
+    Keyboard keyboard = new Keyboard(
+      map.get(KMManager.KMKey_PackageID),
+      map.get(KMManager.KMKey_KeyboardID),
+      map.get(KMManager.KMKey_KeyboardName),
+      map.get(KMManager.KMKey_LanguageID),
+      map.get(KMManager.KMKey_LanguageName),
+      map.get(KMManager.KMKey_KeyboardVersion),
+      map.get(KMManager.KMKey_CustomHelpLink),
+      map.get(KMManager.KMKey_KMPLink),
+      true,
+      null,
+      null
+    );
+    KMManager.addKeyboard(ApplicationProvider.getApplicationContext(), keyboard);
   }
 
 

@@ -16,7 +16,7 @@
 + (CoreHelper *)helper {
   static CoreHelper *coreHelper = nil;
   if (coreHelper == nil) {
-    coreHelper = [[CoreHelper alloc] initWithDebugMode:YES];
+    coreHelper = [[CoreHelper alloc] init];
   }
   return coreHelper;
 }

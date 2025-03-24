@@ -26,7 +26,6 @@ inherited frmMessages: TfrmMessages
     Font.Name = 'Courier New'
     Font.Style = []
     ParentFont = False
-    PopupMenu = mnuPopup
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 0
@@ -35,6 +34,8 @@ inherited frmMessages: TfrmMessages
     OnClick = memoMessageClick
     OnDblClick = memoMessageDblClick
     OnKeyDown = memoMessageKeyDown
+    OnMouseDown = memoMessageMouseDown
+    OnMouseMove = memoMessageMouseMove
   end
   object dlgSave: TSaveDialog
     DefaultExt = 'txt'
@@ -50,6 +51,10 @@ inherited frmMessages: TfrmMessages
       Caption = '&View selected item'
       Default = True
       OnClick = mnuViewItemClick
+    end
+    object mnuOpenDocumentation: TMenuItem
+      Caption = 'Open &documentation on selected message'
+      OnClick = mnuOpenDocumentationClick
     end
     object mnuSeparator1: TMenuItem
       Caption = '-'

@@ -1,5 +1,8 @@
 import { EventEmitter } from "eventemitter3";
-import { Keep, Reversion, Suggestion } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Keep = LexicalModelTypes.Keep;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
 import { type OutputTarget } from "keyman/engine/keyboard";
 
@@ -321,7 +324,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         this.keepSuggestion = s as Keep;
       }
 
-      if(s.autoAccept && !this.selected) {
+      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
         this.selected = s;
       }
     }

@@ -1,0 +1,7 @@
+store(&NAME) 'test_missing_icon'
+store(&TARGETS) 'windows'
+store(&BITMAP) 'test_missing_icon_missing.ico'
+
+begin Unicode > use(main)
+
+group(main) using keys

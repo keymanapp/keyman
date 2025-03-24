@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-Keyman is copyright (C) SIL International. MIT License.
+Keyman is copyright (C) SIL Global. MIT License.
 
 Implements the Sentry error handling
 '''

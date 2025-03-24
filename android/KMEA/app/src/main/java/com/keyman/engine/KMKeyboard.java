@@ -31,6 +31,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -69,6 +70,10 @@ final class KMKeyboard extends WebView {
 
   protected KeyboardType keyboardType = KeyboardType.KEYBOARD_TYPE_UNDEFINED;
   protected ArrayList<String> javascriptAfterLoad = new ArrayList<>();
+
+  // .getMainLooper() returns the looper associated with the main UI thread.
+  // https://stackoverflow.com/questions/13974661/runonuithread-vs-looper-getmainlooper-post-in-android
+  private Handler jsQueuer = new Handler(Looper.getMainLooper());
 
   private static String currentKeyboard = null;
 
@@ -368,7 +373,7 @@ final class KMKeyboard extends WebView {
     if(this.javascriptAfterLoad.size() > 0) {
       // Don't call this WebView method on just ANY thread - run it on the main UI thread.
       // https://stackoverflow.com/a/22611010
-      this.postDelayed(new Runnable() {
+      jsQueuer.postDelayed(new Runnable() {
         @Override
         public void run() {
           StringBuilder allCalls = new StringBuilder();

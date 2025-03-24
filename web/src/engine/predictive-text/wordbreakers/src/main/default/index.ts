@@ -1,4 +1,4 @@
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { WordBreakProperty, propertyMap } from "./data.inc.js";
 
 import { searchForProperty } from "./searchForProperty.js";
@@ -38,7 +38,7 @@ export interface DefaultWordBreakerOptions {
  * @see http://unicode.org/reports/tr29/#Word_Boundaries
  * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
  */
-export default function default_(text: string, options?: DefaultWordBreakerOptions): Span[] {
+export default function default_(text: string, options?: DefaultWordBreakerOptions): LexicalModelTypes.Span[] {
   let boundaries = findBoundaries(text, options);
   if (boundaries.length == 0) {
     return [];
@@ -67,7 +67,7 @@ export default function default_(text: string, options?: DefaultWordBreakerOptio
 /**
  * A span that does not cut out the substring until it absolutely has to!
  */
-class LazySpan implements Span {
+class LazySpan implements LexicalModelTypes.Span {
   private _source: string;
   readonly start: number;
   readonly end: number;

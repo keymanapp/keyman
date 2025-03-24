@@ -139,7 +139,10 @@ foreach kbd : tests
   cfg.set('CONTENT', content)
 
   kbd_kmn = configure_file(
-    copy: true,
+    # not really a file that needs to be configured, but the `copy` parameter
+    # is deprecated and `fs.copyfile` doesn't work with files that are not in
+    # the source directory
+    configuration: cfg,
     input: kbd_src_path,
     output: kbd + '.kmn'
   )
@@ -174,7 +177,7 @@ subdir('fixtures')
 # should work for Linux, macOS, and WASM.
 test_path = source_path
 
-key_e = executable('key_list', ['kmx_key_list.cpp', common_test_files],
+key_e = executable('key_list_tests', ['kmx_key_list.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -193,7 +196,7 @@ test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 
 # test for imx list
 
-imx_e = executable('imx_list', ['kmx_imx.cpp', common_test_files],
+imx_e = executable('imx_list_tests', ['kmx_imx.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -211,7 +214,7 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
 )
   test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 
-external_e = executable('ext_event', ['kmx_external_event.cpp', common_test_files],
+external_e = executable('ext_event_tests', ['kmx_external_event.tests.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,

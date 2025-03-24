@@ -1,0 +1,236 @@
+{
+    "id": "jawa",
+    "name": "Nulisa Aksara Jawa",
+    "license": "mit",
+    "authorName": "Benny Lin",
+    "description": "<p>This keyboard is designed to type all Javanese characters and stacks\ndirectly. You get a Javanese character every time you press a Latin key,\nwithout having to use the Alt key or memorizing arbitrary key locations\nin QWERTY keyboard. This keyboard is based on Benny Lin&#39;s Nulisa Aksara\nJawa web transliterator program - <a href=\"http://is.gd/nulisa\">http://is.gd/nulisa</a>.</p>",
+    "languages": {
+        "id-java": {
+            "examples": [
+                {
+                    "keys": "b a h a s a I n d o n e s i a",
+                    "note": "Name of the language",
+                    "text": "\ua9a7\ua9b2\ua9b1\u200c\ua986\ua9a4\ua9c0\ua9a2\ua9ba\ua9b4\ua9a4\ua9ba\ua9b1\ua9b6\ua9aa\ua9b4"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Indonesian",
+            "scriptName": "Javanese",
+            "displayName": "Indonesian (Javanese)"
+        },
+        "jv-java": {
+            "examples": [
+                {
+                    "keys": "a k s a r a j a w a",
+                    "note": "Name of writing script",
+                    "text": "\ua9b2\ua98f\ua9c0\ua9b1\ua9ab\ua997\ua9ae"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Javanese",
+            "scriptName": "Javanese",
+            "displayName": "Javanese (Javanese)"
+        },
+        "kaw-java": {
+            "examples": [
+                {
+                    "keys": "k a w i",
+                    "note": "Name of the language",
+                    "text": "\ua98f\ua9ae\ua9b6"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Kawi",
+            "scriptName": "Javanese",
+            "displayName": "Kawi (Javanese)"
+        },
+        "mad-java": {
+            "examples": [
+                {
+                    "keys": "m a d u r a",
+                    "note": "Name of the language",
+                    "text": "\ua9a9\ua9a2\ua9b8\ua9ab"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Madura",
+            "scriptName": "Javanese",
+            "displayName": "Madura (Javanese)"
+        },
+        "sas-java": {
+            "examples": [
+                {
+                    "keys": "s a s a k",
+                    "note": "Name of the language",
+                    "text": "\ua9b1\ua9b1\ua98f\ua9c0"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Sasak",
+            "scriptName": "Javanese",
+            "displayName": "Sasak (Javanese)"
+        },
+        "su-java": {
+            "examples": [
+                {
+                    "keys": "s u n d a",
+                    "note": "Name of the language",
+                    "text": "\ua9b1\ua9b8\ua9a4\ua9c0\ua9a2"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Sunda",
+            "scriptName": "Javanese",
+            "displayName": "Sunda (Javanese)"
+        },
+        "osi-java": {
+            "examples": [
+                {
+                    "keys": "o s i n g",
+                    "note": "Name of the language",
+                    "text": "\ua9b2\ua9ba\ua9b4\ua9b1\ua9b6\ua981"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Osing",
+            "scriptName": "Javanese",
+            "displayName": "Osing (Javanese)"
+        },
+        "tes-java": {
+            "examples": [
+                {
+                    "keys": "t e n g g e r",
+                    "note": "Name of the language",
+                    "text": "\ua9a0\ua9ba\ua981\ua992\ua9ba\ua982"
+                }
+            ],
+            "font": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf",
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "oskFont": {
+                "family": "Noto Sans Javanese",
+                "source": [
+                    "NotoSansJavanese-Regular.ttf"
+                ]
+            },
+            "languageName": "Tengger",
+            "scriptName": "Javanese",
+            "displayName": "Tengger (Javanese)"
+        }
+    },
+    "lastModifiedDate": "2023-12-01T20:07:59.000Z",
+    "packageFilename": "jawa.kmp",
+    "packageFileSize": 201458,
+    "jsFilename": "jawa.js",
+    "jsFileSize": 53394,
+    "packageIncludes": [
+        "welcome",
+        "visualKeyboard",
+        "documentation",
+        "fonts"
+    ],
+    "version": "2.0.1",
+    "encodings": [
+        "unicode"
+    ],
+    "platformSupport": {
+        "windows": "full",
+        "macos": "full",
+        "linux": "full",
+        "desktopWeb": "full",
+        "ios": "full",
+        "android": "full",
+        "mobileWeb": "full"
+    },
+    "minKeymanVersion": "10.0",
+    "sourcePath": "release/j/jawa",
+    "helpLink": "https://help.keyman.com/keyboard/jawa"
+}

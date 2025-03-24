@@ -25,6 +25,11 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
+# All content is stored in windows/docs/help
+
+HELP_SOURCE_PATH="$KEYMAN_ROOT/windows/docs/help"
+cd "$HELP_SOURCE_PATH"
+
 MD=`find -name "*.md"`
 DESTCHM="$KEYMAN_ROOT/windows/bin/help/desktop"
 DESTWEB="$KEYMAN_ROOT/windows/bin/help/md/desktop"
@@ -121,7 +126,7 @@ function do_build_chm() {
   #
 
   mkdir -p "$DESTCHM/desktop_images"
-  cp "$THIS_SCRIPT_PATH/desktop_images"/* "$DESTCHM/desktop_images/"
+  cp "$HELP_SOURCE_PATH/desktop_images"/* "$DESTCHM/desktop_images/"
 
   #
   # Prepare TOC and HHP files
@@ -129,7 +134,7 @@ function do_build_chm() {
 
   pushd "$DESTCHM" > /dev/null
 
-  cp "$THIS_SCRIPT_PATH/keymandesktop.hhp" "$DESTCHM/keymandesktop.hhp"
+  cp "$HELP_SOURCE_PATH/keymandesktop.hhp" "$DESTCHM/keymandesktop.hhp"
   find -name '*.htm' >> "$DESTCHM/keymandesktop.hhp"
 
   build_hhc_header
@@ -163,7 +168,7 @@ function do_build_web() {
   done
 
   mkdir -p "$DESTWEB/desktop_images"
-  cp "$THIS_SCRIPT_PATH/desktop_images"/* "$DESTWEB/desktop_images/"
+  cp "$HELP_SOURCE_PATH/desktop_images"/* "$DESTWEB/desktop_images/"
 }
 
 builder_run_action clean:chm   do_clean_chm

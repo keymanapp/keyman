@@ -7,6 +7,9 @@ const
   SHelpTopic_Context_BitmapEditorText = 'context/keyboard-editor#toc-icon-tab';
   SHelpTopic_Context_CharacterMap = 'context/character-map';
   SHelpTopic_Context_CharacterIdentifier = 'context/character-identifier';
+  SHelpTopic_Context_CloneGitHubProjectParameters = 'context/clone-github-project-parameters';
+  SHelpTopic_Context_CloneKeymanCloudProjectParameters = 'context/clone-keyman-cloud-project-parameters';
+  SHelpTopic_Context_CloneLocalProjectParameters = 'context/clone-local-project-parameters';
   SHelpTopic_Context_Debug = 'context/debug';
   SHelpTopic_Context_LdmlDebug = 'context/ldml-debug';
   SHelpTopic_Context_LdmlEditor = 'context/ldml-editor';

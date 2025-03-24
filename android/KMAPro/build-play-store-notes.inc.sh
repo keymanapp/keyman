@@ -24,7 +24,7 @@ function generateReleaseNotes() {
   # Pad release notes if whatsnew.md doesn't have any line items
   # Play Store release notes have a limit of 500 characters
   local DEFAULT_RELEASE_NOTE="* Additional bug fixes and improvements"
-  local FILTERED_LINES=$( grep '^\s*\*.*$' "$KEYMAN_ROOT/android/help/about/whatsnew.md" || [[ $? == 1 ]] ) # Continue if grep has no matches
+  local FILTERED_LINES=$( grep '^\s*\*.*$' "$KEYMAN_ROOT/android/docs/help/about/whatsnew.md" || [[ $? == 1 ]] ) # Continue if grep has no matches
   if [ -z "$FILTERED_LINES" ]; then
     FILTERED_LINES="$DEFAULT_RELEASE_NOTE"
     builder_warn "Warning: whatsnew.md empty so using default release note: '$FILTERED_LINES'"
@@ -32,7 +32,7 @@ function generateReleaseNotes() {
 
   # Change IFS to new line
   local old_IFS="${IFS}"
-  IFS=$'\n'      
+  IFS=$'\n'
   for line in $FILTERED_LINES
   do
     local CHARS_IN_RELEASE_NOTES=$( wc -m < "$PLAY_RELEASE_NOTES" )

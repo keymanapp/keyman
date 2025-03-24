@@ -10,7 +10,7 @@
       "baseUrl": ".",
   },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "*.ts",
       "helpers/*.ts",
       "wordbreakers/*.ts"

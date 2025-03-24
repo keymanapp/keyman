@@ -14,55 +14,54 @@
 #include "keyman_core.h"
 
 #include "keyboard.hpp"
-#include "processor.hpp"
 #include "kmx/kmx_processor.hpp"
 #include "ldml/ldml_processor.hpp"
 #include "mock/mock_processor.hpp"
+#include "processor.hpp"
+#include "utfcodec.hpp"
 
 using namespace km::core;
 
 namespace
 {
-  abstract_processor * processor_factory(path const & kb_path) {
-    // Some legacy packages may include upper-case file extensions
-    // TODO-LDML: move file io out of core and into engine
-    if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
-      std::vector<uint8_t> buf;
-      if(ldml_processor::is_kmxplus_file(kb_path, buf)) {
-        abstract_processor * result = new ldml_processor(kb_path, buf);
-        return result;
-      }
-      return new kmx_processor(kb_path);
+  abstract_processor* processor_factory(path const & kb_name, const std::vector<uint8_t> & buf) {
+    if (ldml_processor::is_handled(buf)) {
+      return new ldml_processor(kb_name, buf);
     }
-    else if (kb_path.suffix() == ".mock") {
-      return new mock_processor(kb_path);
+    if (kmx_processor::is_handled(buf)) {
+      return new kmx_processor(kb_name, buf);
     }
-    else {
-      return new null_processor();
+    if (mock_processor::is_handled(buf)) {
+      return new mock_processor(kb_name);
     }
+    return new null_processor();
   }
 
+}  // namespace
 
-}
 km_core_status
-km_core_keyboard_load(km_core_path_name kb_path, km_core_keyboard **keyboard)
-{
+km_core_keyboard_load_from_blob(
+  const km_core_path_name kb_name,
+  const void* blob,
+  const size_t blob_size,
+  km_core_keyboard** keyboard
+) {
   assert(keyboard);
-  if (!keyboard)
+  if (!keyboard || !blob) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
 
-  try
-  {
-    abstract_processor *kp = processor_factory(kb_path);
-    km_core_status status = kp->validate();
+  std::vector<uint8_t> buf((uint8_t*)blob, (uint8_t*)blob + blob_size);
+  *keyboard = nullptr;
+  try {
+    abstract_processor* kp = processor_factory(kb_name, buf);
+    km_core_status status  = kp->validate();
     if (status != KM_CORE_STATUS_OK) {
       delete kp;
       return status;
     }
-    *keyboard = static_cast<km_core_keyboard *>(kp);
-  }
-  catch (std::bad_alloc &)
-  {
+    *keyboard = static_cast<km_core_keyboard*>(kp);
+  } catch (std::bad_alloc&) {
     return KM_CORE_STATUS_NO_MEM;
   }
   return KM_CORE_STATUS_OK;

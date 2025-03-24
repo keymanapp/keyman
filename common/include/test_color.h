@@ -8,6 +8,12 @@
 
 #include <ostream>
 
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 namespace console_color {
 
 enum ansi_code {
@@ -65,12 +71,10 @@ __define_ansi_code__(reversed, "7");
 #undef __define_ansi_code__
 
 #ifdef _MSC_VER
-#include <io.h>
 inline bool isaterminal() {
   return _isatty(_fileno(stdout));
 }
 #else
-#include <unistd.h>
 inline bool isaterminal() {
   return isatty(STDOUT_FILENO);
 }

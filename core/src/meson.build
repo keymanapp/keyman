@@ -48,23 +48,27 @@ endif
 generated_headers = []
 
 if cpp_compiler.get_id() == 'emscripten'
+  links += [
+    '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
+    # Forcing inclusion of debug symbols
+    '-g', '-Wlimited-postlink-optimizations',
+    '-lembind'
+  ]
 
-util_normalize_table_generator = executable('util_normalize_table_generator',
-    ['util_normalize_table_generator.cpp'],
-    cpp_args: defns + warns,
-    include_directories: [inc],
-    link_args: links,
-    dependencies: [icu_uc, icu_i18n],
-    )
+  util_normalize_table_generator = executable('util_normalize_table_generator',
+      ['util_normalize_table_generator.cpp'],
+      cpp_args: defns + warns,
+      include_directories: [inc],
+      link_args: links,
+      dependencies: [icu_uc, icu_i18n],
+      )
 
-util_normalize_table_h = custom_target('util_normalize_table.h',
-                    output: 'util_normalize_table.h',
-                    command: [util_normalize_table_generator],
-                    capture:true)
+  util_normalize_table_h = custom_target('util_normalize_table.h',
+                      output: 'util_normalize_table.h',
+                      command: [util_normalize_table_generator],
+                      capture:true)
 
-generated_headers += util_normalize_table_h
-
-
+  generated_headers += util_normalize_table_h
 endif
 
 

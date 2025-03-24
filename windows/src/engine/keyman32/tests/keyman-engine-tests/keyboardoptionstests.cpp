@@ -16,7 +16,7 @@ TEST(KEYBOARDOPTIONS, SetupCoreEnvironment) {
   km_core_path_name dummyPath = L"dummyActions.mock";
 
   EXPECT_EQ(SetupCoreEnvironment(&core_env_opts), TRUE);
-  EXPECT_EQ(km_core_keyboard_load(dummyPath, &kp->lpCoreKeyboard), KM_CORE_STATUS_OK);
+  EXPECT_EQ(km_core_keyboard_load_from_blob(dummyPath, (void *)"MOCK", 4, &kp->lpCoreKeyboard), KM_CORE_STATUS_OK);
   EXPECT_EQ(km_core_state_create(kp->lpCoreKeyboard, core_env_opts, &kp->lpCoreKeyboardState), KM_CORE_STATUS_OK);
 
   km_core_option_item *expected_items = new km_core_option_item[5];

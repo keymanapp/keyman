@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <Version>2.0</Version>
+    <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
+    <CheckFilenameConventions>True</CheckFilenameConventions>
+    <SkipMetadataFiles>True</SkipMetadataFiles>
+    <ProjectType>lexicalmodel</ProjectType>
+  </Options>
+</KeymanDeveloperProject>

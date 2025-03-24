@@ -3,7 +3,7 @@ import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { isProject, loadProject } from './projectLoader.js';
 
 async function runProject(callbacks: CompilerCallbacks, filename: string, callback: (filename:string)=>Promise<boolean>): Promise<boolean> {
-  const project = loadProject(filename, callbacks);
+  const project = await loadProject(filename, callbacks);
 
   for(const file of project.files) {
     if(KeymanFileTypes.filenameIs(file.filename, KeymanFileTypes.Source.Project)) {

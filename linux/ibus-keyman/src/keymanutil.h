@@ -3,7 +3,7 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018-2023 SIL International
+ * Copyright (C) 2018-2023 SIL Global
  *
  * keymanutil is dual licensed under the MIT or GPL licenses as described below.
  *

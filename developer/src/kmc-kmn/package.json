@@ -44,7 +44,7 @@
     "typescript": "^5.4.5"
   },
   "mocha": {
-    "spec": "build/test/**/test-*.js",
+    "spec": "build/test/**/*.tests.js",
     "require": [
       "source-map-support/register"
     ]

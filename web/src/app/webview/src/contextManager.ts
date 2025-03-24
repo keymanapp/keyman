@@ -3,7 +3,7 @@ import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmpty
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
-import { Transform } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
@@ -17,7 +17,7 @@ export class ContextHost extends Mock {
     this.saveState();
   }
 
-  apply(transform: Transform): void {
+  apply(transform: LexicalModelTypes.Transform): void {
     super.apply(transform);
     this.updateHost();
   }

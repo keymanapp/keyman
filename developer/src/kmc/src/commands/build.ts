@@ -7,20 +7,18 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 import { CompilerOptions, CompilerFileCallbacks } from '@keymanapp/developer-utils';
-import { BaseOptions } from '../util/baseOptions.js';
+import { BuildBaseOptions } from '../util/baseOptions.js';
 import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
-import { commandOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
+import { commanderOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 
 export function declareBuild(program: Command) {
   // TODO: localization?
   const buildCommand = program
     .command('build')
-    .option('--color', 'Force colorization for log messages')
-    .option('--no-color', 'No colorization for log messages; if both omitted, detects from console')
 
     // These options are only used with build file but are included here so that
     // they are visible in `kmc build --help`
@@ -32,7 +30,7 @@ export function declareBuild(program: Command) {
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
 
-  BaseOptions.addAll(buildCommand);
+  BuildBaseOptions.addAll(buildCommand);
 
   buildCommand.command('file [infile...]', {isDefault: true})
     .description(`Compile one or more source files or projects ('file' subcommand is default).`)
@@ -60,9 +58,9 @@ If no input file is supplied, kmc will build the current folder.`)
   buildCommand
     .command('windows-package-installer <infile>')
     .description('Build an executable installer for Windows for a Keyman package')
-    .option('--msi <msiFilename>', 'Location of keymandesktop.msi')
-    .option('--exe <exeFilename>', 'Location of setup.exe')
-    .option('--license <licenseFilename>', 'Location of license.txt')
+    .requiredOption('--msi <msiFilename>', 'Location of keymandesktop.msi')
+    .requiredOption('--exe <exeFilename>', 'Location of setup.exe')
+    .requiredOption('--license <licenseFilename>', 'Location of license.txt')
     .option('--title-image [titleImageFilename]', 'Location of title image')
     .option('--app-name [applicationName]', 'Installer property: name of the application to be installed', 'Keyman')
     .option('--start-disabled', 'Installer property: do not enable keyboards after installation completes')
@@ -74,7 +72,7 @@ function initialize(commanderOptions: any) {
   // We use a default callback instance when validating command line, but throw
   // it away once we have completed initialization
   const initializationCallbacks = new NodeCompilerCallbacks({});
-  const options = commandOptionsToCompilerOptions(commanderOptions, initializationCallbacks);
+  const options = commanderOptionsToCompilerOptions(commanderOptions, initializationCallbacks);
   return options;
 }
 

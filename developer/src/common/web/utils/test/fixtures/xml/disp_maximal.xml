@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="disp-maximal"/>
+
+  <displays>
+    <display keyId="g" display="(g)"/>
+    <display output="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
+    <display output="${eee}" display="(${eee})"/>
+    <displayOptions baseCharacter="x" />
+  </displays>
+
+  <variables>
+    <string id="eee" value="e" />
+  </variables>
+</keyboard3>

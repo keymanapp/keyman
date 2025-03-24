@@ -1,0 +1,21 @@
+{
+  "languages": [
+    "ti-ER"
+  ],
+  "id": "gff.ti_er.gff_tigrinya_eritrea",
+  "name": "GFF Tigrinya-Eritrean Lexical Model",
+  "license": "mit",
+  "authorName": "Geʾez Frontier Foundation",
+  "authorEmail": "yacob@geez.org",
+  "description": "<p>The Tigrinya-Eritrea lexical model is based on the content found from 131 issues of the Haddas Eritrea (ሓዳስ ኤርትራ) newspaper.</p>",
+  "lastModifiedDate": "2023-07-08T15:10:37.000Z",
+  "packageFilename": "gff.ti_er.gff_tigrinya_eritrea.model.kmp",
+  "packageFileSize": 857854,
+  "jsFilename": "gff.ti_er.gff_tigrinya_eritrea.model.js",
+  "jsFileSize": 6808162,
+  "packageIncludes": [],
+  "version": "1.0.1",
+  "minKeymanVersion": "12.0",
+  "helpLink": "https://help.keyman.com/model/gff.ti_er.gff_tigrinya_eritrea",
+  "sourcePath": "release/gff/gff.ti_er.gff_tigrinya_eritrea"
+}

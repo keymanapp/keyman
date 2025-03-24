@@ -63,7 +63,7 @@ export class LayrCompiler extends SectionCompiler {
       for (const layer of layers.layer) {
         const rows = layer.row.map((row) => {
           const erow: LayrRow = {
-            keys: row.keys.split(' ').map((id) => sections.strs.allocString(id)),
+            keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id)),
           };
           return erow;
         });

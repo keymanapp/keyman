@@ -3,7 +3,7 @@
 //
 
 import { KeymanFileTypes } from '@keymanapp/common-types';
-import { CompilerCallbacks } from '../../compiler-interfaces.js';
+import { CompilerAsyncCallbacks, CompilerPathCallbacks } from "../../compiler-callbacks.js";
 
 export class KeymanDeveloperProject {
   options: KeymanDeveloperProjectOptions;
@@ -15,30 +15,34 @@ export class KeymanDeveloperProject {
     return this._projectFilename;
   }
 
-  constructor(private _projectFilename: string, version: KeymanDeveloperProjectVersion, private callbacks: CompilerCallbacks) {
+  constructor(
+    private _projectFilename: string,
+    version: KeymanDeveloperProjectVersion,
+    protected callbacks: CompilerAsyncCallbacks
+  ) {
     this.projectPath = this.callbacks.path.dirname(this._projectFilename);
     this.options = new KeymanDeveloperProjectOptions(version);
     this.files = [];
-    this.projectFile = new KeymanDeveloperProjectFile20(_projectFilename, callbacks);
+    this.projectFile = new KeymanDeveloperProjectFile20(_projectFilename, this.callbacks.path);
   }
   /**
    * Adds .kmn, .xml, .kps to project based on options.sourcePath
    * @param projectFilename Full path to project.kpj (even if the file doesn't exist)
    */
-  populateFiles() {
+  async populateFiles(): Promise<boolean> {
     if(this.options.version != '2.0') {
       throw new Error('populateFiles can only be called on a v2.0 project');
     }
     const sourcePath = this.resolveProjectPath(this.options.sourcePath);
-    if(!this.callbacks.fs.existsSync(sourcePath)) {
+    if(!await this.callbacks.fsAsync.exists(sourcePath)) {
       return false;
     }
-    const files = this.callbacks.fs.readdirSync(sourcePath);
-    for(const filename of files) {
-      const fullPath = this.callbacks.path.join(sourcePath, filename);
-      if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.LdmlKeyboard)) {
+    const files = await this.callbacks.fsAsync.readdir(sourcePath);
+    for(const file of files.filter(file => file.type == 'file')) {
+      const fullPath = this.callbacks.path.join(sourcePath, file.filename);
+      if(KeymanFileTypes.filenameIs(file.filename, KeymanFileTypes.Source.LdmlKeyboard)) {
         try {
-          const data = this.callbacks.loadFile(fullPath);
+          const data = await this.callbacks.fsAsync.readFile(fullPath);
           const text = new TextDecoder().decode(data);
           if(!text?.match(/<keyboard3/)) {
             // Skip this .xml because we assume it isn't really a keyboard .xml
@@ -50,8 +54,8 @@ export class KeymanDeveloperProject {
           continue;
         }
       }
-      if(KeymanFileTypes.sourceTypeFromFilename(filename) !== null) {
-        const file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks);
+      if(KeymanFileTypes.sourceTypeFromFilename(file.filename) !== null) {
+        const file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks.path);
         this.files.push(file);
       }
     }
@@ -71,7 +75,7 @@ export class KeymanDeveloperProject {
     return p.replace('$PROJECTPATH', this.projectPath);
   }
 
-  getOutputFilePath(type: KeymanFileTypes.Binary) {
+  resolveBuildPath(): string {
     // Roughly corresponds to Delphi TProject.GetTargetFileName
     let p = this.options.version == '1.0' ?
       this.options.buildPath || '$SOURCEPATH' :
@@ -86,12 +90,17 @@ export class KeymanDeveloperProject {
 
     p = this.resolveProjectPath(p);
 
+    return p;
+  }
+
+  getOutputFilePath(type: KeymanFileTypes.Binary) {
+    const p = this.resolveBuildPath();
     const f = this.callbacks.path.basename(this._projectFilename, KeymanFileTypes.Source.Project) + type;
     return this.callbacks.path.normalize(this.callbacks.path.join(p, f));
   }
 
   resolveInputFilePath(file: KeymanDeveloperProjectFile): string {
-    return this.callbacks.resolveFilename(this._projectFilename, file.filePath);
+    return this.callbacks.fsAsync.resolveFilename(this._projectFilename, file.filePath);
   }
 
   resolveOutputFilePath(file: KeymanDeveloperProjectFile, sourceExt: string, targetExt: string): string {
@@ -164,7 +173,7 @@ export interface KeymanDeveloperProjectFile {
 
 export class KeymanDeveloperProjectFile10 implements KeymanDeveloperProjectFile {
   get filename(): string {
-    return this.callbacks.path.basename(this.filePath);
+    return this.path.basename(this.filePath);
   }
   get fileType(): string {
     return KeymanFileTypes.fromFilename(this.filename);
@@ -172,7 +181,7 @@ export class KeymanDeveloperProjectFile10 implements KeymanDeveloperProjectFile 
   details: KeymanDeveloperProjectFileDetail_Kmn & KeymanDeveloperProjectFileDetail_Kps; // 1.0 only
   childFiles: KeymanDeveloperProjectFile[]; // 1.0 only
 
-  constructor(public readonly id: string, public readonly filePath: string, public readonly fileVersion:string, private readonly callbacks: CompilerCallbacks) {
+  constructor(public readonly id: string, public readonly filePath: string, public readonly fileVersion:string, private path: CompilerPathCallbacks) {
     this.details = {};
     this.childFiles = [];
   }
@@ -182,12 +191,12 @@ export type KeymanDeveloperProjectFileType20 = KeymanFileTypes.Source;
 
 export class KeymanDeveloperProjectFile20 implements KeymanDeveloperProjectFile {
   get filename(): string {
-    return this.callbacks.path.basename(this.filePath);
+    return this.path.basename(this.filePath);
   }
   get fileType() {
     return KeymanFileTypes.fromFilename(this.filename);
   }
-  constructor(public readonly filePath: string, private readonly callbacks: CompilerCallbacks) {
+  constructor(public readonly filePath: string, private path: CompilerPathCallbacks) {
   }
 };
 

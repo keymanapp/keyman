@@ -141,7 +141,7 @@
         <DCCReference Include="viskbd\UfrmOSKEntryHelper.pas">
             <Form>frmOSKEntryHelper</Form>
         </DCCReference>
-        <DCCReference Include="..\..\..\..\common\windows\delphi\general\TTInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\ttinfo.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterMapSettings.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\charmap\CharacterRanges.pas"/>
@@ -238,6 +238,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -299,21 +300,21 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="keyman.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>keyman.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="keyman.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\keyman.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>keyman.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="bin\Win32\Debug\keyman.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>keyman.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

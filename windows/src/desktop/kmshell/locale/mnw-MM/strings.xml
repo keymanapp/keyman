@@ -323,10 +323,6 @@
   <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">ထ္ၜးမုက်လိက် ဒုၚ်တၠုၚ်</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">စၟဳစၟတ် keyman.com သွက် သမၠုၚ်က္ဆံၚ် ဇၟာပ်သတ္တဟ</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
   <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">စၟဳစၟတ် အပလဳကေယှေန် ပဠပထုဲမာန် အဃောစ ကဳမာန်</string>
   <!-- Context: Configuration Dialog - Options tab -->

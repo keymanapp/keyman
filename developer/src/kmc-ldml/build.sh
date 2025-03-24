@@ -33,30 +33,19 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action clean; then
+function do_clean() {
   rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_finish_action success clean
-fi
+}
 
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action configure; then
+function do_configure() {
   verify_npm_setup
-  builder_finish_action success configure
-fi
+}
 
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action build; then
+function do_build() {
   npm run build
-  builder_finish_action success build
-fi
+}
 
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action build-fixtures; then
+function do_build_fixtures() {
   # Build basic.kmx and emit its checksum
   mkdir -p ./build/test/fixtures
   node ../kmc build ./test/fixtures/basic.xml --no-compiler-version --debug --out-file ./build/test/fixtures/basic-xml.kmx
@@ -65,22 +54,14 @@ if builder_start_action build-fixtures; then
 
   # Generate a binary file from basic.txt for comparison purposes
   node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
+}
 
-  builder_finish_action success build-fixtures
-fi
-
-builder_run_action api        api-extractor run --local --verbose
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action test; then
-  eslint .
-  cd test
-  tsc -b
-  cd ..
-  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
-  builder_finish_action success test
-fi
+builder_run_action clean           do_clean
+builder_run_action configure       do_configure
+builder_run_action build           do_build
+builder_run_action build-fixtures  do_build_fixtures
+builder_run_action api             api-extractor run --local --verbose
+builder_run_action test            builder_do_typescript_tests
 
 #-------------------------------------------------------------------------------------------------------------------
 

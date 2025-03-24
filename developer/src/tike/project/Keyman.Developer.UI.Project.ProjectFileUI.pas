@@ -83,6 +83,8 @@ type
 
   TProjectFileUIClass = class of TProjectFileUI;
 
+procedure LogMessage(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);
+
 implementation
 
 uses
@@ -177,6 +179,11 @@ begin
 end;
 
 procedure TProjectUI.Log(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);   // I4706
+begin
+  frmMessages.Add(AState, Filename, Msg, MsgCode, line);
+end;
+
+procedure LogMessage(AState: TProjectLogState; Filename, Msg: string; MsgCode, line: Integer);
 begin
   frmMessages.Add(AState, Filename, Msg, MsgCode, line);
 end;

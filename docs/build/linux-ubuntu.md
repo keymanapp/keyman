@@ -23,7 +23,7 @@ The following projects **cannot** be built on Linux:
 
 ### System Requirements
 
-- Minimum Ubuntu version: Ubuntu 20.04
+- Minimum Ubuntu version: Ubuntu 22.04
 
 Other Linux distributions will also work if appropriate dependencies are installed.
 
@@ -70,8 +70,21 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install 3.1.58
 ./emsdk activate 3.1.58
-export EMSCRIPTEN_BASE="$(pwd)/upstream/emscripten"
+cd upstream/emscripten
+npm install
+export EMSCRIPTEN_BASE="$(pwd)"
 echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
+```
+
+If you are updating an existing install of Emscripten:
+
+```bash
+cd emsdk
+git pull
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
 ```
 
 > ![WARNING]
@@ -100,7 +113,7 @@ All dependencies are already installed if you followed the instructions under
 
 Keyman Core can be built with the `core/build.sh` script.
 
-- [Building Keyman Core](../../core/doc/BUILDING.md)
+- [Building Keyman Core](../../core/docs/BUILDING.md)
 
 ## Keyman for Linux
 
@@ -225,83 +238,25 @@ Android projects. `JAVA_HOME_11` is mostly used by CI.
 ## Docker Builder
 
 The Docker builder allows you to perform a build from anywhere Docker is supported.
-
-To build the docker image:
-
-```shell
-cd linux
-docker pull ubuntu:latest # (to make sure you have an up-to-date image)
-docker build . -t keymanapp/keyman-linux-builder:latest
-```
-
-Once the image is built, it may be used to build parts of Keyman.
-
-**Note** that it's not yet possible to run tests in the Docker container.
-
-- core
-
-  ```shell
-  # build 'Keyman Core' in docker
-  # keep linux build artifacts separate
-  mkdir -p $(git rev-parse --show-toplevel)/core/build/linux
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    -v $(git rev-parse --show-toplevel)/core/build/linux:/home/build/build/core/build \
-    keymanapp/keyman-linux-builder:latest \
-    core/build.sh --debug
-  ```
-
-- linux
-
-  ```shell
-  # build 'Keyman for Linux' installation in docker
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    --entrypoint /bin/bash keymanapp/keyman-linux-builder:latest \
-    -c 'DESTDIR=/home/build /usr/bin/bashwrapper linux/build.sh --debug build install'
-  ```
-
-- Keyman Web
-
-  ```shell
-  # build 'Keyman Web' in docker
-  docker run --privileged -it --rm \
-    -v $(git rev-parse --show-toplevel):/home/build/build \
-    keymanapp/keyman-linux-builder:latest \
-    web/build.sh --debug
-  ```
-
-- Keyman for Android
-
-  ```shell
-  # build 'Keyman for Android' in docker
-  docker run -it --rm -v $(git rev-parse --show-toplevel):/home/build/build \
-    keymanapp/keyman-linux-builder:latest \
-    android/build.sh --debug
-  ```
-
-### Customizing the builder
-
-You can use Docker [build args](https://docs.docker.com/build/guide/build-args/) to customize the image build. As an example, the following will build an image explicitly with Ubuntu 23.04 and Node.js 20. Check the [Dockerfile](../../linux/Dockerfile) for `ARG` entries.
-
-```shell
-cd linux
-docker pull ubuntu:23.04 # (to make sure you have an up-to-date image)
-docker build . -t keymanapp/keyman-linux-builder:u23.04-node20 --build-arg OS_VERSION=23.04 --build-arg NODE_MAJOR=20
-````
+See [this README.md](../../resources/docker-images/README.md) for details.
 
 ### Using the builder with VSCode [Dev Containers](https://code.visualstudio.com/docs/devcontainers/tutorial)
 
-1. Save the following as `.devcontainer/devcontainer.json`, updating the `image` to match the Docker image built above.
+1. Save the following as `.devcontainer/devcontainer.json`, updating the `image`
+   to match the Docker image built above.
 
-```json
-// file: .devcontainer/devcontainer.json
-{
-        "name": "Keyman Ubuntu 23.04",
-        "image": "keymanapp/keyman-linux-builder:u23.04-node18"
-}
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
-```
+   ```json
+   // file: .devcontainer/devcontainer.json
+   {
+           "name": "Keyman Ubuntu 23.04",
+           "image": "keymanapp/keyman-linux-builder:u23.04-node18"
+   }
+   // For format details, see https://aka.ms/devcontainer.json. For config options,
+   // see the README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+   ```
 
-2. in VSCode, use the "Dev Containers: Open Folder In Container…" option and choose the Keyman directory.
+2. in VSCode, use the "Dev Containers: Open Folder In Container…" option and
+   choose the Keyman directory.
 
-3. You will be given a window which is running VSCode inside this builder image, regardless of your host OS.
+3. You will be given a window which is running VSCode inside this builder
+   image, regardless of your host OS.

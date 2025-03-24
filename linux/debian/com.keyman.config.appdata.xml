@@ -5,10 +5,15 @@
   <metadata_license>MIT</metadata_license>
   <project_license>MIT</project_license>
   <project_group>Keyman</project_group>
-  <developer_name>SIL International</developer_name>
+  <developer id="org.sil.keyman">
+    <name>SIL Global</name>
+  </developer>
   <icon type="remote" width="96" height="96">https://keyman.com/cdn/dev/img/keyman-logo.png</icon>
   <name>Keyman for Linux</name>
   <summary>Keyman makes it possible for you to type in over 2,000 languages</summary>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-info">mild</content_attribute>
+  </content_rating>
 
   <description>
     <p>

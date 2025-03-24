@@ -1,18 +1,18 @@
 (*
   Name:             utilfiletypes
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    4 Dec 2006
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     04 Dec 2006 - mcdurdin - Add XML and HTML filetypes
@@ -100,7 +100,15 @@ type
   end;
 
 type
-  TKeymanProjectType = (kptUnknown, kptBasic, kptLDMLKeyboard, kptImportWindowsKeyboard, kptWordlistLexicalModel);
+  TKeymanProjectType = (
+    kptUnknown,
+    kptBasic,
+    kptLDMLKeyboard,
+    kptImportWindowsKeyboard,
+    kptWordlistLexicalModel,
+    kptCloneLocalProject,
+    kptCloneKeymanCloudProject,
+    kptCloneGitHubProject);
 
 implementation
 

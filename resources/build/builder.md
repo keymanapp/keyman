@@ -86,13 +86,12 @@ This somewhat unwieldy incantation handles all our build environments.
 The intent is to get a good solid consistent path for the script so that we can
 safely include the build script, no matter what `pwd` is when the script is run.
 
-
 The only modification permissible in this block is the
 `<relative-path-to-repo-root>` text which will be a series of `../` paths taking
 us to the repository root from the location of the script itself.
 
 It is essential to make the include relative to the repo root, even for scripts
-under the resources/ folder.  Doing this gives us significant performance
+under the `resources/` folder.  Doing this gives us significant performance
 benefits.
 
 Inclusion of other scripts should be kept outside this standard build script
@@ -327,6 +326,8 @@ The following parameters are pre-defined and should not be overridden:
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
 * `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
+* `--offline`: allow to build while offline. This might fail if not all
+  dependencies are cached.
 
 --------------------------------------------------------------------------------
 
@@ -1050,6 +1051,26 @@ if builder_has_option --verbose; then
   # ...
 fi
 ```
+
+--------------------------------------------------------------------------------
+
+## `builder_do_typescript_tests` function
+
+Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
+
+**Note:** this is currently hosted in shellHelperFunctions.sh, but will
+be moved to builder.typescript.inc.sh in the future.
+
+### Usage
+
+```bash
+builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+```
+
+### Parameters
+
+* **coverage_threshold** optional, minimum coverage for c8 to pass tests, 
+  defaults to 90 (percent)
 
 --------------------------------------------------------------------------------
 

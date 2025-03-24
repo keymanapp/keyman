@@ -267,22 +267,35 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
 
-  try_multiple_times npm ci
+  offline_param=
+  if builder_try_offline; then
+    builder_echo "Trying offline build"
+    offline_param=--prefer-offline
+  fi
+  try_multiple_times npm ${offline_param} ci
 
   popd > /dev/null
+}
+
+_print_expected_node_version() {
+"$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
 }
 
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
 _select_node_version_with_nvm() {
-  local REQUIRED_NODE_VERSION="$("$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json")"
+  local REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
+  local CURRENT_NODE_VERSION
 
   if [[ $BUILDER_OS != win ]]; then
     # launch nvm in a sub process, see _builder_nvm.sh for details
     "$KEYMAN_ROOT/resources/build/_builder_nvm.sh" "$REQUIRED_NODE_VERSION"
   else
-    nvm install "$REQUIRED_NODE_VERSION"
-    nvm use "$REQUIRED_NODE_VERSION"
+    CURRENT_NODE_VERSION="$(node --version)"
+    if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
+      start //wait //b nvm install "$REQUIRED_NODE_VERSION"
+      start //wait //b nvm use "$REQUIRED_NODE_VERSION"
+    fi
   fi
 
   # Now, check that the node version is correct, on all systems
@@ -291,8 +304,50 @@ _select_node_version_with_nvm() {
   # https://github.com/coreybutler/nvm-windows/issues/738
 
   # note the 'v' prefix that node emits (and npm doesn't!)
-  local CURRENT_NODE_VERSION="$(node --version)"
+  CURRENT_NODE_VERSION="$(node --version)"
   if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
     builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
+  fi
+}
+
+check-markdown() {
+  node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
+}
+
+#
+# Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
+#
+# Usage:
+#   builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+# Parameters:
+#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests,
+#                           defaults to 90 (percent)
+#
+# Todo:
+#   Move to builder.typescript.inc.sh when this is established
+#
+builder_do_typescript_tests() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
+
+  eslint .
+  tsc --build test/
+
+  local THRESHOLD_PARAMS=
+  local C8_THRESHOLD=
+  if [[ $# -gt 0 ]]; then
+    C8_THRESHOLD=$1
+    THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
+  fi
+
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
+
+  if [[ ! -z "$C8_THRESHOLD" ]]; then
+    builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+    builder_echo warning "Please increase threshold in build.sh as test coverage improves."
   fi
 }

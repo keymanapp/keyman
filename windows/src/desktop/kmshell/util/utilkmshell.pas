@@ -33,7 +33,7 @@ unit utilkmshell;  // I3306   // I4181
 interface
 
 uses
-  System.UITypes,
+  System.UITypes, System.IOUtils, System.Types,
   Dialogs, Windows, ComObj, shlobj, controls, sysutils, classes;
 
 const
@@ -96,6 +96,7 @@ procedure SplitString(const instr: string; var outstr1, outstr2: string; const s
 function ValidDirectory(const dir: string): string;
 
 function GetLongFile(APath:String):String;
+procedure GetFileNamesInDirectory(const directoryPath: string; var fileNames: TStringDynArray);
 
 function TSFInstalled: Boolean;
 
@@ -539,6 +540,19 @@ begin
     Delete(APath,1,i);
   until Length(APath)=0;
 end; {Peter Haas}
+
+procedure GetFileNamesInDirectory(const directoryPath: string; var fileNames: TStringDynArray);
+
+begin
+  // Check if the directory exists
+  if TDirectory.Exists(directoryPath) then
+  begin
+    // Retrieve file names within the directory
+    fileNames := TDirectory.GetFiles(directoryPath);
+  end
+  else
+    KL.Log('Directory does not exist.');
+end;
 
 { TString }
 

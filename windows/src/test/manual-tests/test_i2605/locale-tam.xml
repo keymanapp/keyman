@@ -344,8 +344,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
 	<!--    -->
 	<String Type="FormatString" Id="koShowWelcome">வரவேற்பு முகப்பு திரையை  காண்பிக்க</String>
 	<!--    -->
-	<String Type="FormatString" Id="koCheckForUpdates">வாராந்திர மேம்பாட்டிற்கு www.tavultesoft.comல் சோதனையிட</String>
-	<!--    -->
 	<String Type="FormatString" Id="koKeyboardHotkeysAreToggle">தட்டச்சுப்பலகைக்கான ஹாட் கீ </String>
 	<!--    -->
 	<String Type="FormatString" Id="koAltGrCtrlAlt">Simulate AltGr with Ctrl+Alt</String>

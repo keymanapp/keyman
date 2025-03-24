@@ -2,7 +2,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevHint = CompilerErrorSeverity.Hint | Namespace;
 // const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -61,5 +61,10 @@ export class KeyboardInfoCompilerMessages {
   static Error_DescriptionIsMissing = (o:{filename:string}) => m(
     this.ERROR_DescriptionIsMissing,
     `The Info.Description field in the package ${def(o.filename)} is required, but is missing or empty.`);
+
+  static HINT_ScriptDoesNotMatch = SevHint | 0x0011;
+  static Hint_ScriptDoesNotMatch = (o:{script: string, bcp47:string, commonScript: string}) => m(
+    this.HINT_ScriptDoesNotMatch,
+    `The script '${def(o.script)}' associated with language tag '${def(o.bcp47)}' does not match the script '${def(o.commonScript)}' for the first language in the package.`);
 }
 

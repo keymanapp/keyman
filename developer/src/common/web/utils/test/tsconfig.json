@@ -11,7 +11,7 @@
       "baseUrl": ".",
   },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "helpers/*.ts",
   ],
   "references": [

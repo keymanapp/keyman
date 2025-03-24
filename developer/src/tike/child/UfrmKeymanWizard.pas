@@ -369,6 +369,8 @@ type
     FLayoutSetup: Boolean;
     FCheckboxGridHelper: TCheckboxGridHelper;
 
+    FDisplayMapFont: TFont;
+
     function GetCurrentRule: TKeyboardParser_LayoutRule;
 
     procedure EnableControls;
@@ -475,6 +477,7 @@ type
     procedure OrderDetailsPanels;
     function ValidateFileHasNoUnicodeCharacters(sw: WideString): Boolean;
     procedure UpdateQRCode;
+    procedure SetDisplayMapFont(const Value: TFont);
 
   protected
     function GetHelpTopic: string; override;
@@ -494,6 +497,8 @@ type
     function GetProjectFile: TProjectFile; override;
 
     function ShouldRememberFocus(Control: TWinControl): Boolean; override;   // I4679
+
+    property DisplayMapFont: TFont read FDisplayMapFont write SetDisplayMapFont;
 
   public
     procedure StartDebugging(FStartTest: Boolean = False);
@@ -630,6 +635,8 @@ procedure TfrmKeymanWizard.FormCreate(Sender: TObject);
 begin
   FLoading := True;
 
+  FDisplayMapFont := TFont.Create;
+
   //SetWindowTheme(pages.Handle, 'Explorer', '');
 
   cmdAddToProject.Caption := '&Add to Project';
@@ -681,6 +688,7 @@ begin
   FreeAndNil(FKeyboardParser);   // I4557
   FreeAndNil(FDebugForm);
   FreeAndNil(FCheckboxGridHelper);
+  FreeAndNil(FDisplayMapFont);
   UninitSystemKeyboard;
 end;
 
@@ -1825,6 +1833,15 @@ begin
             Delete(Result.Size, Length(Result.Size)-1, 2);
         end;
       end;
+    kfontDisplayMap:
+      begin
+        Result.Enabled := FKeyboardParser.GetSystemStoreValue(ssDisplayMap) <> '';
+        if Result.Enabled then
+        begin
+          Result.Name := DisplayMapFont.Name;
+          Result.Size := IntToStr(TFontUtils.FontSizeInPoints(DisplayMapFont.Name, DisplayMapFont.Size));   // I4872
+        end;
+      end;
   end;
 end;
 
@@ -2535,6 +2552,8 @@ begin
       FFont.Free;
     end;
   end;
+
+  SetFontFromString(DisplayMapFont, ProjectFile.IDEState['DisplayMapFont']);
 end;
 
 procedure TfrmKeymanWizard.SaveSettings(SaveProject: Boolean);
@@ -2548,6 +2567,7 @@ begin
     else ProjectFile.IDEState['DebugDefaultFont'] := '0';   // I4702
 
   ProjectFile.IDEState['DebugFont'] := FontAsString(FDebugForm.memo.Font);   // I4702
+  ProjectFile.IDEState['DisplayMapFont'] := FontAsString(DisplayMapFont);
 
   inherited;
 end;
@@ -2781,6 +2801,13 @@ begin
   TUtilExecute.URL(lbDebugHosts.Items[lbDebugHosts.ItemIndex]);
 end;
 
+procedure TfrmKeymanWizard.SetDisplayMapFont(const Value: TFont);
+begin
+  FDisplayMapFont.Assign(Value);
+  if ProjectFile <> nil then
+    ProjectFile.IDEState['DisplayMapFont'] := FontAsString(DisplayMapFont);
+end;
+
 procedure TfrmKeymanWizard.SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
 var
   f: TFont;
@@ -2813,6 +2840,11 @@ begin
       begin
         CharFont.Name := Value.Name;
         CharFont.Size := StrToIntDef(Value.Size, 12);
+      end;
+    kfontDisplayMap:
+      begin
+        DisplayMapFont.Name := Value.Name;
+        DisplayMapFont.Size := StrToIntDef(Value.Size, 12);
       end;
     kfontOSK:
       begin
@@ -3260,6 +3292,14 @@ begin
   if (FFeature[kfOSK].FileName = '') or not FKeyboardParser.Features.ContainsKey(kfOSK) then   // I4058   // I4138
   begin
     ShowMessage('This keyboard does not include a Desktop On Screen Keyboard');
+    Exit;
+  end;
+
+  if MessageDlg(
+    'Importing the Desktop On Screen Keyboard will overwrite all changes in all '+
+    'layers in the touch layout. Continue and overwrite touch layout?', mtWarning,
+    mbOkCancel, 0) = mrCancel then
+  begin
     Exit;
   end;
 

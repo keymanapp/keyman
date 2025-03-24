@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>17.0.218.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <GraphicFile>jawa2.bmp</GraphicFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+  </Options>
+  <StartMenu>
+    <Folder>Keyboard Indonesia\Jawa</Folder>
+    <AddUninstallEntry/>
+    <Items>
+      <Item>
+        <Name>Documentation</Name>
+        <FileName>welcome.htm</FileName>
+        <Arguments></Arguments>
+        <Icon></Icon>
+        <Location>psmelStartMenu</Location>
+      </Item>
+      <Item>
+        <Name>Welcome</Name>
+        <FileName>welcome2.htm</FileName>
+        <Arguments></Arguments>
+        <Icon></Icon>
+        <Location>psmelStartMenu</Location>
+      </Item>
+      <Item>
+        <Name>Readme</Name>
+        <FileName>readme.htm</FileName>
+        <Arguments></Arguments>
+        <Icon></Icon>
+        <Location>psmelStartMenu</Location>
+      </Item>
+    </Items>
+  </StartMenu>
+  <Info>
+    <Version URL=""></Version>
+    <Name URL="">Nulisa Aksara Jawa</Name>
+    <Copyright URL="">© 2019-2023 Benny Lin</Copyright>
+    <Author URL="">Benny Lin</Author>
+    <WebSite URL="https://bennylin.github.io/">https://bennylin.github.io/</WebSite>
+    <Description>This keyboard is designed to type all Javanese characters and stacks
+directly. You get a Javanese character every time you press a Latin key,
+without having to use the Alt key or memorizing arbitrary key locations
+in QWERTY keyboard. This keyboard is based on Benny Lin\'s Nulisa Aksara
+Jawa web transliterator program - http://is.gd/nulisa.</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>welcome\welcome.htm</Name>
+      <Description>Welcome/Help file</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>jawa2.bmp</Name>
+      <Description>File jawa2.bmp</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.bmp</FileType>
+    </File>
+    <File>
+      <Name>..\build\jawa.kvk</Name>
+      <Description>File jawa.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>..\build\jawa.kmx</Name>
+      <Description>Keyboard Nulisa Aksara Jawa</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>..\build\jawa.js</Name>
+      <Description>File jawa.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>jawa-help.htm</Name>
+      <Description>File jawa-help.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\..\..\shared\fonts\noto\Java\NotoSansJavanese-Bold.ttf</Name>
+      <Description>Font Noto Sans Javanese Bold</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>..\..\..\shared\fonts\noto\Java\NotoSansJavanese-Regular.ttf</Name>
+      <Description>Font Noto Sans Javanese Regular</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description></Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Nulisa Aksara Jawa</Name>
+      <ID>jawa</ID>
+      <Version>2.0</Version>
+      <OSKFont>..\..\..\shared\fonts\noto\Java\NotoSansJavanese-Regular.ttf</OSKFont>
+      <DisplayFont>..\..\..\shared\fonts\noto\Java\NotoSansJavanese-Regular.ttf</DisplayFont>
+      <WebDisplayFonts><Font Filename="NotoSansJavanese-Regular.ttf"/></WebDisplayFonts>
+      <Languages>
+        <Language ID="id-Java">Indonesia (Aksara Jawa)</Language>
+        <Language ID="jv-Java">Jawa (Aksara Jawa)</Language>
+        <Language ID="kaw-Java">Kawi (Aksara Jawa)</Language>
+        <Language ID="mad-Java">Madura (Aksara Jawa)</Language>
+        <Language ID="sas-Java">Sasak (Aksara Jawa)</Language>
+        <Language ID="su-Java">Sunda (Aksara Jawa)</Language>
+        <Language ID="osi-Java">Osing (Aksara Jawa)</Language>
+        <Language ID="tes-Java">Tengger (Aksara Jawa)</Language>
+      </Languages>
+      <Examples>
+        <Example ID="id-Java" Keys="b a h a s a I n d o n e s i a" Text="ꦧꦲꦱ‌ꦆꦤ꧀ꦢꦺꦴꦤꦺꦱꦶꦪꦴ" Note="Name of the language" />
+        <Example ID="jv-Java" Keys="a k s a r a j a w a" Text="ꦲꦏ꧀ꦱꦫꦗꦮ" Note="Name of writing script" />
+        <Example ID="kaw-Java" Keys="k a w i" Text="ꦏꦮꦶ" Note="Name of the language" />
+        <Example ID="mad-Java" Keys="m a d u r a" Text="ꦩꦢꦸꦫ" Note="Name of the language" />
+        <Example ID="sas-Java" Keys="s a s a k" Text="ꦱꦱꦏ꧀" Note="Name of the language" />
+        <Example ID="su-Java" Keys="s u n d a" Text="ꦱꦸꦤ꧀ꦢ" Note="Name of the language" />
+        <Example ID="osi-Java" Keys="o s i n g" Text="ꦲꦺꦴꦱꦶꦁ" Note="Name of the language" />
+        <Example ID="tes-Java" Keys="t e n g g e r" Text="ꦠꦺꦁꦒꦺꦂ" Note="Name of the language" />
+      </Examples>
+  </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

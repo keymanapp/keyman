@@ -27,6 +27,7 @@ uses
   Winapi.Windows;
 
 function GetVersionString: WideString;
+function GetMajorMinorVersionString: string;
 procedure GetVersionBuild(var vMajor, vMinor: Integer);
 function GetVersionCopyright: WideString;
 function GetFileVersionString(const FileName: WideString): WideString;
@@ -52,6 +53,12 @@ begin
             IntToStr(LoWord(VersionMajor)) + '.' +
             IntToStr(HiWord(VersionMinor)) + '.' +
             IntToStr(LoWord(VersionMinor));
+end;
+
+function GetMajorMinorVersionString: string;
+begin
+  Result := IntToStr(HiWord(VersionMajor)) + '.' +  // I3310
+            IntToStr(LoWord(VersionMajor));
 end;
 
 procedure GetVersionBuild(var vMajor, vMinor: Integer);

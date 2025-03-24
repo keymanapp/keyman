@@ -4,16 +4,6 @@
 # Authors:      Marc Durdin
 #
 
-# TODO -- why are these differing from the standard.meson.build flags?
-if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
-
 # Build all keyboards in output folder; these are defined here and used in the
 # keyboards subdir
 
@@ -53,16 +43,8 @@ else
 endif
 
 # copy package.json into build dir for test use
-configure_file(
-  copy: true,
-  input: '../../../../package.json',
-  output: 'package.json',
-)
-configure_file(
-  copy: true,
-  input: '../../../../resources/standards-data/unicode-character-database/Blocks.txt',
-  output: 'Blocks.txt',
-)
+fs.copyfile('../../../../package.json', 'package.json')
+fs.copyfile('../../../../resources/standards-data/unicode-character-database/Blocks.txt', 'Blocks.txt')
 
 configure_file(
   command: [node, meson.current_source_dir() / 'write_node_versions.js','@OUTPUT@'],
@@ -82,8 +64,11 @@ ldml = executable('ldml',
     objects: lib.extract_all_objects(recursive: false),
     )
 
-core_ldml_min = executable('core_ldml_min',
-    ['core_ldml_min.cpp'],
+core_ldml_min = executable('core_ldml_min_tests',
+    [
+      'core_ldml_min.tests.cpp',
+      common_test_files,
+    ],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links,
@@ -91,12 +76,12 @@ core_ldml_min = executable('core_ldml_min',
     link_with: [lib],
     # objects: lib.extract_all_objects(recursive: false),
     )
-test('core_ldml_min', core_ldml_min, suite: 'ldml', should_fail: true)
+test('core_ldml_min_tests', core_ldml_min, suite: 'ldml', should_fail: true)
 
 
 # Build and run additional test_kmx_plus test
 
-e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
+e = executable('kmx_plus_tests', 'kmx_plus.tests.cpp',
     'ldml_test_utils.cpp',
     common_test_files,
     cpp_args: defns + warns,
@@ -104,18 +89,18 @@ e = executable('test_kmx_plus', 'test_kmx_plus.cpp',
     link_args: links + tests_flags,
     dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
-test('test_kmx_plus', e, suite: 'ldml')
+test('kmx_plus_tests', e, suite: 'ldml')
 
 # run transforms / ldml utilities unit test
 
-t = executable('test_transforms', 'test_transforms.cpp',
+t = executable('transforms_tests', 'transforms.tests.cpp',
     common_test_files,
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
     dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
-test('test_transforms', t, suite: 'ldml')
+test('transforms_tests', t, suite: 'ldml')
 
 # run test_context_normalization ldml unit test
 
@@ -125,19 +110,19 @@ if cpp_compiler.get_id() == 'emscripten'
   normalization_tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
-test_context_normalization = executable('test_context_normalization',
-    ['test_context_normalization.cpp', common_test_files],
+test_context_normalization = executable('context_normalization_tests',
+    ['context_normalization.tests.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + normalization_tests_flags,
     dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
-test('test_context_normalization', test_context_normalization, suite: 'ldml')
+test('context_normalization_tests', test_context_normalization, suite: 'ldml')
 
 # Build and run additional test_unicode test
 
-test_unicode = executable('test_unicode', 'test_unicode.cpp',
-    ['test_unicode.cpp', common_test_files, generated_headers],
+test_unicode = executable('unicode_tests', 'unicode.tests.cpp',
+    ['unicode.tests.cpp', common_test_files, generated_headers],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
@@ -146,7 +131,7 @@ test_unicode = executable('test_unicode', 'test_unicode.cpp',
 
 )
 
-test('test_unicode', test_unicode, suite: 'ldml',
+test('unicode_tests', test_unicode, suite: 'ldml',
   args: [
     test_unicode_path / 'nodeversions.json',
     test_unicode_path / 'package.json',

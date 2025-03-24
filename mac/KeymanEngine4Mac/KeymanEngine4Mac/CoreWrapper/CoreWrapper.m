@@ -1,8 +1,5 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
- *
- * CoreWrapper.m
- * Keyman
  *
  * Created by Shawn Schantz on 2022-12-12.
  *
@@ -67,6 +64,40 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   }
 }
 
+-(CoreKeyboardInfo*) getKeyboardInfoForKmxFile:(NSString*)kmxFile {
+  NSArray *keyArray = [self getKeyArray];
+  CoreKeyboardInfo* info = [[CoreKeyboardInfo alloc] init:kmxFile keyArray: keyArray];
+  return info;
+}
+
+/**
+ * Get the list of Keys supported by the keyboard
+ */
+-(NSArray*)getKeyArray {
+  NSMutableArray *keyArray = [[NSMutableArray alloc] initWithCapacity:0];
+  km_core_keyboard_key *keyList;
+
+  km_core_status result = km_core_keyboard_get_key_list(self.coreKeyboard, &keyList);
+
+  for(km_core_keyboard_key* keyPtr = keyList; (keyPtr->key) != 0; keyPtr++) {
+    uint16_t key = keyPtr->key;
+    uint32_t modifier_flag = keyPtr->modifier_flag;
+    
+    if(key != 0) {
+      CoreKey* coreKey = [[CoreKey alloc] init: key modifiers: modifier_flag];
+      [keyArray addObject:coreKey];
+
+      //os_log_debug([KMELogs coreLog], "key %d modifiers 0x%X coreKey %{public}@", key, modifier_flag, coreKey);
+    }
+  }
+
+  km_core_keyboard_key_list_dispose(keyList);
+  
+  os_log_debug([KMELogs coreLog], "getKeyList returning %lu keys", (unsigned long)keyArray.count);
+
+  return keyArray;
+}
+
 -(void) dealloc{
   if (self.coreState) {
     km_core_state_dispose(self.coreState);
@@ -74,16 +105,28 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (self.coreKeyboard) {
     km_core_keyboard_dispose(self.coreKeyboard);
   }
-  os_log_debug([KMELogs coreLog], "dealloc called.");
+  os_log_debug([KMELogs coreLog], "CoreWrapper dealloc called");
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
   km_core_path_name keyboardPath = [path UTF8String];
-  km_core_status result = km_core_keyboard_load(keyboardPath, &_coreKeyboard);
+  NSError* dataError = nil;
+  NSData *data = [NSData dataWithContentsOfFile:path options:0 error:&dataError];
   
-  if (result != KM_CORE_STATUS_OK) {
-    NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
-    [NSException raise:@"LoadKeyboardException" format:@"%@", message];
+  if (dataError != nil) {
+    os_log_error([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataError: %{public}@", path, dataError);
+    [NSException raise:@"LoadKeyboardException" format:@"%@", dataError];
+  } else {
+    NSUInteger dataLength = data.length;
+    os_log_info([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataLength: %lu", path, dataLength);
+    
+    km_core_status result = km_core_keyboard_load_from_blob(keyboardPath,
+                                                   data.bytes, dataLength, &_coreKeyboard);
+    if (result != KM_CORE_STATUS_OK) {
+      NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
+      os_log_error([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n core result: %{public}@", path, message);
+      [NSException raise:@"LoadKeyboardException" format:@"%@", message];
+    }
   }
 }
 
@@ -95,7 +138,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     if (result==KM_CORE_STATUS_OK) {
       _keyboardVersion = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
       _keyboardId = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->id];
-      os_log_debug([KMELogs coreLog], "readKeyboardAttributesUsingCore, keyboardVersion: %{public}@\n, keyboardId: %{public}@\n", _keyboardVersion, _keyboardId);
+      os_log_debug([KMELogs coreLog], "readKeyboardAttributesUsingCore, keyboardVersion: %{public}@, keyboardId: %{public}@\n", _keyboardVersion, _keyboardId);
     } else {
       os_log_error([KMELogs coreLog], "km_core_keyboard_get_attrs() failed with result = %u\n", result);
     }

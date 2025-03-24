@@ -147,13 +147,13 @@
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
 
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">Always show banner</string>
 
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">To be implemented</string>
 
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">When off, only shown when predictive text is enabled</string>
 
   <!-- Context: Keyman Settings menu -->

@@ -1,10 +1,10 @@
-import { CasingForm, Configuration, Context } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Mock } from "keyman/engine/js-processor";
 
-export default class ContextWindow implements Context {
+export default class ContextWindow implements LexicalModelTypes.Context {
   // Used to limit the range of context replicated for use of keyboard rules within
   // the engine, as used for fat-finger prep / `Alternate` generation.
-  public static readonly ENGINE_RULE_WINDOW: Configuration = {
+  public static readonly ENGINE_RULE_WINDOW: LexicalModelTypes.Configuration = {
     leftContextCodePoints: 64,
     rightContextCodePoints: 32
   };
@@ -15,9 +15,9 @@ export default class ContextWindow implements Context {
   startOfBuffer: boolean;
   endOfBuffer: boolean;
 
-  casingForm?: CasingForm;
+  casingForm?: LexicalModelTypes.CasingForm;
 
-  constructor(mock: Mock, config: Configuration, layerId: string) {
+  constructor(mock: Mock, config: LexicalModelTypes.Configuration, layerId: string) {
     this.left = mock.getTextBeforeCaret();
     this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
     if(!this.startOfBuffer) {

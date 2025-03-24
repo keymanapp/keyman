@@ -137,7 +137,7 @@ SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 ```
 
 > [!NOTE]
-> The `SETX` command will set persistent environment variables but they do not 
+> The `SETX` command will set persistent environment variables but they do not
 > impact the current shell environment. Start a new shell to see the variables.
 
 > [!TIP]
@@ -147,7 +147,7 @@ SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 >
 > You can alternatively use Windows Settings to add these environment variables
 > permanently:
-> 
+>
 > 1. In Windows Search, type "environment" and select "Edit System Environment
 >    Variables"
 > 2. Click `Environment Variables...`
@@ -175,6 +175,19 @@ git clone https://github.com/emscripten-core/emsdk
 cd emsdk
 emsdk install 3.1.58
 emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
+```
+
+If you are updating an existing install of Emscripten:
+
+```bash
+cd emsdk
+git pull
+emsdk install 3.1.58
+emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
 ```
 
 > ![WARNING]
@@ -185,7 +198,7 @@ emsdk activate 3.1.58
 
 There is no need to add emscripten to the path in order to build Keyman.
 However, you should set the `EMSCRIPTEN_BASE` variable to the path where `emcc`
-can be found, in the `upstream\emscripten` subdirectory of where you installed 
+can be found, in the `upstream\emscripten` subdirectory of where you installed
 emsdk.
 
 **Environment variables**:
@@ -196,7 +209,7 @@ SETX EMSCRIPTEN_BASE "<your-emsdk-path>\upstream\emscripten"
 
 **Optional environment variables**:
 
-To let the Keyman build scripts control the version of Emscripten 
+To let the Keyman build scripts control the version of Emscripten
 installed on your computer:
 
 ```bat
@@ -259,7 +272,7 @@ of appropriate node versions during builds.
   ```ps1
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
-  
+
   * Verify required build tools are installed
     * Run `Visual Studio Installer`
     * Check the `Individual components` tab

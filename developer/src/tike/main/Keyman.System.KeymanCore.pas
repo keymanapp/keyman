@@ -245,8 +245,10 @@ type
 
   pkm_core_keyboard_attrs = ^km_core_keyboard_attrs;
 
-function km_core_keyboard_load(
-  kb_path: km_core_path_name;
+function km_core_keyboard_load_from_blob(
+  kb_name: km_core_path_name;
+  blob: Pointer;
+  blob_size: NativeUint;
   var keyboard: pkm_core_keyboard
 ): km_core_status; cdecl; external keymancore delayed;
 

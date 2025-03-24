@@ -34,6 +34,38 @@
           </tbody>
         </table>
 
+        <h1>User Profile Options</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Languages</th>
+              <th>ShowAutoCorrection</th>
+              <th>ShowTextPrediction</th>
+              <th>ShowCasing</th>
+              <th>ShowShiftLock</th>
+              <th>InputMethodOverride</th>
+            </tr>
+          </thead>
+          <tbody>
+            <xsl:apply-templates select="//Key[@Path='HKEY_CURRENT_USER\Control Panel\International\User Profile']/Value"/>
+          </tbody>
+        </table>
+
+        <h1>BCP47 Codes</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>BCP47 Code</th>
+              <th>Transient LangId</th>
+              <th>Cached Language Name</th>
+              <th>{LangID}:{Keyboard Layout ID}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <xsl:apply-templates select="//Key[@Path='HKEY_CURRENT_USER\Control Panel\International\User Profile']/Key"/>
+          </tbody>
+        </table>
+
         <h1>Windows Keyboard Hotkeys</h1>
         <table>
           <thead>
@@ -88,7 +120,7 @@
     <td><xsl:value-of select="Value[@Name='Layout File' or @Name='layout file']/@Value"/></td>
     <td><xsl:value-of select="Value[@Name='Layout Text' or @Name='layout text']/@Value"/></td>
     <td><xsl:if test="Value[@Name='keyman install' or @Name='Keyman Install']">Keyman system shadow keyboard</xsl:if></td>
-  </tr>    
+  </tr>
 </xsl:template>
 <xsl:template match="//Locale">
   <tr>
@@ -96,9 +128,9 @@
     <td><xsl:value-of select="@Name"/></td>
     <td><xsl:value-of select="@Country"/></td>
     <td><xsl:value-of select="@Flags"/></td>
-  </tr>  
+  </tr>
 </xsl:template>
-  
+
 <xsl:template match="//Key[@Path='HKEY_CURRENT_USER\keyboard layout\Toggle']/Value">
   <tr>
     <td><xsl:value-of select="@Name"/></td>
@@ -114,6 +146,27 @@
   </tr>
 </xsl:template>
 
+<xsl:template match="//Key[@Path='HKEY_CURRENT_USER\Control Panel\International\User Profile']/Value">
+  <tr>
+    <td><xsl:value-of select="@Name"/></td>
+    <td><xsl:value-of select="@Value"/></td>
+  </tr>
+</xsl:template>
+
+<xsl:template match="//Key[@Path='HKEY_CURRENT_USER\Control Panel\International\User Profile']/Key">
+  <tr>
+    <td><xsl:value-of select="substring-after(@Path, 'User Profile\')"/></td>
+    <td><xsl:value-of select="Value[@Name='TransientLangId']/@Value"/></td>
+    <td><xsl:value-of select="Value[@Name='CachedLanguageName']/@Value"/></td>
+    <td>
+      <xsl:for-each select="Value[contains('0123456789', substring(@Name,1,1))]">
+        <xsl:value-of select="@Name"/>
+        <xsl:if test="position() != last()">, </xsl:if>
+      </xsl:for-each>
+    </td>
+  </tr>
+</xsl:template>
+
 <xsl:template match="//Key[@Path='HKEY_CURRENT_USER\keyboard layout\Preload']/Value">
   <xsl:variable name="LanguageID">0000<xsl:value-of select="substring(@Value,5,4)"/></xsl:variable>
   <xsl:variable name="KeyboardID">
@@ -125,7 +178,7 @@
   <xsl:variable name="KeyboardRegistryKey" select="//Key[translate(@Path,$uppercase,$lowercase)=translate(concat('HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\keyboard layouts\',$KeyboardID),$uppercase,$lowercase)]"/>
   <xsl:variable name="KeyboardName" select="$KeyboardRegistryKey/Value[translate(@Name,$uppercase,$lowercase)='layout text']/@Value" />
   <xsl:variable name="Language" select="//Locale[@ID=$LanguageID]" />
-  
+
   <xsl:variable name="LayoutFile" select="$KeyboardRegistryKey/Value[translate(@Name,$uppercase,$lowercase)='layout file']/@Value" />
   <xsl:variable name="LayoutID" select="$KeyboardRegistryKey/Value[translate(@Name,$uppercase,$lowercase)='layout id']/@Value" />
 
@@ -166,7 +219,7 @@
         <xsl:otherwise>No</xsl:otherwise>
       </xsl:choose>
     </td>
-  </tr>  
+  </tr>
 </xsl:template>
 
-</xsl:stylesheet> 
+</xsl:stylesheet>

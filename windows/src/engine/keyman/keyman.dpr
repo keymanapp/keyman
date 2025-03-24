@@ -32,7 +32,7 @@ uses
   UfrmOSKPlugInBase in 'viskbd\UfrmOSKPlugInBase.pas' {frmOSKPlugInBase},
   UfrmOSKCharacterMap in 'viskbd\UfrmOSKCharacterMap.pas' {frmOSKCharacterMap},
   UfrmOSKEntryHelper in 'viskbd\UfrmOSKEntryHelper.pas' {frmOSKEntryHelper},
-  TTInfo in '..\..\..\..\common\windows\delphi\general\TTInfo.pas',
+  ttinfo in '..\..\..\..\common\windows\delphi\general\ttinfo.pas',
   UnicodeData in '..\..\..\..\common\windows\delphi\charmap\UnicodeData.pas',
   CharacterMapSettings in '..\..\..\..\common\windows\delphi\charmap\CharacterMapSettings.pas',
   CharacterRanges in '..\..\..\..\common\windows\delphi\charmap\CharacterRanges.pas',
@@ -112,7 +112,8 @@ uses
   Sentry.Client.Vcl in '..\..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Vcl.pas',
   sentry in '..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\..\..\common\windows\delphi\general\Keyman.System.KeymanSentryClient.pas',
-  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas';
+  Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas',
+  Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}

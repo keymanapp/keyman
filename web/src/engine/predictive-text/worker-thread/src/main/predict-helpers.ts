@@ -5,7 +5,17 @@ import { determineModelTokenizer, determineModelWordbreaker, determinePunctuatio
 import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { ProbabilityMass, Suggestion, LexicalModel, Distribution, Outcome, Keep, SuggestionTag, Reversion, Transform, Context } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import Keep = LexicalModelTypes.Keep;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Outcome = LexicalModelTypes.Outcome;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import SuggestionTag = LexicalModelTypes.SuggestionTag;
+import Transform = LexicalModelTypes.Transform;
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -248,6 +258,29 @@ export async function correctAndEnumerate(
   let bestCorrectionCost: number;
   let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
 
+  // If corrections are not enabled, bypass the correction search aspect entirely.
+  // No need to 'search' - just do a direct lookup.
+  if(!searchSpace.correctionsEnabled) {
+    const predictionRoot = {
+      sample: {
+        insert: wordbreak(postContext),  // insert correction string
+        deleteLeft: deleteLeft,
+        id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+      },
+      p: 1.0
+    };
+
+    let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
+    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+
+    // Only one 'correction' / prediction root is allowed - the actual text.
+    return {
+      postContextState: postContextState,
+      rawPredictions: predictions
+    }
+  }
+
+  // Only run the correction search when corrections are enabled.
   for await(let match of searchSpace.getBestMatches(timer)) {
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
@@ -548,11 +581,13 @@ export function processSimilarity(
     return;
   }
 
-  // Generate a default 'keep' option if one was not otherwise produced.
-
-  // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
-  // for context-tracking otherwise!
-  let keepTransform: Transform = { ...inputTransform };
+  // Generate a full-word 'keep' replacement like other suggestions when one is not otherwise
+  // produced; we want to replace the full token in the same manner used for other suggestions.
+  const basePrefixLength = truePrefix.kmwLength() - inputTransform.insert.kmwLength() + inputTransform.deleteLeft;
+  const keepTransform = {
+    insert: truePrefix,
+    deleteLeft: basePrefixLength
+  };
 
   // 1 is a filler value; goes unused b/c is for a 'keep'.
   let keepSuggestion = models.transformToSuggestion(keepTransform, 1);

@@ -17,7 +17,7 @@
 "JOK-JV-n8w.title" = "Voltar";
 
 /* Keyboards button text */
-"MPN-9N-wWc.label" = "Keyboards";
+"MPN-9N-wWc.label" = "Teclados";
 
 /* text to explain verbose Console logging option */
 "MrI-GM-7d6.title" = "Quando a opção de registro detalhada estiver ativada, o Keyman irá registrar ações que podem ajudar o suporte ao Keyman a diagnosticar um problema. O programa Console pode ser usado para ver um registro de mensagens do Keyman. Em Console, filtro para mostrar todas as mensagens do processo \"Keyman\". Este log pode ser exportado e enviado para o suporte a Keyman, se necessário.";
