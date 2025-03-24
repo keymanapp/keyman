@@ -2,12 +2,6 @@
  * Keyman is copyright (C) SIL International. MIT License.
  */
 
-/*run with 
-cd developer/src/kmc-convert/
-./build.sh test*/
-
-
-
 import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, compilerTestOptions } from './helpers/index.js';
@@ -22,39 +16,19 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  // convert_object
-  const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-
-  // convert_object from usable file name
-  //copy into C:\Projects\keyman\keyman\developer\src\kmc-convert\test\DATA then they run OK
-  //const inputFilename = makePathToFixture('../data/US_complete.keylayout');               // OKOK
-  const inputFilename =  makePathToFixture('../data/Italian_copy.keylayout');             // OKOK
+  const inputFilename = makePathToFixture('../data/Italian_copy.keylayout');             // OKOK
   //const inputFilename = makePathToFixture('../data/German_complete.keylayout');           // OK NO NCAPS SHIFT <-> SHIFT NCAPS
   //const inputFilename  = makePathToFixture('../data/German_Standard_copy.keylayout');     // OK NO NCAPS SHIFT <-> SHIFT NCAPS
-  //const inputFilename  = makePathToFixture('../data/German_Standard2.keylayout');         // OKOK   small
   //const inputFilename  = makePathToFixture('../data/Spanish_copy.keylayout');             // OKOK
   //const inputFilename  = makePathToFixture('../data/Latin_American_copy.keylayout');      // OKOK
   //const inputFilename  = makePathToFixture('../data/Swiss_French_copy.keylayout');        // OKOK
   //const inputFilename  = makePathToFixture('../data/Swiss_German_copy.keylayout');        // OKOK
   //const inputFilename  = makePathToFixture('../data/US_copy.keylayout');                  // OKOK
+  //const inputFilename = makePathToFixture('../data/Polish_copy.keylayout');               // OKOK
 
-  //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');           // No
-  //const inputFilename  = makePathToFixture('../data/German_StandardTweaked.keylayout');   // NO C3
-
-  const read = sut.read(inputFilename);
-  const converted = sut.convert(read);
-
-  // empty convert_object from unavailable file name
-  const inputFilename_unavailable = makePathToFixture('X.keylayout');
-  const read_unavailable = sut.read(inputFilename_unavailable);
-  const converted_unavailable = sut.convert(read_unavailable);
-
-  // empty convert_object from empty filename
-  const inputFilename_empty = makePathToFixture('');
-  const read_empty = sut.read(inputFilename_empty);
-  const converted_empty = sut.convert(read_empty);
 
   describe("run() ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     it('run() should throw on null inputs', async function () {
       // note, could use 'chai as promised' library to make this more fluent:
@@ -105,6 +79,9 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("read() ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const inputFilename_unavailable = makePathToFixture('X.keylayout');
+
     it('read() should return filled array on correct input', async function () {
       const result = sut.read(inputFilename);
       assert.isNotEmpty(result);
@@ -137,6 +114,15 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("write() ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+    const converted = sut.convert(read);
+
+    // empty convert_object from unavailable file name
+    const inputFilename_unavailable = makePathToFixture('X.keylayout');
+    const read_unavailable = sut.read(inputFilename_unavailable);
+    const converted_unavailable = sut.convert(read_unavailable);
+
     it('write() should return true (no error) if no inputfile', async function () {
       const result = sut.write(converted_unavailable);
       assert.isTrue(result);
@@ -149,6 +135,19 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("convert() ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+    const converted = sut.convert(read);
+
+    // empty convert_object from unavailable file name
+    const inputFilename_unavailable = makePathToFixture('X.keylayout');
+    const read_unavailable = sut.read(inputFilename_unavailable);
+    const converted_unavailable = sut.convert(read_unavailable);
+
+    // empty convert_object from empty filename
+    const inputFilename_empty = makePathToFixture('');
+    const read_empty = sut.read(inputFilename_empty);
+    const converted_empty = sut.convert(read_empty);
 
     it('should return converted array on correct input', async function () {
       // we use 'converted' from above
@@ -193,6 +192,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('create_kmn_modifier ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+
     [
       ['anycontrol', true, 'NCAPS CTRL'],
       ['shift?', true, 'NCAPS'],
@@ -221,6 +222,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('getHexFromString ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+
     [
       ['0009', '0009'],
       ['000027', '001B'],
@@ -243,7 +246,9 @@ describe('KeylayoutToKmnConverter', function () {
     });
   });
 
-  describe('checkOutputChar ', function () {
+  describe('convertToUnicodeCodePoint ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -266,13 +271,15 @@ describe('KeylayoutToKmnConverter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut.checkOutputChar(values[0] as string);
+        const result = sut.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
   });
 
   describe("isAcceptableKeymanModifier ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+
     [
       ["NCAPS", true],
       ["NxCAPS", false],
@@ -296,6 +303,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("map_UkeleleKC_To_VK ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+
     [
       [0x00, "K_A"],
       [0x31, "K_SPACE"],
@@ -315,6 +324,7 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("checkIfCapsIsUsed ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     it(("checkIfCapsIsUsed([['caps', 'xxx'], ['yyy']])").padEnd(45, " ") + " should return true", async function () {
       const result = sut.checkIfCapsIsUsed([["caps", "xxx"], ["yyy"]]);
@@ -336,6 +346,10 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_Modifier_array__From__KeyModifier_array ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+    const converted = sut.convert(read);
+
     [[[['0', 0]], [['', 'shift? caps? ']]],
     [[['0', 1]], [['anyShift caps?', 'shift? rightShift caps? ', 'shift? leftShift caps? ', 'shift leftShift caps ']]],
     [[['0', 999]], [null]],
@@ -363,6 +377,9 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_KeyModifier_array__From__ActionID ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+
     [
       ["a16", [['32', 3]]],
       ["a19", [['45', 3]]],
@@ -387,6 +404,9 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_ActionID__From__ActionNext ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+
     [
       ["none", ""],
       ["a18", ""],
@@ -409,6 +429,9 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_ActionIndex__From__ActionId ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+
     [
       ["none", 0],
       ["a16", 8],
@@ -429,6 +452,9 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_Output__From__ActionId_None ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+
     [["a14", "u"],
     ["", ""],
     [" ", ""],
@@ -454,6 +480,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
 
     const b1_keycode_arr = [
       ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
@@ -565,6 +593,19 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("writeData_Stores() ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+    const converted = sut.convert(read);
+
+    // empty convert_object from unavailable file name
+    const inputFilename_unavailable = makePathToFixture('X.keylayout');
+    const read_unavailable = sut.read(inputFilename_unavailable);
+    const converted_unavailable = sut.convert(read_unavailable);
+
+    // empty convert_object from empty filename
+    const inputFilename_empty = makePathToFixture('');
+    const read_empty = sut.read(inputFilename_empty);
+    const converted_empty = sut.convert(read_empty);
 
     const out_expected_first: string =
       "c ......................................................................\n"
@@ -603,6 +644,10 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_ActionStateOutput_array__From__ActionState ", function () {
+
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+
     [["1", [
       ['a0', '1', 'ˆ'],
       ['a1', '1', 'Â'],
@@ -644,6 +689,11 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput ", function () {
+
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
+    const converted = sut.convert(read);
+
     [
       ["a1", "A", true, [
         ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT NCAPS'],
@@ -675,6 +725,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe("get_KeyActionOutput_array__From__ActionStateOutput_array ", function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const read = sut.read(inputFilename);
 
     const b6_actionId_arr = [
       ['a0', '1', 'ˆ'],
@@ -773,12 +825,6 @@ describe('KeylayoutToKmnConverter', function () {
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
-  });
-
-
-  // Todo remove
-  after(function () {
-    console.log("\nTESTS OK ##########################################################################");
   });
 
 });

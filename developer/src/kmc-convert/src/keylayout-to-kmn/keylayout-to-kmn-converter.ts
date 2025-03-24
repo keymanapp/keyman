@@ -8,106 +8,24 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 
 //     Todo remove these todos
-// OK  TODO keylayout->kmn
-// OK  modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
-// OK  defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
-// OK  write read, convert, write
-// OK  add data to object
-// OK  Use filter functions
-// OK  action/output:use filter etc to shorten func
-// OK  deadkeyables:use filter etc to shorten func
-// OK  dk-> for all action:use filter etc to shorten func
-// OK  remove unnecessary data from data_object
-// OK  rename symbols
-// OK  remove part using kmn_key_Name1
-// OK  remove unnecceaasry map_UkeleleKC_To_kmn_Key_Name_Array_Position_n etc
-// OK  loop throught ANSI, JIS- at moment only use [keyMapSet_count] (keyMapSet_count=0)
-// OK  remove funcs at teh end
-// OK  import { makePathToFixture } from '../../test/helpers/index.js';
-// OK  Mapping 0->30  or 0->K_A-> missing entries in mapping 
-// OK  Replace any-types
-// OK  Several steps action-> action-> action->character ( not only  action->character)
-// OK  Usable for all keylayout files
-// OK  Use callbacks as for writeFileSync
-// OK  objects contain only used stuff READ in: -- out: only read arrays / CONVERT in: only read arrays out: return only to write arrays
-// OK  Use catch blocks for file read
-// OK  read:  answer :  + [K_A] > 'a'  is OK / TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
-// OK  one entry vs several entry in tags
-// OK  no added NCAPS when first modifier in modifierMap does not contain "caps" or"caps?"
-// OK  naming of for-loop var i,j,k?...
-// OK  warning if contrADICTING RULES E:G:   [ 'modifier_C0', 'SHIFT NCAPS', 'K_C', 'c'],  vs [ 'modifier_C0', 'SHIFT NCAPS', 'K_C', 'C' ],
-// OK  print NCAPS as the first of the modifiers in create_kmn_modifier
-// OK  use boxXmlArray from codebase instead of my own
-// OK  where are rules for action+none ( a, e, u, etc)
-// OK  order of object member var
-// OK  readfilesync with paths better way?
-// OK  rearrange code to use read, convert, write
-// OK  TODO rewrite explanantion for object instead of array
-// OK  remove all any types
-// OK  public dk: number,                    //todo remove one
-// OK  todo use from elsewhere boxXmlArray_S
-// OK  prev_deadkeys_Ch: Uint8Array,   /* Todo needed?*/
-// OK  Todo remove print_draft
-// OK  Todo files/path !!!
-// OK  start Tests v ToDo remove......................................
-// OK  TODO remove:  test files: checkif kmn gets the same output as ukelele file(except for C3 t works well :))
-// OK  ToDo needed methods
-// OK  where to put documentation
-// OK  dk <-> id_deadkey ???
-// OK  check if we use the same  algorithm to get Block1 data
-// OK  check unique_prev_deadkey, unique_deadkey, dk_prv, dk, id_deadkey
-// OK  check duplicate rule conditions which do I need; which can go
-// OK  when I run german with uniqueCAll why will there be [ ] without key anf modifier
-// OK  add links to HEADLINE of kmc-convert document
-// OK  TODO more  Data stores to add ??
-// OK  check for keys < 50 whern working with keys
-// OK  NO OUTPUT FOR SPACE in C0C1 !!!
-// OK  check code for code styles keyman
-//     check  (string |number) <-> number
-//     tests for 3 functions read write convert
-//     Return conditions
-//     Tests throws
-//     Conditions NCAPS,OPT;...
-//     TODO move func outside of class
-//     Functions as object methods?
-//     use length to clear array instead of defining new every time (modifierMap_ONE_InKeymapSelect.length=0
+
+//     use cmdl parameters -> new issue/PR
+
+//     TODO what about using actions twice in a row??? -> error msg if chain >4 -> new issue
+//     Todo prevent break for output ="" -> new issue
+
+//     what if keylayout file is not correct e.g missing '>'  -> new issue
+//     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA -> new issue
+// ---------------------------------------------------
+
 //     Filter functions use the same type
-//     TODO need to use export const USVirtualKeyCodes here
-//     replace unique_prev_deadkey 0, >0 with true, false
-//     TODO what about using actions twice in a row??? -> error msg if chain >4
-//     what if keylayout file is not correct e.g missing '>'
-//     read TODO which stores?
-// OK  does order of modifier matter ? -> NO
-//     remove all markers c0, 1-1, #### C2 ###, ...
-// OK  better function names for get......
-//     use cmdl parameters
-// OK  check semicolon everywhere
-// OK  test run
-// OK  test read
-// OK  test convert
-// OK  test write
-// OK  test createRuleData
-// OK  test get_KeyMap_Code_array__From__KeyMap_Action
-// OK  test get_KeyActionOutput_array__From__ActionStateOutput_array
-// OK  test get_ActionIndex__From__ActionId
-// OK  test get_ActionID__From__ActionNext
-// OK  test get_ActionStateOutput_array__From__ActionState
-// OK  test get_Output__From__ActionId_None
-// OK  test get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array
-// OK  test get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput
-// OK test get_KeyModifier_array__From__ActionID
-// OK  test get_Modifier_array__From__KeyModifier_array
-// OK  test create_kmn_modifier
-// OK  test checkIfCapsIsUsed
-// OK  test isAcceptableKeymanModifier
-//     test reviewRules
-// OK  test map_UkeleleKC_To_VK
-//     test writeData_Rules
-// OK  test writeData_Stores
-//     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA
-// separate createRuleData and check for duplicates/amb rules 
-// remove todos
-// check warning text
+//     check  (string |number) <-> number
+
+//     create NAME.kmn instead Myesult,kmn
+
+//     ToDo "undefined" or undefined ????
+
+//     separate createRuleData and check for duplicates/amb rules
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
 import { readFileSync } from 'fs';
@@ -128,7 +46,6 @@ function boxArrays(source: any) {
   boxXmlArray(source?.actions, 'action');
   for (const action of source?.actions?.action) {
     boxXmlArray(action, 'when');
-
   }
   return source;
 }
@@ -179,30 +96,25 @@ export class KeylayoutToKmnConverter {
     if (!inputFilename || !outputFilename) {
       throw new Error('Invalid parameters');
     }
-    console.log(' _S2 first READ file ........................................in:', inputFilename);
     const jsonO: object = this.read(inputFilename);
 
     if (!jsonO) {
-      throw new Error('read() not OK');
+      throw new Error('Error while processing read()');
       return null;
     }
 
-    console.log(' _S2 then CONVERT ........................................');
     const outArray: convert_object = await this.convert(jsonO);
 
     if (!outArray) {
-      throw new Error('convert() not OK');
+      throw new Error('Error while processing convert()');
       return null;
     }
-
-    console.log(' _S2 then WRITE to kmn .....................................');
 
     const out_text: boolean = this.write(outArray);
     if (!out_text) {
-      throw new Error('write() not OK');
+      throw new Error('Error while processing write()');
       return null;
     }
-
     return null;
   }
 
@@ -228,8 +140,7 @@ export class KeylayoutToKmnConverter {
       boxArrays(jsonObj.keyboard);      // jsonObj now contains only arrays; no single fields
     }
     catch (err) {
-      // Todo how to break correctly; return what??
-      console.log(" FILE NOT FOUND");
+      console.log(err.message);
     }
     return jsonObj;
   }
@@ -254,7 +165,7 @@ export class KeylayoutToKmnConverter {
       arrayOf_Rules: []
     };
 
-    // todo check for tags
+    // todo check tags
     if (jsonObj_any.hasOwnProperty("keyboard")) {
 
       data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
@@ -304,7 +215,7 @@ export class KeylayoutToKmnConverter {
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
 
     const object_array: rule_object[] = [];
-    let dk_counter_C3_A: number = 0;
+    let dk_counter_C3: number = 0;
     let dk_counter_C2: number = 0;
     let action_id: string;
 
@@ -350,6 +261,8 @@ export class KeylayoutToKmnConverter {
                   /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                   /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
               );
+
+              // ToDo "undefined" or undefined ????
               if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
                 object_array.push(rule_obj);
               }
@@ -545,7 +458,7 @@ export class KeylayoutToKmnConverter {
                               /*   rule_type */             "C3",
                               /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_arr[n1][n2], isCapsused),
                               /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_arr[n3][0])),
-                              /*   id_prev_deadkey */        dk_counter_C3_A++,
+                              /*   id_prev_deadkey */        dk_counter_C3++,
                               /*   unique A */              0,
 
                               /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_arr[n4][n5], isCapsused),
@@ -573,6 +486,9 @@ export class KeylayoutToKmnConverter {
           }
         } else {
           console.log("ERROR : some entries are not available");
+          // Todo prevent break for output =""
+          console.log(" ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
+
         }
       }
     }
@@ -675,8 +591,6 @@ export class KeylayoutToKmnConverter {
     return data_ukelele;
   }
 
-
-  // ---------------------------------------------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------------------------------------------
 
   /**
@@ -1018,9 +932,8 @@ export class KeylayoutToKmnConverter {
    * @param  keylayout_modifier the modifier value used in the .keylayout-file
    * @return kmn_modifier the modifier value used in the .kmn-file
    */
-  // TODO caps <-> Caps <-> cAPs,...
   public checkIfCapsIsUsed(keylayout_modifier: string[][]): boolean {
-    return JSON.stringify(keylayout_modifier).includes("caps");
+    return JSON.stringify(keylayout_modifier).toUpperCase().includes("CAPS");
   }
 
   /**
@@ -1065,7 +978,6 @@ export class KeylayoutToKmnConverter {
     * @param  index the index of a rule in array[rule]
     * @return a string[] containing possible warnings for a rule
     */
-  // todo remove comments in filters after check of several keylayout files
   public reviewRules(rule: rule_object[], index: number): string[] {
 
     const warningTextArray: string[] = Array(3).fill("");
@@ -1075,28 +987,28 @@ export class KeylayoutToKmnConverter {
     // Todo remoce C1-C3's and other markers
     if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
-        warningTextArray[2] = "C1 unavailable modifier : ";
+        warningTextArray[2] = "unavailable modifier : ";
       }
     }
 
     else if (rule[index].rule_type === "C2") {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
-        warningTextArray[1] = "C2 unavailable modifier : ";
+        warningTextArray[1] = "unavailable modifier : ";
       }
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
-        warningTextArray[2] = "C2 unavailable modifier : ";
+        warningTextArray[2] = "unavailable modifier : ";
       }
     }
 
     else if (rule[index].rule_type === "C3") {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_prev_deadkey)) {
-        warningTextArray[2] = "C3 unavailable modifier : ";
+        warningTextArray[2] = "unavailable modifier : ";
       }
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
-        warningTextArray[1] = "C3 unavailable modifier : ";
+        warningTextArray[1] = "unavailable modifier : ";
       }
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
-        warningTextArray[0] = "C3 unavailable modifier : ";
+        warningTextArray[0] = "unavailable modifier : ";
       }
     }
 
@@ -1146,46 +1058,46 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 4-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_4_1[0].modifier_prev_deadkey
             + " "
             + amb_4_1[0].prev_deadkey
             + "]  >  dk(C"
             + amb_4_1[0].unique_prev_deadkey
-            + ") here: ");
+            + ") ");
       }
 
-       if (amb_2_1.length > 0) {
+      if (amb_2_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 2-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_2_1[0].modifier_deadkey
             + " "
             + amb_2_1[0].deadkey
             + "]  >  dk(A"
             + amb_2_1[0].unique_deadkey
-            + ") here: ");
+            + ") ");
       }
 
-       if (amb_1_1.length > 0) {
+      if (amb_1_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("C1 ambiguous 1-1 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_1_1[0].modifier_key
             + " "
             + amb_1_1[0].key
             + "]  >  \'"
             + new TextDecoder().decode(amb_1_1[0].output)
-            + "\' here: ");
+            + "\' ");
       }
 
-       if (dup_1_1.length > 0) {
+      if (dup_1_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("C1 duplicate 1-1 rule: earlier: ["
+          + ("duplicate rule: earlier: ["
             + dup_1_1[0].modifier_key
             + " "
             + dup_1_1[0].key
             + "]  >  \'"
             + new TextDecoder().decode(dup_1_1[0].output)
-            + "\' here: ");
+            + "\' ");
       }
     }
 
@@ -1240,28 +1152,29 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 2-2 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_2_2[0].modifier_deadkey
             + " "
             + amb_2_2[0].deadkey
             + "]  >  dk(C"
             + amb_2_2[0].id_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (dup_2_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("duplicate 2-2 rule: earlier: ["
+          + ("duplicate rule: earlier: ["
             + dup_2_2[0].modifier_deadkey
             + " "
             + dup_2_2[0].deadkey
             + "]  >  dk(C"
             + dup_2_2[0].id_deadkey
-            + ") here: ");
+            + ") ");
       }
+
       if (amb_3_3.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 3-3 rule: earlier: dk(C"
+          + ("ambiguous rule: earlier: dk(C"
             + amb_3_3[0].id_deadkey
             + ") + ["
             + amb_3_3[0].modifier_key
@@ -1269,11 +1182,12 @@ export class KeylayoutToKmnConverter {
             + amb_3_3[0].key
             + "]  >  \'"
             + new TextDecoder().decode(amb_3_3[0].output)
-            + "\' here: ");
+            + "\' ");
       }
+
       if (dup_3_3.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("duplicate 3-3 rule: earlier: dk(C"
+          + ("duplicate rule: earlier: dk(C"
             + dup_3_3[0].id_deadkey
             + ") + ["
             + dup_3_3[0].modifier_key
@@ -1281,18 +1195,18 @@ export class KeylayoutToKmnConverter {
             + dup_3_3[0].key
             + "]  >  \'"
             + new TextDecoder().decode(dup_3_3[0].output)
-            + "\' here: ");
+            + "\' ");
       }
 
       if (amb_4_2.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 4-2 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_4_2[0].modifier_prev_deadkey
             + " "
             + amb_4_2[0].prev_deadkey
             + "]  >  dk(C"
             + amb_4_2[0].id_prev_deadkey
-            + ") here: ");
+            + ") ");
       }
     }
 
@@ -1386,18 +1300,18 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 2-4 rule: earlier(Todo check if print out or not): ["
+          + ("ambiguous rule: earlier: ["
             + amb_2_4[0].modifier_deadkey
             + " "
             + amb_2_4[0].deadkey
-            + "]  >  dk(C"
+            + "]  >  dk(A"
             + amb_2_4[0].id_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (amb_6_3.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 6-3 rule: earlier: dk(C"
+          + ("ambiguous rule: earlier: dk(C"
             + amb_6_3[0].id_deadkey
             + ") + ["
             + amb_6_3[0].modifier_key
@@ -1405,12 +1319,12 @@ export class KeylayoutToKmnConverter {
             + amb_6_3[0].key
             + "]  >  \'"
             + new TextDecoder().decode(amb_6_3[0].output)
-            + "\' here: ");
+            + "\' ");
       }
 
       if (dup_6_3.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("duplicate 6-3 rule: earlier: dk(C"
+          + ("duplicate rule: earlier: dk(C"
             + dup_6_3[0].id_deadkey
             + ") + ["
             + dup_6_3[0].modifier_key
@@ -1418,34 +1332,34 @@ export class KeylayoutToKmnConverter {
             + dup_6_3[0].key
             + "]  >  \'"
             + new TextDecoder().decode(dup_6_3[0].output)
-            + "\' here: ");
+            + "\' ");
       }
 
       if (amb_4_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 4-4 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_4_4[0].modifier_prev_deadkey
             + " "
             + amb_4_4[0].prev_deadkey
             + "]  >  dk(C"
             + amb_4_4[0].id_prev_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (dup_4_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("duplicate 4-4 rule: earlier: ["
+          + ("duplicate rule: earlier: ["
             + dup_4_4[0].modifier_prev_deadkey
             + " "
             + dup_4_4[0].prev_deadkey
             + "]  >  dk(C"
             + dup_4_4[0].id_prev_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (amb_5_5.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 5-5 rule: earlier: dk(B"
+          + ("ambiguous rule: earlier: dk(B"
             + amb_5_5[0].id_prev_deadkey
             + ") + ["
             + amb_5_5[0].modifier_deadkey
@@ -1453,12 +1367,12 @@ export class KeylayoutToKmnConverter {
             + amb_5_5[0].deadkey
             + "]  >  dk(B"
             + amb_5_5[0].id_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (dup_5_5.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("duplicate 5-5 rule: earlier: dk(B"
+          + ("duplicate rule: earlier: dk(B"
             + dup_5_5[0].id_prev_deadkey
             + ") + ["
             + dup_5_5[0].modifier_deadkey
@@ -1466,12 +1380,12 @@ export class KeylayoutToKmnConverter {
             + dup_5_5[0].deadkey
             + "]  >  dk(B"
             + dup_5_5[0].id_deadkey
-            + ") here: ");
+            + ") ");
       }
 
       if (amb_6_6.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 6-6 rule: earlier: dk(B"
+          + ("ambiguous rule: earlier: dk(B"
             + amb_6_6[0].id_deadkey
             + ") + ["
             + amb_6_6[0].modifier_key
@@ -1479,12 +1393,12 @@ export class KeylayoutToKmnConverter {
             + amb_6_6[0].key
             + "]  >  \'"
             + new TextDecoder().decode(amb_6_6[0].output)
-            + "\' here: ");
+            + "\' ");
       }
 
       if (dup_6_6.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("duplicate 6-6x rule: earlier: dk(B"
+          + ("duplicate rule: earlier: dk(B"
             + dup_6_6[0].id_deadkey
             + ") + ["
             + dup_6_6[0].modifier_key
@@ -1492,18 +1406,18 @@ export class KeylayoutToKmnConverter {
             + dup_6_6[0].key
             + "]  >  \'"
             + new TextDecoder().decode(dup_6_6[0].output)
-            + "\' here: ");
+            + "\' ");
       }
     }
 
     if (warningTextArray[0] !== "") {
-      warningTextArray[0] = "c WARNING: " + warningTextArray[0];
+      warningTextArray[0] = "c WARNING: " + warningTextArray[0]+"here: ";
     }
     if (warningTextArray[1] !== "") {
-      warningTextArray[1] = "c WARNING: " + warningTextArray[1];
+      warningTextArray[1] = "c WARNING: " + warningTextArray[1]+"here: ";
     }
     if (warningTextArray[2] !== "") {
-      warningTextArray[2] = "c WARNING: " + warningTextArray[2];
+      warningTextArray[2] = "c WARNING: " + warningTextArray[2]+"here: ";
     }
 
     return warningTextArray;
@@ -1590,7 +1504,7 @@ export class KeylayoutToKmnConverter {
       * @return a unicode codepoint if instr is a numeric character reference
       *         else instr if instr is not a numeric character reference
       */
-  public checkOutputChar(instr: string): string {
+  public convertToUnicodeCodePoint(instr: string): string {
 
     if (instr.substring(0, 3) === "&#x") {
       const num_length = instr.length - instr.indexOf("x") - 1;
@@ -1608,10 +1522,6 @@ export class KeylayoutToKmnConverter {
     else
       return instr;
   }
-  //----------------------------------------------------------------------------------------------------
-  //----------------------------------------------------------------------------------------------------
-  //----------------------------------------------------------------------------------------------------
-
 
   /**
    * @brief  member function to create a list of rule that will be printed to the resulting kmn file
@@ -1626,12 +1536,10 @@ export class KeylayoutToKmnConverter {
     const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       return ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
         && (curr.key !== "")
-        // && ((curr.rule_type === "C0") || (curr.rule_type === "C1") || (curr.rule_type === "C2" && (curr.deadkey !== "")) || (curr.rule_type === "C3" && (curr.prev_deadkey !== "")))
         && ((curr.rule_type === "C0")
           || (curr.rule_type === "C1")
           || (curr.rule_type === "C2" && (curr.deadkey !== ""))
           || (curr.rule_type === "C3" && (curr.deadkey !== "") && (curr.prev_deadkey !== "")))
-
       );
     }).reduce((unique, o) => {
       if (!unique.some((obj: {
@@ -1658,8 +1566,6 @@ export class KeylayoutToKmnConverter {
       return unique;
     }, []);
 
-    //................................................ C0 C1 ................................................................
-    //................................................ C0 C1 ................................................................
     //................................................ C0 C1 ................................................................
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
@@ -1690,7 +1596,7 @@ export class KeylayoutToKmnConverter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.checkOutputChar(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -1703,10 +1609,10 @@ export class KeylayoutToKmnConverter {
 
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
+        // if warning contains duplicate rules we do not write out this rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data +=
-            warn_text[2]
+          data += warn_text[2]
             + "+ ["
             + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
             + `]  > \'`
@@ -1716,11 +1622,6 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    // Todo remove this marker
-    data += "\n c ########## C2 #################################################################\n";
-
-    //................................................ C2 ...................................................................
-    //................................................ C2 ...................................................................
     //................................................ C2 ...................................................................
     for (let k = 0; k < unique_data_Rules.length; k++) {
 
@@ -1729,7 +1630,7 @@ export class KeylayoutToKmnConverter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.checkOutputChar(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -1741,21 +1642,21 @@ export class KeylayoutToKmnConverter {
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
+        // if warning contains duplicate rules we do not write out this rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[1].indexOf("duplicate") < 0)) {
           data += warn_text[1]
-            + "+ ["
-            + (unique_data_Rules[k].modifier_deadkey + " " + unique_data_Rules[k].deadkey).trim()
-            + "]  >  dk(A"
-            + String(unique_data_Rules[k].id_deadkey)
+            + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
+              + unique_data_Rules[k].deadkey).trim()
+            + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
             + ")\n";
         }
 
         if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data +=
-            warn_text[2]
+          data += warn_text[2]
             + "dk(A"
-            + (String(unique_data_Rules[k].id_deadkey) + ") + [" + unique_data_Rules[k].modifier_key).trim()
+            + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+              + unique_data_Rules[k].modifier_key).trim()
             + " "
             + unique_data_Rules[k].key + "]  >  \'"
             + output_character_unicode
@@ -1767,10 +1668,6 @@ export class KeylayoutToKmnConverter {
     }
 
     //................................................ C3 ...................................................................
-    //................................................ C3 ...................................................................
-    //................................................ C3 ...................................................................
-
-    data += "\nc ########## C3 #################################################################\n";
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
       if (unique_data_Rules[k].rule_type === "C3") {
@@ -1778,7 +1675,7 @@ export class KeylayoutToKmnConverter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.checkOutputChar(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
         if ((output_character_unicode.length > 1)
@@ -1790,23 +1687,23 @@ export class KeylayoutToKmnConverter {
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule (even if there are other warnings for the same rule) since that rule had been written before
+        // if warning contains duplicate rules we do not write out this rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[0].indexOf("duplicate") < 0)
         ) {
-          data +=
-            warn_text[0]
+          data += warn_text[0]
             + "+ ["
-            + (unique_data_Rules[k].modifier_prev_deadkey + " " + unique_data_Rules[k].prev_deadkey).trim()
+            + (unique_data_Rules[k].modifier_prev_deadkey + " "
+              + unique_data_Rules[k].prev_deadkey).trim()
             + "]   >   dk(C"
             + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
         }
 
         if ((warn_text[1].indexOf("duplicate") < 0)
         ) {
-          data +=
-            warn_text[1]
-            + "dk(C"
-            + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + [" + unique_data_Rules[k].modifier_deadkey).trim()
+          data += warn_text[1]
+            + "dk(C" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
+              + unique_data_Rules[k].modifier_deadkey).trim()
             + " "
             + unique_data_Rules[k].deadkey
             + "]  >  dk(B"
@@ -1816,9 +1713,10 @@ export class KeylayoutToKmnConverter {
 
         if ((warn_text[2].indexOf("duplicate") < 0)
         ) {
-          data +=
-            warn_text[2] + "dk(B"
-            + (String(unique_data_Rules[k].id_deadkey) + ") + [" + unique_data_Rules[k].modifier_key).trim()
+          data += warn_text[2] + "dk(B"
+            + (String(unique_data_Rules[k].id_deadkey)
+              + ") + ["
+              + unique_data_Rules[k].modifier_key).trim()
             + " "
             + unique_data_Rules[k].key
             + "]  >  \'"
@@ -1829,10 +1727,8 @@ export class KeylayoutToKmnConverter {
         if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
           data += "\n";
         }
-
       }
     }
-
     return data;
   }
 
@@ -1864,73 +1760,11 @@ export class KeylayoutToKmnConverter {
     data += "\n";
     return data;
   }
-
-  /// console log all entries C3  TODO remove
-  public writeDataset(dataRules: rule_object[]) {
-    for (let i = 0; i < dataRules.length; i++) {
-      //if (dataRules[i].key === "") {
-      if (1 === 1) {
-
-
-        console.log("dataRules[i].key ", "..", dataRules[i].key, "..", dataRules[i].key === "");
-
-        console.log("dataRules ", i,
-
-          dataRules[i].rule_type !== "" ? dataRules[i].rule_type : "--".padEnd(4, " "),
-
-          "|  ", (dataRules[i].modifier_prev_deadkey !== "" ? dataRules[i].modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
-          (dataRules[i].prev_deadkey !== "" ? dataRules[i].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
-          (dataRules[i].id_prev_deadkey !== 0 ? ("dk(A" + String(dataRules[i].id_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-          (dataRules[i].unique_prev_deadkey !== 0 ? ("unique(A" + String(dataRules[i].unique_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-
-          (dataRules[i].modifier_deadkey !== "" ? dataRules[i].modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
-          (dataRules[i].deadkey !== "" ? dataRules[i].deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
-          dataRules[i].rule_type === "C2" ? (dataRules[i].unique_deadkey !== 0 ? ("unique(C" + String(dataRules[i].unique_deadkey) + ")").padEnd(9, " ") : "--".padEnd(9, " ")) : ((dataRules[i].unique_prev_deadkey !== 0 ? ("unique(B" + dataRules[i].id_deadkey + ")").padEnd(9, " ") : "--".padEnd(9, " "))),
-
-          dataRules[i].id_prev_deadkey,
-          dataRules[i].id_deadkey,
-
-          "|  ", (dataRules[i].modifier_key !== "" ? dataRules[i].modifier_key.padEnd(40, " ") : "--".padEnd(40, " ")),
-          (dataRules[i].key !== "" ? dataRules[i].key.padEnd(8, " ") : "--".padEnd(8, " ")),
-          (new TextDecoder().decode(dataRules[i].output) !== "" ? new TextDecoder().decode(dataRules[i].output).padEnd(10, " ") : ("--" + dataRules[i].output) + "--"),
-
-          "| °°");
-      }
-    }
-
-  }
-  // TODO remove
-  public writeDatasetSingle(dataRules: rule_object) {
-
-    console.log("dataRules[i].key ", "..", dataRules.key, "..", dataRules.key === "");
-
-    console.log("dataRules ",
-      dataRules.rule_type !== "" ? dataRules.rule_type : "--".padEnd(4, " "),
-
-      "|  ", (dataRules.modifier_prev_deadkey !== "" ? dataRules.modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
-      (dataRules.prev_deadkey !== "" ? dataRules.prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
-      (dataRules.id_prev_deadkey !== 0 ? ("dk(A" + String(dataRules.id_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-      (dataRules.unique_prev_deadkey !== 0 ? ("unique(A" + String(dataRules.unique_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
-
-      (dataRules.modifier_deadkey !== "" ? dataRules.modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
-      (dataRules.deadkey !== "" ? dataRules.deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
-      dataRules.rule_type === "C2" ? (dataRules.unique_deadkey !== 0 ? ("unique(C" + String(dataRules.unique_deadkey) + ")").padEnd(9, " ") : "--".padEnd(9, " ")) : ((dataRules.unique_prev_deadkey !== 0 ? ("unique(B" + dataRules.id_deadkey + ")").padEnd(9, " ") : "--".padEnd(9, " "))),
-
-      dataRules.id_prev_deadkey,
-      dataRules.id_deadkey,
-
-      "|  ", (dataRules.modifier_key !== "" ? dataRules.modifier_key.padEnd(40, " ") : "--".padEnd(40, " ")),
-      (dataRules.key !== "" ? dataRules.key.padEnd(8, " ") : "--".padEnd(8, " ")),
-      (new TextDecoder().decode(dataRules.output) !== "" ? new TextDecoder().decode(dataRules.output).padEnd(10, " ") : ("--" + dataRules.output) + "--"),
-
-      "| °°");
-
-  }
 }
 
 /**
-   * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
-   */
+ * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
+ */
 class Rules {
   constructor(
     public rule_type: string,             /* C0, C1, C2, C3, or C4 */
