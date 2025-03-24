@@ -587,7 +587,8 @@ var
   item: TPair<string,string>;
   n: Integer;
 begin
-  for item in TSetupUILanguageManager.Locales do
+  TSetupUILanguageManager.Reorder;
+  for item in TSetupUILanguageManager.SortedValues do
   begin
     n := cbLanguage.Items.Add(item.Value);
     if TSetupUILanguageManager.ActiveLocale = item.Key then
@@ -957,8 +958,12 @@ begin
 end;
 
 procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
+var
+  n :  Integer;
 begin
-  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
+  n := cbLanguage.ItemIndex;
+  n := TSetupUILanguageManager.IndexMapping[n];
+  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[n];
   FillStrings;
 end;
 
@@ -1042,7 +1047,6 @@ begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
-
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin
