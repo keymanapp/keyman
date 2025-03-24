@@ -76,9 +76,9 @@ function do_build_fixtures() {
   # Generate a binary file from basic.txt for comparison purposes
   node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
   if ! cmp ./build/test/fixtures/basic-xml.kmx ./build/test/fixtures/basic-txt.kmx; then
-    printf "${COLOR_RED}basic-xml.kmx and basic-txt.kmx are different!${COLOR_RESET}\n"
+    builder_die "basic-xml.kmx (compiled from basic.xml) and basic-txt.kmx (see basic.txt) are different!"
   else
-    printf "${COLOR_GREY}basic-xml.kmx and basic-txt.kmx are identical${COLOR_RESET}\n"
+    builder_echo grey "basic-xml.kmx and basic-txt.kmx are identical"
   fi
 }
 
