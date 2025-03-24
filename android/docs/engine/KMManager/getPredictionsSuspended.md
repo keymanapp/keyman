@@ -3,7 +3,7 @@ title: KMManager.getPredictionsSuspended()
 ---
 
 ## Summary
-The **getPredictionsSuspended()** method returns whether whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field.
+The **getPredictionsSuspended()** method returns a flag that determines whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field.
 
 ## Syntax
 ```java

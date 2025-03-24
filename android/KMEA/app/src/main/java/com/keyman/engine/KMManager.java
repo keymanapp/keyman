@@ -257,7 +257,7 @@ public final class KMManager {
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
 
-  // Special overrides to temporarily disable predictions when editing a password field.
+  // Special flags to temporarily disable predictions when editing a password field.
   // These are maintained independently for inapp keyboard and system keyboard.
   // When true, the suggestion banner passes the option {'mayPredict' = false} to KeymanWeb in the lm-layer
   // regardless what the Settings preference is.

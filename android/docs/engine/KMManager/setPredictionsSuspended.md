@@ -3,7 +3,7 @@ title: KMManager.setPredictionsSuspended()
 ---
 
 ## Summary
-The **setPredictionsSuspended()** method sets an override to temporarily disable predictions when the currently selected text field is a hidden password text field or a numeric text field.
+The **setPredictionsSuspended()** method sets a flag to temporarily disable predictions when the currently selected text field is a hidden password text field or a numeric text field.
 
 ## Syntax
 ```java
