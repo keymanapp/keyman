@@ -109,12 +109,14 @@ export class Lexer {
   private buffer: String;
   private lineNum: number;
   private charNum: number;
+  private line: String;
   private tokenList: Token[];
 
   public constructor(buffer: String) {
     this.buffer    = buffer;
     this.lineNum   = 1;
     this.charNum   = 1;
+    this.line      = '';
     this.tokenList = [];
   }
 
@@ -224,7 +226,14 @@ export class Lexer {
       match      = recogniser.regExp.exec(this.buffer.toString());
 
       if (match) {
-        this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum));
+        this.line   = this.line.concat(match[0].toString());
+        let line: String = null;
+        if (recogniser.tokenType === TokenTypes.NEWLINE) {
+          line      = this.line;
+          this.line = '';
+        }
+        const token = new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line);
+        this.tokenList.push(token);
         tokenMatch  = true;
         this.buffer = this.buffer.substring(match[0].length);
         if (recogniser.tokenType === TokenTypes.NEWLINE) {
@@ -248,12 +257,14 @@ export class Token {
   private _text: String;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
+  private _line: String; // only used by NEWLINE and EOF
 
-  public constructor(tokenType: TokenTypes, text: String, lineNum: number=1, charNum: number=1) {
+  public constructor(tokenType: TokenTypes, text: String, lineNum: number=1, charNum: number=1, line: String=null) {
     this.tokenType = tokenType;
     this._text     = text;
     this._lineNum  = lineNum;
     this._charNum  = charNum;
+    this._line     = line;
   }
 
   public isTokenType(tokenType: TokenTypes): boolean {
@@ -266,6 +277,7 @@ export class Token {
   public set lineNum(lineNum: number) { this._lineNum = lineNum; }
   public get charNum(): number { return this._charNum; }
   public set charNum(charNum: number) { this._charNum = charNum; }
+  public get line(): String { return this._line; }
 
   public toString(): String {
     return `[${this.tokenType},${this._text}]`;
