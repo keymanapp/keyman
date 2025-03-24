@@ -25,13 +25,14 @@ type
   TfrmStartInstall = class(TfrmKeymanBase)
     cmdInstall: TButton;
     cmdLater: TButton;
-    lblInstallUpdate: TLabel;
+    lblUpdateMessage: TLabel;
     imgKeymanLogo: TImage;
     procedure FormCreate(Sender: TObject);
   private
+    FRestartRequired: Boolean;
   public
+  constructor Create(AOwner: TComponent; const RestartRequired: Boolean); reintroduce;
   end;
-
 
 implementation
 uses
@@ -40,12 +41,21 @@ uses
 
 {$R *.dfm}
 
+constructor TfrmStartInstall.Create(AOwner: TComponent; const RestartRequired: Boolean);
+begin
+  inherited Create(AOwner);
+  FRestartRequired := RestartRequired;
+end;
+
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
 begin
   inherited;
   cmdInstall.Caption := MsgFromId(S_Update_Now);
   cmdLater.Caption := MsgFromId(S_Later);
-  lblInstallUpdate.Caption := MsgFromId(S_Ready_To_Install);
+  if FRestartRequired then
+    lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req)
+  else
+    lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
 end;
 
 end.

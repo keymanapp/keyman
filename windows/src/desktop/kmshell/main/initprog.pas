@@ -673,7 +673,7 @@ begin
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
-    frmStartInstall := TfrmStartInstall.Create(nil);
+    frmStartInstall := TfrmStartInstall.Create(nil, false);
     try
       Result := frmStartInstall.ShowModal = mrOk;
     finally

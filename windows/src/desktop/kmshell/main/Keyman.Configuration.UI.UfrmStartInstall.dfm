@@ -16,7 +16,7 @@ object frmStartInstall: TfrmStartInstall
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object lblInstallUpdate: TLabel
+  object lblUpdateMessage: TLabel
     Left = 111
     Top = 113
     Width = 205
