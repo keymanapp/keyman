@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe \
   "Development and build utilities for Delphi" \
   @/common/windows/delphi:keymanversion \
-  clean configure build test prepublish
+  clean configure build test prepublish edit
 
 builder_parse "$@"
 
@@ -30,3 +30,4 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        delphi_msbuild devtools.dproj "//p:Platform=Win32"
 # builder_run_action test:project         do_test
 builder_run_action prepublish:project   "$DEVTOOLS" -rt
+builder_run_action edit:project         start devtools.dproj

@@ -342,9 +342,16 @@ builder_do_typescript_tests() {
   if [[ $# -gt 0 ]]; then
     C8_THRESHOLD=$1
     THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
+  else
+    # Seems like a bug in TeamCity reporter if we don't list default thresholds,
+    # see #13418.
+    #
+    # Making branch and function thresholds slightly lower, because the default
+    # for c8 is 0 for these anyway.
+    THRESHOLD_PARAMS="--lines 90 --statements 90 --branches 80 --functions 80"
   fi
 
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
 
   if [[ ! -z "$C8_THRESHOLD" ]]; then
     builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."

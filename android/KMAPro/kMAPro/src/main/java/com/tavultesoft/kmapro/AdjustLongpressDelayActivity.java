@@ -133,7 +133,6 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     // Store the longpress delay as a reference
     // and then update KeymanWeb with the longpress delay
     KMManager.setLongpressDelay(currentDelayTimeMS);
-    KMManager.sendOptionsToKeyboard();
 
     super.onBackPressed();
   }

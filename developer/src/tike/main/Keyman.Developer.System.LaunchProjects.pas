@@ -16,6 +16,7 @@ type
     FProjectFilename: string;
     FFilenames: TStringList;
     FStatus: TLaunchProjectStatus;
+    function GetLaunchProjectFilename: string;
   public
     constructor Create(const AProjectFilename: string);
     destructor Destroy; override;
@@ -64,11 +65,21 @@ begin
   inherited Destroy;
 end;
 
+/// Use the project filename '-' to indicate launch of a new temporary project
+/// instance, because passing empty string is not possible as a commandline
+/// parameter.
+function TLaunchProject.GetLaunchProjectFilename: string;
+begin
+  if Self.ProjectFilename = ''
+    then Result := '-'
+    else Result := Self.ProjectFilename;
+end;
+
 function TLaunchProject.LaunchAsNewInstance: Boolean;
 var
   filename, cmdline: string;
 begin
-  cmdline := '"'+ParamStr(0)+'" --sub-process "'+Self.ProjectFilename+'"';
+  cmdline := '"'+ParamStr(0)+'" --sub-process "'+Self.GetLaunchProjectFilename+'"';
   for filename in Self.Filenames do
     cmdline := cmdline + ' "'+filename+'"';
 

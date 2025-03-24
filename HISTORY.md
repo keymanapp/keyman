@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 19.0.16 alpha 2025-03-19
+
+* feat(core): check on load for valid kmx_plus unicode (#13486)
+
+## 19.0.15 alpha 2025-03-18
+
+* chore: merge master into linux-mcompile (#13506)
+
+## 19.0.14 alpha 2025-03-14
+
+* chore: B18S3 merge beta to master (#13498)
+* feat(core): move kmx_plus.tests.cpp to GTest (#13494)
+
+## 19.0.13 alpha 2025-03-12
+
+* feat(windows): hard code key cap colour (#13444)
+
+## 19.0.12 alpha 2025-03-04
+
+* chore: remove legacy IIS setup notes (#13403)
+
+## 19.0.11 alpha 2025-03-03
+
+* chore(linux): Update debian changelog (#13347)
+* fix(common): improve resilience of build script trigger (#13402)
+
+## 19.0.10 alpha 2025-03-01
+
+* chore: merge beta into master B18S2 (#13391)
+
+## 19.0.9 alpha 2025-02-27
+
+* docs: move node.js before Emscripten (#13366)
+* chore: add a workflow to automatically close linked issues (#13368)
+
 ## 19.0.8 alpha 2025-02-21
 
 * feat(windows): hack in some fun features for kmdevlink (#13237)
@@ -36,6 +71,166 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.214 beta 2025-03-13
+
+* fix(mac): change text in privacy alert for macOS 13.0 and later (#13480)
+* docs(mac): update troubleshooting page for macOS security (#13476)
+* fix(core): unalign `usetCount` and `rangeCount` (#13450)
+* fix(developer): strip markers when generating KVK from LDML (#13479)
+
+## 18.0.213 beta 2025-03-12
+
+* docs(developer): fix typos in readme and add link (#13414)
+* fix(developer): add folder text to Error_FileDoesNotExist message (#13457)
+* fix(developer): load Keyman Developer options in Server before use (#13459)
+* chore(core): add `clean` actions for `:mac` and `:win` targets (#13460)
+* chore(common): update langtags.json to 2025-02-18 release (#13461)
+* fix(developer): use '-' as placeholder for temp project name in cmdline (#13462)
+* chore: handle failure to retrieve GitHub PR status in build triggers (#13474)
+
+## 18.0.212 beta 2025-03-11
+
+* fix(oem/fv/android): Avoid resetting keyboard index (#13449)
+* fix(android/engine): Ignore key errors if user switched to another IME (#13466)
+* fix(android): Cache inputType to determine external keyboard handling (#13475)
+
+## 18.0.211 beta 2025-03-10
+
+* feat(windows): hide update header if no updates are available (#13442)
+* fix(ios): suppress Get Started dialog when closing help page (#13422)
+* docs(ios): update minimum supported ios version (#13452)
+
+## 18.0.210 beta 2025-03-07
+
+* chore(common): Add crowdin localization for Vietnamese (#13322)
+* chore(linux): add link to fcitx5 issues to bug issue template (#13451)
+
+## 18.0.209 beta 2025-03-06
+
+* fix(common): fail builds with low test coverage for all typescript projects (#13418)
+* fix(windows): Check for updates registry value stored under the one Key (#13413)
+* fix(windows): remove online update deadcode (#13421)
+
+## 18.0.208 beta 2025-03-05
+
+* fix(windows): Check registry report usage value in setup process (#13215)
+* fix(android): Don't report missing kmp.json (#13411)
+
+## 18.0.207 beta 2025-03-04
+
+* fix(common): improve resilience of build script trigger (#13407)
+* fix(mac): improve compliance checking (#13337)
+* chore(common): add unit test for nul and context() in context part of rule (#13412)
+
+## 18.0.206 beta 2025-03-03
+
+* fix(android): Control when system keyboard Keyboard Picker clears activity stack (#13313)
+* docs(android): document control flag for system keyboard picker and task (#13373)
+
+## 18.0.205 beta 2025-03-02
+
+* chore(linux): Update debian changelog (#13346)
+
+## 18.0.204 beta 2025-03-01
+
+* chore(windows): ensure dependencies for keyman32 exclude core:wasm (#13379)
+
+## 18.0.203 beta 2025-02-28
+
+* feat(windows): keyman configuration icon refresh (#13294)
+* fix(windows): if kmshell is "silent" don't start a Keyman update (#13330)
+* chore(windows): Update crowdin strings for Khmer (#13364)
+* docs: clean up links in builder.md (#13328)
+* chore: add build.sh edit action for Delphi projects (#13327)
+* fix(developer): handle line breaks in debugger correctly (#13334)
+* fix(developer): use U+0001 for deadkey markers in the debugger (#13336)
+* feat(developer): use .kps folder as initial dir for Add Files (#13324)
+* fix(developer): verify `context(n)` offsets are valid in kmcmplib (#13308)
+* chore(core): add unit tests to validate `nul` with `index` and `context` (#13311)
+* fix(core): include `nul` in context offset calculations in kmx processor (#13314)
+* fix(developer): include `nul` in offset calculations for kmw v10 compiler (#13326)
+
+## 18.0.202 beta 2025-02-27
+
+* fix(android): Direct user to switch system IME when WebView fails (#13352)
+* fix(android): Filter out SocketTimeoutExceptions (#13353)
+* refactor(linux): extract method for setting up mocks in tests (#13355)
+* chore(linux): update to current Debian policy version (#13362)
+* fix(developer): prevent double action of editor hotkeys in debugger (#13345)
+* fix(linux): ignore DBusException during install and uninstall (#13356)
+* fix(linux): ignore exception when fcitx5-configtool is not found (#13363)
+* fix(developer): prevent simultaneous opening of the same project by two processes (#13341)
+* chore: add a workflow to automatically close linked issues (#13369)
+
+## 18.0.201 beta 2025-02-26
+
+* fix(web): prevent cookie-default behavior from mangling engine init (#13331)
+* chore(linux): adjust to renamed xdg module (#13354)
+
+## 18.0.200 beta 2025-02-25
+
+* fix(web): properly support workerless use of Web engine (#13290)
+* fix(web): reconnect, patch up engine/main headless unit tests (#13291)
+* change(ios): re-order host page script load so Sentry can report script load failures (#13332)
+* chore(linux): Update to new Debian policy version (#13325)
+
+## 18.0.199 beta 2025-02-24
+
+* fix(windows): Update Greek Polytonic for keyboard help (#13323)
+
+## 18.0.198 beta 2025-02-21
+
+* fix(android): Update system keyboard height consistently (#13273)
+
+## 18.0.197 beta 2025-02-20
+
+* fix(linux): address compiling with ICU 76 (#13285)
+
+## 18.0.196 beta 2025-02-19
+
+* fix(windows): remove sentry report on firstrun in idle state (#13266)
+* fix(android): Correct the scope of `tier` in build.gradle (#13268)
+* chore(common): Update crowdin strings for Polytonic Greek (#13277)
+* fix(web): provide informative error + message when loading UI without the engine (#13269)
+* fix(developer): Use 'desktop' for target in OSK fill temp keyboard (#13271)
+* fix(linux): add missing dependency for uploading to llso (#13279)
+* refactor(linux): re-enable integration tests (#13234)
+
+## 18.0.195 beta 2025-02-18
+
+* docs(web): use promise-chaining in manual-control example (#13272)
+
+## 18.0.194 beta 2025-02-17
+
+* fix(android): Use TIER.md to determine Play Store tier (#13259)
+* fix(android): prevent update-checks from crashing system keyboard and app if `DownloadManager` is disabled (#13218)
+* feat(linux): add `--remote-debug` flag to `run-tests.sh` script (#13233)
+* chore(linux): improve output when running tests (#13247)
+* refactor(linux): cleanup code of test fixture (#13248)
+
+## 18.0.193 beta 2025-02-14
+
+* chore(developer): add INFO messages for `kmc copy` and `kmc generate` (#13200)
+* fix(android): Remove sendOptionsToKeyboard function from Engine API (#13219)
+* docs(android): Document removing sendOptionsToKeyboard API (#13220)
+* chore(ios): increase minimum ios version to 15 (#13201)
+* fix(android): Catch WebView exceptions and prompt user to install WebView (#13140)
+* chore(common): Update crowdin strings for Mon (#13241)
+* chore(ios,windows): Update Crowdin strings for Czech (#13242)
+* change(web): drop 'dom' unit test concurrency when run in CI mode (#13141)
+* chore(web): ensure /web/build.sh clean triggers all predictive-text child actions (#13158)
+* chore(web): fix coverage-reporting artifact (#13196)
+
+## 18.0.192 beta 2025-02-14
+
+* chore(common): Fix 17.0.335 tier in HISTORY.md (#13213)
+* docs(linux): update what's new for 18.0 (#13207)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+* docs(windows): update keyman for windows 18.0 whats-new (#13211)
+* chore: undo master merge (#13238)
+* change(ios): prevent memory leaks from keyboard-related notification observers (#13129)
+* change(ios): mitigate keyboard input-view memory leak by force-discarding WebView (#13169)
 
 ## 18.0.191 beta 2025-02-12
 

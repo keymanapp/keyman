@@ -1,0 +1,11 @@
+﻿store(&TARGETS) 'any'
+
+begin Unicode > use(main)
+
+store(cons) 'bcd'
+store(ifx) '1'
+
+group(main) using keys
+
+c ERROR_ContextExCannotReferenceIf:
+if(ifx = '1') any(cons) + 'd' > context(1)
