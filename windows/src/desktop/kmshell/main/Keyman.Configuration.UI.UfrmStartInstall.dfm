@@ -14,11 +14,12 @@ object frmStartInstall: TfrmStartInstall
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object lblUpdateMessage: TLabel
-    Left = 111
-    Top = 113
+    Left = 112
+    Top = 105
     Width = 205
     Height = 34
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
