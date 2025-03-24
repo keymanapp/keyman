@@ -135,8 +135,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             KMManager.setNumericLayer(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         }
 
-        // Temporarily disable predictions if entering a hidden password field
-        KMManager.setMayPredictOverride(inputType);
+        // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
+        KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (KMManager.getMayPredictOverride()) {
             KMManager.setBannerOptions(false);
         } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
