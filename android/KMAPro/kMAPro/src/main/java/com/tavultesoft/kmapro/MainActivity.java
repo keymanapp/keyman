@@ -247,7 +247,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     if (textView != null) {
       // Reset mayPredictOverride
-      KMManager.setMayPredictOverride(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
+      KMManager.setPredictionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
     }
 
     KMManager.onResume();

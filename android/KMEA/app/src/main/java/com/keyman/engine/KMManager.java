@@ -257,11 +257,13 @@ public final class KMManager {
   // haptic feedback disabled for hardware keystrokes
   private static boolean mayHaveHapticFeedback = false;
 
-  // Special overrides for when the inapp/system keyboards are entering a password text field.
-  // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
+  // Special overrides to temporarily disable predictions when editing a password field.
+  // These are maintained independently for inapp keyboard and system keyboard.
+  // When true, the suggestion banner passes the option {'mayPredict' = false} to KeymanWeb in the lm-layer
   // regardless what the Settings preference is.
-  private static boolean inAppMayPredictOverride = false;
-  private static boolean systemMayPredictOverride = false;
+  // API added Keyman 18.0
+  private static boolean inAppPredictionsSuspendedForSensitiveInput = false;
+  private static boolean systemPredictionsSuspendedForSensitiveInput = false;
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -1410,65 +1412,47 @@ public final class KMManager {
   }
 
   /**
-   * Determine the override if the InputType field is a hidden password text field
-   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+   * Determine the predictions should be suspended for a given InputType field: hidden password text field
+   * (but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD).
    * Also true for numeric text fields
    * @param inputType android.text.InputType
    * @return boolean
    */
-  private static boolean determinePredictOverride(int inputType) {
+  private static boolean shouldSuspendPredictions(int inputType) {
     return ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
       isNumericField(inputType));
   }
 
   /**
-   * This API call existed prior to 18.0. Preferred call specifies the KeyboardType.
-   * Sets systemMayPredictOverride true if the InputType field for system keyboard is a hidden password text field
+   * Sets PredictionsSuspended true if the given InputType field for the keyboard is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-   * Also true for numeric text fields
-   * @param inputType android.text.InputType
-   */
-  public static void setMayPredictOverride(int inputType) {
-    systemMayPredictOverride = determinePredictOverride(inputType);
-  }
-
-  /**
-   * Sets mayPredictOverride true if the InputType field for the keyboard is a hidden password text field
-   * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
-   * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-   * Also true for numeric text fields
+   * Also true for numeric text fields.
+   * This is to temporarily disable suggestions in these text fields.
+   * API added Keyman 18.0
    * @param inputType android.text.InputType
    * @param {KeyboardType} keyboard
    */
-  public static void setMayPredictOverride(int inputType, KeyboardType keyboard) {
+  public static void setPredictionsSuspended(int inputType, KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      inAppMayPredictOverride = determinePredictOverride(inputType);
+      inAppPredictionsSuspendedForSensitiveInput = shouldSuspendPredictions(inputType);
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      systemMayPredictOverride = determinePredictOverride(inputType);
+      systemPredictionsSuspendedForSensitiveInput = shouldSuspendPredictions(inputType);
     }
   }
 
   /**
-   * This API call existed prior to 18.0. Preferred call specifies the KeyboardType.
-   * Get the value of systemMayPredictOverride
-   * @return boolean
-   */
-  public static boolean getMayPredictOverride() {
-    return systemMayPredictOverride;
-  }
-
-  /**
-   * Get the value of mayPredictOverride based on KeyboardType
+   * Get the value of PredictionsSuspendedForSensitiveInput based on KeyboardType.
+   * API added in Keyman 18.0
    * @param {KeyboardType} keyboard
-   * @return boolean
+   * @return boolean of inAppPredictionsSuspendedForSensitiveInput or systemPredictionsSuspendedForSensitiveInput
    */
-  public static boolean getMayPredictOverride(KeyboardType keyboard) {
+  public static boolean getPredictionsSuspended(KeyboardType keyboard) {
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      return inAppMayPredictOverride;
+      return inAppPredictionsSuspendedForSensitiveInput;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      return systemMayPredictOverride;
+      return systemPredictionsSuspendedForSensitiveInput;
     }
     return false;
   }
@@ -1606,7 +1590,7 @@ public final class KMManager {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      int inappMaySuggest = inAppMayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+      int inappMaySuggest = inAppPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
         suggestionPreference;
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, inappMaySuggest));
     }
@@ -1614,7 +1598,7 @@ public final class KMManager {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      int maySuggest = systemMayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
+      int maySuggest = systemPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
         suggestionPreference;
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
     }
