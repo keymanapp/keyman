@@ -738,12 +738,21 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can handle no newline at end of file", () => {
+      const lexer    = new Lexer('beep');
+      const actual   = lexer.parse(true);
+      const expected = [
+        new Token(TokenTypes.BEEP, 'beep'),
+        new Token(TokenTypes.EOF, '', 1, 1, 'beep'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
 function recogniseToken(type: TokenTypes, text: String): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse();
+  const actual   = lexer.parse(false);
   const line     = (type === TokenTypes.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
@@ -751,7 +760,7 @@ function recogniseToken(type: TokenTypes, text: String): void {
 
 function recogniseTokens(text: String, expected: Token[]): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse();
+  const actual   = lexer.parse(false);
   assert.deepEqual(actual, expected);
 }
 

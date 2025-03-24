@@ -208,12 +208,12 @@ export class Lexer {
     }
   }
 
-  public parse(): Token[]  {
-    while (this.matchToken());
+  public parse(addEOF: boolean=true): Token[]  {
+    while (this.matchToken(addEOF));
     return this.tokenList;
   }
 
-  private matchToken() {
+  private matchToken(addEOF: boolean) {
     let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
@@ -243,6 +243,10 @@ export class Lexer {
           this.charNum += match[0].length;
         }
       }
+    }
+
+    if (this.buffer.length === 0 && addEOF) {
+      this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line));
     }
 
     if (!tokenMatch || this.buffer.length === 0)
