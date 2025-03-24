@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, CopyrightStoreAssignRule, CopyrightStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
@@ -90,6 +90,33 @@ describe("KMN Analyser Tests", () => {
       const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
       assert.isTrue(copyrightStore.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
+    });
+  });
+  describe("IncludecodesStoreAssignRule Tests", () => {
+    it("can construct a IncludecodesStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
+      const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
+      assert.isNotNull(includecodesStoreAssign);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
+      const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
+      assert.isTrue(includecodesStoreAssign.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+  });
+  describe("IncludecodesStoreRule Tests", () => {
+    it("can construct a IncludecodesStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes)');
+      const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
+      assert.isNotNull(includecodesStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes)');
+      const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
+      assert.isTrue(includecodesStore.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
     });
   });
 });

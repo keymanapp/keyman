@@ -94,6 +94,27 @@ export class CopyrightStoreRule extends SystemStoreRule {
   }
 }
 
+export class IncludecodesStoreAssignRule extends SystemStoreAssignRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    this.storeType = NodeTypes.INCLUDECODES;
+    const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [
+      includecodesStore, this.whitespace, this.stringRule,
+    ]);
+  }
+}
+
+export class IncludecodesStoreRule extends SystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const includecodes: Rule = new KeywordRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      this.store, this.leftBracket, this.optWhitespace, this.amphasand, includecodes, this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
+
 export class OptionalWhiteSpace extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
