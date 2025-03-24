@@ -138,7 +138,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
         KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-            KMManager.setBannerOptions(false);
+          KMManager.setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+          // Set the system keyboard HTML banner
+          BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
         } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
           // Check if predictions needs to be re-enabled per Settings preference
           Context appContext = getApplicationContext();
@@ -147,7 +149,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             String langId = kbInfo.getLanguageID();
             SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
             boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
-            KMManager.setBannerOptions(mayPredict);
+            KMManager.setBannerOptions(mayPredict, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+          } else {
+            KMManager.setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_SYSTEM);
           }
         }
 

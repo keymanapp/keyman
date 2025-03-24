@@ -161,7 +161,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     inputType = attribute.inputType;
     KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      KMManager.setBannerOptions(false);
+      KMManager.setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       // Set the system keyboard HTML banner
       BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
@@ -172,9 +172,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         int maySuggest = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(langId), KMManager.KMDefault_Suggestion);
         // Enable banner if maySuggest is not SuggestionType.SUGGESTIONS_DISABLED (0)
-        KMManager.setBannerOptions(maySuggest != SuggestionType.SUGGESTIONS_DISABLED.toInt());
+        KMManager.setBannerOptions(maySuggest != SuggestionType.SUGGESTIONS_DISABLED.toInt(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
       } else {
-        KMManager.setBannerOptions(false);
+        KMManager.setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       }
     }
 
