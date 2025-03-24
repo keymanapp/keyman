@@ -664,7 +664,7 @@
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
-  <string name="S_Splash_Configuration" comment="Keyman Configuration link">COnfiguración</string>
+  <string name="S_Splash_Configuration" comment="Keyman Configuration link">Configuración</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.341.0 -->
