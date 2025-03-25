@@ -227,19 +227,19 @@ describe("Recursive Descent Tests", () => {
       assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
-  describe("KeywordRule Tests", () => {
-    it("can construct a KeywordRule", () => {
-      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
-      assert.isNotNull(keywordRule);
+  describe("TokenRule Tests", () => {
+    it("can construct a TokenRule", () => {
+      const tokenRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
+      assert.isNotNull(tokenRule);
     });
     it("can parse with a successful child Rule", () => {
-      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
-      assert.isTrue(keywordRule.parse(root));
+      const tokenRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
+      assert.isTrue(tokenRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STORE);
-      assert.isFalse(keywordRule.parse(root));
+      const tokenRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STORE);
+      assert.isFalse(tokenRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 0);
     });
   });
