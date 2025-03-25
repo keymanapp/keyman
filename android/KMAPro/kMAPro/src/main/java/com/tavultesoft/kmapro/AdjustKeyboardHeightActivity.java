@@ -107,11 +107,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
-            int orientation = KMManager.getOrientation(context);
-            String keyboardHeightKey = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
-              KMManager.KMKey_KeyboardHeightLandscape : KMManager.KMKey_KeyboardHeightPortrait;
-            editor.putInt(keyboardHeightKey, currentHeight);
-            editor.commit();
+            KMManager.applyKeyboardHeight(this, currentHeight);
             break;
         }
         return true;
@@ -139,12 +135,5 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     refreshSampleKeyboard(this);
   }
 
-  @Override
-  public void onBackPressed() {
-    // Apply the adjusted height on exit
-    KMManager.applyKeyboardHeight(this, currentHeight);
-
-    super.onBackPressed();
-  }
 
 }

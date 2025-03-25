@@ -2232,6 +2232,15 @@ public final class KMManager {
   }
 
   public static void applyKeyboardHeight(Context context, int height) {
+    SharedPreferences prefs = context.getSharedPreferences("KMAPreferences", Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    int orientation = getOrientation(context);
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
+      editor.commit();
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
+      editor.commit();
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
