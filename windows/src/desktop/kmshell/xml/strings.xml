@@ -596,7 +596,7 @@
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Applying the update now will require a restart of your computer before you can use Keyman again. Update now anyway?.</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Applying the update now will require a restart of your computer before you can use Keyman again. Update now anyway?</string>
 
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->

@@ -18,9 +18,9 @@ object frmStartInstall: TfrmStartInstall
   PixelsPerInch = 96
   TextHeight = 13
   object lblUpdateMessage: TLabel
-    Left = 112
-    Top = 105
-    Width = 205
+    Left = 64
+    Top = 89
+    Width = 313
     Height = 34
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
     Font.Charset = ANSI_CHARSET
