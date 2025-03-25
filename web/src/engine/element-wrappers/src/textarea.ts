@@ -1,6 +1,6 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 
-export default class TextArea extends OutputTarget<{}> {
+export class TextArea extends OutputTargetElementWrapper<{}> {
   root: HTMLTextAreaElement;
 
   /**

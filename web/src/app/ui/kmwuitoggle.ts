@@ -187,7 +187,7 @@ if(!keymanweb) {
       /**
        * Toggle a single keyboard on or off - KMW button control event
        **/
-      readonly switchSingleKbd = () => {
+      readonly switchSingleKbd = async () => {
         const _v = keymanweb.getActiveKeyboard() == '';
         let nLastKbd=0, kbdName='', lgCode='';
 
@@ -202,10 +202,10 @@ if(!keymanweb) {
 
           kbdName = this.keyboards[nLastKbd]._InternalName;
           lgCode = this.keyboards[nLastKbd]._LanguageCode;
-          keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keymanweb.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = nLastKbd;
         } else {
-          keymanweb.setActiveKeyboard('');
+          await keymanweb.setActiveKeyboard('');
         }
 
         if(this.kbdButton) {
@@ -216,7 +216,7 @@ if(!keymanweb) {
       /**
        * Switch to the next keyboard in the list - KMW button control event
        **/
-      readonly switchNextKbd = () => {
+      readonly switchNextKbd = async () => {
         let _v = (keymanweb.getActiveKeyboard() == '');
         let kbdName='', lgCode='';
 
@@ -227,16 +227,16 @@ if(!keymanweb) {
 
           kbdName = this.keyboards[0]._InternalName;
           lgCode = this.keyboards[0]._LanguageCode;
-          keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keymanweb.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = 0;
         } else {
           if(this.lastActiveKeyboard == this.keyboards.length-1) {
-            keymanweb.setActiveKeyboard('');
+            await keymanweb.setActiveKeyboard('');
             _v = false;
           } else {
             kbdName = this.keyboards[++this.lastActiveKeyboard]._InternalName;
             lgCode = this.keyboards[this.lastActiveKeyboard]._LanguageCode;
-            keymanweb.setActiveKeyboard(kbdName,lgCode);
+            await keymanweb.setActiveKeyboard(kbdName,lgCode);
             _v = true;
           }
         }
@@ -558,7 +558,7 @@ if(!keymanweb) {
        * @param       {number}  _kbd
        * Description  Select a keyboard from the drop down menu
        **/
-      selectKbd(_kbd: number) {
+      async selectKbd(_kbd: number): Promise<boolean> {
         let _name,_lgCode;
         if(_kbd < 0) {
           _name = '';
@@ -568,7 +568,7 @@ if(!keymanweb) {
           _lgCode = this.keyboards[_kbd]._LanguageCode;
         }
 
-        keymanweb.setActiveKeyboard(_name,_lgCode);
+        await keymanweb.setActiveKeyboard(_name,_lgCode);
         keymanweb.focusLastActiveElement();
         this.kbdButton._setSelected(_name != '');
         if(_kbd >= 0) {
