@@ -48,14 +48,14 @@
               <xsl:call-template name="button">
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_InstallNow']"/></xsl:with-param>
                 <xsl:with-param name="command">keyman:update_applynow</xsl:with-param>
-                <xsl:with-param name="width">220px</xsl:with-param>
+                <xsl:with-param name="width">200px</xsl:with-param>
               </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="button">
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Update_InstallNow']"/></xsl:with-param>
                 <xsl:with-param name="command"></xsl:with-param>
-                <xsl:with-param name="width">220px</xsl:with-param>
+                <xsl:with-param name="width">200px</xsl:with-param>
                 <xsl:with-param name="disabled">1</xsl:with-param>
               </xsl:call-template>
             </xsl:otherwise>

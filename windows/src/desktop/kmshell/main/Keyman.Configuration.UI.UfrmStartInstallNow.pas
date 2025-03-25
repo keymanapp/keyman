@@ -43,7 +43,7 @@ uses
 procedure TfrmStartInstallNow.FormCreate(Sender: TObject);
 begin
   inherited;
-  cmdInstall.Caption := MsgFromId(S_Update_now);
+  cmdInstall.Caption := MsgFromId(S_Update_Now);
   cmdLater.Caption := MsgFromId(S_Later);
   lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
 end;
