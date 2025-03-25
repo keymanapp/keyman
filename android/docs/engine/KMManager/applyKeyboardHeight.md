@@ -3,7 +3,7 @@ title: KMManager.applyKeyboardHeight()
 ---
 
 ## Summary
-The **applyKeyboardHeight()** method sets the height of the keyboard frame for 
+The **applyKeyboardHeight()** method sets the height of the keyboard and frame for 
 the device's current [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) 
 (portrait vs landscape).
 
