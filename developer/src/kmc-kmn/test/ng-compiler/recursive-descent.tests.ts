@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, KeywordRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule, parameterSequence } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule, parameterSequence } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
@@ -229,16 +229,16 @@ describe("Recursive Descent Tests", () => {
   });
   describe("KeywordRule Tests", () => {
     it("can construct a KeywordRule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STRING);
+      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
       assert.isNotNull(keywordRule);
     });
     it("can parse with a successful child Rule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STRING);
+      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STRING);
       assert.isTrue(keywordRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 1);
     });
     it("can parse with an unsuccessful child Rule", () => {
-      const keywordRule: Rule = new KeywordRule(tokenBuffer, TokenTypes.STORE);
+      const keywordRule: Rule = new TokenRule(tokenBuffer, TokenTypes.STORE);
       assert.isFalse(keywordRule.parse(root));
       assert.equal(tokenBuffer.currentPosition, 0);
     });

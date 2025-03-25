@@ -172,7 +172,7 @@ export class OneOrManyRule extends SingleChildRule {
   }
 }
 
-export class KeywordRule extends Rule {
+export class TokenRule extends Rule {
   private static tokenToNodeMap: Map<TokenTypes, NodeTypes>;
   private tokenType: TokenTypes;
   private addNode: boolean;
@@ -192,9 +192,9 @@ export class KeywordRule extends Rule {
   ];
 
   static {
-    KeywordRule.tokenToNodeMap = new Map<TokenTypes, NodeTypes>();
-    for (const map of KeywordRule.tokenToNode) {
-      KeywordRule.tokenToNodeMap.set(map.tokenType, map.nodeType);
+    TokenRule.tokenToNodeMap = new Map<TokenTypes, NodeTypes>();
+    for (const map of TokenRule.tokenToNode) {
+      TokenRule.tokenToNodeMap.set(map.tokenType, map.nodeType);
     }
   }
 
@@ -206,7 +206,7 @@ export class KeywordRule extends Rule {
       parseSuccess = true;
       this.tokenBuffer.popToken();
       if (this.addNode) {
-        const nodeType: NodeTypes = KeywordRule.tokenToNodeMap.get(token.tokenType);
+        const nodeType: NodeTypes = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType != undefined) {
           node.addChild(new ASTNode(nodeType, token));
         }

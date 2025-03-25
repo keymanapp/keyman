@@ -7,7 +7,7 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { AlternateRule, KeywordRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -17,7 +17,7 @@ export class ContentLineRule extends SingleChildRule {
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
     const content: Rule       = new ContentRule(tokenBuffer);
     const optCommentEnd: Rule = new OptionalCommentEndRule(tokenBuffer);
-    const newline: Rule       = new KeywordRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(tokenBuffer, [
       optWhitespace, content, optCommentEnd, newline
     ]);
@@ -40,7 +40,7 @@ export class BlankLineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const optCommentEnd: Rule = new OptionalCommentEndRule(tokenBuffer);
-    const newline: Rule       = new KeywordRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(tokenBuffer, [optCommentEnd, newline]);
   }
 }
@@ -50,9 +50,9 @@ export class ContinuationLineRule extends SingleChildRule {
     super(tokenBuffer);
     const optWhitespace: Rule   = new OptionalWhiteSpaceRule(tokenBuffer);
     const content: Rule         = new ContentRule(tokenBuffer);
-    const whitespace: Rule      = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const whitespace: Rule      = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
     const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
-    const newline: Rule         = new KeywordRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    const newline: Rule         = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(tokenBuffer, [
       optWhitespace, content, whitespace, continuationEnd, newline
     ]);
@@ -83,7 +83,7 @@ export class CommentEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const comment: Rule       = new KeywordRule(tokenBuffer, TokenTypes.COMMENT);
+    const comment: Rule       = new TokenRule(tokenBuffer, TokenTypes.COMMENT);
     this.rule = new SequenceRule(tokenBuffer, [optWhitespace, comment]);
   }
 }
@@ -91,7 +91,7 @@ export class CommentEndRule extends SingleChildRule {
 export class ContinuationEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const continuation: Rule  = new KeywordRule(tokenBuffer, TokenTypes.CONTINUATION);
+    const continuation: Rule  = new TokenRule(tokenBuffer, TokenTypes.CONTINUATION);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [continuation, optWhitespace]);
   }
@@ -123,8 +123,8 @@ abstract class SystemStoreAssignAbstractRule extends SingleChildRule {
 
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.whitespace = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
-    this.stringRule = new KeywordRule(tokenBuffer, TokenTypes.STRING, true);
+    this.whitespace = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
   }
 
   public parse(node: ASTNode): boolean {
@@ -149,11 +149,11 @@ abstract class SystemStoreAbstractRule extends SingleChildRule {
 
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.store         = new KeywordRule(tokenBuffer, TokenTypes.STORE);
-    this.leftBracket   = new KeywordRule(tokenBuffer, TokenTypes.LEFT_BR);
+    this.store         = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    this.leftBracket   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
     this.optWhitespace = new OptionalWhiteSpaceRule(tokenBuffer);
-    this.amphasand     = new KeywordRule(tokenBuffer, TokenTypes.AMPHASAND);
-    this.rightBracket  = new KeywordRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.amphasand     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    this.rightBracket  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
   }
 }
 
@@ -171,7 +171,7 @@ export class BitmapStoreAssignRule extends SystemStoreAssignAbstractRule {
 export class BitmapStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmap: Rule = new KeywordRule(tokenBuffer, TokenTypes.BITMAP, true);
+    const bitmap: Rule = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
     this.rule = new SequenceRule(tokenBuffer, [
       this.store, this.leftBracket, this.optWhitespace, this.amphasand, bitmap, this.optWhitespace, this.rightBracket,
     ]);
@@ -192,7 +192,7 @@ export class CopyrightStoreAssignRule extends SystemStoreAssignAbstractRule {
 export class CopyrightStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const copyright: Rule = new KeywordRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
+    const copyright: Rule = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
     this.rule = new SequenceRule(tokenBuffer, [
       this.store, this.leftBracket, this.optWhitespace, this.amphasand, copyright, this.optWhitespace, this.rightBracket,
     ]);
@@ -213,7 +213,7 @@ export class IncludecodesStoreAssignRule extends SystemStoreAssignAbstractRule {
 export class IncludecodesStoreRule extends SystemStoreAbstractRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const includecodes: Rule = new KeywordRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
+    const includecodes: Rule = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
     this.rule = new SequenceRule(tokenBuffer, [
       this.store, this.leftBracket, this.optWhitespace, this.amphasand, includecodes, this.optWhitespace, this.rightBracket,
     ]);
@@ -223,7 +223,7 @@ export class IncludecodesStoreRule extends SystemStoreAbstractRule {
 export class OptionalWhiteSpaceRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const whitespace: Rule  = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const whitespace: Rule  = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
     this.rule = new OptionalRule(tokenBuffer, whitespace);
   }
 }
