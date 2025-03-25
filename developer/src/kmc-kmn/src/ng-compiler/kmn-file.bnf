@@ -1,8 +1,10 @@
 multiLine: continuationLine+ soloLine
-soloLine: content commentEnd? newline
-continuationLine: content continuationEnd newline
-commentEnd: whitespace comment
-continationEnd: whitespace continuation whitespace?
+soloLine: contentLine|blankLine
+contentLine: whitespace? content commentEnd? newline
+blankLine: commentEnd? newline
+continuationLine: whitespace? content whitespace continuationEnd newline
+commentEnd: whitespace? comment
+continationEnd: continuation whitespace?
 content: systemStoreAssign
 systemStoreAssign: bitmapStoreAssign|copyrightStoreAssign|includecodesStoreAssign
 bitmapStoreAssign: bitmapStore whitespace string

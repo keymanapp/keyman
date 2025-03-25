@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
@@ -19,6 +19,34 @@ let root: ASTNode = null;
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
+  });
+  describe("SystemStoreAssignRule Tests", () => {
+    it("can construct a SystemStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
+      assert.isNotNull(systemStoreAssign);
+    });
+    it("can parse bitmap store correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(systemStoreAssign.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse copyright store correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(systemStoreAssign.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse includecodes store correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(systemStoreAssign.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
   });
   describe("BitmapStoreAssignRule Tests", () => {
     it("can construct a BitmapStoreAssignRule", () => {
