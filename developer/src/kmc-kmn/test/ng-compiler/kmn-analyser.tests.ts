@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, CommentEndRule, ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -21,6 +21,25 @@ describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
   });
+  describe("BlankLineRule Tests", () => {
+    it("can construct a BlankLineRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('\n');
+      const blankLine: Rule = new BlankLineRule(tokenBuffer);
+      assert.isNotNull(blankLine);
+    });
+    it("can parse correctly (no comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('\n');
+      const blankLine: Rule = new BlankLineRule(tokenBuffer);
+      assert.isTrue(blankLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+    });
+    it("can parse correctly (comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
+      const blankLine: Rule = new BlankLineRule(tokenBuffer);
+      assert.isTrue(blankLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+    });
+  })
   describe("ContinuationLineRule Tests", () => {
     it("can construct a ContinuationLineRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \\\n');
