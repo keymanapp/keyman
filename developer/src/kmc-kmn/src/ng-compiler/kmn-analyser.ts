@@ -11,6 +11,15 @@ import { AlternateRule, KeywordRule, OptionalRule, Rule, SequenceRule, SingleChi
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
+export class CommentEndRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const optWhitespace: Rule = new OptionalWhiteSpace(tokenBuffer);
+    const comment: Rule       = new KeywordRule(tokenBuffer, TokenTypes.COMMENT);
+    this.rule = new SequenceRule(tokenBuffer, [optWhitespace, comment]);
+  }
+}
+
 export class ContinuationEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
