@@ -11,15 +11,54 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
 
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
+  });
+  describe("ContentLineRule Tests", () => {
+    it("can construct a ContentLineRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isNotNull(contentLine);
+    });
+    it("can parse correctly (no space before, no comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isTrue(contentLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (space before, no comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename"\n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isTrue(contentLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (no space before, comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" c a comment\n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isTrue(contentLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (space before, comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename" c a comment\n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isTrue(contentLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
   });
   describe("BlankLineRule Tests", () => {
     it("can construct a BlankLineRule", () => {

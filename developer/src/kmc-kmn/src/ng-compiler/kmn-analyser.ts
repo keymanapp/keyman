@@ -11,6 +11,31 @@ import { AlternateRule, KeywordRule, OptionalRule, Rule, SequenceRule, SingleChi
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
+export class ContentLineRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const content: Rule       = new ContentRule(tokenBuffer);
+    const optCommentEnd: Rule = new OptionalCommentEndRule(tokenBuffer);
+    const newline: Rule       = new KeywordRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      optWhitespace, content, optCommentEnd, newline
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNode: ASTNode    = tmp.removeSoleChildOfType(NodeTypes.LINE);
+      const contentNode: ASTNode = tmp.getSoleChild();
+      lineNode.addChild(contentNode);
+      node.addChild(lineNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class BlankLineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
