@@ -187,6 +187,7 @@ export class KeywordRule extends Rule {
     {tokenType: TokenTypes.BITMAP,       nodeType: NodeTypes.BITMAP},
     {tokenType: TokenTypes.COPYRIGHT,    nodeType: NodeTypes.COPYRIGHT},
     {tokenType: TokenTypes.INCLUDECODES, nodeType: NodeTypes.INCLUDECODES},
+    {tokenType: TokenTypes.NEWLINE,      nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.STRING,       nodeType: NodeTypes.STRING},
   ];
 

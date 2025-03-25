@@ -11,6 +11,32 @@ import { AlternateRule, KeywordRule, OptionalRule, Rule, SequenceRule, SingleChi
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
+export class ContinuationLineRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const optWhitespace: Rule   = new OptionalWhiteSpace(tokenBuffer);
+    const content: Rule         = new ContentRule(tokenBuffer);
+    const whitespace: Rule      = new KeywordRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
+    const newline: Rule         = new KeywordRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      optWhitespace, content, whitespace, continuationEnd, newline
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.LINE);
+      const contentNode: ASTNode = tmp.getSoleChild();
+      lineNode.addChild(contentNode);
+      node.addChild(lineNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class CommentEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
@@ -29,7 +55,12 @@ export class ContinuationEndRule extends SingleChildRule {
   }
 }
 
-//content
+export class ContentRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    this.rule = new SystemStoreAssignRule(tokenBuffer);
+  }
+}
 
 export class SystemStoreAssignRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {

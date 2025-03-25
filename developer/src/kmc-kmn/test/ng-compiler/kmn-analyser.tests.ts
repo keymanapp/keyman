@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, CommentEndRule, ContinuationEndRule, CopyrightStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, CommentEndRule, ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { CopyrightStoreRule, IncludecodesStoreAssignRule, IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -20,6 +20,29 @@ let root: ASTNode = null;
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
+  });
+  describe("ContinuationLineRule Tests", () => {
+    it("can construct a ContinuationLineRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \\\n');
+      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
+      assert.isNotNull(continuationLine);
+    });
+    it("can parse correctly (no space before)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \\\n');
+      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
+      assert.isTrue(continuationLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (space before)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename" \\\n');
+      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
+      assert.isTrue(continuationLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
   });
   describe("CommentEndRule Tests", () => {
     it("can construct a CommentEndRule", () => {

@@ -12,6 +12,7 @@ export enum NodeTypes {
   BITMAP,
   COPYRIGHT,
   INCLUDECODES,
+  LINE,
   STRING,
   TMP,
 }
