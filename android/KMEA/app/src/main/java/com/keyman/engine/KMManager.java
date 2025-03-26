@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -2237,15 +2236,20 @@ public final class KMManager {
     int orientation = getOrientation(context);
     if (height == 0) {
       // Passing 0 will reset both stored heights
-      int defaultPortraitHeight = getDefaultKeyboardHeightByOrientation(context, Configuration.ORIENTATION_PORTRAIT);
-      int defaultLandscapeHeight = getDefaultKeyboardHeightByOrientation(context, Configuration.ORIENTATION_LANDSCAPE);
-      editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, defaultLandscapeHeight);
-      editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, defaultPortraitHeight);
+      editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
+      editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
       editor.commit();
-    
-      height = (orientation == Configuration.ORIENTATION_PORTRAIT) ? defaultPortraitHeight : defaultLandscapeHeight;
+
     }
     else {
+      // Applying gating to 50%-200% of default height (following Keyman) 
+      int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
+      if (height < (defaultHeight / 2)) {
+        height = (int) (defaultHeight / 2);
+      } else if (height > (defaultHeight * 2)) {
+        height = (int) (defaultHeight * 2);
+      }
+
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
@@ -2268,21 +2272,6 @@ public final class KMManager {
     }
   }
 
-  private static int getDefaultKeyboardHeightByOrientation(Context context, int orientation) {
-    Resources resources = context.getResources();
-    Configuration originalConfig = resources.getConfiguration();
-    Configuration newConfig = new Configuration(originalConfig);
-    newConfig.orientation = orientation;
-
-    // Create a new context with the updated configuration
-    Context newContext = context.createConfigurationContext(newConfig);
-    Resources newResources = newContext.getResources();
-
-    // Get the default keyboard height for the new orientation
-    int defaultHeight = (int) newResources.getDimension(R.dimen.keyboard_height);
-
-    return defaultHeight;
-}
 
   /**
    * Get the size of the area the window would occupy.
