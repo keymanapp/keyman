@@ -2220,36 +2220,63 @@ public final class KMManager {
     return bannerHeight;
   }
 
-  // Overloaded method with an additional orientation parameter
+    // Original method remains unchanged
   public static int getKeyboardHeight(Context context) {
-    int orientation = getOrientation(context);
+    int orientation = getOrientation(context); // Default behavior
+    return getKeyboardHeight(context, orientation); // Delegate to the overloaded method
+  }
+
+  // Overloaded method with an additional orientation parameter
+  public static int getKeyboardHeight(Context context, int orientation) {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
+        return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
+        return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
+
     return defaultHeight;
   }
 
+  /**
+   * Apply the keyboard height for the current orientation and store it in SharedPreferences.
+   * If height is KMManager.DEFAULT_KEYBOARD_HEIGHT, remove the stored height for that orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   */
   public static void applyKeyboardHeight(Context context, int height) {
+    int orientation = getOrientation(context); // Default behavior
+    return getKeyboardHeight(context, height, orientation); // Delegate to the overloaded method
+  }
+
+  /**
+   * Apply the keyboard height for the current orientation and store it in SharedPreferences.
+   * If height is KMManager.DEFAULT_KEYBOARD_HEIGHT, remove the stored height for that orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   * @param orientation int - Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
+   */
+  public static void applyKeyboardHeight(Context context, int height, int orientation) {
     SharedPreferences prefs = context.getSharedPreferences("KMAPreferences", Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
-    int orientation = getOrientation(context);
+    int defaultHeightForContext = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     if (height == KMManager.DEFAULT_KEYBOARD_HEIGHT) {
-      // Passing 0 will reset both stored heights
-      editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
-      editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
+      // Passing 0 will reset the stored height for this orientation.
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
+      } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
+      }
       editor.commit();
 
     } else {
       // Applying gating to 50%-200% of default height (following Keyman) 
-      int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
-      if (height < (defaultHeight / 2)) {
-        height = (int) (defaultHeight / 2);
-      } else if (height > (defaultHeight * 2)) {
-        height = (int) (defaultHeight * 2);
+      if (height < (defaultHeightForContext / 2)) {
+        height = (int) (defaultHeightForContext / 2);
+      } else if (height > (defaultHeightForContext * 2)) {
+        height = (int) (defaultHeightForContext * 2);
       }
 
       // Store the new height based on the current orientation
