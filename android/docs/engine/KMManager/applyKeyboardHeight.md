@@ -18,7 +18,7 @@ KMManager.applyKeyboardHeight(Context context, int height)
 : The context
 
 `height`
-: The height of the keyboard frame in *density-independent pixels (dp)*
+: The height of the keyboard frame in *density-independent pixels (dp)*. Pass 0 to reset the keyboard height (portrait and landscape) to device-specific defaults.
 
 ## Description
 Use this method when you want to increase or decrease the keyboard height for 
@@ -48,6 +48,13 @@ The following script illustrates the use of `applyKeyboardHeight()`:
     // Increase the Keyman keyboard height (default Keyman value for most phones is 205dp)
     int newKeyboardHeight = 300;
     KMManager.applyKeyboardHeight(this, newKeyboardHeight);
+```
+
+The following script illustrates the use of `applyKeyboardHeight()` to reset keyboard height to default:
+
+```java
+    // Reset keyboard to default height
+    KMManager.applyKeyboardHeight(this, 0);
 ```
 
 ## See also
