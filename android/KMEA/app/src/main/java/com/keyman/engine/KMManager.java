@@ -343,8 +343,10 @@ public final class KMManager {
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
 
-  // Default keyboard height
-  public static final int KeyboardHeight_Default = 0; 
+  // Default keyboard heights
+  public static final int KeyboardHeight_Default = 0; // Zero value for constructor
+  public static final int KeyboardHeight_Context_Portrait_Default = 0; // Default portrait height
+  public static final int KeyboardHeight_Context_Landscape_Default = 0; // Default landscape height
 
   // Default prediction/correction setting
   public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
@@ -499,6 +501,9 @@ public final class KMManager {
     migrateCloudKeyboards(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
+
+    KeyboardHeight_Context_Portrait_Default = getDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAI); 
+    KeyboardHeight_Context_Landscape_Default = getDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);  
   }
 
   public static void executeResourceUpdate(Context aContext)
@@ -2301,6 +2306,26 @@ public final class KMManager {
     }
   }
 
+  public static int getDefaultKeyboardHeight(Context context) {
+    int orientation = getOrientation(context); // Default behavior
+    return getDefaultKeyboardHeight(Context context, int orientation)
+  }
+
+  public static int getDefaultKeyboardHeight(Context context, int orientation) {
+    Resources resources = context.getResources();
+    Configuration originalConfig = resources.getConfiguration();
+    Configuration newConfig = new Configuration(originalConfig);
+    newConfig.orientation = orientation;
+
+    // Create a new context with the updated configuration
+    Context newContext = context.createConfigurationContext(newConfig);
+    Resources newResources = newContext.getResources();
+
+    // Get the default keyboard height for the new orientation
+    int defaultHeight = (int) newResources.getDimension(R.dimen.keyboard_height);
+
+    return defaultHeight;
+  }
 
   /**
    * Get the size of the area the window would occupy.
