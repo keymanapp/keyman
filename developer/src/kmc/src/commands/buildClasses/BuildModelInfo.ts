@@ -58,7 +58,7 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
+    const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps)) ?? {};
     if(!kmpJsonData) {
       // Errors will have been emitted by KmpCompiler
       return false;
