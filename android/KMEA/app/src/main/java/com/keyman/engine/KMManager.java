@@ -2226,9 +2226,9 @@ public final class KMManager {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
     return defaultHeight;
   }
@@ -2256,10 +2256,8 @@ public final class KMManager {
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
-        editor.commit();
-      } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
         editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
-        editor.commit();
       }
     }
     // Confirm new LayoutParams for in-app or system keyboards 
