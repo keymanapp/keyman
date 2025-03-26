@@ -2244,9 +2244,9 @@ public final class KMManager {
       editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, getKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT));
       editor.commit();
     
-      int height = (orientation == Configuration.ORIENTATION_PORTRAIT) ? getKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT) : getKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
+      height = (orientation == Configuration.ORIENTATION_PORTRAIT) ? getKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT) : getKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
     }
-    else: {
+    else {
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
