@@ -2223,7 +2223,7 @@ public final class KMManager {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
