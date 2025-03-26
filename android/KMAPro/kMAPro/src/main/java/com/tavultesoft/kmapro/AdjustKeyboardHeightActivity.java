@@ -73,7 +73,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Clear the keyboard height preferences to reset
-        KMManager.applyKeyboardHeight(context, 0);
+        KMManager.applyKeyboardHeight(context, KMManager.KeyboardHeight_Reset);
 
         // Restore default height
         currentHeight = KMManager.getKeyboardHeight(context);
