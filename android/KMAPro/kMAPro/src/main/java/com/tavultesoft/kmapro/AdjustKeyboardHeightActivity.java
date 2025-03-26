@@ -101,7 +101,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
-            KMManager.applyKeyboardHeight(this, currentHeight);
+            KMManager.applyKeyboardHeight(context, currentHeight);
             break;
         }
         return true;
