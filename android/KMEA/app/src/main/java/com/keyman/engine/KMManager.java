@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -2217,13 +2218,9 @@ public final class KMManager {
     return bannerHeight;
   }
 
-  public static int getKeyboardHeight(Context context) {
-    int orientation = getOrientation(context); // Default behavior
-    return getKeyboardHeight(context, orientation); // Delegate to the overloaded method
-  }
-
   // Overloaded method with an additional orientation parameter
-  public static int getKeyboardHeight(Context context, int orientation) {
+  public static int getKeyboardHeight(Context context) {
+    int orientation = getOrientation(context);
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -2240,11 +2237,13 @@ public final class KMManager {
     int orientation = getOrientation(context);
     if (height == 0) {
       // Passing 0 will reset both stored heights
-      editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, getKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE));
-      editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, getKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT));
+      int defaultPortraitHeight = getDefaultKeyboardHeightByOrientation(context, Configuration.ORIENTATION_PORTRAIT);
+      int defaultLandscapeHeight = getDefaultKeyboardHeightByOrientation(context, Configuration.ORIENTATION_LANDSCAPE);
+      editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, defaultLandscapeHeight);
+      editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, defaultPortraitHeight);
       editor.commit();
     
-      height = (orientation == Configuration.ORIENTATION_PORTRAIT) ? getKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT) : getKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
+      height = (orientation == Configuration.ORIENTATION_PORTRAIT) ? defaultPortraitHeight : defaultLandscapeHeight;
     }
     else {
       // Store the new height based on the current orientation
@@ -2268,6 +2267,22 @@ public final class KMManager {
       SystemKeyboard.setLayoutParams(params);
     }
   }
+
+  private static int getDefaultKeyboardHeightByOrientation(Context context, int orientation) {
+    Resources resources = context.getResources();
+    Configuration originalConfig = resources.getConfiguration();
+    Configuration newConfig = new Configuration(originalConfig);
+    newConfig.orientation = orientation;
+
+    // Create a new context with the updated configuration
+    Context newContext = context.createConfigurationContext(newConfig);
+    Resources newResources = newContext.getResources();
+
+    // Get the default keyboard height for the new orientation
+    int defaultHeight = (int) newResources.getDimension(R.dimen.keyboard_height);
+
+    return defaultHeight;
+}
 
   /**
    * Get the size of the area the window would occupy.
