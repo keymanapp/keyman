@@ -591,12 +591,22 @@
   <!-- Context: Configuration Dialog - Update tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Updates are available which will be applied when Windows is next restarted.</string>
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Updates are available which will be applied when Windows is next restarted:</string>
+
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">Currently installed version</string>
+
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">New version</string>
 
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Applying the update now will require a restart of your computer before you can use Keyman again. Update now anyway?</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Installing the update now will require a restart of your computer before you can use Keyman again. Update now anyway?</string>
 
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->
@@ -834,6 +844,11 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Apply update now</string>
+
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">Install update now</string>
 
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
