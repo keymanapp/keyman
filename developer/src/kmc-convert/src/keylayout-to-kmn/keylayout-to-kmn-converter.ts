@@ -65,6 +65,7 @@ export interface rule_object {
 
 export interface convert_object {
   keylayout_filename: string,
+  kmn_filename: string,
   arrayOf_Modifiers: string[][],
   arrayOf_Rules: rule_object[],
 };
@@ -86,7 +87,7 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename: string): Promise<ConverterToKmnArtifacts> {
+  async run(inputFilename: string, outputFilename: string = ""): Promise<ConverterToKmnArtifacts> {
 
     //if (!inputFilename || !outputFilename) {
     if (!inputFilename) {
@@ -99,15 +100,17 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    const outArray: convert_object = await this.convert(jsonO);
+    const outArray: convert_object = await this.convert(jsonO, outputFilename);
 
     if (!outArray) {
       throw new Error('Error while processing convert()');
       return null;
     }
 
-    const out_text: boolean = this.write(outArray, outputFilename);
-    if (!out_text) {
+    //const out_text_ok: boolean = this.write(outArray, outputFilename);
+    const out_text_ok: boolean = this.write(outArray);
+
+    if (!out_text_ok) {
       throw new Error('Error while processing write()');
       return null;
     }
@@ -146,7 +149,7 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an convert_object containing all data ready to print out
    */
-  public convert(jsonObj: any): convert_object {
+  public convert(jsonObj: any, outputfilename: string = ""): convert_object {
 
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
     const rule_object: rule_object[] = [];             // an array of data for a kmn rule
@@ -154,12 +157,19 @@ export class KeylayoutToKmnConverter {
 
     const data_object: convert_object = {
       keylayout_filename: "",
+      kmn_filename: "",
       arrayOf_Modifiers: [],
       arrayOf_Rules: []
     };
 
     // todo check tags
     if (jsonObj_any.hasOwnProperty("keyboard")) {
+
+      if ((outputfilename === "") || (outputfilename === null)) {
+        data_object.kmn_filename = (process.cwd() + "\\data\\" + data_object.keylayout_filename.substring(0, data_object.keylayout_filename.lastIndexOf(".")) + ".kmn");
+      }
+      else
+        data_object.kmn_filename = outputfilename;
 
       data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
@@ -582,15 +592,9 @@ export class KeylayoutToKmnConverter {
    * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
    * @return true if data has been written; false if not
    */
-  public write(data_ukelele: convert_object, outputfilename: string = ""): boolean {
-    let save_filename;
-    let data: string = "\n";
+  public write(data_ukelele: convert_object): boolean {
 
-    if ((outputfilename === "") || (outputfilename === null)) {
-      save_filename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn";
-    }
-    else
-      save_filename = outputfilename;
+    let data: string = "\n";
 
     // add top part of kmn file: STORES
     data += this.writeData_Stores(data_ukelele);
@@ -599,7 +603,7 @@ export class KeylayoutToKmnConverter {
     data += this.writeData_Rules(data_ukelele);
 
     try {
-      this.callbacks.fs.writeFileSync(save_filename, new TextEncoder().encode(data));
+      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
       console.log('Error writing kmn file:' + err.message);
@@ -679,7 +683,6 @@ export class KeylayoutToKmnConverter {
         add_modifier = String(modifier_state[i]) + " ";
       }
       kmn_modifier += kmn_ncaps + add_modifier;
-      //console.log("kmn_modifier ", kmn_modifier);
 
     }
 
