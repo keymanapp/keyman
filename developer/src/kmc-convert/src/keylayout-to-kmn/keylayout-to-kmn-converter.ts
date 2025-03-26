@@ -18,14 +18,9 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 //     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA -> new issue
 // ---------------------------------------------------
 
-//     Filter functions use the same type
-//     check  (string |number) <-> number
+//     add all tests again& remove data files test
+//     SHIFT NCAPS <-> NCAPS SHIFT
 
-//     create NAME.kmn instead Myesult,kmn
-
-//     ToDo "undefined" or undefined ????
-
-//     separate createRuleData and check for duplicates/amb rules
 
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
 import { readFileSync } from 'fs';
@@ -93,7 +88,8 @@ export class KeylayoutToKmnConverter {
    */
   async run(inputFilename: string, outputFilename: string): Promise<ConverterToKmnArtifacts> {
 
-    if (!inputFilename || !outputFilename) {
+    //if (!inputFilename || !outputFilename) {
+    if (!inputFilename) {
       throw new Error('Invalid parameters');
     }
     const jsonO: object = this.read(inputFilename);
@@ -110,7 +106,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    const out_text: boolean = this.write(outArray);
+    const out_text: boolean = this.write(outArray, outputFilename);
     if (!out_text) {
       throw new Error('Error while processing write()');
       return null;
@@ -183,12 +179,12 @@ export class KeylayoutToKmnConverter {
     return data_object;
   }
 
-/**
-  * @brief  member function to read the rules contained in a json object and add array of Rules[] to an convert_object
-  * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an (empty) array of Rules
-  * @param  jsonObj: json Object containing all data read from a keylayout file
-  * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
-  */
+  /**
+    * @brief  member function to read the rules contained in a json object and add array of Rules[] to an convert_object
+    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an (empty) array of Rules
+    * @param  jsonObj: json Object containing all data read from a keylayout file
+    * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
+    */
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
 
     const object_array: rule_object[] = [];
@@ -214,8 +210,8 @@ export class KeylayoutToKmnConverter {
         // ...............e. g. <key code="1" output="s"/> ...............................................................................
         // ...............................................................................................................................
 
-        if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined)
-          && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")) {
+        if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined) && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
+        ) {
 
           // loop behaviours
           for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
@@ -240,9 +236,9 @@ export class KeylayoutToKmnConverter {
               );
 
               // ToDo "undefined" or undefined ????
-              if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
-                object_array.push(rule_obj);
-              }
+              // if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "") {
+              object_array.push(rule_obj);
+              // }
             }
           }
 
@@ -462,9 +458,11 @@ export class KeylayoutToKmnConverter {
             }
           }
         } else {
-          console.log("ERROR : some entries are not available");
-          // Todo prevent break for output =""
-          console.log(" ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
+          console.log("ERROR : some output characters can not be used in keyman \"",
+            (jsonObj.keyboard['@_name'] + ".keylayout\""),
+            "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
+            jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
+          continue;
 
         }
       }
@@ -474,23 +472,21 @@ export class KeylayoutToKmnConverter {
     return this.reviewRuleInputData(data_ukelele);
   }
 
-/**
-  * @brief  member function to review data in array of Rules[] of data_ukelele: remove duplicate rules and mark first occurace of a rule in object_array
-  * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an array of Rules
-  * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
-  */
+  /**
+    * @brief  member function to review data in array of Rules[] of data_ukelele: remove duplicate rules and mark first occurace of a rule in object_array
+    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an array of Rules
+    * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
+    */
   public reviewRuleInputData(data_ukelele: convert_object): convert_object {
 
-    // --------------------------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------------------------
     // check for duplicate C2 and C3 rules in object_array (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
     // then compare to object_array and mark first occurrence  of a rule in object_array
-    // --------------------------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------------------------
+
     let unique_dkB_count = 0;
     const list_of_unique_Text2_rules: string[][] = [];
 
     const object_array: rule_object[] = data_ukelele.arrayOf_Rules;
+
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
     object_array[0].unique_deadkey = unique_dkB_count;
@@ -541,7 +537,7 @@ export class KeylayoutToKmnConverter {
           }
         }
 
-        // check if first part of C3 rule contains already defined rule of C2
+        // check if first part of C3 rule contains a rule that is already defined in C2
         if (isFirstUsedHere_prev_dk) {
           object_array[i].unique_prev_deadkey = unique_dkA_count;
           unique_dkA_count++;
@@ -583,12 +579,18 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to write data from object to a kmn file
    * @param  data_ukelele the array holding all keyboard data
+   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
    * @return true if data has been written; false if not
    */
-  public write(data_ukelele: convert_object): boolean {
-
+  public write(data_ukelele: convert_object, outputfilename: string = ""): boolean {
+    let save_filename;
     let data: string = "\n";
-    //const save_filename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn";
+
+    if ((outputfilename === "") || (outputfilename === null)) {
+      save_filename = "data//" + data_ukelele.keylayout_filename.substring(0, data_ukelele.keylayout_filename.lastIndexOf(".")) + ".kmn";
+    }
+    else
+      save_filename = outputfilename;
 
     // add top part of kmn file: STORES
     data += this.writeData_Stores(data_ukelele);
@@ -597,266 +599,12 @@ export class KeylayoutToKmnConverter {
     data += this.writeData_Rules(data_ukelele);
 
     try {
-      this.callbacks.fs.writeFileSync("data/MyResult.kmn", new TextEncoder().encode(data));
-      //this.callbacks.fs.writeFileSync(save_filename, new TextEncoder().encode(data));
+      this.callbacks.fs.writeFileSync(save_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
       console.log('Error writing kmn file:' + err.message);
       return false;
     }
-  }
-  // ---------------------------------------------------------------------------------------------------------------------
-
-  /**
-  * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string[][] - array of [ actionID,state,output]
-  * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
-  */
-  public get_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: string[][]): string[][] {
-
-    if ((search === undefined) || (search === null))
-      return [];
-
-    const returnarray2D: string[][] = [];
-    for (let k = 0; k < search.length; k++) {
-      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          const returnarray: string[] = [];
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])));
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index']);
-            returnarray.push(search[k][2]);
-          }
-          if (returnarray.length > 0) {
-            returnarray2D.push(returnarray);
-          }
-        }
-      }
-    }
-    return returnarray2D;
-  }
-
-  /**
-  * @brief  member function to return an index for a given actionID
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string - value 'id' to be found
-  * @return a number specifying the index of an actionId
-  */
-  public get_ActionIndex__From__ActionId(data: any, search: string): number {
-    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
-      if (data.keyboard.actions.action[i]['@_id'] === search) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  /**
-  * @brief  member function to  find the actionID of a certain state-next pair
-  * @param  data   :any an object containing all data read from a .keylayout file
-  * @param  search :string value 'next' to be found
-  * @return a string containing the actionId of a certain state-next pair
-  */
-  public get_ActionID__From__ActionNext(data: any, search: string): string {
-    if (search !== "none") {
-      for (let i = 0; i < data.keyboard.actions.action.length; i++) {
-        for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-          if (data.keyboard.actions.action[i].when[j]['@_next'] === search) {
-            return data.keyboard.actions.action[i]['@_id'];
-          }
-        }
-      }
-    }
-    return "";
-  }
-
-  /**
-   * @brief  member function to get an array of all actionId-output pairs for a certain state
-   * @param  data    : any an object containing all data read from a .keylayout file
-   * @param  search  : string a 'state' to be found
-   * @return an array: string[][] containing all [actionId, state, output] for a certain state
-   */
-  public get_ActionStateOutput_array__From__ActionState(data: any, search: string): string[][] {
-    const returnarray2D: string[][] = [];
-
-    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
-      for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-        const returnarray: string[] = [];
-        if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
-          returnarray.push(data.keyboard.actions.action[i]['@_id']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_state']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_output']);
-        }
-        if (returnarray.length > 0) {
-          returnarray2D.push(returnarray);
-        }
-      }
-    }
-    return returnarray2D;
-  }
-
-  /**
-   * @brief  member function to find the output for a certain actionID for state 'none'
-   * @param  data   :any an object containing all data read from a .keylayout file
-   * @param  search :string an actionId to be found
-   * @return a string containing the output character
-   */
-  public get_Output__From__ActionId_None(data: any, search: string): string {
-    let OutputValue: string = "";
-
-    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
-      if (data.keyboard.actions.action[i]['@_id'] === search) {
-        for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-          if (data.keyboard.actions.action[i].when[j]['@_state'] === "none") {
-            OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
-          }
-        }
-      }
-    }
-    return OutputValue;
-  }
-
-  /**
-   * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
-   * @param  data    : any an object containing all data read from a .keylayout file
-   * @param  search  : array of [keycode,keyname,actionId,behaviour,output] to be found
-   * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: string[][] containing [KeyName,actionId,behaviour,modifier,output]
-   */
-  public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
-    const returnarray: string[][] = [];
-
-    if (!((search === undefined) || (search === null) || (search.length === 0))) {
-      for (let i = 0; i < search.length; i++) {
-        const behaviour: number = Number(search[i][3]);
-
-        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
-          const returnarray1D: string[] = [];
-          // KeyName
-          returnarray1D.push(String(search[i][1]));
-          // actionId
-          returnarray1D.push(String(search[i][2]));
-          // behaviour
-          returnarray1D.push(String(search[i][3]));
-          // modifier
-          returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)));
-          // output
-          returnarray1D.push(String(search[i][4]));
-
-          if (returnarray1D.length > 0) {
-            returnarray.push(returnarray1D);
-          }
-        }
-      }
-    }
-    // remove duplicates
-    const [unique_returnarray] = returnarray.reduce((acc, curr) => {
-      const [uniq, set] = acc;
-      if (!set.has(curr.join(','))) {
-        set.add(curr.join(','));
-        uniq.push(curr);
-      }
-      return acc;
-    },
-      [[], new Set()],
-    );
-    return unique_returnarray;
-  }
-
-  /**
-   * @brief  member function to create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
-   * @param  data    : any - an object containing all data read from a .keylayout file
-   * @param  modi    : any - an array of modifiers
-   * @param  search  : string - an actionId to be found
-   * @param  outchar  : string - the output character
-   * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: string[][] containing [actionID,output,actionID, behaviour,keyname,modifier]
-   */
-  public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): string[][] {
-    const returnarray2D: string[][] = [];
-
-    if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
-      return [];
-    }
-
-    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
-    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
-            const returnarray: string[] = [];
-            const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
-            const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
-            const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
-
-            returnarray.push(search);
-            returnarray.push(outchar);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(behaviour);
-            returnarray.push(keyName);
-            returnarray.push(modifierkmn);
-
-            if (returnarray.length > 0) {
-              returnarray2D.push(returnarray);
-            }
-          }
-        }
-      }
-    }
-    // remove duplicates
-    const [unique_returnarray] = returnarray2D.reduce((acc, curr) => {
-      const [uniq, set] = acc;
-      if (!set.has(curr.join(','))) {
-        set.add(curr.join(','));
-        uniq.push(curr);
-      }
-      return acc;
-    },
-      [[], new Set()],
-    );
-
-    return unique_returnarray;
-  }
-
-  /**
-   * @brief  member function to create an array of [keycode,behaviour] for a given actionId
-   * @param  data    : any - an object containing all data read from a .keylayout file
-   * @param  search  : string - an actionId to be found
-   * @return an array: number[][] containing [keycode,behaviour]
-   */
-  public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
-    const mapIndexArray_2D: number[][] = [];
-    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-        const mapIndexArrayperKey: number[] = [];
-        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-          mapIndexArrayperKey.push(i);
-        }
-        if (mapIndexArrayperKey.length > 0) {
-          mapIndexArray_2D.push(mapIndexArrayperKey);
-        }
-      }
-    }
-    return mapIndexArray_2D;
-  }
-
-  /**
-   * @brief  member function to create an array of modifier behaviours for a given keycode in [keycode,modifier]
-   * @param  data    : any - an object containing all data read from a .keylayout file
-   * @param  search  : (string | number)[][] - an array[keycode,modifier]  to be found
-   * @return an array: string[] containing modifiers
-   */
-  public get_Modifier_array__From__KeyModifier_array(data: any, search: (string | number)[][]): string[] {
-    const mapIndexArray_2D: string[] = [];
-    for (let i = 0; i < search.length; i++) {
-      mapIndexArray_2D.push(data[search[i][1]]);
-    }
-    return mapIndexArray_2D;
   }
 
   /**
@@ -878,7 +626,7 @@ export class KeylayoutToKmnConverter {
         kmn_ncaps = " NCAPS ";
       }
 
-      // if we find a modifier containing a '?' e.g. SHIFT? => SHIFT is not necessary. If it is not necessary  we don't write this modifier
+      // if we find a modifier containing a '?' e.g. SHIFT? => SHIFT occurs 0 or 1 times so it is not necessary. If it is not necessary  we don't write this modifier
       if (modifier_state[i].toUpperCase().includes('?') && (!modifier_state[i].toUpperCase().includes('CAPS?'))) {
         add_modifier = "";
       }
@@ -931,11 +679,25 @@ export class KeylayoutToKmnConverter {
         add_modifier = String(modifier_state[i]) + " ";
       }
       kmn_modifier += kmn_ncaps + add_modifier;
+      //console.log("kmn_modifier ", kmn_modifier);
+
     }
 
-    // remove duplicate and empty entries
+    // remove duplicate and empty entries and make sure NCAPS is at the beginning
     const duplicate_modifier_array: string[] = kmn_modifier.split(" ").filter(item => item);
     const unique_modifier: string[] = duplicate_modifier_array.filter(function (item, pos, self) {
+      /*
+            console.log("kmn_modifier ", kmn_modifier);
+            console.log("duplicate_modifier_array ", duplicate_modifier_array);
+      
+      
+            if (kmn_modifier.indexOf("NCAPS") !== -1) {
+              duplicate_modifier_array.unshift("NCAPS");
+            }
+            console.log(" duplicate_modifier_array", duplicate_modifier_array);
+      
+      
+      */
       return self.indexOf(item) === pos;
     });
     return unique_modifier.flat().toString().replace(/,/g, " ");
@@ -995,9 +757,8 @@ export class KeylayoutToKmnConverter {
 
     const warningTextArray: string[] = Array(3).fill("");
 
-    // +++++++++++++++++++++++++ check unavailable modifiers ++++++++++++++++++++++++++++++++++++++
+    // ------------------------- check unavailable modifiers -------------------------
 
-    // Todo remoce C1-C3's and other markers
     if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[2] = "unavailable modifier : ";
@@ -1025,7 +786,7 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    // +++++++++++++++++++++++++ check ambiguous/duplicate rules ++++++++++++++++++++++++++++++++++++++
+    // ------------------------- check ambiguous/duplicate rules -------------------------
 
     if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
 
@@ -1115,7 +876,6 @@ export class KeylayoutToKmnConverter {
     }
 
     if (rule[index].rule_type === "C2") {
-
       // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C3)
       const amb_2_2 = rule.filter((curr, idx) =>
         curr.rule_type === "C2"
@@ -1224,6 +984,7 @@ export class KeylayoutToKmnConverter {
     }
 
     if (rule[index].rule_type === "C3") {
+
       // 2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
       const amb_2_4 = rule.filter((curr, idx) =>
         ((curr.rule_type === "C2"))
@@ -1436,6 +1197,249 @@ export class KeylayoutToKmnConverter {
     return warningTextArray;
   }
 
+
+  /**
+   * @brief  member function to create data for stores that will be printed to the resulting kmn file
+   * @param  data_ukelele an object containing all data read from a .keylayout file
+   * @return string -  all stores to be printed
+   */
+  public writeData_Stores(data_ukelele: convert_object): string {
+
+    let data: string = "";
+    data += "c ......................................................................\n";
+    data += "c ......................................................................\n";
+    data += "c Keyman keyboard generated by kmn-convert\n";
+    data += "c from Ukelele file: " + data_ukelele.keylayout_filename + "\n";
+    data += "c ......................................................................\n";
+    data += "c ......................................................................\n";
+    data += "\n";
+
+    data += "store(&VERSION) \'10.0\'\n";
+    data += "store(&TARGETS) \'any\'\n";
+    data += "store(&KEYBOARDVERSION) \'1.0\'\n";
+    data += "store(&COPYRIGHT) '© 2024 SIL International\'\n";
+
+    data += "\n";
+    data += "begin Unicode > use(main)\n\n";
+    data += "group(main) using keys\n\n";
+
+    data += "\n";
+    return data;
+  }
+
+  /**
+   * @brief  member function to create data from rules that will be printed to the resulting kmn file
+   * @param  data_ukelele an object containing all data read from a .keylayout file
+   * @return string -  all rules to be printed
+   */
+  public writeData_Rules(data_ukelele: convert_object): string {
+
+    let data: string = "";
+
+    // filter array of all rules and remove duplicates
+    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
+      return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
+        && (curr.key !== "")
+        && ((curr.rule_type === "C0")
+          || (curr.rule_type === "C1")
+          || (curr.rule_type === "C2" && (curr.deadkey !== ""))
+          || (curr.rule_type === "C3" && (curr.deadkey !== "") && (curr.prev_deadkey !== "")))
+      );
+    }).reduce((unique, o) => {
+      if (!unique.some((obj: {
+        modifier_prev_deadkey: string; prev_deadkey: string;
+        modifier_deadkey: string; deadkey: string;
+        modifier_key: string; key: string;
+        rule_type: string;
+        output: Uint8Array;
+      }) =>
+        new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
+
+        && obj.output !== new TextEncoder().encode("")
+
+        && obj.rule_type === o.rule_type
+        && obj.modifier_key === o.modifier_key
+        && obj.key === o.key
+
+        && obj.modifier_deadkey === o.modifier_deadkey
+        && obj.deadkey === o.deadkey
+
+        && obj.modifier_prev_deadkey === o.modifier_prev_deadkey
+        && obj.prev_deadkey === o.prev_deadkey)
+      ) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    // this.writeDataset(unique_data_Rules);
+
+    //................................................ C0 C1 ................................................................
+
+    for (let k = 0; k < unique_data_Rules.length; k++) {
+
+      if ((unique_data_Rules[k].rule_type === "C0") || (unique_data_Rules[k].rule_type === "C1")) {
+
+        // lookup key nr of the key which is being processed
+        let keyNr: number = 0;
+        for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+          if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
+            keyNr = j;
+            break;
+          }
+        }
+
+        // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
+        if ((keyNr === 48) || (keyNr === 36)) {
+          continue;
+        }
+
+        //---------------------------------------------------------------------------------------------
+
+        // add a line after rules of each key
+        if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
+          data += '\n';
+        }
+
+        const warn_text = this.reviewRules(unique_data_Rules, k);
+
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
+
+
+        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
+        // if warning contains duplicate rules we do not write out the whole rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
+        if ((warn_text[2].indexOf("duplicate") < 0)) {
+          data += warn_text[2]
+            + "+ ["
+            + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+            + `]  > \'`
+            + output_character_unicode
+            + '\'\n';
+        }
+      }
+    }
+
+    //................................................ C2 ...................................................................
+    for (let k = 0; k < unique_data_Rules.length; k++) {
+
+      if (unique_data_Rules[k].rule_type === "C2") {
+
+        const warn_text = this.reviewRules(unique_data_Rules, k);
+
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
+
+        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
+        // if warning contains duplicate rules we do not write out the whole rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
+        if ((warn_text[1].indexOf("duplicate") < 0)) {
+          data += warn_text[1]
+            + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
+              + unique_data_Rules[k].deadkey).trim()
+            + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
+            + ")\n";
+        }
+
+        if ((warn_text[2].indexOf("duplicate") < 0)) {
+          data += warn_text[2]
+            + "dk(A"
+            + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+              + unique_data_Rules[k].modifier_key).trim()
+            + " "
+            + unique_data_Rules[k].key + "]  >  \'"
+            + output_character_unicode
+            + "\'\n";
+
+          data += "\n";
+        }
+      }
+    }
+
+    //................................................ C3 ...................................................................
+
+    for (let k = 0; k < unique_data_Rules.length; k++) {
+      if (unique_data_Rules[k].rule_type === "C3") {
+
+        const warn_text = this.reviewRules(unique_data_Rules, k);
+
+        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+
+        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+        if ((output_character_unicode.length > 1)
+          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+          if (warn_text[2] == "")
+            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+          else
+            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        }
+
+        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
+        // if warning contains duplicate rules we do not write out the whole rule
+        // (even if there are other warnings for the same rule) since that rule had been written before
+        if ((warn_text[0].indexOf("duplicate") < 0)
+        ) {
+          data += warn_text[0]
+            + "+ ["
+            + (unique_data_Rules[k].modifier_prev_deadkey + " "
+              + unique_data_Rules[k].prev_deadkey).trim()
+            + "]   >   dk(C"
+            + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
+        }
+
+        if ((warn_text[1].indexOf("duplicate") < 0)
+        ) {
+          data += warn_text[1]
+            + "dk(C" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
+              + unique_data_Rules[k].modifier_deadkey).trim()
+            + " "
+            + unique_data_Rules[k].deadkey
+            + "]  >  dk(B"
+            + String(unique_data_Rules[k].id_deadkey)
+            + ")\n";
+        }
+
+        if ((warn_text[2].indexOf("duplicate") < 0)
+        ) {
+          data += warn_text[2] + "dk(B"
+            + (String(unique_data_Rules[k].id_deadkey)
+              + ") + ["
+              + unique_data_Rules[k].modifier_key).trim()
+            + " "
+            + unique_data_Rules[k].key
+            + "]  >  \'"
+            + output_character_unicode
+            + "\'\n";
+        }
+
+        if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
+          data += "\n";
+        }
+      }
+    }
+    return data;
+  }
+
   /**
    * @brief  member function to map Ukelele keycodes to Windows Keycodes
    * @param  pos Ukelele (=mac) keycodes
@@ -1443,7 +1447,7 @@ export class KeylayoutToKmnConverter {
    */
   public map_UkeleleKC_To_VK(pos: number): string {
 
-    // ukelele KC  -->  // VK_US
+    // ukelele KC  -->  VK_US
     if (pos === 0x0A) return "K_BKQUOTE";         /* ^ */
     else if (pos === 0x12) return "K_1";          /* 1 */
     else if (pos === 0x13) return "K_2";          /* 2 */
@@ -1537,243 +1541,341 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  member function to create data from rules that will be printed to the resulting kmn file
-   * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  all rules to be printed
-   */
-  public writeData_Rules(data_ukelele: convert_object): string {
-
-    let data: string = "";
-
-    // filter array of all rules and remove duplicates
-    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
-      return ((curr.output !== new TextEncoder().encode("") || curr.output !== undefined)
-        && (curr.key !== "")
-        && ((curr.rule_type === "C0")
-          || (curr.rule_type === "C1")
-          || (curr.rule_type === "C2" && (curr.deadkey !== ""))
-          || (curr.rule_type === "C3" && (curr.deadkey !== "") && (curr.prev_deadkey !== "")))
-      );
-    }).reduce((unique, o) => {
-      if (!unique.some((obj: {
-        modifier_prev_deadkey: string; prev_deadkey: string;
-        modifier_deadkey: string; deadkey: string;
-        modifier_key: string; key: string;
-        rule_type: string;
-        output: Uint8Array;
-      }) =>
-        new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
-
-        && obj.rule_type === o.rule_type
-        && obj.modifier_key === o.modifier_key
-        && obj.key === o.key
-
-        && obj.modifier_deadkey === o.modifier_deadkey
-        && obj.deadkey === o.deadkey
-
-        && obj.modifier_prev_deadkey === o.modifier_prev_deadkey
-        && obj.prev_deadkey === o.prev_deadkey)
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    //................................................ C0 C1 ................................................................
-
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-
-      if ((unique_data_Rules[k].rule_type === "C0") || (unique_data_Rules[k].rule_type === "C1")) {
-
-        // lookup key nr of the key which is being processed
-        let keyNr: number = 0;
-        for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-          if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
-            keyNr = j;
-            break;
-          }
-        }
-
-        // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
-        if ((keyNr === 48) || (keyNr === 36)) {
-          continue;
-        }
-
-        //---------------------------------------------------------------------------------------------
-
-        // add a line after rules of each key
-        if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
-          data += '\n';
-        }
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
-        }
-
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data += warn_text[2]
-            + "+ ["
-            + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
-            + `]  > \'`
-            + output_character_unicode
-            + '\'\n';
-        }
+  * @brief  member function to return an index for a given actionID
+  * @param  data   :any - an object containing all data read from a .keylayout file
+  * @param  search :string - value 'id' to be found
+  * @return a number specifying the index of an actionId
+  */
+  public get_ActionIndex__From__ActionId(data: any, search: string): number {
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      if (data.keyboard.actions.action[i]['@_id'] === search) {
+        return i;
       }
     }
-
-    //................................................ C2 ...................................................................
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-
-      if (unique_data_Rules[k].rule_type === "C2") {
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
-        }
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[1].indexOf("duplicate") < 0)) {
-          data += warn_text[1]
-            + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
-              + unique_data_Rules[k].deadkey).trim()
-            + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
-            + ")\n";
-        }
-
-        if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data += warn_text[2]
-            + "dk(A"
-            + (String(unique_data_Rules[k].id_deadkey) + ") + ["
-              + unique_data_Rules[k].modifier_key).trim()
-            + " "
-            + unique_data_Rules[k].key + "]  >  \'"
-            + output_character_unicode
-            + "\'\n";
-
-          data += "\n";
-        }
-      }
-    }
-
-    //................................................ C3 ...................................................................
-
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-      if (unique_data_Rules[k].rule_type === "C3") {
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
-        }
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out this rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[0].indexOf("duplicate") < 0)
-        ) {
-          data += warn_text[0]
-            + "+ ["
-            + (unique_data_Rules[k].modifier_prev_deadkey + " "
-              + unique_data_Rules[k].prev_deadkey).trim()
-            + "]   >   dk(C"
-            + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
-        }
-
-        if ((warn_text[1].indexOf("duplicate") < 0)
-        ) {
-          data += warn_text[1]
-            + "dk(C" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
-              + unique_data_Rules[k].modifier_deadkey).trim()
-            + " "
-            + unique_data_Rules[k].deadkey
-            + "]  >  dk(B"
-            + String(unique_data_Rules[k].id_deadkey)
-            + ")\n";
-        }
-
-        if ((warn_text[2].indexOf("duplicate") < 0)
-        ) {
-          data += warn_text[2] + "dk(B"
-            + (String(unique_data_Rules[k].id_deadkey)
-              + ") + ["
-              + unique_data_Rules[k].modifier_key).trim()
-            + " "
-            + unique_data_Rules[k].key
-            + "]  >  \'"
-            + output_character_unicode
-            + "\'\n";
-        }
-
-        if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
-          data += "\n";
-        }
-      }
-    }
-    return data;
+    return 0;
   }
 
   /**
-   * @brief  member function to create data for stores that will be printed to the resulting kmn file
-   * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  all stores to be printed
-   */
-  public writeData_Stores(data_ukelele: convert_object): string {
-
-    let data: string = "";
-    data += "c ......................................................................\n";
-    data += "c ......................................................................\n";
-    data += "c Keyman keyboard generated by kmn-convert\n";
-    data += "c from Ukelele file: " + data_ukelele.keylayout_filename + "\n";
-    data += "c ......................................................................\n";
-    data += "c ......................................................................\n";
-    data += "\n";
-
-    data += "store(&VERSION) \'10.0\'\n";
-    data += "store(&TARGETS) \'any\'\n";
-    data += "store(&KEYBOARDVERSION) \'1.0\'\n";
-    data += "store(&COPYRIGHT) '© 2024 SIL International\'\n";
-
-    data += "\n";
-    data += "begin Unicode > use(main)\n\n";
-    data += "group(main) using keys\n\n";
-
-    data += "\n";
-    return data;
+  * @brief  member function to  find the actionID of a certain state-next pair
+  * @param  data   :any an object containing all data read from a .keylayout file
+  * @param  search :string value 'next' to be found
+  * @return a string containing the actionId of a certain state-next pair
+  */
+  public get_ActionID__From__ActionNext(data: any, search: string): string {
+    if (search !== "none") {
+      for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+        for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+          if (data.keyboard.actions.action[i].when[j]['@_next'] === search) {
+            return data.keyboard.actions.action[i]['@_id'];
+          }
+        }
+      }
+    }
+    return "";
   }
 
+  /**
+   * @brief  member function to create an array of modifier behaviours for a given keycode in [keycode,modifier]
+   * @param  data    : any - an object containing all data read from a .keylayout file
+   * @param  search  : (string | number)[][] - an array[keycode,modifier]  to be found
+   * @return an array: string[] containing modifiers
+   */
+  public get_Modifier_array__From__KeyModifier_array(data: any, search: (string | number)[][]): string[] {
+    const mapIndexArray_2D: string[] = [];
+    for (let i = 0; i < search.length; i++) {
+      mapIndexArray_2D.push(data[search[i][1]]);
+    }
+    return mapIndexArray_2D;
+  }
+
+  /**
+   * @brief  member function to find the output for a certain actionID for state 'none'
+   * @param  data   :any an object containing all data read from a .keylayout file
+   * @param  search :string an actionId to be found
+   * @return a string containing the output character
+   */
+  public get_Output__From__ActionId_None(data: any, search: string): string {
+    let OutputValue: string = "";
+
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      if (data.keyboard.actions.action[i]['@_id'] === search) {
+        for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+          if (data.keyboard.actions.action[i].when[j]['@_state'] === "none") {
+            OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
+          }
+        }
+      }
+    }
+    return OutputValue;
+  }
+
+  /**
+  * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
+  * @param  data   :any - an object containing all data read from a .keylayout file
+  * @param  search :string[][] - array of [ actionID,state,output]
+  * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
+  */
+  public get_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: string[][]): string[][] {
+
+    if ((search === undefined) || (search === null))
+      return [];
+
+    const returnarray2D: string[][] = [];
+    for (let k = 0; k < search.length; k++) {
+      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+          const returnarray: string[] = [];
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
+            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])));
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index']);
+            returnarray.push(search[k][2]);
+          }
+          if (returnarray.length > 0) {
+            returnarray2D.push(returnarray);
+          }
+        }
+      }
+    }
+    return returnarray2D;
+  }
+
+  /**
+   * @brief  member function to get an array of all actionId-output pairs for a certain state
+   * @param  data    : any an object containing all data read from a .keylayout file
+   * @param  search  : string a 'state' to be found
+   * @return an array: string[][] containing all [actionId, state, output] for a certain state
+   */
+  public get_ActionStateOutput_array__From__ActionState(data: any, search: string): string[][] {
+    const returnarray2D: string[][] = [];
+
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+        const returnarray: string[] = [];
+        if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
+          returnarray.push(data.keyboard.actions.action[i]['@_id']);
+          returnarray.push(data.keyboard.actions.action[i].when[j]['@_state']);
+          returnarray.push(data.keyboard.actions.action[i].when[j]['@_output']);
+        }
+        if (returnarray.length > 0) {
+          returnarray2D.push(returnarray);
+        }
+      }
+    }
+    return returnarray2D;
+  }
+
+  /**
+   * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
+   * @param  data    : any an object containing all data read from a .keylayout file
+   * @param  search  : array of [keycode,keyname,actionId,behaviour,output] to be found
+   * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
+   * @return an array: string[][] containing [KeyName,actionId,behaviour,modifier,output]
+   */
+  public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
+    const returnarray: string[][] = [];
+
+    if (!((search === undefined) || (search === null) || (search.length === 0))) {
+      for (let i = 0; i < search.length; i++) {
+        const behaviour: number = Number(search[i][3]);
+
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
+          const returnarray1D: string[] = [];
+          // KeyName
+          returnarray1D.push(String(search[i][1]));
+          // actionId
+          returnarray1D.push(String(search[i][2]));
+          // behaviour
+          returnarray1D.push(String(search[i][3]));
+          // modifier
+          returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)));
+          // output
+          returnarray1D.push(String(search[i][4]));
+
+          if (returnarray1D.length > 0) {
+            returnarray.push(returnarray1D);
+          }
+        }
+      }
+    }
+    // remove duplicates
+    const [unique_returnarray] = returnarray.reduce((acc, curr) => {
+      const [uniq, set] = acc;
+      if (!set.has(curr.join(','))) {
+        set.add(curr.join(','));
+        uniq.push(curr);
+      }
+      return acc;
+    },
+      [[], new Set()],
+    );
+    return unique_returnarray;
+  }
+
+  /**
+   * @brief  member function to create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
+   * @param  data    : any - an object containing all data read from a .keylayout file
+   * @param  modi    : any - an array of modifiers
+   * @param  search  : string - an actionId to be found
+   * @param  outchar  : string - the output character
+   * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
+   * @return an array: string[][] containing [actionID,output,actionID, behaviour,keyname,modifier]
+   */
+  public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): string[][] {
+    const returnarray2D: string[][] = [];
+
+    if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
+      return [];
+    }
+
+    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
+            const returnarray: string[] = [];
+            const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
+            const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
+            const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
+
+            returnarray.push(search);
+            returnarray.push(outchar);
+            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
+            returnarray.push(behaviour);
+            returnarray.push(keyName);
+            returnarray.push(modifierkmn);
+
+            if (returnarray.length > 0) {
+              returnarray2D.push(returnarray);
+            }
+          }
+        }
+      }
+    }
+    // remove duplicates
+    const [unique_returnarray] = returnarray2D.reduce((acc, curr) => {
+      const [uniq, set] = acc;
+      if (!set.has(curr.join(','))) {
+        set.add(curr.join(','));
+        uniq.push(curr);
+      }
+      return acc;
+    },
+      [[], new Set()],
+    );
+
+    return unique_returnarray;
+  }
+
+  /**
+   * @brief  member function to create an array of [keycode,behaviour] for a given actionId
+   * @param  data    : any - an object containing all data read from a .keylayout file
+   * @param  search  : string - an actionId to be found
+   * @return an array: number[][] containing [keycode,behaviour]
+   */
+  public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
+    const mapIndexArray_2D: number[][] = [];
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        const mapIndexArrayperKey: number[] = [];
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+          mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
+          mapIndexArrayperKey.push(i);
+        }
+        if (mapIndexArrayperKey.length > 0) {
+          mapIndexArray_2D.push(mapIndexArrayperKey);
+        }
+      }
+    }
+    return mapIndexArray_2D;
+  }
+
+  // console log all entries C3  TODO remove
+  public writeDataset(dataRules: rule_object[]) {
+    for (let i = 0; i < dataRules.length; i++) {
+      //if (dataRules[i].key === "") {
+      if ((i > 2934) && (i < 2939)) {
+        //   if (true ) {
+
+
+        console.log("dataRules[i].outp ", "..", dataRules[i].output, "..", dataRules[i].output === new TextEncoder().encode(""));
+
+        console.log("dataRules ", i,
+
+          dataRules[i].rule_type !== "" ? dataRules[i].rule_type : "--".padEnd(4, " "),
+
+          "|  ", (dataRules[i].modifier_prev_deadkey !== "" ? dataRules[i].modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
+          (dataRules[i].prev_deadkey !== "" ? dataRules[i].prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
+          (dataRules[i].id_prev_deadkey !== 0 ? ("dk(A" + String(dataRules[i].id_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+          (dataRules[i].unique_prev_deadkey !== 0 ? ("unique(A" + String(dataRules[i].unique_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+
+          (dataRules[i].modifier_deadkey !== "" ? dataRules[i].modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
+          (dataRules[i].deadkey !== "" ? dataRules[i].deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
+          dataRules[i].rule_type === "C2" ? (dataRules[i].unique_deadkey !== 0 ? ("unique(C" + String(dataRules[i].unique_deadkey) + ")").padEnd(9, " ") : "--".padEnd(9, " ")) : ((dataRules[i].unique_prev_deadkey !== 0 ? ("unique(B" + dataRules[i].id_deadkey + ")").padEnd(9, " ") : "--".padEnd(9, " "))),
+
+          dataRules[i].id_prev_deadkey,
+          dataRules[i].id_deadkey,
+
+          "|  ", (dataRules[i].modifier_key !== "" ? dataRules[i].modifier_key.padEnd(40, " ") : "--".padEnd(40, " ")),
+          (dataRules[i].key !== "" ? dataRules[i].key.padEnd(8, " ") : "--".padEnd(8, " ")),
+          (new TextDecoder().decode(dataRules[i].output) !== "" ? new TextDecoder().decode(dataRules[i].output).padEnd(10, " ") : ("--" + dataRules[i].output) + "--"),
+
+          "| °°");
+      }
+    }
+
+  }
+  // TODO remove
+  public writeDatasetSingle(dataRules: rule_object) {
+
+    console.log("dataRules[i].key ", "..", dataRules.key, "..", dataRules.key === "");
+
+    console.log("dataRules ",
+      dataRules.rule_type !== "" ? dataRules.rule_type : "--".padEnd(4, " "),
+
+      "|  ", (dataRules.modifier_prev_deadkey !== "" ? dataRules.modifier_prev_deadkey.padEnd(33, " ") : "--".padEnd(33, " ")),
+      (dataRules.prev_deadkey !== "" ? dataRules.prev_deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
+      (dataRules.id_prev_deadkey !== 0 ? ("dk(A" + String(dataRules.id_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+      (dataRules.unique_prev_deadkey !== 0 ? ("unique(A" + String(dataRules.unique_prev_deadkey) + ")").padEnd(11, " ") : "--".padEnd(11, " ")),
+
+      (dataRules.modifier_deadkey !== "" ? dataRules.modifier_deadkey.padEnd(30, " ") : "--".padEnd(30, " ")),
+      (dataRules.deadkey !== "" ? dataRules.deadkey.padEnd(8, " ") : "--".padEnd(8, " ")),
+      dataRules.rule_type === "C2" ? (dataRules.unique_deadkey !== 0 ? ("unique(C" + String(dataRules.unique_deadkey) + ")").padEnd(9, " ") : "--".padEnd(9, " ")) : ((dataRules.unique_prev_deadkey !== 0 ? ("unique(B" + dataRules.id_deadkey + ")").padEnd(9, " ") : "--".padEnd(9, " "))),
+
+      dataRules.id_prev_deadkey,
+      dataRules.id_deadkey,
+
+      "|  ", (dataRules.modifier_key !== "" ? dataRules.modifier_key.padEnd(40, " ") : "--".padEnd(40, " ")),
+      (dataRules.key !== "" ? dataRules.key.padEnd(8, " ") : "--".padEnd(8, " ")),
+      (new TextDecoder().decode(dataRules.output) !== "" ? new TextDecoder().decode(dataRules.output).padEnd(10, " ") : ("--" + dataRules.output) + "--"),
+
+      "| °°");
+
+  }
+
+
+
+
+  public Translate_Allmodifiers(data: convert_object) {
+    //let i=0; i< data.
+    console.log("HuRRA ",);
+    console.log(" ", data.arrayOf_Modifiers);
+
+    const modi_flat = data.arrayOf_Modifiers.flat();
+    console.log("modi_flat ", modi_flat);
+    const cps: boolean = this.checkIfCapsIsUsed(data.arrayOf_Modifiers);
+
+    for (let i = 0; i < modi_flat.length; i++) {
+
+      console.log(" ", this.create_kmn_modifier(modi_flat[i], cps));
+    }
+
+
+    //const modi= data.arrayOf_Modifiers
+
+  }
 }
 
 /**
