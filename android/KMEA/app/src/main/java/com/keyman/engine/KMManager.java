@@ -342,6 +342,9 @@ public final class KMManager {
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
 
+  // Default keyboard height
+  public static final int KeyboardHeight_Default = 0; 
+
   // Default prediction/correction setting
   public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
 
