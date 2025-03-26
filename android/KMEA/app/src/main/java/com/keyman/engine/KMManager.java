@@ -2253,10 +2253,8 @@ public final class KMManager {
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
-        editor.commit();
-      } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
         editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
-        editor.commit();
       }
     }
     // Confirm new LayoutParams for in-app or system keyboards 
