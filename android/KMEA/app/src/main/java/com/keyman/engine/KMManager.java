@@ -2243,8 +2243,7 @@ public final class KMManager {
       editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
       editor.commit();
 
-    }
-    else {
+    } else {
       // Applying gating to 50%-200% of default height (following Keyman) 
       int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
       if (height < (defaultHeight / 2)) {
