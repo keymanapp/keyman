@@ -2237,7 +2237,7 @@ public final class KMManager {
     SharedPreferences prefs = context.getSharedPreferences("KMAPreferences", Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     int orientation = getOrientation(context);
-    if (height == 0) {
+    if (height == KMManager.DEFAULT_KEYBOARD_HEIGHT) {
       // Passing 0 will reset both stored heights
       editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
       editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
