@@ -2225,7 +2225,7 @@ public final class KMManager {
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
+      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
     }
     return defaultHeight;
   }
