@@ -34,7 +34,6 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   private static ImageView sampleKeyboard = null;
 
   // Keeps track of the adjusted keyboard height for saving
-  private static SharedPreferences.Editor editor = null;
   private static int currentHeight = 0;
   private static ViewGroup.LayoutParams layoutParams;
 
@@ -65,9 +64,6 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     adjustKeyboardHeightActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
     adjustKeyboardHeightActivityTitle.setText(titleStr);
 
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    editor = prefs.edit();
-
     sampleKeyboard = (ImageView) findViewById(R.id.sample_keyboard);
     layoutParams = sampleKeyboard.getLayoutParams();
     currentHeight = KMManager.getKeyboardHeight(context);
@@ -77,9 +73,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Clear the keyboard height preferences to reset
-        editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
-        editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
-        editor.commit();
+        KMManager.applyKeyboardHeight(this, 0);
 
         // Restore default height
         currentHeight = KMManager.getKeyboardHeight(context);
