@@ -23,7 +23,7 @@ object frmStartInstall: TfrmStartInstall
     Width = 313
     Height = 34
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
-    Font.Charset = ANSI_CHARSET
+    Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -13
     Font.Name = 'Segoe UI'
