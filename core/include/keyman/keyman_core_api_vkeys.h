@@ -60,8 +60,8 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY_RBUTTON,           // 0x02
   KM_CORE_VKEY_CANCEL,            // 0x03
   KM_CORE_VKEY_MBUTTON,           // 0x04
-  KM_CORE_VKEY_XBUTTON1,          // 0x05
-  KM_CORE_VKEY_XBUTTON2,          // 0x06
+  KM_CORE_VKEY__XBUTTON1__,       // 0x05
+  KM_CORE_VKEY__XBUTTON2__,       // 0x06
   KM_CORE_VKEY__07,               // 0x07 - Reserved
   KM_CORE_VKEY_BKSP,              // 0x08 - VK_BACK
   KM_CORE_VKEY_TAB,               // 0x09
@@ -76,17 +76,17 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY_ALT,               // 0x12 - VK_MENU
   KM_CORE_VKEY_PAUSE,             // 0x13
   KM_CORE_VKEY_CAPS,              // 0x14 - VK_CAPITAL
-  KM_CORE_VKEY_KANA,              // 0x15
-  KM_CORE_VKEY_HANGUL,            // 0x16
-  KM_CORE_VKEY_JUNJA,             // 0x17
-  KM_CORE_VKEY_FINAL,             // 0x18
-  KM_CORE_VKEY_HANJA,             // 0x19 - or VK_KANJI
-  KM_CORE_VKEY_IMEOFF,            // 0x1a - VK_IME_OFF
+  KM_CORE_VKEY__KANA__,           // 0x15
+  KM_CORE_VKEY__HANGUL__,         // 0x16
+  KM_CORE_VKEY__JUNJA__,          // 0x17
+  KM_CORE_VKEY__FINAL__,          // 0x18
+  KM_CORE_VKEY__HANJA__,          // 0x19 - or VK_KANJI
+  KM_CORE_VKEY__IMEOFF__,         // 0x1a - VK_IME_OFF
   KM_CORE_VKEY_ESC,               // 0x1b - VK_ESCAPE
-  KM_CORE_VKEY_CONVERT,           // 0x1c
-  KM_CORE_VKEY_NONCONVERT,        // 0x1d
-  KM_CORE_VKEY_ACCEPT,            // 0x1e
-  KM_CORE_VKEY_MODECHANGE,        // 0x1f
+  KM_CORE_VKEY__CONVERT__,        // 0x1c
+  KM_CORE_VKEY__NONCONVERT__,     // 0x1d
+  KM_CORE_VKEY__ACCEPT__,         // 0x1e
+  KM_CORE_VKEY__MODECHANGE__,     // 0x1f
   KM_CORE_VKEY_SPACE,             // 0x20
   KM_CORE_VKEY_PGUP,              // 0x21 - VK_PRIOR
   KM_CORE_VKEY_PGDN,              // 0x22 - VK_NEXT
@@ -146,11 +146,11 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY_X,                 // 0x58
   KM_CORE_VKEY_Y,                 // 0x59
   KM_CORE_VKEY_Z,                 // 0x5a
-  KM_CORE_VKEY_LWIN,              // 0x5b
-  KM_CORE_VKEY_RWIN,              // 0x5c
-  KM_CORE_VKEY_APPS,              // 0x5d
+  KM_CORE_VKEY__LWIN__,           // 0x5b
+  KM_CORE_VKEY__RWIN__,           // 0x5c
+  KM_CORE_VKEY__APPS__,           // 0x5d
   KM_CORE_VKEY__5E,               // 0x5e - reserved
-  KM_CORE_VKEY_SLEEP,             // 0x5f
+  KM_CORE_VKEY__SLEEP__,          // 0x5f
   KM_CORE_VKEY_NP0,               // 0x60 - VK_NUMPAD0
   KM_CORE_VKEY_NP1,               // 0x61 - VK_NUMPAD1
   KM_CORE_VKEY_NP2,               // 0x62 - VK_NUMPAD2
@@ -215,30 +215,30 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY__9D,               // 0x9d - unassigned
   KM_CORE_VKEY__9E,               // 0x9e - unassigned
   KM_CORE_VKEY__9F,               // 0x9f - unassigned
-  KM_CORE_VKEY_LSHIFT,            // 0xa0
-  KM_CORE_VKEY_RSHIFT,            // 0xa1
-  KM_CORE_VKEY_LCONTROL,          // 0xa2
-  KM_CORE_VKEY_RCONTROL,          // 0xa3
-  KM_CORE_VKEY_LMENU,             // 0xa4
-  KM_CORE_VKEY_RMENU,             // 0xa5
-  KM_CORE_VKEY_BROWSERBACK,       // 0xa6 - VK_BROWSER_BACK
-  KM_CORE_VKEY_BROWSERFORWARD,    // 0xa7 - VK_BROWSER_FORWARD
-  KM_CORE_VKEY_BROWSERREFRESH,    // 0xa8 - VK_BROWSER_REFRESH
-  KM_CORE_VKEY_BROWSERSTOP,       // 0xa9 - VK_BROWSER_STOP
-  KM_CORE_VKEY_BROWSERSEARCH,     // 0xaa - VK_BROWSER_SEARCH
+  KM_CORE_VKEY__LSHIFT__,         // 0xa0
+  KM_CORE_VKEY__RSHIFT__,         // 0xa1
+  KM_CORE_VKEY__LCONTROL__,       // 0xa2
+  KM_CORE_VKEY__RCONTROL__,       // 0xa3
+  KM_CORE_VKEY__LMENU__,          // 0xa4
+  KM_CORE_VKEY__RMENU__,          // 0xa5
+  KM_CORE_VKEY__BROWSERBACK__,    // 0xa6 - VK_BROWSER_BACK
+  KM_CORE_VKEY__BROWSERFORWARD__, // 0xa7 - VK_BROWSER_FORWARD
+  KM_CORE_VKEY__BROWSERREFRESH__, // 0xa8 - VK_BROWSER_REFRESH
+  KM_CORE_VKEY__BROWSERSTOP__,    // 0xa9 - VK_BROWSER_STOP
+  KM_CORE_VKEY__BROWSERSEARCH__,  // 0xaa - VK_BROWSER_SEARCH
   KM_CORE_VKEY_BROWSERFAVORITES,  // 0xab - VK_BROWSER_FAVORITES
-  KM_CORE_VKEY_BROWSERHOME,       // 0xac - VK_BROWSER_HOME
-  KM_CORE_VKEY_VOLUMEMUTE,        // 0xad - VK_VOLUME_MUTE
-  KM_CORE_VKEY_VOLUMEDOWN,        // 0xae - VK_VOLUME_DOWN
-  KM_CORE_VKEY_VOLUMEUP,          // 0xaf - VK_VOLUME_UP
-  KM_CORE_VKEY_MEDIANEXT,         // 0xb0 - VK_MEDIA_NEXT_TRACK
-  KM_CORE_VKEY_MEDIAPREV,         // 0xb1 - VK_MEDIA_PREV_TRACK
-  KM_CORE_VKEY_MEDIASTOP,         // 0xb2 - VK_MEDIA_STOP
-  KM_CORE_VKEY_MEDIAPLAY,         // 0xb3 - VK_MEDIA_PLAY_PAUSE
-  KM_CORE_VKEY_MAIL,              // 0xb4 - VK_LAUNCH_MAIL
-  KM_CORE_VKEY_MEDIA,             // 0xb5 - VK_LAUNCH_MEDIA_SELECT
-  KM_CORE_VKEY_APP1,              // 0xb6 - VK_LAUNCH_APP1
-  KM_CORE_VKEY_APP2,              // 0xb7 - VK_LAUNCH_APP2
+  KM_CORE_VKEY__BROWSERHOME__,    // 0xac - VK_BROWSER_HOME
+  KM_CORE_VKEY__VOLUMEMUTE__,     // 0xad - VK_VOLUME_MUTE
+  KM_CORE_VKEY__VOLUMEDOWN__,     // 0xae - VK_VOLUME_DOWN
+  KM_CORE_VKEY__VOLUMEUP__,       // 0xaf - VK_VOLUME_UP
+  KM_CORE_VKEY__MEDIANEXT__,      // 0xb0 - VK_MEDIA_NEXT_TRACK
+  KM_CORE_VKEY__MEDIAPREV__,      // 0xb1 - VK_MEDIA_PREV_TRACK
+  KM_CORE_VKEY__MEDIASTOP__,      // 0xb2 - VK_MEDIA_STOP
+  KM_CORE_VKEY__MEDIAPLAY__,      // 0xb3 - VK_MEDIA_PLAY_PAUSE
+  KM_CORE_VKEY__MAIL__,           // 0xb4 - VK_LAUNCH_MAIL
+  KM_CORE_VKEY__MEDIA__,          // 0xb5 - VK_LAUNCH_MEDIA_SELECT
+  KM_CORE_VKEY__APP1__,           // 0xb6 - VK_LAUNCH_APP1
+  KM_CORE_VKEY__APP2__,           // 0xb7 - VK_LAUNCH_APP2
   KM_CORE_VKEY__B8,               // 0xb8 - reserved
   KM_CORE_VKEY__B9,               // 0xb9 - reserved
   KM_CORE_VKEY_COLON,             // 0xba - VK_OEM_1
@@ -284,9 +284,9 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY_oE2,               // 0xe2 - VK_OEM_102 - 102nd key on European layouts
   KM_CORE_VKEY_oE3,               // 0xe3 - OEM specific
   KM_CORE_VKEY_oE4,               // 0xe4 - OEM specific
-  KM_CORE_VKEY_PROCESSKEY,        // 0xe5
+  KM_CORE_VKEY__PROCESSKEY__,     // 0xe5
   KM_CORE_VKEY_oE6,               // 0xe6 - OEM specific
-  KM_CORE_VKEY_PACKET,            // 0xe7
+  KM_CORE_VKEY__PACKET__,         // 0xe7
   KM_CORE_VKEY__E8,               // 0xe8 - unassigned
   KM_CORE_VKEY_oE9,               // 0xe9 - OEM specific
   KM_CORE_VKEY_oEA,               // 0xea - OEM specific
@@ -301,14 +301,14 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY_oF3,               // 0xf3 - OEM specific
   KM_CORE_VKEY_oF4,               // 0xf4 - OEM specific
   KM_CORE_VKEY_oF5,               // 0xf5 - OEM specific
-  KM_CORE_VKEY_ATTN,              // 0xf6
-  KM_CORE_VKEY_CRSEL,             // 0xf7
-  KM_CORE_VKEY_EXSEL,             // 0xf8
-  KM_CORE_VKEY_EREOF,             // 0xf9
-  KM_CORE_VKEY_PLAY,              // 0xfa
-  KM_CORE_VKEY_ZOOM,              // 0xfb
-  KM_CORE_VKEY_NONAME,            // 0xfc
-  KM_CORE_VKEY_PA1,               // 0xfd
-  KM_CORE_VKEY_OEMCLEAR,          // 0xfe
+  KM_CORE_VKEY__ATTN__,           // 0xf6
+  KM_CORE_VKEY__CRSEL__,          // 0xf7
+  KM_CORE_VKEY__EXSEL__,          // 0xf8
+  KM_CORE_VKEY__EREOF__,          // 0xf9
+  KM_CORE_VKEY__PLAY__,           // 0xfa
+  KM_CORE_VKEY__ZOOM__,           // 0xfb
+  KM_CORE_VKEY__NONAME__,         // 0xfc
+  KM_CORE_VKEY__PA1__,            // 0xfd
+  KM_CORE_VKEY__OEMCLEAR__,       // 0xfe
   KM_CORE_VKEY__FF,               // 0xff
 };
