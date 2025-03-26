@@ -2259,6 +2259,7 @@ public final class KMManager {
         editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
       }
     }
+    editor.commit();
     // Confirm new LayoutParams for in-app or system keyboards 
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
