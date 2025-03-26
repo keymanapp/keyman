@@ -48,14 +48,18 @@ do_test() {
   local new_table="$(mktemp)"
   cp "$KEYMAN_ROOT/docs/minimum-versions.md.in" "$new_table"
   generate_table >> "$new_table"
-  diff --suppress-common-lines -yw "$KEYMAN_ROOT/docs/minimum-versions.md" "$new_table" || \
+  diff --suppress-common-lines -yw "$KEYMAN_ROOT/docs/minimum-versions.md" "$new_table" || ( \
+    rm "$new_table"
     builder_die "minimum-versions.md is not up to date. Please run 'publish-minimum-versions.sh build'"
+  )
+
+  rm  "$new_table"
 
   # TODO: this should have a test for each of the known machine-extractable versions.
 
   # language-subtag-registry
+
   local NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY="$(head ../standards-data/language-subtag-registry/language-subtag-registry -n 1 | cut -d" " -f 2 -)"
-  echo "$NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY"
   if [[ "$NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY" != "$KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY" ]]; then
     builder_die "language-subtag-registry is version '$NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY' but minimum-version.inc.sh has version '$KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY'"
   fi
