@@ -18,7 +18,7 @@ KMManager.applyKeyboardHeight(Context context, int height)
 : The context
 
 `height`
-: The height of the keyboard frame in *density-independent pixels (dp)*. Pass 0 to reset the keyboard height (portrait and landscape) to device-specific defaults.
+: The height of the keyboard frame in *density-independent pixels (dp)*. Pass `KMManager.KeyboardHeight_Reset` to reset the keyboard height (for current orientation) to device-specific defaults.
 
 ## Description
 Use this method when you want to increase or decrease the keyboard height for 
