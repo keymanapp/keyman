@@ -2267,9 +2267,10 @@ public final class KMManager {
       // Passing 0 will reset the stored height for this orientation.
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
-      } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
         editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
       }
+      height = defaultHeightForContext;
     } else {
       // Applying gating to 50%-200% of default height (following Keyman) 
       if (height < (defaultHeightForContext / 2)) {
