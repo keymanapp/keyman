@@ -240,7 +240,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     // load the file from disk into a string
-    const data = this.callbacks.loadFile(filename);
+    const data = reader.readFile(filename);
     if (!data) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;

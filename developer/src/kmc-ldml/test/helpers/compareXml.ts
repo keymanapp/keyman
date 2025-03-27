@@ -21,5 +21,5 @@ export function compareXml(actual : string, expect: string, mutator?: (input: an
     const actualParsed = mutator(reader.parse(actualStr));
     const expectParsed = mutator(reader.parse(expectStr));
 
-    assert.deepEqual(actualParsed, expectParsed);
+    assert.deepEqual(KeymanXMLReader.removeSymbols(actualParsed), KeymanXMLReader.removeSymbols(expectParsed));
 }

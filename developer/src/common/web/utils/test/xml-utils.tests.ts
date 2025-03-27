@@ -12,7 +12,7 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, XML_START_INDEX_SYMBOL } from '../src/xml-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 
 // if true, attempt to WRITE the fixtures
@@ -119,7 +119,7 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
             writeJson(jsonPath, actual);
           } else {
             assert.ok(expect, `Could not read ${jsonPath} - run with env GEN_XML_FIXTURES=1 to update.`);
-            assert.deepEqual(actual, expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
+            assert.deepEqual(KeymanXMLReader.removeSymbols(actual), expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
           }
         });
       }
@@ -159,4 +159,30 @@ describe(`XML Writer Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
       }
     });
   }
+});
+
+describe(`XML Reader line number test`, () => {
+  const path = 'tran_fail-empty.xml';
+  const xmlPath = makePathToFixture('xml', `${path}`);
+  const type: KeymanXMLType = 'keyboard3';
+  it(`Should report line numbers on parse of ${type} ${path}`, () => {
+    let xml = readData(xmlPath);
+    assert.ok(xml, `Could not read ${xmlPath}`);
+    xml = xml.replace(/\r\n/g, '\n');
+    const reader = new KeymanXMLReader(type);
+    assert.ok(reader);
+
+    // now, parse. subsitute endings for Win
+    const actual = reader.parse(xml);
+    const lines = KeymanXMLReader.textToLines(xml);
+    assert.ok(actual, `Parser failed on ${xmlPath}`);
+
+    // now, assert char offset
+    assert.equal(actual.keyboard3[XML_START_INDEX_SYMBOL as any], 40); // index of <keyboard3> element
+    assert.equal(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], 136);  // index of <info> etc
+    assert.equal(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], 186);
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[XML_START_INDEX_SYMBOL as any], lines), { line: 3, column: 0 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], lines), { line: 4, column: 2 });
+    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], lines), { line: 8, column: 2 });
+  });
 });
