@@ -2242,7 +2242,7 @@ public final class KMManager {
 
   /**
    * Apply the keyboard height for the current orientation and store it in SharedPreferences.
-   * If height is KMManager.DEFAULT_KEYBOARD_HEIGHT, remove the stored height for that orientation.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that orientation.
    * @param context Context
    * @param height int - keyboard height in dp
    */
@@ -2253,7 +2253,7 @@ public final class KMManager {
 
   /**
    * Apply the keyboard height for the current orientation and store it in SharedPreferences.
-   * If height is KMManager.DEFAULT_KEYBOARD_HEIGHT, remove the stored height for that orientation.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that orientation.
    * @param context Context
    * @param height int - keyboard height in dp
    * @param orientation int - Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
