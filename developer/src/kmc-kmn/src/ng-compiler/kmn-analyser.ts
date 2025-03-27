@@ -7,9 +7,19 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, OneOrManyRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
+
+export class MultiLineRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const continuationLine          = new ContinuationLineRule(tokenBuffer);
+    const oneOrManyContinuationLine = new OneOrManyRule(tokenBuffer, continuationLine);
+    const soloLine                  = new SoloLineRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [oneOrManyContinuationLine, soloLine]);
+  }
+}
 
 export class SoloLineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, SoloLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, MultiLineRule, SoloLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -20,6 +20,21 @@ let root: ASTNode = null;
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
+  });
+  describe("LineBlockRule Tests", () => {
+    it("can construct a LineBlockRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
+      const lineBlock: Rule = new MultiLineRule(tokenBuffer);
+      assert.isNotNull(lineBlock);
+    });
+    it("can parse correctly", () => {
+      const line1 = 'store(&bitmap) "filename" \\\n'
+      const line2 = 'store(&copyright) "message" \\\n'
+      const line3 = 'store(&includecodes) "filename" c a comment\n'
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(`${line1}${line2}${line3}`);
+      const lineBlock: Rule = new MultiLineRule(tokenBuffer);
+      assert.isTrue(lineBlock.parse(root));
+    });
   });
   describe("SoloLineRule Tests", () => {
     it("can construct a SoloLineRule", () => {
