@@ -4,9 +4,9 @@ title: Uninstalling Keyman for macOS
 
 To uninstall Keyman for macOS:
 
-1. Choose Apple menu > System Preferences.
+1. Choose Apple menu > System Settings.
 
-   ![Apple menu](../mac_images/apple_menu.png)
+   ![Apple menu](../mac_images/open-apple-menu.png)
 
 2. Click Keyboard, then click Input Sources.
 
