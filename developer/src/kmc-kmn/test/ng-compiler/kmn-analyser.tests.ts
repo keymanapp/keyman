@@ -107,6 +107,13 @@ describe("KMN Analyser Tests", () => {
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
+    it("can parse correctly (space before comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied\n');
+      const blankLine: Rule = new BlankLineRule(tokenBuffer);
+      assert.isTrue(blankLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.isFalse(root.getSoleChild().hasChild());
+    });
   })
   describe("CommentEndRule Tests", () => {
     it("can construct a CommentEndRule", () => {

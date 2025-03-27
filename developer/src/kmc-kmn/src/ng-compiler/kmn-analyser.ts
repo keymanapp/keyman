@@ -36,9 +36,12 @@ export class ContentLineRule extends SingleChildRule {
 export class BlankLineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
     const optCommentEnd: Rule = new OptionalCommentEndRule(tokenBuffer);
     const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [optCommentEnd, newline]);
+    this.rule = new SequenceRule(tokenBuffer, [
+      optWhitespace, optCommentEnd, newline,
+    ]);
   }
 }
 
