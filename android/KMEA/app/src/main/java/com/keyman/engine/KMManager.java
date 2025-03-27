@@ -2307,6 +2307,10 @@ public final class KMManager {
   }
 
   public static int getDefaultKeyboardHeight(Context context, int orientation) {
+    if (isTestMode()) {
+      // Keyboard height not needed for unit tests  #13578
+      return KeyboardHeight_Context_Portrait_Default;
+    }
     Resources resources = context.getResources();
     Configuration originalConfig = resources.getConfiguration();
     Configuration newConfig = new Configuration(originalConfig);
