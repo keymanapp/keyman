@@ -19,6 +19,17 @@ export class MultiLineRule extends SingleChildRule {
     const soloLine                  = new SoloLineRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [oneOrManyContinuationLine, soloLine]);
   }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineChildren: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
+      node.addChildren(tmp.getChildren());
+      node.addChildren(lineChildren);
+    }
+    return parseSuccess;
+  }
 }
 
 export class SoloLineRule extends SingleChildRule {
@@ -40,18 +51,6 @@ export class ContentLineRule extends SingleChildRule {
     this.rule = new SequenceRule(tokenBuffer, [
       optWhitespace, content, optCommentEnd, newline
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineNode: ASTNode    = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const contentNode: ASTNode = tmp.getSoleChild();
-      lineNode.addChild(contentNode);
-      node.addChild(lineNode);
-    }
-    return parseSuccess;
   }
 }
 
@@ -75,18 +74,6 @@ export class ContinuationLineRule extends SingleChildRule {
     this.rule = new SequenceRule(tokenBuffer, [
       optWhitespace, content, whitespace, continuationEnd, newline
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineNode: ASTNode    = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const contentNode: ASTNode = tmp.getSoleChild();
-      lineNode.addChild(contentNode);
-      node.addChild(lineNode);
-    }
-    return parseSuccess;
   }
 }
 

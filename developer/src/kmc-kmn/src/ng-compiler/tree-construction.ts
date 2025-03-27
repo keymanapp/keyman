@@ -19,12 +19,12 @@ export enum NodeTypes {
 
 export class ASTNode {
   private _nodeType: NodeTypes;
-  private token: Token;
+  private _token: Token;
   private children: ASTNode[] = [];
 
   public constructor(nodeType: NodeTypes, token: Token=null) {
     this._nodeType = nodeType;
-    this.token     = token;
+    this._token     = token;
   }
 
   public addChild(child: ASTNode): ASTNode {
@@ -70,7 +70,7 @@ export class ASTNode {
   }
 
   public getText(): String {
-    return (this.token != null) ? this.token.text : '';
+    return (this._token != null) ? this._token.text : '';
   }
 
   public getTextOfType(nodeType: NodeTypes): String  {
@@ -121,4 +121,5 @@ export class ASTNode {
   }
 
   public get nodeType() { return this._nodeType; }
+  public get token() { return this._token; }
 }
