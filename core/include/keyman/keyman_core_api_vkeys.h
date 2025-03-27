@@ -54,6 +54,9 @@ enum km_core_modifier_mask {
 
 // These are Windows API VKEYs, using Keyman VKEY names.
 // Underlying values from winuser.h (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+// Note, some codes are defined here for parity with winuser.h, but are 
+// not available in .kmn language. These codes are marked as "internal"
+// by using `__` in the name: `KM_CORE_VKEY__<name>__`
 enum km_kpb_virtual_key {
   KM_CORE_VKEY__00,
   KM_CORE_VKEY_LBUTTON,           // 0x01
