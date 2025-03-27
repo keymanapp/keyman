@@ -14,3 +14,9 @@ copyrightStoreAssign: copyrightStore whitespace string
 copyrightStore: store leftBracket whitespace? amphasand copyright whitespace? rightBracket
 includecodesStoreAssign: includecodesStore whitespace string
 includecodesStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket
+variableStoreAssign: variableStore text+
+text: string|virtualKey|uChar
+virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSquare
+spacedShiftCode: shiftcode whitespace
+variableStore: store leftBracket whitespace? storeName whitespace? rightBracket
+storeName: parameter
