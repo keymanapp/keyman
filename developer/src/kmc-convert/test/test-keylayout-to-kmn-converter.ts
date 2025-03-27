@@ -7,7 +7,6 @@ import { assert } from 'chai';
 import { compilerTestCallbacks, compilerTestOptions } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { makePathToFixture } from './helpers/index.js';
-import { error } from 'console';
 
 //-----------------------------------------------------------------------------------------------------------------------
 
@@ -17,17 +16,16 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-// todo remove
-  describe('RunOneFile ', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/XX.keylayout');
-    console.log(" inputFilename: ", inputFilename);
-    sut.run(inputFilename);
-    assert.isTrue(true);
-    ;
-  });
+  // todo remove
+   describe('RunOneFile ', function () {
+     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+     const inputFilename = makePathToFixture('../data/Italian.keylayout');
+     sut.run(inputFilename);
+     assert.isTrue(true);
+     ;
+   });
 
-// todo remove
+  // todo remove
   describe('RunAllFiles ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -41,9 +39,11 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/French.keylayout')],
       [makePathToFixture('../data/Latin_American.keylayout')],
       [makePathToFixture('../data/German_complete.keylayout')],
-      [makePathToFixture('../data/German_Standard.keylayout')],
+      [makePathToFixture('../data/German_complete_reduced.keylayout')],
+      // [makePathToFixture('../data/German_Standard.keylayout')],
+
+
     ].forEach(function (files_) {
-      console.log(" inputFilename: ", files_[0]);
       sut.run(files_[0]);
       assert.isTrue(true);
     });
@@ -230,19 +230,16 @@ describe('KeylayoutToKmnConverter', function () {
     const converted_empty = sut.convert(read_empty);
 
     it('should return converted array on correct input', async function () {
-      // we use 'converted' from above
       assert.isTrue(converted.arrayOf_Rules.length !== 0);
     });
 
     it('should return empty on empty input', async function () {
-      // we use 'converted_empty' from above
       assert.isTrue((converted_empty.keylayout_filename === ''
         && converted_empty.arrayOf_Modifiers.length === 0
         && converted_empty.arrayOf_Rules.length === 0));
     });
 
     it('should return empty on only name as input', async function () {
-      // we use 'converted_unavailable' from above
       assert.isTrue((converted_unavailable.keylayout_filename === ''
         && converted_unavailable.arrayOf_Modifiers.length === 0
         && converted_unavailable.arrayOf_Rules.length === 0));
@@ -275,6 +272,14 @@ describe('KeylayoutToKmnConverter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     [
+      ['shift', true, 'NCAPS SHIFT'],
+      ['leftshift', true, 'NCAPS SHIFT'],
+      ['rightShift', true, 'NCAPS SHIFT'],
+      ['shift rightShift?', true, 'NCAPS SHIFT'],
+      ['rightShift?', true, 'NCAPS'],
+      ['shift Shift?', true, 'NCAPS SHIFT'],
+      ['shift rightShift? caps? rightOption? rightControl', true, 'NCAPS SHIFT RCTRL'],
+      ['leftshift rightShift? caps? rightOption? rightControl', true, 'NCAPS SHIFT RCTRL'],
       ['anycontrol', true, 'NCAPS CTRL'],
       ['shift?', true, 'NCAPS'],
       ['?', true, 'NCAPS'],
@@ -595,37 +600,36 @@ describe('KeylayoutToKmnConverter', function () {
     ];
     const b1_modifierKey_arr = [
       ['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ'],
-      ['K_SPACE', 'a0', '1', 'SHIFT NCAPS', 'ˆ'],
+      ['K_SPACE', 'a0', '1', 'NCAPS SHIFT', 'ˆ'],
       ['K_SPACE', 'a0', '1', 'SHIFT CAPS', 'ˆ'],
       ['K_SPACE', 'a0', '2', 'CAPS', 'ˆ'],
-      ['K_Z', 'a0', '4', 'SHIFT NCAPS RALT', 'ˆ'],
-      ['K_9', 'a0', '4', 'SHIFT NCAPS RALT', 'ˆ'],
-      ['K_COMMA', 'a0', '4', 'SHIFT NCAPS RALT', 'ˆ'],
+      ['K_Z', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
+      ['K_9', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
+      ['K_COMMA', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
       ['K_SPACE', 'a0', '7', 'NCAPS CTRL', 'ˆ'],
       ['K_SPACE', 'a0', '7', 'NCAPS RALT CTRL', 'ˆ'],
-      ['K_A', 'a1', '1', 'SHIFT NCAPS', 'Â'],
+      ['K_A', 'a1', '1', 'NCAPS SHIFT', 'Â'],
       ['K_A', 'a1', '1', 'SHIFT CAPS', 'Â'],
       ['K_A', 'a1', '2', 'CAPS', 'Â'],
       ['K_E', 'a10', '0', 'NCAPS', 'ê'],
       ['K_I', 'a11', '0', 'NCAPS', 'î'],
       ['K_O', 'a13', '0', 'NCAPS', 'ô'],
       ['K_U', 'a14', '0', 'NCAPS', 'û'],
-      ['K_E', 'a2', '1', 'SHIFT NCAPS', 'Ê'],
+      ['K_E', 'a2', '1', 'NCAPS SHIFT', 'Ê'],
       ['K_E', 'a2', '1', 'SHIFT CAPS', 'Ê'],
       ['K_E', 'a2', '2', 'CAPS', 'Ê'],
-      ['K_I', 'a3', '1', 'SHIFT NCAPS', 'Î'],
+      ['K_I', 'a3', '1', 'NCAPS SHIFT', 'Î'],
       ['K_I', 'a3', '1', 'SHIFT CAPS', 'Î'],
       ['K_I', 'a3', '2', 'CAPS', 'Î'],
-      ['K_O', 'a5', '1', 'SHIFT NCAPS', 'Ô'],
+      ['K_O', 'a5', '1', 'NCAPS SHIFT', 'Ô'],
       ['K_O', 'a5', '1', 'SHIFT CAPS', 'Ô'],
       ['K_O', 'a5', '2', 'CAPS', 'Ô'],
-      ['K_U', 'a6', '1', 'SHIFT NCAPS', 'Û'],
+      ['K_U', 'a6', '1', 'NCAPS SHIFT', 'Û'],
       ['K_U', 'a6', '1', 'SHIFT CAPS', 'Û'],
       ['K_U', 'a6', '2', 'CAPS', 'Û'],
       ['K_A', 'a9', '0', 'NCAPS', 'â']
     ];
 
-    // isCaps_used === true; input defined
     [[b1_keycode_arr, b1_modifierKey_arr],
     [[['49', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ']]],
     [[['49', 'K_SPACE', 'a0', '0', '']], [['K_SPACE', 'a0', '0', 'NCAPS', '']]],
@@ -648,7 +652,6 @@ describe('KeylayoutToKmnConverter', function () {
         });
     });
 
-    // isCaps_used === false; input defined
     [[[['49', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', '', 'ˆ']]],
     [[['49', 'K_SPACE', 'a0', '0', '']], [['K_SPACE', 'a0', '0', '', '']]],
     [[['', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', '', 'ˆ']]],
@@ -665,7 +668,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    // isCaps_used === true; input undefined/null/empty
     [[[], []],
     [undefined, []],
     [null, []],
@@ -785,7 +787,7 @@ describe('KeylayoutToKmnConverter', function () {
 
     [
       ["a1", "A", true, [
-        ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT NCAPS'],
+        ['a1', 'A', 'a1', '1', 'K_A', 'NCAPS SHIFT'],
         ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT CAPS'],
         ['a1', 'A', 'a1', '2', 'K_A', 'CAPS']]
       ],
