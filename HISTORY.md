@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.221 beta 2025-03-27
+
+* fix(windows): configuration update tab text changes (#13555)
+* chore(common): update language-subtag-registry to 2025-03-10 release (#13577)
+* docs(mac): update help documentation due to changes in Settings in macOS 13.0 Ventura (#13501)
+* fix(linux): improve emitting keystrokes (#13558)
+* fix(linux): improve key mapping to allow Core to reset context (#13372)
+
 ## 18.0.220 beta 2025-03-24
 
 * fix(windows,mac): Update Spanish configuration string and mac strings (#13564)
