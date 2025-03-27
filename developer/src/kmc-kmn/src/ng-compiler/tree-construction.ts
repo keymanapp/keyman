@@ -13,6 +13,7 @@ export enum NodeTypes {
   COPYRIGHT,
   INCLUDECODES,
   LINE,
+  LINEBLOCK,
   STRING,
   TMP,
 }
