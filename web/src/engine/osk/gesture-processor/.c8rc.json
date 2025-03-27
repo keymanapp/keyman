@@ -11,7 +11,7 @@
     "src/engine/headless/*"
   ],
   "reporter": ["text", "text-summary"],
-  "reports-dir": "build/coverage",
+  "reports-dir": "../../../../build/coverage/raw/engine/osk/gesture-processor",
   "src": [
     "src/engine/headless/*"
   ]

@@ -118,6 +118,7 @@ uses
   GlobalProxySettings,
   kmint,
   keymanapi_TLB,
+  KeymanMutex,
   Keyman.System.KeymanSentryClient,
   Keyman.System.DownloadUpdate,
   Keyman.System.RemoteUpdateCheck,
@@ -131,6 +132,7 @@ const
   SPackageUpgradeFilename = 'upgrade_packages.inf';
   kmShellContinue = 0;
   kmShellExit = 1;
+  KeymanDownloadMutexName = 'KeymanDownloading';
 
   { State Class Memebers }
 
@@ -157,6 +159,7 @@ type
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleFirstRun; override;
   end;
 
   UpdateAvailableState = class(TState)
@@ -667,6 +670,14 @@ begin
   // Do Nothing
 end;
 
+procedure IdleState.HandleFirstRun;
+begin
+  // This would be the case if it was a clean first time install of Keyman
+  // and not an update. However, incase it was some sort of failed update
+  // clean any cached files.
+  bucStateContext.RemoveCachedFiles;
+end;
+
 { UpdateAvailableState }
 
 procedure UpdateAvailableState.StartDownloadProcess;
@@ -753,18 +764,29 @@ procedure DownloadingState.Enter;
 var
   DownloadResult: Boolean;
   RetryCount: Integer;
+  FMutex: TKeymanMutex;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
 
-  RetryCount := 0;
-  DownloadResult := False;
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
 
-  while (not DownloadResult) and (RetryCount < 3) do
-  begin
-    DownloadResult := DownloadUpdatesBackground;
-    if not DownloadResult then
+  try
+    // Should be impossible but just exit anyway and let the process current
+    // downloading process finish.
+    if not FMutex.TakeOwnership then
+    begin
+      Exit;
+    end;
+
+    RetryCount := 0;
+    repeat
+      DownloadResult := DownloadUpdatesBackground;
       Inc(RetryCount);
+    until DownloadResult or (RetryCount >= 3);
+    FMutex.ReleaseOwnership;
+  finally
+    FreeAndNil(FMutex);
   end;
 
   if (not DownloadResult) then
@@ -805,14 +827,45 @@ begin
 end;
 
 function DownloadingState.HandleKmShell;
+var
+  FMutex: TKeymanMutex;
 begin
-  // Downloading state, in other process, so continue
+  // Whether already downloading in another process or download has failed and
+  // this function has clean up and force a restart, kmshell should continue processing
   Result := kmShellContinue;
+  // Check to ensure a download process is running if not
+  // clean up return to the the idle state and check for updates
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
+  try
+    if FMutex.TakeOwnership then
+    begin
+      bucStateContext.RemoveCachedFiles;
+      FMutex.ReleaseOwnership; // Mutex must be freed before changing state
+      ChangeState(IdleState);
+      bucStateContext.CurrentState.HandleCheck;
+    end;
+  finally
+    FreeAndNil(FMutex);
+  end;
 end;
 
 procedure DownloadingState.HandleDownload;
+var
+  FMutex: TKeymanMutex;
 begin
-  // Enter Already Downloading
+  // If downloading process is not running clean files and return to idle
+  FMutex := TKeymanMutex.Create(KeymanDownloadMutexName);
+  try
+    if FMutex.TakeOwnership then
+    begin
+      bucStateContext.RemoveCachedFiles;
+      FMutex.ReleaseOwnership;  // Mutex must be freed before changing state
+      ChangeState(IdleState);
+      bucStateContext.CurrentState.HandleCheck;
+    end;
+  finally
+    FreeAndNil(FMutex);
+  end;
 end;
 
 procedure DownloadingState.HandleAbort;

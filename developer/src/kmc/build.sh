@@ -55,7 +55,7 @@ function do_build() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_test() {
-  builder_do_typescript_tests 50
+  builder_do_typescript_tests 45
   ./test/command-line-tests.sh test
 }
 

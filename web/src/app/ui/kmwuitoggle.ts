@@ -6,7 +6,11 @@
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
 import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
 
-declare var keyman: KeymanEngine
+declare global {
+  interface Window {
+    keyman: KeymanEngine
+  }
+}
 
 type KeyboardMenuEntry = {
   _InternalName: string,
@@ -18,10 +22,14 @@ interface Owned<T> {
   _owningObject?: T;
 }
 
+const keymanweb=window.keyman;
+
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keyman?.ui?.name) {
+if(!keymanweb) {
+  throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
+} else if(!keymanweb.ui?.name) {
   /********************************/
   /*                              */
   /* Toggle User Interface Code   */
@@ -39,7 +47,6 @@ if(!keyman?.ui?.name) {
 
   try {
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    const keymanweb = keyman;
     //var dbg=keymanweb['debug'];
     const util = keymanweb.util;
 

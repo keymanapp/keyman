@@ -3000,7 +3000,7 @@ begin
       else kbdparser.KeyboardText := frameSource.EditorText;
 
     kbdparser.AddRequiredLines;
-    kbdparser.SetSystemStoreValue(ssTargets, 'windows native');
+    kbdparser.SetSystemStoreValue(ssTargets, 'desktop');
     kbdparser.SetSystemStoreValue(ssVersion, SKeymanVersion90);
     kbdparser.DeleteSystemStore(ssVisualKeyboard);
     kbdparser.DeleteSystemStore(ssBitmap);
