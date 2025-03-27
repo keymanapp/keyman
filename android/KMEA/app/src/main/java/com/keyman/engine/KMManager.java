@@ -2270,8 +2270,6 @@ public final class KMManager {
       } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
       }
-      editor.commit();
-
     } else {
       // Applying gating to 50%-200% of default height (following Keyman) 
       if (height < (defaultHeightForContext / 2)) {
