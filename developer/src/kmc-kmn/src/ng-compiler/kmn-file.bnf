@@ -1,4 +1,5 @@
-multiLine: continuationLine+ soloLine
+line: lineBlock|soloLine
+lineBlock: continuationLine+ soloLine
 soloLine: contentLine|blankLine
 contentLine: whitespace? content commentEnd? newline
 blankLine: commentEnd? newline

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, SoloLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -20,6 +20,28 @@ let root: ASTNode = null;
 describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
+  });
+  describe("SoloLineRule Tests", () => {
+    it("can construct a SoloLineRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
+      const soloLine: Rule = new SoloLineRule(tokenBuffer);
+      assert.isNotNull(soloLine);
+    });
+    it("can parse correctly (contentLine)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
+      const soloLine: Rule = new SoloLineRule(tokenBuffer);
+      assert.isTrue(soloLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.BITMAP);
+      assert.equal(root.getSoleChild().getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (blankLine, comment)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
+      const soloLine: Rule = new SoloLineRule(tokenBuffer);
+      assert.isTrue(soloLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.isFalse(root.getSoleChild().hasChild());
+    });
   });
   describe("ContentLineRule Tests", () => {
     it("can construct a ContentLineRule", () => {
@@ -71,12 +93,14 @@ describe("KMN Analyser Tests", () => {
       const blankLine: Rule = new BlankLineRule(tokenBuffer);
       assert.isTrue(blankLine.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.isFalse(root.getSoleChild().hasChild());
     });
     it("can parse correctly (comment)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
       const blankLine: Rule = new BlankLineRule(tokenBuffer);
       assert.isTrue(blankLine.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.isFalse(root.getSoleChild().hasChild());
     });
   })
   describe("ContinuationLineRule Tests", () => {
@@ -112,11 +136,13 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied');
       const commentEnd: Rule = new CommentEndRule(tokenBuffer);
       assert.isTrue(commentEnd.parse(root));
+      assert.isFalse(root.hasChild());
     });
     it("can parse correctly (space before)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied');
       const commentEnd: Rule = new CommentEndRule(tokenBuffer);
       assert.isTrue(commentEnd.parse(root));
+      assert.isFalse(root.hasChild());
     });
   });
   describe("ContinuationEndRule Tests", () => {
@@ -129,11 +155,13 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('\\\n');
       const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
       assert.isTrue(continuationEnd.parse(root));
+      assert.isFalse(root.hasChild());
     });
     it("can parse correctly (space after)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('\\ \n');
       const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
       assert.isTrue(continuationEnd.parse(root));
+      assert.isFalse(root.hasChild());
     });
   });
   describe("SystemStoreAssignRule Tests", () => {
