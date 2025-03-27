@@ -547,6 +547,8 @@ end;
 
 
 procedure TfrmKeymanDeveloper.FormCreate(Sender: TObject);
+var
+  newProject: TProjectUI;
 begin
   inherited;
 
@@ -605,7 +607,10 @@ begin
   if TikeCommandLine.StartupProjectPath <> '' then
   begin
     try
-      if LoadGlobalProjectUI(ptUnknown, TikeCommandLine.StartupProjectPath) = nil then
+      if TikeCommandLine.StartupProjectPath = '-'
+        then newProject := CreateTempGlobalProjectUI(ptUnknown)
+        else newProject := LoadGlobalProjectUI(ptUnknown, TikeCommandLine.StartupProjectPath);
+      if newProject = nil then
       begin
         raise EProjectLoader.Create('Project is already open in another process');
       end;

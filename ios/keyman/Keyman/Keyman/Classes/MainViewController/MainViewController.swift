@@ -554,11 +554,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       navigationItem.titleView = nil
       navigationItem.rightBarButtonItem = nil
       setNavBarButtons()
-      if shouldShowGetStarted {
-        perform(#selector(self.showGetStartedView), with: nil, afterDelay: 0.75)
-      } else if wasKeyboardVisible {
-        perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
-      }
+      perform(#selector(self.displayKeyboard), with: nil, afterDelay: 0.75)
     } else {
       _ = dismissDropDownMenu()
       popover?.dismiss(animated: false)

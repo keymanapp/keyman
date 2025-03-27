@@ -56,13 +56,14 @@ function triggerTeamCityBuild() {
 
   # adjust indentation for output of curl
   echo -n "     "
-  curl --no-progress-meter --write-out '\n' --header "Authorization: Bearer $TEAMCITY_TOKEN" \
+  call_curl "$TEAMCITY_SERVER/app/rest/buildQueue" \
+    --header "Authorization: Bearer $TEAMCITY_TOKEN" \
     -X POST \
     -H "Content-Type: application/xml" \
     -H "Accept: application/json" \
     -H "Origin: $TEAMCITY_SERVER" \
-    $TEAMCITY_SERVER/app/rest/buildQueue \
     -d "$command"
+  echo
 }
 
 function triggerGitHubActionsBuild() {
@@ -81,10 +82,7 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
-    # set -E: fail on errors in subshell
-    set -E
-    JSON=$(curl --no-progress-meter "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
-    set +E
+    local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
@@ -110,12 +108,57 @@ function triggerGitHubActionsBuild() {
 
   echo "GitHub Action Data: $DATA"
 
+  if [[ "$GIT_BUILD_SHA" == null ]]; then
+    echo "Invalid GIT_BUILD_SHA"
+    exit 1
+  fi
+
   # adjust indentation for output of curl
   echo -n "     "
-  curl --no-progress-meter --write-out '\n' \
+  call_curl "${GITHUB_SERVER}/dispatches" \
     --request POST \
     --header "Accept: application/vnd.github+json" \
     --header "Authorization: token $GITHUB_TOKEN" \
-    --data "$DATA" \
-    ${GITHUB_SERVER}/dispatches
+    --data "$DATA"
+  echo
+}
+
+#
+# Error handling and reporting for curl + default parameters
+# We cannot use --fail-with-body yet due to older curl versions
+# on infrastructure
+#
+function call_curl() {
+  local url="$1"
+  shift
+
+  local curl_result
+  local http_code
+  local output_file=$(mktemp)
+
+  set +e
+  if [[ $# -gt 0 ]]; then
+    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$@" "$url")
+  else
+    http_code=$(curl --silent --output $output_file --no-progress-meter --write-out "%{http_code}" "$url")
+  fi
+  curl_result=$?
+  if [[ ${curl_result} != 0 ]]; then
+    echo "curl call to '${url}' failed with code '${curl_result}'" >& 2
+    >&2 cat $output_file
+    rm -f $output_file
+    exit $curl_result
+  fi
+
+  if [[ ${http_code} -lt 200 || ${http_code} -gt 299 ]] ; then
+    echo "curl call to '${url}' failed with HTTP error code '${http_code}'" >& 2
+    >&2 cat $output_file
+    rm -f $output_file
+    exit 22
+  fi
+
+  set -e
+
+  cat $output_file
+  rm -f $output_file
 }

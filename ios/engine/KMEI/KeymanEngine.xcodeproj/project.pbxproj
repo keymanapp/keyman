@@ -530,6 +530,9 @@
 		CEFFECD52A417F1300D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEFFECD62A417F2900D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEFFECD72A417F2E00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		D88EC4042D7876650022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		D88EC4052D7876910022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D88EC4062D7876990022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = vi; path = vi.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
@@ -1215,6 +1218,7 @@
 				ru,
 				es,
 				el,
+				vi,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1615,6 +1619,7 @@
 				298566DF2980E48C004ACA95 /* ru */,
 				CEFFECD72A417F2E00D58C36 /* es */,
 				CEAC2A232C2A505700C99ABD /* el */,
+				D88EC4062D7876990022CB80 /* vi */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1644,6 +1649,7 @@
 				298566DE2980E486004ACA95 /* ru */,
 				CEFFECD62A417F2900D58C36 /* es */,
 				CEAC2A242C2A508000C99ABD /* el */,
+				D88EC4052D7876910022CB80 /* vi */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1674,6 +1680,7 @@
 				298566DD2980E477004ACA95 /* ru */,
 				CEFFECD52A417F1300D58C36 /* es */,
 				CEAC2A222C2A503600C99ABD /* el */,
+				D88EC4042D7876650022CB80 /* vi */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
