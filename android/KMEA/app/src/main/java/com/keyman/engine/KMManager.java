@@ -1642,12 +1642,10 @@ public final class KMManager {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
-      Log.d(TAG, "InApp.setBannerOptions(mayPredict: " + mayPredict + ")");
     }
 
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
-      Log.d(TAG, "System.setBannerOptions(mayPredict: " + mayPredict + ")");
     }
 
     return true;
