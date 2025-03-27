@@ -40,7 +40,7 @@ Hotkeys *Hotkeys::Instance() {   // I4326
   if(g_Hotkeys == NULL) {
     g_Hotkeys = new Hotkeys;
     g_Hotkeys->Load();   // I4390
-    g_Hotkeys->load_right_modifier_hotkey_option();
+    g_Hotkeys->LoadRightModifierHotkeyOption();
   }
 
   return g_Hotkeys;
@@ -65,7 +65,7 @@ void Hotkeys::Reload() {   // I4326   // I4390
   }
 
   hotkeys->Load();   // I4390
-  hotkeys->load_right_modifier_hotkey_option();
+  hotkeys->LoadRightModifierHotkeyOption();
 }
 
 void Hotkeys::Load() {   // I4390
@@ -147,20 +147,22 @@ Hotkey *Hotkeys::GetHotkey(DWORD hotkey)
 	return NULL;
 }
 
-void Hotkeys::load_right_modifier_hotkey_option() {
-  if (GetCurrentThreadId() == Globals::get_InitialisingThread()) {
-    m_allow_right_modifier_hotkey = FALSE; // Default to off
-    RegistryReadOnly reg(HKEY_CURRENT_USER);
-    if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
-      if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
-        m_allow_right_modifier_hotkey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
-      }
+void Hotkeys::LoadRightModifierHotkeyOption() {
+  m_AllowRightModifierHotkey = FALSE; // Default to off
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
+  if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+    if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
+      m_AllowRightModifierHotkey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
     }
   }
 }
 
-BOOL Hotkeys::allow_right_modifier_hotkey() {
-  return m_allow_right_modifier_hotkey;
+BOOL Hotkeys::AllowRightModifierHotkey() {
+  if (GetCurrentThreadId() != Globals::get_InitialisingThread()) {
+    OutputThreadDebugString("Unexpected: no other thread should be attempting read allow right modifier option");
+    return FALSE;
+  }
+  return m_AllowRightModifierHotkey;
 }
 
 #endif

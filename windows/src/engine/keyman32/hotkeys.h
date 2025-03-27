@@ -1,18 +1,18 @@
 /*
   Name:             hotkeys
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    25 Oct 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     11 Dec 2009 - mcdurdin - I934 - x64 - Initial version
                     03 Aug 2014 - mcdurdin - I4326 - V9.0 - Switch-off hotkey not working, then keyboard hotkey stopped working (win 8.1 jeremy) [High]
@@ -39,14 +39,13 @@ class Hotkeys
 private:
 	int m_nHotkeys;
 	Hotkey m_hotkeys[MAX_HOTKEYS];
-  BOOL m_allow_right_modifier_hotkey;
+  BOOL m_AllowRightModifierHotkey;
 	void Load();
-  
+  void LoadRightModifierHotkeyOption();
 public:
 	Hotkey *GetHotkey(DWORD hotkey);
   static void Reload();   // I4326
   static Hotkeys *Instance();   // I4326
   static void Unload();
-  void load_right_modifier_hotkey_option();
-  BOOL allow_right_modifier_hotkey();
+  BOOL AllowRightModifierHotkey();
  };
