@@ -7,52 +7,11 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, OneOrManyRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
-export class LineBlockRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const multiline = new MultiLineRule(tokenBuffer);
-    const soloLine  = new SoloLineRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [multiline, soloLine]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineBlockNode: ASTNode = new ASTNode(NodeTypes.LINEBLOCK);
-      lineBlockNode.addChildren(tmp.getChildren());
-      node.addChild(lineBlockNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class MultiLineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const continuationLine          = new ContinuationLineRule(tokenBuffer);
-    const oneOrManyContinuationLine = new OneOrManyRule(tokenBuffer, continuationLine);
-    const soloLine                  = new SoloLineRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [oneOrManyContinuationLine, soloLine]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineChildren: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
-      node.addChildren(tmp.getChildren());
-      node.addChildren(lineChildren);
-    }
-    return parseSuccess;
-  }
-}
-
-export class SoloLineRule extends SingleChildRule {
+export class LineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const contentLine: Rule = new ContentLineRule(tokenBuffer);
@@ -83,20 +42,6 @@ export class BlankLineRule extends SingleChildRule {
   }
 }
 
-export class ContinuationLineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const optWhitespace: Rule   = new OptionalWhiteSpaceRule(tokenBuffer);
-    const content: Rule         = new ContentRule(tokenBuffer);
-    const whitespace: Rule      = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
-    const newline: Rule         = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      optWhitespace, content, whitespace, continuationEnd, newline
-    ]);
-  }
-}
-
 export class OptionalCommentEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
@@ -114,12 +59,22 @@ export class CommentEndRule extends SingleChildRule {
   }
 }
 
-export class ContinuationEndRule extends SingleChildRule {
+export class PaddingRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const whitespace          = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const continuationNewline = new ContinuationNewlineRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [whitespace, continuationNewline]);
+  }
+}
+
+export class ContinuationNewlineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const continuation: Rule  = new TokenRule(tokenBuffer, TokenTypes.CONTINUATION);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [continuation, optWhitespace]);
+    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule(tokenBuffer, [continuation, optWhitespace, newline]);
   }
 }
 
@@ -143,13 +98,13 @@ export class SystemStoreAssignRule extends SingleChildRule {
 }
 
 abstract class SystemStoreAssignAbstractRule extends SingleChildRule {
-  protected whitespace: Rule     = null;
+  protected padding: Rule     = null;
   protected stringRule: Rule     = null;
   protected storeType: NodeTypes = null;
 
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.whitespace = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.padding    = new PaddingRule(tokenBuffer);
     this.stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
   }
 
@@ -159,8 +114,12 @@ abstract class SystemStoreAssignAbstractRule extends SingleChildRule {
     if (parseSuccess) {
       const storeNode: ASTNode  = tmp.getSoleChildOfType(this.storeType);
       const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
+      const lineNode: ASTNode   = tmp.getSoleChildOfType(NodeTypes.LINE);
       storeNode.addChild(stringNode);
       node.addChild(storeNode);
+      if (lineNode !== null) {
+        node.addChild(lineNode);
+      }
     }
     return parseSuccess;
   }
@@ -189,7 +148,7 @@ export class BitmapStoreAssignRule extends SystemStoreAssignAbstractRule {
     this.storeType = NodeTypes.BITMAP;
     const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
-      bitmapStore, this.whitespace, this.stringRule,
+      bitmapStore, this.padding, this.stringRule,
     ]);
   }
 }
@@ -210,7 +169,7 @@ export class CopyrightStoreAssignRule extends SystemStoreAssignAbstractRule {
     this.storeType = NodeTypes.COPYRIGHT;
     const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
-      copyrightStore, this.whitespace, this.stringRule,
+      copyrightStore, this.padding, this.stringRule,
     ]);
   }
 }
@@ -231,7 +190,7 @@ export class IncludecodesStoreAssignRule extends SystemStoreAssignAbstractRule {
     this.storeType = NodeTypes.INCLUDECODES;
     const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
-      includecodesStore, this.whitespace, this.stringRule,
+      includecodesStore, this.padding, this.stringRule,
     ]);
   }
 }

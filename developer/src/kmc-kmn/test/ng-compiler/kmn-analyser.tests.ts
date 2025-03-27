@@ -11,8 +11,8 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, LineBlockRule, MultiLineRule, SoloLineRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ContinuationEndRule, ContinuationLineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, PaddingRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ContinuationNewlineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
@@ -21,79 +21,16 @@ describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
   });
-  describe("LineBlockRule Tests", () => {
-    it("can construct a LineBlockRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
-      const lineBlock: Rule = new LineBlockRule(tokenBuffer);
-      assert.isNotNull(lineBlock);
-    });
-    it("can parse correctly (multiLine)", () => {
-      const line1 = 'store(&bitmap) "filename" \\\n'
-      const line2 = 'store(&copyright) "message" \\\n'
-      const line3 = 'store(&includecodes) "filename" c a comment\n'
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer(`${line1}${line2}${line3}`);
-      const lineBlock: Rule = new LineBlockRule(tokenBuffer);
-      assert.isTrue(lineBlock.parse(root));
-      const block = root.getSoleChild();
-      assert.equal(block.nodeType, NodeTypes.LINEBLOCK);
-      const children = block.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[1].nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(children[2].nodeType, NodeTypes.INCLUDECODES);
-      assert.equal(children[3].nodeType, NodeTypes.LINE);
-      assert.equal(children[3].token.lineNum, 1);
-      assert.equal(children[4].nodeType, NodeTypes.LINE);
-      assert.equal(children[4].token.lineNum, 2);
-      assert.equal(children[5].nodeType, NodeTypes.LINE);
-      assert.equal(children[5].token.lineNum, 3);
-    });
-    it("can parse correctly (soloLine)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
-      const lineBlock: Rule = new LineBlockRule(tokenBuffer);
-      assert.isTrue(lineBlock.parse(root));
-      const block = root.getSoleChild();
-      assert.equal(block.nodeType, NodeTypes.LINEBLOCK);
-      const children = block.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-    });
-  });
-  describe("MultiLineRule Tests", () => {
-    it("can construct a MultiLineRule", () => {
+  describe("LineRule Tests", () => {
+    it("can construct a LineRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const multiLine: Rule = new MultiLineRule(tokenBuffer);
-      assert.isNotNull(multiLine);
-    });
-    it("can parse correctly", () => {
-      const line1 = 'store(&bitmap) "filename" \\\n'
-      const line2 = 'store(&copyright) "message" \\\n'
-      const line3 = 'store(&includecodes) "filename" c a comment\n'
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer(`${line1}${line2}${line3}`);
-      const multiLine: Rule = new MultiLineRule(tokenBuffer);
-      assert.isTrue(multiLine.parse(root));
-      const children = root.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[1].nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(children[2].nodeType, NodeTypes.INCLUDECODES);
-      assert.equal(children[3].nodeType, NodeTypes.LINE);
-      assert.equal(children[3].token.lineNum, 1);
-      assert.equal(children[4].nodeType, NodeTypes.LINE);
-      assert.equal(children[4].token.lineNum, 2);
-      assert.equal(children[5].nodeType, NodeTypes.LINE);
-      assert.equal(children[5].token.lineNum, 3);
-    });
-  });
-  describe("SoloLineRule Tests", () => {
-    it("can construct a SoloLineRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const soloLine: Rule = new SoloLineRule(tokenBuffer);
-      assert.isNotNull(soloLine);
+      const line: Rule = new LineRule(tokenBuffer);
+      assert.isNotNull(line);
     });
     it("can parse correctly (contentLine)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
-      const soloLine: Rule = new SoloLineRule(tokenBuffer);
-      assert.isTrue(soloLine.parse(root));
+      const line: Rule = new LineRule(tokenBuffer);
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -101,8 +38,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (blankLine, comment)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
-      const soloLine: Rule = new SoloLineRule(tokenBuffer);
-      assert.isTrue(soloLine.parse(root));
+      const line: Rule = new LineRule(tokenBuffer);
+      assert.isTrue(line.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
@@ -171,31 +108,6 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(root.getSoleChild().hasChild());
     });
   })
-  describe("ContinuationLineRule Tests", () => {
-    it("can construct a ContinuationLineRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
-      assert.isNotNull(continuationLine);
-    });
-    it("can parse correctly (no space before)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \\\n');
-      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
-      assert.isTrue(continuationLine.parse(root));
-      const children = root.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-    });
-    it("can parse correctly (space before)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename" \\\n');
-      const continuationLine: Rule = new ContinuationLineRule(tokenBuffer);
-      assert.isTrue(continuationLine.parse(root));
-      const children = root.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-    });
-  });
   describe("CommentEndRule Tests", () => {
     it("can construct a CommentEndRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -215,23 +127,42 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(root.hasChild());
     });
   });
-  describe("ContinuationEndRule Tests", () => {
-    it("can construct a ContinuationEndRule", () => {
+  describe("PaddingRule Tests", () => {
+    it("can construct a PaddingRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
-      assert.isNotNull(continuationEnd);
+      const padding: Rule = new PaddingRule(tokenBuffer);
+      assert.isNotNull(padding);
+    });
+    it("can parse correctly (whitespace)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' ');
+      const padding: Rule = new PaddingRule(tokenBuffer);
+      assert.isTrue(padding.parse(root));
+      assert.isFalse(root.hasChild());
+    });
+    it("can parse correctly (ContinuationNewline)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('\\ \n');
+      const padding: Rule = new PaddingRule(tokenBuffer);
+      assert.isTrue(padding.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+    });
+  });
+  describe("ContinuationNewlineRule Tests", () => {
+    it("can construct a ContinuationNewlineRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const continuationNewline: Rule = new ContinuationNewlineRule(tokenBuffer);
+      assert.isNotNull(continuationNewline);
     });
     it("can parse correctly (no space after)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('\\\n');
-      const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
-      assert.isTrue(continuationEnd.parse(root));
-      assert.isFalse(root.hasChild());
+      const continuationNewline: Rule = new ContinuationNewlineRule(tokenBuffer);
+      assert.isTrue(continuationNewline.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
     });
     it("can parse correctly (space after)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('\\ \n');
-      const continuationEnd: Rule = new ContinuationEndRule(tokenBuffer);
-      assert.isTrue(continuationEnd.parse(root));
-      assert.isFalse(root.hasChild());
+      const continuationNewline: Rule = new ContinuationNewlineRule(tokenBuffer);
+      assert.isTrue(continuationNewline.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
     });
   });
   describe("SystemStoreAssignRule Tests", () => {
@@ -274,6 +205,15 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(bitmapStoreAssign.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
       assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    });
+    it("can parse correctly (continuationNewline)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap)\\ \n"filename"');
+      const bitmapStoreAssign: Rule = new BitmapStoreAssignRule(tokenBuffer);
+      assert.isTrue(bitmapStoreAssign.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeTypes.LINE);
     });
   });
   describe("BitmapStoreRule Tests", () => {

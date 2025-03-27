@@ -1,18 +1,16 @@
-lineBlock: multiLine|soloLine
-multiLine: continuationLine+ soloLine
-soloLine: contentLine|blankLine
+line: contentLine|blankLine
 contentLine: whitespace? content commentEnd? newline
 blankLine: commentEnd? newline
-continuationLine: whitespace? content whitespace continuationEnd newline
 commentEnd: whitespace? comment
-continationEnd: continuation whitespace?
+padding: whitespace|continuationNewline
+continuationNewline: continuation whitespace? newline
 content: systemStoreAssign
 systemStoreAssign: bitmapStoreAssign|copyrightStoreAssign|includecodesStoreAssign
-bitmapStoreAssign: bitmapStore whitespace string
+bitmapStoreAssign: bitmapStore padding string
 bitmapStore: store leftBracket whitespace? amphasand bitmap whitespace? rightBracket
-copyrightStoreAssign: copyrightStore whitespace string
+copyrightStoreAssign: copyrightStore padding string
 copyrightStore: store leftBracket whitespace? amphasand copyright whitespace? rightBracket
-includecodesStoreAssign: includecodesStore whitespace string
+includecodesStoreAssign: includecodesStore padding string
 includecodesStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket
 variableStoreAssign: variableStore text+
 text: string|virtualKey|uChar
