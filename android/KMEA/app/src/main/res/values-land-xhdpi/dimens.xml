@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dimens for Landscape (Tablet 7") -->
+<resources>
+    <dimen name="banner_height">50dp</dimen>
+    <dimen name="keyboard_height">140dp</dimen>
+    <dimen name="key_width">73.5dp</dimen>
+    <dimen name="key_height">58.5dp</dimen>
+    <dimen name="popup_arrow_width">32dp</dimen>
+    <dimen name="popup_arrow_height">12dp</dimen>
+    <dimen name="popup_margin">6dp</dimen>
+    <dimen name="popup_padding">4dp</dimen>
+    <dimen name="popup_offset_y">8dp</dimen>
+    <dimen name="help_bubble_width">125dp</dimen>
+    <dimen name="help_bubble_height">85dp</dimen>
+    <dimen name="help_bubble_offset_x">0.5dp</dimen>
+    <dimen name="help_bubble_offset_y">8dp</dimen>
+</resources>
