@@ -348,8 +348,8 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     NSRange selectionRange = [client selectedRange];
     os_log_debug([KMLogs eventsLog], "InputMethodEventHandler readContext, canReadText: true selectionRange %{public}@: ", NSStringFromRange(selectionRange));
     
-      NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
-      NSUInteger contextStart = selectionRange.location - contextLength;
+    NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
+    NSUInteger contextStart = selectionRange.location - contextLength;
     
     if (contextLength > 0) {
       NSRange contextRange = NSMakeRange(contextStart, contextLength);

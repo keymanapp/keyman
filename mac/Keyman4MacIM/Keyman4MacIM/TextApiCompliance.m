@@ -223,10 +223,10 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   if (context && context.length > 0) {
     if ([context hasSuffix:insertedText]) {
       self.hasCompliantAttributedSubstringApi = YES;
-      os_log_debug([KMLogs complianceLog], "  validateCanReadInsertedText passed, context: '%{public}@', insertedText '%{public}@'", context, insertedText);
+      os_log_debug([KMLogs complianceLog], "  validateCanReadInsertedText passed, context matches insertedText '%{public}@'", insertedText);
     } else {
       self.hasCompliantAttributedSubstringApi = NO;
-      os_log_debug([KMLogs complianceLog], "  validateCanReadInsertedText failed, context: '%{public}@' does not have suffix of insertedText '%{public}@'", context, insertedText);
+      os_log_debug([KMLogs complianceLog], "  validateCanReadInsertedText failed, context does not have suffix of insertedText '%{public}@'", insertedText);
     }
   } else {
     self.hasCompliantAttributedSubstringApi = NO;
@@ -237,6 +237,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   self.didValidateAttributedSubstringApi = YES;
 }
 
+// TODO: getContext and calculateContextRange roughly duplicates code in KMInputMethodHandler
+// These should be moved to a class that wraps the text input client and its three APIs
+
 /**
  * Get the string that ends with the current location using `attributedSubstringFromRange`
  */
@@ -245,7 +248,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   NSRange contextRange = [self calculateContextRange: newLocation];
   
   attributedString = [self.client attributedSubstringFromRange:contextRange];
-  os_log_debug([KMLogs complianceLog], "getContext substring = '%{public}@', length %lu character range: %{public}@: client: %p", attributedString.string, contextRange.length, NSStringFromRange(contextRange), self.client);
+  os_log_debug([KMLogs complianceLog], "getContext length %lu character range: %{public}@: client: %p", contextRange.length, NSStringFromRange(contextRange), self.client);
   
   if (attributedString) {
     return attributedString.string;
