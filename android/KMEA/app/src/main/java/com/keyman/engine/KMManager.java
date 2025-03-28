@@ -2226,6 +2226,9 @@ public final class KMManager {
     return bannerHeight;
   }
 
+  /**
+   * Returns the current keyboard height in dp for the current device orientation
+   */
   public static int getKeyboardHeight(Context context) {
     int orientation = getOrientation(context);
     return getKeyboardHeight(context, orientation); 
