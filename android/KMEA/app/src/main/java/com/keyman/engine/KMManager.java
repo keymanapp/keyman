@@ -2246,7 +2246,7 @@ public final class KMManager {
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
     } else {
-      return KMManager.KeyboardHeight_Reset; // Invalid orientation, return reset value
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
     }
   }
 
