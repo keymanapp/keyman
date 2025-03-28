@@ -28,6 +28,7 @@
         </keyMapSelect>
         <keyMapSelect mapIndex="3">
             <modifier keys="anyOption"/>
+            <modifier keys="caps"/>
         </keyMapSelect>
         <keyMapSelect mapIndex="4">
             <modifier keys="anyShift caps? anyOption ?"/>
