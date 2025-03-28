@@ -72,14 +72,6 @@ class KeymanWebViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
 
     _ = view
-
-    NotificationCenter.default.addObserver(
-      forName: UIApplication.willEnterForegroundNotification,
-      object: nil,
-      queue: OperationQueue.main
-    ) { _ in
-      self.reloadKeyboard()
-    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -154,19 +146,12 @@ class KeymanWebViewController: UIViewController {
 
     view = webView
 
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow),
-                                           name: UIResponder.keyboardWillShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide),
-                                           name: UIResponder.keyboardWillHideNotification, object: nil)
-
     reloadKeyboard()
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    if #available(iOSApplicationExtension 14.0, *) {
-      self.userContentController.removeAllScriptMessageHandlers()
-    }
+    self.userContentController.removeAllScriptMessageHandlers()
     self.userContentController.add(self, name: keymanWebViewName)
   }
 
@@ -186,6 +171,18 @@ class KeymanWebViewController: UIViewController {
 
 // MARK: - JavaScript functions
 extension KeymanWebViewController {
+  // In app-extension mode, there are scenarios in which this class does not properly
+  // deallocate!  We need to help that process along.
+  func destroy() {
+    // Message handlers can maintain references.
+    if #available(iOSApplicationExtension 14.0, *) {
+      self.userContentController.removeAllScriptMessageHandlers()
+    } else {
+      self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
+    }
+    view = nil
+  }
+  
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
     webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {
@@ -988,20 +985,5 @@ extension KeymanWebViewController {
 
   var isKeyboardMenuVisible: Bool {
     return keyboardMenuView != nil
-  }
-}
-
-// MARK: - Keyboard Notifications
-extension KeymanWebViewController {
-  @objc func keyboardWillShow(_ notification: Notification) {
-    resizeKeyboard()
-
-    if Manager.shared.isKeymanHelpOn {
-      showHelpBubble(afterDelay: 1.5)
-    }
-  }
-
-  @objc func keyboardWillHide(_ notification: Notification) {
-    dismissHelpBubble()
   }
 }

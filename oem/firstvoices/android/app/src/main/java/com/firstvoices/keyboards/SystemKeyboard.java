@@ -169,9 +169,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
                 }
             }
         }
-
-        if (KMManager.getCurrentKeyboardIndex(this) < 0)
-            KMManager.setKeyboard(this, 0);
     }
 
     @Override

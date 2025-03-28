@@ -20,9 +20,9 @@ object frmOpenCRMRecord: TfrmOpenCRMRecord
   object TntLabel1: TLabel
     Left = 20
     Top = 20
-    Width = 62
+    Width = 115
     Height = 19
-    Caption = '&Issue/PR'
+    Caption = '&Issue/PR/Search'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -45,9 +45,9 @@ object frmOpenCRMRecord: TfrmOpenCRMRecord
     ParentFont = False
   end
   object editSearchFor: TEdit
-    Left = 108
+    Left = 156
     Top = 17
-    Width = 341
+    Width = 293
     Height = 27
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -66,7 +66,7 @@ object frmOpenCRMRecord: TfrmOpenCRMRecord
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 3
   end
   object cmdCancel: TButton
     Left = 240
@@ -76,12 +76,12 @@ object frmOpenCRMRecord: TfrmOpenCRMRecord
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 2
+    TabOrder = 4
   end
   object cbRepository: TComboBox
-    Left = 108
+    Left = 156
     Top = 69
-    Width = 341
+    Width = 293
     Height = 27
     Style = csDropDownList
     Font.Charset = DEFAULT_CHARSET
@@ -90,7 +90,16 @@ object frmOpenCRMRecord: TfrmOpenCRMRecord
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 1
     OnClick = cbRepositoryClick
+  end
+  object cmdCopyHTML: TButton
+    Left = 156
+    Top = 110
+    Width = 159
+    Height = 25
+    Caption = 'Copy short form as &HTML link'
+    TabOrder = 2
+    OnClick = cmdCopyHTMLClick
   end
 end

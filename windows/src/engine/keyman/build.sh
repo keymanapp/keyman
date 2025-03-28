@@ -9,7 +9,7 @@ builder_describe "Keyman main host process (32-bit)" \
   @/common/include \
   @/common/windows/delphi \
   @/windows/src/global/delphi \
-  clean configure build test publish install debug-manifest
+  clean configure build test publish install debug-manifest edit
 
 builder_parse "$@"
 
@@ -85,3 +85,4 @@ builder_run_action publish:project      do_publish
 builder_run_action install:project      cp "$WINDOWS_PROGRAM_ENGINE/keyman.exe" "$INSTALLPATH_KEYMANENGINE/keyman.exe"
 
 builder_run_action debug-manifest:project  do_build_debug_manifest
+builder_run_action edit:project         start keyman.dproj

@@ -11,7 +11,7 @@
 
     <include layout="@layout/titlebar" />
 
-    <include layout="@layout/update_chrome_layout"
+    <include layout="@layout/check_chrome_webview_layout"
       android:visibility="gone"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
         android:background="@drawable/textview_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/updateChromeLayout"
+        android:layout_below="@id/checkWebViewChromeLayout"
         android:ems="10"
         android:inputType="textMultiLine|textNoSuggestions"
         android:hint="@string/textview_hint"

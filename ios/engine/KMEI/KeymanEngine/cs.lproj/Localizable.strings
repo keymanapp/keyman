@@ -226,6 +226,24 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "Jazyk a klávesnice";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "Upravit výšku klávesnice";
+
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "Upravit klávesnici";
+
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "Obnovit výchozí výšku klávesnice";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "Tažením šipky nastavíte výšku klávesnice.";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "Otočte zařízení pro nastavení na šířku.";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "Otočte zařízení pro nastavení na výšku.";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Stahování klávesnice se nezdařilo";
 

@@ -1,0 +1,332 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: keyman\n"
+"Report-Msgid-Bugs-To: <support@keyman.com>\n"
+"POT-Creation-Date: 2020-08-19 19:17+0200\n"
+"PO-Revision-Date: 2025-02-22 00:36\n"
+"Last-Translator: \n"
+"Language-Team: Vietnamese\n"
+"Language: vi_VN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: keyman\n"
+"X-Crowdin-Project-ID: 386703\n"
+"X-Crowdin-Language: vi\n"
+"X-Crowdin-File: /master/linux/keyman-config.pot\n"
+"X-Crowdin-File-ID: 504\n"
+
+#: keyman_config/__init__.py:68
+msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
+msgstr "Không có sẵn cả sentry-sdk và raven. Không bật báo cáo lỗi Sentry."
+
+#: keyman_config/downloadkeyboard.py:23
+msgid "Download Keyman keyboards"
+msgstr "Tải xuống bàn phím Keyman"
+
+#: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
+#: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
+msgid "_Close"
+msgstr "_Đóng"
+
+#: keyman_config/install_kmp.py:99
+msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
+msgstr "Bạn không có quyền cài đặt các tập tin bàn phím vào vùng chia sẻ /usr/local/share/keyman"
+
+#: keyman_config/install_kmp.py:103
+msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
+msgstr "Bạn không có quyền cài đặt tài liệu vào vùng tài liệu được chia sẻ /usr/local/share/doc/keyman"
+
+#: keyman_config/install_kmp.py:107
+msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
+msgstr "Bạn không có quyền cài đặt các tệp phông chữ vào vùng phông chữ được chia sẻ /usr/local/share/fonts"
+
+#: keyman_config/install_kmp.py:179
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
+msgstr "install_kmp.py: lỗi: Không có kmp.json hay kmp.inf được tìm thấy {package}"
+
+#: keyman_config/install_kmp.py:246
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
+msgstr "install_kmp.py: lỗi: Không có kmp.json hay kmp.inf được tìm thấy {packageFile}"
+
+#: keyman_config/install_window.py:54
+#, python-brace-format
+msgid "Installing keyboard/package {keyboardid}"
+msgstr "Đang cài đặt gói/bàn phím {keyboardid}"
+
+#: keyman_config/install_window.py:72 keyman_config/install_window.py:93
+msgid "Keyboard is installed already"
+msgstr "Bàn phím đã được cài đặt rồi"
+
+#: keyman_config/install_window.py:74
+#, python-brace-format
+msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
+msgstr "Bàn phím {name} đã được cài đặt ở phiên bản {version}. Bạn có muốn gỡ cài đặt rồi cài đặt lại nó chứ?"
+
+#: keyman_config/install_window.py:95
+#, python-brace-format
+msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
+msgstr "Bàn phím {name} đã được cài đặt với phiên bản mới nhất {installedversion}. Bạn có muốn gỡ cài đặt rồi cài đặt phiên bản cũ nhất {version} không?"
+
+#: keyman_config/install_window.py:128
+msgid "Keyboard layouts:   "
+msgstr "Bố trí bàn phím:   "
+
+#: keyman_config/install_window.py:147
+msgid "Fonts:   "
+msgstr "Phông chữ:   "
+
+#: keyman_config/install_window.py:167 keyman_config/keyboard_details.py:96
+msgid "Package version:   "
+msgstr "Phiên bản gói:   "
+
+#: keyman_config/install_window.py:179
+msgid "Author:   "
+msgstr "Tác giả:   "
+
+#: keyman_config/install_window.py:197
+msgid "Website:   "
+msgstr "Website:   "
+
+#: keyman_config/install_window.py:211
+msgid "Copyright:   "
+msgstr "Bản quyền:   "
+
+#: keyman_config/install_window.py:245
+msgid "Details"
+msgstr "Chi tiết"
+
+#: keyman_config/install_window.py:248
+msgid "README"
+msgstr "README"
+
+#: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
+msgid "_Install"
+msgstr "_Cài đặt"
+
+#: keyman_config/install_window.py:260
+msgid "_Cancel"
+msgstr "_Hủy bỏ"
+
+#: keyman_config/install_window.py:305
+#, python-brace-format
+msgid "Keyboard {name} installed"
+msgstr "Bàn phím {name} đã được cài đặt"
+
+#: keyman_config/install_window.py:310 keyman_config/install_window.py:315
+#, python-brace-format
+msgid "Keyboard {name} could not be installed."
+msgstr "Bàn phím {name} không thể cài đặt được."
+
+#: keyman_config/install_window.py:311
+msgid "Error Message:"
+msgstr "Thông báo lỗi:"
+
+#: keyman_config/install_window.py:316
+msgid "Warning Message:"
+msgstr "Thông báo cảnh báo:"
+
+#: keyman_config/keyboard_details.py:37
+#, python-brace-format
+msgid "{name} keyboard"
+msgstr "Bàn phím {name}"
+
+#: keyman_config/keyboard_details.py:53
+msgid "ERROR: Keyboard metadata is damaged.\n"
+"Please \"Uninstall\" and then \"Install\" the keyboard."
+msgstr "LỖI: Siêu dữ liệu bàn phím bị hỏng.\n"
+"Vui lòng \"Gỡ cài đặt\" rồi \"Cài đặt\" bàn phím."
+
+#: keyman_config/keyboard_details.py:74
+msgid "Package name:   "
+msgstr "Tên gói:   "
+
+#: keyman_config/keyboard_details.py:85
+msgid "Package id:   "
+msgstr "id gói:   "
+
+#: keyman_config/keyboard_details.py:108
+msgid "Package description:   "
+msgstr "Mô tả gói:   "
+
+#: keyman_config/keyboard_details.py:121
+msgid "Package author:   "
+msgstr "Tác giả gói:   "
+
+#: keyman_config/keyboard_details.py:133
+msgid "Package copyright:   "
+msgstr "Bản quyền gói:   "
+
+#: keyman_config/keyboard_details.py:174
+msgid "Keyboard filename:   "
+msgstr "Tên tệp bàn phím:   "
+
+#: keyman_config/keyboard_details.py:187
+msgid "Keyboard name:   "
+msgstr "Tên bàn phím:   "
+
+#: keyman_config/keyboard_details.py:198
+msgid "Keyboard id:   "
+msgstr "id bàn phím:   "
+
+#: keyman_config/keyboard_details.py:209
+msgid "Keyboard version:   "
+msgstr "Phiên bản bàn phím:   "
+
+#: keyman_config/keyboard_details.py:221
+msgid "Keyboard author:   "
+msgstr "Tác giả bàn phím:   "
+
+#: keyman_config/keyboard_details.py:232
+msgid "Keyboard license:   "
+msgstr "Giấy phép bàn phím:   "
+
+#: keyman_config/keyboard_details.py:243
+msgid "Keyboard description:   "
+msgstr "Mô tả bàn phím:   "
+
+#: keyman_config/keyboard_details.py:334
+#, python-brace-format
+msgid "Scan this code to load this keyboard\n"
+"on another device or <a href='{uri}'>share online</a>"
+msgstr "Quét mã này để tải bàn phím này\n"
+"trên thiết bị khác hoặc <a href='{uri}'>chia sẻ trực tuyến</a>"
+
+#: keyman_config/options.py:24
+#, python-brace-format
+msgid "{packageId} Settings"
+msgstr "Cài đặt {packageId}"
+
+#: keyman_config/view_installed.py:30
+msgid "Keyman Configuration"
+msgstr "Cấu hình Keyman"
+
+#: keyman_config/view_installed.py:60
+msgid "Choose a kmp file..."
+msgstr "Chọn một tệp kmp..."
+
+#. i18n: file type in file selection dialog
+#: keyman_config/view_installed.py:65
+msgid "KMP files"
+msgstr "Tệp KMP"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:141
+msgid "Icon"
+msgstr "Icon"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:145
+msgid "Name"
+msgstr "Tên"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:148
+msgid "Version"
+msgstr "Phiên bản"
+
+#: keyman_config/view_installed.py:161
+msgid "_Uninstall"
+msgstr "_Gỡ cài đặt"
+
+#: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
+msgid "Uninstall keyboard"
+msgstr "_Gỡ cài đặt bàn phím"
+
+#: keyman_config/view_installed.py:167
+msgid "_About"
+msgstr "_Về"
+
+#: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
+msgid "About keyboard"
+msgstr "Về bàn phím"
+
+#: keyman_config/view_installed.py:173
+msgid "_Help"
+msgstr "_Trợ giúp"
+
+#: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
+msgid "Help for keyboard"
+msgstr "Trợ giúp cho bàn phím"
+
+#: keyman_config/view_installed.py:179
+msgid "_Options"
+msgstr "_Tùy chọn"
+
+#: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
+msgid "Settings for keyboard"
+msgstr "Cài đặt cho bàn phím"
+
+#: keyman_config/view_installed.py:190
+msgid "_Refresh"
+msgstr "_Làm mới"
+
+#: keyman_config/view_installed.py:191
+msgid "Refresh keyboard list"
+msgstr "Làm mới danh sách bàn phím"
+
+#: keyman_config/view_installed.py:195
+msgid "_Download"
+msgstr "_Tải xuống"
+
+#: keyman_config/view_installed.py:196
+msgid "Download and install a keyboard from the Keyman website"
+msgstr "Tải xuống rồi cài đặt một bàn phím từ trang Keyman"
+
+#: keyman_config/view_installed.py:201
+msgid "Install a keyboard from a file"
+msgstr "Cài đặt bàn phím từ một tệp"
+
+#: keyman_config/view_installed.py:206
+msgid "Close window"
+msgstr "Đóng cửa sổ"
+
+#: keyman_config/view_installed.py:278
+#, python-brace-format
+msgid "Uninstall keyboard {package}"
+msgstr "Gỡ cài đặt bàn phím {package}"
+
+#: keyman_config/view_installed.py:280
+#, python-brace-format
+msgid "Help for keyboard {package}"
+msgstr "Trợ giúp cho bàn phím {package}"
+
+#: keyman_config/view_installed.py:282
+#, python-brace-format
+msgid "About keyboard {package}"
+msgstr "Về bàn phím {package}"
+
+#: keyman_config/view_installed.py:284
+#, python-brace-format
+msgid "Settings for keyboard {package}"
+msgstr "Cài đặt cho bàn phím {package}"
+
+#: keyman_config/view_installed.py:349
+msgid "Uninstall keyboard package?"
+msgstr "Gỡ cài đặt gói bàn phím?"
+
+#: keyman_config/view_installed.py:351
+#, python-brace-format
+msgid "Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?"
+msgstr "Bạn có chắc rằng muốn gỡ cài đặt bàn phím {keyboard} cùng phông chữ của nó?"
+
+#: keyman_config/welcome.py:22
+#, python-brace-format
+msgid "{name} installed"
+msgstr "{name} đã được cài đặt"
+
+#: keyman_config/welcome.py:40
+msgid "Open in _Web browser"
+msgstr "Mở trong _Trình duyệt"
+
+#: keyman_config/welcome.py:42
+msgid "Open in the default web browser to do things like printing"
+msgstr "Mở trong trình duyệt mặc định để thực hiện những việc như in ấn"
+
+#: keyman_config/welcome.py:45
+msgid "_OK"
+msgstr "_OK"
+

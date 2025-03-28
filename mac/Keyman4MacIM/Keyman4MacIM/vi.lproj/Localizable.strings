@@ -1,0 +1,74 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Bạn có chắc bạn muốn xóa cái bàn phím này không?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Bạn không thể hoàn tác hành động này.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Huỷ";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Xóa";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Bạn có muốn tải bàn phím Keyman này không?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Bạn có muốn Keyman tải bàn phím này từ file này '%@' không?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Hủy";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Tải về";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Không thể đọc file bàn phím này '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(lỗi không tải được bàn phím)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "không rõ";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Phiên bản %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Đang tải...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Tải xong bàn phím.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Hủy";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Xong";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Bàn phím:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Phông chữ:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Phiên bản của package:";
+
+/* author label in the Package Information window */
+"author-label" = "Tác giả:";
+
+/* website label in the Package Information window */
+"website-label" = "Trang web:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Bản quyền:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "Để hoạt động đúng, Keyman yêu cầu tính năng trợ năng:\n\nCấp quyền truy cập trong Thông tin Hệ thống, Bảo mật & Riêng tư.\nKhởi động lại hệ thống của bạn.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Không có bàn phím được cấu hình)";

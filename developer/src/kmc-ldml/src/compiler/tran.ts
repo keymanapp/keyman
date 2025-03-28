@@ -17,6 +17,7 @@ import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
+import { transform_from_parse, transform_to_parse } from "../util/abnf/abnf.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
@@ -138,10 +139,19 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
     let result = new TranTransform();
+    // setup for serializing
+    result._from = transform.from;
+    result._to = transform.to;
     let cookedFrom = transform.from;
 
     // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
+    // We run this first because it's more helpful than the ABNF.
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+
+    if (cookedFrom === '') {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }));
+      return null;
+    }
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
     const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
@@ -183,6 +193,24 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       return null;
     }
 
+    // run the parser here next, on the original from
+    try {
+      if (cookedFrom != null) {
+        transform_from_parse(transform.from);
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
+      return null;
+    }
+    
+    // run the parser here next, on the original to
+    try {
+      transform_to_parse(transform.to || '');
+    } catch (e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
+      return null;
+    }
+  
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,
@@ -262,6 +290,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
     let result = new TranReorder();
+    // for serializing
+    result._before = reorder.before;
+    result._from = reorder.from;
+    result._order = reorder.order;
     if (reorder.from && this.checkEscapes(reorder.from) === null) {
       return null; // error'ed
     }

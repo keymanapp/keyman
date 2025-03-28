@@ -648,8 +648,8 @@ typedef KMX_DWORD KMXPLUS_USET;
 struct COMP_KMXPLUS_USET {
   static const KMX_DWORD IDENT = LDML_SECTIONID_USET;
   COMP_KMXPLUS_HEADER header;
-  KMX_DWORD usetCount;
-  KMX_DWORD rangeCount;
+  KMX_DWORD_unaligned usetCount;
+  KMX_DWORD_unaligned rangeCount;
   // see helper for: usets sub-table
   // see helper for: ranges sub-table
 
