@@ -2,15 +2,7 @@
 
 GestureRecognizer is designed to support customizable sets of gesture-component and gesture-component sequences, rather than forcing a non-customizable and limited number of gestures.  While customizability makes it difficult to determine the specifications needed for a traditional finite state machine (FSM), it is possible to straightforwardly define FSM states & transitions for each gesture and gesture component in isolation.
 
-To define terms used below, consider the path taken by one finger during a potential touch-based gesture input.  Suppose a user holds a button or key down for a period of time to activate a menu, then selecting an item from that menu.  Note the phrasing there - there are two separate 'stages', or 'components', to that input:
-1. The user holds the button down for a period of time, without moving the input location.
-    - After a set amount of time passes, the UI's state shifts, displaying a new menu corresponding to the held location and button.
-2. Once the menu appears, the user then moves their finger to select an item from the menu.
-    - Once an item is selected and the finger is lifted, the program should respond and act accordingly to the selected menu item.
-
-These two items correspond to **gesture components**, corresponding to _segments_ of the overall touch input path.  These components are related and happen in sequence, hence use of the term **gesture sequence**.
-
-**Touchpoint** refers to the location of the mouse (during mouse-based input) or of the finger (during touch) being observed.
+For definitions to a few commonly-used terms below, see the [Terms](./terms.md) document.
 
 There are four separate layers used when processing gesture input to ensure that each gesture and gesture component may be modeled as they would work in isolation.  Sequential components are connected via FSM-style state transitions that the engine can resolve to ensure the best gesture-models for the user's input are selected.
 

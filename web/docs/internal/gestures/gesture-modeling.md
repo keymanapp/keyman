@@ -1,15 +1,7 @@
 # GestureRecognizer - gesture modeling
 GestureRecognizer is designed to support customizable sets of gesture-components and gesture-component sequences, rather than forcing a non-customizable and limited number of gestures.  In order to simplify the requirements for gesture customization, there are three layers used when modeling gesture components.  Other aspects of GestureRecognizer have been designed to allow manage the parallel evaluation of multiple gesture components and ensure that only one per input triggers completion.
 
-To define terms used here, consider the path taken by one finger during a potential touch-based gesture input.  Suppose a user holds a button or key down for a period of time to activate a menu, then selecting an item from that menu.  Note the phrasing there - there are two separate 'stages', or 'components', to that input:
-1. The user holds the button down for a period of time, without moving the input location.
-    - After a set amount of time passes, the UI's state shifts, displaying a new menu corresponding to the held location and button.
-2. Once the menu appears, the user then moves their finger to select an item from the menu.
-    - Once an item is selected and the finger is lifted, the program should respond and act accordingly to the selected menu item.
-
-These two items correspond to **gesture components**, corresponding to _segments_ of the overall touch input path.  These components are related and happen in sequence, hence use of the term **gesture sequence**.
-
-**Touchpoint** refers to the location of the mouse (during mouse-based input) or of the finger (during touch) being observed.
+For definitions to a few commonly-used terms below, see the [Terms](./terms.md) document.
 
 The three layers comprising gesture models are as follows:
 1. [`PathModel`](#pathmodel) is responsible for modeling the path of the touchpoint handled by the `ContactModel` owning it.
