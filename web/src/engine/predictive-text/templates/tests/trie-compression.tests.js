@@ -10,6 +10,10 @@ import {
   ENCODED_NUM_BASE
 } from '@keymanapp/models-templates/obj/trie-compression.js';
 
+import {
+  buildDecoder
+} from '@keymanapp/models-templates/obj/trie-decoder.js';
+
 import { TrieBuilder } from '@keymanapp/models-templates';
 import { Trie } from '../build/obj/trie.js';
 
@@ -235,6 +239,22 @@ describe('Trie decompression', function () {
 
     // The test:  did it throw?  If no, we'll assume we're good.
   });
+
+  it('can be decoded into the original unencoded format', () => {
+    const trieFixture = jsonFixture('tries/english-1000');
+    const builder = new TrieBuilder((word) => word, trieFixture.root, trieFixture.totalWeight);
+    const compressedTrie = builder.compress();
+
+    const decompressor = buildDecoder(compressedTrie, (word) => word);
+
+    // Note:  no obvious method calls here; it needs to match the original, non-encoded Trie's specification.
+    assert.doesNotThrow(() => decompressor.children.a.children.b.children.l);
+
+    // Must be able to fully follow this chain without any modifications.
+    // All children objects and the entry lookup near the end should appear decoded to code of this form
+    // when the base object is 'wrapped' with the decoder.
+    assert.equal(decompressor.children.a.children.b.children.l.entries[0].content, 'able');
+  })
 
   describe('surrogate-pair handling', () => {
     it('compresses a Trie with non-BMP characters without throwing an error', () => {
