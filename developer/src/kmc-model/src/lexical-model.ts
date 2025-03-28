@@ -50,7 +50,7 @@ export interface LexicalModelDeclaration {
  *
  * @since 11.0
  */
- export type SimpleWordBreakerSpec = 'default' | 'ascii' | WordBreakingFunction;
+ export type SimpleWordBreakerSpec = 'default' | 'ascii' | 'dict' | WordBreakingFunction;
 
 /**
  * @public
