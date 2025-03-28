@@ -344,7 +344,8 @@ public final class KMManager {
   public static final int KMMaximum_LongpressDelay = 1500;
 
   // Default keyboard heights
-  public static final int KeyboardHeight_Reset = 0; // Zero value for constructor
+  public static final int KeyboardHeight_Reset = 0; // To reset to default, applyKeyboardHeight
+  public static final int KeyboardHeight_Invalid = -1; // If invalid orientation passed to functions
   public static int KeyboardHeight_Context_Portrait_Default = 0; // Default portrait height
   public static int KeyboardHeight_Context_Landscape_Default = 0; // Default landscape height
 
