@@ -2339,7 +2339,7 @@ public final class KMManager {
   private static int calculateDefaultKeyboardHeight(Context context, int orientation) {
     if (isTestMode()) {
       // Keyboard height not needed for unit tests  #13578
-      return KeyboardHeight_Context_Portrait_Default;
+      return 0;
     }
     if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
       return KeyboardHeight_Reset; // Invalid orientation, return reset value
