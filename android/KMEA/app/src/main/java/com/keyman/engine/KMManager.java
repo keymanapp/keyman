@@ -503,8 +503,8 @@ public final class KMManager {
 
     CloudDownloadMgr.getInstance().initialize(appContext);
 
-    KeyboardHeight_Context_Portrait_Default = getDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT); 
-    KeyboardHeight_Context_Landscape_Default = getDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);  
+    KeyboardHeight_Context_Portrait_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT); 
+    KeyboardHeight_Context_Landscape_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);  
   }
 
   public static void executeResourceUpdate(Context aContext)
