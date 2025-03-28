@@ -2235,8 +2235,10 @@ public final class KMManager {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
-    } else /*(orientation == Configuration.ORIENTATION_LANDSCAPE) */ {
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+    } else {
+      return KMManager.KeyboardHeight_Reset; // Invalid orientation, return reset value
     }
   }
 
@@ -2264,13 +2266,16 @@ public final class KMManager {
     int defaultHeightForContext = orientation == Configuration.ORIENTATION_PORTRAIT
       ? KeyboardHeight_Context_Portrait_Default
       : KeyboardHeight_Context_Landscape_Default;
+    if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return; // Invalid orientation, do nothing
+    }
     if (height == KMManager.KeyboardHeight_Reset) {
       // Passing 0 will reset the stored height for this orientation.
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
-      } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */{
         editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
-      }
+      } 
       height = defaultHeightForContext;
     } else {
       // Applying gating to 50%-200% of default height (following Keyman) 
@@ -2283,9 +2288,9 @@ public final class KMManager {
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
-      } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
         editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
-      }
+      } 
     }
     editor.commit();
     // Confirm new LayoutParams for in-app or system keyboards 
@@ -2310,6 +2315,9 @@ public final class KMManager {
     if (isTestMode()) {
       // Keyboard height not needed for unit tests  #13578
       return KeyboardHeight_Context_Portrait_Default;
+    }
+    if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return KeyboardHeight_Reset; // Invalid orientation, return reset value
     }
     Resources resources = context.getResources();
     Configuration originalConfig = resources.getConfiguration();
