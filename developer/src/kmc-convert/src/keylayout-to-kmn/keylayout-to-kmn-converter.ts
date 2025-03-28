@@ -8,14 +8,6 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 
 //     Todo remove these todos
-
-//     use cmdl parameters -> new issue/PR
-
-//     TODO what about using actions twice in a row??? -> error msg if chain >4 -> new issue
-//     Todo prevent break for output ="" -> new issue
-
-//     what if keylayout file is not correct e.g missing '>'  -> new issue
-//     what if nodes in keylayout file do not exist/ diff name keyboard <-> keyboardA -> new issue
 // ---------------------------------------------------
 
 //     add all tests again remove data files test
@@ -158,7 +150,7 @@ export class KeylayoutToKmnConverter {
       arrayOf_Rules: []
     };
 
-    // ToDo in a new PR: check tags
+    // ToDo in a new PR: check tags  ( issue # 13599)
     if (jsonObj_any.hasOwnProperty("keyboard")) {
 
       data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
@@ -758,6 +750,12 @@ export class KeylayoutToKmnConverter {
     else if (rule[index].rule_type === "C2") {
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
         warningTextArray[1] = "unavailable modifier : ";
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
       }
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[2] = "unavailable modifier : ";
@@ -765,12 +763,34 @@ export class KeylayoutToKmnConverter {
     }
 
     else if (rule[index].rule_type === "C3") {
+
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_prev_deadkey)) {
         warningTextArray[0] = "unavailable modifier : ";
+        warningTextArray[1] = "unavailable superior rule ( ["
+          + rule[index].modifier_prev_deadkey + " "
+          + rule[index].prev_deadkey
+          + "]  >  dk(A"
+          + rule[index].id_prev_deadkey
+          + ") ) : ";
+
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
       }
+
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
         warningTextArray[1] = "unavailable modifier : ";
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
       }
+
       if (!this.isAcceptableKeymanModifier(rule[index].modifier_key)) {
         warningTextArray[2] = "unavailable modifier : ";
       }
@@ -822,7 +842,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous rule: later: ["
+          + ("ambiguous 4-1 rule: later: ["
             + amb_4_1[0].modifier_prev_deadkey
             + " "
             + amb_4_1[0].prev_deadkey
@@ -833,7 +853,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous rule: later: ["
+          + ("ambiguous 2-1 rule: later: ["
             + amb_2_1[0].modifier_deadkey
             + " "
             + amb_2_1[0].deadkey
@@ -844,7 +864,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_1_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous rule: earlier: ["
+          + ("ambiguous 1-1 rule: earlier: ["
             + amb_1_1[0].modifier_key
             + " "
             + amb_1_1[0].key
@@ -915,7 +935,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous rule: earlier: ["
+          + ("ambiguous 2-2 rule: earlier: ["
             + amb_2_2[0].modifier_deadkey
             + " "
             + amb_2_2[0].deadkey
@@ -937,7 +957,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_3_3.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous rule: earlier: dk(A"
+          + ("ambiguous 3-3 rule: earlier: dk(A"
             + amb_3_3[0].id_deadkey
             + ") + ["
             + amb_3_3[0].modifier_key
@@ -963,7 +983,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_2.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous rule: later: ["
+          + ("ambiguous 4-2 rule: later: ["
             + amb_4_2[0].modifier_prev_deadkey
             + " "
             + amb_4_2[0].prev_deadkey
@@ -1062,7 +1082,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous rule: earlier: ["
+          + ("ambiguous 2-4 rule: earlier: ["
             + amb_2_4[0].modifier_deadkey
             + " "
             + amb_2_4[0].deadkey
@@ -1073,7 +1093,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_6_3.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous rule: earlier: dk(C"
+          + ("ambiguous 6-3 rule: earlier: dk(C"
             + amb_6_3[0].id_deadkey
             + ") + ["
             + amb_6_3[0].modifier_key
@@ -1099,7 +1119,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous rule: earlier: ["
+          + ("ambiguous 4-4 rule: earlier: ["
             + amb_4_4[0].modifier_prev_deadkey
             + " "
             + amb_4_4[0].prev_deadkey
@@ -1121,7 +1141,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_5_5.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous rule: earlier: dk(B"
+          + ("ambiguous 5-5 rule: earlier: dk(B"
             + amb_5_5[0].id_prev_deadkey
             + ") + ["
             + amb_5_5[0].modifier_deadkey
@@ -1147,7 +1167,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_6_6.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous rule: earlier: dk(B"
+          + ("ambiguous 6-6 rule: earlier: dk(B"
             + amb_6_6[0].id_deadkey
             + ") + ["
             + amb_6_6[0].modifier_key
@@ -1313,9 +1333,8 @@ export class KeylayoutToKmnConverter {
           if (warn_text[2] == "")
             warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
           else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
+            warn_text[2] = warn_text[2] + " Use of a control character ";
         }
-
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the whole rule
@@ -1331,6 +1350,7 @@ export class KeylayoutToKmnConverter {
       }
     }
 
+    data += "c #################### C2 \n";
     //................................................ C2 ...................................................................
     for (let k = 0; k < unique_data_Rules.length; k++) {
 
@@ -1375,7 +1395,7 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
-
+    data += "c #################### C3 \n";
     //................................................ C3 ...................................................................
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
@@ -1398,20 +1418,18 @@ export class KeylayoutToKmnConverter {
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the whole rule
         // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[0].indexOf("duplicate") < 0)
-        ) {
+        if ((warn_text[0].indexOf("duplicate") < 0)) {
           data += warn_text[0]
             + "+ ["
             + (unique_data_Rules[k].modifier_prev_deadkey + " "
               + unique_data_Rules[k].prev_deadkey).trim()
-            + "]   >   dk(C"
+            + "]   >   dk(A"
             + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
         }
 
-        if ((warn_text[1].indexOf("duplicate") < 0)
-        ) {
+        if ((warn_text[1].indexOf("duplicate") < 0)) {
           data += warn_text[1]
-            + "dk(C" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
+            + "dk(A" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
               + unique_data_Rules[k].modifier_deadkey).trim()
             + " "
             + unique_data_Rules[k].deadkey
@@ -1420,8 +1438,7 @@ export class KeylayoutToKmnConverter {
             + ")\n";
         }
 
-        if ((warn_text[2].indexOf("duplicate") < 0)
-        ) {
+        if ((warn_text[2].indexOf("duplicate") < 0)) {
           data += warn_text[2] + "dk(B"
             + (String(unique_data_Rules[k].id_deadkey)
               + ") + ["
