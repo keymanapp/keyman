@@ -2272,9 +2272,7 @@ public final class KMManager {
   public static void applyKeyboardHeight(Context context, int height, int orientation) {
     SharedPreferences prefs = context.getSharedPreferences("KMAPreferences", Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
-    int defaultHeightForContext = orientation == Configuration.ORIENTATION_PORTRAIT
-      ? KeyboardHeight_Context_Portrait_Default
-      : KeyboardHeight_Context_Landscape_Default;
+    int defaultHeightForContext = getDefaultKeyboardHeight(orientation);
     if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
       return; // Invalid orientation, do nothing
     }
