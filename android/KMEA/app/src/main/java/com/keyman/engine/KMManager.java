@@ -2319,7 +2319,7 @@ public final class KMManager {
    */
   public static int getDefaultKeyboardHeight(Context context) {
     int orientation = getOrientation(context);
-    return getDefaultKeyboardHeight(context, orientation);
+    return getDefaultKeyboardHeight(orientation);
   }
 
   public static int getDefaultKeyboardHeight(Context context, int orientation) {
