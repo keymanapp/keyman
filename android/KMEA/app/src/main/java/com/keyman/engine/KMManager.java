@@ -2313,6 +2313,10 @@ public final class KMManager {
     }
   }
 
+  /**
+   * Returns the default keyboard height in dp for the current device 
+   * and orientation
+   */
   public static int getDefaultKeyboardHeight(Context context) {
     int orientation = getOrientation(context);
     return getDefaultKeyboardHeight(context, orientation);
