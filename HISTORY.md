@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.222 beta 2025-03-28
+
+* fix(android): Handle banner overrides independently when device is locked and unlocked (#13546)
+
 ## 18.0.221 beta 2025-03-27
 
 * fix(windows): configuration update tab text changes (#13555)
