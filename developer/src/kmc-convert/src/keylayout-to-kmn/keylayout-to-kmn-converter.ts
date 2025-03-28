@@ -67,6 +67,7 @@ export class KeylayoutToKmnConverter {
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly USED_KEYS_COUNT = 51;
   static readonly MAX_CTRL_CHARACTER = 32;
+  static readonly SKIP_COMMENTED_LINES = true;
 
   constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) {
   };
@@ -1340,12 +1341,20 @@ export class KeylayoutToKmnConverter {
         // if warning contains duplicate rules we do not write out the whole rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data += warn_text[2]
-            + "+ ["
-            + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
-            + `]  > \'`
-            + output_character_unicode
-            + '\'\n';
+
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
+            warningTextToWrite = warn_text[2];
+          }
+
+          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite
+              + "+ ["
+              + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+              + `]  > \'`
+              + output_character_unicode
+              + '\'\n';
+          }
         }
       }
     }
@@ -1374,23 +1383,38 @@ export class KeylayoutToKmnConverter {
         // if warning contains duplicate rules we do not write out the whole rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[1].indexOf("duplicate") < 0)) {
-          data += warn_text[1]
-            + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
-              + unique_data_Rules[k].deadkey).trim()
-            + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
-            + ")\n";
+
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[1].length > 0)) {
+            warningTextToWrite = warn_text[1];
+          }
+
+          if (!((warn_text[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite
+              + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
+                + unique_data_Rules[k].deadkey).trim()
+              + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
+              + ")\n";
+          }
         }
 
         if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data += warn_text[2]
-            + "dk(A"
-            + (String(unique_data_Rules[k].id_deadkey) + ") + ["
-              + unique_data_Rules[k].modifier_key).trim()
-            + " "
-            + unique_data_Rules[k].key + "]  >  \'"
-            + output_character_unicode
-            + "\'\n";
 
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
+            warningTextToWrite = warn_text[2];
+          }
+
+          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite
+              + "dk(A"
+              + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+                + unique_data_Rules[k].modifier_key).trim()
+              + " "
+              + unique_data_Rules[k].key + "]  >  \'"
+              + output_character_unicode
+              + "\'\n";
+          }
           data += "\n";
         }
       }
@@ -1419,35 +1443,63 @@ export class KeylayoutToKmnConverter {
         // if warning contains duplicate rules we do not write out the whole rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[0].indexOf("duplicate") < 0)) {
-          data += warn_text[0]
-            + "+ ["
-            + (unique_data_Rules[k].modifier_prev_deadkey + " "
-              + unique_data_Rules[k].prev_deadkey).trim()
-            + "]   >   dk(A"
-            + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
+
+
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[0].length > 0)) {
+            warningTextToWrite = warn_text[0];
+          }
+
+          if (!((warn_text[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite
+              + "+ ["
+              + (unique_data_Rules[k].modifier_prev_deadkey + " "
+                + unique_data_Rules[k].prev_deadkey).trim()
+              + "]   >   dk(A"
+              + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
+          }
         }
 
+
+
+
         if ((warn_text[1].indexOf("duplicate") < 0)) {
-          data += warn_text[1]
-            + "dk(A" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
-              + unique_data_Rules[k].modifier_deadkey).trim()
-            + " "
-            + unique_data_Rules[k].deadkey
-            + "]  >  dk(B"
-            + String(unique_data_Rules[k].id_deadkey)
-            + ")\n";
+
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[1].length > 0)) {
+            warningTextToWrite = warn_text[1];
+          }
+
+          if (!((warn_text[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite
+              + "dk(A" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
+                + unique_data_Rules[k].modifier_deadkey).trim()
+              + " "
+              + unique_data_Rules[k].deadkey
+              + "]  >  dk(B"
+              + String(unique_data_Rules[k].id_deadkey)
+              + ")\n";
+          }
         }
 
         if ((warn_text[2].indexOf("duplicate") < 0)) {
-          data += warn_text[2] + "dk(B"
-            + (String(unique_data_Rules[k].id_deadkey)
-              + ") + ["
-              + unique_data_Rules[k].modifier_key).trim()
-            + " "
-            + unique_data_Rules[k].key
-            + "]  >  \'"
-            + output_character_unicode
-            + "\'\n";
+
+          let warningTextToWrite = "";
+          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
+            warningTextToWrite = warn_text[2];
+          }
+
+          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
+            data += warningTextToWrite + "dk(B"
+              + (String(unique_data_Rules[k].id_deadkey)
+                + ") + ["
+                + unique_data_Rules[k].modifier_key).trim()
+              + " "
+              + unique_data_Rules[k].key
+              + "]  >  \'"
+              + output_character_unicode
+              + "\'\n";
+          }
         }
 
         if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
