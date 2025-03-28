@@ -2342,7 +2342,7 @@ public final class KMManager {
       return 0;
     }
     if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
-      return KeyboardHeight_Reset; // Invalid orientation, return reset value
+      return KeyboardHeight_Invalid; // Invalid orientation
     }
     Resources resources = context.getResources();
     Configuration originalConfig = resources.getConfiguration();
