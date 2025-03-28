@@ -40,7 +40,6 @@ Hotkeys *Hotkeys::Instance() {   // I4326
   if(g_Hotkeys == NULL) {
     g_Hotkeys = new Hotkeys;
     g_Hotkeys->Load();   // I4390
-    g_Hotkeys->LoadRightModifierHotkeyOption();
   }
 
   return g_Hotkeys;
@@ -65,13 +64,15 @@ void Hotkeys::Reload() {   // I4326   // I4390
   }
 
   hotkeys->Load();   // I4390
-  hotkeys->LoadRightModifierHotkeyOption();
 }
 
 void Hotkeys::Load() {   // I4390
 	SendDebugEntry();
 	m_nHotkeys = 0;
-	RegistryReadOnly reg(HKEY_CURRENT_USER);
+
+  LoadRightModifierHotkeyOption();
+
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
 
   /* Load interface hotkeys */
 

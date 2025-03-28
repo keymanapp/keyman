@@ -151,14 +151,18 @@ LRESULT _kmnLowLevelKeyboardProc(
   // #5190: Don't cache modifier state because sometimes we won't receive
   // modifier change events (e.g. on lock screen)
   FHotkeyShiftState = 0;
+  BOOL AllowRightModifierHotkey = FALSE;
   Hotkeys* hotkeys  = Hotkeys::Instance();
+  if (hotkeys) {
+    AllowRightModifierHotkey = hotkeys->AllowRightModifierHotkey();
+  }
 
   if (GetKeyState(VK_LCONTROL) < 0) {
     FHotkeyShiftState |= HK_CTRL;
   }
 
   if (GetKeyState(VK_RCONTROL) < 0) {
-    FHotkeyShiftState |= hotkeys->AllowRightModifierHotkey() ? HK_CTRL : HK_RCTRL_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_CTRL : HK_RCTRL_INVALID;
   }
 
   if (GetKeyState(VK_LMENU) < 0) {
@@ -166,14 +170,14 @@ LRESULT _kmnLowLevelKeyboardProc(
   }
 
   if (GetKeyState(VK_RMENU) < 0) {
-    FHotkeyShiftState |= hotkeys->AllowRightModifierHotkey() ? HK_ALT : HK_RALT_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_ALT : HK_RALT_INVALID;
   }
 
   if (GetKeyState(VK_LSHIFT) < 0) {
     FHotkeyShiftState |= HK_SHIFT;
   }
   if (GetKeyState(VK_RSHIFT) < 0) {
-    FHotkeyShiftState |= hotkeys->AllowRightModifierHotkey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_SHIFT : HK_RSHIFT_INVALID;
   }
 
   //TODO: #8064. Can remove debug message once issue #8064 is resolved
