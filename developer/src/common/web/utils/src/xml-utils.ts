@@ -99,6 +99,13 @@ const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   kps: {
     ...GENERATOR_COMMON_OPTIONS,
   },
+  keyboard3: {
+    attributeNamePrefix: '$',
+    ignoreAttributes: false,
+    format: true,
+    textNodeName: '_',
+    suppressEmptyNode: true,
+  },
 };
 
 /** wrapper for XML parsing support */
