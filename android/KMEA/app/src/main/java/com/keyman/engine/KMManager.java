@@ -2322,7 +2322,21 @@ public final class KMManager {
     return getDefaultKeyboardHeight(orientation);
   }
 
-  public static int getDefaultKeyboardHeight(Context context, int orientation) {
+  /**
+   * Returns the current keyboard height in dp for the specified orientation
+   * for the current device
+   */
+  public static int getDefaultKeyboardHeight(int orientation) {
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return KMManager.KeyboardHeight_Context_Portrait_Default;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return KMManager.KeyboardHeight_Context_Landscape_Default;
+    } else {
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
+    }
+  }
+  
+  private static int calculateDefaultKeyboardHeight(Context context, int orientation) {
     if (isTestMode()) {
       // Keyboard height not needed for unit tests  #13578
       return KeyboardHeight_Context_Portrait_Default;
