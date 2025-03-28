@@ -23,7 +23,7 @@ KMManager.getKeyboardHeight(Context context, int orientation)
 :   The context.
 
 `orientation` _(Optional)_
-: Accepts a [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) value. This is most useful if you want to get the size of the keyboard in the other (non-current) orientation. If `orientation` is not defined, keyboard height is returned for the current device orientation.
+: Accepts a [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) value. This is most useful if you want to get the size of the keyboard in the other (non-current) orientation. If `orientation` parameter is not passed in, keyboard height is returned for the current device orientation.
 
 ### Returns
 
