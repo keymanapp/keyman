@@ -61,12 +61,14 @@ export class LdmlCompilerMessages {
   static Error_InvalidVersion = (o:{version: string}) => m(
     this.ERROR_InvalidVersion,
     `Version number '${def(o.version)}' must be a semantic version format string with 'major.minor.patch' components.`,
-    `The version number in the LDML keyboard file must be a [semantic version](https://semver.org) (semver) string.
-    This string has a format of three integers representing major, minor, and patch versions, separated by periods.
-    In the LDML keyboard specification, the full semver format is permitted, including pre-release suffix strings,
-    but the Keyman toolchain currently restricts the format to the three integer components.
+    `The version number in the LDML keyboard file must be a [semantic
+    version](https://semver.org) (semver) string. This string has a format of three
+    integers representing major, minor, and patch versions, separated by periods. In
+    the LDML keyboard specification, the full semver format is permitted, including
+    pre-release suffix strings, but the Keyman toolchain currently restricts the
+    format to the three integer components.
 
-    Example: \`"1.2.3"\``
+    Example: \`"1.12.3"\``
   );
 
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
