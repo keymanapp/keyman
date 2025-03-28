@@ -2416,11 +2416,10 @@ public final class KMManager {
       height = defaultHeightForContext;
     } else {
       // Applying gating to 50%-200% of default height (following Keyman)
-      if (height < (defaultHeightForContext / 2)) {
-        height = (int) (defaultHeightForContext / 2);
-      } else if (height > (defaultHeightForContext * 2)) {
-        height = (int) (defaultHeightForContext * 2);
-      }
+      int minKeyboardHeight = KMManager.getKeyboardHeightMin(context, orientation);
+      int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context, orientation);
+      height = Math.max(minKeyboardHeight, height);
+      height = Math.min(maxKeyboardHeight, height);
 
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2437,16 +2436,32 @@ public final class KMManager {
       KeyboardHeight_Context_Portrait_Current = height;
     }
     editor.commit();
+
+    // Track whether height was successfully applied
+    boolean heightApplied = false;
+
     // Confirm new LayoutParams for in-app or system keyboards
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
+      heightApplied = true;
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
+      heightApplied = true;
+    }
+
+    // If keyboard wasn't loaded, set a pending flag so height gets applied when keyboard loads
+    if (!heightApplied) {
+      SharedPreferences.Editor pendingEditor = prefs.edit();
+      String pendingKey = (orientation == Configuration.ORIENTATION_LANDSCAPE)
+          ? "pendingHeightUpdate_landscape"
+          : "pendingHeightUpdate_portrait";
+      pendingEditor.putBoolean(pendingKey, true);
+      pendingEditor.commit();
     }
   }
 
@@ -2517,6 +2532,36 @@ public final class KMManager {
     int resourceId = context.getResources().getIdentifier(
       "navigation_bar_height", "dimen", "android");
     return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+  }
+
+  public static int getKeyboardHeightMax(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMax(context, orientation);
+  }
+
+  public static int getKeyboardHeightMax(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default * 2;
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default * 2;
+    } else {
+      return KMManager.KeyboardHeight_Reset;
+    }
+  }
+
+  public static int getKeyboardHeightMin(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMin(context, orientation);
+  }
+
+  public static int getKeyboardHeightMin(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default / 2;
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default / 2;
+    } else {
+      return KMManager.KeyboardHeight_Reset;
+    }
   }
 
   /**
