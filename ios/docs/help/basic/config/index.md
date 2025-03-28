@@ -30,7 +30,7 @@ Click on this to [search for a keyboard or language](../../start/searching-for-k
 When enabled, the Keyman app will display the 'Get Started' screen on app startup.
 
 ## Allow error reporting
-When enabled, the Keyman app will send crash reporting information to https://sentry.keyman.com. No personally identifiable information or keyboard strokes are recorded.
+When enabled, the Keyman app will send crash reporting information to Sentry. No personally identifiable information or keyboard strokes are recorded.
 
 ## Spacebar Caption
 Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.

@@ -8,6 +8,8 @@ LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Build Base Image"
 
+SHELL ["/bin/bash", "-c"]
+
 # We will switch to a build user after some installation
 USER root
 ENV HOME=/home/build

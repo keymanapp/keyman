@@ -465,7 +465,7 @@
   <!-- Context: Configuration Dialog - Update tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">သမၠုၚ်ပ္တိုန်တံဂှ် ယဝ်ကၟာတ်ပံက်ထောံ မုက်လိက်တုဲမ္ဂး ဒှ်ဒတန်ရ။</string>
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">သမၠုၚ်ပ္တိုန်တံဂှ် ယဝ်ကၟာတ်ပံက်ထောံ မုက်လိက်တုဲမ္ဂး ဒှ်ဒတန်ရ။:</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->

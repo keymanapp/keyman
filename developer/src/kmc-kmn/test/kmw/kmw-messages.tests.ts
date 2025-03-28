@@ -88,7 +88,7 @@ describe('KmwCompilerMessages', function () {
 
   // ERROR_NotSupportedInKeymanWebOutput
 
-  it('should generate ERROR_NotSupportedInKeymanWebOutput if the command is not supported in output for KeymanWeb', async function() {
+  it('should generate ERROR_NotSupportedInKeymanWebOutput if the statement is not supported in output for KeymanWeb', async function() {
     await testForMessage(this, ['kmw', 'error_not_supported_in_keyman_web_output.kmn'], KmwCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
   });
 

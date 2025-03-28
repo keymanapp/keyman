@@ -232,7 +232,7 @@ get_context_debug(IBusEngine *engine) {
 static gchar *
 debug_utf8_with_codepoints(const gchar *utf8) {
   GString *output = g_string_new("");
-  g_string_append_printf(output, "|%s| len:%ld) [", utf8, g_utf8_strlen(utf8, -1));
+  g_string_append_printf(output, "|%s| (len:%ld) [", utf8, g_utf8_strlen(utf8, -1));
   gunichar2 *utf16 = g_utf8_to_utf16(utf8, -1, NULL, NULL, NULL);
   for (int i = 0; utf16[i] != '\0'; i++) {
     g_string_append_printf(output, "U+%04x ", utf16[i]);
@@ -290,7 +290,7 @@ set_context_if_needed(IBusEngine *engine) {
 }
 
 static void
-initialize_queue(IBusKeymanEngine *keyman, int index, int count) {
+initialize_queue_items(IBusKeymanEngine *keyman, int index, int count) {
   g_assert(keyman != NULL);
   g_assert(index >= 0 && index < MAX_QUEUE_SIZE);
   g_assert(count > 0 && count <= MAX_QUEUE_SIZE);
@@ -463,7 +463,7 @@ ibus_keyman_engine_constructor(
     keyman->lctrl_pressed = FALSE;
     keyman->ralt_pressed = FALSE;
     keyman->rctrl_pressed = FALSE;
-    initialize_queue(keyman, 0, MAX_QUEUE_SIZE);
+    initialize_queue_items(keyman, 0, MAX_QUEUE_SIZE);
     keyman->commit_item    = &keyman->commit_queue[0];
     gchar **split_name     = g_strsplit(engine_name, ":", 2);
     if (split_name[0] == NULL)
@@ -703,18 +703,19 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
 
 static void
 process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
-  if (!emit_keystroke) {
-    return;
-  }
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (client_supports_surrounding_text(engine)) {
     // compliant app
+    if (!emit_keystroke) {
+      return;
+    }
     ibus_engine_forward_key_event(engine, keyman->commit_item->keyval,
       keyman->commit_item->keycode, keyman->commit_item->state);
     return;
   }
+
   // non-compliant app
-  keyman->commit_item->emitting_keystroke = TRUE;
+  keyman->commit_item->emitting_keystroke = emit_keystroke;
 }
 
 static void
@@ -768,7 +769,7 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
   }
   keyman->commit_item--;
   memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * MAX_QUEUE_SIZE - 1);
-  initialize_queue(keyman, MAX_QUEUE_SIZE - 1, 1);
+  initialize_queue_items(keyman, MAX_QUEUE_SIZE - 1, 1);
 }
 
 static void

@@ -9,7 +9,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/docker-images/docker-build.inc.sh"
 
 builder_describe \
   "Build docker images" \
@@ -18,7 +19,8 @@ builder_describe \
   ":core" \
   ":linux" \
   ":web" \
-  "--distro=DISTRO                  The distribution to use for the base image (debian or ubuntu, default: ubuntu)" \
+  "--distro=DISTRO                  The distribution to use for the base image "\
+  "                                 (debian or ubuntu, default: ubuntu)" \
   "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
   "build                            Build docker images" \
@@ -97,7 +99,7 @@ build_action() {
   docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
-  if _is_default_values; then
+  if is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
     docker build -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
@@ -119,7 +121,6 @@ _convert_parameters_to_build_args
 
 if builder_has_action build; then
   build_action base
-  BASE_VERSION="${build_version}"
   builder_run_action build:android  build_action android
   builder_run_action build:core     build_action core
   builder_run_action build:linux    build_action linux

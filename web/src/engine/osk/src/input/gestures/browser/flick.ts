@@ -119,7 +119,8 @@ export default class Flick implements GestureHandler {
     let source: GestureSource<KeyElement> = baseSource;
 
     sequence.on('complete', () => {
-      previewHost?.cancel()
+      previewHost?.cancel();
+      this.baseSpec;
     });
 
     this.sequence.on('stage', (result) => {
@@ -206,6 +207,7 @@ export default class Flick implements GestureHandler {
     }
 
     keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
+    keyEvent.inputBreadcrumb = this.sequence.trace();
 
     // emit the keystroke
     vkbd.raiseKeyEvent(keyEvent, null);

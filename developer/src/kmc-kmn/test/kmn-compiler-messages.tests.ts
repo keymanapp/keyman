@@ -1,10 +1,10 @@
 import 'mocha';
 import { assert } from 'chai';
-import { KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
-import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
-import { makePathToFixture } from './helpers/index.js';
-import { KmnCompiler } from '../src/main.js';
 import { CompilerErrorMask, CompilerErrorNamespace } from '@keymanapp/developer-utils';
+import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
+import { KmnCompiler } from '../src/main.js';
+import { KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
+import { makePathToFixture } from './helpers/index.js';
 
 describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -214,6 +214,13 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate ERROR_ContextExCannotReferenceNul if the offset points to a nul statement', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_contextex_cannot_reference_nul.kmn'], KmnCompilerMessages.ERROR_ContextExCannotReferenceNul);
+  });
+
+  // ERROR_TextBeforeOrAfterNulInOutput
+
+  it('should generate ERROR_TextBeforeOrAfterNulInOutput if text before or after nul in output', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_text_before_or_after_nul_in_output_before.kmn'], KmnCompilerMessages.ERROR_TextBeforeOrAfterNulInOutput);
+    await testForMessage(this, ['invalid-keyboards', 'error_text_before_or_after_nul_in_output_after.kmn'], KmnCompilerMessages.ERROR_TextBeforeOrAfterNulInOutput);
   });
 
 });

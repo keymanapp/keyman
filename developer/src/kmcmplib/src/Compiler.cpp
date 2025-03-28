@@ -1556,6 +1556,71 @@ KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
   return STATUS_Success;
 }
 
+const KMX_BOOL CODE__IS_TEXTUAL[] = {
+  -1,     // undefined                0x00
+  TRUE,   // CODE_ANY                 0x01
+  TRUE,   // CODE_INDEX               0x02
+  TRUE,   // CODE_CONTEXT             0x03
+  FALSE,  // CODE_NUL                 0x04
+  FALSE,  // CODE_USE                 0x05 // may trigger text effects but indirectly
+  FALSE,  // CODE_RETURN              0x06
+  FALSE,  // CODE_BEEP                0x07
+  TRUE,   // CODE_DEADKEY             0x08
+  -1,     // unused                   0x09
+  TRUE,   // CODE_EXTENDED            0x0A
+  -1,     // CODE_EXTENDEDEND         0x0B (unused)
+  FALSE,  // CODE_SWITCH              0x0C
+  -1,     // CODE_KEY                 0x0D (never used)
+  FALSE,  // CODE_CLEARCONTEXT        0x0E
+  FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
+  -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
+  TRUE,   // CODE_CONTEXTEX           0x11
+  TRUE,   // CODE_NOTANY              0x12
+  FALSE,  // CODE_SETOPT              0x13
+  FALSE,  // CODE_IFOPT               0x14
+  FALSE,  // CODE_SAVEOPT             0x15
+  FALSE,  // CODE_RESETOPT            0x16
+  FALSE,  // CODE_IFSYSTEMSTORE       0x17
+  FALSE   // CODE_SETSYSTEMSTORE      0x18
+};
+
+static_assert(sizeof(CODE__IS_TEXTUAL) / sizeof(CODE__IS_TEXTUAL[0]) == (CODE_LASTCODE + 1), "Size of array CODE__EMITS_TEXT not correct");
+
+KMX_BOOL IsTextualCode(KMX_WORD code) {
+  assert(code >= CODE_ANY && code <= CODE_LASTCODE);
+  if(!(code >= CODE_ANY && code <= CODE_LASTCODE)) {
+    return FALSE;
+  }
+  return CODE__IS_TEXTUAL[code];
+}
+
+/**
+ * Warn if output has text before or after a nul statement, which
+ * doesn't make sense -- if nul is used, it indicates no output
+ */
+KMX_DWORD CheckNulUsageInOutput(PKMX_WCHAR output) {
+  PKMX_WCHAR p;
+  KMX_BOOL hasNul = FALSE, hasOther = FALSE;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p+1);
+      if(code == CODE_NUL) {
+        hasNul = TRUE;
+      } else if(IsTextualCode(code)) {
+        hasOther = TRUE;
+      }
+    } else {
+      hasOther = TRUE;
+    }
+  }
+
+  if(hasNul && hasOther) {
+    return KmnCompilerMessages::ERROR_TextBeforeOrAfterNulInOutput;
+  }
+
+  return STATUS_Success;
+}
+
 /**
  * Adds implicit `context` to start of output of rules for readonly groups
  */
@@ -1691,6 +1756,10 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
   // Warn if virtual keys are used in the output, as they are unsupported by Core
   if ((msg = CheckVirtualKeysInOutput(pklOut)) != STATUS_Success) {
+    return msg;
+  }
+
+  if ((msg = CheckNulUsageInOutput(pklOut)) != STATUS_Success) {
     return msg;
   }
 

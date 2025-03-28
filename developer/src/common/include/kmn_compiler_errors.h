@@ -275,8 +275,10 @@ namespace KmnCompilerMessages {
     ERROR_ContextExCannotReferenceIf =                  SevError | 0x0B1,
     ERROR_ContextExCannotReferenceNul =                 SevError | 0x0B2,
 
-    FATAL_BufferOverflow =                                SevFatal | 0x0C0
-//    FATAL_Break =                                         SevFatal | 0x0C1,      unused
+    ERROR_TextBeforeOrAfterNulInOutput =                SevError | 0x0B3,
+
+    FATAL_BufferOverflow =                              SevFatal | 0x0C0
+//    FATAL_Break =                                       SevFatal | 0x0C1,      unused
   };
 }
 

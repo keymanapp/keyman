@@ -59,4 +59,4 @@ When enabled, the Keyman keyboard will provide haptic feedback (vibrate) when th
 When enabled, the Keyman app will display the 'Get Started' screen on app startup.
 
 ## Allow sending crash reports over network
-When enabled, the Keyman app will send crash reporting information to https://sentry.keyman.com. No personally identifiable information or keyboard strokes are recorded.
+When enabled, the Keyman app will send crash reporting information to [Sentry](https://keyman.sentry.io). No personally identifiable information or keyboard strokes are recorded.

@@ -4,7 +4,7 @@ title: Data Privacy Policy
 
 ## Privacy Policy for Keyman
 
-This application will send crash reporting information to https://sentry.keyman.com. No personally identifiable information or keyboard strokes are recorded or shared.
+This application will send crash reporting information to https://keyman.sentry.io. No personally identifiable information or keyboard strokes are recorded or shared.
 
 You can disable crash reporting on the Keyman 
 [settings menu](../basic/config/)

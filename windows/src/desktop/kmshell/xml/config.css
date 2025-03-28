@@ -1160,14 +1160,12 @@ th
 {
   font-size: 13px;
   margin-left: 64px;
-  margin-top: 30px;
+  margin-top: 64px;
+  margin-bottom: 20px;
 }
 
 #update_content {
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  display: block;
   padding: 5px 10px 5px 10px;
 }
 

@@ -1,4 +1,4 @@
-# Debian Packaging GitHub Action
+# Ubuntu Packaging GitHub Action
 
 You can manually trigger a deb-packaging action on GitHub, e.g. to test changes:
 
