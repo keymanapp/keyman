@@ -2263,7 +2263,7 @@ public final class KMManager {
   }
 
   /**
-   * Apply the keyboard height for the current orientation and store it in SharedPreferences.
+   * Apply the keyboard height for the specified orientation and store it in SharedPreferences.
    * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that orientation.
    * @param context Context
    * @param height int - keyboard height in dp
