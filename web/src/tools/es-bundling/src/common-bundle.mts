@@ -5,6 +5,7 @@ import { prepareTslibTreeshaking } from './tslibTreeshaking.mjs';
 
 let CHARSET = 'ascii';
 let FORMAT = 'iife';
+let GLOBAL_NAME = '';
 let MINIFY = false;
 
 let sourceFromArgs;
@@ -35,6 +36,8 @@ Options:
                         'iife' or 'esm'.
 
                         If not specified, 'iife' will be used.
+  --globalName          If 'iife' is specified, exports are assigned to this name as a
+                        script-global variable
   --minify              Enables minification.
   --platform=<platform> Sets the 'platform' property of the esbuild config accordingly.
   --profile=<out-file>  Generates an associated filesize profile at the specified path.
@@ -77,6 +80,9 @@ if(process.argv.length > 2) {
             doHelp(1);
             break;
         }
+        break;
+      case '--globalName':
+        GLOBAL_NAME = process.argv[++i];
         break;
       case '--minify':
         MINIFY = true;
@@ -151,6 +157,10 @@ const config: esbuild.BuildOptions = {
   sourceRoot: sourceRoot, // may be undefined - is fine if so.
   platform: platform as esbuild.Platform || "browser"
 };
+
+if(GLOBAL_NAME && FORMAT == 'iife') {
+  config.globalName = GLOBAL_NAME;
+}
 
 await prepareTslibTreeshaking(config);
 const results = await esbuild.build(config);

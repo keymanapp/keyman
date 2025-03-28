@@ -1,0 +1,1 @@
+export { buildDecoder as wrap } from "./trie-decoder.js";

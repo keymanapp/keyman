@@ -34,6 +34,23 @@ function do_build() {
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+
+  # Bundler definition
+  BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
+
+  # Bundles and minifies the back-compatibility trie-decoding functionality for inclusion in compiled models
+  # (Still needs a bit of rework to get it _just_ right, though.)
+  #
+  # May want to use the `global_name` esbuild setting to allow a directly-embeddable export, though that
+  # may in itself add extra overhead
+  $BUNDLE_CMD "${KEYMAN_ROOT}/web/src/engine/predictive-text/templates/src/decompressor-main.js" \
+    --out        "${KEYMAN_ROOT}/web/src/engine/predictive-text/templates/build/lib/decompressor.js" \
+    --charset    "utf8" \
+    --format     "iife" \
+    --globalName "triecompat" \
+    --sourceRoot "@keymanapp/keyman/web/src/engine/predictive-text/templates/build/lib" \
+    --target     "es6" \
+    --minify
 }
 
 function do_test() {
