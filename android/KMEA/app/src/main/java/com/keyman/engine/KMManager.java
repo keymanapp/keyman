@@ -2235,6 +2235,10 @@ public final class KMManager {
     return getKeyboardHeight(context, orientation); 
   }
 
+  /**
+   * Returns the current keyboard height in dp for the specified device 
+   * orientation
+   */
   public static int getKeyboardHeight(Context context, int orientation) {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
