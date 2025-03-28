@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.18 alpha 2025-03-25
+
+* chore(developer): improve ldml code coverage (#13516)
+
+## 19.0.17 alpha 2025-03-24
+
+* chore(deps-dev): bump esbuild from 0.18.20 to 0.25.0 (#13191)
+
 ## 19.0.16 alpha 2025-03-19
 
 * feat(core): check on load for valid kmx_plus unicode (#13486)
