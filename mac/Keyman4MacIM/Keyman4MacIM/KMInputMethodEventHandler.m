@@ -233,10 +233,14 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   return stale;
 }
 
+/**
+ * Handle the flag set in the eventTap when we detect events that cause a change in context.
+ * This includes mouse movement, arrow keys, page up and page down, function keys, and others.
+ */
 - (void) handleContextChangedByLowLevelEvent {
   if (self.appDelegate.contextChangedByLowLevelEvent) {
     if (!self.contextChanged) {
-      os_log_debug([KMLogs complianceLog], "Low-level event has changed the context.");
+      os_log_debug([KMLogs complianceLog], "Handling context change due to low-level event.");
       self.contextChanged = YES;
     }
     self.appDelegate.contextChangedByLowLevelEvent = NO;
@@ -248,10 +252,9 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   BOOL handled = NO;
   os_log_debug([KMLogs eventsLog], "handleEvent፡ event = %{public}@", event);
 
-  [self checkTextApiCompliance:sender];
-  
-  // mouse movement requires that the context be invalidated
   [self handleContextChangedByLowLevelEvent];
+
+  [self checkTextApiCompliance:sender];
   
   if (event.type == NSEventTypeKeyDown) {
     [KMSentryHelper addDebugBreadCrumb:@"event" message:@"handling keydown event"];
@@ -343,22 +346,27 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   // if we can read the text, then get the context for up to kMaxContext characters
   if (self.apiCompliance.canReadText) {
     NSRange selectionRange = [client selectedRange];
+    os_log_debug([KMLogs eventsLog], "InputMethodEventHandler readContext, canReadText: true selectionRange %{public}@: ", NSStringFromRange(selectionRange));
+    
     NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
     NSUInteger contextStart = selectionRange.location - contextLength;
     
     if (contextLength > 0) {
-      os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, %lu characters", (unsigned long)contextLength);
       NSRange contextRange = NSMakeRange(contextStart, contextLength);
+      os_log_debug([KMLogs eventsLog], " contextRange %{public}@: client: %p", NSStringFromRange(contextRange), client);
       attributedString = [client attributedSubstringFromRange:contextRange];
       
       // adjust string in case that we receive half of a surrogate pair at context start
       // the API appears to always return a full code point, but this could vary by app
       if (attributedString.length > 0) {
         if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
-          os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, first char is low surrogate, reducing context by one character");
+          os_log_debug([KMLogs eventsLog], " first char is low surrogate, reducing context by one character");
           contextString = [attributedString.string substringFromIndex:1];
         } else {
           contextString = attributedString.string;
+          
+          //only uncomment for testing as we do not want to write context in logs
+          //os_log_debug([KMLogs testLog], " length: %lu result: %{public}@", contextString.length, contextString);
         }
       }
     }
