@@ -113,12 +113,12 @@ export interface KpsFileRelatedPackage {
 }
 
 export interface KpsFileKeyboard {
-  Name: string;     /// the descriptive name of the keyboard
+  // Defined in .kps schema but not used: Name: string; #13593
   ID: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
-  Version: string;
+  // Defined in .kps schema but not used: Version: string; #13593
   OSKFont?: string;
   DisplayFont?: string;
-  RTL?: string;
+  // Defined in .kps schema but not used: RTL?: string; #13593
   Languages?: KpsFileLanguages;
   Examples?: KpsFileLanguageExamples;
   /**

@@ -138,12 +138,8 @@ type
     Label2: TLabel;
     Label3: TLabel;
     lblKeyboardFiles: TLabel;
-    lblKeyboardDescription: TLabel;
     lbKeyboards: TListBox;
-    editKeyboardDescription: TEdit;
     memoKeyboardFiles: TMemo;
-    lblKeyboardVersion: TLabel;
-    editKeyboardVersion: TEdit;
     lblKeyboardOSKFont: TLabel;
     cbKeyboardOSKFont: TComboBox;
     cbKeyboardDisplayFont: TComboBox;
@@ -153,8 +149,6 @@ type
     cmdKeyboardAddLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     chkFollowKeyboardVersion: TCheckBox;
-    lblKeyboardRTL: TLabel;
-    editKeyboardRTL: TEdit;
     cmdKeyboardEditLanguage: TButton;
     panBuildMobile: TPanel;
     lblDebugHostCaption: TLabel;
@@ -1628,10 +1622,7 @@ begin
     k := SelectedKeyboard;
     if not Assigned(k) then
     begin
-      editKeyboardDescription.Text := '';
-      editKeyboardVersion.Text := '';
       memoKeyboardFiles.Text := '';
-      editKeyboardRTL.Text := '';
       cbKeyboardOSKFont.ItemIndex := -1;
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
@@ -1645,12 +1636,6 @@ begin
     // Details
 
     memoKeyboardFiles.Text := '';
-    editKeyboardDescription.Text := k.Name;
-    editKeyboardVersion.Text := k.Version;
-
-    if k.RTL
-      then editKeyboardRTL.Text := 'True'
-      else editKeyboardRTL.Text := 'False (or not .js format)';
 
     for i := 0 to pack.Files.Count - 1 do
       if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
@@ -1779,12 +1764,8 @@ var
   e: Boolean;
 begin
   e := lbKeyboards.ItemIndex >= 0;
-  lblKeyboardDescription.Enabled := e;
-  editKeyboardDescription.Enabled := e;
   lblKeyboardFiles.Enabled := e;
   memoKeyboardFiles.Enabled := e;
-  lblKeyboardVersion.Enabled := e;
-  editKeyboardVersion.Enabled := e;
   lblKeyboardOSKFont.Enabled := e;
   cbKeyboardOSKFont.Enabled := e;
   lblKeyboardDisplayFont.Enabled := e;

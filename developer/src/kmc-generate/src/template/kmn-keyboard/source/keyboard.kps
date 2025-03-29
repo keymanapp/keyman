@@ -38,9 +38,7 @@ $KVKS:    </File>
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>$NAME</Name>
       <ID>$ID</ID>
-      <Version>$VERSION</Version>
 $PACKAGE_LANGUAGES
     </Keyboard>
   </Keyboards>

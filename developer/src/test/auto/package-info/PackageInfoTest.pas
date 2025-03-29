@@ -278,9 +278,7 @@ begin
   Assert.AreEqual(k1.Keyboards.Count, k2.Keyboards.Count);
   for i := 0 to k1.Keyboards.Count - 1 do
   begin
-    Assert.AreEqual(k1.Keyboards[i].Name, k2.Keyboards[i].Name);
     Assert.AreEqual(k1.Keyboards[i].ID, k2.Keyboards[i].ID);
-    Assert.AreEqual(k1.Keyboards[i].Version, k2.Keyboards[i].Version);
     Assert.IsTrue(
       (
         Assigned(k1.Keyboards[i].OSKFont) and

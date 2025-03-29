@@ -13,7 +13,7 @@ import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
-import { MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
+import { DEFAULT_KEYBOARD_VERSION, MIN_LM_FILEVERSION_KMP_JSON, PackageVersionValidator } from './package-version-validator.js';
 import { PackageKeyboardTargetValidator } from './package-keyboard-target-validator.js';
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
@@ -292,10 +292,10 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.keyboards = kps.Keyboards.Keyboard.map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
-        name:keyboard.Name?.trim(),
+        name: '', // filled by PackageMetadataUpdater
         id:keyboard.ID?.trim(),
-        version:keyboard.Version?.trim(),
-        rtl:keyboard.RTL == 'True' ? true : undefined,
+        version: DEFAULT_KEYBOARD_VERSION,  // filled by PackageMetadataUpdater
+        rtl: false, // filled by PackageMetadataUpdater
         languages: keyboard.Languages?.Language?.length ?
           this.kpsLanguagesToKmpLanguages(keyboard.Languages.Language) :
           [],

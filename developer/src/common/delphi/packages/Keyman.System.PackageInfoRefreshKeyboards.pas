@@ -120,15 +120,8 @@ begin
 
       if FillKeyboardDetails(pack.Files[i], pki) then
       begin
-        k.Name := pki.Name;
         k.ID := pki.ID;
-        k.Version := pki.Version;
         k.MinKeymanVersion := pki.MinKeymanVersion;
-        if IsKeyboardFileByName(pack.Files[i]) = ftJavascript then
-          // RTL flag is currently only relevant for KMW so although the
-          // information can be read from .kmx we only copy it over for
-          // js keyboards.
-          k.RTL := pki.RTL;
       end;
     end;
   end;
