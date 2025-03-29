@@ -69,7 +69,10 @@ void Hotkeys::Reload() {   // I4326   // I4390
 void Hotkeys::Load() {   // I4390
 	SendDebugEntry();
 	m_nHotkeys = 0;
-	RegistryReadOnly reg(HKEY_CURRENT_USER);
+
+  LoadRightModifierHotkeyOption();
+
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
 
   /* Load interface hotkeys */
 
@@ -143,6 +146,24 @@ Hotkey *Hotkeys::GetHotkey(DWORD hotkey)
     }
   }
 	return NULL;
+}
+
+void Hotkeys::LoadRightModifierHotkeyOption() {
+  m_AllowRightModifierHotkey = FALSE; // Default to off
+  RegistryReadOnly reg(HKEY_CURRENT_USER);
+  if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+    if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
+      m_AllowRightModifierHotkey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
+    }
+  }
+}
+
+BOOL Hotkeys::AllowRightModifierHotkey() {
+  if (GetCurrentThreadId() != Globals::get_InitialisingThread()) {
+    OutputThreadDebugString("Unexpected: no other thread should be attempting read allow right modifier option");
+    return FALSE;
+  }
+  return m_AllowRightModifierHotkey;
 }
 
 #endif
