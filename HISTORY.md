@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.223 beta 2025-03-29
+
+* chore(developer): improve kmc-ldml 'invalid version' message (#13602)
+
 ## 18.0.222 beta 2025-03-28
 
 * fix(android): Handle banner overrides independently when device is locked and unlocked (#13546)
