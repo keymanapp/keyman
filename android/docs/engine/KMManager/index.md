@@ -221,6 +221,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`removeKeyboardEventListener()`](removeKeyboardEventListener)
 : removes the specified listener from the list of keyboard event listeners
 
+[`setBannerOptions()`](setBannerOptions)
+: send options to the KeymanWeb engine for controlling whether to generate predictions
+
 [`setCanAddNewKeyboard()`](setCanAddNewKeyboard)
 : sets whether adding a new keyboard is allowed
 

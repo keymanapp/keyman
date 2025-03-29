@@ -1559,7 +1559,8 @@ public final class KMManager {
     // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
       modelFileExists = false;
-      setBannerOptions(false);
+      setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_INAPP);
+      setBannerOptions(false, KeyboardType.KEYBOARD_TYPE_SYSTEM);
       KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
     }
 
@@ -1633,28 +1634,12 @@ public final class KMManager {
   }
 
   /**
-   * setBannerOptions - Update KMW whether to generate predictions.
-   *                    For now, also display banner
-   * @param mayPredict - boolean whether KMW should generate predictions
-   * @return boolean - Success
-   */
-  public static boolean setBannerOptions(boolean mayPredict) {
-    String url = KMString.format("setBannerOptions(%s)", mayPredict);
-    if (InAppKeyboard != null) {
-      InAppKeyboard.loadJavascript(url);
-    }
-
-    if (SystemKeyboard != null) {
-      SystemKeyboard.loadJavascript(url);
-    }
-
-    return true;
-  }
-
-  /**
-   * setBannerOptions - Update KMW for inapp/system keyboard whether to generate predictions.
-   *                    For now, also display banner
-   * @param mayPredict - boolean whether KMW should generate predictions
+   * setBannerOptions - Update KeymanWeb for inapp/system keyboard whether to generate predictions.
+   *                    For now, also display banner. This is generally controlled by the user preference
+   *                    in the LanguageSettings menu, with priority to
+   *                    the PredictionsSuspendedForSensitiveInput flag.
+   * API published in Keyman 18.0
+   * @param mayPredict - boolean whether KeymanWeb should generate predictions
    * @param {KeyboardType} keyboard
    * @return boolean - Success
    */
