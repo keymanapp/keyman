@@ -54,4 +54,4 @@ or
 
 ## See also
 
--   [applyKeyboardHeight](applyKeyboardHeight)
+-   [applyKeyboardHeight()](applyKeyboardHeight)

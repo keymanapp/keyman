@@ -348,6 +348,8 @@ public final class KMManager {
   public static final int KeyboardHeight_Invalid = -1; // If invalid orientation passed to functions
   public static int KeyboardHeight_Context_Portrait_Default = 0; // Default portrait height
   public static int KeyboardHeight_Context_Landscape_Default = 0; // Default landscape height
+  public static int KeyboardHeight_Context_Portrait_Current = 0; // Current portrait height
+  public static int KeyboardHeight_Context_Landscape_Current = 0; // Current landscape height
 
   // Default prediction/correction setting
   public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
@@ -504,7 +506,11 @@ public final class KMManager {
     CloudDownloadMgr.getInstance().initialize(appContext);
 
     KeyboardHeight_Context_Portrait_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT); 
-    KeyboardHeight_Context_Landscape_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);  
+    KeyboardHeight_Context_Landscape_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+
   }
 
   public static void executeResourceUpdate(Context aContext)
@@ -2242,9 +2248,9 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context, int orientation) {
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+        return KMManager.KeyboardHeight_Context_Portrait_Current;
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-        return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+        return KMManager.KeyboardHeight_Context_Landscape_Current;
     } else {
       return KMManager.KeyboardHeight_Invalid; // Invalid orientation
     }
