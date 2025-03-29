@@ -80,6 +80,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">    ကဳဗုဒ်ယောၚ်ယာဇၞော်ဇၞော်နကဵု %1$s:%2$s သွက် ဘာသာ %3$s ။ ဂြဲပ္တိုန်မံၚ် ကဳဗုဒ်ပကတိ။</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      တၚ်ယောၚ်ယာ ပ္ဍဲကဳဗုဒ် %1$s:%2$s သွက် ဘာသာ %3$s</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">        သ္ဂောံဂြဲဖျေံ Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        သ္ဂောံပံက် Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">ပ္တိုန်စုတ် WebView ရောၚ်</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">ပံက် WebView</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">စၟဳစၟတ်ဒၟံၚ် အဘိဓာန် မဆက်စပ် သ္ဂောံဂြဲဖျေံ</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      သ္ဂောံဂြဲဖျေံ အဘိဓာန်မဆက်စပ်တံဂှ် ဆက်စၠောံကု သာပါ ကဳမာန်ဟွံဂွံ</string>
@@ -113,6 +121,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">ဝှာၚ်မဂၠောၚ်ဂြဲ​ဖျေံလဝ်ဂှ် ကလေၚ်​ကေတ်ဟွံဂွံ</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">ဆက်စၠောံကုသာပါဟွံအံၚ်ဇၞး!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">စက်ဂြဲကၟာတ်လဝ်ရောၚ် - စၟဳစၟတ်တၚ်သမၠုၚ်ဟွံဂွံ</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"တံရိုဟ်ဖအိုတ်ဂှ် ဒှ်တၟိရ!"</string>
     <!-- Context: General Updates -->
