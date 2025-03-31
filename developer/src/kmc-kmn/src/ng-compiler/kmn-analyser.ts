@@ -6,8 +6,8 @@
  * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
  */
 
-import { TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { Token, TokenTypes } from "./lexer.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -148,4 +148,33 @@ export class OptionalWhiteSpaceRule extends SingleChildRule {
     const whitespace: Rule  = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
     this.rule = new OptionalRule(tokenBuffer, whitespace);
   }
+}
+
+export class VariableStoreRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE, true);
+    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
+    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
+    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      store, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
+    ]);
+  }
+}
+
+export class VariableStoreNameRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const parameters: Token[]   = [];
+    const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
+    if (parseSuccess) {
+      node.addToken(NodeTypes.STORENAME, parameters[0]);
+    }
+    return parseSuccess;
+  };
 }
