@@ -66,7 +66,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("el", "Polytonic Greek"),
       new DisplayLanguageType("pt-PT", "Português de Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
-      new DisplayLanguageType("ru-RU", "Pyccĸий (Russian)"),
+      new DisplayLanguageType("ru-RU", "Русский (Russian)"),
       new DisplayLanguageType("shu-latn", "Shuwa (Latin)"),
       new DisplayLanguageType("sv-SE", "svenska (Swedish)"),
       new DisplayLanguageType("vi-VN", "Tiếng Việt (Vietnamese)"),

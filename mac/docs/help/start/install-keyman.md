@@ -16,7 +16,7 @@ Apple Disk Image (.dmg) file. It should be installed according to the following 
 4. Keyman should now be an option in the Input Sources menu towards the right hand
    side of the menu bar.
 
-   ![Input Sources menu](../mac_images/input_menu.png)
+   ![Input Sources menu](../mac_images/input-menu-keyman-selected.png)
 
    **Note**: On recent versions of macOS, the first time you enable Keyman by selecting Keyman
    from the menu, you will be prompted to give certain permissions to Keyman. It is

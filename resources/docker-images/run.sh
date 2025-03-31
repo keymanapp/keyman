@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+. "${KEYMAN_ROOT}/resources/docker-images/docker-build.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 ################################ Main script ################################
@@ -21,6 +22,17 @@ builder_describe \
   "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})"
 
 builder_parse "$@"
+
+check_for_default_values
+convert_parameters_to_args
+
+if is_default_values; then
+  image_version=default
+  build_dir=default
+else
+  image_version=${build_version:-}
+  build_dir="${DISTRO:-}-${DISTRO_VERSION:-}"
+fi
 
 run_android() {
   docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \

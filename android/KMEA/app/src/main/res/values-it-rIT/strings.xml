@@ -82,6 +82,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Errore fatale della tastiera con %1$s:%2$s per %3$s lingua. Caricamento tastiera predefinita.</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Errore nella tastiera %1$s:%2$s per %3$s lingua.</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">        Keyman richiede che WebView sia installato.\"</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        Keyman richiede che WebView sia abilitato.\"</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">Installa WebView</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">Abilita WebView</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Controllo del dizionario associato da scaricare</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Non è possibile connettersi al server Keyman per verificare dizionari associati da scaricare</string>
@@ -115,6 +123,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">Recupero del file scaricato non riuscito</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">Accesso al server non riuscito!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager disabilitato - impossibile controllare aggiornamenti</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"Tutte le risorse sono aggiornate!"</string>
     <!-- Context: General Updates -->
