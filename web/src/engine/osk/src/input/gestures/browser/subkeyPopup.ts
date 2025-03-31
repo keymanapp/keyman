@@ -97,6 +97,7 @@ export default class SubkeyPopup implements GestureHandler {
         const keyEvent = vkbd.keyEventFromSpec(key.key.spec);
         keyEvent.keyDistribution = this.currentStageKeyDistribution();
 
+        keyEvent.inputBreadcrumb = this.source.trace();
         vkbd.raiseKeyEvent(keyEvent, key);
       }
     });

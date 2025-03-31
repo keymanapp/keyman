@@ -68,7 +68,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public unloadModel() {
-    if(!this.isActive) {
+    if(!this.canEnable) {
       return;
     }
 

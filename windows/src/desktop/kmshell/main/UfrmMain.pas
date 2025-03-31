@@ -194,7 +194,7 @@ uses
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.UI.UfrmSettingsManager,
-  Keyman.Configuration.UI.UfrmStartInstallNow,
+  Keyman.Configuration.UI.UfrmStartInstall,
   RegistryKeys,
   SupportXMLRenderer,
   UfrmChangeHotkey,
@@ -816,13 +816,13 @@ procedure TfrmMain.Update_ApplyNow;
 var
   ShellPath : string;
   FResult, InstallNow: Boolean;
-  frmStartInstallNow: TfrmStartInstallNow;
+  frmStartInstallNow: TfrmStartInstall;
 begin
   InstallNow := True;
   // Confirm User is ok that this will require a reset
   if HasKeymanRun then
   begin
-    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
+    frmStartInstallNow := TfrmStartInstall.Create(nil, true);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True
