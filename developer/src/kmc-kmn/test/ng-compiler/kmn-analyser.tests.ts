@@ -277,11 +277,17 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
     });
   });
-  describe(" VariableStoreRule Tests", () => {
+  describe("VariableStoreRule Tests", () => {
     it("can construct a  VariableStoreRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const variableStore: Rule = new  VariableStoreRule(tokenBuffer);
+      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
       assert.isNotNull(variableStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(digit)');
+      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
+      assert.isTrue(variableStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
     });
   });
 });
