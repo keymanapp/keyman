@@ -44,30 +44,37 @@ export type TextWithProbability = {
  */
 export interface LexiconTraversal {
   /**
-   * Provides an iterable pattern used to search for words with a 'keyed' prefix matching
-   * the current traversal state's prefix when a new character is appended.  Iterating
-   * across `children` provides 'breadth' to a lexical search.
+   * Provides an iterable pattern used to search for words with a 'keyed' prefix
+   * matching the current traversal state's prefix when a new character is
+   * appended.  Iterating across `children` provides 'breadth' to a lexical
+   * search.
    *
-   * For an example with English, if the current traversal state corresponds to 'th',
-   * children() may return an iterator with states corresponding 'e'
-   * (for 'the', 'then', 'there'), 'a' (for 'than', 'that'), etc.
+   * For an example with English, if the current traversal state corresponds to
+   * 'th', children() may return an iterator with states corresponding 'e' (for
+   * 'the', 'then', 'there'), 'a' (for 'than', 'that'), etc.
    *
-   * @param char      A full character (a UTF-16 code point, which may be comprised of two
-   *                  code units) corresponding to the child node, appended to the current
-   *                  node's prefix to produce the child node's prefix.
+   * @param char      A full character (a UTF-16 code point, which may be
+   *                  comprised of two code units) corresponding to the child
+   *                  node, appended to the current node's prefix to produce the
+   *                  child node's prefix.
    * <p>
    *                  Example: if the current traversal's represented prefix is 'th',
    *                  char = 'e' would indicate a child node with prefix = 'the'.
-   * @param traversal a LexiconTraversal starting from (or "rooted at") the child node.  Use
-   *                  of the returned object provides 'depth' to a lexical search.
+   * @param traversal a LexiconTraversal starting from (or "rooted at") the
+   *                  child node.  Use of the returned object provides 'depth'
+   *                  to a lexical search.
    * <p>
    *                  Example:
    *
    * - Suppose our current LexiconTraversal represents a prefix of 'th'.
    * - If `char` = 'e', the child represents a prefix of 'the'.
-   * - Then `traversal` allows traversing the part of the lexicon prefixed by 'the'.
+   * - Then `traversal` allows traversing the part of the lexicon prefixed by
+   *   'the'.
+   *
+   * Note that there is no requirement for the ordering of the returned entries;
+   * no sorting of any kind is required.
    */
-  children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
+  children(): {char: USVString, p: number, traversal: () => LexiconTraversal}[];
 
   /**
    * Allows direct access to the traversal state that results when appending one
