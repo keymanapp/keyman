@@ -16,6 +16,7 @@ export enum NodeTypes {
   STORE,
   STRING,
   TMP,
+  U_CHAR,
 }
 
 export class ASTNode {

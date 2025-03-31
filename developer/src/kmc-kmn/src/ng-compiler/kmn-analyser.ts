@@ -7,7 +7,7 @@
  */
 
 import { Token, TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -145,8 +145,50 @@ export class StringSystemStoreNameRule extends SingleChildRule {
 export class OptionalWhiteSpaceRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const whitespace: Rule  = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
     this.rule = new OptionalRule(tokenBuffer, whitespace);
+  }
+}
+
+export class VariableStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const variableStore: Rule       = new VariableStoreRule(tokenBuffer);
+    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
+    this.rule = new SequenceRule(tokenBuffer, [variableStore, oneOrManyPaddedText]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const storeNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.STORE);
+      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const textNodes: ASTNode[] = tmp.getChildren();
+      storeNode.addChildren(textNodes);
+      node.addChild(storeNode);
+      node.addChildren(lineNodes);
+    }
+    return parseSuccess;
+  }
+}
+
+export class PaddedTextRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const padding: Rule = new PaddingRule(tokenBuffer);
+    const text: Rule    = new TextRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [padding, text]);
+  }
+}
+
+export class TextRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
+    const uChar      = new TokenRule(tokenBuffer, TokenTypes.U_CHAR, true);
+    this.rule = new AlternateRule(tokenBuffer, [stringRule, uChar]);
   }
 }
 

@@ -10,7 +10,7 @@ stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName
 stringSystemStoreName: bitmap|copyright|includecodes
 
 variableStoreAssign: variableStore paddedText+
-paddedText: text padding?
+paddedText: padding text
 text: string|virtualKey|uChar
 virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSquare
 spacedShiftCode: shiftcode whitespace

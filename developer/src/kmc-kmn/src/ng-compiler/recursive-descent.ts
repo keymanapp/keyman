@@ -189,6 +189,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.INCLUDECODES, nodeType: NodeTypes.INCLUDECODES},
     {tokenType: TokenTypes.NEWLINE,      nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.STRING,       nodeType: NodeTypes.STRING},
+    {tokenType: TokenTypes.U_CHAR,       nodeType: NodeTypes.U_CHAR},
   ];
 
   static {

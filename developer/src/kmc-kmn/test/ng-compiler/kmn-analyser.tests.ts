@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, VariableStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -277,8 +277,40 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
     });
   });
+  describe("VariableStoreAssignRule Tests", () => {
+    it("can construct a VariableStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isNotNull(variableStoreAssign);
+    });
+    it("can parse correctly (single u_char)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) U+1780');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isTrue(variableStoreAssign.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+    it("can parse correctly (two u_char)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) U+1780 U+1781');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isTrue(variableStoreAssign.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+    });
+    it("can parse correctly (two u_char with continuation)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isTrue(variableStoreAssign.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+    });
+  });
   describe("VariableStoreRule Tests", () => {
-    it("can construct a  VariableStoreRule", () => {
+    it("can construct a VariableStoreRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
       const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
       assert.isNotNull(variableStore);
@@ -288,6 +320,25 @@ describe("KMN Analyser Tests", () => {
       const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
       assert.isTrue(variableStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+    });
+  });
+  describe("TextRule Tests", () => {
+    it("can construct a TextRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isNotNull(text);
+    });
+    it("can parse correctly (string)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a"');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isTrue(text.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (u_char)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('U+1780');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isTrue(text.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
 });
