@@ -3,7 +3,7 @@ contentLine: whitespace? content commentEnd? newline
 blankLine: commentEnd? newline
 commentEnd: whitespace? comment
 padding: whitespace|continuationNewline
-continuationNewline: continuation whitespace? newline
+continuationNewline: whitespace? continuation whitespace? newline
 content: stringSystemStoreAssign
 stringSystemStoreAssign: stringSystemStore padding string
 stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket

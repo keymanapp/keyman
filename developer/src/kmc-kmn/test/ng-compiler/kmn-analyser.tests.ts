@@ -171,6 +171,18 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(continuationNewline.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
     });
+    it("can parse correctly (space before)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' \\\n');
+      const continuationNewline: Rule = new ContinuationNewlineRule(tokenBuffer);
+      assert.isTrue(continuationNewline.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+    });
+    it("can parse correctly (space before and after)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' \\ \n');
+      const continuationNewline: Rule = new ContinuationNewlineRule(tokenBuffer);
+      assert.isTrue(continuationNewline.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+    });
   });
   describe("StringSystemStoreAssignRule Tests", () => {
     it("can construct a StringSystemStoreAssignRule", () => {

@@ -71,10 +71,12 @@ export class PaddingRule extends SingleChildRule {
 export class ContinuationNewlineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const continuation: Rule  = new TokenRule(tokenBuffer, TokenTypes.CONTINUATION);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const continuation: Rule  = new TokenRule(tokenBuffer, TokenTypes.CONTINUATION);
     const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [continuation, optWhitespace, newline]);
+    this.rule = new SequenceRule(tokenBuffer,
+      [optWhitespace, continuation, optWhitespace, newline]
+    );
   }
 }
 
