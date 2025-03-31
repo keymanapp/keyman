@@ -9,7 +9,7 @@ installing *Keyman for macOS*, please see: [Install Keyman for macOS](install-ke
 
 ## Step 1: Is Keyman active?
 
-![Keyman menu bar](../mac_images/menu_bar_keyman.png)
+![Keyman menu bar](../mac_images/menu-bar-with-keyman.png)
 
 Check the menu bar near the date and time to see if Keyman for macOS is
 active. If it is active you will see the Keyman icon: ![Keyman icon](../mac_images/icon-keyman.png)
@@ -21,38 +21,45 @@ active. If it is active you will see the Keyman icon: ![Keyman icon](../mac_imag
 If the Keyman icon is not in the menu bar, choose **Keyman** from the Input menu in the
 menu bar and continue on to **Step 4**.
 
-![Input menu](../mac_images/input_menu.png)
+![Input menu](../mac_images/input-menu-keyman-selected.png)
 
-The Input menu appears in the menu bar only if you enable at least two input
-sources in Keyboard preferences. The Input menu is identified by a flag or character
-that represents the input source currently in use.
+The Input menu appears in the menu bar only if you enable 'Show Input menu in menu bar'
+under Keyboard settings > Input Sources > Edit. The Input source currently in use is represented in the menu bar by an icon or a symbol containing one or more characters.
 
-If Keyman is not in the Input menu, Keyman for macOS is not added as an input source.
+If Keyman is not listed in the Input menu, then Keyman for macOS has not been added as an input source.
 Follow **Step 3** to add Keyman for macOS as an input source.
 
 ## Step 3: Add Keyman for macOS
 
 To add Keyman for macOS as an input source:
 
-1. On the Apple menu, click System Preferences.
+1. On the Apple menu, click System Settings
 
-   ![Apple menu](../mac_images/apple_menu.png)
+   ![Apple menu](../mac_images/open-apple-menu.png)
 
-2. Click Keyboard, select the **Input Sources** tab, and then click ![+](../mac_images/add.png).
+2. Click Keyboard, go to the **Text Input** section and then click the Edit... button
 
-3. In the left-hand pane, select **Multiple Languages**, and then select **Keyman** in the
-   right-hand pane.
+   ![Edit Input Sources](../mac_images/keyboard-settings-annotated.png)
 
-   ![Add Keyman](../mac_images/add_keyman.png)
+3. In the Input Sources window, click the plus sign to add a keyboard 
 
-4. Click Add.
+   ![Add Input Source](../mac_images/keyboard-input-sources-annotated.png)
+
+4. In the left-hand pane, select **Multiple Languages**, and then select **Keyman** in the
+   right-hand pane and click the Add button.
+
+   ![Add Keyman](../mac_images/keyboard-add-input-source.png)
 
 Now, return to **Step 2**.
 
 ## Step 4: Select a Keyman keyboard
 
-On the Input menu, point to Keyboards, and then select a Keyman keyboard. Note: If
-the Keyman menu items are not available, please restart the computer.
+With Keyman selected in the Input menu, select a Keyman keyboard. 
+
+Note: If the Keyman menu items are not available, please restart the computer.
+
+   ![Select Keyboard](../mac_images/keyman-keyboard-selected.png)
+
 
 **Tip:**: If there are no Keyman keyboards in the Keyboards menu, you can learn
 how to install one here: [Install a keyboard](../start/install-keyboard).
