@@ -8,6 +8,8 @@ There are a few different aspects to GestureRecognizer, each with its own intern
 - [Gesture processing](./gesture-processing.md) refers to the process of interpreting the user's input as gestures.
 - The [Glossary](./glossary.md) provides definitions for some of the terms seen among the internal documentation pages.
 
+There is also documentation regarding some of the trickier aspects of [configuring the region that accepts gestures](./recognizer-configuration.md)
+
 Keyman configures two separate instances of this gesture engine - one for main keyboard body and another for the predictive-text banner.  In both cases, gestures (from the user perspective) are broken own into components, each corresponding to different movement patterns that comprise a each gesture type.  Once components are recognized, they are added into a sequence that represents the causal relationship among the different components of the gesture and ensures that it may continue if appropriate for that type of gesture.
 
 ----
