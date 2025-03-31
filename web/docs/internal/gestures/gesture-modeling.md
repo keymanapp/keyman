@@ -1,20 +1,19 @@
 # GestureRecognizer - gesture modeling
-GestureRecognizer is designed to support customizable sets of gesture-components and gesture-component sequences, rather than forcing a non-customizable and limited number of gestures.  In order to simplify the requirements for gesture customization, there are three layers used when modeling gesture components.  Other aspects of GestureRecognizer have been designed to allow manage the parallel evaluation of multiple gesture components and ensure that only one per input triggers completion.
 
-For definitions to a few commonly-used terms below, see the [Terms](./terms.md) document.
+For definitions to a few commonly-used terms below, see the [Glossary](./glossary.md) document.
 
-The three layers comprising gesture models are as follows:
-1. [`PathModel`](#pathmodel) is responsible for modeling the path of the touchpoint handled by the `ContactModel` owning it.
-2. [`ContactModel`](#contactmodel) owns a `PathModel` and is additionally responsible for validating initial state, changes in associated item, and the portion of previously-existing path to consider if continuing an active gesture sequence.
-3. [`GestureModel`](#gesturemodel) owns at least one `ContactModel` and defines the gesture-component's properties and relationships to other gesture-components.  Also defines special properties for gesture-components with an initial state that lacks active touchpoints.
+The four layers comprising gesture modeling with `GestureRecognizer` are as follows:
 
-Topping these off is the [`GestureModelDefs`](#gesturemodeldefs) type.  This object should be defined once, with a full set of custom gesture-component definitions, as part of configuring a `GestureRecognizer` instance.
+1. [`GestureModelDefs`](#gesturemodeldefs) corresponds to the top-most object used to specify gesture definitions.  It represents a full set of custom gesture-component definitions as well at least one set of gesture-component ids that corresponds to legal initial gesture-components for a newly-beginning gesture sequence.
+2. Each [`GestureModel`](#gesturemodel) object directly models a gesture-component.  To do so, it owns at least one `ContactModel` and defines the gesture-component's properties and relationships to other gesture-components.  Also defines a start-up timer for cases that lack active touchpoints during startup, such as the "wait" for the start of a second tap during multitap gestures.
+2. Each [`ContactModel`](#contactmodel) owns a single `PathModel` and is additionally responsible for validating initial state, changes in associated item, and the portion of previously-existing path to consider if continuing an active gesture sequence.
+3. [`PathModel`](#pathmodel) specifies which paths do and do not satisfy the requirements for the touchpoint handled by the `ContactModel` owning it.
 
 ## `GestureModelDefs`
 
 `GestureModelDefs` is used to specify a full set of all `GestureModel` definitions to be used for an instance of `GestureRecognizer`.  These may also be listed in `sets`, each identified with a unique `string` and comprised of `GestureModel` ids, for cases where the set of gestures available by default should change in certain conditions.
 
-`GestureModelDefs` is used internally to define and implicitly specify a finite-state-model (FSM) for interpreting input as gestures.  The currently-active gesture set - `default` by default - specifies the legal states that may be reached from an implicit "start" state.  Once one is successfully matched, the properties of its `GestureModel` specify any further legal states that may succeed it.
+`GestureModelDefs` is used internally to define and implicitly specify a finite-state-machine (FSM) for interpreting input as gestures.  The currently-active gesture set - `default` by default - specifies the legal states that may be reached from an implicit "start" state.  Once one is successfully matched, the properties of its `GestureModel` specify any further legal states that may succeed it.
 
 There are essentially three implicit states not defined directly:
 - "start" - when no gesture is yet matched

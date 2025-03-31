@@ -1,8 +1,6 @@
 # GestureRecognizer - gesture processing
 
-GestureRecognizer is designed to support customizable sets of gesture-component and gesture-component sequences, rather than forcing a non-customizable and limited number of gestures.  While customizability makes it difficult to determine the specifications needed for a traditional finite state machine (FSM), it is possible to straightforwardly define FSM states & transitions for each gesture and gesture component in isolation.
-
-For definitions to a few commonly-used terms below, see the [Terms](./terms.md) document.
+For definitions to a few commonly-used terms below, see the [Glossary](./glossary.md) document.
 
 There are four separate layers used when processing gesture input to ensure that each gesture and gesture component may be modeled as they would work in isolation.  Sequential components are connected via FSM-style state transitions that the engine can resolve to ensure the best gesture-models for the user's input are selected.
 
