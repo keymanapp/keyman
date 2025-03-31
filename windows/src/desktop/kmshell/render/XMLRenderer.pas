@@ -107,6 +107,7 @@ uses
   UFixupMissingFile,
   UILanguages,
   Keyman.Configuration.System.UmodWebHttpServer,
+  Keyman.System.KeymanSentryClient,
   Unicode,
   utildir,
   utilhttp,
@@ -200,7 +201,7 @@ begin
   FOutput := TStringList.Create;
   try
     LanguageCode := (kmcom.Control as IKeymanCustomisationAccess).KeymanCustomisation.CustMessages.LanguageCode;
-
+    TKeymanSentryClient.Breadcrumb('ui.configuration', ClassName +' LanguagueCode: '+LanguageCode, 'file-io');
     FOutput.Add(
       '<?xml version="1.0" encoding="utf-8"?>'+
 
@@ -229,6 +230,7 @@ begin
     if not FileExists(FTemplatePath + FRenderTemplate) then
     begin
       try
+        TKeymanSentryClient.Breadcrumb('ui.configuration', ClassName+' Call FixupMissingFile for ' +FTemplatePath +FRenderTemplate, 'file-io');
         FixupMissingFile(FTemplatePath + FRenderTemplate);
       except
         on E:EFixupMissingFile do
@@ -236,9 +238,22 @@ begin
       end;
     end;
 
-    xml.LoadFromFile(FTemplatePath + FRenderTemplate);
+    try
+      TKeymanSentryClient.Breadcrumb('ui.configuration', ClassName+' Loading XSLT '+FTemplatePath +FRenderTemplate, 'file-io');
+      xml.LoadFromFile(FTemplatePath + FRenderTemplate);
+    except
+      on E: Exception do
+        raise EXMLRenderer.Create('Unexpected error while loading XSLT: ' + E.ClassName+': ' + E.Message);
+    end;
 
-    doc.Node.transformNode(xml.Node, s);
+    try
+      doc.Node.transformNode(xml.Node, s);
+      Result := s;
+    except
+      on E: Exception do
+        raise EXMLRenderer.Create('Error transforming XML with XSLT: ' + E.ClassName+': ' + E.Message);
+    end;
+
     Result := s;
 
     if KLEnabled or (GetDebugPath('Debug_XMLRenderer', '', False) <> '') then  // I3269   // I3545
