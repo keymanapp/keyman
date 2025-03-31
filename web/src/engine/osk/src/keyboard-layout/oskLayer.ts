@@ -182,9 +182,6 @@ export default class OSKLayer {
       }
 
       oskRow.refreshLayout(layoutParams);
-      if(nRow == nRows-1) {
-        oskRow.element.style.bottom = '1px';
-      }
     }
 
     for(const row of this.rows) {
