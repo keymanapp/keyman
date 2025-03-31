@@ -129,7 +129,9 @@ export class InputProcessor {
                if this is a purely-layer-switching multitap.  (#11230)
           */
         } else {
-          console.warn('The base context for the multitap could not be found');
+          console.warn('The base context for the multitap could not be found!\n\n' + this.contextCache.buildLog());
+          // would be lovely to report a desire for gesture debug output
+          // maybe add something to RuleBehavior?
         }
       }
 
@@ -256,7 +258,7 @@ export class InputProcessor {
 
     // Multitaps operate in part by referencing 'committed' Transcriptions to rewind
     // the context as necessary.
-    this.contextCache.save(ruleBehavior.transcription);
+    this.contextCache.save(ruleBehavior.transcription); //
 
     // The keyboard may want to take an action after all other keystroke processing is
     // finished, for example to switch layers. This action may not have any output

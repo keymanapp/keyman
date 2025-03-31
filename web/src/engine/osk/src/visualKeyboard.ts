@@ -35,7 +35,7 @@ import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
-import { type KeyElement, getKeyFrom } from './keyElement.js';
+import { type KeyElement } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
@@ -597,9 +597,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
         // First, if we've configured the gesture to generate a keystroke, let's handle that.
         const gestureKey = gestureStage.item;
-
         const coordSource = gestureStage.sources[0];
-        const coord: InputSample<KeyElement, string> = coordSource ? coordSource.currentSample : null;
 
         let keyResult: KeyRuleEffects = null;
 
@@ -628,7 +626,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
+            keyResult = this.modelKeyClick(gestureSequence, correctionKeyDistribution); // second spot for modelKeyClick
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
@@ -660,7 +658,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             //
             // Merely constructing the instance is enough; it'll link into the sequence's events and
             // handle everything that remains for the backspace from here.
-            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
+            handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureSequence))]; // site 1 for modelKeyClick
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
             gestureSequence.on('complete', () => {
               gestureKey.key.highlight(false);
@@ -944,56 +942,21 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
-
-  /**
-   * Get the current key target from the touch point element within the key
-   *
-   * @param   {Object}  t   element at touch point
-   * @return  {Object}      the key element (or null)
-   **/
-  keyTarget(target: HTMLElement | EventTarget): KeyElement {
-    let t = <HTMLElement>target;
-
-    try {
-      if (t) {
-        if (t.classList.contains('kmw-key')) {
-          return getKeyFrom(t);
-        }
-        if (t.parentNode && (t.parentNode as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.parentNode);
-        }
-        if (t.firstChild && (t.firstChild as HTMLElement).classList.contains('kmw-key')) {
-          return getKeyFrom(t.firstChild);
-        }
-      }
-    } catch (ex) { }
-    return null;
-  }
-
-  /**
-   *  Repeat backspace as long as the backspace key is held down
-   **/
-  repeatDelete: () => void = function (this: VisualKeyboard) {
-    if (this.deleting) {
-      this.modelKeyClick(this.deleteKey);
-      this.deleting = window.setTimeout(this.repeatDelete, 100);
-    }
-  }.bind(this);
-
-  /**
-   * Cancels any active repeatDelete() timeouts, ensuring that
-   * repeating backspace operations are properly terminated.
-   */
-  cancelDelete() {
-    // Clears the delete-repeating timeout.
-    if (this.deleting) {
-      window.clearTimeout(this.deleting);
-    }
-    this.deleting = 0;
-  }
   //#endregion
 
-  modelKeyClick(e: KeyElement, input?: InputSample<KeyElement, string>, keyDistribution?: KeyDistribution) {
+  // Retool:  take in `gestureStage` (or its index?) and the SEQUENCE; the latter lets us log gesture breadcrumbs.
+  modelKeyClick(sequence: GestureSequence<KeyElement>, keyDistribution?: KeyDistribution) {
+    if(!sequence) {
+      throw new Error("cannot model key event without its gesture");
+    }
+    const stage = sequence.stageReports[sequence.stageReports.length-1];
+    const e = stage.item;
+    const input = stage.sources[0]?.currentSample;
+
+    if(!e) {
+      throw new Error(`Cannot model keypress without a selected key: \n${sequence.trace()}`);
+    }
+
     let keyEvent = this.initKeyEvent(e);
 
     if (input) {
@@ -1003,6 +966,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       keyEvent.keyDistribution = keyDistribution;
     }
 
+    keyEvent.inputBreadcrumb = sequence.trace();
     return this.raiseKeyEvent(keyEvent, e);
   }
 
@@ -1026,12 +990,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   keyEventFromSpec(keySpec: ActiveKey | ActiveSubKey) {
-    //let core = com.keyman.singleton.core; // only singleton-based ref currently needed here.
-
     // Start:  mirrors _GetKeyEventProperties
 
     // First check the virtual key, and process shift, control, alt or function keys
-    //let Lkc = keySpec.constructKeyEvent(core.keyboardProcessor, this.device);
     let Lkc = this.layoutKeyboard.constructKeyEvent(keySpec, this.device, this.stateKeys);
 
     /* In case of "fun" edge cases caused by JS's single-threadedness & event processing queue.
@@ -1060,7 +1021,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    */
   _UpdateVKShiftStyle(layerId?: string) {
     var i;
-    //let core = com.keyman.singleton.core;
 
     if (!layerId) {
       layerId = this.layerId;
@@ -1305,48 +1265,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     };
   }
 
-  // Appears to be abandoned now - candidate for removal in future.
-  /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
-    if (!this.layerGroup) {
-      return allottedHeight;
-    }
-
-    /*
-      Note:  these may not be fully preprocessed yet!
-
-      However, any "empty row bug" preprocessing has been applied, and that's
-      what we care about here.
-    */
-    const layers = this.layerGroup.spec.layer;
-    let oskHeight = 0;
-
-    // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
-    for (const layerID in layers) {
-      const layer = layers[layerID];
-      let nRows = layer.row.length;
-      let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
-      let layerHeight = nRows * rowHeight;
-
-      if (layerHeight > oskHeight) {
-        oskHeight = layerHeight;
-      }
-    }
-
-    // This isn't set anywhere else; it's a legacy part of the original methods.
-    const oskPad = 0;
-    let oskPaddedHeight = oskHeight + oskPad;
-
-    return oskPaddedHeight;
-  }
-
   /**
    *  Append a style sheet for the current keyboard if needed for specifying an embedded font
    *  or to re-apply the default element font
    *
    **/
   appendStyleSheet() {
-    //let util = com.keyman.singleton.util;
-
     var activeKeyboard = this.layoutKeyboard;
     var activeStub = this.layoutKeyboardProperties;
 
