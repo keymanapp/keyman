@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.224 beta 2025-03-31
+
+* fix(windows): reload right modifier key option (#13585)
+
 ## 18.0.223 beta 2025-03-29
 
 * chore(developer): improve kmc-ldml 'invalid version' message (#13602)
