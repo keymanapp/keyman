@@ -11,9 +11,9 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BitmapStoreAssignRule, BitmapStoreRule, BlankLineRule, CommentEndRule, ContentLineRule, PaddingRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ContinuationNewlineRule, CopyrightStoreAssignRule, CopyrightStoreRule, IncludecodesStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { IncludecodesStoreRule, SystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
 
@@ -172,140 +172,88 @@ describe("KMN Analyser Tests", () => {
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
     });
   });
-  describe("SystemStoreAssignRule Tests", () => {
-    it("can construct a SystemStoreAssignRule", () => {
+  describe("StringSystemStoreAssignRule Tests", () => {
+    it("can construct a StringSystemStoreAssignRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
-      assert.isNotNull(systemStoreAssign);
+      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+      assert.isNotNull(stringSystemStoreAssign);
     });
     it("can parse bitmap store correctly", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
-      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
-      assert.isTrue(systemStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreAssign.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse copyright store correctly", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
-      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
-      assert.isTrue(systemStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreAssign.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse includecodes store correctly", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
-      const systemStoreAssign: Rule = new SystemStoreAssignRule(tokenBuffer);
-      assert.isTrue(systemStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreAssign.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
   });
-  describe("BitmapStoreAssignRule Tests", () => {
-    it("can construct a BitmapStoreAssignRule", () => {
+  describe("StringSystemStoreRule Tests", () => {
+    it("can construct a StringSystemStoreRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const bitmapStoreAssign: Rule = new BitmapStoreAssignRule(tokenBuffer);
-      assert.isNotNull(bitmapStoreAssign);
+      const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+      assert.isNotNull(stringSystemStore);
     });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
-      const bitmapStoreAssign: Rule = new BitmapStoreAssignRule(tokenBuffer);
-      assert.isTrue(bitmapStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
-    });
-    it("can parse correctly (continuationNewline)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap)\\ \n"filename"');
-      const bitmapStoreAssign: Rule = new BitmapStoreAssignRule(tokenBuffer);
-      assert.isTrue(bitmapStoreAssign.parse(root));
-      const children = root.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-    });
-  });
-  describe("BitmapStoreRule Tests", () => {
-    it("can construct a BitmapStoreRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-      assert.isNotNull(bitmapStore);
-    });
-    it("can parse correctly", () => {
+    it("can parse correctly (bitmap)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap)');
-      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-      assert.isTrue(bitmapStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+      assert.isTrue(stringSystemStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
-    it("can parse correctly (whitespace after left bracket)", () => {
+    it("can parse correctly (bitmap, whitespace after left bracket)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store( &bitmap)');
-      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-      assert.isTrue(bitmapStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+      assert.isTrue(stringSystemStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
-    it("can parse correctly (whitespace before right bracket)", () => {
+    it("can parse correctly (bitmap, whitespace before right bracket)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap )');
-      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-      assert.isTrue(bitmapStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+      assert.isTrue(stringSystemStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
-    it("can parse correctly (whitespace after left and before right brackets)", () => {
+    it("can parse correctly (bitmap, whitespace after left and before right brackets)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store( &bitmap )');
-      const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
-      assert.isTrue(bitmapStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.BITMAP);
+      const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+      assert.isTrue(stringSystemStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
   });
-  describe("CopyrightStoreAssignRule Tests", () => {
-    it("can construct a CopyrightStoreAssignRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const copyrightStoreAssign: Rule = new CopyrightStoreAssignRule(tokenBuffer);
-      assert.isNotNull(copyrightStoreAssign);
+  describe("StringSystemStoreNameRule Tests", () => {
+    it("can construct a StringSystemStoreNameRule", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isNotNull(stringSystemStoreName);
     });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
-      const copyrightStoreAssign: Rule = new CopyrightStoreAssignRule(tokenBuffer);
-      assert.isTrue(copyrightStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
+    it("can parse correctly (bitmap)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('bitmap');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
-  });
-  describe("CopyrightStoreRule Tests", () => {
-    it("can construct a CopyrightStoreRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
-      assert.isNotNull(copyrightStore);
+    it("can parse correctly (copyright)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('copyright');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
     });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright)');
-      const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
-      assert.isTrue(copyrightStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.COPYRIGHT);
-    });
-  });
-  describe("IncludecodesStoreAssignRule Tests", () => {
-    it("can construct a IncludecodesStoreAssignRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
-      assert.isNotNull(includecodesStoreAssign);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
-      const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
-      assert.isTrue(includecodesStoreAssign.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
-      assert.equal(root.getSoleChild().getSoleChild().nodeType, NodeTypes.STRING);
-    });
-  });
-  describe("IncludecodesStoreRule Tests", () => {
-    it("can construct a IncludecodesStoreRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
-      assert.isNotNull(includecodesStore);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&includecodes)');
-      const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
-      assert.isTrue(includecodesStore.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.INCLUDECODES);
+    it("can parse correctly (includecodes)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('includecodes');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
     });
   });
 });

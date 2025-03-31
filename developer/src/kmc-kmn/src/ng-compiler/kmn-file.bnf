@@ -1,17 +1,14 @@
 line: contentLine|blankLine
 contentLine: whitespace? content commentEnd? newline
-blankLine: whitespace? commentEnd? newline
+blankLine: commentEnd? newline
 commentEnd: whitespace? comment
 padding: whitespace|continuationNewline
 continuationNewline: continuation whitespace? newline
-content: systemStoreAssign
-systemStoreAssign: bitmapStoreAssign|copyrightStoreAssign|includecodesStoreAssign
-bitmapStoreAssign: bitmapStore padding string
-bitmapStore: store leftBracket whitespace? amphasand bitmap whitespace? rightBracket
-copyrightStoreAssign: copyrightStore padding string
-copyrightStore: store leftBracket whitespace? amphasand copyright whitespace? rightBracket
-includecodesStoreAssign: includecodesStore padding string
-includecodesStore: store leftBracket whitespace? amphasand includecodes whitespace? rightBracket
+content: stringSystemStoreAssign
+stringSystemStoreAssign: stringSystemStore padding string
+stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
+stringSystemStoreName: bitmap|copyright|includecodes
+
 variableStoreAssign: variableStore paddedText+
 paddedText: text padding?
 text: string|virtualKey|uChar

@@ -36,12 +36,9 @@ export class ContentLineRule extends SingleChildRule {
 export class BlankLineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
     const optCommentEnd: Rule = new OptionalCommentEndRule(tokenBuffer);
     const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      optWhitespace, optCommentEnd, newline,
-    ]);
+    this.rule = new SequenceRule(tokenBuffer, [optCommentEnd, newline]);
   }
 }
 
@@ -84,126 +81,58 @@ export class ContinuationNewlineRule extends SingleChildRule {
 export class ContentRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.rule = new SystemStoreAssignRule(tokenBuffer);
+    this.rule = new StringSystemStoreAssignRule(tokenBuffer);
   }
 }
 
-export class SystemStoreAssignRule extends SingleChildRule {
+export class StringSystemStoreAssignRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmapStoreAssign: Rule       = new BitmapStoreAssignRule(tokenBuffer);
-    const copyrightStoreAssign: Rule    = new CopyrightStoreAssignRule(tokenBuffer);
-    const includecodesStoreAssign: Rule = new IncludecodesStoreAssignRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [
-      bitmapStoreAssign, copyrightStoreAssign, includecodesStoreAssign,
+    const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
+    const padding: Rule           = new PaddingRule(tokenBuffer);
+    const stringRule: Rule        = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      stringSystemStore, padding, stringRule,
     ]);
-  }
-}
-
-abstract class SystemStoreAssignAbstractRule extends SingleChildRule {
-  protected padding: Rule     = null;
-  protected stringRule: Rule     = null;
-  protected storeType: NodeTypes = null;
-
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.padding    = new PaddingRule(tokenBuffer);
-    this.stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const storeNode: ASTNode  = tmp.getSoleChildOfType(this.storeType);
-      const stringNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.STRING);
-      const lineNode: ASTNode   = tmp.getSoleChildOfType(NodeTypes.LINE);
+      const children: ASTNode[] = tmp.getChildren();
+      const storeNode: ASTNode  = children[0];
+      const stringNode: ASTNode = children[1];
       storeNode.addChild(stringNode);
       node.addChild(storeNode);
-      if (lineNode !== null) {
-        node.addChild(lineNode);
-      }
     }
     return parseSuccess;
   }
 }
 
-abstract class SystemStoreAbstractRule extends SingleChildRule {
-  protected store: Rule           = null;
-  protected leftBracket: Rule     = null;
-  protected optWhitespace: Rule   = null;
-  protected amphasand: Rule       = null;
-  protected rightBracket: Rule    = null;
-
+export class StringSystemStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.store         = new TokenRule(tokenBuffer, TokenTypes.STORE);
-    this.leftBracket   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    this.optWhitespace = new OptionalWhiteSpaceRule(tokenBuffer);
-    this.amphasand     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
-    this.rightBracket  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-  }
-}
-
-export class BitmapStoreAssignRule extends SystemStoreAssignAbstractRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.storeType = NodeTypes.BITMAP;
-    const bitmapStore: Rule = new BitmapStoreRule(tokenBuffer);
+    const store: Rule                 = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    const leftBracket: Rule           = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule         = new OptionalWhiteSpaceRule(tokenBuffer);
+    const amphasand: Rule             = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+    const rightBracket: Rule          = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule(tokenBuffer, [
-      bitmapStore, this.padding, this.stringRule,
+      store, leftBracket, optWhitespace, amphasand, stringSystemStoreName, optWhitespace, rightBracket,
     ]);
   }
 }
 
-export class BitmapStoreRule extends SystemStoreAbstractRule {
+export class StringSystemStoreNameRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmap: Rule = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      this.store, this.leftBracket, this.optWhitespace, this.amphasand, bitmap, this.optWhitespace, this.rightBracket,
-    ]);
-  }
-}
-
-export class CopyrightStoreAssignRule extends SystemStoreAssignAbstractRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.storeType = NodeTypes.COPYRIGHT;
-    const copyrightStore: Rule = new CopyrightStoreRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [
-      copyrightStore, this.padding, this.stringRule,
-    ]);
-  }
-}
-
-export class CopyrightStoreRule extends SystemStoreAbstractRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const copyright: Rule = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      this.store, this.leftBracket, this.optWhitespace, this.amphasand, copyright, this.optWhitespace, this.rightBracket,
-    ]);
-  }
-}
-
-export class IncludecodesStoreAssignRule extends SystemStoreAssignAbstractRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.storeType = NodeTypes.INCLUDECODES;
-    const includecodesStore: Rule = new IncludecodesStoreRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [
-      includecodesStore, this.padding, this.stringRule,
-    ]);
-  }
-}
-
-export class IncludecodesStoreRule extends SystemStoreAbstractRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
+    const bitmap: Rule       = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
+    const copyright: Rule    = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
     const includecodes: Rule = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      this.store, this.leftBracket, this.optWhitespace, this.amphasand, includecodes, this.optWhitespace, this.rightBracket,
+    this.rule = new AlternateRule(tokenBuffer, [
+      bitmap, copyright, includecodes,
     ]);
   }
 }
