@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.18 alpha 2025-03-25
+
+* chore(developer): improve ldml code coverage (#13516)
+
+## 19.0.17 alpha 2025-03-24
+
+* chore(deps-dev): bump esbuild from 0.18.20 to 0.25.0 (#13191)
+
 ## 19.0.16 alpha 2025-03-19
 
 * feat(core): check on load for valid kmx_plus unicode (#13486)
@@ -71,6 +79,59 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.222 beta 2025-03-28
+
+* fix(android): Handle banner overrides independently when device is locked and unlocked (#13546)
+
+## 18.0.221 beta 2025-03-27
+
+* fix(windows): configuration update tab text changes (#13555)
+* chore(common): update language-subtag-registry to 2025-03-10 release (#13577)
+* docs(mac): update help documentation due to changes in Settings in macOS 13.0 Ventura (#13501)
+* fix(linux): improve emitting keystrokes (#13558)
+* fix(linux): improve key mapping to allow Core to reset context (#13372)
+
+## 18.0.220 beta 2025-03-24
+
+* fix(windows,mac): Update Spanish configuration string and mac strings (#13564)
+* chore(developer): use 'statement' instead of 'command' for messages about kmn statements (#13562)
+
+## 18.0.219 beta 2025-03-21
+
+* fix(windows): add exception handling for loading xml file in XSL Rendering (#13530)
+* refactor(linux): rename `initialize_queue` method (#13554)
+
+## 18.0.218 beta 2025-03-19
+
+* fix(developer): add validation of `nul` usage in output part of rule (#13532)
+* fix(web): model unload and load should use consistent, canEnable check (#13534)
+* feat(web): adds gesture 'traces' for warning/error logging (#13360)
+* fix(linux): fix building in Docker with different Ubuntu/Debian version (#13537)
+* chore(linux): replace deprecated setup.py (#13524)
+* chore(linux): rename "Debian packaging" to "Ubuntu packaging" (#13523)
+
+## 18.0.217 beta 2025-03-18
+
+* fix(windows): cherry pick hard code key cap (#13526)
+* fix(android,windows): Update Russian language strings to use Cyrillic script (#13527)
+* docs(web): add internal documentation for context state and keystroke processing (#13520)
+* docs(common): add link to schemas (#13521)
+* chore(linux): update URL for lcov package (#13535)
+* chore(linux): allow to build and use Debian docker image (#13536)
+
+## 18.0.216 beta 2025-03-17
+
+* change(android): re-order host page script load so Sentry can report script load failures (#13333)
+* chore(web): remove dead osk code (#13358)
+* fix(web): cancel held backspace on new key input (#13359)
+* fix(developer): handle non bmp numeric entities in xml reader (#13365)
+
+## 18.0.215 beta 2025-03-14
+
+* docs(common): Update Sentry links to keyman.sentry.io (#13491)
+* chore(android,windows): Update Crowdin for Spanish and Spanish (Latin America) (#13499)
+* chore(common): update crowdin strings for Italian (#13500)
 
 ## 18.0.214 beta 2025-03-13
 
