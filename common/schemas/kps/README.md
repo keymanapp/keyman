@@ -2,6 +2,19 @@
 
 Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/kps/17.0/kps.xsd
 
+See https://github.com/keymanapp/
+
+## 2024-11-29 18.0
+* Version 18.0 adds:
+  - Files/File/Source - a remote source for the file, or 'local'
+* Version 18.0 modifies:
+  - Files/File/Name - may be either a local file, relative to .kps (or absolute
+    path, not recommended) or a permanent URL on github.com
+* Version 18.0 deprecates (for later removal):
+  - Files/File/CopyLocation
+  - Files/File/Description
+  - Files/File/FileType
+
 ## 2023-10-19 17.0
 * Version 17.0 adds:
   - LicenseFile - a .md file, usually named LICENSE.md
@@ -10,7 +23,7 @@ Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/
   - RelatedPackages - a list of other packages which relate to this one, or are deprecated by it
   - Keyboards/Keyboard/Examples - a list of typing examples for the keyboard
   - Keyboarsd/Keyboard/WebOSKFonts - a list of font filenames (not necessarily in package) suitable for rendering the on screen keyboard
-  - Keyboarsd/Keyboard/WebDisplayFonts - a list of font filenames (not necessarily in package) suitable for use with the keyboard
+  - Keyboards/Keyboard/WebDisplayFonts - a list of font filenames (not necessarily in package) suitable for use with the keyboard
 * Version 17.0 removes:
   - LexicalModels/LexicalModel/Version - version information is not stored in the models, but only in the package metadata (was unused)
 

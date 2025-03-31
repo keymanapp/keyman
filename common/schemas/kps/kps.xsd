@@ -6,7 +6,10 @@
 
   Supports KPS files for Keyman Developer 7+
 
-  Expects FileVersion 7.0
+  Expects FileVersion:
+  - 7.0 - minimum version
+  - 12.0 - supports lexical models, kmp.json
+  - 18.0 - supports Files/File/Source
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
@@ -89,9 +92,10 @@
               <xs:complexType>
                 <xs:all>
                   <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="CopyLocation" type="km-file-copy-location" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="FileType" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Description" type="xs:string" /> <!-- 18.0: deprecated -->
+                  <xs:element minOccurs="0" maxOccurs="1" name="CopyLocation" type="km-file-copy-location" /> <!-- 18.0: deprecated -->
+                  <xs:element minOccurs="0" maxOccurs="1" name="FileType" type="xs:string" /> <!-- 18.0: deprecated -->
+                  <xs:element minOccurs="0" maxOccurs="1" name="Source" type="xs:string" />
                 </xs:all>
               </xs:complexType>
             </xs:element>
