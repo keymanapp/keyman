@@ -271,6 +271,8 @@ public final class KMManager {
   // will be blocked.
   private static boolean maySendCrashReport = true;
 
+  private final static String KMEngine_PrefsKey = "KMAPreferences";
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -507,7 +509,7 @@ public final class KMManager {
 
     KeyboardHeight_Context_Portrait_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT); 
     KeyboardHeight_Context_Landscape_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
     KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
 
@@ -1452,7 +1454,7 @@ public final class KMManager {
    * @param suggestType SuggestionType
    */
   public static void setMaySuggest(String languageID, SuggestionType suggestType) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType.toInt());
     editor.commit();
@@ -1571,7 +1573,7 @@ public final class KMManager {
     model = model.replaceAll("\"", "'");
 
     // When entering password field, maySuggest should override to disabled
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     int maySuggest = mayPredictOverride ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
       prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
@@ -2180,7 +2182,7 @@ public final class KMManager {
    */
   public static int getLongpressDelay() {
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
 
     return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
   }
@@ -2197,7 +2199,7 @@ public final class KMManager {
     }
 
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
@@ -2246,7 +2248,7 @@ public final class KMManager {
    * orientation
    */
   public static int getKeyboardHeight(Context context, int orientation) {
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
         return KMManager.KeyboardHeight_Context_Portrait_Current;
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2394,7 +2396,7 @@ public final class KMManager {
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, flag);
     editor.commit();
