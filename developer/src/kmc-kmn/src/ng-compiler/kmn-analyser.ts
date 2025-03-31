@@ -153,7 +153,7 @@ export class OptionalWhiteSpaceRule extends SingleChildRule {
 export class VariableStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE, true);
+    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE);
     const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
     const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
     const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
@@ -173,7 +173,7 @@ export class VariableStoreNameRule extends SingleChildRule {
     const parameters: Token[]   = [];
     const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
     if (parseSuccess) {
-      node.addToken(NodeTypes.STORENAME, parameters[0]);
+      node.addToken(NodeTypes.STORE, parameters[0]);
     }
     return parseSuccess;
   };

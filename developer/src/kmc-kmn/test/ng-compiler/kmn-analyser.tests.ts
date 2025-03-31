@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, VariableStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -275,6 +275,13 @@ describe("KMN Analyser Tests", () => {
       const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
+    });
+  });
+  describe(" VariableStoreRule Tests", () => {
+    it("can construct a  VariableStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const variableStore: Rule = new  VariableStoreRule(tokenBuffer);
+      assert.isNotNull(variableStore);
     });
   });
 });
