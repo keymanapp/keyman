@@ -5,14 +5,7 @@
  */
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
-
-
-//     Todo remove these todos
-// ---------------------------------------------------
-
-//     add all tests again remove data files test
-
-
+import path from 'path';
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
 import { readFileSync } from 'fs';
 import { util } from '@keymanapp/common-types';
@@ -67,7 +60,7 @@ export class KeylayoutToKmnConverter {
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly USED_KEYS_COUNT = 51;
   static readonly MAX_CTRL_CHARACTER = 32;
-  static readonly SKIP_COMMENTED_LINES = true;
+  static readonly SKIP_COMMENTED_LINES = false;
 
   constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) {
   };
@@ -108,10 +101,10 @@ export class KeylayoutToKmnConverter {
 
   /**
    * @brief  member function to parse data from a .keylayout-file and store to a json object
-   * @param  filename the ukelele .keylayout-file to be parsed
+   * @param  absolutefilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(filename: string): Object {
+  public read(absolutefilename: string): Object {
     let xmlFile;
     let jsonObj = [];
 
@@ -122,10 +115,10 @@ export class KeylayoutToKmnConverter {
     };
 
     try {
-      xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
+      xmlFile = readFileSync(path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);  // get plain Object
-      boxArray(jsonObj.keyboard);      // jsonObj now contains arrays; no single fields
+      boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
     }
     catch (err) {
       console.log(err.message);
@@ -865,7 +858,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_1_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 1-1 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_1_1[0].modifier_key
             + " "
             + amb_1_1[0].key
@@ -936,7 +929,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_2.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 2-2 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_2_2[0].modifier_deadkey
             + " "
             + amb_2_2[0].deadkey
@@ -958,7 +951,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_3_3.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 3-3 rule: earlier: dk(A"
+          + ("ambiguous rule: earlier: dk(A"
             + amb_3_3[0].id_deadkey
             + ") + ["
             + amb_3_3[0].modifier_key
@@ -984,7 +977,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_2.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 4-2 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_4_2[0].modifier_prev_deadkey
             + " "
             + amb_4_2[0].prev_deadkey
@@ -1083,7 +1076,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 2-4 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_2_4[0].modifier_deadkey
             + " "
             + amb_2_4[0].deadkey
@@ -1094,7 +1087,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_6_3.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 6-3 rule: earlier: dk(C"
+          + ("ambiguous rule: earlier: dk(C"
             + amb_6_3[0].id_deadkey
             + ") + ["
             + amb_6_3[0].modifier_key
@@ -1120,7 +1113,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_4_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
-          + ("ambiguous 4-4 rule: earlier: ["
+          + ("ambiguous rule: earlier: ["
             + amb_4_4[0].modifier_prev_deadkey
             + " "
             + amb_4_4[0].prev_deadkey
@@ -1142,7 +1135,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_5_5.length > 0) {
         warningTextArray[1] = warningTextArray[1]
-          + ("ambiguous 5-5 rule: earlier: dk(B"
+          + ("ambiguous rule: earlier: dk(B"
             + amb_5_5[0].id_prev_deadkey
             + ") + ["
             + amb_5_5[0].modifier_deadkey
@@ -1168,7 +1161,7 @@ export class KeylayoutToKmnConverter {
 
       if (amb_6_6.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 6-6 rule: earlier: dk(B"
+          + ("ambiguous rule: earlier: dk(B"
             + amb_6_6[0].id_deadkey
             + ") + ["
             + amb_6_6[0].modifier_key
@@ -1338,7 +1331,7 @@ export class KeylayoutToKmnConverter {
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the whole rule
+        // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[2].indexOf("duplicate") < 0)) {
 
@@ -1359,7 +1352,6 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    data += "c #################### C2 \n";
     //................................................ C2 ...................................................................
     for (let k = 0; k < unique_data_Rules.length; k++) {
 
@@ -1380,7 +1372,7 @@ export class KeylayoutToKmnConverter {
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the whole rule
+        // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[1].indexOf("duplicate") < 0)) {
 
@@ -1419,7 +1411,7 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
-    data += "c #################### C3 \n";
+
     //................................................ C3 ...................................................................
 
     for (let k = 0; k < unique_data_Rules.length; k++) {
@@ -1440,7 +1432,7 @@ export class KeylayoutToKmnConverter {
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the whole rule
+        // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[0].indexOf("duplicate") < 0)) {
 

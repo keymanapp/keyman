@@ -16,38 +16,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  // todo remove
-   describe('RunOneFile ', function () {
-     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-     const inputFilename = makePathToFixture('../data/Italian.keylayout');
-     sut.run(inputFilename);
-     assert.isTrue(true);
-     ;
-   });
-
-  // todo remove
-  describe('RunAllFiles ', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Italian.keylayout')],
-      [makePathToFixture('../data/Italian_command.keylayout')],
-      [makePathToFixture('../data/Swiss_French.keylayout')],
-      [makePathToFixture('../data/Spanish.keylayout')],
-      [makePathToFixture('../data/Swiss_German.keylayout')],
-      [makePathToFixture('../data/US.keylayout')],
-      [makePathToFixture('../data/Polish.keylayout')],
-      [makePathToFixture('../data/French.keylayout')],
-      [makePathToFixture('../data/Latin_American.keylayout')],
-      [makePathToFixture('../data/German_complete.keylayout')],
-      [makePathToFixture('../data/German_complete_reduced.keylayout')],
-      // [makePathToFixture('../data/German_Standard.keylayout')],
-
-
-    ].forEach(function (files_) {
-      sut.run(files_[0]);
-      assert.isTrue(true);
-    });
-  });
 
 
   describe("run() ", function () {
@@ -96,7 +64,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Italian_command.keylayout');
+      const inputFilename = makePathToFixture('../data/Italian.keylayout');
       let threw = false;
       try {
         await sut.run(inputFilename, "");
@@ -107,7 +75,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should return on correct input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Italian_command.keylayout');
+      const inputFilename = makePathToFixture('../data/Italian.keylayout');
       let threw = false;
       try {
         await sut.run(inputFilename, null);
@@ -118,7 +86,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should return on correct input file name and given output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Italian_command.keylayout');
+      const inputFilename = makePathToFixture('../data/Italian.keylayout');
       const outputFilename = makePathToFixture('../../data/OutputName.kmn');
       let threw = false;
       try {
@@ -142,7 +110,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {
-      const inputFilename = makePathToFixture('../data/Italian_command.keylayout');
+      const inputFilename = makePathToFixture('../data/Italian.keylayout');
       const outputFilename = makePathToFixture('../../data/OutputXName.B');
       let threw = false;
       try {
