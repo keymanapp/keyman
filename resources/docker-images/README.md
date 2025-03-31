@@ -31,7 +31,7 @@ and are named e.g. `keyman-core-ci:default`.
 The versions can be changed, e.g.
 
 ```shell
-resources/docker-images/build.sh --ubuntu-version jammy --node 20
+resources/docker-images/build.sh --distro-version jammy --node 20
 ```
 
 This will create an image named e.g. `keyman-core-ci:jammy-node20`.
