@@ -195,8 +195,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
       *
       * This, in turn, can affect what the initial 'item' for the new gesture will be.
       */
-      const modelingSpinupPromise = potentialSelector.matchGesture(touchpoint, getGestureModelSet(modelDefs, potentialSelector.baseGestureSetId));
-      const modelingSpinupResults = await modelingSpinupPromise;
+      const modelingSpinupResults = await potentialSelector.matchGesture(touchpoint, getGestureModelSet(modelDefs, potentialSelector.baseGestureSetId));
 
       if(modelingSpinupResults.sustainModeWithoutMatch) {
 

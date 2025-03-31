@@ -1,3 +1,14 @@
+#
+# This workflow builds the source package for Keyman for Linux, and then builds
+# the binary packages for the released versions of Ubuntu. It also signs the
+# packages. Released Keyman versions get uploaded to the LLSO repository.
+# It is triggered by a repository_dispatch event with the
+# types `deb-release-packaging:*` and `deb-pr-packaging:*`.
+#
+# We use the filename `deb-packaging.yml` even though we only do Ubuntu
+# packaging here, because we're packaging the .deb format, and because it's shorter.
+#
+
 name: "Ubuntu packaging"
 run-name: "Ubuntu packaging - ${{ github.event.client_payload.branch }} (branch ${{ github.event.client_payload.baseBranch }}), by @${{ github.event.client_payload.user }}, testbuild: ${{ github.event.client_payload.isTestBuild }}"
 on:
@@ -16,7 +27,7 @@ on:
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
-  STATUS_CONTEXT: 'Debian Packaging'
+  STATUS_CONTEXT: 'Ubuntu Packaging'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
 
@@ -45,7 +56,7 @@ jobs:
           /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-          -f description='Debian packaging started' \
+          -f description='Ubuntu packaging started' \
           -f context="$STATUS_CONTEXT"
 
     - name: Install devscripts
