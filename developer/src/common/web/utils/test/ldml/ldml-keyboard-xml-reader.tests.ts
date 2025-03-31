@@ -1,9 +1,9 @@
-import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
-import { CommonTypesMessages } from '../../src/common-messages.js';
-import { testReaderCases } from '../helpers/reader-callback-test.js';
 import { Constants } from '@keymanapp/common-types';
+import { CommonTypesMessages } from '../../src/common-messages.js';
+import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
+import { testReaderCases } from '../helpers/reader-callback-test.js';
 
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
@@ -200,6 +200,25 @@ describe('ldml keyboard xml reader tests', function () {
           subtag: 'flicks',
         }),
       ],
+    },
+    {
+      subpath: 'numeric-id.xml',
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['1', '2']);
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
+          {id: '1', output: '1'}, //default import
+          {id: '2', output: '2'}, //default import
+          {id: '1', output: 'ħ'}, //override
+          {id: '2', output: 'ថា'}, //override
+        ]);
+      },
     },
   ]);
 });

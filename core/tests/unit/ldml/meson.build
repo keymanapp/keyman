@@ -19,6 +19,10 @@ if node.found()
   subdir('invalid-keyboards')
 endif
 
+gtest = subproject('gtest')
+gtest_dep = gtest.get_variable('gtest_dep')
+gmock_dep = gtest.get_variable('gmock_dep')
+
 # Build ldml test executable
 
 keyboard_build_path = meson.current_build_dir() / 'keyboards'
@@ -87,7 +91,7 @@ e = executable('kmx_plus_tests', 'kmx_plus.tests.cpp',
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
-    dependencies: [icu_uc, icu_i18n],
+    dependencies: [icu_uc, icu_i18n, gtest_dep, gmock_dep],
     objects: lib.extract_all_objects(recursive: false))
 test('kmx_plus_tests', e, suite: 'ldml')
 
