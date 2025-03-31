@@ -4,7 +4,7 @@ title: KMManager.setMaySendCrashReport()
 
 ## Summary
 The **setMaySendCrashReport()** enables or disables whether Keyman Engine can send crash reports over the 
-network to sentry.keyman.com.
+network to Sentry.
 
 ## Syntax
 ```java
