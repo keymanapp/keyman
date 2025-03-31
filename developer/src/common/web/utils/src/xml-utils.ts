@@ -24,17 +24,30 @@ export type KeymanXMLType =
 
 /** Bag of options, maximally one for each KeymanXMLType */
 type KeymanXMLParserOptionsBag = {
-  [key in KeymanXMLType]?: X2jOptions
+  [key in KeymanXMLType]?: X2jOptions;
+};
+
+const PARSER_COMMON_OPTIONS: X2jOptions = {
+  attributeNamePrefix: '$', // causes remapping into $: { … } objects
+  htmlEntities: true,
+  ignoreAttributes: false,
+  ignorePiTags: true,
+  numberParseOptions: { // TODO: query is this option really necessary?
+    eNotation: null,
+    hex: null,
+    leadingZeros: null,
+    skipLike: /(?:)/, // parse numbers as strings
+  },
+  textNodeName: '_',
 };
 
 /** map of options for the XML parser */
 const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   'keyboard3': {
-    ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
-    trimValues: false, // preserve spaces, but:
     htmlEntities: true,
-    tagValueProcessor: (tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+    ignoreAttributes: false, // We'd like attributes, please
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       // currently, the LDML spec doesn't have any element values, but this
       // future-proofs us a little in that element values are allowed, just trimmed.
@@ -42,60 +55,32 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
       return tagValue?.trim();
     },
     captureMetaData: true,
+    trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'keyboardTest3': {
-    ignorePiTags: true,
+    attributeNamePrefix: '', // avoid @_
     htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
-    attributeNamePrefix: '', // avoid @_
+    ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
   },
   'kps': {
-    ignorePiTags: true,
-    ignoreAttributes: false,
-    htmlEntities: true,
-    attributeNamePrefix: '$', // causes remapping into $: { … } objects
-    textNodeName: '_',
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
+    ...PARSER_COMMON_OPTIONS,
   },
   'kpj': {
-    ignorePiTags: true,
-    textNodeName: '_',
-    htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
+    ...PARSER_COMMON_OPTIONS,
     attributeNamePrefix: '', // to avoid '@_' prefixes
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
   },
   'kvks': {
-    ignorePiTags: true,
-    textNodeName: '_',
-    htmlEntities: true,
-    ignoreAttributes: false, // We'd like attributes, please
-    attributeNamePrefix: '$', // causes remapping into $: { … } objects
-    numberParseOptions: {
-      skipLike: /(?:)/, // parse numbers as strings
-      hex: null,
-      leadingZeros: null,
-      eNotation: null,
-    },
-    trimValues: false, // preserve spaces, but:
-    tagValueProcessor: (tagName: string, tagValue: string, jPath: string, hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
+    ...PARSER_COMMON_OPTIONS,
+    tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
         return null;  // no change to leaf nodes
       }
     },
+    trimValues: false, // preserve spaces
   },
 };
 
@@ -103,27 +88,23 @@ type KeymanXMLGeneratorOptionsBag = {
   [key in KeymanXMLType]?: XmlBuilderOptions
 };
 
+const GENERATOR_COMMON_OPTIONS: XmlBuilderOptions = {
+  attributeNamePrefix: '$',
+  ignoreAttributes: false,
+  format: true,
+  textNodeName: '_',
+  suppressEmptyNode: true,
+};
+
 const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   kvks: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kpj: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   kps: {
-    attributeNamePrefix: '$',
-    ignoreAttributes: false,
-    format: true,
-    textNodeName: '_',
-    suppressEmptyNode: true,
+    ...GENERATOR_COMMON_OPTIONS,
   },
   keyboard3: {
     attributeNamePrefix: '$',
