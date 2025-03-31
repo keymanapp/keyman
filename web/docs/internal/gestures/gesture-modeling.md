@@ -1,5 +1,4 @@
 # GestureRecognizer - gesture modeling
-GestureRecognizer is designed to support customizable sets of gesture-components and gesture-component sequences, rather than forcing a non-customizable and limited number of gestures.  In order to simplify the requirements for gesture customization, there are three layers used when modeling gesture components.  Other aspects of GestureRecognizer have been designed to allow manage the parallel evaluation of multiple gesture components and ensure that only one per input triggers completion.
 
 For definitions to a few commonly-used terms below, see the [Glossary](./glossary.md) document.
 
