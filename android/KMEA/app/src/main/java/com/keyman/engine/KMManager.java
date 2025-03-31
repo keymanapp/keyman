@@ -2327,7 +2327,7 @@ public final class KMManager {
    * @param orientation int - Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
    */
   public static void applyKeyboardHeight(Context context, int height, int orientation) {
-    SharedPreferences prefs = context.getSharedPreferences("KMAPreferences", Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     int defaultHeightForContext = getDefaultKeyboardHeight(orientation);
     if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
