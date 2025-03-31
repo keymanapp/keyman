@@ -8,7 +8,7 @@
 
 -->
 <!--Last edited by Ukelele version 396 on 2024-10-30 at 02:47 (CET)-->
-<keyboard group="126" id="-15908" name="U.S." maxout="2">
+<keyboard group="126" id="-15908" name="US" maxout="2">
     <layouts>
         <layout first="0" last="17" mapSet="16c" modifiers="f4"/>
         <layout first="18" last="18" mapSet="984" modifiers="f4"/>

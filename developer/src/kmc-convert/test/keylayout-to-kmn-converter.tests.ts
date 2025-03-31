@@ -16,8 +16,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-
-
   describe("run() ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
