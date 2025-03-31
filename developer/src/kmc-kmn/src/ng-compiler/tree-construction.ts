@@ -12,11 +12,14 @@ export enum NodeTypes {
   BITMAP,
   COPYRIGHT,
   INCLUDECODES,
+  KEY_CODE,
   LINE,
+  SHIFT_CODE,
   STORE,
   STRING,
   TMP,
   U_CHAR,
+  VIRTUAL_KEY,
 }
 
 export class ASTNode {

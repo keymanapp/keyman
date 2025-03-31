@@ -7,7 +7,7 @@
  */
 
 import { Token, TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -189,6 +189,43 @@ export class TextRule extends SingleChildRule {
     const stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
     const uChar      = new TokenRule(tokenBuffer, TokenTypes.U_CHAR, true);
     this.rule = new AlternateRule(tokenBuffer, [stringRule, uChar]);
+  }
+}
+
+export class VirtualKeyRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const leftSquare: Rule          = new TokenRule(tokenBuffer, TokenTypes.LEFT_SQ);
+    const optWhitespace: Rule       = new OptionalWhiteSpaceRule(tokenBuffer);
+    const spacedShiftCode: Rule     = new SpacedShiftCodeRule(tokenBuffer);
+    const manySpacedShiftCode: Rule = new ManyRule(tokenBuffer, spacedShiftCode);
+    const keyCode: Rule             = new TokenRule(tokenBuffer, TokenTypes.KEY_CODE, true);
+    const rightSquare: Rule          = new TokenRule(tokenBuffer, TokenTypes.RIGHT_SQ);
+    this.rule = new SequenceRule(tokenBuffer, [
+      leftSquare, optWhitespace, manySpacedShiftCode, keyCode, optWhitespace, rightSquare
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const virtualKeyNode       = new ASTNode(NodeTypes.VIRTUAL_KEY);
+      virtualKeyNode.addChildren(tmp.getChildren());
+      node.addChild(virtualKeyNode);
+      node.addChildren(lineNodes);
+    }
+    return parseSuccess;
+  }
+}
+
+export class SpacedShiftCodeRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const shiftCode: Rule  = new TokenRule(tokenBuffer, TokenTypes.SHIFT_CODE, true);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.rule = new SequenceRule(tokenBuffer, [shiftCode, whitespace]);
   }
 }
 

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -309,19 +309,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
     });
   });
-  describe("VariableStoreRule Tests", () => {
-    it("can construct a VariableStoreRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
-      assert.isNotNull(variableStore);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(digit)');
-      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
-      assert.isTrue(variableStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
-    });
-  });
   describe("TextRule Tests", () => {
     it("can construct a TextRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -339,6 +326,79 @@ describe("KMN Analyser Tests", () => {
       const text: Rule               = new TextRule(tokenBuffer);
       assert.isTrue(text.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+  });
+  describe("VirtualKeyRule Tests", () => {
+    it("can construct a VirtualKeyRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isNotNull(virtualKey);
+    });
+    it("can parse correctly (simple virtual key)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_K]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+    });
+    it("can parse correctly (single shiftcode virtual key)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[SHIFT K_K]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.SHIFT_CODE));
+    });
+    it("can parse correctly (two shiftcode virtual key)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[SHIFT CTRL K_K]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      const shiftCodes = virtualKeyNode.getChildrenOfType(NodeTypes.SHIFT_CODE);
+      assert.equal(shiftCodes.length, 2);
+      assert.equal(shiftCodes[0].token.text, 'SHIFT');
+      assert.equal(shiftCodes[1].token.text, 'CTRL');
+    });
+    it("can parse correctly (simple virtual key, space before)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[ K_K]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+    });
+    it("can parse correctly (simple virtual key, space after)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_K ]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+    });
+    it("can parse correctly (simple virtual key, space before and after)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[ K_K ]');
+      const virtualKey: Rule         = new VirtualKeyRule(tokenBuffer);
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+    });
+  });
+  describe("VariableStoreRule Tests", () => {
+    it("can construct a VariableStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
+      assert.isNotNull(variableStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(digit)');
+      const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
+      assert.isTrue(variableStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
     });
   });
 });
