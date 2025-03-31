@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.19 alpha 2025-03-31
+
+* chore: merge beta to master B18S4 (#13606)
+
 ## 19.0.18 alpha 2025-03-25
 
 * chore(developer): improve ldml code coverage (#13516)
