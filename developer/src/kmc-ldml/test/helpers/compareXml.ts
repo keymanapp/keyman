@@ -1,6 +1,6 @@
 import {assert} from 'chai';
 import {readFileSync} from 'node:fs';
-import { KeymanXMLReader } from "@keymanapp/developer-utils";
+import { KeymanXMLReader, SymbolUtils } from "@keymanapp/developer-utils";
 
 /**
  *
@@ -21,5 +21,5 @@ export function compareXml(actual : string, expect: string, mutator?: (input: an
     const actualParsed = mutator(reader.parse(actualStr));
     const expectParsed = mutator(reader.parse(expectStr));
 
-    assert.deepEqual(KeymanXMLReader.removeSymbols(actualParsed), KeymanXMLReader.removeSymbols(expectParsed));
+    assert.deepEqual(SymbolUtils.removeSymbols(actualParsed), SymbolUtils.removeSymbols(expectParsed));
 }

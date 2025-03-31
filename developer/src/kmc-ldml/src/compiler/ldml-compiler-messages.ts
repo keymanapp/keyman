@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_START_INDEX_SYMBOL, XML_FILENAME_SYMBOL, CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -271,13 +271,14 @@ export class LdmlCompilerMessages {
   /**
    * Get an offset from o and set e's offset field
    * @param event a compiler event, such as from functions in this class
-   * @param x any object parsed from XML or with the XML_START_INDEX_SYMBOL symbol copied over
+   * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
    * @returns modified event object
    */
   static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
-      event.offset = (x as any)[XML_START_INDEX_SYMBOL as any];
-      event.filename = event.filename || (x as any)[XML_FILENAME_SYMBOL as any];
+      const metadata = KeymanXMLReader.getMetaData(x) || {};
+      event.offset = metadata?.startIndex;
+      event.filename = event.filename || metadata[XML_FILENAME_SYMBOL];
     }
     return event;
   }

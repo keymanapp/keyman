@@ -12,8 +12,9 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, XML_START_INDEX_SYMBOL } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
 import { makePathToFixture } from './helpers/index.js';
+import { SymbolUtils } from '../src/symbol-utils.js';
 
 // if true, attempt to WRITE the fixtures
 const { GEN_XML_FIXTURES } = env;
@@ -119,7 +120,7 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
             writeJson(jsonPath, actual);
           } else {
             assert.ok(expect, `Could not read ${jsonPath} - run with env GEN_XML_FIXTURES=1 to update.`);
-            assert.deepEqual(KeymanXMLReader.removeSymbols(actual), expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
+            assert.deepEqual(SymbolUtils.removeSymbols(actual), expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
           }
         });
       }
@@ -178,11 +179,22 @@ describe(`XML Reader line number test`, () => {
     assert.ok(actual, `Parser failed on ${xmlPath}`);
 
     // now, assert char offset
-    assert.equal(actual.keyboard3[XML_START_INDEX_SYMBOL as any], 40); // index of <keyboard3> element
-    assert.equal(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], 136);  // index of <info> etc
-    assert.equal(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], 186);
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3[XML_START_INDEX_SYMBOL as any], lines), { line: 3, column: 0 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.info[XML_START_INDEX_SYMBOL as any], lines), { line: 4, column: 2 });
-    assert.deepEqual(KeymanXMLReader.offsetToLineColumn(actual.keyboard3.transforms[XML_START_INDEX_SYMBOL as any], lines), { line: 8, column: 2 });
+    const getMetaData = KeymanXMLReader.getMetaData;
+    assert.ok(getMetaData(actual.keyboard3));
+    assert.equal(
+      getMetaData(actual.keyboard3)?.startIndex, 40); // index of <keyboard3> element
+    assert.equal(
+      getMetaData(actual.keyboard3.info)?.startIndex, 136);  // index of <info> etc
+    assert.equal(
+      getMetaData(actual.keyboard3.transforms)?.startIndex, 186);
+    assert.deepEqual(
+      KeymanXMLReader.offsetToLineColumn(
+        getMetaData(actual.keyboard3).startIndex, lines), { line: 3, column: 0 });
+    assert.deepEqual(
+      KeymanXMLReader.offsetToLineColumn(
+        getMetaData(actual.keyboard3.info).startIndex, lines), { line: 4, column: 2 });
+    assert.deepEqual(
+      KeymanXMLReader.offsetToLineColumn(
+        getMetaData(actual.keyboard3.transforms).startIndex, lines), { line: 8, column: 2 });
   });
 });

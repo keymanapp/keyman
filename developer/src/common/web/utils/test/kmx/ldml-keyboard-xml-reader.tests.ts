@@ -8,7 +8,7 @@ import { Constants } from '@keymanapp/common-types';
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
-import { XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
+import { KeymanXMLReader, XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -147,7 +147,9 @@ describe('ldml keyboard xml reader tests', function () {
         assert.isTrue(ImportStatus.isImport(snailKey));
         assert.isTrue(ImportStatus.isLocalImport(snailKey));
         // get the actual filename of where the import was located
-        const snailFilename = (snailKey as any)[XML_FILENAME_SYMBOL as any];
+        const metadata = KeymanXMLReader.getMetaData(snailKey);
+        assert.ok(metadata);
+        const snailFilename = (metadata)[XML_FILENAME_SYMBOL];
         assert.ok(snailFilename);
         assert.ok(/\/keys-Zyyy-morepunctuation.xml$/.test(snailFilename)
           , `snail key filename is ${snailFilename}`);

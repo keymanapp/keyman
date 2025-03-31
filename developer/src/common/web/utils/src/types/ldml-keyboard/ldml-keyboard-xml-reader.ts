@@ -12,7 +12,7 @@ import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-key
 import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
 import { LdmlEventResolver } from './eventresolver.js';
-import { XML_FILENAME_SYMBOL } from 'src/xml-utils.js';
+import { XML_FILENAME_SYMBOL } from '../../xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -281,7 +281,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       // Mark all children as an import
       subsubval.forEach(o => {
         o[ImportStatus.import] = basePath;
-        o[XML_FILENAME_SYMBOL] = importPath; // mark overriding import path
+        KeymanXMLReader.setMetaData(o, {[XML_FILENAME_SYMBOL]: importPath}); // mark overriding import path
       });
 
       if (implied) {

@@ -6,10 +6,11 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { SymbolUtils } from "./symbol-utils.js";
 
 /** Symbol giving the start offset, in chars, of the node */
-export const XML_START_INDEX_SYMBOL = XMLParser.getStartIndexSymbol();
+const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
 /** Symbol giving an override which file a node came from */
 export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
@@ -22,12 +23,12 @@ export type KeymanXMLType =
   ;
 
 /** Bag of options, maximally one for each KeymanXMLType */
-type KeymanXMLOptionsBag = {
-  [key in KeymanXMLType]?: any
+type KeymanXMLParserOptionsBag = {
+  [key in KeymanXMLType]?: X2jOptions
 };
 
 /** map of options for the XML parser */
-const PARSER_OPTIONS: KeymanXMLOptionsBag = {
+const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   'keyboard3': {
     ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
@@ -40,6 +41,7 @@ const PARSER_OPTIONS: KeymanXMLOptionsBag = {
       // if we do need elements in the future, we'd check the preserve-space attribute here.
       return tagValue?.trim();
     },
+    captureMetaData: true,
   },
   'keyboardTest3': {
     ignorePiTags: true,
@@ -87,7 +89,7 @@ const PARSER_OPTIONS: KeymanXMLOptionsBag = {
       eNotation: null,
     },
     trimValues: false, // preserve spaces, but:
-    tagValueProcessor: (tagName: string, tagValue: string, jPath: string, hasAttributes: string, isLeafNode: boolean) : string | undefined => {
+    tagValueProcessor: (tagName: string, tagValue: string, jPath: string, hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
@@ -97,7 +99,11 @@ const PARSER_OPTIONS: KeymanXMLOptionsBag = {
   },
 };
 
-const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
+type KeymanXMLGeneratorOptionsBag = {
+  [key in KeymanXMLType]?: XmlBuilderOptions
+};
+
+const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   kvks: {
     attributeNamePrefix: '$',
     ignoreAttributes: false,
@@ -133,10 +139,37 @@ export interface LineColumn {
   column?: number;
 }
 
+export interface KeymanXMLMetadata extends XMLMetaData {
+  /** override of name of XML file */
+  [XML_FILENAME_SYMBOL]?: string;
+}
+
 /** wrapper for XML parsing support */
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
   }
+
+  /** Get metadata on a node if not already set */
+  static getMetaData(o: any) : KeymanXMLMetadata {
+    if(!o) return o;
+    const metadata : KeymanXMLMetadata = o[XML_META_DATA_SYMBOL as any];
+    return metadata;
+  }
+
+  /** Set metadata if not already set */
+  public static setMetaData(o: any, metadata: KeymanXMLMetadata) : KeymanXMLMetadata {
+    let m : KeymanXMLMetadata = KeymanXMLReader.getMetaData(o);
+    if (!m) {
+      m = {};
+    }
+    // copy non-symbols
+    m = {...metadata, ...m};
+    // copy symbols
+    SymbolUtils.copySymbols(m, metadata);
+    o[XML_META_DATA_SYMBOL as any] = m;
+    return m;
+  }
+
   /** 
    * preprocess text to turn it into arrays of line lengths.
    * This is effectively a 1-based line length, since line 0 has length of
@@ -160,31 +193,6 @@ export class KeymanXMLReader {
     return { line: 0 }
   }
 
-  /**
-   * Copy symbols from 'from' onto 'onto'
-   * This is used to propagate special symbols
-   * and XML
-   * @param onto object to copy onto
-   * @param from source for symbols
-   * @returns the onto object
-   */
-  public static copySymbols<T>(onto: T, from: any): T {
-    const o = onto as any;
-    for (const sym of Object.getOwnPropertySymbols(from)) {
-      o[sym] = from[sym];
-    }
-    return onto;
-  }
-
-  /** use Object.entries to remove all symbols */
-  public static removeSymbols<T>(from: T): T {
-    if (Array.isArray(from)) {
-      return from.map(o => KeymanXMLReader.removeSymbols(o)) as T;
-    }
-    if (typeof from !== "object") return from;
-    return Object.fromEntries(Object.entries(from).map(([k, v]) => ([k, KeymanXMLReader.removeSymbols(v)]))) as T;
-  }
-
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
   private static fixupDollarAttributes(data: any) : any {
     if (typeof data === 'object') {
@@ -203,9 +211,9 @@ export class KeymanXMLReader {
         }
       });
       if (attrs.length) {
-        e.push(['$', this.copySymbols(Object.fromEntries(attrs), data)]);
+        e.push(['$', SymbolUtils.copySymbols(Object.fromEntries(attrs), data)]);
       }
-      return this.copySymbols(Object.fromEntries(e), data);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -241,7 +249,7 @@ export class KeymanXMLReader {
           }
         }
       });
-      return this.copySymbols(Object.fromEntries(e), data);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -321,14 +329,10 @@ export class KeymanXMLReader {
   }
 
   public parser() {
-    let options = PARSER_OPTIONS[this.type];
+    const options = PARSER_OPTIONS[this.type];
     if (!options) {
       /* c8 ignore next 1 */
       throw Error(`Internal error: unhandled XML type ${this.type}`);
-    }
-    options = Object.assign({}, options); // TODO: xml2js likes to mutate the options here. Shallow clone the object.
-    if (options.emptyTag) {
-        options.emptyTag = {}; // TODO: xml2js likes to mutate the options here. Reset it.
     }
     return new XMLParser(options);
   }
