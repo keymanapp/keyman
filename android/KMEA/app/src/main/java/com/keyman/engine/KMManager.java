@@ -2344,27 +2344,28 @@ public final class KMManager {
     }
   }
   
-  private static int calculateDefaultKeyboardHeight(Context context, int orientation) {
+  private static void calculateDefaultKeyboardHeights(Context context, int orientation) {
     if (isTestMode()) {
       // Keyboard height not needed for unit tests  #13578
-      return 0;
-    }
-    if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
-      return KeyboardHeight_Invalid; // Invalid orientation
-    }
+      KeyboardHeight_Context_Portrait_Default = 0;
+      KeyboardHeight_Context_Landscape_Default = 0;
+      return;
+    } 
+
     Resources resources = context.getResources();
     Configuration originalConfig = resources.getConfiguration();
-    Configuration newConfig = new Configuration(originalConfig);
-    newConfig.orientation = orientation;
 
-    // Create a new context with the updated configuration
+    Configuration newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_PORTRAIT;
     Context newContext = context.createConfigurationContext(newConfig);
     Resources newResources = newContext.getResources();
+    KeyboardHeight_Context_Portrait_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
 
-    // Get the default keyboard height for the new orientation
-    int defaultHeight = (int) newResources.getDimension(R.dimen.keyboard_height);
-
-    return defaultHeight;
+    newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_LANDSCAPE;
+    newContext = context.createConfigurationContext(newConfig);
+    newResources = newContext.getResources();
+    KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
   }
 
   /**
