@@ -185,6 +185,15 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
+    it("can parse bitmap store correctly (with continuation)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap)\\\n"filename"');
+      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreAssign.parse(root));
+      const bitmapNode = root.getSoleChildOfType(NodeTypes.BITMAP);
+      assert.isNotNull(bitmapNode);
+      assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+    });
     it("can parse copyright store correctly", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
       const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);

@@ -100,11 +100,14 @@ export class StringSystemStoreAssignRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const children: ASTNode[] = tmp.getChildren();
-      const storeNode: ASTNode  = children[0];
-      const stringNode: ASTNode = children[1];
+      const stringNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STRING);
+      const lineNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.LINE);
+      const storeNode: ASTNode  = tmp.getSoleChild();
       storeNode.addChild(stringNode);
       node.addChild(storeNode);
+      if (lineNode !== null) {
+        node.addChild(lineNode);
+      }
     }
     return parseSuccess;
   }
