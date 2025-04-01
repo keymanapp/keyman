@@ -5,7 +5,7 @@ GestureRecognizer is an engine designed to interpret mouse event paths and touch
 There are a few different aspects to GestureRecognizer, each with its own internal doc.
 
 - [Gesture modeling](./gesture-modeling.md) refers to the specification of gestures to be interpreted from the user's input.
-- [Gesture processing](./gesture-processing.md) refers to the process of interpreting the user's input as gestures.
+- [Gesture processing](./gesture-processing.md) refers to the process of interpreting the user's input as from among the specified gesture models.
 - The [Glossary](./glossary.md) provides definitions for some of the terms seen among the internal documentation pages.
 
 There is also documentation regarding some of the trickier aspects of [configuring the region that accepts gestures](./recognizer-configuration.md).
@@ -36,6 +36,8 @@ Components:
 4. Exit case:  a key was held too long - no further taps on the key should be considered part of the gesture
 
 ### Modipress
+- A "modipress", or "**modi**fier-key long**press**", refers to the act of holding down a modifier key, typing on the resulting layer, and then reverting the layer once the modifier key is released.  In essence, using the modifier key like a longpress, with the pushed "layer" acting as its "subkey menu".
+
 1. The user holds down on a modipress-friendly key
 2. Engine alt-state:  a different set of initial gesture components is activated and used for newly-starting concurrent gestures
 3. Release of the modipressed key
