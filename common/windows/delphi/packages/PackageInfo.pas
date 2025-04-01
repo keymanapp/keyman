@@ -401,17 +401,13 @@ type
 
   TPackageLexicalModel = class(TPackageBaseObject)
   private
-    FName: string;
     FID: string;
     FLanguages: TPackageKeyboardLanguageList;
-    FRTL: Boolean;
   public
     constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
     procedure Assign(Source: TPackageLexicalModel); virtual;
-    property Name: string read FName write FName;
     property ID: string read FID write FID;
-    property RTL: Boolean read FRTL write FRTL;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
   end;
 
@@ -545,9 +541,7 @@ const
 
   SXML_PackageLexicalModels = 'LexicalModels';
   SXML_PackageLexicalModel = 'LexicalModel';
-  SXML_PackageLexicalModel_Name = 'Name';
   SXML_PackageLexicalModel_ID = 'ID';
-  SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
 
   SXML_PackageRelatedPackages = 'RelatedPackages';
@@ -629,9 +623,7 @@ const
   SJSON_Keyboard_WebDisplayFonts = 'webDisplayFonts';
 
   SJSON_LexicalModels = 'lexicalModels';
-  SJSON_LexicalModel_Name = 'name';
   SJSON_LexicalModel_ID = 'id';
-  SJSON_LexicalModel_RTL = 'rtl';
   SJSON_LexicalModel_Languages = 'languages';
 
   SJSON_RelatedPackages = 'relatedPackages';
@@ -2386,9 +2378,7 @@ var
   i: Integer;
   FLanguage: TPackageKeyboardLanguage;
 begin
-  FName := Source.Name;
   FID := Source.ID;
-  FRTL := Source.RTL;
   FLanguages.Clear;
   for i := 0 to Source.Languages.Count - 1 do
   begin
@@ -2453,9 +2443,7 @@ begin
     ALexicalModel := ANode.Items[i] as TJSONObject;
 
     lexicalModel := TPackageLexicalModel.Create(Package);
-    lexicalModel.Name := GetJsonValueString(ALexicalModel, SJSON_LexicalModel_Name);
     lexicalModel.ID := GetJsonValueString(ALexicalModel,SJSON_LexicalModel_ID);
-    lexicalModel.RTL := GetJsonValueBool(ALexicalModel, SJSON_LexicalModel_RTL);
     lexicalModel.Languages.LoadJSON(ALexicalModel);
 
     Add(lexicalModel);
@@ -2476,9 +2464,7 @@ begin
     ALexicalModel := ANode.ChildNodes[i];
 
     lexicalModel := TPackageLexicalModel.Create(Package);
-    lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.RTL := ALexicalModel.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
   end;
@@ -2501,9 +2487,7 @@ begin
     ALexicalModel := TJSONObject.Create;
     ALexicalModels.Add(ALexicalModel);
 
-    ALexicalModel.AddPair(SJSON_LexicalModel_Name, Items[i].Name);
     ALexicalModel.AddPair(SJSON_LexicalModel_ID, Items[i].ID);
-    if Items[i].RTL then ALexicalModel.AddPair(SJSON_LexicalModel_RTL, TJSONTrue.Create);
     Items[i].Languages.SaveJSON(ALexicalModel);
   end;
 end;
@@ -2518,10 +2502,7 @@ begin
   begin
     ALexicalModel := ANode.AddChild(SXML_PackageLexicalModel);
 
-    ALexicalModel.ChildNodes[SXML_PackageLexicalModel_Name].NodeValue := Items[i].Name;
     ALexicalModel.ChildNodes[SXML_PackageLexicalModel_ID].NodeValue := Items[i].ID;
-    if Items[i].RTL then
-      ALexicalModel.ChildNodes[SXML_PackageLexicalModel_RTL].NodeValue := True;
 
     Items[i].Languages.SaveXML(ALexicalModel);
   end;
