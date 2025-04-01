@@ -44,6 +44,8 @@ open class SettingsViewController: UITableViewController {
     if ((previousPortraitKeyboardHeight != newPortraitHeight) || (previousLandscapeKeyboardHeight != newLandscapeHeight)) {
       Manager.shared.keyboardHeightChanged()
     }
+    
+    navigationController?.presentationController?.delegate = nil
   }
   
   open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
@@ -148,6 +150,13 @@ open class SettingsViewController: UITableViewController {
                              width: switchWidth,
                              height: cellFrame.size.height)
     return switchFrame
+  }
+  
+  override open func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    // Helps to handle slide-dismissal.
+    navigationController?.presentationController?.delegate = self
   }
 
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -467,5 +476,11 @@ open class SettingsViewController: UITableViewController {
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
       SentryManager.capture(message)
     }
+  }
+}
+
+extension SettingsViewController: UIAdaptivePresentationControllerDelegate {
+  public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+    doneClicked(1)
   }
 }
