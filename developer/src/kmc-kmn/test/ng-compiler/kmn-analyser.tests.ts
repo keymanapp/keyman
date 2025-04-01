@@ -331,7 +331,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
     });
-    it("can parse correctly (mixed test)", () => {
+    it("can parse correctly (mixed text)", () => {
       const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) " " U+1781 [K_K]');
       const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
       assert.isTrue(variableStoreAssign.parse(root));
@@ -358,12 +358,13 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".."c"');
       const text: Rule               = new TextRule(tokenBuffer);
       assert.isTrue(text.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.STRING);
-      assert.equal(children[2].getText(), '"c"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
     });
   });
   describe("SimpleTextRule Tests", () => {
@@ -401,70 +402,75 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".."c"');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.STRING);
-      assert.equal(children[2].getText(), '"c"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space before range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a" .."c"');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.STRING);
-      assert.equal(children[2].getText(), '"c"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space after range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".. "c"');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.STRING);
-      assert.equal(children[2].getText(), '"c"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (string range, space before and after range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a" .. "c"');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.STRING);
       assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.STRING);
-      assert.equal(children[2].getText(), '"c"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
     });
     it("can parse correctly (virtual key range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_A]..[K_C]');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
-      assert.equal(children[2].nodeType, NodeTypes.VIRTUAL_KEY);
-      assert.equal(children[2].getSoleChild().getText(), 'K_C');
+      assert.equal(children[1].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[1].getSoleChild().getText(), 'K_C');
     });
     it("can parse correctly (multiple virtual key range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_A]..[K_C]..[K_E]');
       const textRange: Rule          = new TextRangeRule(tokenBuffer);
       assert.isTrue(textRange.parse(root));
-      const children = root.getChildren();
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.VIRTUAL_KEY);
       assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[1].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[1].getSoleChild().getText(), 'K_C');
       assert.equal(children[2].nodeType, NodeTypes.VIRTUAL_KEY);
-      assert.equal(children[2].getSoleChild().getText(), 'K_C');
-      assert.equal(children[3].nodeType, NodeTypes.RANGE);
-      assert.equal(children[4].nodeType, NodeTypes.VIRTUAL_KEY);
-      assert.equal(children[4].getSoleChild().getText(), 'K_E');
+      assert.equal(children[2].getSoleChild().getText(), 'K_E');
     });
   });
   describe("VirtualKeyRule Tests", () => {

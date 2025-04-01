@@ -214,13 +214,24 @@ export class TextRangeRule extends SingleChildRule {
     const oneOrManyRangeEnd: Rule = new OneOrManyRule(tokenBuffer, rangeEnd);
     this.rule = new SequenceRule(tokenBuffer, [simpleText, oneOrManyRangeEnd]);
   }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const rangeNode: ASTNode = new ASTNode(NodeTypes.RANGE);
+      rangeNode.addChildren(tmp.getChildren());
+      node.addChild(rangeNode);
+    }
+    return parseSuccess;
+  }
 }
 
 export class RangeEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const range: Rule         = new TokenRule(tokenBuffer, TokenTypes.RANGE, true);
+    const range: Rule         = new TokenRule(tokenBuffer, TokenTypes.RANGE);
     const simpleText: Rule    = new SimpleTextRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
       optWhitespace, range, optWhitespace, simpleText
