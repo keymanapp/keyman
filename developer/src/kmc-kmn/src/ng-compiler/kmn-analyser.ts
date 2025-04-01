@@ -190,21 +190,40 @@ export class PaddedTextRule extends SingleChildRule {
 export class TextRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
+    const textRange: Rule  = new TextRangeRule(tokenBuffer);
+    const simpleText: Rule = new SimpleTextRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [textRange, simpleText]);
+  }
+}
+
+export class SimpleTextRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
     const stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
     const virtualKey = new VirtualKeyRule(tokenBuffer);
     const uChar      = new TokenRule(tokenBuffer, TokenTypes.U_CHAR, true);
-    this.rule = new AlternateRule(tokenBuffer, [stringRule, virtualKey, uChar]);
+    this.rule = new AlternateRule(tokenBuffer, [ stringRule, virtualKey, uChar]);
   }
 }
 
 export class TextRangeRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const text: Rule          = new TextRule(tokenBuffer);
+    const simpleText: Rule        = new SimpleTextRule(tokenBuffer);
+    const rangeEnd: Rule          = new RangeEndRule(tokenBuffer);
+    const oneOrManyRangeEnd: Rule = new OneOrManyRule(tokenBuffer, rangeEnd);
+    this.rule = new SequenceRule(tokenBuffer, [simpleText, oneOrManyRangeEnd]);
+  }
+}
+
+export class RangeEndRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
     const range: Rule         = new TokenRule(tokenBuffer, TokenTypes.RANGE, true);
+    const simpleText: Rule    = new SimpleTextRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [
-      text, optWhitespace, range, optWhitespace, text
+      optWhitespace, range, optWhitespace, simpleText
     ]);
   }
 }
