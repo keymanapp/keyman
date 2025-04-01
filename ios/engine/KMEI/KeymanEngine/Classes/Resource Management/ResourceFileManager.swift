@@ -134,7 +134,7 @@ public class ResourceFileManager {
     // in a state where the destination was erased but never got re-written due
     // to a copy error.
     let tempFile = fileManager.temporaryDirectory.appendingPathComponent("temp.file")
-    try? fileManager.removeItem(at: tempFile) // Just in case the replace fails.
+    try? fileManager.removeItem(at: tempFile) // Just in case the replace failed previously.
     try fileManager.copyItem(at: source, to: tempFile)
 
     // The "replace" operation essentially transfers ownership of the temp file's
