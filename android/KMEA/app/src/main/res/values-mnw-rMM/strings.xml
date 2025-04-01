@@ -81,9 +81,9 @@
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      တၚ်ယောၚ်ယာ ပ္ဍဲကဳဗုဒ် %1$s:%2$s သွက် ဘာသာ %3$s</string>
     <!-- Context: Alert Dialog body: System WebView not installed -->
-    <string name="body_install_webview" comment="Notification when WebView not installed">        သ္ဂောံဂြဲဖျေံ Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
+    <string name="body_install_webview" comment="Notification when WebView not installed">သ္ဂောံဂြဲဖျေံ Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
     <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
-    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">        သ္ဂောံပံက် Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">သ္ဂောံပံက် Keyman ဂှ် ဒးသုၚ်စောဲ WebView ရောၚ်။</string>
     <!-- Context Button label: Install WebView -->
     <string name="label_install_webview" comment="Button label to install webview">ပ္တိုန်စုတ် WebView ရောၚ်</string>
     <!-- Context Button label: Enable WebView -->
