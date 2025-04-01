@@ -5,9 +5,7 @@
  */
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
-import path from 'path';
 import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
-import { readFileSync } from 'fs';
 import { util } from '@keymanapp/common-types';
 import boxXmlArray = util.boxXmlArray;
 
@@ -115,7 +113,7 @@ export class KeylayoutToKmnConverter {
     };
 
     try {
-      xmlFile = readFileSync(path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8');
+      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);  // get plain Object
       boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
