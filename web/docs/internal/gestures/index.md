@@ -8,9 +8,9 @@ There are a few different aspects to GestureRecognizer, each with its own intern
 - [Gesture processing](./gesture-processing.md) refers to the process of interpreting the user's input as gestures.
 - The [Glossary](./glossary.md) provides definitions for some of the terms seen among the internal documentation pages.
 
-There is also documentation regarding some of the trickier aspects of [configuring the region that accepts gestures](./recognizer-configuration.md)
+There is also documentation regarding some of the trickier aspects of [configuring the region that accepts gestures](./recognizer-configuration.md).
 
-Keyman configures two separate instances of this gesture engine - one for main keyboard body and another for the predictive-text banner.  In both cases, gestures (from the user perspective) are broken own into components, each corresponding to different movement patterns that comprise a each gesture type.  Once components are recognized, they are added into a sequence that represents the causal relationship among the different components of the gesture and ensures that it may continue if appropriate for that type of gesture.
+Keyman configures two separate instances of this gesture engine - one for main keyboard body and another for the predictive-text banner.  In both cases, gestures (from the user perspective) are broken down into components, each corresponding to different movement patterns that each comprise a gesture type.  Once components are recognized, they are added into a sequence that represents the causal relationship among the different components of the gesture and ensures that it may continue if appropriate for that type of gesture.
 
 ----
 
@@ -30,7 +30,7 @@ Components:
 4. Flick end - the user has input enough motion to confirm the flick _and_ released the touchpoint.
 
 ### Multitap
-1. First tap - the user has tapped a key.
+1. First tap - the user has tapped a key
 2. Awaiting the next tap
 3. Awaiting release of the current tap
 4. Exit case:  a key was held too long - no further taps on the key should be considered part of the gesture
@@ -38,4 +38,4 @@ Components:
 ### Modipress
 1. The user holds down on a modipress-friendly key
 2. Engine alt-state:  a different set of initial gesture components is activated and used for newly-starting concurrent gestures
-3. Release of the modipressed key.
+3. Release of the modipressed key
