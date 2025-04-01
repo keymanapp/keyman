@@ -240,6 +240,9 @@ describe("Lexer Tests", () => {
     it("can recognise a EQUAL token", () => {
       recogniseToken(TokenTypes.EQUAL, '=');
     });
+    it("can recognise a RANGE token", () => {
+      recogniseToken(TokenTypes.RANGE, '..');
+    });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenTypes.U_CHAR, 'U+1');
       recogniseToken(TokenTypes.U_CHAR, 'U+A');
