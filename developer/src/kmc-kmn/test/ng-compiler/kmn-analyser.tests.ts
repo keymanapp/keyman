@@ -353,6 +353,30 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LANGUAGE));
     });
+    it("can parse correctly (layoutfile)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('layoutfile');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYOUTFILE));
+    });
+    it("can parse correctly (message)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('message');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MESSAGE));
+    });
+    it("can parse correctly (mnemoniclayout)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('mnemoniclayout');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MNEMONICLAYOUT));
+    });
+    it("can parse correctly (name)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('name');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAME));
+    });
   });
   describe("VariableStoreAssignRule Tests", () => {
     it("can construct a VariableStoreAssignRule", () => {
