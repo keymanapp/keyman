@@ -137,11 +137,15 @@ export class StringSystemStoreRule extends SingleChildRule {
 export class StringSystemStoreNameRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmap: Rule       = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
-    const copyright: Rule    = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
-    const includecodes: Rule = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
+    const bitmap: Rule          = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
+    const copyright: Rule       = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
+    const displaymap: Rule      = new TokenRule(tokenBuffer, TokenTypes.DISPLAYMAP, true);
+    const ethnologuecode: Rule  = new TokenRule(tokenBuffer, TokenTypes.ETHNOLOGUECODE, true);
+    const includecodes: Rule    = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
+    const keyboardversion: Rule = new TokenRule(tokenBuffer, TokenTypes.KEYBOARDVERSION, true);
+    const kmw_embedcss: Rule    = new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDCSS, true);
     this.rule = new AlternateRule(tokenBuffer, [
-      bitmap, copyright, includecodes,
+      bitmap, copyright, displaymap, ethnologuecode, includecodes, keyboardversion, kmw_embedcss
     ]);
   }
 }

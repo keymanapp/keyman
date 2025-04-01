@@ -7,7 +7,8 @@ continuationNewline: whitespace? continuation whitespace? newline
 content: stringSystemStoreAssign|variableStoreAssign
 stringSystemStoreAssign: stringSystemStore padding string
 stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
-stringSystemStoreName: bitmap|copyright|includecodes
+stringSystemStoreName: bitmap|copyright|displaymap|ethnologuecode|includecodes|
+  keyboardversion|kmw_embedcss
 variableStoreAssign: variableStore paddedText+
 paddedText: padding text
 text: textRange|simpleText

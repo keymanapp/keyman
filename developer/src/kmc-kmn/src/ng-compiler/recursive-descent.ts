@@ -184,14 +184,18 @@ export class TokenRule extends Rule {
   }
 
   private static tokenToNode = [
-    {tokenType: TokenTypes.BITMAP,       nodeType: NodeTypes.BITMAP},
-    {tokenType: TokenTypes.COPYRIGHT,    nodeType: NodeTypes.COPYRIGHT},
-    {tokenType: TokenTypes.INCLUDECODES, nodeType: NodeTypes.INCLUDECODES},
-    {tokenType: TokenTypes.KEY_CODE,     nodeType: NodeTypes.KEY_CODE},
-    {tokenType: TokenTypes.NEWLINE,      nodeType: NodeTypes.LINE},
-    {tokenType: TokenTypes.SHIFT_CODE,   nodeType: NodeTypes.SHIFT_CODE},
-    {tokenType: TokenTypes.STRING,       nodeType: NodeTypes.STRING},
-    {tokenType: TokenTypes.U_CHAR,       nodeType: NodeTypes.U_CHAR},
+    {tokenType: TokenTypes.BITMAP,          nodeType: NodeTypes.BITMAP},
+    {tokenType: TokenTypes.COPYRIGHT,       nodeType: NodeTypes.COPYRIGHT},
+    {tokenType: TokenTypes.DISPLAYMAP,      nodeType: NodeTypes.DISPLAYMAP},
+    {tokenType: TokenTypes.ETHNOLOGUECODE,  nodeType: NodeTypes.ETHNOLOGUECODE},
+    {tokenType: TokenTypes.INCLUDECODES,    nodeType: NodeTypes.INCLUDECODES},
+    {tokenType: TokenTypes.KEYBOARDVERSION, nodeType: NodeTypes.KEYBOARDVERSION},
+    {tokenType: TokenTypes.KEY_CODE,        nodeType: NodeTypes.KEY_CODE},
+    {tokenType: TokenTypes.KMW_EMBEDCSS,    nodeType: NodeTypes.KMW_EMBEDCSS},
+    {tokenType: TokenTypes.NEWLINE,         nodeType: NodeTypes.LINE},
+    {tokenType: TokenTypes.SHIFT_CODE,      nodeType: NodeTypes.SHIFT_CODE},
+    {tokenType: TokenTypes.STRING,          nodeType: NodeTypes.STRING},
+    {tokenType: TokenTypes.U_CHAR,          nodeType: NodeTypes.U_CHAR},
   ];
 
   static {

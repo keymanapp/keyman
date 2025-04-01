@@ -293,11 +293,35 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
     });
+    it("can parse correctly (displaymap)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('displaymap');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DISPLAYMAP));
+    });
+    it("can parse correctly (ethnologuecode)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('ethnologuecode');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.ETHNOLOGUECODE));
+    });
     it("can parse correctly (includecodes)", () => {
       const tokenBuffer: TokenBuffer    = stringToTokenBuffer('includecodes');
       const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
+    });
+    it("can parse correctly (keyboardversion)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('keyboardversion');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
+    });
+    it("can parse correctly (kmw_embedcss)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('kmw_embedcss');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_EMBEDCSS));
     });
   });
   describe("VariableStoreAssignRule Tests", () => {

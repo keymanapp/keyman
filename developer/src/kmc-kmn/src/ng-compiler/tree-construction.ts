@@ -11,8 +11,12 @@ import { Token } from "./lexer.js";
 export enum NodeTypes {
   BITMAP,
   COPYRIGHT,
+  DISPLAYMAP,
+  ETHNOLOGUECODE,
   INCLUDECODES,
+  KEYBOARDVERSION,
   KEY_CODE,
+  KMW_EMBEDCSS,
   LINE,
   RANGE,
   SHIFT_CODE,
