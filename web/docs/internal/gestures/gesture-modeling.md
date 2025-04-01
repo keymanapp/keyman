@@ -6,8 +6,8 @@ The four layers comprising gesture modeling with `GestureRecognizer` are as foll
 
 1. [`GestureModelDefs`](#gesturemodeldefs) corresponds to the top-most object used to specify gesture definitions.  It represents a full set of custom gesture-component definitions as well at least one set of gesture-component ids that corresponds to legal initial gesture-components for a newly-beginning gesture sequence.
 2. Each [`GestureModel`](#gesturemodel) object directly models a gesture-component.  To do so, it owns at least one `ContactModel` and defines the gesture-component's properties and relationships to other gesture-components.  Also defines a start-up timer for cases that lack active touchpoints during startup, such as the "wait" for the start of a second tap during multitap gestures.
-2. Each [`ContactModel`](#contactmodel) owns a single `PathModel` and is additionally responsible for validating initial state, changes in associated item, and the portion of previously-existing path to consider if continuing an active gesture sequence.
-3. [`PathModel`](#pathmodel) specifies which paths do and do not satisfy the requirements for the touchpoint handled by the `ContactModel` owning it.
+3. Each [`ContactModel`](#contactmodel) owns a single `PathModel` and is additionally responsible for validating initial state, changes in associated item, and the portion of previously-existing path to consider if continuing an active gesture sequence.
+4. [`PathModel`](#pathmodel) specifies which paths do and do not satisfy the requirements for the touchpoint handled by the `ContactModel` owning it.
 
 ## `GestureModelDefs`
 
