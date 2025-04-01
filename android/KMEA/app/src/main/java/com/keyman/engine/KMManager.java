@@ -510,8 +510,7 @@ public final class KMManager {
 
     CloudDownloadMgr.getInstance().initialize(appContext);
 
-    KeyboardHeight_Context_Portrait_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_PORTRAIT); 
-    KeyboardHeight_Context_Landscape_Default = calculateDefaultKeyboardHeight(context, Configuration.ORIENTATION_LANDSCAPE);
+    calculateDefaultKeyboardHeights(context);
     SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
     KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
@@ -2393,7 +2392,7 @@ public final class KMManager {
     }
   }
   
-  private static void calculateDefaultKeyboardHeights(Context context, int orientation) {
+  private static void calculateDefaultKeyboardHeights(Context context) {
     if (isTestMode()) {
       // Keyboard height not needed for unit tests  #13578
       KeyboardHeight_Context_Portrait_Default = 0;
