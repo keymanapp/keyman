@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.20 alpha 2025-04-01
+
+* fix(android): move responsibility for setting keyboard height preference into `applyKeyboardHeight()` (#13578)
+
 ## 19.0.19 alpha 2025-03-31
 
 * chore: merge beta to master B18S4 (#13606)
