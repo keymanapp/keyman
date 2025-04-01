@@ -11,8 +11,9 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { TextRangeRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
@@ -364,6 +365,68 @@ describe("KMN Analyser Tests", () => {
       const text: Rule               = new TextRule(tokenBuffer);
       assert.isTrue(text.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+    });
+  });
+  describe("TextRangeRule Tests", () => {
+    it("can construct a TextRangeRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isNotNull(textRange);
+    });
+    it("can parse correctly (string range)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".."c"');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isTrue(textRange.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[2].nodeType, NodeTypes.STRING);
+      assert.equal(children[2].getText(), '"c"');
+    });
+    it("can parse correctly (string range, space before range)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a" .."c"');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isTrue(textRange.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[2].nodeType, NodeTypes.STRING);
+      assert.equal(children[2].getText(), '"c"');
+    });
+    it("can parse correctly (string range, space after range)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".. "c"');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isTrue(textRange.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[2].nodeType, NodeTypes.STRING);
+      assert.equal(children[2].getText(), '"c"');
+    });
+    it("can parse correctly (string range, space before and after range)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a" .. "c"');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isTrue(textRange.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[2].nodeType, NodeTypes.STRING);
+      assert.equal(children[2].getText(), '"c"');
+    });
+    it("can parse correctly (virtual key range)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_A]..[K_C]');
+      const textRange: Rule          = new TextRangeRule(tokenBuffer);
+      assert.isTrue(textRange.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[1].nodeType, NodeTypes.RANGE);
+      assert.equal(children[2].nodeType, NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[2].getSoleChild().getText(), 'K_C');
     });
   });
   describe("VirtualKeyRule Tests", () => {

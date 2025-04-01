@@ -14,6 +14,7 @@ export enum NodeTypes {
   INCLUDECODES,
   KEY_CODE,
   LINE,
+  RANGE,
   SHIFT_CODE,
   STORE,
   STRING,

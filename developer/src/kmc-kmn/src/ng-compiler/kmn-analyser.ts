@@ -197,6 +197,18 @@ export class TextRule extends SingleChildRule {
   }
 }
 
+export class TextRangeRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const text: Rule          = new TextRule(tokenBuffer);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const range: Rule         = new TokenRule(tokenBuffer, TokenTypes.RANGE, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      text, optWhitespace, range, optWhitespace, text
+    ]);
+  }
+}
+
 export class VirtualKeyRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
