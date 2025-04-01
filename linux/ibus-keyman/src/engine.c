@@ -701,6 +701,14 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
   }
 }
 
+/**
+ * Process the emit_keystroke action
+ *
+ * @param engine          A pointer to the IBusEngine instance.
+ * @param emit_keystroke  A boolean indicating whether to emit a keystroke.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
 static gboolean
 process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -809,6 +817,14 @@ finish_process_actions(IBusEngine *engine) {
   }
 }
 
+/**
+ * Process the actions from Keyman Core
+ *
+ * @param engine   A pointer to the IBusEngine instance.
+ * @param actions  A pointer to the km_core_actions structure containing the actions to process.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
 static gboolean
 process_actions(
   IBusEngine *engine,
