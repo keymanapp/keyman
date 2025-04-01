@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.225 beta 2025-04-01
+
+* fix(web): remove extra px offset from last OSK row (#13621)
+* fix(developer): add special handling for 'und' in kmc-keyboard-info (#13622)
+* chore(mac,windows): Update Crowdin strings for Italian (#13594)
+* change(ios): prevent file erasure during copyWithOverwrite error state (#13548)
+* fix(ios): uninstalls keyboards upon failure to load (#13549)
+* refactor(linux): remove warning if no custom keyboards exist (#13624)
+
 ## 18.0.224 beta 2025-03-31
 
 * fix(windows): reload right modifier key option (#13585)
