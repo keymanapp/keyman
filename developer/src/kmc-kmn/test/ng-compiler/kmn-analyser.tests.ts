@@ -323,6 +323,36 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_EMBEDCSS));
     });
+    it("can parse correctly (kmw_embedjs)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('kmw_embedjs');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_EMBEDJS));
+    });
+    it("can parse correctly (kmw_helpfile)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('kmw_helpfile');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_HELPFILE));
+    });
+    it("can parse correctly (kmw_helptext)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('kmw_helptext');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_HELPTEXT));
+    });
+    it("can parse correctly (kmw_rtl)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('kmw_rtl');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_RTL));
+    });
+    it("can parse correctly (language)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('language');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LANGUAGE));
+    });
   });
   describe("VariableStoreAssignRule Tests", () => {
     it("can construct a VariableStoreAssignRule", () => {

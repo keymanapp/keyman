@@ -144,8 +144,14 @@ export class StringSystemStoreNameRule extends SingleChildRule {
     const includecodes: Rule    = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
     const keyboardversion: Rule = new TokenRule(tokenBuffer, TokenTypes.KEYBOARDVERSION, true);
     const kmw_embedcss: Rule    = new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDCSS, true);
+    const kmw_embedjs: Rule     = new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDJS, true);
+    const kmw_helpfile: Rule    = new TokenRule(tokenBuffer, TokenTypes.KMW_HELPFILE, true);
+    const kmw_helptext: Rule    = new TokenRule(tokenBuffer, TokenTypes.KMW_HELPTEXT, true);
+    const kmw_rtl: Rule         = new TokenRule(tokenBuffer, TokenTypes.KMW_RTL, true);
+    const language: Rule        = new TokenRule(tokenBuffer, TokenTypes.LANGUAGE, true);
     this.rule = new AlternateRule(tokenBuffer, [
-      bitmap, copyright, displaymap, ethnologuecode, includecodes, keyboardversion, kmw_embedcss
+      bitmap, copyright, displaymap, ethnologuecode, includecodes, keyboardversion, kmw_embedcss,
+      kmw_embedjs, kmw_helpfile, kmw_helptext, kmw_rtl, language
     ]);
   }
 }
