@@ -83,7 +83,11 @@ export class ContinuationNewlineRule extends SingleChildRule {
 export class ContentRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.rule = new StringSystemStoreAssignRule(tokenBuffer);
+    const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+    const variableStoreAssign: Rule     = new VariableStoreAssignRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [
+      stringSystemStoreAssign, variableStoreAssign
+    ]);
   }
 }
 
@@ -187,8 +191,9 @@ export class TextRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
+    const virtualKey = new VirtualKeyRule(tokenBuffer);
     const uChar      = new TokenRule(tokenBuffer, TokenTypes.U_CHAR, true);
-    this.rule = new AlternateRule(tokenBuffer, [stringRule, uChar]);
+    this.rule = new AlternateRule(tokenBuffer, [stringRule, virtualKey, uChar]);
   }
 }
 

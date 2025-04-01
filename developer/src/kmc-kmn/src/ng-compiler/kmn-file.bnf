@@ -4,11 +4,10 @@ blankLine: commentEnd? newline
 commentEnd: whitespace? comment
 padding: whitespace|continuationNewline
 continuationNewline: whitespace? continuation whitespace? newline
-content: stringSystemStoreAssign
+content: stringSystemStoreAssign|variableStoreAssign
 stringSystemStoreAssign: stringSystemStore padding string
 stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
 stringSystemStoreName: bitmap|copyright|includecodes
-
 variableStoreAssign: variableStore paddedText+
 paddedText: padding text
 text: string|virtualKey|uChar

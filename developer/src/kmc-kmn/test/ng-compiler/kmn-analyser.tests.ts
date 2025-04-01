@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, LineRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
@@ -184,6 +184,28 @@ describe("KMN Analyser Tests", () => {
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
     });
   });
+  describe("ContentRule Tests", () => {
+    it("can construct a ContentRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const content: Rule = new ContentRule(tokenBuffer);
+      assert.isNotNull(content);
+    });
+    it("can parse correctly (string system store assign)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
+      const content: Rule = new ContentRule(tokenBuffer);
+      assert.isTrue(content.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (variable store assign)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) U+1780');
+      const content: Rule = new ContentRule(tokenBuffer);
+      assert.isTrue(content.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+  });
   describe("StringSystemStoreAssignRule Tests", () => {
     it("can construct a StringSystemStoreAssignRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -308,6 +330,16 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
     });
+    it("can parse correctly (mixed test)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) " " U+1781 [K_K]');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isTrue(variableStoreAssign.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+    });
   });
   describe("TextRule Tests", () => {
     it("can construct a TextRule", () => {
@@ -326,6 +358,12 @@ describe("KMN Analyser Tests", () => {
       const text: Rule               = new TextRule(tokenBuffer);
       assert.isTrue(text.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+    it("can parse correctly (virtualKey)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('[K_K]');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isTrue(text.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
     });
   });
   describe("VirtualKeyRule Tests", () => {
