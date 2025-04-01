@@ -4,7 +4,7 @@ title: KMManager.setBannerOptions()
 
 ## Summary
 
-The **`setBannerOoptions()`** method sends options to the KeymanWeb engine for controlling whether to generate predictions.
+The **`setBannerOptions()`** method sets options relating to the predictive text banner, such as controlling whether to enable predictions.
 
 ## Syntax
 
