@@ -31,9 +31,13 @@ export enum NodeTypes {
   SHIFT_CODE,
   STORE,
   STRING,
+  TARGETS,
   TMP,
   U_CHAR,
+  VERSION,
   VIRTUAL_KEY,
+  VISUALKEYBOARD,
+  WINDOWSLANGUAGES,
 }
 
 export class ASTNode {

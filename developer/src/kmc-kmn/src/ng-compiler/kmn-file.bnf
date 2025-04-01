@@ -8,7 +8,9 @@ content: stringSystemStoreAssign|variableStoreAssign
 stringSystemStoreAssign: stringSystemStore padding string
 stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
 stringSystemStoreName: bitmap|copyright|displaymap|ethnologuecode|includecodes|
-  keyboardversion|kmw_embedcss
+  keyboardversion|kmw_embedcss|kmw_embedjs|kmw_helpfile|kmw_helptext|kmw_rtl|
+  language|layoutfile|message|mnemoniclayout|name|target|version|
+  visualkeyboard|windowslanguages
 variableStoreAssign: variableStore paddedText+
 paddedText: padding text
 text: textRange|simpleText

@@ -377,6 +377,30 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(stringSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAME));
     });
+    it("can parse correctly (targets)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('targets');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.TARGETS));
+    });
+    it("can parse correctly (version)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('version');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
+    });
+    it("can parse correctly (visualkeyboard)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('visualkeyboard');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
+    });
+    it("can parse correctly (windowslanguages)", () => {
+      const tokenBuffer: TokenBuffer    = stringToTokenBuffer('windowslanguages');
+      const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
+      assert.isTrue(stringSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.WINDOWSLANGUAGES));
+    });
   });
   describe("VariableStoreAssignRule Tests", () => {
     it("can construct a VariableStoreAssignRule", () => {
