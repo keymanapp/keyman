@@ -1,31 +1,14 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
- * Converts macOS/Ukelele .keylayout files to Keyman .kmn
+ * Convert macOS/Ukelele .keylayout files to Keyman .kmn
+ *
  */
+
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
-import { XMLParser } from 'fast-xml-parser';  // for reading an xml file
-import { util } from '@keymanapp/common-types';
-import boxXmlArray = util.boxXmlArray;
-
-function boxArray(source: any) {
-  boxXmlArray(source.layouts, 'layout');
-  boxXmlArray(source.terminators, 'when');
-  boxXmlArray(source, 'keyMapSet');
-  boxXmlArray(source.keyMapSet, 'keyMap');
-  boxXmlArray(source.action, 'actions');
-
-  boxXmlArray(source?.modifierMap, 'keyMapSelect');
-  for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
-    boxXmlArray(keyMapSelect, 'modifier');
-  }
-  boxXmlArray(source?.actions, 'action');
-  for (const action of source?.actions?.action) {
-    boxXmlArray(action, 'when');
-  }
-  return source;
-}
+import { KmnFileWriter } from './kmn-file-writer.js';
+import { KeylayoutFileReader } from './keylayout-file-reader.js';
 
 export interface rule_object {
   rule_type: string,              /* rule type C0-C4 */
@@ -60,8 +43,16 @@ export class KeylayoutToKmnConverter {
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
 
-  constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) {
-  };
+  //private callbacks: CompilerCallbacks;
+  private options: CompilerOptions;
+
+  async init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+    this.options = { ...options };
+    this.callbacks = callbacks;
+    return true;
+  }
+
+  constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) { };
 
   /**
    * @brief  member function to run read/convert/write
@@ -74,54 +65,28 @@ export class KeylayoutToKmnConverter {
     if (!inputFilename) {
       throw new Error('Invalid parameters');
     }
-    const jsonO: object = this.read(inputFilename);
 
+    const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
+    const jsonO: object = KeylayoutReader.read(inputFilename);
     if (!jsonO) {
       throw new Error('Error while processing read()');
       return null;
     }
 
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
-
     if (!outArray) {
       throw new Error('Error while processing convert()');
       return null;
     }
 
-    const out_text_ok: boolean = this.write(outArray);
+    const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
+    const out_text_ok: boolean = kmnFileWriter.write(outArray);
 
     if (!out_text_ok) {
       throw new Error('Error while processing write()');
       return null;
     }
     return null;
-  }
-
-  /**
-   * @brief  member function to parse data from a .keylayout-file and store to a json object
-   * @param  absolutefilename the ukelele .keylayout-file to be parsed
-   * @return in case of success: json object containing data of the .keylayout file; else null
-   */
-  public read(absolutefilename: string): Object {
-    let xmlFile;
-    let jsonObj = [];
-
-    const options = {
-      ignoreAttributes: false,
-      trimValues: false,           // preserve spaces
-      attributeNamePrefix: '@_'    // to access the attribute
-    };
-
-    try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8');
-      const parser = new XMLParser(options);
-      jsonObj = parser.parse(xmlFile);  // get plain Object
-      boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
-    }
-    catch (err) {
-      console.log(err.message);
-    }
-    return jsonObj;
   }
 
   /**
@@ -501,7 +466,6 @@ export class KeylayoutToKmnConverter {
           unique_dkB_count++;
           list_of_unique_Text2_rules.push(ruleArray);
         }
-
       }
     }
 
@@ -543,7 +507,6 @@ export class KeylayoutToKmnConverter {
           ruleArray.push(String(unique_dkB_count));
           unique_dkB_count++;
           list_of_unique_Text2_rules.push(ruleArray);
-
         }
       }
     }
@@ -563,30 +526,6 @@ export class KeylayoutToKmnConverter {
     return data_ukelele;
   }
 
-  /**
-   * @brief  member function to write data from object to a kmn file
-   * @param  data_ukelele the array holding all keyboard data
-   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
-   * @return true if data has been written; false if not
-   */
-  public write(data_ukelele: convert_object): boolean {
-
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
-      return true;
-    } catch (err) {
-      console.log('ERROR writing kmn file:' + err.message);
-      return false;
-    }
-  }
 
   /**
    * @brief  member function to create a kmn modifier from a keylayout modifier
@@ -878,6 +817,7 @@ export class KeylayoutToKmnConverter {
     }
 
     if (rule[index].rule_type === "C2") {
+
       // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C3)
       const amb_2_2 = rule.filter((curr, idx) =>
         curr.rule_type === "C2"
@@ -1208,296 +1148,7 @@ export class KeylayoutToKmnConverter {
         warningTextArray[2] = warningTextArray[2] + extra_warning;
       }
     }
-
     return warningTextArray;
-  }
-
-
-  /**
-   * @brief  member function to create data for stores that will be printed to the resulting kmn file
-   * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  all stores to be printed
-   */
-  public writeData_Stores(data_ukelele: convert_object): string {
-
-    let data: string = "";
-    data += "c ......................................................................\n";
-    data += "c ......................................................................\n";
-    data += "c Keyman keyboard generated by kmn-convert\n";
-    data += "c from Ukelele file: " + data_ukelele.keylayout_filename + "\n";
-    data += "c ......................................................................\n";
-    data += "c ......................................................................\n";
-    data += "\n";
-
-    data += "store(&VERSION) \'10.0\'\n";
-    data += "store(&TARGETS) \'any\'\n";
-    data += "store(&KEYBOARDVERSION) \'1.0\'\n";
-    data += "store(&COPYRIGHT) '© 2024 SIL International\'\n";
-
-    data += "\n";
-    data += "begin Unicode > use(main)\n\n";
-    data += "group(main) using keys\n\n";
-
-    data += "\n";
-    return data;
-  }
-
-  /**
-   * @brief  member function to create data from rules that will be printed to the resulting kmn file
-   * @param  data_ukelele an object containing all data read from a .keylayout file
-   * @return string -  all rules to be printed
-   */
-  public writeData_Rules(data_ukelele: convert_object): string {
-
-    let data: string = "";
-
-    // filter array of all rules and remove duplicates
-    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
-      return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
-        && (curr.key !== "")
-        && ((curr.rule_type === "C0")
-          || (curr.rule_type === "C1")
-          || (curr.rule_type === "C2" && (curr.deadkey !== ""))
-          || (curr.rule_type === "C3" && (curr.deadkey !== "") && (curr.prev_deadkey !== "")))
-      );
-    }).reduce((unique, o) => {
-      if (!unique.some((obj: {
-        modifier_prev_deadkey: string; prev_deadkey: string;
-        modifier_deadkey: string; deadkey: string;
-        modifier_key: string; key: string;
-        rule_type: string;
-        output: Uint8Array;
-      }) =>
-        new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
-
-        && obj.output !== new TextEncoder().encode("")
-
-        && obj.rule_type === o.rule_type
-        && obj.modifier_key === o.modifier_key
-        && obj.key === o.key
-
-        && obj.modifier_deadkey === o.modifier_deadkey
-        && obj.deadkey === o.deadkey
-
-        && obj.modifier_prev_deadkey === o.modifier_prev_deadkey
-        && obj.prev_deadkey === o.prev_deadkey)
-      ) {
-        unique.push(o);
-      }
-      return unique;
-    }, []);
-
-    //................................................ C0 C1 ................................................................
-
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-
-      if ((unique_data_Rules[k].rule_type === "C0") || (unique_data_Rules[k].rule_type === "C1")) {
-
-        // lookup key nr of the key which is being processed
-        let keyNr: number = 0;
-        for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-          if (this.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
-            keyNr = j;
-            break;
-          }
-        }
-
-        // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
-        if ((keyNr === 48) || (keyNr === 36)) {
-          continue;
-        }
-
-        //---------------------------------------------------------------------------------------------
-
-        // add a line after rules of each key
-        if ((k > 1) && (unique_data_Rules[k - 1].key !== unique_data_Rules[k].key) && (unique_data_Rules[k - 1].rule_type === unique_data_Rules[k].rule_type)) {
-          data += '\n';
-        }
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + " Use of a control character ";
-        }
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the entire rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[2].indexOf("duplicate") < 0)) {
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
-            warningTextToWrite = warn_text[2];
-          }
-
-          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "+ ["
-              + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
-              + `]  > \'`
-              + output_character_unicode
-              + '\'\n';
-          }
-        }
-      }
-    }
-
-    //................................................ C2 ...................................................................
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-
-      if (unique_data_Rules[k].rule_type === "C2") {
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
-        }
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the entire rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[1].indexOf("duplicate") < 0)) {
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[1].length > 0)) {
-            warningTextToWrite = warn_text[1];
-          }
-
-          if (!((warn_text[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "+ [" + (unique_data_Rules[k].modifier_deadkey + " "
-                + unique_data_Rules[k].deadkey).trim()
-              + "]  >  dk(A" + String(unique_data_Rules[k].id_deadkey)
-              + ")\n";
-          }
-        }
-
-        if ((warn_text[2].indexOf("duplicate") < 0)) {
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
-            warningTextToWrite = warn_text[2];
-          }
-
-          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "dk(A"
-              + (String(unique_data_Rules[k].id_deadkey) + ") + ["
-                + unique_data_Rules[k].modifier_key).trim()
-              + " "
-              + unique_data_Rules[k].key + "]  >  \'"
-              + output_character_unicode
-              + "\'\n";
-          }
-          data += "\n";
-        }
-      }
-    }
-
-    //................................................ C3 ...................................................................
-
-    for (let k = 0; k < unique_data_Rules.length; k++) {
-      if (unique_data_Rules[k].rule_type === "C3") {
-
-        const warn_text = this.reviewRules(unique_data_Rules, k);
-
-        const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
-
-        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
-        }
-
-        // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
-        // if warning contains duplicate rules we do not write out the entire rule
-        // (even if there are other warnings for the same rule) since that rule had been written before
-        if ((warn_text[0].indexOf("duplicate") < 0)) {
-
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[0].length > 0)) {
-            warningTextToWrite = warn_text[0];
-          }
-
-          if (!((warn_text[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "+ ["
-              + (unique_data_Rules[k].modifier_prev_deadkey + " "
-                + unique_data_Rules[k].prev_deadkey).trim()
-              + "]   >   dk(A"
-              + String(unique_data_Rules[k].id_prev_deadkey) + ")\n";
-          }
-        }
-
-
-
-
-        if ((warn_text[1].indexOf("duplicate") < 0)) {
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[1].length > 0)) {
-            warningTextToWrite = warn_text[1];
-          }
-
-          if (!((warn_text[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "dk(A" + (String(unique_data_Rules[k].id_prev_deadkey) + ")  + ["
-                + unique_data_Rules[k].modifier_deadkey).trim()
-              + " "
-              + unique_data_Rules[k].deadkey
-              + "]  >  dk(B"
-              + String(unique_data_Rules[k].id_deadkey)
-              + ")\n";
-          }
-        }
-
-        if ((warn_text[2].indexOf("duplicate") < 0)) {
-
-          let warningTextToWrite = "";
-          if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[2].length > 0)) {
-            warningTextToWrite = warn_text[2];
-          }
-
-          if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite + "dk(B"
-              + (String(unique_data_Rules[k].id_deadkey)
-                + ") + ["
-                + unique_data_Rules[k].modifier_key).trim()
-              + " "
-              + unique_data_Rules[k].key
-              + "]  >  \'"
-              + output_character_unicode
-              + "\'\n";
-          }
-        }
-
-        if ((warn_text[0].indexOf("duplicate") < 0) || (warn_text[1].indexOf("duplicate") < 0) || (warn_text[2].indexOf("duplicate") < 0)) {
-          data += "\n";
-        }
-      }
-    }
-    return data;
   }
 
   /**
