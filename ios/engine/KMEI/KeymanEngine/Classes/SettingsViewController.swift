@@ -27,15 +27,15 @@ open class SettingsViewController: UITableViewController {
     
     title = NSLocalizedString("menu-settings-title", bundle: engineBundle, comment: "")
     let doneButton = UIBarButtonItem(title: NSLocalizedString("Done", bundle: engineBundle, comment: ""), style: .plain, target: self,
-                                     action: #selector(self.doneClicked))
+                                     action: #selector(self.settingsDismissed))
     navigationItem.leftBarButtonItem = doneButton
 
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
   
-  @objc func doneClicked(_ sender: Any) {
+  @objc func settingsDismissed() {
     // This resets KMW so that any new and/or updated resources can be properly loaded.
-    os_log("SettingsViewController doneClicked", log:KeymanEngineLogger.settings, type: .info)
+    os_log("SettingsViewController settingsDismissed", log:KeymanEngineLogger.settings, type: .info)
     Manager.shared.dismissKeyboardPicker(self)
     
     let newPortraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
@@ -427,7 +427,7 @@ open class SettingsViewController: UITableViewController {
     let doneOrCancel = value
     if doneOrCancel {
       let doneButton = UIBarButtonItem(title: NSLocalizedString("command-done", bundle: engineBundle, comment: ""), style: .plain, target: self,
-                                       action: nil /* #selector(self.doneClicked) */ )
+                                       action: nil /* #selector(self.settingsDismissed) */ )
       nc.navigationItem.leftBarButtonItem = doneButton
     } else {
       let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self,
@@ -481,6 +481,6 @@ open class SettingsViewController: UITableViewController {
 
 extension SettingsViewController: UIAdaptivePresentationControllerDelegate {
   public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-    doneClicked(1)
+    settingsDismissed()
   }
 }
