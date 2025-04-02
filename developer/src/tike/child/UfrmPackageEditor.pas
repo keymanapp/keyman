@@ -166,15 +166,12 @@ type
     lblLexlicalModels: TLabel;
     lblLexicalModelsSubtitle: TLabel;
     lblLexicalModelFilename: TLabel;
-    lblLexicalModelDescription: TLabel;
     lblLexicalModelLanguages: TLabel;
     lbLexicalModels: TListBox;
-    editLexicalModelDescription: TEdit;
     gridLexicalModelLanguages: TStringGrid;
     cmdLexicalModelLanguageAdd: TButton;
     cmdLexicalModelLanguageRemove: TButton;
     cmdLexicalModelLanguageEdit: TButton;
-    chkLexicalModelRTL: TCheckBox;
     editLexicalModelFilename: TEdit;
     imgQRCode: TImage;
     panOpenInExplorer: TPanel;
@@ -2311,18 +2308,13 @@ begin
     lm := SelectedLexicalModel;
     if not Assigned(lm) then
     begin
-      editLexicalModelDescription.Text := '';
       editLexicalModelFilename.Text := '';
-      chkLexicalModelRTL.Checked := False;
       gridLexicalModelLanguages.RowCount := 1;
       EnableLexicalModelTabControls;
       Exit;
     end;
 
     // Details
-
-    editLexicalModelDescription.Text := lm.Name;
-    chkLexicalModelRTL.Checked := lm.RTL;
 
     for i := 0 to pack.Files.Count - 1 do
       if TLexicalModelUtils.LexicalModelFileNameToID(pack.Files[i].FileName) = lm.ID then
@@ -2345,13 +2337,10 @@ var
   e: Boolean;
 begin
   e := lbLexicalModels.ItemIndex >= 0;
-  lblLexicalModelDescription.Enabled := e;
-  editLexicalModelDescription.Enabled := e;
   lblLexicalModelFilename.Enabled := e;
   editLexicalModelFilename.Enabled := e;
   lblLexicalModelLanguages.Enabled := e;
   cmdLexicalModelLanguageAdd.Enabled := e;
-  chkLexicalModelRTL.Enabled := e;
 
   e := e and (gridLexicalModelLanguages.Row > 0);
   gridLexicalModelLanguages.Enabled := e;
@@ -2417,7 +2406,6 @@ begin
 
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.Name := editLexicalModelDescription.Text;
   Modified := True;
 end;
 
@@ -2429,7 +2417,6 @@ begin
     Exit;
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.RTL := chkLexicalModelRTL.Checked;
   Modified := True;
 end;
 

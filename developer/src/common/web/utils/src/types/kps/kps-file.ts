@@ -80,8 +80,9 @@ export interface KpsFileContentFile {
 }
 
 export interface KpsFileLexicalModel {
-  Name: string;
+  // Defined in .kps schema but not used: Name: string; #13600(comment)
   ID: string;
+  // Defined in .kps schema but not used: RTL: string; #13600(comment)
   Languages: KpsFileLanguages;
 }
 

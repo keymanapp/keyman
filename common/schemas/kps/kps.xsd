@@ -119,10 +119,10 @@
             <xs:element minOccurs="0" maxOccurs="unbounded" name="Keyboard">
               <xs:complexType>
                 <xs:all>
-                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" /> <!-- deprecated: 18.0 -->
                   <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" /> <!-- deprecated: 18.0 -->
+                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" /> <!-- deprecated: 18.0 -->
                   <xs:element minOccurs="0" maxOccurs="1" name="OSKFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="DisplayFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
@@ -143,9 +143,9 @@
             <xs:element minOccurs="0" maxOccurs="unbounded" name="LexicalModel">
               <xs:complexType>
                 <xs:all>
-                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" /> <!-- deprecated: 18.0 -->
                   <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" /> <!-- deprecated: 18.0 -->
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
                 </xs:all>
               </xs:complexType>

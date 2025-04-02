@@ -323,7 +323,7 @@ export class KmpCompiler implements KeymanCompiler {
 
     if(kps.LexicalModels?.LexicalModel?.length) {
       kmp.lexicalModels = kps.LexicalModels.LexicalModel.map((model: KpsFile.KpsFileLexicalModel) => ({
-        name:model.Name.trim(),
+        name:model.ID.trim(),
         id:model.ID.trim(),
         languages: model.Languages?.Language?.length ?
           this.kpsLanguagesToKmpLanguages(model.Languages.Language) : []

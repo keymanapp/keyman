@@ -184,7 +184,7 @@ inherited frmPackageEditor: TfrmPackageEditor
     Top = 0
     Width = 965
     Height = 622
-    ActivePage = pageKeyboards
+    ActivePage = pageLexicalModels
     Align = alClient
     Images = modActionsMain.ilEditorPages
     MultiLine = True
@@ -236,7 +236,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Width = 546
           Height = 32
           AutoSize = False
-          Caption =
+          Caption = 
             'A typical package will need keyboards, fonts, and documentation.' +
             ' You shouldn'#39't typically add source files. Also, don'#39't add any s' +
             'tandard Keyman files (such as keyman.exe) here.'
@@ -261,7 +261,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblFileType: TLabel
           Left = 256
           Top = 107
-          Width = 47
+          Width = 46
           Height = 13
           Caption = 'File Type:'
           FocusControl = editFilePath
@@ -639,16 +639,9 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 13
           Caption = 'Filename:'
         end
-        object lblLexicalModelDescription: TLabel
-          Left = 261
-          Top = 102
-          Width = 62
-          Height = 13
-          Caption = 'Description:'
-        end
         object lblLexicalModelLanguages: TLabel
-          Left = 260
-          Top = 181
+          Left = 261
+          Top = 101
           Width = 59
           Height = 13
           Caption = 'Languages:'
@@ -663,27 +656,18 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabOrder = 0
           OnClick = lbLexicalModelsClick
         end
-        object editLexicalModelDescription: TEdit
-          Left = 342
-          Top = 99
-          Width = 275
-          Height = 21
-          TabStop = False
-          TabOrder = 1
-          OnChange = editLexicalModelDescriptionChange
-        end
         object gridLexicalModelLanguages: TStringGrid
           Left = 260
-          Top = 200
+          Top = 120
           Width = 593
-          Height = 376
+          Height = 456
           Anchors = [akLeft, akTop, akRight, akBottom]
           ColCount = 2
           DefaultRowHeight = 16
           FixedCols = 0
           RowCount = 9
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
-          TabOrder = 2
+          TabOrder = 1
           OnClick = gridLexicalModelLanguagesClick
           OnDblClick = gridLexicalModelLanguagesDblClick
           ColWidths = (
@@ -697,7 +681,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Add...'
-          TabOrder = 3
+          TabOrder = 2
           OnClick = cmdLexicalModelLanguageAddClick
         end
         object cmdLexicalModelLanguageRemove: TButton
@@ -707,7 +691,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = '&Remove'
-          TabOrder = 4
+          TabOrder = 3
           OnClick = cmdLexicalModelLanguageRemoveClick
         end
         object cmdLexicalModelLanguageEdit: TButton
@@ -717,17 +701,8 @@ inherited frmPackageEditor: TfrmPackageEditor
           Height = 25
           Anchors = [akLeft, akBottom]
           Caption = 'Ed&it...'
-          TabOrder = 5
+          TabOrder = 4
           OnClick = cmdLexicalModelLanguageEditClick
-        end
-        object chkLexicalModelRTL: TCheckBox
-          Left = 342
-          Top = 126
-          Width = 97
-          Height = 17
-          Caption = 'Is Right-to-left'
-          TabOrder = 6
-          OnClick = chkLexicalModelRTLClick
         end
         object editLexicalModelFilename: TEdit
           Left = 342
@@ -737,7 +712,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           TabStop = False
           ParentColor = True
           ReadOnly = True
-          TabOrder = 7
+          TabOrder = 5
         end
       end
     end
@@ -883,7 +858,7 @@ inherited frmPackageEditor: TfrmPackageEditor
         object lblDescriptionMarkdown: TLabel
           Left = 114
           Top = 497
-          Width = 215
+          Width = 214
           Height = 13
           Caption = 'Markdown accepted, no embedded HTML'
           Transparent = True
@@ -1281,7 +1256,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           Top = 48
           Width = 551
           Height = 13
-          Caption =
+          Caption = 
             'Compiling the package takes all the files you have selected and ' +
             'compresses them into a single package file.'
         end
@@ -1514,7 +1489,7 @@ inherited frmPackageEditor: TfrmPackageEditor
           object Label5: TLabel
             Left = 9
             Top = 73
-            Width = 82
+            Width = 81
             Height = 13
             Caption = 'Target filename:'
           end
