@@ -6,6 +6,7 @@ There are a few different aspects to GestureRecognizer, each with its own intern
 
 - [Gesture modeling](./gesture-modeling.md) refers to the specification of gestures to be interpreted from the user's input.
 - [Gesture processing](./gesture-processing.md) refers to the process of interpreting the user's input as from among the specified gesture models.
+- [Input serialization](./gesture-input-serialization.md) refers to some of the trickier aspects of handling input to ensure every input event is processed in the correct, user-intended order.
 - The [Glossary](./glossary.md) provides definitions for some of the terms seen among the internal documentation pages.
 
 There is also documentation regarding some of the trickier aspects of [configuring the region that accepts gestures](./recognizer-configuration.md).
