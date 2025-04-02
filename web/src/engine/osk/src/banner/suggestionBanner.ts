@@ -67,7 +67,13 @@ interface BannerSuggestionFormatSpec {
    * Sets a target width to use when 'collapsing' suggestions.  Only affects those long
    * enough to need said 'collapsing'.
    */
-  collapsedWidth?: number
+  collapsedWidth?: number;
+
+  /**
+   * The height allotted to each suggestion; needed to support font scaling if the
+   * font would otherwise be too large.
+   */
+  height?: number
 }
 
 export class BannerSuggestion {
@@ -170,7 +176,22 @@ export class BannerSuggestion {
 
     if(suggestion && suggestion.displayAs) {
       const rawMetrics = getTextMetrics(suggestion.displayAs, format.emSize, format.styleForFont);
-      this._textWidth = rawMetrics.width;
+      let projectedHeight = 0;
+      if(rawMetrics.fontBoundingBoxAscent) {
+        projectedHeight = rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent;
+      }
+      let ratio = Math.min(1, format.height / projectedHeight);
+      let width = rawMetrics.width;
+
+      // do we need font-height scaling?
+      this._textWidth = width * ratio;
+      // Apply styling to the container element so that it does not override CSS styling on the
+      // display element (for tablets)
+      if(ratio < 1) {
+        this.container.style.fontSize = ParsedLengthStyle.forScalar(ratio).styleString;
+      } else {
+        delete this.container.style.fontSize;
+      }
     } else {
       this._textWidth = 0;
     }
@@ -726,14 +747,15 @@ export class SuggestionBanner extends Banner {
     const emSizeStr = getComputedStyle(document.body).fontSize;
     const emSize    = getFontSizeStyle(emSizeStr).val;
 
-    const textStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
+    const textElementStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
 
     const targetWidth = this.width / SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT;
+    const height = this.height * .85; // .85 is a modifier seen in the CSS.
 
     // computedStyle will fail if the element's not in the DOM yet.
     // Seeks to get the values specified within kmwosk.css.
-    const textLeftPad = new ParsedLengthStyle(textStyle.paddingLeft   || '4px');
-    const textRightPad = new ParsedLengthStyle(textStyle.paddingRight || '4px');
+    const textLeftPad = new ParsedLengthStyle(textElementStyle.paddingLeft   || '4px');
+    const textRightPad = new ParsedLengthStyle(textElementStyle.paddingRight || '4px');
 
     let optionFormat: BannerSuggestionFormatSpec = {
       paddingWidth: textLeftPad.val + textRightPad.val, // Assumes fixed px padding.
@@ -741,6 +763,7 @@ export class SuggestionBanner extends Banner {
       styleForFont: fontStyle,
       collapsedWidth: targetWidth,
       minWidth: 0,
+      height: height
     }
 
     for (let i=0; i<SuggestionBanner.SUGGESTION_LIMIT; i++) {
