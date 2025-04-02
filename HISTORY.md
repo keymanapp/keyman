@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.226 beta 2025-04-02
+
+* docs(web): document internals for gesture modeling and processing (#13587)
+* docs(web): document input-serialization aspects of gesture processing (#13597)
+* fix(android): Add dimensions for 320+dpi phones in landscape (#13592)
+* chore(common): Update crowdin strings for Mon (#13595)
+* docs(linux): add function headers for some of the engine methods (#13637)
+
 ## 18.0.225 beta 2025-04-01
 
 * fix(web): remove extra px offset from last OSK row (#13621)
