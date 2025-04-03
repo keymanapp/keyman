@@ -26,6 +26,9 @@ const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 
 const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
 
+// .85 is seen in kmwosk.css on `.kmw-banner-bar .kmw-suggest-option`.
+const SUGGESTION_HEIGHT_IN_BANNER_RATIO = 0.85;
+
 /**
  * The style to temporarily apply when updating suggestion text in order to prevent
  * fade transitions at that time.
@@ -176,15 +179,13 @@ export class BannerSuggestion {
 
     if(suggestion && suggestion.displayAs) {
       const rawMetrics = getTextMetrics(suggestion.displayAs, format.emSize, format.styleForFont);
-      let projectedHeight = 1;
-      if(rawMetrics.fontBoundingBoxAscent) {
-        projectedHeight = rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent;
-      }
+      const projectedHeight = rawMetrics.fontBoundingBoxAscent
+        ? rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent
+        : 1;
       let ratio = Math.min(1, format.height / projectedHeight);
-      let width = rawMetrics.width;
 
       // do we need font-height scaling?
-      this._textWidth = width * ratio;
+      this._textWidth = rawMetrics.width * ratio;
       // Apply styling to the container element so that it does not override CSS styling on the
       // display element (for tablets)
       if(ratio < 1) {
@@ -750,7 +751,7 @@ export class SuggestionBanner extends Banner {
     const textElementStyle = getComputedStyle(this.options[0].container.firstChild as HTMLSpanElement);
 
     const targetWidth = this.width / SuggestionBanner.LONG_SUGGESTION_DISPLAY_LIMIT;
-    const height = this.height * .85; // .85 is a modifier seen in the CSS.
+    const height = this.height * SUGGESTION_HEIGHT_IN_BANNER_RATIO;
 
     // computedStyle will fail if the element's not in the DOM yet.
     // Seeks to get the values specified within kmwosk.css.
