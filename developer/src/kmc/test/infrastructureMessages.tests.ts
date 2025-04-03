@@ -8,7 +8,7 @@ import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
 import {  KeymanFileTypes } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
-import { clearOptions } from '@keymanapp/developer-utils';
+import { clearOptions } from '../src/util/options.js';
 import { loadProject } from '../src/util/projectLoader.js';
 import { CompilerErrorNamespace, CompilerEvent, defaultCompilerOptions, CompilerOptions} from '@keymanapp/developer-utils';
 import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
