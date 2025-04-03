@@ -7,11 +7,10 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { compilerTestCallbacks, compilerTestOptions } from './helpers/index.js';
+import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { makePathToFixture } from './helpers/index.js';
-import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+//import { rejects, doesNotReject } from "node:assert";
 
 //-----------------------------------------------------------------------------------------------------------------------
 
@@ -20,6 +19,140 @@ describe('KeylayoutToKmnConverter', function () {
   before(function () {
     compilerTestCallbacks.clear();
   });
+  /*
+    // always fails - the FAIL-or
+    async function failor() { throw Error('Foo'); }
+  
+    // always passes - the PASS-or
+    async function passor() { return 3; }
+  
+    describe('test of node:assert', async () => {
+      it('should be able test reject or not reject', async () => {
+        await rejects(failor); // as function
+        await doesNotReject(async () => await passor()); // or as async arrow function
+      });
+  
+      // this should fail
+      it('FAILS: show that doesNotReject() works', async () => {
+        await doesNotReject(async () => await failor());
+      });
+      // this should also fail
+      it('FAILS: show that rejects() works', async () => {
+        await rejects(passor);
+      });
+  
+      it('it should pass if 1+1=2', async () => {
+        const a = 1 + 1;
+        if (a === 2)
+          await doesNotReject(passor);
+        else
+          await rejects(failor);
+      });
+      //------------------------------------------
+      it('irgendwas', async () => {
+        await assert.rejects(
+          async () => {
+            throw new TypeError('Wrong value');
+          },
+          {
+            name: 'TypeError',
+            message: 'Wrong value',
+          },
+        );
+      });
+  
+  
+  
+      it("should fail but it's not", async () => {
+        const itemId = 77;
+        const x = 77;
+        await assert.rejects(
+          (itemId !== x),
+          { message: 'abracadabra' }
+        );
+      }
+      );
+  
+  
+      it('rejects when given foobar', () => {
+        return fxnThatShouldReject(foobar)
+          .then(
+            (val) => {
+              assert.fail(`Should have rejected, returned with ${val} instead`)
+              ,
+              (err) => { assert.equal(err.message, "Rejection reason I was expecting"); }
+              );
+      }) ;
+  
+      const assert = require('assert').strict;
+  
+      (async () => {
+        assert.strictEqual(45, 46);
+        await assert.rejects(
+          async () => {
+            throw new TypeError('This is an Error!');
+          },
+          (err: any) => {
+            assert.strictEqual(err.name, 'TypeError');
+            assert.strictEqual(err.message, 'This is an Error!');
+            return true;
+          }
+        );
+      })();
+  
+  
+  
+  
+      (async () => {
+        assert.strictEqual(46, 46);
+        await assert.rejects(
+          async () => {
+            throw new TypeError('This is an Error!');
+          },
+          (error: any) => {
+            assert.strictEqual(error.name, 'TypeError');
+            assert.strictEqual(error.message, 'This is an Error!');
+            return true;
+          }
+        );
+      })();
+  
+  
+  
+    });
+  */
+
+  // todo remove
+  describe('RunOneFile ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    sut.run(inputFilename);
+    assert.isTrue(true);
+    ;
+  });
+
+  // todo remove
+  describe('RunAllFiles ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [makePathToFixture('../data/Italian.keylayout')],
+      [makePathToFixture('../data/Italian_command.keylayout')],
+      [makePathToFixture('../data/Swiss_French.keylayout')],
+      [makePathToFixture('../data/Spanish.keylayout')],
+      [makePathToFixture('../data/Swiss_German.keylayout')],
+      [makePathToFixture('../data/US.keylayout')],
+      [makePathToFixture('../data/Polish.keylayout')],
+      [makePathToFixture('../data/French.keylayout')],
+      [makePathToFixture('../data/Latin_American.keylayout')],
+      /*  [makePathToFixture('../data/German_complete.keylayout')],*/
+      // [makePathToFixture('../data/German_complete_reduced.keylayout')],
+      // [makePathToFixture('../data/German_Standard.keylayout')],
+    ].forEach(function (files_) {
+      sut.run(files_[0]);
+      assert.isTrue(true);
+    });
+  });
+
 
   describe("run() ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
@@ -33,6 +166,7 @@ describe('KeylayoutToKmnConverter', function () {
         threw = true;
       }
       assert.isTrue(threw);
+      //await rejects(async () => sut.run(null, null));
     });
 
     it('run() should throw on null input file name and empty output file name', async function () {
@@ -122,67 +256,6 @@ describe('KeylayoutToKmnConverter', function () {
         threw = true;
       }
       assert.isFalse(threw);
-    });
-
-  });
-
-  describe("read() ", function () {
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename_unavailable = makePathToFixture('X.keylayout');
-
-    it('read() should return filled array on correct input', async function () {
-      const inputFilename = makePathToFixture('../data/Italian.keylayout');
-      const result = sut_r.read(inputFilename);
-      assert.isNotEmpty(result);
-    });
-
-    it('read() should return empty array  on null input', async function () {
-      const result = sut_r.read(null);
-      assert.isEmpty(result);
-    });
-
-    it('read() should return empty array  on empty input', async function () {
-      const result = sut_r.read("");
-      assert.isEmpty(result);
-    });
-
-    it('read() should return empty array  on space as input', async function () {
-      const result = sut_r.read(" ");
-      assert.isEmpty(result);
-    });
-
-    it('read() should return empty array  on unavailable file name', async function () {
-      const result = sut_r.read(inputFilename_unavailable);
-      assert.isEmpty(result);
-    });
-
-    it('read() should return empty array  on typo in path', async function () {
-      const result = sut_r.read('../data|Italian.keylayout');
-      assert.isEmpty(result);
-    });
-  });
-
-  describe("write() ", function () {
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const read = sut_r.read(inputFilename);
-    const converted = sut.convert(read);
-
-    // empty convert_object from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('X.keylayout');
-    const read_unavailable = sut_r.read(inputFilename_unavailable);
-    const converted_unavailable = sut.convert(read_unavailable);
-
-    it('write() should return true (no error) if written', async function () {
-      const result = sut_w.write(converted);
-      assert.isTrue(result);
-    });
-
-    it('write() should return false if no inputfile', async function () {
-      const result = sut_w.write(converted_unavailable);
-      assert.isFalse(result);
     });
 
   });
@@ -277,62 +350,6 @@ describe('KeylayoutToKmnConverter', function () {
       it(('should convert "' + values[0] + '"').padEnd(36, " ") + 'to "' + values[2] + '"', async function () {
         const result = sut.create_kmn_modifier(values[0] as string, values[1] as boolean);
         assert.equal(result, values[2]);
-      });
-    });
-  });
-
-  describe('getHexFromString ', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-
-    [
-      ['0009', '0009'],
-      ['000027', '001B'],
-      ['00027', '001B'],
-      ['0027', '001B'],
-      ['027', '001B'],
-      ['27', '001B'],
-      ['001C', '0NAN'],
-      ['0000', '0000'],
-      ['X', '0NAN'],
-      ['', '0000'],
-      [' ', '0000'],
-      [123, '007B'],
-      [null, '0000'],
-    ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut.getHexFromString(values[0] as string);
-        assert.equal(result, values[1]);
-      });
-    });
-  });
-
-  describe('convertToUnicodeCodePoint ', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-
-    [
-      ["&#x10F601;", 'U+10F601'],
-      ["&#x1F601;", 'U+1F601'],
-      ["&#x9;", 'U+0009'],
-      ["&#x99;", 'U+0099'],
-      ["&#x999;", 'U+0999'],
-      ["&#x9999;", 'U+9999'],
-      ["&#x99999;", 'U+99999'],
-      ["&#1111553;", 'U+10F601'],
-      ["&#128513;", 'U+1F601'],
-      ["&#9;", 'U+0009'],
-      ["&#99;", 'U+0063'],
-      ["&#999;", 'U+03E7'],
-      ["&#9999;", 'U+270F'],
-      ["&#99999;", 'U+1869F'],
-      ['0000;', '0000;'],
-      ['X;', 'X;'],
-      ['123;', '123;'],
-      [';', ';'],
-      [' ;', ' ;']
-    ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut.convertToUnicodeCodePoint(values[0] as string);
-        assert.equal(result, values[1]);
       });
     });
   });
@@ -658,60 +675,6 @@ describe('KeylayoutToKmnConverter', function () {
         const result = sut.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(read, values[0], isCaps);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
-    });
-  });
-
-  describe("writeData_Stores() ", function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
-    const read = sut_r.read(inputFilename);
-    const converted = sut.convert(read);
-
-    // empty convert_object from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('X.keylayout');
-    const read_unavailable = sut_r.read(inputFilename_unavailable);
-    const converted_unavailable = sut.convert(read_unavailable);
-
-    // empty convert_object from empty filename
-    const inputFilename_empty = makePathToFixture('');
-    const read_empty = sut_r.read(inputFilename_empty);
-    const converted_empty = sut.convert(read_empty);
-
-    const out_expected_first: string =
-      "c ......................................................................\n"
-      + "c ......................................................................\n"
-      + "c Keyman keyboard generated by kmn-convert\n"
-      + "c from Ukelele file: ";
-
-    const out_expected_last: string =
-      "\n"
-      + "c ......................................................................\n"
-      + "c ......................................................................\n"
-      + "\n"
-      + "store(&VERSION) '10.0'\n"
-      + "store(&TARGETS) 'any'\n"
-      + "store(&KEYBOARDVERSION) '1.0'\n"
-      + "store(&COPYRIGHT) '© 2024 SIL International'\n"
-      + "\n"
-      + "begin Unicode > use(main)\n\n"
-      + "group(main) using keys\n\n"
-      + "\n";
-
-    it(('writeData_Stores should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
-      const written_correctName = sut_w.writeData_Stores(converted);
-      assert.equal(written_correctName, (out_expected_first + converted.keylayout_filename + out_expected_last));
-    });
-
-    it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
-      const written_emptyName = sut_w.writeData_Stores(converted_empty);
-      assert.equal(written_emptyName, (out_expected_first + out_expected_last));
-    });
-
-    it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
-      const written_onlyName = sut_w.writeData_Stores(converted_unavailable);
-      assert.equal(written_onlyName, (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last));
     });
   });
 

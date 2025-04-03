@@ -133,10 +133,10 @@ export class KmnFileWriter {
           data += '\n';
         }
 
-        const warn_text = keylayoutKmnConverter.reviewRules(unique_data_Rules, k);
+        const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = keylayoutKmnConverter.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -174,10 +174,10 @@ export class KmnFileWriter {
 
       if (unique_data_Rules[k].rule_type === "C2") {
 
-        const warn_text = keylayoutKmnConverter.reviewRules(unique_data_Rules, k);
+        const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = keylayoutKmnConverter.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -234,10 +234,10 @@ export class KmnFileWriter {
     for (let k = 0; k < unique_data_Rules.length; k++) {
       if (unique_data_Rules[k].rule_type === "C3") {
 
-        const warn_text = keylayoutKmnConverter.reviewRules(unique_data_Rules, k);
+        const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = keylayoutKmnConverter.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
         if ((output_character_unicode.length > 1)
@@ -315,4 +315,523 @@ export class KmnFileWriter {
     }
     return data;
   }
+
+  /**
+   * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings
+   *         definition of comparisons e.g. 1-1, 2-4, 6-6
+   *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
+   * @param  rule : rule_object[] - an array of all rules
+   * @param  index the index of a rule in array[rule]
+   * @return a string[] containing possible warnings for a rule
+   */
+  public reviewRules(rule: rule_object[], index: number): string[] {
+
+    const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
+    const warningTextArray: string[] = Array(3).fill("");
+
+    // ------------------------- check unavailable modifiers -------------------------
+
+    if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_key)) {
+        warningTextArray[2] = "unavailable modifier : ";
+      }
+    }
+
+    else if (rule[index].rule_type === "C2") {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
+        warningTextArray[1] = "unavailable modifier : ";
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
+      }
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_key)) {
+        warningTextArray[2] = "unavailable modifier : ";
+      }
+    }
+
+    else if (rule[index].rule_type === "C3") {
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_prev_deadkey)) {
+        warningTextArray[0] = "unavailable modifier : ";
+        warningTextArray[1] = "unavailable superior rule ( ["
+          + rule[index].modifier_prev_deadkey + " "
+          + rule[index].prev_deadkey
+          + "]  >  dk(A"
+          + rule[index].id_prev_deadkey
+          + ") ) : ";
+
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
+      }
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
+        warningTextArray[1] = "unavailable modifier : ";
+        warningTextArray[2] = "unavailable superior rule ( ["
+          + rule[index].modifier_deadkey + " "
+          + rule[index].deadkey
+          + "]  >  dk(A"
+          + rule[index].id_deadkey
+          + ") ) : ";
+      }
+
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_key)) {
+        warningTextArray[2] = "unavailable modifier : ";
+      }
+    }
+
+    // ------------------------- check ambiguous/duplicate rules -------------------------
+
+    if ((rule[index].rule_type === "C0") || (rule[index].rule_type === "C1")) {
+
+      // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'A'
+      const amb_1_1 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C0" || curr.rule_type === "C1")
+        && curr.modifier_prev_deadkey === ""
+        && curr.prev_deadkey === ""
+        && curr.modifier_deadkey === ""
+        && curr.deadkey === ""
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'N'
+      const dup_1_1 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C0" || curr.rule_type === "C1")
+        && curr.modifier_prev_deadkey === ""
+        && curr.prev_deadkey === ""
+        && curr.modifier_deadkey === ""
+        && curr.deadkey === ""
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      // 4-1: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      const amb_4_1 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C3"))
+        && curr.modifier_prev_deadkey === rule[index].modifier_key
+        && curr.prev_deadkey === rule[index].key
+      );
+
+      // 2-1: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  'Ñ'
+      const amb_2_1 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C2"))
+        && curr.modifier_deadkey === rule[index].modifier_key
+        && curr.deadkey === rule[index].key
+      );
+
+      if (amb_4_1.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("ambiguous 4-1 rule: later: ["
+            + amb_4_1[0].modifier_prev_deadkey
+            + " "
+            + amb_4_1[0].prev_deadkey
+            + "]  >  dk(C"
+            + amb_2_1[0].id_deadkey
+            + ") ");
+      }
+
+      if (amb_2_1.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("ambiguous 2-1 rule: later: ["
+            + amb_2_1[0].modifier_deadkey
+            + " "
+            + amb_2_1[0].deadkey
+            + "]  >  dk(A"
+            + amb_2_1[0].id_deadkey
+            + ") ");
+      }
+
+      if (amb_1_1.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("ambiguous rule: earlier: ["
+            + amb_1_1[0].modifier_key
+            + " "
+            + amb_1_1[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(amb_1_1[0].output)
+            + "\' ");
+      }
+
+      if (dup_1_1.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("duplicate rule: earlier: ["
+            + dup_1_1[0].modifier_key
+            + " "
+            + dup_1_1[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(dup_1_1[0].output)
+            + "\' ");
+      }
+    }
+
+    if (rule[index].rule_type === "C2") {
+
+      // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C3)
+      const amb_2_2 = rule.filter((curr, idx) =>
+        curr.rule_type === "C2"
+        && curr.modifier_deadkey === rule[index].modifier_deadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.id_deadkey !== rule[index].id_deadkey
+        && idx < index
+      );
+
+      // 2-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C11)
+      const dup_2_2 = rule.filter((curr, idx) =>
+        curr.rule_type === "C2"
+        && curr.modifier_deadkey === rule[index].modifier_deadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.id_deadkey === rule[index].id_deadkey
+        && idx < index
+      );
+
+      //3-3: dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_3_3 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C2")
+        && curr.id_deadkey === rule[index].id_deadkey
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      //3-3: dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_3_3 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C2")
+        && curr.id_deadkey === rule[index].id_deadkey
+        && rule[index].unique_deadkey === 0
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+        && idx < index
+      );
+
+      // 4-2: + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
+      const amb_4_2 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C3"))
+        && curr.modifier_prev_deadkey === rule[index].modifier_deadkey
+        && curr.prev_deadkey === rule[index].deadkey
+        && curr.id_prev_deadkey === rule[index].id_deadkey
+      );
+
+      if (amb_2_2.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("ambiguous rule: earlier: ["
+            + amb_2_2[0].modifier_deadkey
+            + " "
+            + amb_2_2[0].deadkey
+            + "]  >  dk(C"
+            + amb_2_2[0].id_deadkey
+            + ") ");
+      }
+
+      if (dup_2_2.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("duplicate rule: earlier: ["
+            + dup_2_2[0].modifier_deadkey
+            + " "
+            + dup_2_2[0].deadkey
+            + "]  >  dk(C"
+            + dup_2_2[0].id_deadkey
+            + ") ");
+      }
+
+      if (amb_3_3.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("ambiguous rule: earlier: dk(A"
+            + amb_3_3[0].id_deadkey
+            + ") + ["
+            + amb_3_3[0].modifier_key
+            + " "
+            + amb_3_3[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(amb_3_3[0].output)
+            + "\' ");
+      }
+
+      if (dup_3_3.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("duplicate rule: earlier: dk(A"
+            + dup_3_3[0].id_deadkey
+            + ") + ["
+            + dup_3_3[0].modifier_key
+            + " "
+            + dup_3_3[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(dup_3_3[0].output)
+            + "\' ");
+      }
+
+      if (amb_4_2.length > 0) {
+        warningTextArray[0] = warningTextArray[0]
+          + ("ambiguous rule: later: ["
+            + amb_4_2[0].modifier_prev_deadkey
+            + " "
+            + amb_4_2[0].prev_deadkey
+            + "]  >  dk(C"
+            + amb_4_2[0].id_prev_deadkey
+            + ") ");
+      }
+    }
+
+    if (rule[index].rule_type === "C3") {
+
+      // 2-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(B11)
+      const amb_2_4 = rule.filter((curr, idx) =>
+        ((curr.rule_type === "C2"))
+        && curr.modifier_deadkey === rule[index].modifier_prev_deadkey
+        && curr.deadkey === rule[index].prev_deadkey
+        && curr.id_deadkey === rule[index].id_prev_deadkey
+      );
+
+      // 6-3  dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_6_3 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C2")
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+      );
+
+      // 6-3 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_6_3 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C2")
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output)
+      );
+
+      // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C1)
+      const amb_4_4 = rule.filter((curr, idx) =>
+        curr.rule_type === "C3"
+        && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
+        && curr.id_prev_deadkey !== rule[index].id_prev_deadkey
+        && curr.prev_deadkey === rule[index].prev_deadkey
+        && rule[index].unique_prev_deadkey !== 0
+        && idx < index
+      );
+
+      // 4-4 + [CAPS K_N]  >  dk(C11) <-> + [CAPS K_N]  >  dk(C11)
+      const dup_4_4 = rule.filter((curr, idx) =>
+        curr.rule_type === "C3"
+        && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
+        && curr.prev_deadkey === rule[index].prev_deadkey
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && idx < index
+      );
+
+      // 5-5
+      const amb_5_5 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C3")
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && curr.id_deadkey === rule[index].id_deadkey
+        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && idx < index
+      );
+
+      // 5-5
+      const dup_5_5 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C3")
+        && curr.modifier_deadkey === rule[index].modifier_deadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.id_deadkey === rule[index].id_deadkey
+        && rule[index].unique_deadkey === 0
+      );
+
+      // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
+      const amb_6_6 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C3")
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && idx < index
+      );
+
+      // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
+      const dup_6_6 = rule.filter((curr, idx) =>
+        (curr.rule_type === "C3")
+        && curr.id_deadkey === rule[index].id_deadkey
+        && curr.modifier_key === rule[index].modifier_key
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
+        && idx < index
+      );
+
+      if (amb_2_4.length > 0) {
+        warningTextArray[0] = warningTextArray[0]
+          + ("ambiguous rule: earlier: ["
+            + amb_2_4[0].modifier_deadkey
+            + " "
+            + amb_2_4[0].deadkey
+            + "]  >  dk(A"
+            + amb_2_4[0].id_deadkey
+            + ") ");
+      }
+
+      if (amb_6_3.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("ambiguous rule: earlier: dk(C"
+            + amb_6_3[0].id_deadkey
+            + ") + ["
+            + amb_6_3[0].modifier_key
+            + " "
+            + amb_6_3[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(amb_6_3[0].output)
+            + "\' ");
+      }
+
+      if (dup_6_3.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("duplicate rule: earlier: dk(C"
+            + dup_6_3[0].id_deadkey
+            + ") + ["
+            + dup_6_3[0].modifier_key
+            + " "
+            + dup_6_3[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(dup_6_3[0].output)
+            + "\' ");
+      }
+
+      if (amb_4_4.length > 0) {
+        warningTextArray[0] = warningTextArray[0]
+          + ("ambiguous rule: earlier: ["
+            + amb_4_4[0].modifier_prev_deadkey
+            + " "
+            + amb_4_4[0].prev_deadkey
+            + "]  >  dk(C"
+            + amb_4_4[0].id_prev_deadkey
+            + ") ");
+      }
+
+      if (dup_4_4.length > 0) {
+        warningTextArray[0] = warningTextArray[0]
+          + ("duplicate rule: earlier: ["
+            + dup_4_4[0].modifier_prev_deadkey
+            + " "
+            + dup_4_4[0].prev_deadkey
+            + "]  >  dk(C"
+            + dup_4_4[0].id_prev_deadkey
+            + ") ");
+      }
+
+      if (amb_5_5.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("ambiguous rule: earlier: dk(B"
+            + amb_5_5[0].id_prev_deadkey
+            + ") + ["
+            + amb_5_5[0].modifier_deadkey
+            + " "
+            + amb_5_5[0].deadkey
+            + "]  >  dk(B"
+            + amb_5_5[0].id_deadkey
+            + ") ");
+      }
+
+      if (dup_5_5.length > 0) {
+        warningTextArray[1] = warningTextArray[1]
+          + ("duplicate rule: earlier: dk(B"
+            + dup_5_5[0].id_prev_deadkey
+            + ") + ["
+            + dup_5_5[0].modifier_deadkey
+            + " "
+            + dup_5_5[0].deadkey
+            + "]  >  dk(B"
+            + dup_5_5[0].id_deadkey
+            + ") ");
+      }
+
+      if (amb_6_6.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("ambiguous rule: earlier: dk(B"
+            + amb_6_6[0].id_deadkey
+            + ") + ["
+            + amb_6_6[0].modifier_key
+            + " "
+            + amb_6_6[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(amb_6_6[0].output)
+            + "\' ");
+      }
+
+      if (dup_6_6.length > 0) {
+        warningTextArray[2] = warningTextArray[2]
+          + ("duplicate rule: earlier: dk(B"
+            + dup_6_6[0].id_deadkey
+            + ") + ["
+            + dup_6_6[0].modifier_key
+            + " "
+            + dup_6_6[0].key
+            + "]  >  \'"
+            + new TextDecoder().decode(dup_6_6[0].output)
+            + "\' ");
+      }
+    }
+    // In rare cases a rule might not be written out therefore we need to inform the user
+    const extra_warning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
+
+    if (warningTextArray[0] !== "") {
+      warningTextArray[0] = "c WARNING: " + warningTextArray[0] + "here: ";
+
+      if ((warningTextArray[0].indexOf("earlier:") > 0) && (warningTextArray[0].indexOf("later:") > 0)) {
+        warningTextArray[0] = warningTextArray[0] + extra_warning;
+      }
+    }
+    if (warningTextArray[1] !== "") {
+      warningTextArray[1] = "c WARNING: " + warningTextArray[1] + "here: ";
+
+      if ((warningTextArray[1].indexOf("earlier:") > 0) && (warningTextArray[1].indexOf("later:") > 0)) {
+        warningTextArray[1] = warningTextArray[1] + extra_warning;
+      }
+    }
+
+    if (warningTextArray[2] !== "") {
+      warningTextArray[2] = "c WARNING: " + warningTextArray[2] + "here: ";
+
+      if ((warningTextArray[2].indexOf("earlier:") > 0) && (warningTextArray[2].indexOf("later:") > 0)) {
+        warningTextArray[2] = warningTextArray[2] + extra_warning;
+      }
+    }
+    return warningTextArray;
+  }
+
+  /**
+   * @brief  member function to convert a numeric character reference to a unicode codepoint e.g. &#&#99 -> U+0063;  &#1111553 -> U+10F601
+   * @param  instr the value that will converted
+   * @return a unicode codepoint if instr is a numeric character reference
+   *         instr if instr is not a numeric character reference
+   */
+  public convertToUnicodeCodePoint(instr: string): string {
+
+    if (instr.substring(0, 3) === "&#x") {
+      const num_length = instr.length - instr.indexOf("x") - 1;
+      const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
+      return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
+    }
+
+    // if not hex: convert to hex
+    if ((instr.substring(0, 2) === "&#")) {
+      const num_length = instr.length - instr.indexOf("#") - 1;
+      const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
+      return "U+" + Number(num_str.slice(-num_length)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
+    }
+    else
+      return instr;
+  }
+
 }
