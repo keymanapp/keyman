@@ -36,8 +36,8 @@ class KeyboardDetailsView(Gtk.Dialog):
     # TODO clean up file once have what we want
     def __init__(self, parent, kmp):
         self.kmp = kmp
-        name = secure_lookup(kmp, 'name')
         # kmp has name, version, packageID, area
+        name = secure_lookup(kmp, 'name') or self.kmp['packageID']
         if name and "keyboard" in name.lower():
             wintitle = name
         else:
