@@ -608,6 +608,14 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     IBUS_OBJECT_CLASS (parent_class)->destroy ((IBusObject *)keyman);
 }
 
+/**
+ * Set text on the client
+ *
+ * Called by the Keyman service from the handler of the `SendText` method.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ * @param text    The text to be set on the client
+ */
 void ibus_keyman_set_text(IBusEngine *engine, const gchar *text)
 {
     IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -827,6 +835,23 @@ process_actions(
   finish_process_actions(engine);
 }
 
+/**
+ * Handler for the IBus `process-key-event` signal
+ *
+ * Called by IBus when the user presses a key. Called twice for each
+ * keypress: once when the key is pressed down and once when it is
+ * released.
+ *
+ * @param engine   A pointer to the IBusEngine instance
+ * @param keyval   The key value of the keypress
+ * @param keycode  The key code of the keypress
+ * @param state    Modifier flags
+ *
+ * @return TRUE if we processed the key event, i.e. if there were
+ * matching rules in the keyboard. No further processing of this key event
+ * will be done. Otherwise FALSE, allowing other interested parties to
+ * respond to the key event.
+ */
 static gboolean
 ibus_keyman_engine_process_key_event(
   IBusEngine *engine,
@@ -970,12 +995,24 @@ ibus_keyman_engine_process_key_event(
   return TRUE;
 }
 
+/**
+ * Handler for the IBus `set-surrounding-text` signal
+ *
+ * Called by IBus to let us know the surrounding text and the cursor position
+ * (and selection) in the text. This is used by Keyman as context.
+ *
+ * @param engine      A pointer to the IBusEngine instance
+ * @param text        The surrounding text
+ * @param cursor_pos  The position of the cursor in the text
+ * @param anchor_pos  The position of the anchor in the text
+ */
 static void
-ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
-                                            IBusText    *text,
-                                            guint       cursor_pos,
-                                            guint       anchor_pos)
-{
+ibus_keyman_engine_set_surrounding_text(
+  IBusEngine *engine,
+  IBusText    *text,
+  guint       cursor_pos,
+  guint       anchor_pos
+){
     parent_class->set_surrounding_text(engine, text, cursor_pos, anchor_pos);
     set_context_if_needed(engine);
 }
@@ -991,6 +1028,13 @@ ibus_keyman_engine_set_surrounding_text (IBusEngine *engine,
 //     parent_class->set_cursor_location (engine, x, y, w, h);
 // }
 
+/**
+ * Handler for the IBus `focus-in` signal
+ *
+ * Called by ibus when the client application receives focus
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_focus_in (IBusEngine *engine)
 {
@@ -1003,6 +1047,13 @@ ibus_keyman_engine_focus_in (IBusEngine *engine)
     parent_class->focus_in (engine);
 }
 
+/**
+ * Handler for the IBus `focus-out` signal
+ *
+ * Called by ibus when the client application loses focus
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_focus_out (IBusEngine *engine)
 {
@@ -1013,6 +1064,13 @@ ibus_keyman_engine_focus_out (IBusEngine *engine)
     parent_class->focus_out (engine);
 }
 
+/**
+ * Handler for the IBus `reset` signal
+ *
+ * Called by ibus when the IME is reset.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_reset (IBusEngine *engine)
 {
@@ -1021,8 +1079,13 @@ ibus_keyman_engine_reset (IBusEngine *engine)
     set_context_if_needed(engine);
 }
 
-
-
+/**
+ * Handler for the IBus `enable` signal
+ *
+ * Called by ibus when the IME is enabled.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_enable (IBusEngine *engine)
 {
@@ -1044,6 +1107,13 @@ ibus_keyman_engine_enable (IBusEngine *engine)
     parent_class->enable (engine);
 }
 
+/**
+ * Handler for the IBus `disable` signal
+ *
+ * Called by ibus when the IME is disabled.
+ *
+ * @param engine  A pointer to the IBusEngine instance
+ */
 static void
 ibus_keyman_engine_disable (IBusEngine *engine)
 {

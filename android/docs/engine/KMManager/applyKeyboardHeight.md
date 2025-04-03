@@ -38,7 +38,8 @@ For reference, here's a table of the default Keyman keyboard heights for various
  Device Type and Screen Orientation | Default height (dp) |
 |-----------------------------------|---------------------|
 | Default handset in portrait | 205 |
-| Default handset in landscape | 100 |
+| Default handset in landscape | 150 |
+| Extra High Density handset in landscape | 140 |
 | 7" tablet in portrait | 305 |
 | 7" tablet in landscape | 140 |
 | 10" tablet in portrait | 405 |
