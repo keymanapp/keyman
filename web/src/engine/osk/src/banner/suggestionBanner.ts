@@ -176,7 +176,7 @@ export class BannerSuggestion {
 
     if(suggestion && suggestion.displayAs) {
       const rawMetrics = getTextMetrics(suggestion.displayAs, format.emSize, format.styleForFont);
-      let projectedHeight = 0;
+      let projectedHeight = 1;
       if(rawMetrics.fontBoundingBoxAscent) {
         projectedHeight = rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent;
       }
