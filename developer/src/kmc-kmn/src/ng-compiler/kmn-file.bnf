@@ -30,3 +30,8 @@ variableStoreName: parameter
 anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket
 baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
+beginStatement: begin spacedEntryPoint?
+spacedEntryPoint: whitespace entryPoint
+entryPoint: unicode|newcontext|postkeystroke|ansi
+useStatement: use leftBracket whitespace? groupName whitespace? rightBracket
+groupName: parameter

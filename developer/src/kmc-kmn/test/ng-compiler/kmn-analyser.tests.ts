@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -795,6 +795,60 @@ describe("KMN Analyser Tests", () => {
       const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
       assert.isTrue(beepStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
+  });
+  describe("EntryPointRule Tests", () => {
+    it("can construct an EntryPointRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const entryPoint: Rule         = new EntryPointRule(tokenBuffer);
+      assert.isNotNull(entryPoint);
+    });
+    it("can parse correctly (unicode)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('unicode');
+      const entryPoint: Rule         = new EntryPointRule(tokenBuffer);
+      assert.isTrue(entryPoint.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.UNICODE));
+    });
+    it("can parse correctly (newcontext)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('newcontext');
+      const entryPoint: Rule         = new EntryPointRule(tokenBuffer);
+      assert.isTrue(entryPoint.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
+    });
+    it("can parse correctly (postkeystroke)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('postkeystroke');
+      const entryPoint: Rule         = new EntryPointRule(tokenBuffer);
+      assert.isTrue(entryPoint.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
+    });
+    it("can parse correctly (ansi)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('ansi');
+      const entryPoint: Rule         = new EntryPointRule(tokenBuffer);
+      assert.isTrue(entryPoint.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.ANSI));
+    });
+  });
+  describe("BeginStatementRule Tests", () => {
+    it("can construct an BeginStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isNotNull(beginStatement);
+    });
+    it("can parse correctly (entrypoint)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin unicode');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isTrue(beginStatement.parse(root));
+      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      assert.isNotNull(beginNode);
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.UNICODE));
+    });
+    it("can parse correctly (no entrypoint)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isTrue(beginStatement.parse(root));
+      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      assert.isNotNull(beginNode);
+      assert.isFalse(beginNode.hasChild());
     });
   });
 });

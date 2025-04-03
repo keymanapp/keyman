@@ -45,7 +45,7 @@ export class BlankLineRule extends SingleChildRule {
 export class OptionalCommentEndRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const commentEndRule: Rule  = new CommentEndRule(tokenBuffer);
+    const commentEndRule: Rule = new CommentEndRule(tokenBuffer);
     this.rule = new OptionalRule(tokenBuffer, commentEndRule);
   }
 }
@@ -489,3 +489,55 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
+export class BeginStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const begin: Rule                = new TokenRule(tokenBuffer, TokenTypes.BEGIN, true);
+    const optSpacedEntryPoint: Rule  = new OptionalSpacedEntryPointRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [begin, optSpacedEntryPoint]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const beginNode      = tmp.removeSoleChildOfType(NodeTypes.BEGIN);
+      const entryPointNode = tmp.getSoleChild();
+      if (entryPointNode !== null) {
+        beginNode.addChild(entryPointNode);
+      }
+      node.addChild(beginNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class SpacedEntryPointRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const entryPoint: Rule  = new EntryPointRule(tokenBuffer);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    this.rule = new SequenceRule(tokenBuffer, [whitespace, entryPoint]);
+  }
+}
+
+export class EntryPointRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const unicode: Rule       = new TokenRule(tokenBuffer, TokenTypes.UNICODE, true);
+    const newcontext: Rule    = new TokenRule(tokenBuffer, TokenTypes.NEWCONTEXT, true);
+    const postkeystroke: Rule = new TokenRule(tokenBuffer, TokenTypes.POSTKEYSTROKE, true);
+    const ansi: Rule          = new TokenRule(tokenBuffer, TokenTypes.ANSI, true);
+    this.rule = new AlternateRule(tokenBuffer, [
+      unicode, newcontext, postkeystroke, ansi,
+    ]);
+  }
+}
+
+export class OptionalSpacedEntryPointRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const spacedEntryPointRule: Rule = new SpacedEntryPointRule(tokenBuffer);
+    this.rule = new OptionalRule(tokenBuffer, spacedEntryPointRule);
+  }
+}

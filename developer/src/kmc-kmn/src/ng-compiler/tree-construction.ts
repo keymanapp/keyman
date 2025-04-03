@@ -9,9 +9,11 @@
 import { Token } from "./lexer.js";
 
 export enum NodeTypes {
+  ANSI,
   ANY,
   BASELAYOUT,
   BEEP,
+  BEGIN,
   BITMAP,
   CASEDKEYS,
   COPYRIGHT,
@@ -32,6 +34,8 @@ export enum NodeTypes {
   MNEMONICLAYOUT,
   LINE,
   NAME,
+  NEWCONTEXT,
+  POSTKEYSTROKE,
   RANGE,
   SHIFT_CODE,
   STORE,
@@ -39,6 +43,7 @@ export enum NodeTypes {
   TARGETS,
   TMP,
   U_CHAR,
+  UNICODE,
   VERSION,
   VIRTUAL_KEY,
   VISUALKEYBOARD,
