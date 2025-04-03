@@ -119,17 +119,35 @@ export class StringSystemStoreAssignRule extends SingleChildRule {
   }
 }
 
-export class StringSystemStoreRule extends SingleChildRule {
+abstract class AbstractSystemStoreRule extends SingleChildRule {
+  protected store: Rule;
+  protected leftBracket: Rule;
+  protected optWhitespace: Rule;
+  protected amphasand: Rule;
+  protected rightBracket: Rule;
+
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule                 = new TokenRule(tokenBuffer, TokenTypes.STORE);
-    const leftBracket: Rule           = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule         = new OptionalWhiteSpaceRule(tokenBuffer);
-    const amphasand: Rule             = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    this.store         = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    this.leftBracket   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    this.optWhitespace = new OptionalWhiteSpaceRule(tokenBuffer);
+    this.amphasand     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    this.rightBracket  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+  }
+}
+
+export class StringSystemStoreRule extends AbstractSystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
     const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
-    const rightBracket: Rule          = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, optWhitespace, amphasand, stringSystemStoreName, optWhitespace, rightBracket,
+      this.store,
+      this.leftBracket,
+      this.optWhitespace,
+      this.amphasand,
+      stringSystemStoreName,
+      this.optWhitespace,
+      this.rightBracket,
     ]);
   }
 }
@@ -348,17 +366,18 @@ export class CasedkeysStoreAssignRule extends SingleChildRule {
   }
 }
 
-export class CasedkeysStoreRule extends SingleChildRule {
+export class CasedkeysStoreRule extends AbstractSystemStoreRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule         = new TokenRule(tokenBuffer, TokenTypes.STORE);
-    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const amphasand: Rule     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
-    const casedkeys: Rule     = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
-    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    const casedkeys: Rule = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, optWhitespace, amphasand, casedkeys, optWhitespace, rightBracket,
+      this.store,
+      this.leftBracket,
+      this.optWhitespace,
+      this.amphasand,
+      casedkeys,
+      this.optWhitespace,
+      this.rightBracket,
     ]);
   }
 }
@@ -389,17 +408,18 @@ export class HotkeyStoreAssignRule extends SingleChildRule {
   }
 }
 
-export class HotkeyStoreRule extends SingleChildRule {
+export class HotkeyStoreRule extends AbstractSystemStoreRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule         = new TokenRule(tokenBuffer, TokenTypes.STORE);
-    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const amphasand: Rule     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
-    const hotkey: Rule     = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
-    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    const hotkey: Rule = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
     this.rule = new SequenceRule(tokenBuffer, [
-      store, leftBracket, optWhitespace, amphasand, hotkey, optWhitespace, rightBracket,
+      this.store,
+      this.leftBracket,
+      this.optWhitespace,
+      this.amphasand,
+      hotkey,
+      this.optWhitespace,
+      this.rightBracket,
     ]);
   }
 }
