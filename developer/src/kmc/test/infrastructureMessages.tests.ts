@@ -10,7 +10,7 @@ import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { clearOptions } from '../src/util/options.js';
 import { loadProject } from '../src/util/projectLoader.js';
-import { CompilerErrorNamespace, CompilerEvent, defaultCompilerOptions, CompilerOptions} from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerEvent, defaultCompilerOptions, CompilerOptions, DeveloperUtilsMessages} from '@keymanapp/developer-utils';
 import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
 import { BuildModelInfo } from '../src/commands/buildClasses/BuildModelInfo.js';
@@ -71,12 +71,12 @@ describe('InfrastructureMessages', function () {
       'ERROR_OutFileNotValidForProjects not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
 
-  // ERROR_InvalidProjectFile
+  // ERROR_InvalidProjectFile - test stays here for now though referencing developer-messages
 
   it('should generate ERROR_InvalidProjectFile if a project file is invalid', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     await unitTestEndpoints.build(makePathToFixture('invalid-projects', 'error_invalid_project_file.kpj'), null, ncb, {});
-    assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFile),
+    assert.isTrue(ncb.hasMessage(DeveloperUtilsMessages.ERROR_InvalidProjectFile),
       'ERROR_InvalidProjectFile not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
 
@@ -202,14 +202,14 @@ describe('InfrastructureMessages', function () {
     assertMessagesEqual(ncb.messages, expectedMessages);
   });
 
-  // ERROR_UnsupportedProjectVersion
+  // ERROR_UnsupportedProjectVersion (test stays here for now though referencing developer-utils)
 
   it('should generate ERROR_UnsupportedProjectVersion if a project file with an unsupported version is loaded', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     const filename = makePathToFixture('invalid-projects', 'error_unsupported_project_version.kpj');
     const expectedMessages = [
       InfrastructureMessages.INFO_BuildingFile,
-      InfrastructureMessages.ERROR_UnsupportedProjectVersion,
+      DeveloperUtilsMessages.ERROR_UnsupportedProjectVersion,
       InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully
     ];
     await unitTestEndpoints.build(filename, null, ncb, {compilerWarningsAsErrors: true});
