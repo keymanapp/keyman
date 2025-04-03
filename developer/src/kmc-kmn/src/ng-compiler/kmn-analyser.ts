@@ -155,30 +155,27 @@ export class StringSystemStoreRule extends AbstractSystemStoreRule {
 export class StringSystemStoreNameRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const bitmap: Rule           = new TokenRule(tokenBuffer, TokenTypes.BITMAP, true);
-    const copyright: Rule        = new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true);
-    const displaymap: Rule       = new TokenRule(tokenBuffer, TokenTypes.DISPLAYMAP, true);
-    const ethnologuecode: Rule   = new TokenRule(tokenBuffer, TokenTypes.ETHNOLOGUECODE, true);
-    const includecodes: Rule     = new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true);
-    const keyboardversion: Rule  = new TokenRule(tokenBuffer, TokenTypes.KEYBOARDVERSION, true);
-    const kmw_embedcss: Rule     = new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDCSS, true);
-    const kmw_embedjs: Rule      = new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDJS, true);
-    const kmw_helpfile: Rule     = new TokenRule(tokenBuffer, TokenTypes.KMW_HELPFILE, true);
-    const kmw_helptext: Rule     = new TokenRule(tokenBuffer, TokenTypes.KMW_HELPTEXT, true);
-    const kmw_rtl: Rule          = new TokenRule(tokenBuffer, TokenTypes.KMW_RTL, true);
-    const language: Rule         = new TokenRule(tokenBuffer, TokenTypes.LANGUAGE, true);
-    const layoutfile: Rule       = new TokenRule(tokenBuffer, TokenTypes.LAYOUTFILE, true);
-    const message: Rule          = new TokenRule(tokenBuffer, TokenTypes.MESSAGE, true);
-    const mnemoniclayout: Rule   = new TokenRule(tokenBuffer, TokenTypes.MNEMONICLAYOUT, true);
-    const name: Rule             = new TokenRule(tokenBuffer, TokenTypes.NAME, true);
-    const targets: Rule          = new TokenRule(tokenBuffer, TokenTypes.TARGETS, true);
-    const version: Rule          = new TokenRule(tokenBuffer, TokenTypes.VERSION, true);
-    const visualkeyboard: Rule   = new TokenRule(tokenBuffer, TokenTypes.VISUALKEYBOARD, true);
-    const windowslanguages: Rule = new TokenRule(tokenBuffer, TokenTypes.WINDOWSLANGUAGES, true);
     this.rule = new AlternateRule(tokenBuffer, [
-      bitmap, copyright, displaymap, ethnologuecode, includecodes, keyboardversion, kmw_embedcss,
-      kmw_embedjs, kmw_helpfile, kmw_helptext, kmw_rtl, language, layoutfile, message,
-      mnemoniclayout, name, targets, version, visualkeyboard, windowslanguages,
+      new TokenRule(tokenBuffer, TokenTypes.BITMAP, true),
+      new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true),
+      new TokenRule(tokenBuffer, TokenTypes.DISPLAYMAP, true),
+      new TokenRule(tokenBuffer, TokenTypes.ETHNOLOGUECODE, true),
+      new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true),
+      new TokenRule(tokenBuffer, TokenTypes.KEYBOARDVERSION, true),
+      new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDCSS, true),
+      new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDJS, true),
+      new TokenRule(tokenBuffer, TokenTypes.KMW_HELPFILE, true),
+      new TokenRule(tokenBuffer, TokenTypes.KMW_HELPTEXT, true),
+      new TokenRule(tokenBuffer, TokenTypes.KMW_RTL, true),
+      new TokenRule(tokenBuffer, TokenTypes.LANGUAGE, true),
+      new TokenRule(tokenBuffer, TokenTypes.LAYOUTFILE, true),
+      new TokenRule(tokenBuffer, TokenTypes.MESSAGE, true),
+      new TokenRule(tokenBuffer, TokenTypes.MNEMONICLAYOUT, true),
+      new TokenRule(tokenBuffer, TokenTypes.NAME, true),
+      new TokenRule(tokenBuffer, TokenTypes.TARGETS, true),
+      new TokenRule(tokenBuffer, TokenTypes.VERSION, true),
+      new TokenRule(tokenBuffer, TokenTypes.VISUALKEYBOARD, true),
+      new TokenRule(tokenBuffer, TokenTypes.WINDOWSLANGUAGES, true),
     ]);
   }
 }
