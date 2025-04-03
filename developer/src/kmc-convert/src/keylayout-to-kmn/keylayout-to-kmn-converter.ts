@@ -97,7 +97,7 @@ export class KeylayoutToKmnConverter {
   public convert(jsonObj: any, outputfilename: string = ""): convert_object {
 
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
-    const rule_object: rule_object[] = [];             // an array of data for a kmn rule
+    const rules: rule_object[] = [];                   // an array of data for kmn rules
     const jsonObj_any: any = jsonObj;
 
     const data_object: convert_object = {
@@ -112,17 +112,21 @@ export class KeylayoutToKmnConverter {
 
       data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
 
+      //  this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutFileReader.FILE_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
       //use join as in this.callbacks.path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8' 
       if ((outputfilename === "") || (outputfilename === null)) {
+        //  data_object.kmn_filename = (process.cwd() + "\\data\\" + data_object.keylayout_filename.substring(0, data_object.keylayout_filename.lastIndexOf(".")) + ".kmn");
         data_object.kmn_filename = (process.cwd() + "\\data\\" + data_object.keylayout_filename.substring(0, data_object.keylayout_filename.lastIndexOf(".")) + ".kmn");
       }
       else
         data_object.kmn_filename = outputfilename;
 
-      console.log("RUN kmc convert - input file: ", (process.cwd() + "\\data\\" + data_object.keylayout_filename), " -->  output file: ", data_object.kmn_filename);
+      //console.log("RUN kmc convert - input file: ", (process.cwd() + "\\data\\" + data_object.keylayout_filename), " -->  output file: ", data_object.kmn_filename);
+      console.log("RUN kmc convert - input file: ", (this.callbacks.path.dirname(data_object.kmn_filename) + "\\" + data_object.keylayout_filename), " -->  output file: ", data_object.kmn_filename);
+
 
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
-      data_object.arrayOf_Rules = rule_object;
+      data_object.arrayOf_Rules = rules;
 
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {

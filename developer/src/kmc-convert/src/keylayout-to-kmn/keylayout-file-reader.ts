@@ -14,6 +14,8 @@ export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
+  static readonly FILE_SUBFOLDER = 'data';
+
   /**
    * @brief  member function to box single-entry objects into arrays
    * @param  source the object to be changed
@@ -54,7 +56,7 @@ export class KeylayoutFileReader {
     };
 
     try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8');
+      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutFileReader.FILE_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
