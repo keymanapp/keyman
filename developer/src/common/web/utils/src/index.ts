@@ -63,7 +63,7 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerE
 
 export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.js';
 
-export { CommonTypesMessages } from './common-messages.js';
+export { DeveloperUtilsMessages } from './developer-utils-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
 export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
 
