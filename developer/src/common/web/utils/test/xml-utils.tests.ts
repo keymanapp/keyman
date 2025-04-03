@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 
 import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { LineFinder } from '../src/line-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 import { SymbolUtils } from '../src/symbol-utils.js';
 
@@ -175,7 +176,7 @@ describe(`XML Reader line number test`, () => {
 
     // now, parse. subsitute endings for Win
     const actual = reader.parse(xml);
-    const lines = KeymanXMLReader.textToLines(xml);
+    const lines = LineFinder.textToLines(xml);
     assert.ok(actual, `Parser failed on ${xmlPath}`);
 
     // now, assert char offset
@@ -188,13 +189,14 @@ describe(`XML Reader line number test`, () => {
     assert.equal(
       getMetaData(actual.keyboard3.transforms)?.startIndex, 186);
     assert.deepEqual(
-      KeymanXMLReader.offsetToLineColumn(
+      LineFinder.offsetToLineColumn(
         getMetaData(actual.keyboard3).startIndex, lines), { line: 3, column: 0 });
     assert.deepEqual(
-      KeymanXMLReader.offsetToLineColumn(
+      LineFinder.offsetToLineColumn(
         getMetaData(actual.keyboard3.info).startIndex, lines), { line: 4, column: 2 });
     assert.deepEqual(
-      KeymanXMLReader.offsetToLineColumn(
+      LineFinder.offsetToLineColumn(
         getMetaData(actual.keyboard3.transforms).startIndex, lines), { line: 8, column: 2 });
   });
 });
+

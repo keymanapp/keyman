@@ -115,11 +115,6 @@ const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   },
 };
 
-export interface LineColumn {
-  line: number;
-  column?: number;
-}
-
 export interface KeymanXMLMetadata extends XMLMetaData {
   /** override of name of XML file */
   [XML_FILENAME_SYMBOL]?: string;
@@ -149,29 +144,6 @@ export class KeymanXMLReader {
     SymbolUtils.copySymbols(m, metadata);
     o[XML_META_DATA_SYMBOL as any] = m;
     return m;
-  }
-
-  /** 
-   * preprocess text to turn it into arrays of line lengths.
-   * This is effectively a 1-based line length, since line 0 has length of
-   * 0.
-   */
-  public static textToLines(text: string) : number[] {
-    return [
-      0, // "line 0" is empty
-      ...text.replaceAll("\r\n", "\n").split("\n")
-      .map(l => l.length + 1) // line length (counting the trailing newline)
-    ];
-  }
-  public static offsetToLineColumn(offset: number, lines: number[]) : LineColumn {
-    for (let line = 1; line < lines.length; line++) { // 1-based (assume the first row is 0)
-      if (lines[line] > offset) {
-        return { line, column: offset };
-      }
-      offset = offset - (lines[line]); // count newline at end
-    }
-    // default: line 0, error
-    return { line: 0 }
   }
 
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
