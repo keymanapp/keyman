@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.227 beta 2025-04-03
+
+* fix(developer): remove redundant keyboard fields from .kps (#13600)
+* fix(developer): remove redundant Name and RTL fields from .kps `LexicalModel` (#13640)
+* fix(mac): reevaluate API compliance for each change in context (#13550)
+* fix(android): Move responsibility for setting keyboard height preference (#13635)
+* fix(android): Add back button to "Adjust Keyboard Height "menu (#13645)
+* fix(linux): allow unhandled keys to pass through to compliant apps (#13625)
+
 ## 18.0.226 beta 2025-04-02
 
 * docs(web): document internals for gesture modeling and processing (#13587)
