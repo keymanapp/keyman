@@ -25,6 +25,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -273,6 +274,8 @@ public final class KMManager {
   // will be blocked.
   private static boolean maySendCrashReport = true;
 
+  private final static String KMEngine_PrefsKey = "KMAPreferences";
+
   // Keyman public keys
   public static final String KMKey_ID = "id";
   public static final String KMKey_Name = "name";
@@ -295,8 +298,8 @@ public final class KMManager {
   public static final String KMKey_KMPInstall_Mode = "kmpInstallMode";
   public static final String KMKey_KeyboardModified = "lastModified";
   public static final String KMKey_KeyboardRTL = "rtl";
-  public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
-  public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
+  private static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
+  private static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
   public static final String KMKey_LongpressDelay = "longpressDelay";
 
@@ -344,6 +347,14 @@ public final class KMManager {
   public static final int KMDefault_LongpressDelay = 500;
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
+
+  // Default keyboard heights
+  public static final int KeyboardHeight_Reset = 0; // To reset to default, applyKeyboardHeight
+  public static final int KeyboardHeight_Invalid = -1; // If invalid orientation passed to functions
+  public static int KeyboardHeight_Context_Portrait_Default = 0; // Default portrait height
+  public static int KeyboardHeight_Context_Landscape_Default = 0; // Default landscape height
+  public static int KeyboardHeight_Context_Portrait_Current = 0; // Current portrait height
+  public static int KeyboardHeight_Context_Landscape_Current = 0; // Current landscape height
 
   // Default prediction/correction setting
   public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
@@ -498,6 +509,12 @@ public final class KMManager {
     migrateCloudKeyboards(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
+
+    calculateDefaultKeyboardHeights(context);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+
   }
 
   public static void executeResourceUpdate(Context aContext)
@@ -1463,7 +1480,7 @@ public final class KMManager {
    * @param suggestType SuggestionType
    */
   public static void setMaySuggest(String languageID, SuggestionType suggestType) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType.toInt());
     editor.commit();
@@ -1582,7 +1599,7 @@ public final class KMManager {
     model = model.replaceAll("\"", "'");
 
     // When entering password field, maySuggest should override to disabled
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     int suggestionPreference = prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
 
     RelativeLayout.LayoutParams params;
@@ -2213,7 +2230,7 @@ public final class KMManager {
    */
   public static int getLongpressDelay() {
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
 
     return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
   }
@@ -2230,7 +2247,7 @@ public final class KMManager {
     }
 
     SharedPreferences prefs = appContext.getSharedPreferences(
-      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
@@ -2266,21 +2283,87 @@ public final class KMManager {
     return bannerHeight;
   }
 
+  /**
+   * Returns the current keyboard height in dp for the current device orientation
+   */
   public static int getKeyboardHeight(Context context) {
-    int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-
     int orientation = getOrientation(context);
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
-    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      return prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, defaultHeight);
-    }
-
-    return defaultHeight;
+    return getKeyboardHeight(context, orientation); 
   }
 
+  /**
+   * Returns the current keyboard height in dp for the specified device 
+   * orientation
+   */
+  public static int getKeyboardHeight(Context context, int orientation) {
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        return KMManager.KeyboardHeight_Context_Portrait_Current;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        return KMManager.KeyboardHeight_Context_Landscape_Current;
+    } else {
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
+    }
+  }
+
+  /**
+   * Apply the keyboard height for the current orientation and store it in SharedPreferences.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that 
+   * orientation, resetting to the default height for the device/orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   */
   public static void applyKeyboardHeight(Context context, int height) {
+    int orientation = getOrientation(context);
+    applyKeyboardHeight(context, height, orientation); 
+  }
+
+  /**
+   * Apply the keyboard height for the specified orientation and store it in SharedPreferences.
+   * If height is KMManager.KeyboardHeight_Reset, remove the stored height for that orientation.
+   * @param context Context
+   * @param height int - keyboard height in dp
+   * @param orientation int - Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
+   */
+  public static void applyKeyboardHeight(Context context, int height, int orientation) {
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    int defaultHeightForContext = getDefaultKeyboardHeight(orientation);
+    if (orientation != Configuration.ORIENTATION_PORTRAIT && orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return; // Invalid orientation, do nothing
+    }
+    if (height == KMManager.KeyboardHeight_Reset) {
+      // Passing 0 will reset the stored height for this orientation.
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */{
+        editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
+      } 
+      height = defaultHeightForContext;
+    } else {
+      // Applying gating to 50%-200% of default height (following Keyman) 
+      if (height < (defaultHeightForContext / 2)) {
+        height = (int) (defaultHeightForContext / 2);
+      } else if (height > (defaultHeightForContext * 2)) {
+        height = (int) (defaultHeightForContext * 2);
+      } 
+
+      // Store the new height based on the current orientation
+      if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
+      } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
+        editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
+      }
+    }
+
+    // Update the height based on the current orientation
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      KeyboardHeight_Context_Landscape_Current = height;
+    } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
+      KeyboardHeight_Context_Portrait_Current = height;
+    }
+    editor.commit();
+    // Confirm new LayoutParams for in-app or system keyboards 
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
@@ -2291,6 +2374,53 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Returns the default keyboard height in dp for the current device 
+   * and orientation
+   */
+  public static int getDefaultKeyboardHeight(Context context) {
+    int orientation = getOrientation(context);
+    return getDefaultKeyboardHeight(orientation);
+  }
+
+  /**
+   * Returns the current keyboard height in dp for the specified orientation
+   * for the current device
+   */
+  public static int getDefaultKeyboardHeight(int orientation) {
+    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return KMManager.KeyboardHeight_Context_Portrait_Default;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return KMManager.KeyboardHeight_Context_Landscape_Default;
+    } else {
+      return KMManager.KeyboardHeight_Invalid; // Invalid orientation
+    }
+  }
+  
+  private static void calculateDefaultKeyboardHeights(Context context) {
+    if (isTestMode()) {
+      // Keyboard height not needed for unit tests  #13578
+      KeyboardHeight_Context_Portrait_Default = 0;
+      KeyboardHeight_Context_Landscape_Default = 0;
+      return;
+    } 
+
+    Resources resources = context.getResources();
+    Configuration originalConfig = resources.getConfiguration();
+
+    Configuration newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_PORTRAIT;
+    Context newContext = context.createConfigurationContext(newConfig);
+    Resources newResources = newContext.getResources();
+    KeyboardHeight_Context_Portrait_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
+
+    newConfig = new Configuration(originalConfig);
+    newConfig.orientation = Configuration.ORIENTATION_LANDSCAPE;
+    newContext = context.createConfigurationContext(newConfig);
+    newResources = newContext.getResources();
+    KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
   }
 
   /**
@@ -2322,7 +2452,7 @@ public final class KMManager {
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putBoolean(KMManager.KMKey_ShouldShowHelpBubble, flag);
     editor.commit();
