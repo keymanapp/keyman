@@ -39,7 +39,7 @@ For reference, here's a table of the default Keyman keyboard heights for various
 |-------------------------------|---------------------------------|----------------------------------|
 | Default handset (160dpi)      | 205 | 120 |
 | High Density handset (240dpi) | 170 | 100 |
-| Extra High Density handset (320dpi) |     | 140 |
+| Extra High Density handset (320dpi) | 270 | 140 |
 | 7" tablet                     | 305 | 140 |
 | 10" tablet                    | 405 | 200 |
 
