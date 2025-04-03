@@ -182,7 +182,7 @@ export class BannerSuggestion {
       const projectedHeight = rawMetrics.fontBoundingBoxAscent
         ? rawMetrics.fontBoundingBoxAscent + rawMetrics.fontBoundingBoxDescent
         : 1;
-      let ratio = Math.min(1, format.height / projectedHeight);
+      const ratio = Math.min(1, format.height / projectedHeight);
 
       // do we need font-height scaling?
       this._textWidth = rawMetrics.width * ratio;
