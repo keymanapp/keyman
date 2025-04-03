@@ -6,7 +6,13 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder, XmlBuilderOptions, X2jOptions } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { SymbolUtils } from "./symbol-utils.js";
+
+/** Symbol giving the start offset, in chars, of the node */
+const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
+/** Symbol giving an override which file a node came from */
+export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
@@ -48,6 +54,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
       // if we do need elements in the future, we'd check the preserve-space attribute here.
       return tagValue?.trim();
     },
+    captureMetaData: true,
     trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'keyboardTest3': {
@@ -108,9 +115,63 @@ const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   },
 };
 
+export interface LineColumn {
+  line: number;
+  column?: number;
+}
+
+export interface KeymanXMLMetadata extends XMLMetaData {
+  /** override of name of XML file */
+  [XML_FILENAME_SYMBOL]?: string;
+}
+
 /** wrapper for XML parsing support */
 export class KeymanXMLReader {
   public constructor(public type: KeymanXMLType) {
+  }
+
+  /** Get metadata on a node if not already set */
+  static getMetaData(o: any) : KeymanXMLMetadata {
+    if(!o) return o;
+    const metadata : KeymanXMLMetadata = o[XML_META_DATA_SYMBOL as any];
+    return metadata;
+  }
+
+  /** Set metadata if not already set */
+  public static setMetaData(o: any, metadata: KeymanXMLMetadata) : KeymanXMLMetadata {
+    let m : KeymanXMLMetadata = KeymanXMLReader.getMetaData(o);
+    if (!m) {
+      m = {};
+    }
+    // copy non-symbols
+    m = {...metadata, ...m};
+    // copy symbols
+    SymbolUtils.copySymbols(m, metadata);
+    o[XML_META_DATA_SYMBOL as any] = m;
+    return m;
+  }
+
+  /** 
+   * preprocess text to turn it into arrays of line lengths.
+   * This is effectively a 1-based line length, since line 0 has length of
+   * 0.
+   */
+  public static textToLines(text: string) : number[] {
+    return [
+      0, // "line 0" is empty
+      ...text.replaceAll("\r\n", "\n").split("\n")
+      .map(l => l.length + 1) // line length (counting the trailing newline)
+    ];
+  }
+  public static offsetToLineColumn(offset: number, lines: number[]) : LineColumn {
+    for (let line = 1; line < lines.length; line++) { // 1-based (assume the first row is 0)
+      if (lines[line] > offset) {
+        return { line, column: offset };
+      }
+      offset = offset - (lines[line]); // count newline at end
+    }
+    // default: line 0, error
+    return { line: 0 }
   }
 
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
@@ -131,9 +192,9 @@ export class KeymanXMLReader {
         }
       });
       if (attrs.length) {
-        e.push(['$', Object.fromEntries(attrs)]);
+        e.push(['$', SymbolUtils.copySymbols(Object.fromEntries(attrs), data)]);
       }
-      return Object.fromEntries(e);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -169,7 +230,7 @@ export class KeymanXMLReader {
           }
         }
       });
-      return Object.fromEntries(e);
+      return SymbolUtils.copySymbols(Object.fromEntries(e), data);
     } else {
       return data;
     }
@@ -249,12 +310,11 @@ export class KeymanXMLReader {
   }
 
   public parser() {
-    let options = PARSER_OPTIONS[this.type];
+    const options = PARSER_OPTIONS[this.type];
     if (!options) {
       /* c8 ignore next 1 */
       throw Error(`Internal error: unhandled XML type ${this.type}`);
     }
-    options = Object.assign({}, options); // TODO: xml2js likes to mutate the options here. Shallow clone the object.
     return new XMLParser(options);
   }
 }
