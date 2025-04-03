@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -706,6 +706,34 @@ describe("KMN Analyser Tests", () => {
       const casedkeysStore: Rule     = new CasedkeysStoreRule(tokenBuffer);
       assert.isTrue(casedkeysStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.CASEDKEYS));
+    });
+  });
+  describe("HotkeyStoreRule Tests", () => {
+    it("can construct a HotkeyStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const hotkeyStore: Rule        = new HotkeyStoreRule(tokenBuffer);
+      assert.isNotNull(hotkeyStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&hotkey)');
+      const hotkeyStore: Rule        = new HotkeyStoreRule(tokenBuffer);
+      assert.isTrue(hotkeyStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY));
+    });
+  });
+  describe("HotkeyStoreAssignRule Tests", () => {
+    it("can construct a HotkeyStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const hotkeyStoreAssign: Rule  = new HotkeyStoreAssignRule(tokenBuffer);
+      assert.isNotNull(hotkeyStoreAssign);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
+      const hotkeyStoreAssign: Rule  = new HotkeyStoreAssignRule(tokenBuffer);
+      assert.isTrue(hotkeyStoreAssign.parse(root));
+      const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
+      assert.isNotNull(hotkeyNode);
+      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
     });
   });
 });

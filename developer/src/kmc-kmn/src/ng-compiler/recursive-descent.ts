@@ -189,6 +189,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},
     {tokenType: TokenTypes.DISPLAYMAP,       nodeType: NodeTypes.DISPLAYMAP},
     {tokenType: TokenTypes.ETHNOLOGUECODE,   nodeType: NodeTypes.ETHNOLOGUECODE},
+    {tokenType: TokenTypes.HOTKEY,           nodeType: NodeTypes.HOTKEY},
     {tokenType: TokenTypes.INCLUDECODES,     nodeType: NodeTypes.INCLUDECODES},
     {tokenType: TokenTypes.KEYBOARDVERSION,  nodeType: NodeTypes.KEYBOARDVERSION},
     {tokenType: TokenTypes.KEY_CODE,         nodeType: NodeTypes.KEY_CODE},

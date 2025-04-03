@@ -362,3 +362,44 @@ export class CasedkeysStoreRule extends SingleChildRule {
     ]);
   }
 }
+
+export class HotkeyStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const hotkeyStore: Rule = new HotkeyStoreRule(tokenBuffer);
+    const padding: Rule     = new PaddingRule(tokenBuffer);
+    const virtualKey: Rule  = new VirtualKeyRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [hotkeyStore, padding, virtualKey]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const hotkeyNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.HOTKEY);
+      const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
+      const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      hotkeyNode.addChild(virtualKeyNode);
+      node.addChild(hotkeyNode);
+      if (lineNode !== null) {
+        node.addChild(lineNode);
+      }
+    }
+    return parseSuccess;
+  }
+}
+
+export class HotkeyStoreRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const store: Rule         = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const amphasand: Rule     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    const hotkey: Rule     = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
+    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      store, leftBracket, optWhitespace, amphasand, hotkey, optWhitespace, rightBracket,
+    ]);
+  }
+}
