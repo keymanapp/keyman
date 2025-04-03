@@ -709,21 +709,25 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
   }
 }
 
-static void
+/**
+ * Process the emit_keystroke action
+ *
+ * @param engine          A pointer to the IBusEngine instance.
+ * @param emit_keystroke  A boolean indicating whether to emit a keystroke.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
+static gboolean
 process_emit_keystroke_action(IBusEngine *engine, km_core_bool emit_keystroke) {
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
   if (client_supports_surrounding_text(engine)) {
     // compliant app
-    if (!emit_keystroke) {
-      return;
-    }
-    ibus_engine_forward_key_event(engine, keyman->commit_item->keyval,
-      keyman->commit_item->keycode, keyman->commit_item->state);
-    return;
+    return !emit_keystroke;
   }
 
   // non-compliant app
   keyman->commit_item->emitting_keystroke = emit_keystroke;
+  return TRUE;
 }
 
 static void
@@ -821,7 +825,15 @@ finish_process_actions(IBusEngine *engine) {
   }
 }
 
-static void
+/**
+ * Process the actions from Keyman Core
+ *
+ * @param engine   A pointer to the IBusEngine instance.
+ * @param actions  A pointer to the km_core_actions structure containing the actions to process.
+ *
+ * @returns TRUE if Keyman handled the event, FALSE otherwise.
+ */
+static gboolean
 process_actions(
   IBusEngine *engine,
   km_core_actions const *actions
@@ -830,9 +842,10 @@ process_actions(
   process_output_action(engine, actions->output);
   process_persist_action(engine, actions->persist_options);
   process_alert_action(actions->do_alert);
-  process_emit_keystroke_action(engine, actions->emit_keystroke);
+  gboolean result = process_emit_keystroke_action(engine, actions->emit_keystroke);
   process_capslock_action(actions->new_caps_lock_state);
   finish_process_actions(engine);
+  return result;
 }
 
 /**
@@ -982,17 +995,21 @@ ibus_keyman_engine_process_key_event(
   keyman->commit_item->char_buffer = NULL;
   const km_core_actions *core_actions = km_core_state_get_actions(keyman->state);
 
-  process_actions(engine, core_actions);
+  gboolean result = process_actions(engine, core_actions);
 
   // If we have a non-compliant client, i.e. a client that doesn't support
   // surrounding text (e.g. Chromium as of v104) we sent the key event
   // to the system service and now stop further processing by returning TRUE.
-  // With a compliant client (i.e. it does support surrounding text), we return
-  // TRUE because we completely processed the event and no further
-  // processing should happen.
-  g_message("%s: after processing all actions: %s", __FUNCTION__, debug_context2 = get_context_debug(engine));
+  //
+  // With a compliant client (i.e. supports surrounding text), it
+  // depends whether or not we handled the event. We return TRUE if we
+  // completely processed the event and no further processing should happen,
+  // or FALSE if someone else should handle the event (e.g. for a left-arrow
+  // key event).
+  g_message("%s: after processing all actions: %s, returning %s", __FUNCTION__,
+    debug_context2 = get_context_debug(engine), result ? "TRUE" : "FALSE");
 
-  return TRUE;
+  return result;
 }
 
 /**
