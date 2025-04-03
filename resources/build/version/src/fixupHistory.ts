@@ -3,7 +3,7 @@ import {
 } from '@actions/core';
 
 import { GitHub } from '@actions/github';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { gt } from 'semver';
 import { reportHistory } from './reportHistory.js';
 import { spawnChild } from './util/spawnAwait.js';
