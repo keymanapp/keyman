@@ -184,6 +184,7 @@ export class TokenRule extends Rule {
   }
 
   private static tokenToNode = [
+    {tokenType: TokenTypes.ANY,              nodeType: NodeTypes.ANY},
     {tokenType: TokenTypes.BITMAP,           nodeType: NodeTypes.BITMAP},
     {tokenType: TokenTypes.CASEDKEYS,        nodeType: NodeTypes.CASEDKEYS},
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},
@@ -202,8 +203,8 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.LAYOUTFILE,       nodeType: NodeTypes.LAYOUTFILE},
     {tokenType: TokenTypes.MESSAGE,          nodeType: NodeTypes.MESSAGE},
     {tokenType: TokenTypes.MNEMONICLAYOUT,   nodeType: NodeTypes.MNEMONICLAYOUT},
-    {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.NAME,             nodeType: NodeTypes.NAME},
+    {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.SHIFT_CODE,       nodeType: NodeTypes.SHIFT_CODE},
     {tokenType: TokenTypes.STRING,           nodeType: NodeTypes.STRING},
     {tokenType: TokenTypes.TARGETS,          nodeType: NodeTypes.TARGETS},

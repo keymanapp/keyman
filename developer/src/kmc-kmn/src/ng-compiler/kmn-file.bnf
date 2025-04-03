@@ -26,3 +26,5 @@ virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSqu
 spacedShiftCode: shiftcode whitespace
 variableStore: store leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
+
+anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket

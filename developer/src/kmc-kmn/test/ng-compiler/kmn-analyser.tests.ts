@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -750,6 +750,21 @@ describe("KMN Analyser Tests", () => {
       const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
       assert.isTrue(variableStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+    });
+  });
+  describe("AnyStatementRule Tests", () => {
+    it("can construct an AnyStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
+      assert.isNotNull(anyStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('any(digit)');
+      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
+      assert.isTrue(anyStatement.parse(root));
+      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
+      assert.isNotNull(anyNode);
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORE));
     });
   });
 });

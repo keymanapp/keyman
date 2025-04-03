@@ -430,3 +430,29 @@ export class VariableStoreNameRule extends SingleChildRule {
   };
 }
 
+export class AnyStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const any: Rule               = new TokenRule(tokenBuffer, TokenTypes.ANY, true);
+    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
+    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
+    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      any, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const anyNode   = tmp.getSoleChildOfType(NodeTypes.ANY);
+      const storeNode = tmp.getSoleChildOfType(NodeTypes.STORE);
+      anyNode.addChild(storeNode);
+      node.addChild(anyNode);
+    }
+    return parseSuccess;
+  }
+}
+
