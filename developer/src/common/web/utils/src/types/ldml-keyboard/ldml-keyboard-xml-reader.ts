@@ -281,7 +281,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       // Mark all children as an import
       subsubval.forEach(o => {
         o[ImportStatus.import] = basePath;
-        KeymanXMLReader.setMetaData(o, {[XML_FILENAME_SYMBOL]: importPath}); // mark overriding import path
+        KeymanXMLReader.setMetaData(o, {[XML_FILENAME_SYMBOL as any]: importPath}); // mark overriding import path
       });
 
       if (implied) {
