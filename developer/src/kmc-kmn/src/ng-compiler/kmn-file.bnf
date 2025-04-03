@@ -29,3 +29,4 @@ variableStoreName: parameter
 
 anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket
 baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket
+beepStatement: beep

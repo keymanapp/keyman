@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -782,6 +782,19 @@ describe("KMN Analyser Tests", () => {
       const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"en-US"');
+    });
+  });
+  describe("BeepStatementRule Tests", () => {
+    it("can construct an BeepStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
+      assert.isNotNull(beepStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('beep');
+      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
+      assert.isTrue(beepStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
     });
   });
 });

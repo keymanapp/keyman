@@ -11,6 +11,7 @@ import { Token } from "./lexer.js";
 export enum NodeTypes {
   ANY,
   BASELAYOUT,
+  BEEP,
   BITMAP,
   CASEDKEYS,
   COPYRIGHT,

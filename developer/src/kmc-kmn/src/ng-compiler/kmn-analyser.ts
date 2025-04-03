@@ -482,3 +482,10 @@ export class BaselayoutStatementRule extends SingleChildRule {
   }
 }
 
+export class BeepStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    this.rule = new TokenRule(tokenBuffer, TokenTypes.BEEP, true);
+  }
+}
+
