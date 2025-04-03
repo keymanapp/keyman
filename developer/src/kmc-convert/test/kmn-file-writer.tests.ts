@@ -7,11 +7,13 @@
 
 import 'mocha';
 import { assert } from 'chai';
+import { util } from '@keymanapp/common-types';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 //import { rejects, doesNotReject } from "node:assert";
+
 
 //-----------------------------------------------------------------------------------------------------------------------
 
@@ -58,15 +60,15 @@ describe('KmnFileWriter', function () {
     const inputFilename_unavailable = makePathToFixture('X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert(read_unavailable);
-    
+
     it('writeData_Rules() should return true (no error) if written', async function () {
       const result = sut_w.writeData_Rules(converted);
-      assert.isTrue(result.length>0);
+      assert.isTrue(result.length > 0);
     });
 
     it('writeData_Rules() should return false if no inputfile', async function () {
       const result = sut_w.writeData_Rules(converted_unavailable);
-      assert.isFalse(result.length>0);
+      assert.isFalse(result.length > 0);
     });
 
   });
@@ -150,7 +152,6 @@ describe('KmnFileWriter', function () {
   });
 
   describe('convertToUnicodeCodePoint ', function () {
-    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -173,7 +174,7 @@ describe('KmnFileWriter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sut_w.convertToUnicodeCodePoint(values[0] as string);
+        const result = util.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });

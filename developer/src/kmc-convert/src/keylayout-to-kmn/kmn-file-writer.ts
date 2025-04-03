@@ -7,6 +7,7 @@
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, convert_object, rule_object } from './keylayout-to-kmn-converter.js';
+import { util } from '@keymanapp/common-types';
 
 export class KmnFileWriter {
 
@@ -136,7 +137,7 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -177,7 +178,7 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
         if ((output_character_unicode.length > 1)
@@ -237,7 +238,7 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = this.convertToUnicodeCodePoint(output_character);
+        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
         if ((output_character_unicode.length > 1)
@@ -809,29 +810,4 @@ export class KmnFileWriter {
     }
     return warningTextArray;
   }
-
-  /**
-   * @brief  member function to convert a numeric character reference to a unicode codepoint e.g. &#&#99 -> U+0063;  &#1111553 -> U+10F601
-   * @param  instr the value that will converted
-   * @return a unicode codepoint if instr is a numeric character reference
-   *         instr if instr is not a numeric character reference
-   */
-  public convertToUnicodeCodePoint(instr: string): string {
-
-    if (instr.substring(0, 3) === "&#x") {
-      const num_length = instr.length - instr.indexOf("x") - 1;
-      const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
-      return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
-    }
-
-    // if not hex: convert to hex
-    if ((instr.substring(0, 2) === "&#")) {
-      const num_length = instr.length - instr.indexOf("#") - 1;
-      const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
-      return "U+" + Number(num_str.slice(-num_length)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
-    }
-    else
-      return instr;
-  }
-
 }
