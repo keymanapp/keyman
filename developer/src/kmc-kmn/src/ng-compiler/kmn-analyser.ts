@@ -84,9 +84,14 @@ export class ContentRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
+    const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule(tokenBuffer);
+    const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule(tokenBuffer);
     const variableStoreAssign: Rule     = new VariableStoreAssignRule(tokenBuffer);
     this.rule = new AlternateRule(tokenBuffer, [
-      stringSystemStoreAssign, variableStoreAssign
+      stringSystemStoreAssign,
+      casedkeysStoreAssign,
+      hotkeyStoreAssign,
+      variableStoreAssign,
     ]);
   }
 }
@@ -181,6 +186,88 @@ export class StringSystemStoreNameRule extends SingleChildRule {
       tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
     });
     this.rule = new AlternateRule(tokenBuffer, tokenRules);
+  }
+}
+
+export class CasedkeysStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const casedkeysStore: Rule      = new CasedkeysStoreRule(tokenBuffer);
+    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
+    this.rule = new SequenceRule(tokenBuffer, [casedkeysStore, oneOrManyPaddedText]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const casedkeysNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.CASEDKEYS);
+      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const textNodes: ASTNode[]   = tmp.getChildren();
+      casedkeysNode.addChildren(textNodes);
+      node.addChild(casedkeysNode);
+      node.addChildren(lineNodes);
+    }
+    return parseSuccess;
+  }
+}
+
+export class CasedkeysStoreRule extends AbstractSystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const casedkeys: Rule = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      this.store,
+      this.leftBracket,
+      this.optWhitespace,
+      this.amphasand,
+      casedkeys,
+      this.optWhitespace,
+      this.rightBracket,
+    ]);
+  }
+}
+
+export class HotkeyStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const hotkeyStore: Rule = new HotkeyStoreRule(tokenBuffer);
+    const padding: Rule     = new PaddingRule(tokenBuffer);
+    const virtualKey: Rule  = new VirtualKeyRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [hotkeyStore, padding, virtualKey]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const hotkeyNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.HOTKEY);
+      const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
+      const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      hotkeyNode.addChild(virtualKeyNode);
+      node.addChild(hotkeyNode);
+      if (lineNode !== null) {
+        node.addChild(lineNode);
+      }
+    }
+    return parseSuccess;
+  }
+}
+
+export class HotkeyStoreRule extends AbstractSystemStoreRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const hotkey: Rule = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
+    this.rule = new SequenceRule(tokenBuffer, [
+      this.store,
+      this.leftBracket,
+      this.optWhitespace,
+      this.amphasand,
+      hotkey,
+      this.optWhitespace,
+      this.rightBracket,
+    ]);
   }
 }
 
@@ -343,84 +430,3 @@ export class VariableStoreNameRule extends SingleChildRule {
   };
 }
 
-export class CasedkeysStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const casedkeysStore: Rule      = new CasedkeysStoreRule(tokenBuffer);
-    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
-    this.rule = new SequenceRule(tokenBuffer, [casedkeysStore, oneOrManyPaddedText]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const casedkeysNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.CASEDKEYS);
-      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const textNodes: ASTNode[]   = tmp.getChildren();
-      casedkeysNode.addChildren(textNodes);
-      node.addChild(casedkeysNode);
-      node.addChildren(lineNodes);
-    }
-    return parseSuccess;
-  }
-}
-
-export class CasedkeysStoreRule extends AbstractSystemStoreRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const casedkeys: Rule = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.amphasand,
-      casedkeys,
-      this.optWhitespace,
-      this.rightBracket,
-    ]);
-  }
-}
-
-export class HotkeyStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const hotkeyStore: Rule = new HotkeyStoreRule(tokenBuffer);
-    const padding: Rule     = new PaddingRule(tokenBuffer);
-    const virtualKey: Rule  = new VirtualKeyRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [hotkeyStore, padding, virtualKey]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const hotkeyNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.HOTKEY);
-      const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
-      hotkeyNode.addChild(virtualKeyNode);
-      node.addChild(hotkeyNode);
-      if (lineNode !== null) {
-        node.addChild(lineNode);
-      }
-    }
-    return parseSuccess;
-  }
-}
-
-export class HotkeyStoreRule extends AbstractSystemStoreRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const hotkey: Rule = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
-    this.rule = new SequenceRule(tokenBuffer, [
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.amphasand,
-      hotkey,
-      this.optWhitespace,
-      this.rightBracket,
-    ]);
-  }
-}
