@@ -11,9 +11,11 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginStatementRule, BlankLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreAssignRule, StringSystemStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { TextRangeRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 
 let root: ASTNode = null;
