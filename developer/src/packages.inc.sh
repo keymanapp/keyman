@@ -18,5 +18,6 @@ readonly PACKAGES=(
   developer/src/kmc-model
   developer/src/kmc-model-info
   developer/src/kmc-package
+  developer/src/kmc-test
   developer/src/kmc
 )

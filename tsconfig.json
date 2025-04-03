@@ -32,6 +32,8 @@
     { "path": "./developer/src/kmc-model-info/tsconfig.json" },
     { "path": "./developer/src/kmc-package/test/tsconfig.json" },
     { "path": "./developer/src/kmc-package/tsconfig.json" },
+    { "path": "./developer/src/kmc-test/test/tsconfig.json" },
+    { "path": "./developer/src/kmc-test/tsconfig.json" },
     { "path": "./developer/src/server/tsconfig.json" },
 
     { "path": "./resources/build/version/" },

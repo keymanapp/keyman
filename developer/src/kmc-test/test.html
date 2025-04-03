@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@keymanapp/developer-utils": "/developer/src/common/web/utils/build/src/index.js",
+          "@keymanapp/common-types": "/common/web/types/build/src/main.js",
+          "@keymanapp/keyman-version": "/common/web/keyman-version/build/version.inc.js",
+          "@keymanapp/ldml-keyboard-constants": "/core/include/ldml/build/keyman_core_ldml.js",
+          "restructure": "/node_modules/restructure/index.js",
+          "fast-xml-parser": "/developer/src/kmc-test/src/import/fxp/fxp.js",
+          "path-browserify": "/developer/src/kmc-test/src/import/path-browserify.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { km_core_factory } from './build/src/core-wrapper.js';
+      import { KeymanTester } from './build/src/KeymanTester.js';
+
+      async function start() {
+        const core = await km_core_factory();
+        const attr = core.tmp_wasm_attributes();
+        console.dir(attr);
+
+        const callbacks = new BrowserCompilerCallbacks();
+        const projectSource = '/developer/src/kmc-test/test/fixtures/khmer_ldml/khmer_ldml.kpj';
+        const tester = new KeymanTester();
+        assert.isTrue(await tester.init(callbacks, {}));
+        const result = await tester.run(projectSource);
+
+      }
+
+      window.addEventListener('load', () => {
+        const go = document.getElementById('go');
+        go.addEventListener('click', start);
+      });
+    </script>
+  </head>
+  <body>
+    <input type="button" id="go">
+  </body>
+</html>
