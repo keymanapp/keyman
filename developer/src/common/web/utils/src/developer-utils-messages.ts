@@ -4,14 +4,14 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
-const CommonTypesErrMask   = CompilerErrorNamespace.CommonTypes;
-// const SevInfo = CompilerErrorSeverity.Info   | CommonTypesErrMask;
-// const SevHint = CompilerErrorSeverity.Hint   | CommonTypesErrMask;
-// const SevWarn = CompilerErrorSeverity.Warn   | CommonTypesErrMask;
-const SevError = CompilerErrorSeverity.Error | CommonTypesErrMask;
-// const SevFatal = CompilerErrorSeverity.Fatal | CommonTypesErrMask;
+const DeveloperUtilsErrMask   = CompilerErrorNamespace.DeveloperUtils;
+// const SevInfo = CompilerErrorSeverity.Info   | DeveloperUtilsErrMask;
+// const SevHint = CompilerErrorSeverity.Hint   | DeveloperUtilsErrMask;
+// const SevWarn = CompilerErrorSeverity.Warn   | DeveloperUtilsErrMask;
+const SevError = CompilerErrorSeverity.Error | DeveloperUtilsErrMask;
+// const SevFatal = CompilerErrorSeverity.Fatal | DeveloperUtilsErrMask;
 
-export class CommonTypesMessages {
+export class DeveloperUtilsMessages {
   // structured Ajv validation error
   static ERROR_SchemaValidationError = SevError | 0x0001;
   static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
