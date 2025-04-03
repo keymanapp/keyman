@@ -9,7 +9,7 @@ stringSystemStoreAssign: stringSystemStore padding string
 stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
 stringSystemStoreName: bitmap|copyright|displaymap|ethnologuecode|includecodes|
   keyboardversion|kmw_embedcss|kmw_embedjs|kmw_helpfile|kmw_helptext|kmw_rtl|
-  language|layoutfile|message|mnemoniclayout|name|target|version|
+  language|layoutfile|message|mnemoniclayout|name|targets|version|
   visualkeyboard|windowslanguages
 variableStoreAssign: variableStore paddedText+
 paddedText: padding text
@@ -21,3 +21,8 @@ virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSqu
 spacedShiftCode: shiftcode whitespace
 variableStore: store leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
+
+casedkeysStoreAssign: casedkeysStore paddedText+
+casedkeysStore: store leftBracket whitespace? amphasand casedkeys whitespace? rightBracket
+hotkeyStoreAssign: hotkeyStore padding virtualKey
+hotkeyStore: store leftBracket whitespace? amphasand hotkey whitespace? rightBracket

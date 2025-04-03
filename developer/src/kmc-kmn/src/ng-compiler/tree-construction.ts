@@ -10,6 +10,7 @@ import { Token } from "./lexer.js";
 
 export enum NodeTypes {
   BITMAP,
+  CASEDKEYS,
   COPYRIGHT,
   DISPLAYMAP,
   ETHNOLOGUECODE,

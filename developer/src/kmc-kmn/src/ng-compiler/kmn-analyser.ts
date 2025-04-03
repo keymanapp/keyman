@@ -323,3 +323,42 @@ export class VariableStoreNameRule extends SingleChildRule {
     return parseSuccess;
   };
 }
+
+export class CasedkeysStoreAssignRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const casedkeysStore: Rule      = new CasedkeysStoreRule(tokenBuffer);
+    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
+    this.rule = new SequenceRule(tokenBuffer, [casedkeysStore, oneOrManyPaddedText]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const casedkeysNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.CASEDKEYS);
+      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const textNodes: ASTNode[]   = tmp.getChildren();
+      casedkeysNode.addChildren(textNodes);
+      node.addChild(casedkeysNode);
+      node.addChildren(lineNodes);
+    }
+    return parseSuccess;
+  }
+}
+
+export class CasedkeysStoreRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const store: Rule         = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const amphasand: Rule     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
+    const casedkeys: Rule     = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
+    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      store, leftBracket, optWhitespace, amphasand, casedkeys, optWhitespace, rightBracket,
+    ]);
+  }
+}

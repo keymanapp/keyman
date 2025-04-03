@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BlankLineRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -646,6 +646,66 @@ describe("KMN Analyser Tests", () => {
       const variableStore: Rule      = new VariableStoreRule(tokenBuffer);
       assert.isTrue(variableStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+    });
+  });
+  describe("CasedkeysStoreAssignRule Tests", () => {
+    it("can construct a CasedkeysStoreAssignRule", () => {
+      const tokenBuffer: TokenBuffer   = stringToTokenBuffer('');
+      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule(tokenBuffer);
+      assert.isNotNull(casedkeysStoreAssign);
+    });
+    it("can parse correctly (single virtual key)", () => {
+      const tokenBuffer: TokenBuffer   = stringToTokenBuffer('store(&casedkeys) [K_A]');
+      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule(tokenBuffer);
+      assert.isTrue(casedkeysStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+    });
+    it("can parse correctly (two virtual keys)", () => {
+      const tokenBuffer: TokenBuffer   = stringToTokenBuffer('store(&casedkeys) [K_A] [K_B]');
+      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule(tokenBuffer);
+      assert.isTrue(casedkeysStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const children = casedkeysNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[1].getSoleChild().getText(), 'K_B');
+    });
+    it("can parse correctly (virtual key range)", () => {
+      const tokenBuffer: TokenBuffer   = stringToTokenBuffer('store(&casedkeys) [K_A]..[K_C]');
+      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule(tokenBuffer);
+      assert.isTrue(casedkeysStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+    });
+    it("can parse correctly (character range)", () => {
+      const tokenBuffer: TokenBuffer   = stringToTokenBuffer('store(&casedkeys) "a".."c"');
+      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule(tokenBuffer);
+      assert.isTrue(casedkeysStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].getText(), '"c"');
+    });
+  });
+  describe("CasedkeysStoreRule Tests", () => {
+    it("can construct a CasedkeysStoreRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const casedkeysStore: Rule     = new CasedkeysStoreRule(tokenBuffer);
+      assert.isNotNull(casedkeysStore);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&casedkeys)');
+      const casedkeysStore: Rule     = new CasedkeysStoreRule(tokenBuffer);
+      assert.isTrue(casedkeysStore.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CASEDKEYS));
     });
   });
 });
