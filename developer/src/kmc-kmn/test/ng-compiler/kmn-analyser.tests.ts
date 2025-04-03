@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BlankLineRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule, ContinuationNewlineRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule, TextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -765,6 +765,23 @@ describe("KMN Analyser Tests", () => {
       const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
       assert.isNotNull(anyNode);
       assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORE));
+    });
+  });
+  describe("BaselayoutStatementRule Tests", () => {
+    it("can construct an BaselayoutStatementRule", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('');
+      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
+      assert.isNotNull(baselayoutStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('baselayout("en-US")');
+      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
+      assert.isTrue(baselayoutStatement.parse(root));
+      const baselayoutNode = root.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      assert.isNotNull(baselayoutNode);
+      const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"en-US"');
     });
   });
 });

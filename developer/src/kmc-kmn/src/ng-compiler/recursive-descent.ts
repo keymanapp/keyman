@@ -185,6 +185,7 @@ export class TokenRule extends Rule {
 
   private static tokenToNode = [
     {tokenType: TokenTypes.ANY,              nodeType: NodeTypes.ANY},
+    {tokenType: TokenTypes.BASELAYOUT,       nodeType: NodeTypes.BASELAYOUT},
     {tokenType: TokenTypes.BITMAP,           nodeType: NodeTypes.BITMAP},
     {tokenType: TokenTypes.CASEDKEYS,        nodeType: NodeTypes.CASEDKEYS},
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},

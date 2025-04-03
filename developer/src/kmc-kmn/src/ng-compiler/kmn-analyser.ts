@@ -456,3 +456,29 @@ export class AnyStatementRule extends SingleChildRule {
   }
 }
 
+export class BaselayoutStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const baselayout: Rule    = new TokenRule(tokenBuffer, TokenTypes.BASELAYOUT, true);
+    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const stringRule: Rule    = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
+    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      baselayout, leftBracket, optWhitespace, stringRule, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const baselayoutNode  = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      const stringNode      = tmp.getSoleChildOfType(NodeTypes.STRING);
+      baselayoutNode.addChild(stringNode);
+      node.addChild(baselayoutNode);
+    }
+    return parseSuccess;
+  }
+}
+
