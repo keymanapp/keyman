@@ -155,28 +155,32 @@ export class StringSystemStoreRule extends AbstractSystemStoreRule {
 export class StringSystemStoreNameRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [
-      new TokenRule(tokenBuffer, TokenTypes.BITMAP, true),
-      new TokenRule(tokenBuffer, TokenTypes.COPYRIGHT, true),
-      new TokenRule(tokenBuffer, TokenTypes.DISPLAYMAP, true),
-      new TokenRule(tokenBuffer, TokenTypes.ETHNOLOGUECODE, true),
-      new TokenRule(tokenBuffer, TokenTypes.INCLUDECODES, true),
-      new TokenRule(tokenBuffer, TokenTypes.KEYBOARDVERSION, true),
-      new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDCSS, true),
-      new TokenRule(tokenBuffer, TokenTypes.KMW_EMBEDJS, true),
-      new TokenRule(tokenBuffer, TokenTypes.KMW_HELPFILE, true),
-      new TokenRule(tokenBuffer, TokenTypes.KMW_HELPTEXT, true),
-      new TokenRule(tokenBuffer, TokenTypes.KMW_RTL, true),
-      new TokenRule(tokenBuffer, TokenTypes.LANGUAGE, true),
-      new TokenRule(tokenBuffer, TokenTypes.LAYOUTFILE, true),
-      new TokenRule(tokenBuffer, TokenTypes.MESSAGE, true),
-      new TokenRule(tokenBuffer, TokenTypes.MNEMONICLAYOUT, true),
-      new TokenRule(tokenBuffer, TokenTypes.NAME, true),
-      new TokenRule(tokenBuffer, TokenTypes.TARGETS, true),
-      new TokenRule(tokenBuffer, TokenTypes.VERSION, true),
-      new TokenRule(tokenBuffer, TokenTypes.VISUALKEYBOARD, true),
-      new TokenRule(tokenBuffer, TokenTypes.WINDOWSLANGUAGES, true),
-    ]);
+    const tokenRules: TokenRule[] = [];
+    [
+      TokenTypes.BITMAP,
+      TokenTypes.COPYRIGHT,
+      TokenTypes.DISPLAYMAP,
+      TokenTypes.ETHNOLOGUECODE,
+      TokenTypes.INCLUDECODES,
+      TokenTypes.KEYBOARDVERSION,
+      TokenTypes.KMW_EMBEDCSS,
+      TokenTypes.KMW_EMBEDJS,
+      TokenTypes.KMW_HELPFILE,
+      TokenTypes.KMW_HELPTEXT,
+      TokenTypes.KMW_RTL,
+      TokenTypes.LANGUAGE,
+      TokenTypes.LAYOUTFILE,
+      TokenTypes.MESSAGE,
+      TokenTypes.MNEMONICLAYOUT,
+      TokenTypes.NAME,
+      TokenTypes.TARGETS,
+      TokenTypes.VERSION,
+      TokenTypes.VISUALKEYBOARD,
+      TokenTypes.WINDOWSLANGUAGES,
+    ].forEach((tokenType) => {
+      tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
+    });
+    this.rule = new AlternateRule(tokenBuffer, tokenRules);
   }
 }
 
