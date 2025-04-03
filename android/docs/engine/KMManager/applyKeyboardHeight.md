@@ -35,15 +35,13 @@ the height of the suggestion banner frame.
 
 For reference, here's a table of the default Keyman keyboard heights for various devices and screen orientation.
  
- Device Type and Screen Orientation | Default height (dp) |
-|-----------------------------------|---------------------|
-| Default handset in portrait | 205 |
-| Default handset in landscape | 150 |
-| Extra High Density handset in landscape | 140 |
-| 7" tablet in portrait | 305 |
-| 7" tablet in landscape | 140 |
-| 10" tablet in portrait | 405 |
-| 10" tablet in landscape | 200 |
+ Device Type                    | Default height (dp)<br>Portrait | Default height (dp)<br>Landscape |
+|-------------------------------|---------------------------------|----------------------------------|
+| Default handset (160dpi)      | 205 | 120 |
+| High Density handset (240dpi) | 170 | 100 |
+| Extra High Density handset (320dpi) |     | 140 |
+| 7" tablet                     | 305 | 140 |
+| 10" tablet                    | 405 | 200 |
 
 **Note:** This new keyboard height would be applied for all platforms, so an 
 adjusted keyboard height for a phone would appear too small for a tablet.
