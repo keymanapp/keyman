@@ -1,4 +1,4 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 
 class SelectionCaret {
   node: Node;
@@ -20,7 +20,7 @@ class SelectionRange {
   }
 }
 
-export default class ContentEditable extends OutputTarget<{}> {
+export class ContentEditable extends OutputTargetElementWrapper<{}> {
   root: HTMLElement;
 
   constructor(ele: HTMLElement) {
