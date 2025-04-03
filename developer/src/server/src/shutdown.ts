@@ -1,4 +1,4 @@
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 
 export async function shutdown(code?: number): Promise<never> {
   await KeymanSentry.close();
