@@ -151,7 +151,7 @@ describe('ldml keyboard xml reader tests', function () {
         assert.ok(metadata);
         const snailFilename = (metadata)[XML_FILENAME_SYMBOL];
         assert.ok(snailFilename);
-        assert.ok(/\/keys-Zyyy-morepunctuation.xml$/.test(snailFilename)
+        assert.ok(/keys-Zyyy-morepunctuation.xml$/.test(snailFilename)
           , `snail key filename is ${snailFilename}`);
       },
     },
