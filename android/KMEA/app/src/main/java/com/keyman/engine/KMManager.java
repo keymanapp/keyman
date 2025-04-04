@@ -2351,8 +2351,10 @@ public final class KMManager {
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
         editor.putInt(KMManager.KMKey_KeyboardHeightLandscape, height);
+        KMManager.KeyboardHeight_Context_Landscape_Current = height;
       } else /* (orientation == Configuration.ORIENTATION_PORTRAIT) */ {
         editor.putInt(KMManager.KMKey_KeyboardHeightPortrait, height);
+        KMManager.KeyboardHeight_Context_Portrait_Current = height;
       } 
     }
     editor.commit();
