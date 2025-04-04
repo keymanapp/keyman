@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.228 beta 2025-04-04
+
+* fix(ios): prevent re-display of keyboard when re-entering app to its menus (#13630)
+* fix(ios): slide dismissal of keyboard-height adjuster will properly resize the keyboard (#13631)
+* docs(web): improve section on motivation for gesture input serialization (#13652)
+* fix(linux): fix crash if kmp doesn't have name field (#13648)
+* chore(web): improve error logging in predictive-text worker message validation (#13660)
+* fix(android): Adjust keyboard and banner heights for mdpi and hdpi devices (#13651)
+* fix(android): adjust keyboard and banner height for xhdpi portrait (#13655)
+* fix(android): Adjust keyboard and banner height for 7" tablet landscape (#13667)
+* fix(android): Adjust keyboard height for 10" tablet landscape (#13668)
+
 ## 18.0.227 beta 2025-04-03
 
 * fix(developer): remove redundant keyboard fields from .kps (#13600)
