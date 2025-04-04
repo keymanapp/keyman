@@ -155,14 +155,34 @@ describe('createTrieDataStructure()', function () {
     let lowercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
       return wf.toLowerCase()
     })
-    assert.match(lowercaseSourceCode, /"key":\s*"turtles"/);
-    assert.notMatch(lowercaseSourceCode, /"key":\s*"TURTLES"/);
+
+    // 'I' should be keyed to 'i', which should appear here.
+    assert.match(lowercaseSourceCode, /[^ ]i/);
+    // It's a sparse data set, so only the first letter of each word should appear
+    // in keyed form when compressed.
+    const lowerKeyCharMatches = ['L', 'T']
+      .map((char) => lowercaseSourceCode.indexOf(char))
+      .filter((entry) => entry > -1);
+
+    // At least one letter of 'L' and 'T' should be missing; ideally none,
+    // but it's possible for one to appear as the encoding for a number.
+    assert.isAtMost(lowerKeyCharMatches.length, 1);
+    // 0 assumes that none of the chars appears in the encoded form.
+    // Fortunately... it's actually true for this fixture as-is.
+    assert.equal(lowerKeyCharMatches.length, 0);
 
     let uppercaseSourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => {
       return wf.toUpperCase()
-    })
-    assert.match(uppercaseSourceCode, /"key":\s*"TURTLES"/);
-    assert.notMatch(uppercaseSourceCode, /"key":\s*"turtles"/);
+    });
+
+    // We don't do a a check for 'i' here because it appears both within the
+    // wordlist-word 'like' and within the property name 'totalWeight'.
+    const upperKeyCharMatches = ['I', 'L', 'T']
+      .map((char) => uppercaseSourceCode.indexOf(char))
+      .filter((entry) => entry > -1);
+
+    // All first letters should appear in keyed form.
+    assert.equal(upperKeyCharMatches.length, 3);
   });
 
   it('does not create `null`/"undefined"-keyed children', function () {
