@@ -41,7 +41,7 @@ For reference, here's a table of the default Keyman keyboard heights for various
 | High Density handset (240dpi) | 170 | 100 |
 | Extra High Density handset (320dpi) | 270 | 140 |
 | 7" tablet                     | 305 | 200 |
-| 10" tablet                    | 405 | 200 |
+| 10" tablet                    | 405 | 280 |
 
 **Note:** This new keyboard height would be applied for all platforms, so an 
 adjusted keyboard height for a phone would appear too small for a tablet.
