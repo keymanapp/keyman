@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.22 alpha 2025-04-04
+
+* build(deps): bump tar-fs and puppeteer-core (#13661)
+
 ## 19.0.21 alpha 2025-04-03
 
 * chore: use explicit `node:` prefix for node imports (#13650)
