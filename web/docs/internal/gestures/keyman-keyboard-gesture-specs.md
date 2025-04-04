@@ -44,7 +44,7 @@ graph TD;
     end
 
     allowedRoam -- Yes --> longpress-roam
-    allowedRoam -- No --> reject
+    allowedRoam -- No + input finishes --> reject
 
     subgraph Stage3[" "]
     longpress-roam --> didWait2
@@ -53,7 +53,7 @@ graph TD;
 
     didWait2 -- No --> didRoam
     didRoam  -- Yes --> longpress-roam
-    didRoam  -- No --> reject
+    didRoam  -- No + input finishes --> reject
     supportsSubkeys2 -- Yes --> subkey-select
     supportsSubkeys2 -- No --> longpress-roam-restore
 
@@ -93,7 +93,7 @@ graph TD;
     end
 
     start-condition -- Yes --> flick-mid
-    start-condition -- No  --> reject
+    start-condition -- No + input finishes --> reject
 
     subgraph Stage2[" "]
     flick-mid
