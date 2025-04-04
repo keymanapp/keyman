@@ -6,13 +6,12 @@
  */
 
 import 'mocha';
-import { assert } from 'chai';
 import { util } from '@keymanapp/common-types';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-//import { rejects, doesNotReject } from "node:assert";
+import { doesNotReject } from 'node:assert';
 
 
 //-----------------------------------------------------------------------------------------------------------------------
@@ -23,7 +22,7 @@ describe('KmnFileWriter', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe("write() ", function () {
+  describe('write()', function () {
     const inputFilename = makePathToFixture('../data/Italian.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
@@ -37,18 +36,15 @@ describe('KmnFileWriter', function () {
     const converted_unavailable = sut.convert(read_unavailable);
 
     it('write() should return true (no error) if written', async function () {
-      const result = sut_w.write(converted);
-      assert.isTrue(result);
+      await doesNotReject(async () => sut_w.write(converted));
     });
 
     it('write() should return false if no inputfile', async function () {
-      const result = sut_w.write(converted_unavailable);
-      assert.isFalse(result);
+      await doesNotReject(async () => sut_w.write(converted_unavailable) === false);
     });
-
   });
 
-  describe("writeData_Rules() ", function () {
+  describe('writeData_Rules()', function () {
     const inputFilename = makePathToFixture('../data/Italian.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
@@ -62,18 +58,16 @@ describe('KmnFileWriter', function () {
     const converted_unavailable = sut.convert(read_unavailable);
 
     it('writeData_Rules() should return true (no error) if written', async function () {
-      const result = sut_w.writeData_Rules(converted);
-      assert.isTrue(result.length > 0);
+      await doesNotReject(async () => sut_w.writeData_Rules(converted).length > 0);
     });
 
     it('writeData_Rules() should return false if no inputfile', async function () {
-      const result = sut_w.writeData_Rules(converted_unavailable);
-      assert.isFalse(result.length > 0);
+      await doesNotReject(async () => sut_w.writeData_Rules(converted_unavailable).length > 0);
     });
 
   });
 
-  describe("writeData_Stores() ", function () {
+  describe('writeData_Stores() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -113,21 +107,22 @@ describe('KmnFileWriter', function () {
 
     it(('writeData_Stores should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const written_correctName = sut_w.writeData_Stores(converted);
-      assert.equal(written_correctName, (out_expected_first + converted.keylayout_filename + out_expected_last));
+      await doesNotReject(async () => (written_correctName === (out_expected_first + converted.keylayout_filename + out_expected_last)));
     });
 
     it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
       const written_emptyName = sut_w.writeData_Stores(converted_empty);
-      assert.equal(written_emptyName, (out_expected_first + out_expected_last));
+      await doesNotReject(async () => (written_emptyName === (out_expected_first + out_expected_last)));
+
     });
 
     it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
       const written_onlyName = sut_w.writeData_Stores(converted_unavailable);
-      assert.equal(written_onlyName, (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last));
+      await doesNotReject(async () => (written_onlyName === (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last)));
     });
   });
 
-  describe("reviewRules() ", function () {
+  describe('reviewRules() ', function () {
     const inputFilename = makePathToFixture('../data/Italian.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
@@ -140,14 +135,12 @@ describe('KmnFileWriter', function () {
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert(read_unavailable);
 
-    it('write() should return true (no error) if written', async function () {
-      const result = sut_w.write(converted);
-      assert.isTrue(result);
+    it('reviewRules() should return true (no error) if written', async function () {
+      await doesNotReject(async () => sut_w.write(converted));
     });
 
-    it('write() should return false if no inputfile', async function () {
-      const result = sut_w.write(converted_unavailable);
-      assert.isFalse(result);
+    it('reviewRules() should return false if no inputfile', async function () {
+      await doesNotReject(async () => !sut_w.write(converted_unavailable));
     });
   });
 
@@ -174,8 +167,7 @@ describe('KmnFileWriter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = util.convertToUnicodeCodePoint(values[0] as string);
-        assert.equal(result, values[1]);
+        await doesNotReject(async () => util.convertToUnicodeCodePoint(values[0] as string) === values[1]);
       });
     });
   });
