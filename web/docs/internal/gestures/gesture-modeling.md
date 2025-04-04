@@ -50,3 +50,7 @@ When either the timer (if specified) reaches its end or the `pathModel` signals 
 - `'reject'`:  the path is not legal for this model's gesture component; it should no longer be considered
 - `'resolve'`: the path satisfies and completes the path aspect of this model's gesture component; we're ready to transition and either accept or reject it (based on other, higher-level model properties)
 - `undefined`: the path is legal but does not _yet_ satisfy the path aspect of this model's gesture component.
+
+## See also
+
+Refer to [the page on Keyman's gesture model design](./keyman-keyboard-gesture-specs.md) for documentation on how touch-keyboard gestures are specified and implemented.
