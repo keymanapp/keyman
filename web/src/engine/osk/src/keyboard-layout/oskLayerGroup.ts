@@ -40,14 +40,6 @@ export default class OSKLayerGroup {
       return;
     }
 
-    // Set default OSK font size (Build 344, KMEW-90)
-    let layoutFS = layout['fontsize'];
-    if(typeof layoutFS == 'undefined' || layoutFS == null || layoutFS == '') {
-      ls.fontSize='1em';
-    } else {
-      ls.fontSize=layout['fontsize'];
-    }
-
     ls.width = '100%';
     ls.height = '100%';
 
