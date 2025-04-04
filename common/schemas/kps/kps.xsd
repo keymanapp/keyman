@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  .kps file schema, version 7.0
+  .kps file schema, version 18.0
 
   Copyright (C) SIL International
 
   Supports KPS files for Keyman Developer 7+
 
-  Expects FileVersion 7.0
+  Expects FileVersion '7.0' or '12.0'
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
