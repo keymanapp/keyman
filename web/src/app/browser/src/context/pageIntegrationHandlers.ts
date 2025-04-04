@@ -57,6 +57,7 @@ export class PageIntegrationHandlers {
     // Add a blank DIV to the bottom of the page to allow the bottom of the page to be shown
     const dTrailer = this.mobilePageTrailer = document.createElement('div');
     const ds=dTrailer.style;
+    dTrailer.className = 'kmw-page-trailer';
     ds.width='100%';
     ds.height=(screen.width/2)+'px';  // ... interesting choice, but okay.
     document.body.appendChild(dTrailer);
