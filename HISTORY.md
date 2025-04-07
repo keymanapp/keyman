@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.229 beta 2025-04-07
+
+* fix(ios): ensure keyboard height is set when engine settings view is used in a NavigationController (#13643)
+* chore(android,mac,windows): update Crowdin strings for Czech (#13680)
+* chore(android,mac,windows): update Crowdin strings for Khmer (#13681)
+* chore(linux): Update debian changelog (#13674)
+
 ## 18.0.228 beta 2025-04-04
 
 * fix(ios): prevent re-display of keyboard when re-entering app to its menus (#13630)
