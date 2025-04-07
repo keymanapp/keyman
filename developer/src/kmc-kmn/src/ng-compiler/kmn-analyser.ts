@@ -95,11 +95,13 @@ export class ContentRule extends SingleChildRule {
     const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule(tokenBuffer);
     const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule(tokenBuffer);
     const variableStoreAssign: Rule     = new VariableStoreAssignRule(tokenBuffer);
+    const ruleBlock: Rule               = new ruleBlockRule(tokenBuffer);
     this.rule = new AlternateRule(tokenBuffer, [
       stringSystemStoreAssign,
       casedkeysStoreAssign,
       hotkeyStoreAssign,
       variableStoreAssign,
+      ruleBlock,
     ]);
   }
 }
@@ -434,6 +436,14 @@ export class VariableStoreNameRule extends SingleChildRule {
     }
     return parseSuccess;
   };
+}
+
+export class ruleBlockRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const beginBlock: Rule  = new BeginBlockRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [beginBlock]);
+  }
 }
 
 export class AnyStatementRule extends SingleChildRule {
