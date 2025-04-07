@@ -543,3 +543,44 @@ export class OptionalSpacedEntryPointRule extends SingleChildRule {
     this.rule = new OptionalRule(tokenBuffer, spacedEntryPointRule);
   }
 }
+
+export class UseStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const use: Rule           = new TokenRule(tokenBuffer, TokenTypes.USE, true);
+    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
+    const groupName: Rule     = new GroupNameRule(tokenBuffer);
+    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      use, leftBracket, optWhitespace, groupName, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const useNode       = tmp.getSoleChildOfType(NodeTypes.USE);
+      const groupNameNode = tmp.getSoleChildOfType(NodeTypes.GROUPNAME);
+      useNode.addChild(groupNameNode);
+      node.addChild(useNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class GroupNameRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const parameters: Token[]   = [];
+    const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
+    if (parseSuccess) {
+      node.addToken(NodeTypes.GROUPNAME, parameters[0]);
+    }
+    return parseSuccess;
+  };
+}

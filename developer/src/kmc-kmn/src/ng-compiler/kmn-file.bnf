@@ -35,3 +35,5 @@ spacedEntryPoint: whitespace entryPoint
 entryPoint: unicode|newcontext|postkeystroke|ansi
 useStatement: use leftBracket whitespace? groupName whitespace? rightBracket
 groupName: parameter
+spacedChevron:whitespace chevron whitespace
+beginBlock: beginStatement spacedChevron useStatement

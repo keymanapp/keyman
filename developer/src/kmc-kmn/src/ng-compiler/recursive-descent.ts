@@ -217,6 +217,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.TARGETS,          nodeType: NodeTypes.TARGETS},
     {tokenType: TokenTypes.U_CHAR,           nodeType: NodeTypes.U_CHAR},
     {tokenType: TokenTypes.UNICODE,          nodeType: NodeTypes.UNICODE},
+    {tokenType: TokenTypes.USE,              nodeType: NodeTypes.USE},
     {tokenType: TokenTypes.VERSION,          nodeType: NodeTypes.VERSION},
     {tokenType: TokenTypes.VISUALKEYBOARD,   nodeType: NodeTypes.VISUALKEYBOARD},
     {tokenType: TokenTypes.WINDOWSLANGUAGES, nodeType: NodeTypes.WINDOWSLANGUAGES},

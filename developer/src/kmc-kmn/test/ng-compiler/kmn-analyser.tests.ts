@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginStatementRule, BlankLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginStatementRule, BlankLineRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreAssignRule, StringSystemStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -851,6 +851,21 @@ describe("KMN Analyser Tests", () => {
       const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
       assert.isNotNull(beginNode);
       assert.isFalse(beginNode.hasChild());
+    });
+  });
+  describe("UseStatementRule Tests", () => {
+    it("can construct an UseStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const useStatement: Rule       = new UseStatementRule(tokenBuffer);
+      assert.isNotNull(useStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('use(main)');
+      const useStatement: Rule       = new UseStatementRule(tokenBuffer);
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
   });
 });
