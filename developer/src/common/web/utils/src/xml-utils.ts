@@ -14,6 +14,7 @@ export type KeymanXMLType =
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
+  | 'regressiontest'      // <regressiontest>
   ;
 
 /** Bag of options, maximally one for each KeymanXMLType */
@@ -75,6 +76,19 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     },
     trimValues: false, // preserve spaces
   },
+  'regressiontest' : {
+    ignorePiTags: true,
+    textNodeName: '_',
+    htmlEntities: true,
+    ignoreAttributes: true,
+    attributeNamePrefix: '', // to avoid '@_' prefixes
+    // numberParseOptions: {
+    //   skipLike: /(?:)/, // parse numbers as strings
+    //   hex: null,
+    //   leadingZeros: null,
+    //   eNotation: null,
+    // },
+  }
 };
 
 type KeymanXMLGeneratorOptionsBag = {
@@ -102,6 +116,12 @@ const GENERATOR_OPTIONS: KeymanXMLGeneratorOptionsBag = {
   keyboard3: {
     attributeNamePrefix: '$',
     ignoreAttributes: false,
+    format: true,
+    textNodeName: '_',
+    suppressEmptyNode: true,
+  },
+  regressiontest: {
+    ignoreAttributes: true,
     format: true,
     textNodeName: '_',
     suppressEmptyNode: true,
