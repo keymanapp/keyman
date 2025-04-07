@@ -7,7 +7,7 @@
  */
 
 // For later: BITMAPS, CAPS, ON, ONLY, ALWAYS, OFF, SHIFT, FREES, COPYRIGHT
-//            LAYOUT
+//            LAYOUT, OLDCHARPOSMATCHING
 
 export enum TokenTypes {
   BITMAP             = "BITMAP",
