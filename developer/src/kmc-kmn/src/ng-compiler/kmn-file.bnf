@@ -1,3 +1,4 @@
+kmnTree: line*
 line: contentLine|blankLine
 contentLine: whitespace? content commentEnd? newline
 blankLine: commentEnd? newline

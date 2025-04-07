@@ -11,12 +11,13 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, KmnTreeRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreAssignRule, StringSystemStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+import { readFileSync } from 'fs';
 
 let root: ASTNode = null;
 
@@ -881,6 +882,28 @@ describe("KMN Analyser Tests", () => {
       const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
       assert.isNotNull(beginNode);
       assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
+    });
+  });
+  describe("Analyser Tests", () => {
+    it("can parse (part of) Khmer Angkor correctly", () => {
+      const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      const lexer = new Lexer(buffer);
+      const tokens: Token[] = lexer.parse();
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 10);
+      const tokenBuffer: TokenBuffer = new TokenBuffer(subset);
+      const kmnTreeRule: Rule = new KmnTreeRule(tokenBuffer);
+      assert.isTrue(kmnTreeRule.parse(root));
+      //assert.equal(root.toString(), '');
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAME));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MESSAGE));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.TARGETS));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DISPLAYMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYOUTFILE));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
     });
   });
 });

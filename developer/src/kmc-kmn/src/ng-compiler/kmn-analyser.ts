@@ -11,6 +11,14 @@ import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChild
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
+export class KmnTreeRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const line: Rule = new LineRule(tokenBuffer);
+    this.rule = new ManyRule(tokenBuffer, line);
+  }
+}
+
 export class LineRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);

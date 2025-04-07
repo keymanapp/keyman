@@ -158,4 +158,25 @@ export class ASTNode {
 
   public get nodeType() { return this._nodeType; }
   public get token() { return this._token; }
+
+  public toString(): string {
+    let buf: string = `[${this._nodeType}`;
+    if (this._token !== null) {
+      buf = buf.concat(`,${this._token}`);
+    }
+    if (this.children.length > 0) {
+      buf = buf.concat(',{');
+    }
+    this.children.forEach((child, idx) => {
+      buf = buf.concat(child.toString());
+      if (idx < (this.children.length-1)) {
+        buf = buf.concat(',');
+      }
+    });
+    if (this.children.length > 0) {
+      buf = buf.concat('}');
+    }
+    buf = buf.concat('}]');
+    return buf;
+  }
 }

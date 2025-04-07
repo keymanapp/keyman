@@ -285,8 +285,13 @@ export class Token {
   public set charNum(charNum: number) { this._charNum = charNum; }
   public get line(): String { return this._line; }
 
-  public toString(): String {
-    return `[${this.tokenType},${this._text}]`;
+  public toString(): string {
+    let buf: string = `[${this.tokenType}`
+    if (this.tokenType !== TokenTypes.NEWLINE && this.tokenType !== TokenTypes.WHITESPACE) {
+      buf = buf.concat(`,${this._text}`);
+    }
+    buf = buf.concat(']');
+    return buf;
   }
 }
 
