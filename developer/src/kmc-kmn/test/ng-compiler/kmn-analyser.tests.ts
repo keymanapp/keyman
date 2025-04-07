@@ -860,8 +860,16 @@ describe("KMN Analyser Tests", () => {
       const useStatement: Rule       = new UseStatementRule(tokenBuffer);
       assert.isNotNull(useStatement);
     });
-    it("can parse correctly", () => {
+    it("can parse correctly (parameter)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('use(main)');
+      const useStatement: Rule       = new UseStatementRule(tokenBuffer);
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+    });
+    it("can parse correctly (permitted keyword)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('use(postkeystroke)');
       const useStatement: Rule       = new UseStatementRule(tokenBuffer);
       assert.isTrue(useStatement.parse(root));
       const useNode = root.getSoleChildOfType(NodeTypes.USE);

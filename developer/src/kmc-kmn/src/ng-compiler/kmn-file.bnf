@@ -35,7 +35,9 @@ beepStatement: beep
 beginStatement: begin spacedEntryPoint?
 spacedEntryPoint: whitespace entryPoint
 entryPoint: unicode|newcontext|postkeystroke|ansi
-useStatement: use leftBracket whitespace? groupName whitespace? rightBracket
+useStatement: use leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
+groupNameOrKeyword: groupName|permittedKeyword
+permittedKeyword: postkeystroke
 groupName: parameter
 spacedChevron:whitespace chevron whitespace
 beginBlock: beginStatement spacedChevron useStatement

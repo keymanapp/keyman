@@ -559,13 +559,13 @@ export class OptionalSpacedEntryPointRule extends SingleChildRule {
 export class UseStatementRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const use: Rule           = new TokenRule(tokenBuffer, TokenTypes.USE, true);
-    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const groupName: Rule     = new GroupNameRule(tokenBuffer);
-    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    const use: Rule                = new TokenRule(tokenBuffer, TokenTypes.USE, true);
+    const leftBracket: Rule        = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule(tokenBuffer);
+    const groupNameOrKeyword: Rule = new GroupNameRule(tokenBuffer);
+    const rightBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule(tokenBuffer, [
-      use, leftBracket, optWhitespace, groupName, optWhitespace, rightBracket,
+      use, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
     ]);
   }
 
@@ -579,6 +579,41 @@ export class UseStatementRule extends SingleChildRule {
       node.addChild(useNode);
     }
     return parseSuccess;
+  }
+}
+
+export class GroupNameOrKeywordRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const groupName: Rule        = new GroupNameRule(tokenBuffer);
+    const permittedKeyword: Rule = new PermittedKeywordRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [groupName, permittedKeyword]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      if (!tmp.hasChildOfType(NodeTypes.GROUPNAME)) {
+        node.addToken(NodeTypes.GROUPNAME, tmp.getSoleChild().token);
+      } else {
+        node.addChild(tmp.getSoleChildOfType(NodeTypes.GROUPNAME));
+      }
+    }
+    return parseSuccess;
+  }
+}
+
+export class PermittedKeywordRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const tokenRules: TokenRule[] = [];
+    [
+      TokenTypes.POSTKEYSTROKE,
+    ].forEach((tokenType) => {
+      tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
+    });
+    this.rule = new AlternateRule(tokenBuffer, tokenRules);
   }
 }
 
