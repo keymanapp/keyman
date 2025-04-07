@@ -212,6 +212,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.POSTKEYSTROKE,    nodeType: NodeTypes.POSTKEYSTROKE},
     {tokenType: TokenTypes.SHIFT_CODE,       nodeType: NodeTypes.SHIFT_CODE},
+    {tokenType: TokenTypes.STORE,            nodeType: NodeTypes.STORE},
     {tokenType: TokenTypes.STRING,           nodeType: NodeTypes.STRING},
     {tokenType: TokenTypes.TARGETS,          nodeType: NodeTypes.TARGETS},
     {tokenType: TokenTypes.U_CHAR,           nodeType: NodeTypes.U_CHAR},

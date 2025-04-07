@@ -115,10 +115,10 @@ export class StringSystemStoreAssignRule extends SingleChildRule {
       const lineNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.LINE);
       const storeNode: ASTNode  = tmp.getSoleChild();
       storeNode.addChild(stringNode);
-      node.addChild(storeNode);
       if (lineNode !== null) {
-        node.addChild(lineNode);
+        storeNode.addChild(lineNode);
       }
+      node.addChild(storeNode);
     }
     return parseSuccess;
   }
@@ -206,8 +206,8 @@ export class CasedkeysStoreAssignRule extends SingleChildRule {
       const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
       const textNodes: ASTNode[]   = tmp.getChildren();
       casedkeysNode.addChildren(textNodes);
+      casedkeysNode.addChildren(lineNodes);
       node.addChild(casedkeysNode);
-      node.addChildren(lineNodes);
     }
     return parseSuccess;
   }
@@ -246,10 +246,10 @@ export class HotkeyStoreAssignRule extends SingleChildRule {
       const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
       const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
       hotkeyNode.addChild(virtualKeyNode);
-      node.addChild(hotkeyNode);
       if (lineNode !== null) {
-        node.addChild(lineNode);
+        hotkeyNode.addChild(lineNode);
       }
+      node.addChild(hotkeyNode);
     }
     return parseSuccess;
   }
@@ -292,12 +292,14 @@ export class VariableStoreAssignRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const storeNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.STORE);
-      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const textNodes: ASTNode[] = tmp.getChildren();
+      const storeNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.STORE);
+      const storeNameNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STORENAME);
+      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const textNodes: ASTNode[]   = tmp.getChildren();
+      storeNode.addChild(storeNameNode);
       storeNode.addChildren(textNodes);
+      storeNode.addChildren(lineNodes);
       node.addChild(storeNode);
-      node.addChildren(lineNodes);
     }
     return parseSuccess;
   }
@@ -404,7 +406,7 @@ export class SpacedShiftCodeRule extends SingleChildRule {
 export class VariableStoreRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE);
+    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE, true);
     const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
     const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
     const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
@@ -424,7 +426,7 @@ export class VariableStoreNameRule extends SingleChildRule {
     const parameters: Token[]   = [];
     const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
     if (parseSuccess) {
-      node.addToken(NodeTypes.STORE, parameters[0]);
+      node.addToken(NodeTypes.STORENAME, parameters[0]);
     }
     return parseSuccess;
   };
@@ -447,9 +449,9 @@ export class AnyStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const anyNode   = tmp.getSoleChildOfType(NodeTypes.ANY);
-      const storeNode = tmp.getSoleChildOfType(NodeTypes.STORE);
-      anyNode.addChild(storeNode);
+      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      anyNode.addChild(storeNameNode);
       node.addChild(anyNode);
     }
     return parseSuccess;

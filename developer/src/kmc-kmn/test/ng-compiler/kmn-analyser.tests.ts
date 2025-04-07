@@ -245,7 +245,7 @@ describe("KMN Analyser Tests", () => {
       const bitmapNode = root.getSoleChildOfType(NodeTypes.BITMAP);
       assert.isNotNull(bitmapNode);
       assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.STRING));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+      assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse copyright store correctly", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
@@ -537,7 +537,7 @@ describe("KMN Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (mixed text)", () => {
       const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) " " U+1781 [K_K]');
@@ -766,7 +766,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(anyStatement.parse(root));
       const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
       assert.isNotNull(anyNode);
-      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORE));
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("BaselayoutStatementRule Tests", () => {

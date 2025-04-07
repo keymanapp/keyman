@@ -39,6 +39,7 @@ export enum NodeTypes {
   RANGE,
   SHIFT_CODE,
   STORE,
+  STORENAME,
   STRING,
   TARGETS,
   TMP,
