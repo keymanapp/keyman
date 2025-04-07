@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.23 alpha 2025-04-07
+
+* chore(web): remove dead methods regarding keyboard state (#13671)
+* chore(linux): Update debian changelog (#13675)
+
 ## 19.0.22 alpha 2025-04-04
 
 * build(deps): bump tar-fs and puppeteer-core (#13661)
