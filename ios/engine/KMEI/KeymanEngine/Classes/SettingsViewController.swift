@@ -427,7 +427,7 @@ open class SettingsViewController: UITableViewController {
     let doneOrCancel = value
     if doneOrCancel {
       let doneButton = UIBarButtonItem(title: NSLocalizedString("command-done", bundle: engineBundle, comment: ""), style: .plain, target: self,
-                                       action: nil /* #selector(self.settingsDismissed) */ )
+                                       action: #selector(self.settingsDismissed))
       nc.navigationItem.leftBarButtonItem = doneButton
     } else {
       let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self,
