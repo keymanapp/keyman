@@ -336,8 +336,8 @@ graph TD;
     end
 
     recenter-condition -- Yes --> flick-restart
-    recenter-condition -- No + input finishes --> reject
-    %% comment %% (should --> flick-reset-end)
+    recenter-condition -- No + input finishes --> flick-reset-end
+    %% comment %% ... could treat as a --> reject if we wanted cancellation per #10876...
 
     subgraph Stage6[" "]
     flick-restart --> restart-move-condition
@@ -345,7 +345,7 @@ graph TD;
 
     restart-move-condition -- Yes --> flick-mid
     restart-move-condition -- No + input finishes --> flick-reset-end
-    %% comment %% ... could treat as a --> reject if we wanted a semblance of cancellation...
+    %% comment %% ... could treat as a --> reject if we wanted cancellation per #10876...
 ```
 
 Note that the early cases from 'flick-start' that lead to 'reject' are all valid inputs for gesture types handled by previously-defined FSMs.

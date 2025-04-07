@@ -959,6 +959,13 @@ export function flickResetCenteringModel(params: FullGestureParams): GestureMode
       type: 'chain',
       next: 'flick-restart'
     },
+    rejectionActions: {
+      // Only 'rejects' in this form if the path is completed before direction-locking state.
+      path: {
+        type: 'replace',
+        replace: 'flick-reset-end'
+      }
+    },
     sustainWhenNested: true
   };
 }
