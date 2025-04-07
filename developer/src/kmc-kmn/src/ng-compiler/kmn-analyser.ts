@@ -578,3 +578,34 @@ export class GroupNameRule extends SingleChildRule {
     return parseSuccess;
   };
 }
+
+export class SpacedChevronRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const chevron: Rule    = new TokenRule(tokenBuffer, TokenTypes.CHEVRON);
+    this.rule = new SequenceRule(tokenBuffer, [whitespace, chevron, whitespace]);
+  }
+}
+
+export class BeginBlockRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const beginStatement: Rule = new BeginStatementRule(tokenBuffer);
+    const spacedChevron: Rule  = new SpacedChevronRule(tokenBuffer);
+    const useStatement: Rule   = new UseStatementRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [beginStatement, spacedChevron, useStatement]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const beginNode = tmp.getSoleChildOfType(NodeTypes.BEGIN);
+      const useNode   = tmp.getSoleChildOfType(NodeTypes.USE);
+      beginNode.addChild(useNode);
+      node.addChild(beginNode);
+    }
+    return parseSuccess;
+  }
+}
