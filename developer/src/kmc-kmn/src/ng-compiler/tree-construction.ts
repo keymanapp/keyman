@@ -64,14 +64,14 @@ export class ASTNode {
   }
 
   public addChild(child: ASTNode): ASTNode {
-    if (child != null) {
+    if (child !== null) {
       this.children.push(child);
     }
     return this;
   }
 
   public addChildren(children: ASTNode[]): ASTNode {
-    if (children != null) {
+    if (children !== null) {
       for (const child of children) {
         this.addChild(child);
       }
@@ -106,12 +106,12 @@ export class ASTNode {
   }
 
   public getText(): String {
-    return (this._token != null) ? this._token.text : '';
+    return (this._token !== null) ? this._token.text : '';
   }
 
   public getTextOfType(nodeType: NodeTypes): String  {
     const child: ASTNode = this.getSoleChildOfType(nodeType);
-    return (child != null) ? child.getText() : '';
+    return (child !== null) ? child.getText() : '';
   }
 
   public getSoleChild(): ASTNode {

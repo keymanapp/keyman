@@ -115,9 +115,7 @@ export class StringSystemStoreAssignRule extends SingleChildRule {
       const lineNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.LINE);
       const storeNode: ASTNode  = tmp.getSoleChild();
       storeNode.addChild(stringNode);
-      if (lineNode !== null) {
-        storeNode.addChild(lineNode);
-      }
+      storeNode.addChild(lineNode);
       node.addChild(storeNode);
     }
     return parseSuccess;
@@ -246,9 +244,7 @@ export class HotkeyStoreAssignRule extends SingleChildRule {
       const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
       const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
       hotkeyNode.addChild(virtualKeyNode);
-      if (lineNode !== null) {
-        hotkeyNode.addChild(lineNode);
-      }
+      hotkeyNode.addChild(lineNode);
       node.addChild(hotkeyNode);
     }
     return parseSuccess;
@@ -505,9 +501,7 @@ export class BeginStatementRule extends SingleChildRule {
     if (parseSuccess) {
       const beginNode      = tmp.removeSoleChildOfType(NodeTypes.BEGIN);
       const entryPointNode = tmp.getSoleChild();
-      if (entryPointNode !== null) {
-        beginNode.addChild(entryPointNode);
-      }
+      beginNode.addChild(entryPointNode);
       node.addChild(beginNode);
     }
     return parseSuccess;
