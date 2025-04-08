@@ -562,7 +562,7 @@ export class UseStatementRule extends SingleChildRule {
     const use: Rule                = new TokenRule(tokenBuffer, TokenTypes.USE, true);
     const leftBracket: Rule        = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
     const optWhitespace: Rule      = new OptionalWhiteSpaceRule(tokenBuffer);
-    const groupNameOrKeyword: Rule = new GroupNameRule(tokenBuffer);
+    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule(tokenBuffer);
     const rightBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule(tokenBuffer, [
       use, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,

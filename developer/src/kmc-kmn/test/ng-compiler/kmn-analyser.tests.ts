@@ -897,7 +897,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 12);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 13);
       const tokenBuffer: TokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule(tokenBuffer);
       assert.isTrue(kmnTreeRule.parse(root));
@@ -911,7 +911,10 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEGIN));
+      const beginNodes = root.getChildrenOfType(NodeTypes.BEGIN);
+      assert.equal(beginNodes.length, 2);
+      assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
+      assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
       //assert.equal(root.toString(), '');
     });
   });
