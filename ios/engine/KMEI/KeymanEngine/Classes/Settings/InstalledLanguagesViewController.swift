@@ -456,7 +456,7 @@ extension InstalledLanguagesViewController {
             os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
           }
         case .success(let package, let fullID):
-        self.navigationController?.setToolbarHidden(true, animated: false)
+          self.navigationController?.setToolbarHidden(true, animated: false)
           ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
                                                      defaultLanguageCode: fullID.languageID,
                                                      in: self.navigationController!,
