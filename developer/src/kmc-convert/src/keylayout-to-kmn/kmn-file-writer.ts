@@ -6,7 +6,8 @@
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { KeylayoutToKmnConverter, convert_object, rule_object } from './keylayout-to-kmn-converter.js';
+//import { KeylayoutToKmnConverter, convert_object, rule_object } from './keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, convert_object } from './keylayout-to-kmn-converter.js';
 import { util } from '@keymanapp/common-types';
 
 export class KmnFileWriter {
@@ -78,7 +79,8 @@ export class KmnFileWriter {
     let data: string = "";
 
     // filter array of all rules and remove duplicates
-    const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
+    //const unique_data_Rules: rule_object[] = data_ukelele.arrayOf_Rules.filter((curr) => {
+      const unique_data_Rules: any[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
         && (curr.key !== "")
         && ((curr.rule_type === "C0")
@@ -87,10 +89,9 @@ export class KmnFileWriter {
           || (curr.rule_type === "C3" && (curr.deadkey !== "") && (curr.prev_deadkey !== "")))
       );
     }).reduce((unique, o) => {
-      if (!unique.some((obj: rule_object) =>
+     // if (!unique.some((obj: rule_object) =>
+        if (!unique.some((obj: any) =>
         new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
-
-        && obj.output !== new TextEncoder().encode("")
 
         && obj.rule_type === o.rule_type
         && obj.modifier_key === o.modifier_key
@@ -325,7 +326,8 @@ export class KmnFileWriter {
    * @param  index the index of a rule in array[rule]
    * @return a string[] containing possible warnings for a rule
    */
-  public reviewRules(rule: rule_object[], index: number): string[] {
+  //public reviewRules(rule: rule_object[], index: number): string[] {
+    public reviewRules(rule: any[], index: number): string[] {
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     const warningTextArray: string[] = Array(3).fill("");

@@ -33,6 +33,7 @@ export interface convert_object {
   kmn_filename: string,
   arrayOf_Modifiers: string[][],
   arrayOf_Rules: rule_object[],
+  //arrayOf_Rules: any[],
 };
 
 export class KeylayoutToKmnConverter {
@@ -97,8 +98,8 @@ export class KeylayoutToKmnConverter {
   public convert(jsonObj: any, outputfilename: string = ""): convert_object {
 
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
-    const rules: rule_object[] = [];                   // an array of data for kmn rules
-    const jsonObj_any: any = jsonObj;
+    const rules: rule_object[] = [];                   // an array of data for a kmn rule
+    //const rules: any[] = [];                   // an array of data for a kmn rule
 
     const data_object: convert_object = {
       keylayout_filename: "",
@@ -108,22 +109,23 @@ export class KeylayoutToKmnConverter {
     };
 
     // ToDo in a new PR: check tags  ( issue # 13599)
-    if (jsonObj_any.hasOwnProperty("keyboard")) {
+    if (jsonObj.hasOwnProperty("keyboard")) {
 
-      data_object.keylayout_filename = jsonObj_any.keyboard['@_name'] + ".keylayout";
+      // get filename from data that had been read
+      const fileNameNoExtention = jsonObj.keyboard['@_name'];
+      const filePath = this.callbacks.path.join(process.cwd(), "data");
 
-      //  this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutFileReader.FILE_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
-      //use join as in this.callbacks.path.join(process.cwd(), "data", absolutefilename.replace(/^.*[\\/]/, '')), 'utf8' 
+      data_object.keylayout_filename = this.callbacks.path.join(filePath, (fileNameNoExtention + ".keylayout"));
+
+      // if no outputfile name is specified: create one from input file name
       if ((outputfilename === "") || (outputfilename === null)) {
-        //  data_object.kmn_filename = (process.cwd() + "\\data\\" + data_object.keylayout_filename.substring(0, data_object.keylayout_filename.lastIndexOf(".")) + ".kmn");
-        data_object.kmn_filename = (process.cwd() + "\\data\\" + data_object.keylayout_filename.substring(0, data_object.keylayout_filename.lastIndexOf(".")) + ".kmn");
+        data_object.kmn_filename = this.callbacks.path.join(filePath, fileNameNoExtention + ".kmn");
       }
+      // if outputfile name is specified: use it
       else
         data_object.kmn_filename = outputfilename;
 
-      //console.log("RUN kmc convert - input file: ", (process.cwd() + "\\data\\" + data_object.keylayout_filename), " -->  output file: ", data_object.kmn_filename);
-      console.log("RUN kmc convert - input file: ", (this.callbacks.path.dirname(data_object.kmn_filename) + "\\" + data_object.keylayout_filename), " -->  output file: ", data_object.kmn_filename);
-
+      console.log("RUN kmc convert - input file: ", data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
 
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
@@ -151,6 +153,7 @@ export class KeylayoutToKmnConverter {
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
 
     const object_array: rule_object[] = [];
+    // const object_array = [];
     let dk_counter_C3: number = 0;
     let dk_counter_C2: number = 0;
     let action_id: string;
@@ -165,6 +168,7 @@ export class KeylayoutToKmnConverter {
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
 
         let rule_obj: rule_object;
+        //let rule_obj;
 
         // ...............................................................................................................................
         // case C0: output ...............................................................................................................
@@ -180,7 +184,7 @@ export class KeylayoutToKmnConverter {
           for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
             if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
 
-              rule_obj = new Rules(
+              rule_obj = new Rule(
                   /*   rule_type */               "C0",
 
                   /*   modifier_prev_deadkey*/    "",
@@ -224,7 +228,7 @@ export class KeylayoutToKmnConverter {
 
               for (let m = 0; m < b1_modifierKey_arr.length; m++) {
 
-                rule_obj = new Rules(
+                rule_obj = new Rule(
                   /*   rule_type */               "C1",
 
                   /*   modifier_prev_deadkey*/    "",
@@ -295,7 +299,7 @@ export class KeylayoutToKmnConverter {
                     for (let n3 = 0; n3 < b4_deadkey_arr.length; n3++) {
                       for (let n4 = 0; n4 < b1_modifierKey_arr.length; n4++) {
 
-                        rule_obj = new Rules(
+                        rule_obj = new Rule(
                         /*   rule_type */             "C2",
 
                         /*   modifier_prev_deadkey*/  "",
@@ -384,7 +388,7 @@ export class KeylayoutToKmnConverter {
                           for (let n6 = 0; n6 < b4_deadkey_arr.length; n6++) {
                             for (let n7 = 0; n7 < b1_modifierKey_arr.length; n7++) {
 
-                              rule_obj = new Rules(
+                              rule_obj = new Rule(
                               /*   rule_type */             "C3",
                               /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_arr[n1][n2], isCapsused),
                               /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_arr[n3][0])),
@@ -443,6 +447,7 @@ export class KeylayoutToKmnConverter {
     const list_of_unique_Text2_rules: string[][] = [];
 
     const object_array: rule_object[] = data_ukelele.arrayOf_Rules;
+    //const object_array = data_ukelele.arrayOf_Rules;
 
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
@@ -985,7 +990,7 @@ export class KeylayoutToKmnConverter {
 /**
  * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
  */
-class Rules {
+class Rule {
   constructor(
     public rule_type: string,             /* C0, C1, C2, C3, or C4 */
 
