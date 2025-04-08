@@ -38,8 +38,9 @@ permittedKeyword: newcontext|postkeystroke
 groupName: parameter
 outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
 
-groupBlock: groupStatement groupQualifier?
+groupBlock: groupStatement spacedGroupQualifier?
 groupStatement: group leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
+spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
 

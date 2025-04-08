@@ -487,8 +487,8 @@ export class BeginStatementRule extends SingleChildRule {
 export class SpacedEntryPointRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const entryPoint: Rule  = new EntryPointRule(tokenBuffer);
     const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const entryPoint: Rule = new EntryPointRule(tokenBuffer);
     this.rule = new SequenceRule(tokenBuffer, [whitespace, entryPoint]);
   }
 }
@@ -544,6 +544,27 @@ export class UseStatementRule extends SingleChildRule {
       const groupNameNode = tmp.getSoleChildOfType(NodeTypes.GROUPNAME);
       useNode.addChild(groupNameNode);
       node.addChild(useNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class GroupBlockRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const groupStatement: Rule          = new GroupStatementRule(tokenBuffer);
+    const optSpacedGroupQualifier: Rule = new OptionalSpacedGroupQualifierRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [groupStatement, optSpacedGroupQualifier]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const groupNode          = tmp.removeSoleChildOfType(NodeTypes.GROUP);
+      const groupQualifierNode = tmp.getSoleChild();
+      groupNode.addChild(groupQualifierNode);
+      node.addChild(groupNode);
     }
     return parseSuccess;
   }
@@ -649,6 +670,23 @@ export class OutsStatementRule extends SingleChildRule {
       node.addChild(outsNode);
     }
     return parseSuccess;
+  }
+}
+
+export class OptionalSpacedGroupQualifierRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule(tokenBuffer);
+    this.rule = new OptionalRule(tokenBuffer, spacedGroupQualifierRule);
+  }
+}
+
+export class SpacedGroupQualifierRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const whitespace: Rule     = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const groupQualifier: Rule = new GroupQualifierRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [whitespace, groupQualifier]);
   }
 }
 
