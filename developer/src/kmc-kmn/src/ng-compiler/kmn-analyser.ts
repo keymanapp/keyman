@@ -625,6 +625,27 @@ export class OutsStatementRule extends SingleChildRule {
   }
 }
 
+export class UsingKeysRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const using: Rule      = new TokenRule(tokenBuffer, TokenTypes.USING);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const keys: Rule       = new TokenRule(tokenBuffer, TokenTypes.KEYS);
+    this.rule = new SequenceRule(tokenBuffer, [
+      using, whitespace, keys,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      node.addChild(new ASTNode(NodeTypes.USING_KEYS));
+    }
+    return parseSuccess;
+  }
+}
+
 export class AnyStatementRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);

@@ -48,6 +48,7 @@ export enum NodeTypes {
   U_CHAR           = "U_CHAR",
   UNICODE          = "UNICODE",
   USE              = "USE",
+  USING_KEYS       = "USING_KEYS",
   VERSION          = "VERSION",
   VIRTUAL_KEY      = "VIRTUAL_KEY",
   VISUALKEYBOARD   = "VISUALKEYBOARD",
