@@ -767,19 +767,42 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
     });
   });
-  describe("AnyStatementRule Tests", () => {
-    it("can construct an AnyStatementRule", () => {
+  describe("BeginBlockRule Tests", () => {
+    it("can construct an BeginBlockRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
-      assert.isNotNull(anyStatement);
+      const beginBlock: Rule         = new BeginBlockRule(tokenBuffer);
+      assert.isNotNull(beginBlock);
     });
     it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('any(digit)');
-      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
-      assert.isTrue(anyStatement.parse(root));
-      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
-      assert.isNotNull(anyNode);
-      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin unicode > use(main)');
+      const beginBlock: Rule         = new BeginBlockRule(tokenBuffer);
+      assert.isTrue(beginBlock.parse(root));
+      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      assert.isNotNull(beginNode);
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
+    });
+  });
+  describe("BeginStatementRule Tests", () => {
+    it("can construct an BeginStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isNotNull(beginStatement);
+    });
+    it("can parse correctly (entrypoint)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin unicode');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isTrue(beginStatement.parse(root));
+      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      assert.isNotNull(beginNode);
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.UNICODE));
+    });
+    it("can parse correctly (no entrypoint)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin');
+      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
+      assert.isTrue(beginStatement.parse(root));
+      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
+      assert.isNotNull(beginNode);
+      assert.isFalse(beginNode.hasChild());
     });
   });
   describe("EntryPointRule Tests", () => {
@@ -813,29 +836,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.ANSI));
     });
   });
-  describe("BeginStatementRule Tests", () => {
-    it("can construct an BeginStatementRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
-      assert.isNotNull(beginStatement);
-    });
-    it("can parse correctly (entrypoint)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin unicode');
-      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
-      assert.isTrue(beginStatement.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
-      assert.isNotNull(beginNode);
-      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.UNICODE));
-    });
-    it("can parse correctly (no entrypoint)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin');
-      const beginStatement: Rule     = new BeginStatementRule(tokenBuffer);
-      assert.isTrue(beginStatement.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
-      assert.isNotNull(beginNode);
-      assert.isFalse(beginNode.hasChild());
-    });
-  });
   describe("UseStatementRule Tests", () => {
     it("can construct an UseStatementRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -859,21 +859,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
   });
-  describe("BeginBlockRule Tests", () => {
-    it("can construct an BeginBlockRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const beginBlock: Rule         = new BeginBlockRule(tokenBuffer);
-      assert.isNotNull(beginBlock);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('begin unicode > use(main)');
-      const beginBlock: Rule         = new BeginBlockRule(tokenBuffer);
-      assert.isTrue(beginBlock.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
-      assert.isNotNull(beginNode);
-      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
-    });
-  });
   describe("OutsStatementRule Tests", () => {
     it("can construct an OutsStatementRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -887,6 +872,21 @@ describe("KMN Analyser Tests", () => {
       const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
       assert.isNotNull(outsNode);
       assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("AnyStatementRule Tests", () => {
+    it("can construct an AnyStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
+      assert.isNotNull(anyStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('any(digit)');
+      const anyStatement: Rule       = new AnyStatementRule(tokenBuffer);
+      assert.isTrue(anyStatement.parse(root));
+      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
+      assert.isNotNull(anyNode);
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("BaselayoutStatementRule Tests", () => {

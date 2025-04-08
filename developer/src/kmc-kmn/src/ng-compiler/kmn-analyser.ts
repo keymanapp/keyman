@@ -441,27 +441,23 @@ export class ruleBlockRule extends SingleChildRule {
   }
 }
 
-export class AnyStatementRule extends SingleChildRule {
+export class BeginBlockRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
-    const any: Rule               = new TokenRule(tokenBuffer, TokenTypes.ANY, true);
-    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
-    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
-    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
-      any, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
-    ]);
+    const beginStatement: Rule = new BeginStatementRule(tokenBuffer);
+    const spacedChevron: Rule  = new SpacedChevronRule(tokenBuffer);
+    const useStatement: Rule   = new UseStatementRule(tokenBuffer);
+    this.rule = new SequenceRule(tokenBuffer, [beginStatement, spacedChevron, useStatement]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      anyNode.addChild(storeNameNode);
-      node.addChild(anyNode);
+      const beginNode = tmp.getSoleChildOfType(NodeTypes.BEGIN);
+      const useNode   = tmp.getSoleChildOfType(NodeTypes.USE);
+      beginNode.addChild(useNode);
+      node.addChild(beginNode);
     }
     return parseSuccess;
   }
@@ -515,6 +511,15 @@ export class OptionalSpacedEntryPointRule extends SingleChildRule {
     super(tokenBuffer);
     const spacedEntryPointRule: Rule = new SpacedEntryPointRule(tokenBuffer);
     this.rule = new OptionalRule(tokenBuffer, spacedEntryPointRule);
+  }
+}
+
+export class SpacedChevronRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
+    const chevron: Rule    = new TokenRule(tokenBuffer, TokenTypes.CHEVRON);
+    this.rule = new SequenceRule(tokenBuffer, [whitespace, chevron, whitespace]);
   }
 }
 
@@ -594,37 +599,6 @@ export class GroupNameRule extends SingleChildRule {
   };
 }
 
-export class SpacedChevronRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const chevron: Rule    = new TokenRule(tokenBuffer, TokenTypes.CHEVRON);
-    this.rule = new SequenceRule(tokenBuffer, [whitespace, chevron, whitespace]);
-  }
-}
-
-export class BeginBlockRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const beginStatement: Rule = new BeginStatementRule(tokenBuffer);
-    const spacedChevron: Rule  = new SpacedChevronRule(tokenBuffer);
-    const useStatement: Rule   = new UseStatementRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [beginStatement, spacedChevron, useStatement]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const beginNode = tmp.getSoleChildOfType(NodeTypes.BEGIN);
-      const useNode   = tmp.getSoleChildOfType(NodeTypes.USE);
-      beginNode.addChild(useNode);
-      node.addChild(beginNode);
-    }
-    return parseSuccess;
-  }
-}
-
 export class OutsStatementRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
@@ -646,6 +620,32 @@ export class OutsStatementRule extends SingleChildRule {
       const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
       outsNode.addChild(storeNameNode);
       node.addChild(outsNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class AnyStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const any: Rule               = new TokenRule(tokenBuffer, TokenTypes.ANY, true);
+    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
+    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
+    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      any, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      anyNode.addChild(storeNameNode);
+      node.addChild(anyNode);
     }
     return parseSuccess;
   }
