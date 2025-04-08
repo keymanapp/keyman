@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.230 beta 2025-04-08
+
+* docs(web): documentation for touch-keyboard gesture models (#13659)
+
 ## 18.0.229 beta 2025-04-07
 
 * fix(ios): ensure keyboard height is set when engine settings view is used in a NavigationController (#13643)
