@@ -26,7 +26,7 @@ virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSqu
 spacedShiftCode: shiftcode whitespace
 variableStore: store leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
-ruleBlock: beginBlock
+ruleBlock: beginBlock|groupBlock
 beginBlock: beginStatement spacedChevron useStatement
 beginStatement: begin spacedEntryPoint?
 spacedEntryPoint: whitespace entryPoint
@@ -36,13 +36,12 @@ useStatement: use leftBracket whitespace? groupNameOrKeyword whitespace? rightBr
 groupNameOrKeyword: groupName|permittedKeyword
 permittedKeyword: newcontext|postkeystroke
 groupName: parameter
-outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
-
 groupBlock: groupStatement spacedGroupQualifier?
 groupStatement: group leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
 spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
+outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
 
 anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket
 baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket

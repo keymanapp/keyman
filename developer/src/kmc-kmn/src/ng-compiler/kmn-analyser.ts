@@ -437,7 +437,8 @@ export class ruleBlockRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
     const beginBlock: Rule  = new BeginBlockRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [beginBlock]);
+    const groupBlock: Rule  = new GroupBlockRule(tokenBuffer);
+    this.rule = new AlternateRule(tokenBuffer, [beginBlock, groupBlock]);
   }
 }
 
