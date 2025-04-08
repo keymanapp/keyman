@@ -63,6 +63,15 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
       assert.equal(children[1].nodeType, NodeTypes.LINE);
     });
+    it("can parse correctly (no space before, no comment, space before newline)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \n');
+      const contentLine: Rule = new ContentLineRule(tokenBuffer);
+      assert.isTrue(contentLine.parse(root));
+      const children = root.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
+      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
+      assert.equal(children[1].nodeType, NodeTypes.LINE);
+    });
     it("can parse correctly (space before, no comment)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename"\n');
       const contentLine: Rule = new ContentLineRule(tokenBuffer);
@@ -99,6 +108,13 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (no comment)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('\n');
+      const blankLine: Rule = new BlankLineRule(tokenBuffer);
+      assert.isTrue(blankLine.parse(root));
+      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
+      assert.isFalse(root.getSoleChild().hasChild());
+    });
+    it("can parse correctly (no comment, space before newline)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' \n');
       const blankLine: Rule = new BlankLineRule(tokenBuffer);
       assert.isTrue(blankLine.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
