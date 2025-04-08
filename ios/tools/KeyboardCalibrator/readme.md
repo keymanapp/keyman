@@ -25,6 +25,10 @@ This tool was designed to facilitate collection of values for use with `KeymanEn
 
 7.  Repeat steps 2 through 6 for the other device orientation.
 
+![Example calibration run](readme_imgs/keyboard-calibration-run.gif)
+
+Note how the green ("system inset") and blue ("inset") areas beneath the red ("keyboard") perfectly match the area reserved for the system globe key on notched devices when in portrait.  That is not space available to the keyboard - only the red area is.
+
 ## Notes
 
 On tablet devices, the default "banner" may not disappear when prediction is turned off for an input.  In this case, the banner's height will generally be reported as the "system inset" instead.  Said "System inset" (on phones) corresponds to the part of the iOS phone keyboard that never disappears on iPhone X and later devices _below_ the keyboard.
