@@ -51,6 +51,7 @@ export enum NodeTypes {
   VIRTUAL_KEY,
   VISUALKEYBOARD,
   WINDOWSLANGUAGES,
+  OUTS,
 }
 
 export class ASTNode {

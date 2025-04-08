@@ -11,8 +11,8 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, KmnTreeRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { CasedkeysStoreAssignRule, CasedkeysStoreRule, CommentEndRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, KmnTreeRule, OutsStatementRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreAssignRule, StringSystemStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -119,25 +119,6 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(root.getSoleChild().hasChild());
     });
   })
-  describe("CommentEndRule Tests", () => {
-    it("can construct a CommentEndRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const commentEnd: Rule = new CommentEndRule(tokenBuffer);
-      assert.isNotNull(commentEnd);
-    });
-    it("can parse correctly (no space before)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied');
-      const commentEnd: Rule = new CommentEndRule(tokenBuffer);
-      assert.isTrue(commentEnd.parse(root));
-      assert.isFalse(root.hasChild());
-    });
-    it("can parse correctly (space before)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied');
-      const commentEnd: Rule = new CommentEndRule(tokenBuffer);
-      assert.isTrue(commentEnd.parse(root));
-      assert.isFalse(root.hasChild());
-    });
-  });
   describe("PaddingRule Tests", () => {
     it("can construct a PaddingRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -523,6 +504,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
+    it("can parse correctly (single outs)", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(ShiftOutAll)  outs(ShiftOutSingle)');
+      const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
+      assert.isTrue(variableStoreAssign.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
+    });
     it("can parse correctly (two u_char)", () => {
       const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) U+1780 U+1781');
       const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
@@ -541,7 +530,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (mixed text)", () => {
-      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) " " U+1781 [K_K]');
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('store(c_out) " " U+1781 [K_K] outs(ShiftOutSingle)');
       const variableStoreAssign: Rule = new VariableStoreAssignRule(tokenBuffer);
       assert.isTrue(variableStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
@@ -549,6 +538,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STRING));
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
     });
   });
   describe("TextRule Tests", () => {
@@ -556,12 +546,6 @@ describe("KMN Analyser Tests", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
       const text: Rule               = new TextRule(tokenBuffer);
       assert.isNotNull(text);
-    });
-    it("can parse correctly (simple text)", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a"');
-      const text: Rule               = new TextRule(tokenBuffer);
-      assert.isTrue(text.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse correctly (text range)", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a".."c"');
@@ -574,6 +558,18 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].getText(), '"a"');
       assert.equal(children[1].nodeType, NodeTypes.STRING);
       assert.equal(children[1].getText(), '"c"');
+    });
+    it("can parse correctly (simple text)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('"a"');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isTrue(text.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (outs statement)", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('outs(digit)');
+      const text: Rule               = new TextRule(tokenBuffer);
+      assert.isTrue(text.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OUTS));
     });
   });
   describe("SimpleTextRule Tests", () => {
@@ -770,36 +766,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
-  describe("BaselayoutStatementRule Tests", () => {
-    it("can construct an BaselayoutStatementRule", () => {
-      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('');
-      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
-      assert.isNotNull(baselayoutStatement);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('baselayout("en-US")');
-      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
-      assert.isTrue(baselayoutStatement.parse(root));
-      const baselayoutNode = root.getSoleChildOfType(NodeTypes.BASELAYOUT);
-      assert.isNotNull(baselayoutNode);
-      const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"en-US"');
-    });
-  });
-  describe("BeepStatementRule Tests", () => {
-    it("can construct an BeepStatementRule", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
-      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
-      assert.isNotNull(beepStatement);
-    });
-    it("can parse correctly", () => {
-      const tokenBuffer: TokenBuffer = stringToTokenBuffer('beep');
-      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
-      assert.isTrue(beepStatement.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
-    });
-  });
   describe("EntryPointRule Tests", () => {
     it("can construct an EntryPointRule", () => {
       const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
@@ -892,12 +858,57 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
     });
   });
+  describe("OutsStatementRule Tests", () => {
+    it("can construct an OutsStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const outsStatement: Rule      = new OutsStatementRule(tokenBuffer);
+      assert.isNotNull(outsStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('outs(digit)');
+      const outsStatement: Rule      = new OutsStatementRule(tokenBuffer);
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("BaselayoutStatementRule Tests", () => {
+    it("can construct an BaselayoutStatementRule", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('');
+      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
+      assert.isNotNull(baselayoutStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer  = stringToTokenBuffer('baselayout("en-US")');
+      const baselayoutStatement: Rule = new BaselayoutStatementRule(tokenBuffer);
+      assert.isTrue(baselayoutStatement.parse(root));
+      const baselayoutNode = root.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      assert.isNotNull(baselayoutNode);
+      const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"en-US"');
+    });
+  });
+  describe("BeepStatementRule Tests", () => {
+    it("can construct an BeepStatementRule", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('');
+      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
+      assert.isNotNull(beepStatement);
+    });
+    it("can parse correctly", () => {
+      const tokenBuffer: TokenBuffer = stringToTokenBuffer('beep');
+      const beepStatement: Rule      = new BeepStatementRule(tokenBuffer);
+      assert.isTrue(beepStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
+  });
   describe("Analyser Tests", () => {
     it("can parse (part of) Khmer Angkor correctly", () => {
       const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 19);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 20);
       const tokenBuffer: TokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule(tokenBuffer);
       assert.isTrue(kmnTreeRule.parse(root));
@@ -916,12 +927,14 @@ describe("KMN Analyser Tests", () => {
       assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
       assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
       const storeNodes = root.getChildrenOfType(NodeTypes.STORE);
-      assert.equal(storeNodes.length, 4);
+      //assert.equal(root.toString(), '');
+      assert.equal(storeNodes.length, 5);
       assert.equal(storeNodes[0].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutSingle');
       assert.equal(storeNodes[1].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo1');
       assert.equal(storeNodes[2].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo2');
       assert.equal(storeNodes[3].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo3');
-      //assert.equal(root.toString(), '');
+      assert.equal(storeNodes[4].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutAll');
+
     });
   });
 });

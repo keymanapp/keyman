@@ -1,8 +1,7 @@
 kmnTree: line*
 line: contentLine|blankLine
-contentLine: whitespace? content commentEnd? newline
-blankLine: commentEnd? newline
-commentEnd: whitespace? comment
+contentLine: whitespace? content whitespace? comment? newline
+blankLine: whitespace? comment? newline
 padding: whitespace|continuationNewline
 continuationNewline: whitespace? continuation whitespace? newline
 content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
@@ -19,7 +18,7 @@ hotkeyStoreAssign: hotkeyStore padding virtualKey
 hotkeyStore: store leftBracket whitespace? amphasand hotkey whitespace? rightBracket
 variableStoreAssign: variableStore paddedText+
 paddedText: padding text
-text: textRange|simpleText
+text: textRange|simpleText|outsStatement
 simpleText: string|virtualKey|uChar
 textRange: simpleText rangeEnd+
 rangeEnd: whitespace? range whitespace? simpleText
@@ -27,11 +26,8 @@ virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSqu
 spacedShiftCode: shiftcode whitespace
 variableStore: store leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
-
 ruleBlock: beginBlock
 anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket
-baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket
-beepStatement: beep
 beginStatement: begin spacedEntryPoint?
 spacedEntryPoint: whitespace entryPoint
 entryPoint: unicode|newcontext|postkeystroke|ansi
@@ -41,3 +37,7 @@ permittedKeyword: postkeystroke
 groupName: parameter
 spacedChevron:whitespace chevron whitespace
 beginBlock: beginStatement spacedChevron useStatement
+outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
+
+baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket
+beepStatement: beep

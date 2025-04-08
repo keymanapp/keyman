@@ -210,6 +210,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.NAME,             nodeType: NodeTypes.NAME},
     {tokenType: TokenTypes.NEWCONTEXT,       nodeType: NodeTypes.NEWCONTEXT},
     {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
+    {tokenType: TokenTypes.OUTS,             nodeType: NodeTypes.OUTS},
     {tokenType: TokenTypes.POSTKEYSTROKE,    nodeType: NodeTypes.POSTKEYSTROKE},
     {tokenType: TokenTypes.SHIFT_CODE,       nodeType: NodeTypes.SHIFT_CODE},
     {tokenType: TokenTypes.STORE,            nodeType: NodeTypes.STORE},
