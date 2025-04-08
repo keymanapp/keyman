@@ -625,6 +625,15 @@ export class OutsStatementRule extends SingleChildRule {
   }
 }
 
+export class GroupQualifierRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const usingKeys: Rule = new UsingKeysRule(tokenBuffer);
+    const readonly: Rule  = new TokenRule(tokenBuffer, TokenTypes.READONLY, true);
+    this.rule = new AlternateRule(tokenBuffer, [usingKeys, readonly]);
+  }
+}
+
 export class UsingKeysRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);

@@ -39,6 +39,7 @@ export enum NodeTypes {
   OUTS             = "OUTS",
   POSTKEYSTROKE    = "POSTKEYSTROKE",
   RANGE            = "RANGE",
+  READONLY         = "READONLY",
   SHIFT_CODE       = "SHIFT_CODE",
   STORE            = "STORE",
   STORENAME        = "STORENAME",
