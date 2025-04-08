@@ -123,18 +123,22 @@ class ViewController: UIViewController {
     switch captureMode {
       case .predict:
         captureInput.autocorrectionType = .yes
+        captureInput.spellCheckingType = .yes
         captureInput.inputView = nil
         captureButton.setTitle("Capture", for: .normal)
       case .plain:
         captureInput.autocorrectionType = .no
+        captureInput.spellCheckingType = .no
         captureInput.inputView = nil
         captureButton.setTitle("Capture", for: .normal)
       case .calibrate:
         captureInput.autocorrectionType = .no
+        captureInput.spellCheckingType = .no
         captureInput.inputView = nil
         captureButton.setTitle("Calibrate", for: .normal)
       case .check:
         captureInput.autocorrectionType = .no
+        captureInput.spellCheckingType = .no
 
         // Compute proper height
         captureInput.inputView = DummyInputViewController(height: capture.keyboardHeight, inset: capture.inputServicesHeight).inputView
