@@ -924,7 +924,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 20);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 29);
       const tokenBuffer: TokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule(tokenBuffer);
       assert.isTrue(kmnTreeRule.parse(root));
@@ -944,12 +944,15 @@ describe("KMN Analyser Tests", () => {
       assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
       const storeNodes = root.getChildrenOfType(NodeTypes.STORE);
       //assert.equal(root.toString(), '');
-      assert.equal(storeNodes.length, 5);
+      assert.equal(storeNodes.length, 8);
       assert.equal(storeNodes[0].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutSingle');
       assert.equal(storeNodes[1].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo1');
       assert.equal(storeNodes[2].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo2');
       assert.equal(storeNodes[3].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo3');
       assert.equal(storeNodes[4].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutAll');
+      assert.equal(storeNodes[5].getDescendents(NodeTypes.STORENAME)[0].getText(), 'digit');
+      assert.equal(storeNodes[6].getDescendents(NodeTypes.STORENAME)[0].getText(), 'number');
+      assert.equal(storeNodes[7].getDescendents(NodeTypes.STORENAME)[0].getText(), 'whitespace');
     });
   });
 });
