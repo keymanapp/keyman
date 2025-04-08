@@ -34,7 +34,7 @@ entryPoint: unicode|newcontext|postkeystroke|ansi
 spacedChevron:whitespace chevron whitespace
 useStatement: use leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
 groupNameOrKeyword: groupName|permittedKeyword
-permittedKeyword: postkeystroke
+permittedKeyword: newcontext|postkeystroke
 groupName: parameter
 outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
 

@@ -19,6 +19,7 @@ export enum NodeTypes {
   COPYRIGHT        = "COPYRIGHT",
   DISPLAYMAP       = "DISPLAYMAP",
   ETHNOLOGUECODE   = "ETHNOLOGUECODE",
+  GROUP            = "GROUP",
   GROUPNAME        = "GROUPNAME",
   HOTKEY           = "HOTKEY",
   INCLUDECODES     = "INCLUDECODES",

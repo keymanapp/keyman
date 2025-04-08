@@ -549,6 +549,32 @@ export class UseStatementRule extends SingleChildRule {
   }
 }
 
+export class GroupStatementRule extends SingleChildRule {
+  public constructor(tokenBuffer: TokenBuffer) {
+    super(tokenBuffer);
+    const group: Rule              = new TokenRule(tokenBuffer, TokenTypes.GROUP, true);
+    const leftBracket: Rule        = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule(tokenBuffer);
+    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule(tokenBuffer);
+    const rightBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule(tokenBuffer, [
+      group, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const groupNode     = tmp.getSoleChildOfType(NodeTypes.GROUP);
+      const groupNameNode = tmp.getSoleChildOfType(NodeTypes.GROUPNAME);
+      groupNode.addChild(groupNameNode);
+      node.addChild(groupNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class GroupNameOrKeywordRule extends SingleChildRule {
   public constructor(tokenBuffer: TokenBuffer) {
     super(tokenBuffer);
@@ -576,6 +602,7 @@ export class PermittedKeywordRule extends SingleChildRule {
     super(tokenBuffer);
     const tokenRules: TokenRule[] = [];
     [
+      TokenTypes.NEWCONTEXT,
       TokenTypes.POSTKEYSTROKE,
     ].forEach((tokenType) => {
       tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
