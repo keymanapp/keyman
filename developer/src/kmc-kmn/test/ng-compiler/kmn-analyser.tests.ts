@@ -897,7 +897,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 13);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 19);
       const tokenBuffer: TokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule(tokenBuffer);
       assert.isTrue(kmnTreeRule.parse(root));
@@ -915,6 +915,12 @@ describe("KMN Analyser Tests", () => {
       assert.equal(beginNodes.length, 2);
       assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
       assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
+      const storeNodes = root.getChildrenOfType(NodeTypes.STORE);
+      assert.equal(storeNodes.length, 4);
+      assert.equal(storeNodes[0].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutSingle');
+      assert.equal(storeNodes[1].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo1');
+      assert.equal(storeNodes[2].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo2');
+      assert.equal(storeNodes[3].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo3');
       //assert.equal(root.toString(), '');
     });
   });
