@@ -934,7 +934,6 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNodes[2].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo2');
       assert.equal(storeNodes[3].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo3');
       assert.equal(storeNodes[4].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutAll');
-
     });
   });
 });
