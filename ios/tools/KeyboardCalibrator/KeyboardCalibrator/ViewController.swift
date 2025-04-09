@@ -101,6 +101,10 @@ class ViewController: UIViewController {
     captureStatsView.isHidden = true
     let screen = UIScreen.main.bounds
     uikitPointsLabel.text = "(\(screen.width), \(screen.height))"
+    
+    let assistant = captureInput.inputAssistantItem;
+    assistant.leadingBarButtonGroups = [];
+    assistant.trailingBarButtonGroups = [];
   }
 
   @objc func keyboardWillShow(_ notification: Notification) {
@@ -119,7 +123,12 @@ class ViewController: UIViewController {
   @IBAction func operationChanged(_ sender: Any) {
     // Operation mode has been altered; update accordingly
     captureMode = CaptureOperation(rawValue: operationControl.selectedSegmentIndex)!
-
+    
+    // Disable undo/redo/copy on tablet:  the "Assistant" bar
+    let assistant = captureInput.inputAssistantItem;
+    assistant.leadingBarButtonGroups = [];
+    assistant.trailingBarButtonGroups = [];
+    
     switch captureMode {
       case .predict:
         captureInput.autocorrectionType = .yes
