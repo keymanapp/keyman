@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.231 beta 2025-04-09
+
+* docs(android): Document default keyboard height for xxxhdpi devices (#13673)
+* fix(ios): allow swipe-dismissal of Settings to be cancelled (#13686)
+* fix(ios): do not show notification for downloaded keyboard when showing its installer (#13687)
+* fix(ios): restore banner-hiding mechanism for keyboard calibration tool (#13689)
+
 ## 18.0.230 beta 2025-04-08
 
 * docs(web): documentation for touch-keyboard gesture models (#13659)
