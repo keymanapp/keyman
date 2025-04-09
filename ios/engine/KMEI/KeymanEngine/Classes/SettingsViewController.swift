@@ -17,14 +17,14 @@ open class SettingsViewController: UITableViewController {
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    
+
     loadUserLanguages()
     os_log("viewWillAppear: SettingsViewController", log:KeymanEngineLogger.settings, type: .info)
  }
-  
+
   override open func viewDidLoad() {
     super.viewDidLoad()
-    
+
     title = NSLocalizedString("menu-settings-title", bundle: engineBundle, comment: "")
     let doneButton = UIBarButtonItem(title: NSLocalizedString("Done", bundle: engineBundle, comment: ""), style: .plain, target: self,
                                      action: #selector(self.settingsDismissed))
@@ -32,22 +32,22 @@ open class SettingsViewController: UITableViewController {
 
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
-  
+
   @objc func settingsDismissed() {
     // This resets KMW so that any new and/or updated resources can be properly loaded.
     os_log("SettingsViewController settingsDismissed", log:KeymanEngineLogger.settings, type: .info)
     Manager.shared.dismissKeyboardPicker(self)
-    
+
     let newPortraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
     let newLandscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
 
     if ((previousPortraitKeyboardHeight != newPortraitHeight) || (previousLandscapeKeyboardHeight != newLandscapeHeight)) {
       Manager.shared.keyboardHeightChanged()
     }
-    
+
     navigationController?.presentationController?.delegate = nil
   }
-  
+
   open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
     let sb : UIStoryboard = UIStoryboard(name: "Settings", bundle: nil)
     if let vc = sb.instantiateInitialViewController() {
@@ -60,7 +60,7 @@ open class SettingsViewController: UITableViewController {
 //  convenience init() {
 //    self.init(style: UITableViewStyle.grouped)
 //  }
-  
+
   public init(/*storage: Storage*/) {
 //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
@@ -72,7 +72,7 @@ open class SettingsViewController: UITableViewController {
       "subtitle": "0", //count of installed languages as string
       "reuseid" : "languages"
       ])
-    
+
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-startup-get-started", bundle: engineBundle, comment: ""),
       "subtitle": "",
@@ -90,13 +90,13 @@ open class SettingsViewController: UITableViewController {
       "subtitle": "",
       "reuseid": "spacebartext"
       ])
-    
+
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-adjust-keyboard-height", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid": "adjustkeyboardheight"
       ])
-    
+
     if let _ = URL(string: UIApplication.openSettingsURLString) {
       itemsArray.append([
         "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
@@ -136,7 +136,7 @@ open class SettingsViewController: UITableViewController {
   override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemsArray.count
     }
-  
+
   public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
     let rightOffset = cellFrame.size.width
     let switchWidth: CGFloat = 20
@@ -144,17 +144,17 @@ open class SettingsViewController: UITableViewController {
     let switchHeight = controlSize.height
     let cellSwitchHeightDiff = cellFrame.size.height - switchHeight
     let switchY = cellFrame.origin.y + 0.5 * cellSwitchHeightDiff
-    
+
     let switchFrame = CGRect(x: switchX,
                              y: switchY,
                              width: switchWidth,
                              height: cellFrame.size.height)
     return switchFrame
   }
-  
+
   override open func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    
+
     // Helps to handle slide-dismissal.
     navigationController?.presentationController?.delegate = self
   }
@@ -166,17 +166,17 @@ open class SettingsViewController: UITableViewController {
     }
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     cell.selectionStyle = .none
-    
+
     switch(cellIdentifier) {
       case "languages":
         break
       case "showgetstarted":
         let showAgainSwitch = UISwitch()
         showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showAgainSwitch.frame.size)
         showAgainSwitch.frame = switchFrame
-        
+
         showAgainSwitch.isOn = showGetStarted
         showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
                                       for: .valueChanged)
@@ -200,7 +200,7 @@ open class SettingsViewController: UITableViewController {
 
         enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        
+
       case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext", "adjustkeyboardheight":
         break
       default:
@@ -209,7 +209,7 @@ open class SettingsViewController: UITableViewController {
         SentryManager.capture(message)
         cell.accessoryType = .none
     }
-    
+
     return cell
   }
 
@@ -219,7 +219,7 @@ open class SettingsViewController: UITableViewController {
       SentryManager.enabled = toggle.isOn
     }
   }
-  
+
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
@@ -227,7 +227,7 @@ open class SettingsViewController: UITableViewController {
       userData.synchronize()
     }
   }
-  
+
   private var showGetStarted: Bool {
     let userData = Storage.active.userDefaults
     return userData.bool(forKey: Key.optShouldShowGetStarted)
@@ -270,17 +270,17 @@ open class SettingsViewController: UITableViewController {
         SentryManager.capture(message)
     }
   }
-  
+
   // In a xib-based application, navigation from a table can be handled in -tableView:didSelectRowAtIndexPath:
   override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
     performAction(for: indexPath)
   }
-  
+
   override open func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     performAction(for: indexPath)
   }
-  
+
   private func performAction(for indexPath: IndexPath) {
     switch indexPath.section {
     case 0:
@@ -335,7 +335,7 @@ open class SettingsViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
     */
 
@@ -362,9 +362,9 @@ open class SettingsViewController: UITableViewController {
     // Get the new view controller using segue.destination.
     // Pass the selected object to the new view controller.
   }
-  
+
   // MARK: - language access -
-  
+
   /** returns an array of LexicalModel created from an array of InstallableLexicalModel
    *  @param installedList: The InstallableLexicalModel are probably already installed
    *  The returned LexicalModels are not complete (usually we go the other way round)
@@ -377,7 +377,7 @@ open class SettingsViewController: UITableViewController {
     }
     return returnList
   }
-  
+
   // MARK: - language access -
   private func loadUserLanguages() {
     //iterate the list of installed languages and save their names
@@ -422,7 +422,7 @@ open class SettingsViewController: UITableViewController {
     itemsArray[0]["subtitle"] = String.localizedStringWithFormat(formatString, userLanguages.count)
     tableView.reloadData()
   }
-  
+
   public func setIsDoneButtonEnabled(_ nc: UINavigationController, _ value: Bool) {
     let doneOrCancel = value
     if doneOrCancel {
@@ -447,7 +447,7 @@ open class SettingsViewController: UITableViewController {
       SentryManager.capture(message)
     }
   }
-  
+
   func showSpacebarText() {
     let vc = SpacebarTextViewController()
     if let nc = navigationController {
@@ -459,16 +459,16 @@ open class SettingsViewController: UITableViewController {
       SentryManager.capture(message)
     }
   }
-  
+
   func showAdjustKeyboardHeight() {
     let vc = KeyboardHeightViewController()
     if let nc = navigationController {
       self.previousPortraitKeyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
       self.previousLandscapeKeyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
-      
+
       let message = "selected Adjust Keyboard Height, previousPortraitKeyboardHeight: \(previousPortraitKeyboardHeight), previousLandscapeKeyboardHeight: \(previousLandscapeKeyboardHeight)"
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .default, message)
-      
+
       nc.pushViewController(vc, animated: true)
       setIsDoneButtonEnabled(nc, true)
     } else {
@@ -480,7 +480,7 @@ open class SettingsViewController: UITableViewController {
 }
 
 extension SettingsViewController: UIAdaptivePresentationControllerDelegate {
-  public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+  public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
     settingsDismissed()
   }
 }
