@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1075,6 +1075,45 @@ describe("KMN Analyser Tests", () => {
       const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"en-US"');
+    });
+  });
+  describe("BracketedStringRule Tests", () => {
+    it("can construct a BracketedStringRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const bracketedString: Rule = new BracketedStringRule();
+      assert.isNotNull(bracketedString);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('("a")');
+      const bracketedString: Rule = new BracketedStringRule();
+      assert.isTrue(bracketedString.parse(root));
+      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"a"');
+    });
+    it("can parse correctly (space before name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( "a")');
+      const bracketedString: Rule = new BracketedStringRule();
+      assert.isTrue(bracketedString.parse(root));
+      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"a"');
+    });
+    it("can parse correctly (space after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('("a" )');
+      const bracketedString: Rule = new BracketedStringRule();
+      assert.isTrue(bracketedString.parse(root));
+      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"a"');
+    });
+    it("can parse correctly (space before and after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( "a" )');
+      const bracketedStoreName: Rule = new BracketedStringRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"a"');
     });
   });
   describe("BeepStatementRule Tests", () => {

@@ -760,26 +760,34 @@ export class AnyStatementRule extends SingleChildRule {
 export class BaselayoutStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const baselayout: Rule    = new TokenRule(TokenTypes.BASELAYOUT, true);
-    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      baselayout, leftBracket, optWhitespace, stringRule, optWhitespace, rightBracket,
-    ]);
+    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const bracketedString: Rule = new BracketedStringRule();
+    this.rule = new SequenceRule([baselayout, bracketedString]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const baselayoutNode  = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
-      const stringNode      = tmp.getSoleChildOfType(NodeTypes.STRING);
+      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      const stringNode     = tmp.getSoleChildOfType(NodeTypes.STRING);
       baselayoutNode.addChild(stringNode);
       node.addChild(baselayoutNode);
     }
     return parseSuccess;
+  }
+}
+
+export class BracketedStringRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const string: Rule        = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      leftBracket, optWhitespace, string, optWhitespace, rightBracket,
+    ]);
   }
 }
 
