@@ -49,3 +49,10 @@ anyStatement: any bracketedStoreName
 baselayoutStatement: baselayout bracketedString
 bracketedString: leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
+productionBlock: lhsBlock spacedChevron rhsBlock
+lhsBlock: lhsStatement paddedLhsStatement*
+paddedLhsStatement: padding lhsStatement
+lhsStatement: platformStatement
+platformStatement: platform bracketedString
+rhsBlock: rhsStatement
+rhsStatement: useStatement

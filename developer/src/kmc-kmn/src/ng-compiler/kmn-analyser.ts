@@ -86,7 +86,7 @@ export class ContentRule extends SingleChildRule {
     const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule();
     const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule();
     const variableStoreAssign: Rule     = new VariableStoreAssignRule();
-    const ruleBlock: Rule               = new ruleBlockRule();
+    const ruleBlock: Rule               = new RuleBlockRule();
     this.rule = new AlternateRule([
       stringSystemStoreAssign,
       casedkeysStoreAssign,
@@ -471,7 +471,7 @@ export class OutsStatementRule extends SingleChildRule {
   }
 }
 
-export class ruleBlockRule extends SingleChildRule {
+export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const beginBlock: Rule  = new BeginBlockRule();
@@ -798,6 +798,75 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
+export class ProductionBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const lhsBlock      = new LhsBlockRule();
+    const spacedChevron = new SpacedChevronRule();
+    const rhsBlock      = new RhsBlockRule();
+    this.rule = new SequenceRule([lhsBlock, spacedChevron, rhsBlock]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lhsNode  = tmp.getSoleChildOfType(NodeTypes.LHS);
+      const rhsNode  = tmp.getSoleChildOfType(NodeTypes.RHS);
+      const lhsLines = lhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const rhsLines = rhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const ruleNode = new ASTNode(NodeTypes.RULE);
+      ruleNode.addChild(lhsNode);
+      ruleNode.addChild(rhsNode);
+      ruleNode.addChildren(lhsLines);
+      ruleNode.addChildren(rhsLines);
+      node.addChild(ruleNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class LhsBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const lhsStatement           = new LhsStatementRule();
+    const paddedLhsStatemente    = new PaddedLhsStatementRule();
+    const manyPaddedLhsStatement = new ManyRule(paddedLhsStatemente);
+    this.rule = new SequenceRule([lhsStatement, manyPaddedLhsStatement]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes         = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const lhsStatementNodes = tmp.getChildren();
+      const lhsNode           = new ASTNode(NodeTypes.LHS);
+      lhsNode.addChildren(lhsStatementNodes);
+      lhsNode.addChildren(lineNodes);
+      node.addChild(lhsNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class PaddedLhsStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule      = new PaddingRule();
+    const lhsStatement: Rule = new LhsStatementRule();
+    this.rule = new SequenceRule([padding, lhsStatement]);
+  }
+}
+
+export class LhsStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const platformStatement: Rule = new PlatformStatementRule();
+    this.rule = new AlternateRule([platformStatement]);
+  }
+}
+
 export class PlatformStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -816,5 +885,35 @@ export class PlatformStatementRule extends SingleChildRule {
       node.addChild(platformNode);
     }
     return parseSuccess;
+  }
+}
+
+export class RhsBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const rhsStatement = new RhsStatementRule();
+    this.rule = new SequenceRule([rhsStatement]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes         = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const rhsStatementNodes = tmp.getChildren();
+      const rhsNode           = new ASTNode(NodeTypes.RHS);
+      rhsNode.addChildren(rhsStatementNodes);
+      rhsNode.addChildren(lineNodes);
+      node.addChild(rhsNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class RhsStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const useStatement: Rule = new UseStatementRule();
+    this.rule = new AlternateRule([useStatement]);
   }
 }
