@@ -8,6 +8,21 @@
 import { CompilerEvent, CompilerCallbackOptions, CompilerErrorSeverity, CompilerError, CompilerMessageOverrideMap, CompilerErrorMask } from "./compiler-interfaces.js";
 
 /**
+ * The EventResolver implementation is able to expand error messages,
+ * particularly to change a byte offset into a line number.
+ */
+export interface EventResolver {
+  resolve(event: CompilerEvent): void;
+}
+
+/** A do-nothing EventResolver. Implementations can use this as their default EventResolver. */
+export class NullEventResolver implements EventResolver {
+  resolve(event: CompilerEvent): void {
+    // do nothing, this is the null event resolver.
+  }
+}
+
+/**
  * Abstract interface for callbacks, to abstract out file i/o
  */
 
@@ -34,12 +49,16 @@ export interface CompilerCallbacks {
   get net(): CompilerNetAsyncCallbacks;
 
   /**
-   * Resolves a file path relative to the baseFilename
+   * Resolves a file path relative to the baseFilename.
    * @param baseFilename
    * @param filename
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
+  /**
+   * Report a message from the compiler back to the caller.
+   * @param event
+   */
   reportMessage(event: CompilerEvent): void;
 
   debug(msg: string): void;

@@ -13,7 +13,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 
 import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { LineFinder } from '../src/line-utils.js';
 import { makePathToFixture } from './helpers/index.js';
+import { SymbolUtils } from '../src/symbol-utils.js';
 
 // if true, attempt to WRITE the fixtures
 const { GEN_XML_FIXTURES } = env;
@@ -119,7 +121,7 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
             writeJson(jsonPath, actual);
           } else {
             assert.ok(expect, `Could not read ${jsonPath} - run with env GEN_XML_FIXTURES=1 to update.`);
-            assert.deepEqual(actual, expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
+            assert.deepEqual(SymbolUtils.removeSymbols(actual), expect, `Mismatch of ${xmlPath} vs ${jsonPath}`);
           }
         });
       }
@@ -160,3 +162,41 @@ describe(`XML Writer Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
     });
   }
 });
+
+describe(`XML Reader line number test`, () => {
+  const path = 'tran_fail-empty.xml';
+  const xmlPath = makePathToFixture('xml', `${path}`);
+  const type: KeymanXMLType = 'keyboard3';
+  it(`Should report line numbers on parse of ${type} ${path}`, () => {
+    let xml = readData(xmlPath);
+    assert.ok(xml, `Could not read ${xmlPath}`);
+    xml = xml.replace(/\r\n/g, '\n');
+    const reader = new KeymanXMLReader(type);
+    assert.ok(reader);
+
+    // now, parse. subsitute endings for Win
+    const actual = reader.parse(xml);
+    const lines = LineFinder.textToLines(xml);
+    assert.ok(actual, `Parser failed on ${xmlPath}`);
+
+    // now, assert char offset
+    const getMetaData = KeymanXMLReader.getMetaData;
+    assert.ok(getMetaData(actual.keyboard3));
+    assert.equal(
+      getMetaData(actual.keyboard3)?.startIndex, 40); // index of <keyboard3> element
+    assert.equal(
+      getMetaData(actual.keyboard3.info)?.startIndex, 136);  // index of <info> etc
+    assert.equal(
+      getMetaData(actual.keyboard3.transforms)?.startIndex, 186);
+    assert.deepEqual(
+      LineFinder.offsetToLineColumn(
+        getMetaData(actual.keyboard3).startIndex, lines), { line: 3, column: 0 });
+    assert.deepEqual(
+      LineFinder.offsetToLineColumn(
+        getMetaData(actual.keyboard3.info).startIndex, lines), { line: 4, column: 2 });
+    assert.deepEqual(
+      LineFinder.offsetToLineColumn(
+        getMetaData(actual.keyboard3.transforms).startIndex, lines), { line: 8, column: 2 });
+  });
+});
+

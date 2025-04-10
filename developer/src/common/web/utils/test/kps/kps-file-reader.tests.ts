@@ -14,6 +14,7 @@ import { makePathToFixture } from '../helpers/index.js';
 
 import { KpsFileReader } from "../../src/types/kps/kps-file-reader.js";
 import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
+import { SymbolUtils } from '../../src/symbol-utils.js';
 import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
 const callbacks = new TestCompilerCallbacks();
@@ -61,13 +62,13 @@ describe('kps-file-reader', function () {
   it('kps-file-reader should round-trip with kps-file-writer', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);
-    const kps = reader.read(input);
+    const kps = SymbolUtils.removeSymbols(reader.read(input));
 
     const writer = new KpsFileWriter();
     const output = writer.write(kps);
 
     // Round Trip
-    const kps2 = reader.read(new TextEncoder().encode(output));
+    const kps2 = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
     assert.deepEqual(kps2, kps);
   });
 
