@@ -28,7 +28,7 @@ variableStore: store bracketedStoreName
 bracketedStoreName: leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
 outsStatement: outs bracketedStoreName
-ruleBlock: beginBlock|groupBlock
+ruleBlock: beginBlock|groupBlock|productionBlock
 beginBlock: beginStatement spacedChevron useStatement
 beginStatement: begin spacedEntryPoint?
 spacedEntryPoint: whitespace entryPoint
@@ -44,11 +44,6 @@ groupStatement: group bracketedGroupName
 spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
-
-anyStatement: any bracketedStoreName
-baselayoutStatement: baselayout bracketedString
-bracketedString: leftBracket whitespace? string whitespace? rightBracket
-beepStatement: beep
 productionBlock: lhsBlock spacedChevron rhsBlock
 lhsBlock: lhsStatement paddedLhsStatement*
 paddedLhsStatement: padding lhsStatement
@@ -56,3 +51,8 @@ lhsStatement: platformStatement
 platformStatement: platform bracketedString
 rhsBlock: rhsStatement
 rhsStatement: useStatement
+
+anyStatement: any bracketedStoreName
+baselayoutStatement: baselayout bracketedString
+bracketedString: leftBracket whitespace? string whitespace? rightBracket
+beepStatement: beep

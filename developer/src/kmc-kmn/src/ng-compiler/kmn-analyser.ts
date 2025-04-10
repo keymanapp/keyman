@@ -474,9 +474,12 @@ export class OutsStatementRule extends SingleChildRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginBlock: Rule  = new BeginBlockRule();
-    const groupBlock: Rule  = new GroupBlockRule();
-    this.rule = new AlternateRule([beginBlock, groupBlock]);
+    const beginBlock: Rule      = new BeginBlockRule();
+    const groupBlock: Rule      = new GroupBlockRule();
+    const productionBlock: Rule = new ProductionBlockRule()
+    this.rule = new AlternateRule([
+      beginBlock, groupBlock, productionBlock,
+    ]);
   }
 }
 
@@ -811,16 +814,16 @@ export class ProductionBlockRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode  = tmp.getSoleChildOfType(NodeTypes.LHS);
-      const rhsNode  = tmp.getSoleChildOfType(NodeTypes.RHS);
-      const lhsLines = lhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const rhsLines = rhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const ruleNode = new ASTNode(NodeTypes.RULE);
-      ruleNode.addChild(lhsNode);
-      ruleNode.addChild(rhsNode);
-      ruleNode.addChildren(lhsLines);
-      ruleNode.addChildren(rhsLines);
-      node.addChild(ruleNode);
+      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS);
+      const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
+      const lhsLines       = lhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const rhsLines       = rhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const productionNode = new ASTNode(NodeTypes.PRODUCTION);
+      productionNode.addChild(lhsNode);
+      productionNode.addChild(rhsNode);
+      productionNode.addChildren(lhsLines);
+      productionNode.addChildren(rhsLines);
+      node.addChild(productionNode);
     }
     return parseSuccess;
   }

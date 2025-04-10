@@ -1139,7 +1139,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const ruleNode = root.getSoleChildOfType(NodeTypes.RULE);
+      const ruleNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(ruleNode);
       const lhsNode = ruleNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
@@ -1187,7 +1187,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 33);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 39);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -1216,9 +1216,13 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNodes[6].getDescendents(NodeTypes.STORENAME)[0].getText(), 'number');
       assert.equal(storeNodes[7].getDescendents(NodeTypes.STORENAME)[0].getText(), 'whitespace');
       const groupNodes = root.getChildrenOfType(NodeTypes.GROUP);
-      assert.equal(groupNodes.length, 1);
+      assert.equal(groupNodes.length, 2);
       assert.equal(groupNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'NewContext');
       assert.equal(groupNodes[0].getDescendents(NodeTypes.READONLY).length, 1);
+      assert.equal(groupNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
+      assert.equal(groupNodes[1].getDescendents(NodeTypes.READONLY).length, 1);
+      const productionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION);
+      assert.equal(productionNodes.length, 1);
       //assert.equal(root.toString(), '');
     });
   });
