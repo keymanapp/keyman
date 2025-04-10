@@ -11,12 +11,14 @@ import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export abstract class Rule { // equivalent to a no-child rule
-  protected tokenBuffer: TokenBuffer;
+  protected static _tokenBuffer: TokenBuffer = null;
 
-  public constructor(tokenBuffer: TokenBuffer) {
+  public static set tokenBuffer(tokenBuffer: TokenBuffer) {
     // TODO error if tokenBuffer is null
-    this.tokenBuffer = tokenBuffer;
+    Rule._tokenBuffer = tokenBuffer;
   }
+
+  public static get tokenBuffer(): TokenBuffer { return Rule._tokenBuffer; }
 
   public abstract parse(node: ASTNode): boolean;
 }
@@ -24,8 +26,8 @@ export abstract class Rule { // equivalent to a no-child rule
 export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
 
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule=null) {
-    super(tokenBuffer);
+  public constructor(rule: Rule=null) {
+    super();
     this.rule = rule;
   }
 
@@ -37,21 +39,21 @@ export abstract class SingleChildRule extends Rule {
 export abstract class MultiChildRule extends Rule {
   protected rules: Rule[];
 
-  public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
+  public constructor(rules: Rule[]) {
     // TODO error if rules is null
-    super(tokenBuffer);
+    super();
     this.rules = rules;
   }
 }
 
 export class SequenceRule extends MultiChildRule {
-  public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
-    super(tokenBuffer, rules);
+  public constructor(rules: Rule[]) {
+    super(rules);
   }
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
-    const save: number = this.tokenBuffer.currentPosition;
+    const save: number = Rule.tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
 
     for (const rule of this.rules) {
@@ -63,7 +65,7 @@ export class SequenceRule extends MultiChildRule {
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      this.tokenBuffer.resetCurrentPosition(save);
+      Rule.tokenBuffer.resetCurrentPosition(save);
     }
 
     return parseSuccess;
@@ -71,13 +73,13 @@ export class SequenceRule extends MultiChildRule {
 }
 
 export class AlternateRule extends MultiChildRule {
-  public constructor(tokenBuffer: TokenBuffer, rules: Rule[]) {
-    super(tokenBuffer, rules);
+  public constructor(rules: Rule[]) {
+    super(rules);
   }
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const save: number = this.tokenBuffer.currentPosition;
+    const save: number = Rule.tokenBuffer.currentPosition;
     let tmp: ASTNode;
 
     for (const rule of this.rules) {
@@ -90,7 +92,7 @@ export class AlternateRule extends MultiChildRule {
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      this.tokenBuffer.resetCurrentPosition(save);
+      Rule.tokenBuffer.resetCurrentPosition(save);
     }
 
     return parseSuccess;
@@ -98,20 +100,20 @@ export class AlternateRule extends MultiChildRule {
 }
 
 export class OptionalRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
-    super(tokenBuffer, rule);
+  public constructor(rule: Rule) {
+    super(rule);
   }
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
-    const save: number = this.tokenBuffer.currentPosition;
+    const save: number = Rule.tokenBuffer.currentPosition;
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     parseSuccess = this.rule.parse(tmp);
 
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      this.tokenBuffer.resetCurrentPosition(save);
+      Rule.tokenBuffer.resetCurrentPosition(save);
       // TODO generate warning
     }
 
@@ -120,20 +122,20 @@ export class OptionalRule extends SingleChildRule {
 }
 
 export class ManyRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
-    super(tokenBuffer, rule);
+  public constructor(rule: Rule) {
+    super(rule);
   }
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     while (parseSuccess) {
-      let save: number = this.tokenBuffer.currentPosition;
+      let save: number = Rule.tokenBuffer.currentPosition;
       let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
       parseSuccess     = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
       } else {
-        this.tokenBuffer.resetCurrentPosition(save);
+        Rule.tokenBuffer.resetCurrentPosition(save);
       }
     };
     return true;
@@ -141,31 +143,31 @@ export class ManyRule extends SingleChildRule {
 }
 
 export class OneOrManyRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer, rule: Rule) {
-    super(tokenBuffer, rule);
+  public constructor(rule: Rule) {
+    super(rule);
   }
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    let save: number = this.tokenBuffer.currentPosition;
+    let save: number = Rule.tokenBuffer.currentPosition;
     let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
 
     parseSuccess = this.rule.parse(tmp);
     if (parseSuccess) {
       node.addChildren(tmp.getChildren());
     } else {
-      this.tokenBuffer.resetCurrentPosition(save);
+      Rule.tokenBuffer.resetCurrentPosition(save);
       return false;
     }
 
     while (parseSuccess) {
-      save         = this.tokenBuffer.currentPosition;
+      save         = Rule.tokenBuffer.currentPosition;
       tmp          = new ASTNode(NodeTypes.TMP);
       parseSuccess = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
       } else {
-        this.tokenBuffer.resetCurrentPosition(save);
+        Rule.tokenBuffer.resetCurrentPosition(save);
       }
     }
     return true;
@@ -177,8 +179,8 @@ export class TokenRule extends Rule {
   private tokenType: TokenTypes;
   private addNode: boolean;
 
-  public constructor(tokenBuffer: TokenBuffer, tokenType: TokenTypes, addNode: boolean=false) {
-    super(tokenBuffer);
+  public constructor(tokenType: TokenTypes, addNode: boolean=false) {
+    super();
     this.tokenType = tokenType;
     this.addNode   = addNode;
   }
@@ -235,11 +237,11 @@ export class TokenRule extends Rule {
 
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
-    const token: Token = this.tokenBuffer.nextToken();
+    const token: Token = Rule.tokenBuffer.nextToken();
 
     if (token.isTokenType(this.tokenType)) {
       parseSuccess = true;
-      this.tokenBuffer.popToken();
+      Rule.tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeTypes = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType != undefined) {
@@ -254,21 +256,21 @@ export class TokenRule extends Rule {
   }
 }
 
-export function parameterSequence(tokenBuffer: TokenBuffer, parameters: Token[], numExpected: number): boolean {
-  return tokenSequence(tokenBuffer, parameters, TokenTypes.PARAMETER, numExpected);
+export function parameterSequence(parameters: Token[], numExpected: number): boolean {
+  return tokenSequence(parameters, TokenTypes.PARAMETER, numExpected);
 }
 
-export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenType: TokenTypes, numExpected: number): boolean {
+export function tokenSequence(tokens: Token[], tokenType: TokenTypes, numExpected: number): boolean {
   let parseSuccess: boolean = true;
-  const save: number = tokenBuffer.currentPosition;
-  let token: Token = tokenBuffer.nextToken();
+  const save: number = Rule.tokenBuffer.currentPosition;
+  let token: Token = Rule.tokenBuffer.nextToken();
   const tmpTokens: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
     if (token.isTokenType(tokenType)) {
-      tokenBuffer.popToken();
+      Rule.tokenBuffer.popToken();
       tmpTokens.push(token);
-      token = tokenBuffer.nextToken();
+      token = Rule.tokenBuffer.nextToken();
     } else {
       parseSuccess = false;
       break;
@@ -278,7 +280,7 @@ export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenTy
   if (parseSuccess) {
     tokens.push(...tmpTokens);
   } else {
-    tokenBuffer.resetCurrentPosition(save);
+    Rule.tokenBuffer.resetCurrentPosition(save);
   }
 
   return parseSuccess;

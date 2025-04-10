@@ -8,87 +8,86 @@
 
 import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const line: Rule = new LineRule(tokenBuffer);
-    this.rule = new ManyRule(tokenBuffer, line);
+  public constructor() {
+    super();
+    const line: Rule = new LineRule();
+    this.rule = new ManyRule(line);
   }
 }
 
 export class LineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const contentLine: Rule = new ContentLineRule(tokenBuffer);
-    const blankLine: Rule   = new BlankLineRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [contentLine, blankLine]);
+  public constructor() {
+    super();
+    const contentLine: Rule = new ContentLineRule();
+    const blankLine: Rule   = new BlankLineRule();
+    this.rule = new AlternateRule([contentLine, blankLine]);
   }
 }
 
 export class ContentLineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const content: Rule       = new ContentRule(tokenBuffer);
-    const optComment: Rule    = new OptionalCommentRule(tokenBuffer);
-    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const content: Rule       = new ContentRule();
+    const optComment: Rule    = new OptionalCommentRule();
+    const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule([
       optWhitespace, content, optWhitespace, optComment, newline
     ]);
   }
 }
 
 export class BlankLineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const optComment: Rule    = new OptionalCommentRule(tokenBuffer);
-    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer, [optWhitespace, optComment, newline]);
+  public constructor() {
+    super();
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const optComment: Rule    = new OptionalCommentRule();
+    const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule([optWhitespace, optComment, newline]);
   }
 }
 
 export class OptionalCommentRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const commentRule: Rule = new TokenRule(tokenBuffer, TokenTypes.COMMENT);
-    this.rule = new OptionalRule(tokenBuffer, commentRule);
+  public constructor() {
+    super();
+    const commentRule: Rule = new TokenRule(TokenTypes.COMMENT);
+    this.rule = new OptionalRule(commentRule);
   }
 }
 
 export class PaddingRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace          = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const continuationNewline = new ContinuationNewlineRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [whitespace, continuationNewline]);
+  public constructor() {
+    super();
+    const whitespace          = new TokenRule(TokenTypes.WHITESPACE);
+    const continuationNewline = new ContinuationNewlineRule();
+    this.rule = new AlternateRule([whitespace, continuationNewline]);
   }
 }
 
 export class ContinuationNewlineRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const continuation: Rule  = new TokenRule(tokenBuffer, TokenTypes.CONTINUATION);
-    const newline: Rule       = new TokenRule(tokenBuffer, TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(tokenBuffer,
+  public constructor() {
+    super();
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const continuation: Rule  = new TokenRule(TokenTypes.CONTINUATION);
+    const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule(
       [optWhitespace, continuation, optWhitespace, newline]
     );
   }
 }
 
 export class ContentRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule(tokenBuffer);
-    const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule(tokenBuffer);
-    const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule(tokenBuffer);
-    const variableStoreAssign: Rule     = new VariableStoreAssignRule(tokenBuffer);
-    const ruleBlock: Rule               = new ruleBlockRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
+    const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule();
+    const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule();
+    const variableStoreAssign: Rule     = new VariableStoreAssignRule();
+    const ruleBlock: Rule               = new ruleBlockRule();
+    this.rule = new AlternateRule([
       stringSystemStoreAssign,
       casedkeysStoreAssign,
       hotkeyStoreAssign,
@@ -99,12 +98,12 @@ export class ContentRule extends SingleChildRule {
 }
 
 export class StringSystemStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const stringSystemStore: Rule = new StringSystemStoreRule(tokenBuffer);
-    const padding: Rule           = new PaddingRule(tokenBuffer);
-    const stringRule: Rule        = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const stringSystemStore: Rule = new StringSystemStoreRule();
+    const padding: Rule           = new PaddingRule();
+    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    this.rule = new SequenceRule([
       stringSystemStore, padding, stringRule,
     ]);
   }
@@ -131,21 +130,21 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
   protected amphasand: Rule;
   protected rightBracket: Rule;
 
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.store         = new TokenRule(tokenBuffer, TokenTypes.STORE);
-    this.leftBracket   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    this.optWhitespace = new OptionalWhiteSpaceRule(tokenBuffer);
-    this.amphasand     = new TokenRule(tokenBuffer, TokenTypes.AMPHASAND);
-    this.rightBracket  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
+  public constructor() {
+    super();
+    this.store         = new TokenRule(TokenTypes.STORE);
+    this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
+    this.optWhitespace = new OptionalWhiteSpaceRule();
+    this.amphasand     = new TokenRule(TokenTypes.AMPHASAND);
+    this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
   }
 }
 
 export class StringSystemStoreRule extends AbstractSystemStoreRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+    this.rule = new SequenceRule([
       this.store,
       this.leftBracket,
       this.optWhitespace,
@@ -158,8 +157,8 @@ export class StringSystemStoreRule extends AbstractSystemStoreRule {
 }
 
 export class StringSystemStoreNameRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
+  public constructor() {
+    super();
     const tokenRules: TokenRule[] = [];
     [
       TokenTypes.BITMAP,
@@ -183,19 +182,19 @@ export class StringSystemStoreNameRule extends SingleChildRule {
       TokenTypes.VISUALKEYBOARD,
       TokenTypes.WINDOWSLANGUAGES,
     ].forEach((tokenType) => {
-      tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
+      tokenRules.push(new TokenRule(tokenType, true));
     });
-    this.rule = new AlternateRule(tokenBuffer, tokenRules);
+    this.rule = new AlternateRule(tokenRules);
   }
 }
 
 export class CasedkeysStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const casedkeysStore: Rule      = new CasedkeysStoreRule(tokenBuffer);
-    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
-    this.rule = new SequenceRule(tokenBuffer, [casedkeysStore, oneOrManyPaddedText]);
+  public constructor() {
+    super();
+    const casedkeysStore: Rule      = new CasedkeysStoreRule();
+    const paddedText: Rule          = new PaddedTextRule();
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
+    this.rule = new SequenceRule([casedkeysStore, oneOrManyPaddedText]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -214,10 +213,10 @@ export class CasedkeysStoreAssignRule extends SingleChildRule {
 }
 
 export class CasedkeysStoreRule extends AbstractSystemStoreRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const casedkeys: Rule = new TokenRule(tokenBuffer, TokenTypes.CASEDKEYS, true);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const casedkeys: Rule = new TokenRule(TokenTypes.CASEDKEYS, true);
+    this.rule = new SequenceRule([
       this.store,
       this.leftBracket,
       this.optWhitespace,
@@ -230,12 +229,12 @@ export class CasedkeysStoreRule extends AbstractSystemStoreRule {
 }
 
 export class HotkeyStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const hotkeyStore: Rule = new HotkeyStoreRule(tokenBuffer);
-    const padding: Rule     = new PaddingRule(tokenBuffer);
-    const virtualKey: Rule  = new VirtualKeyRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [hotkeyStore, padding, virtualKey]);
+  public constructor() {
+    super();
+    const hotkeyStore: Rule = new HotkeyStoreRule();
+    const padding: Rule     = new PaddingRule();
+    const virtualKey: Rule  = new VirtualKeyRule();
+    this.rule = new SequenceRule([hotkeyStore, padding, virtualKey]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -254,10 +253,10 @@ export class HotkeyStoreAssignRule extends SingleChildRule {
 }
 
 export class HotkeyStoreRule extends AbstractSystemStoreRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const hotkey: Rule = new TokenRule(tokenBuffer, TokenTypes.HOTKEY, true);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const hotkey: Rule = new TokenRule(TokenTypes.HOTKEY, true);
+    this.rule = new SequenceRule([
       this.store,
       this.leftBracket,
       this.optWhitespace,
@@ -270,20 +269,20 @@ export class HotkeyStoreRule extends AbstractSystemStoreRule {
 }
 
 export class OptionalWhiteSpaceRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    this.rule = new OptionalRule(tokenBuffer, whitespace);
+  public constructor() {
+    super();
+    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
+    this.rule = new OptionalRule(whitespace);
   }
 }
 
 export class VariableStoreAssignRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const variableStore: Rule       = new VariableStoreRule(tokenBuffer);
-    const paddedText: Rule          = new PaddedTextRule(tokenBuffer);
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(tokenBuffer, paddedText);
-    this.rule = new SequenceRule(tokenBuffer, [variableStore, oneOrManyPaddedText]);
+  public constructor() {
+    super();
+    const variableStore: Rule       = new VariableStoreRule();
+    const paddedText: Rule          = new PaddedTextRule();
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
+    this.rule = new SequenceRule([variableStore, oneOrManyPaddedText]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -304,43 +303,43 @@ export class VariableStoreAssignRule extends SingleChildRule {
 }
 
 export class PaddedTextRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const padding: Rule = new PaddingRule(tokenBuffer);
-    const text: Rule    = new TextRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [padding, text]);
+  public constructor() {
+    super();
+    const padding: Rule = new PaddingRule();
+    const text: Rule    = new TextRule();
+    this.rule = new SequenceRule([padding, text]);
   }
 }
 
 export class TextRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const textRange: Rule     = new TextRangeRule(tokenBuffer);
-    const simpleText: Rule    = new SimpleTextRule(tokenBuffer);
-    const outsStatement: Rule = new OutsStatementRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const textRange: Rule     = new TextRangeRule();
+    const simpleText: Rule    = new SimpleTextRule();
+    const outsStatement: Rule = new OutsStatementRule();
+    this.rule = new AlternateRule([
       textRange, simpleText, outsStatement,
     ]);
   }
 }
 
 export class SimpleTextRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const stringRule = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
-    const virtualKey = new VirtualKeyRule(tokenBuffer);
-    const uChar      = new TokenRule(tokenBuffer, TokenTypes.U_CHAR, true);
-    this.rule = new AlternateRule(tokenBuffer, [ stringRule, virtualKey, uChar]);
+  public constructor() {
+    super();
+    const stringRule = new TokenRule(TokenTypes.STRING, true);
+    const virtualKey = new VirtualKeyRule();
+    const uChar      = new TokenRule(TokenTypes.U_CHAR, true);
+    this.rule = new AlternateRule([ stringRule, virtualKey, uChar]);
   }
 }
 
 export class TextRangeRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const simpleText: Rule        = new SimpleTextRule(tokenBuffer);
-    const rangeEnd: Rule          = new RangeEndRule(tokenBuffer);
-    const oneOrManyRangeEnd: Rule = new OneOrManyRule(tokenBuffer, rangeEnd);
-    this.rule = new SequenceRule(tokenBuffer, [simpleText, oneOrManyRangeEnd]);
+  public constructor() {
+    super();
+    const simpleText: Rule        = new SimpleTextRule();
+    const rangeEnd: Rule          = new RangeEndRule();
+    const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
+    this.rule = new SequenceRule([simpleText, oneOrManyRangeEnd]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -356,27 +355,27 @@ export class TextRangeRule extends SingleChildRule {
 }
 
 export class RangeEndRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const range: Rule         = new TokenRule(tokenBuffer, TokenTypes.RANGE);
-    const simpleText: Rule    = new SimpleTextRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const range: Rule         = new TokenRule(TokenTypes.RANGE);
+    const simpleText: Rule    = new SimpleTextRule();
+    this.rule = new SequenceRule([
       optWhitespace, range, optWhitespace, simpleText
     ]);
   }
 }
 
 export class VirtualKeyRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const leftSquare: Rule          = new TokenRule(tokenBuffer, TokenTypes.LEFT_SQ);
-    const optWhitespace: Rule       = new OptionalWhiteSpaceRule(tokenBuffer);
-    const spacedShiftCode: Rule     = new SpacedShiftCodeRule(tokenBuffer);
-    const manySpacedShiftCode: Rule = new ManyRule(tokenBuffer, spacedShiftCode);
-    const keyCode: Rule             = new TokenRule(tokenBuffer, TokenTypes.KEY_CODE, true);
-    const rightSquare: Rule          = new TokenRule(tokenBuffer, TokenTypes.RIGHT_SQ);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const leftSquare: Rule          = new TokenRule(TokenTypes.LEFT_SQ);
+    const optWhitespace: Rule       = new OptionalWhiteSpaceRule();
+    const spacedShiftCode: Rule     = new SpacedShiftCodeRule();
+    const manySpacedShiftCode: Rule = new ManyRule(spacedShiftCode);
+    const keyCode: Rule             = new TokenRule(TokenTypes.KEY_CODE, true);
+    const rightSquare: Rule          = new TokenRule(TokenTypes.RIGHT_SQ);
+    this.rule = new SequenceRule([
       leftSquare, optWhitespace, manySpacedShiftCode, keyCode, optWhitespace, rightSquare
     ]);
   }
@@ -396,36 +395,36 @@ export class VirtualKeyRule extends SingleChildRule {
 }
 
 export class SpacedShiftCodeRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const shiftCode: Rule  = new TokenRule(tokenBuffer, TokenTypes.SHIFT_CODE, true);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    this.rule = new SequenceRule(tokenBuffer, [shiftCode, whitespace]);
+  public constructor() {
+    super();
+    const shiftCode: Rule  = new TokenRule(TokenTypes.SHIFT_CODE, true);
+    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
+    this.rule = new SequenceRule([shiftCode, whitespace]);
   }
 }
 
 export class VariableStoreRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const store: Rule             = new TokenRule(tokenBuffer, TokenTypes.STORE, true);
-    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
-    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
-    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const store: Rule             = new TokenRule(TokenTypes.STORE, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       store, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
     ]);
   }
 }
 
 export class VariableStoreNameRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
+  public constructor() {
+    super();
   }
 
   public parse(node: ASTNode): boolean {
     const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
+    const parseSuccess: boolean = parameterSequence(parameters, 1);
     if (parseSuccess) {
       node.addToken(NodeTypes.STORENAME, parameters[0]);
     }
@@ -434,21 +433,21 @@ export class VariableStoreNameRule extends SingleChildRule {
 }
 
 export class ruleBlockRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const beginBlock: Rule  = new BeginBlockRule(tokenBuffer);
-    const groupBlock: Rule  = new GroupBlockRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [beginBlock, groupBlock]);
+  public constructor() {
+    super();
+    const beginBlock: Rule  = new BeginBlockRule();
+    const groupBlock: Rule  = new GroupBlockRule();
+    this.rule = new AlternateRule([beginBlock, groupBlock]);
   }
 }
 
 export class BeginBlockRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const beginStatement: Rule = new BeginStatementRule(tokenBuffer);
-    const spacedChevron: Rule  = new SpacedChevronRule(tokenBuffer);
-    const useStatement: Rule   = new UseStatementRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [beginStatement, spacedChevron, useStatement]);
+  public constructor() {
+    super();
+    const beginStatement: Rule = new BeginStatementRule();
+    const spacedChevron: Rule  = new SpacedChevronRule();
+    const useStatement: Rule   = new UseStatementRule();
+    this.rule = new SequenceRule([beginStatement, spacedChevron, useStatement]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -465,11 +464,11 @@ export class BeginBlockRule extends SingleChildRule {
 }
 
 export class BeginStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const begin: Rule                = new TokenRule(tokenBuffer, TokenTypes.BEGIN, true);
-    const optSpacedEntryPoint: Rule  = new OptionalSpacedEntryPointRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [begin, optSpacedEntryPoint]);
+  public constructor() {
+    super();
+    const begin: Rule                = new TokenRule(TokenTypes.BEGIN, true);
+    const optSpacedEntryPoint: Rule  = new OptionalSpacedEntryPointRule();
+    this.rule = new SequenceRule([begin, optSpacedEntryPoint]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -486,53 +485,53 @@ export class BeginStatementRule extends SingleChildRule {
 }
 
 export class SpacedEntryPointRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const entryPoint: Rule = new EntryPointRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [whitespace, entryPoint]);
+  public constructor() {
+    super();
+    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
+    const entryPoint: Rule = new EntryPointRule();
+    this.rule = new SequenceRule([whitespace, entryPoint]);
   }
 }
 
 export class EntryPointRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const unicode: Rule       = new TokenRule(tokenBuffer, TokenTypes.UNICODE, true);
-    const newcontext: Rule    = new TokenRule(tokenBuffer, TokenTypes.NEWCONTEXT, true);
-    const postkeystroke: Rule = new TokenRule(tokenBuffer, TokenTypes.POSTKEYSTROKE, true);
-    const ansi: Rule          = new TokenRule(tokenBuffer, TokenTypes.ANSI, true);
-    this.rule = new AlternateRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const unicode: Rule       = new TokenRule(TokenTypes.UNICODE, true);
+    const newcontext: Rule    = new TokenRule(TokenTypes.NEWCONTEXT, true);
+    const postkeystroke: Rule = new TokenRule(TokenTypes.POSTKEYSTROKE, true);
+    const ansi: Rule          = new TokenRule(TokenTypes.ANSI, true);
+    this.rule = new AlternateRule([
       unicode, newcontext, postkeystroke, ansi,
     ]);
   }
 }
 
 export class OptionalSpacedEntryPointRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const spacedEntryPointRule: Rule = new SpacedEntryPointRule(tokenBuffer);
-    this.rule = new OptionalRule(tokenBuffer, spacedEntryPointRule);
+  public constructor() {
+    super();
+    const spacedEntryPointRule: Rule = new SpacedEntryPointRule();
+    this.rule = new OptionalRule(spacedEntryPointRule);
   }
 }
 
 export class SpacedChevronRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const chevron: Rule    = new TokenRule(tokenBuffer, TokenTypes.CHEVRON);
-    this.rule = new SequenceRule(tokenBuffer, [whitespace, chevron, whitespace]);
+  public constructor() {
+    super();
+    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
+    const chevron: Rule    = new TokenRule(TokenTypes.CHEVRON);
+    this.rule = new SequenceRule([whitespace, chevron, whitespace]);
   }
 }
 
 export class UseStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const use: Rule                = new TokenRule(tokenBuffer, TokenTypes.USE, true);
-    const leftBracket: Rule        = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule(tokenBuffer);
-    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule(tokenBuffer);
-    const rightBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const use: Rule                = new TokenRule(TokenTypes.USE, true);
+    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
+    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       use, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
     ]);
   }
@@ -551,11 +550,11 @@ export class UseStatementRule extends SingleChildRule {
 }
 
 export class GroupBlockRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const groupStatement: Rule          = new GroupStatementRule(tokenBuffer);
-    const optSpacedGroupQualifier: Rule = new OptionalSpacedGroupQualifierRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [groupStatement, optSpacedGroupQualifier]);
+  public constructor() {
+    super();
+    const groupStatement: Rule          = new GroupStatementRule();
+    const optSpacedGroupQualifier: Rule = new OptionalSpacedGroupQualifierRule();
+    this.rule = new SequenceRule([groupStatement, optSpacedGroupQualifier]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -572,14 +571,14 @@ export class GroupBlockRule extends SingleChildRule {
 }
 
 export class GroupStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const group: Rule              = new TokenRule(tokenBuffer, TokenTypes.GROUP, true);
-    const leftBracket: Rule        = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule(tokenBuffer);
-    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule(tokenBuffer);
-    const rightBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
+    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
+    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       group, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
     ]);
   }
@@ -598,11 +597,11 @@ export class GroupStatementRule extends SingleChildRule {
 }
 
 export class GroupNameOrKeywordRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const groupName: Rule        = new GroupNameRule(tokenBuffer);
-    const permittedKeyword: Rule = new PermittedKeywordRule(tokenBuffer);
-    this.rule = new AlternateRule(tokenBuffer, [groupName, permittedKeyword]);
+  public constructor() {
+    super();
+    const groupName: Rule        = new GroupNameRule();
+    const permittedKeyword: Rule = new PermittedKeywordRule();
+    this.rule = new AlternateRule([groupName, permittedKeyword]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -620,27 +619,27 @@ export class GroupNameOrKeywordRule extends SingleChildRule {
 }
 
 export class PermittedKeywordRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
+  public constructor() {
+    super();
     const tokenRules: TokenRule[] = [];
     [
       TokenTypes.NEWCONTEXT,
       TokenTypes.POSTKEYSTROKE,
     ].forEach((tokenType) => {
-      tokenRules.push(new TokenRule(tokenBuffer, tokenType, true));
+      tokenRules.push(new TokenRule(tokenType, true));
     });
-    this.rule = new AlternateRule(tokenBuffer, tokenRules);
+    this.rule = new AlternateRule(tokenRules);
   }
 }
 
 export class GroupNameRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
+  public constructor() {
+    super();
   }
 
   public parse(node: ASTNode): boolean {
     const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(this.tokenBuffer, parameters, 1);
+    const parseSuccess: boolean = parameterSequence(parameters, 1);
     if (parseSuccess) {
       node.addToken(NodeTypes.GROUPNAME, parameters[0]);
     }
@@ -649,14 +648,14 @@ export class GroupNameRule extends SingleChildRule {
 }
 
 export class OutsStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const outs: Rule              = new TokenRule(tokenBuffer, TokenTypes.OUTS, true);
-    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
-    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
-    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const outs: Rule              = new TokenRule(TokenTypes.OUTS, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       outs, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
     ]);
   }
@@ -675,38 +674,38 @@ export class OutsStatementRule extends SingleChildRule {
 }
 
 export class OptionalSpacedGroupQualifierRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule(tokenBuffer);
-    this.rule = new OptionalRule(tokenBuffer, spacedGroupQualifierRule);
+  public constructor() {
+    super();
+    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule();
+    this.rule = new OptionalRule(spacedGroupQualifierRule);
   }
 }
 
 export class SpacedGroupQualifierRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const whitespace: Rule     = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const groupQualifier: Rule = new GroupQualifierRule(tokenBuffer);
-    this.rule = new SequenceRule(tokenBuffer, [whitespace, groupQualifier]);
+  public constructor() {
+    super();
+    const whitespace: Rule     = new TokenRule(TokenTypes.WHITESPACE);
+    const groupQualifier: Rule = new GroupQualifierRule();
+    this.rule = new SequenceRule([whitespace, groupQualifier]);
   }
 }
 
 export class GroupQualifierRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const usingKeys: Rule = new UsingKeysRule(tokenBuffer);
-    const readonly: Rule  = new TokenRule(tokenBuffer, TokenTypes.READONLY, true);
-    this.rule = new AlternateRule(tokenBuffer, [usingKeys, readonly]);
+  public constructor() {
+    super();
+    const usingKeys: Rule = new UsingKeysRule();
+    const readonly: Rule  = new TokenRule(TokenTypes.READONLY, true);
+    this.rule = new AlternateRule([usingKeys, readonly]);
   }
 }
 
 export class UsingKeysRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const using: Rule      = new TokenRule(tokenBuffer, TokenTypes.USING);
-    const whitespace: Rule = new TokenRule(tokenBuffer, TokenTypes.WHITESPACE);
-    const keys: Rule       = new TokenRule(tokenBuffer, TokenTypes.KEYS);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const using: Rule      = new TokenRule(TokenTypes.USING);
+    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
+    const keys: Rule       = new TokenRule(TokenTypes.KEYS);
+    this.rule = new SequenceRule([
       using, whitespace, keys,
     ]);
   }
@@ -722,14 +721,14 @@ export class UsingKeysRule extends SingleChildRule {
 }
 
 export class AnyStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const any: Rule               = new TokenRule(tokenBuffer, TokenTypes.ANY, true);
-    const leftBracket: Rule       = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule(tokenBuffer);
-    const variableStoreName: Rule = new VariableStoreNameRule(tokenBuffer);
-    const rightBracket: Rule      = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const any: Rule               = new TokenRule(TokenTypes.ANY, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       any, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
     ]);
   }
@@ -748,14 +747,14 @@ export class AnyStatementRule extends SingleChildRule {
 }
 
 export class BaselayoutStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    const baselayout: Rule    = new TokenRule(tokenBuffer, TokenTypes.BASELAYOUT, true);
-    const leftBracket: Rule   = new TokenRule(tokenBuffer, TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule(tokenBuffer);
-    const stringRule: Rule    = new TokenRule(tokenBuffer, TokenTypes.STRING, true);
-    const rightBracket: Rule  = new TokenRule(tokenBuffer, TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule(tokenBuffer, [
+  public constructor() {
+    super();
+    const baselayout: Rule    = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
       baselayout, leftBracket, optWhitespace, stringRule, optWhitespace, rightBracket,
     ]);
   }
@@ -774,8 +773,8 @@ export class BaselayoutStatementRule extends SingleChildRule {
 }
 
 export class BeepStatementRule extends SingleChildRule {
-  public constructor(tokenBuffer: TokenBuffer) {
-    super(tokenBuffer);
-    this.rule = new TokenRule(tokenBuffer, TokenTypes.BEEP, true);
+  public constructor() {
+    super();
+    this.rule = new TokenRule(TokenTypes.BEEP, true);
   }
 }

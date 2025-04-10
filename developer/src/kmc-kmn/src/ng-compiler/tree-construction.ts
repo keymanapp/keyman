@@ -180,7 +180,7 @@ export class ASTNode {
     if (this.children.length > 0) {
       buf = buf.concat('}');
     }
-    buf = buf.concat('}]');
+    buf = buf.concat(']');
     return buf;
   }
 }
