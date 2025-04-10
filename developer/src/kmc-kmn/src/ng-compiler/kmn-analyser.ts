@@ -450,6 +450,27 @@ export class VariableStoreNameRule extends SingleChildRule {
   };
 }
 
+export class OutsStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const outs: Rule               = new TokenRule(TokenTypes.OUTS, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([outs, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const outsNode      = tmp.getSoleChildOfType(NodeTypes.OUTS);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      outsNode.addChild(storeNameNode);
+      node.addChild(outsNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class ruleBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -545,13 +566,8 @@ export class UseStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const use: Rule                = new TokenRule(TokenTypes.USE, true);
-    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
-    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
-    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      use, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
-    ]);
+    const bracketedGroupName: Rule = new BracketedGroupNameRule();
+    this.rule = new SequenceRule([use, bracketedGroupName]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -564,6 +580,19 @@ export class UseStatementRule extends SingleChildRule {
       node.addChild(useNode);
     }
     return parseSuccess;
+  }
+}
+
+export class BracketedGroupNameRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
+    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
+    ]);
   }
 }
 
@@ -592,13 +621,8 @@ export class GroupStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
-    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
-    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
-    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      group, leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
-    ]);
+    const bracketedGroupName: Rule = new BracketedGroupNameRule();
+    this.rule = new SequenceRule([group, bracketedGroupName]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -663,27 +687,6 @@ export class GroupNameRule extends SingleChildRule {
     }
     return parseSuccess;
   };
-}
-
-export class OutsStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const outs: Rule               = new TokenRule(TokenTypes.OUTS, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([outs, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const outsNode      = tmp.getSoleChildOfType(NodeTypes.OUTS);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      outsNode.addChild(storeNameNode);
-      node.addChild(outsNode);
-    }
-    return parseSuccess;
-  }
 }
 
 export class OptionalSpacedGroupQualifierRule extends SingleChildRule {

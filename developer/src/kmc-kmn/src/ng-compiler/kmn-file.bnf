@@ -27,22 +27,23 @@ spacedShiftCode: shiftcode whitespace
 variableStore: store bracketedStoreName
 bracketedStoreName: leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
+outsStatement: outs bracketedStoreName
 ruleBlock: beginBlock|groupBlock
 beginBlock: beginStatement spacedChevron useStatement
 beginStatement: begin spacedEntryPoint?
 spacedEntryPoint: whitespace entryPoint
 entryPoint: unicode|newcontext|postkeystroke|ansi
 spacedChevron:whitespace chevron whitespace
-useStatement: use leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
+useStatement: use bracketedGroupName
+bracketedGroupName: leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
 groupNameOrKeyword: groupName|permittedKeyword
 permittedKeyword: newcontext|postkeystroke
 groupName: parameter
 groupBlock: groupStatement spacedGroupQualifier?
-groupStatement: group leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
+groupStatement: group bracketedGroupName
 spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
-outsStatement: outs bracketedStoreName
 
 anyStatement: any bracketedStoreName
 baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -810,6 +810,21 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNameNode.getText(), 'digit');
     });
   });
+  describe("OutsStatementRule Tests", () => {
+    it("can construct an OutsStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isNotNull(outsStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
   describe("BeginBlockRule Tests", () => {
     it("can construct an BeginBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -902,6 +917,45 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
   });
+  describe("BracketedGroupNameRule Tests", () => {
+    it("can construct a BracketedGroupNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const bracketedGroupName: Rule = new BracketedGroupNameRule();
+      assert.isNotNull(bracketedGroupName);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('(main)');
+      const bracketedGroupName: Rule = new BracketedGroupNameRule();
+      assert.isTrue(bracketedGroupName.parse(root));
+      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+    it("can parse correctly (space before name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( main)');
+      const bracketedGroupName: Rule = new BracketedGroupNameRule();
+      assert.isTrue(bracketedGroupName.parse(root));
+      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+    it("can parse correctly (space after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('(main )');
+      const bracketedGroupName: Rule = new BracketedGroupNameRule();
+      assert.isTrue(bracketedGroupName.parse(root));
+      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+    it("can parse correctly (space before and after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( main )');
+      const bracketedStoreName: Rule = new BracketedGroupNameRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+  });
   describe("GroupBlockRule Tests", () => {
     it("can construct an GroupBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -989,21 +1043,6 @@ describe("KMN Analyser Tests", () => {
       const usingKeys: Rule = new UsingKeysRule();
       assert.isTrue(usingKeys.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
-    });
-  });
-  describe("OutsStatementRule Tests", () => {
-    it("can construct an OutsStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isNotNull(outsStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("AnyStatementRule Tests", () => {
