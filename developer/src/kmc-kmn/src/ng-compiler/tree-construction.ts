@@ -38,6 +38,7 @@ export enum NodeTypes {
   NAME             = "NAME",
   NEWCONTEXT       = "NEWCONTEXT",
   OUTS             = "OUTS",
+  PLATFORM         = "PLATFORM",
   POSTKEYSTROKE    = "POSTKEYSTROKE",
   RANGE            = "RANGE",
   READONLY         = "READONLY",

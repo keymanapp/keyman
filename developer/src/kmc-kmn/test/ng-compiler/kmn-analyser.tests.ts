@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, PlatformStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1127,6 +1127,23 @@ describe("KMN Analyser Tests", () => {
       const beepStatement: Rule = new BeepStatementRule();
       assert.isTrue(beepStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
+  });
+  describe("PlatformStatementRule Tests", () => {
+    it("can construct an PlatformStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const platformStatement: Rule = new PlatformStatementRule();
+      assert.isNotNull(platformStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      const platformStatement: Rule = new PlatformStatementRule();
+      assert.isTrue(platformStatement.parse(root));
+      const platformNode = root.getSoleChildOfType(NodeTypes.PLATFORM);
+      assert.isNotNull(platformNode);
+      const stringNode = platformNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"touch"');
     });
   });
   describe("Analyser Tests", () => {

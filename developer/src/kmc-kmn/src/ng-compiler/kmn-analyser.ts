@@ -797,3 +797,24 @@ export class BeepStatementRule extends SingleChildRule {
     this.rule = new TokenRule(TokenTypes.BEEP, true);
   }
 }
+
+export class PlatformStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
+    const bracketedString: Rule = new BracketedStringRule();
+    this.rule = new SequenceRule([platform, bracketedString]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const platformNode = tmp.getSoleChildOfType(NodeTypes.PLATFORM);
+      const stringNode   = tmp.getSoleChildOfType(NodeTypes.STRING);
+      platformNode.addChild(stringNode);
+      node.addChild(platformNode);
+    }
+    return parseSuccess;
+  }
+}
