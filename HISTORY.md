@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.232 beta 2025-04-10
+
+* fix(android): Downgrade UnknownHostException error to info (#13692)
+* change(web): add unique classname to mobile-device page-trailer element (#13632)
+* chore(android,mac,windows): Update crowdin strings for Spanish Latin America (#13691)
+
 ## 18.0.231 beta 2025-04-09
 
 * docs(android): Document default keyboard height for xxxhdpi devices (#13673)
