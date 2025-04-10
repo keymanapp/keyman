@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { platform } from 'os';
-import { CompilerCallbacks, CompilerEvent, EventResolver, NullEventResolver,
+import { CompilerCallbacks, CompilerEvent, 
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
@@ -148,18 +148,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     return fileURLToPath(url);
   }
 
-  private eventResolver = new NullEventResolver();
-
-  setEventResolver(eventResolver: EventResolver): void {
-    this.eventResolver = eventResolver;
-  }
-
   reportMessage(event: CompilerEvent): void {
-    this.eventResolver.resolve(event);
-    this.handleReportMessage(event);
-  }
-
-  handleReportMessage(event: CompilerEvent): void {
     if(!event.filename) {
       event.filename = this.messageFilename;
     }

@@ -30,7 +30,6 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
 export class LDMLKeyboardXMLSourceFileReader {
   static eventResolver: LdmlEventResolver = new LdmlEventResolver();
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {  
-    callbacks.setEventResolver(LDMLKeyboardXMLSourceFileReader.eventResolver);
   }
 
   static get defaultImportsURL(): [string,string] {

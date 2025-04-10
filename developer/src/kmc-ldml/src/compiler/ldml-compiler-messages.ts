@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -10,7 +10,12 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 const SevErrorTransform = SevError | 0xF00;
 
 // like m() but takes an XML object for line numbers
-const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => LdmlCompilerMessages.offset(m(code, message, detail), x);
+const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => {
+  let evt = m(code, message, detail);        // raw message
+  evt = LdmlCompilerMessages.offset(evt, x); // with offset
+  evt = LDMLKeyboardXMLSourceFileReader.eventResolver.resolve(evt); // offset expanded to line number
+  return evt;
+};
 
 /**
  * @internal

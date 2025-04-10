@@ -55,12 +55,8 @@ export interface CompilerCallbacks {
    */
   resolveFilename(baseFilename: string, filename: string): string;
 
-  /** change the EventResolver to use. If called more than once, the last resolver replaces a prior one. */
-  setEventResolver(eventResolver: EventResolver): void;
-
   /**
    * Report a message from the compiler back to the caller.
-   * It is expected that eventResolver.resolve() will be called on the message before processing.
    * @param event
    */
   reportMessage(event: CompilerEvent): void;
@@ -225,19 +221,7 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
     return this.parent.resolveFilename(baseFilename, filename);
   }
 
-  private eventResolver = new NullEventResolver();
-
-  setEventResolver(eventResolver: EventResolver): void {
-    this.eventResolver = eventResolver;
-    this.parent.setEventResolver(eventResolver);
-  }
-
   reportMessage(event: CompilerEvent): void {
-    this.eventResolver.resolve(event);
-    this.handleReportMessage(event);
-  }
-
-  handleReportMessage(event: CompilerEvent): void {
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
     this.messages.push(event);
     if (!disable) {
