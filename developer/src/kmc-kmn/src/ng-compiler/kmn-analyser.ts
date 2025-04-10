@@ -668,14 +668,9 @@ export class GroupNameRule extends SingleChildRule {
 export class OutsStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const outs: Rule              = new TokenRule(TokenTypes.OUTS, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      outs, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
-    ]);
+    const outs: Rule               = new TokenRule(TokenTypes.OUTS, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([outs, bracketedStoreName]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -741,14 +736,9 @@ export class UsingKeysRule extends SingleChildRule {
 export class AnyStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const any: Rule               = new TokenRule(TokenTypes.ANY, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      any, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
-    ]);
+    const any: Rule                = new TokenRule(TokenTypes.ANY, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([any, bracketedStoreName]);
   }
 
   public parse(node: ASTNode): boolean {

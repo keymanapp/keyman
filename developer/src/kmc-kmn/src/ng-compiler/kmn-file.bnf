@@ -42,8 +42,8 @@ groupStatement: group leftBracket whitespace? groupNameOrKeyword whitespace? rig
 spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
-outsStatement: outs leftBracket whitespace? variableStoreName whitespace? rightBracket
+outsStatement: outs bracketedStoreName
 
-anyStatement: any leftBracket whitespace? variableStoreName whitespace? rightBracket
+anyStatement: any bracketedStoreName
 baselayoutStatement: baselayout leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
