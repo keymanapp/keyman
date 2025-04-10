@@ -13,7 +13,7 @@ import { CompilerCallbacks, CompilerEvent, EventResolver, NullEventResolver,
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 import { fileURLToPath } from 'url';
 
 const color = chalk.default;

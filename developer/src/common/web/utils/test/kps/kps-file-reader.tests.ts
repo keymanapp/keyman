@@ -14,8 +14,8 @@ import { makePathToFixture } from '../helpers/index.js';
 
 import { KpsFileReader } from "../../src/types/kps/kps-file-reader.js";
 import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
-import { CommonTypesMessages } from '../../src/common-messages.js';
 import { SymbolUtils } from '../../src/symbol-utils.js';
+import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -81,6 +81,6 @@ describe('kps-file-reader', function () {
 
     assert.isNull(kps);
     assert.lengthOf(callbacks.messages, 1);
-    assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_InvalidPackageFile));
+    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_InvalidPackageFile));
   });
 });

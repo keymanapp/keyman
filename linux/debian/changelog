@@ -1,3 +1,9 @@
+keyman (18.0.227-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 04 Apr 2025 15:12:41 +0200
+
 keyman (18.0.199-2) unstable; urgency=medium
 
   * Team upload.

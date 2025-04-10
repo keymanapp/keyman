@@ -4,7 +4,7 @@
  * Reads a LDML XML keyboard file into JS object tree and resolves imports
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
-import { CommonTypesMessages } from '../../common-messages.js';
+import { DeveloperUtilsMessages } from '../../developer-utils-messages.js';
 import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -233,7 +233,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     const { base, path } = asImport;
     // If base is not an empty string (or null/undefined), then it must be 'cldr'
     if (base && base !== constants.cldr_import_base) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportInvalidBase({base, path, subtag}));
       return false;
     }
     let importData: Uint8Array;
@@ -243,7 +243,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       // CLDR import
       const paths = path.split('/');
       if (paths[0] == '' || paths[1] == '' || paths.length !== 2) {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidPath({base, path, subtag}));
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportInvalidPath({base, path, subtag}));
         return false;
       }
       if (constants.treatAsLatest(paths[0])) {
@@ -256,7 +256,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       [importData, importPath] = this.readLocalImportFile(path);
     }
     if (!importData || !importData.length) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportReadFail({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportReadFail({base, path, subtag}));
       return false;
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
@@ -265,7 +265,7 @@ export class LDMLKeyboardXMLSourceFileReader {
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_ImportWrongRoot({base, path, subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportWrongRoot({base, path, subtag}));
       return false;
     }
     // pull all children of importXml[subtag] into obj
@@ -275,7 +275,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!Array.isArray(subsubval)) {
         // This is somewhat of an internal error, indicating that a non-mergeable XML file was imported
         // Not exercisable with the standard LDML imports.
-        this.callbacks.reportMessage(CommonTypesMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportMergeFail({base, path, subtag, subsubtag}));
         return false;
       }
       // Mark all children as an import
@@ -306,7 +306,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
     if(!SchemaValidators.default.ldmlKeyboard3(source)) {
       for (const err of (<any>SchemaValidators.default.ldmlKeyboard3).errors) {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
           message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
@@ -338,7 +338,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     try {
       source = this.loadUnboxed(file);
     } catch(e) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXml({e}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
       return null;
     }
 
@@ -379,7 +379,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     } else if (r.length === 1) {
       return r[0];
     } else {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_TestDataUnexpectedArray({subtag}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_TestDataUnexpectedArray({subtag}));
       return null; // ERROR
     }
   }

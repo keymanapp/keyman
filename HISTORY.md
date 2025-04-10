@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 19.0.23 alpha 2025-04-07
+
+* chore(web): remove dead methods regarding keyboard state (#13671)
+* chore(linux): Update debian changelog (#13675)
+
+## 19.0.22 alpha 2025-04-04
+
+* build(deps): bump tar-fs and puppeteer-core (#13661)
+
+## 19.0.21 alpha 2025-04-03
+
+* chore: use explicit `node:` prefix for node imports (#13650)
+* refactor(developer): rename developer/web/utils/common-messages.ts to developer-utils-messages.ts (#13653)
+* refactor(developer): move sentry and developer options into console apps (#13654)
+* refactor(developer): consolidate project loader (#13656)
+
+## 19.0.20 alpha 2025-04-01
+
+* fix(android): move responsibility for setting keyboard height preference into `applyKeyboardHeight()` (#13578)
+
 ## 19.0.19 alpha 2025-03-31
 
 * chore: merge beta to master B18S4 (#13606)

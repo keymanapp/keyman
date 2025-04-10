@@ -243,9 +243,10 @@ export enum CompilerErrorNamespace {
    */
   LdmlKeyboardCompiler = 0x0000,
   /**
-   * common/web/types errors between 0x1000…0x1FFF
+   * common/web/utils errors between 0x1000…0x1FFF
+   * was previously called CommonTypes
    */
-  CommonTypes = 0x1000,
+  DeveloperUtils = 0x1000,
   /**
    * kmc-kmn errors between 0x2000…0x2FFF; these map to
    * the base codes found in kmn_compiler_errors.h, exclusive severity flags
