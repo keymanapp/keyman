@@ -1,0 +1,58 @@
+kmnTree: line*
+line: contentLine|blankLine
+contentLine: whitespace? content whitespace? comment? newline
+blankLine: whitespace? comment? newline
+padding: whitespace|continuationNewline
+continuationNewline: whitespace? continuation whitespace? newline
+content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
+  variableStoreAssign|ruleBlock
+stringSystemStoreAssign: stringSystemStore padding string
+stringSystemStore: store leftBracket whitespace? amphasand stringSystemStoreName whitespace? rightBracket
+stringSystemStoreName: bitmap|copyright|displaymap|ethnologuecode|includecodes|
+  keyboardversion|kmw_embedcss|kmw_embedjs|kmw_helpfile|kmw_helptext|kmw_rtl|
+  language|layoutfile|message|mnemoniclayout|name|targets|version|
+  visualkeyboard|windowslanguages
+casedkeysStoreAssign: casedkeysStore paddedText+
+casedkeysStore: store leftBracket whitespace? amphasand casedkeys whitespace? rightBracket
+hotkeyStoreAssign: hotkeyStore padding virtualKey
+hotkeyStore: store leftBracket whitespace? amphasand hotkey whitespace? rightBracket
+variableStoreAssign: variableStore paddedText+
+paddedText: padding text
+text: textRange|simpleText|outsStatement
+simpleText: string|virtualKey|uChar
+textRange: simpleText rangeEnd+
+rangeEnd: whitespace? range whitespace? simpleText
+virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSquare
+spacedShiftCode: shiftcode whitespace
+variableStore: store bracketedStoreName
+bracketedStoreName: leftBracket whitespace? variableStoreName whitespace? rightBracket
+variableStoreName: parameter
+outsStatement: outs bracketedStoreName
+ruleBlock: beginBlock|groupBlock|productionBlock
+beginBlock: beginStatement spacedChevron useStatement
+beginStatement: begin spacedEntryPoint?
+spacedEntryPoint: whitespace entryPoint
+entryPoint: unicode|newcontext|postkeystroke|ansi
+spacedChevron:whitespace chevron whitespace
+useStatement: use bracketedGroupName
+bracketedGroupName: leftBracket whitespace? groupNameOrKeyword whitespace? rightBracket
+groupNameOrKeyword: groupName|permittedKeyword
+permittedKeyword: newcontext|postkeystroke
+groupName: parameter
+groupBlock: groupStatement spacedGroupQualifier?
+groupStatement: group bracketedGroupName
+spacedGroupQualifier: whitespace groupQualifier
+groupQualifier: usingKeys|readonly
+usingKeys: using whitespace keys
+productionBlock: lhsBlock spacedChevron rhsBlock
+lhsBlock: lhsStatement paddedLhsStatement*
+paddedLhsStatement: padding lhsStatement
+lhsStatement: platformStatement
+platformStatement: platform bracketedString
+rhsBlock: rhsStatement
+rhsStatement: useStatement
+
+anyStatement: any bracketedStoreName
+baselayoutStatement: baselayout bracketedString
+bracketedString: leftBracket whitespace? string whitespace? rightBracket
+beepStatement: beep
