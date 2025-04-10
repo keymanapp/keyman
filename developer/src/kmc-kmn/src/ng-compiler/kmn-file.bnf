@@ -24,7 +24,8 @@ textRange: simpleText rangeEnd+
 rangeEnd: whitespace? range whitespace? simpleText
 virtualKey: leftSquare whitespace? spacedShiftCode* keyCode whitespace? rightSquare
 spacedShiftCode: shiftcode whitespace
-variableStore: store leftBracket whitespace? variableStoreName whitespace? rightBracket
+variableStore: store bracketedStoreName
+bracketedStoreName: leftBracket whitespace? variableStoreName whitespace? rightBracket
 variableStoreName: parameter
 ruleBlock: beginBlock|groupBlock
 beginBlock: beginStatement spacedChevron useStatement

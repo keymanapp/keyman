@@ -11,11 +11,13 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, GroupBlockRule, GroupQualifierRule, GroupStatementRule, KmnTreeRule, OutsStatementRule, UseStatementRule, UsingKeysRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ContinuationNewlineRule, EntryPointRule, HotkeyStoreAssignRule, HotkeyStoreRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { LineRule, PaddingRule, StringSystemStoreNameRule, StringSystemStoreAssignRule, StringSystemStoreRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { TextRangeRule, TextRule, VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { OutsStatementRule, PaddingRule, SimpleTextRule, StringSystemStoreNameRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { StringSystemStoreRule, TextRangeRule, TextRule, UseStatementRule, UsingKeysRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { readFileSync } from 'fs';
 
@@ -764,7 +766,48 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(digit)');
       const variableStore: Rule = new VariableStoreRule();
       assert.isTrue(variableStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE);
+      assert.isNotNull(storeNode);
+      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("BracketedStoreNameRule Tests", () => {
+    it("can construct a BracketedStoreNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const bracketedStoreName: Rule = new BracketedStoreNameRule();
+      assert.isNotNull(bracketedStoreName);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('(digit)');
+      const bracketedStoreName: Rule = new BracketedStoreNameRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      assert.isNotNull(storeNameNode);
+      assert.equal(storeNameNode.getText(), 'digit');
+    });
+    it("can parse correctly (space before name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( digit)');
+      const bracketedStoreName: Rule = new BracketedStoreNameRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      assert.isNotNull(storeNameNode);
+      assert.equal(storeNameNode.getText(), 'digit');
+    });
+    it("can parse correctly (space after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('(digit )');
+      const bracketedStoreName: Rule = new BracketedStoreNameRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      assert.isNotNull(storeNameNode);
+      assert.equal(storeNameNode.getText(), 'digit');
+    });
+    it("can parse correctly (space before and after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('( digit )');
+      const bracketedStoreName: Rule = new BracketedStoreNameRule();
+      assert.isTrue(bracketedStoreName.parse(root));
+      const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      assert.isNotNull(storeNameNode);
+      assert.equal(storeNameNode.getText(), 'digit');
     });
   });
   describe("BeginBlockRule Tests", () => {

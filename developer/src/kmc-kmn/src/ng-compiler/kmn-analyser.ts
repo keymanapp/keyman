@@ -290,10 +290,8 @@ export class VariableStoreAssignRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const storeNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.STORE);
-      const storeNameNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STORENAME);
       const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
       const textNodes: ASTNode[]   = tmp.getChildren();
-      storeNode.addChild(storeNameNode);
       storeNode.addChildren(textNodes);
       storeNode.addChildren(lineNodes);
       node.addChild(storeNode);
@@ -406,13 +404,33 @@ export class SpacedShiftCodeRule extends SingleChildRule {
 export class VariableStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const store: Rule             = new TokenRule(TokenTypes.STORE, true);
+    const store: Rule              = new TokenRule(TokenTypes.STORE, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([store, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const storeNode     = tmp.getSoleChildOfType(NodeTypes.STORE);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      storeNode.addChild(storeNameNode);
+      node.addChild(storeNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class BracketedStoreNameRule extends SingleChildRule {
+  public constructor() {
+    super();
     const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
     const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
     const variableStoreName: Rule = new VariableStoreNameRule();
     const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      store, leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
+      leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
     ]);
   }
 }
