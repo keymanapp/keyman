@@ -38,6 +38,13 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     scroll(toSelectedKeyboard: false)
   }
   
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    // Helps to handle slide-dismissal.
+    navigationController?.presentationController?.delegate = self
+  }
+  
   public func scroll(toSelectedKeyboard animated: Bool) {
     let index = userKeyboards.firstIndex { kb in
       return Manager.shared.currentKeyboardID == kb.fullID
@@ -108,6 +115,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
       tableView.reloadData()
     }
     
+    navigationController?.presentationController?.delegate = nil
     Manager.shared.dismissKeyboardPicker(self)
   }
   
@@ -119,5 +127,13 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   public func loadUserKeyboards() {
     userKeyboards = Storage.active.userDefaults.userKeyboards ?? []
     tableView.reloadData()
+  }
+}
+
+extension KeyboardSwitcherViewController: UIAdaptivePresentationControllerDelegate {
+  public func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    
+    navigationController?.presentationController?.delegate = nil
+    Manager.shared.dismissKeyboardPicker(self)
   }
 }
