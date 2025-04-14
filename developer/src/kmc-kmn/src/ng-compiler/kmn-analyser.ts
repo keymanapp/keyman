@@ -921,6 +921,27 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
+export class LayerStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
+    const bracketedString: Rule = new BracketedStringRule();
+    this.rule = new SequenceRule([layer, bracketedString]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const layerNode  = tmp.getSoleChildOfType(NodeTypes.LAYER);
+      const stringNode = tmp.getSoleChildOfType(NodeTypes.STRING);
+      layerNode.addChild(stringNode);
+      node.addChild(layerNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
     super();

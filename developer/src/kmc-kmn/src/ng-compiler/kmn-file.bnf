@@ -56,7 +56,9 @@ anyStatement: any bracketedStoreName
 baselayoutStatement: baselayout bracketedString
 bracketedString: leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
+layerStatement: layer bracketedString
 
+ifLikeStatement: ifStatement|layerStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
   ifSystemStoreStringStatement
 ifStoreStoreStatement: if leftBracket whitespace? variableStoreName whitespace

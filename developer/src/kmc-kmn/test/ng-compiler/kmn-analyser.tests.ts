@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LayerStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1180,6 +1180,23 @@ describe("KMN Analyser Tests", () => {
       const beepStatement: Rule = new BeepStatementRule();
       assert.isTrue(beepStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
+  });
+  describe("LayerStatementRule Tests", () => {
+    it("can construct an LayerStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const layerStatement: Rule = new LayerStatementRule();
+      assert.isNotNull(layerStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
+      const layerStatement: Rule = new LayerStatementRule();
+      assert.isTrue(layerStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
     });
   });
   describe("IfStatementRule Tests", () => {
