@@ -10,30 +10,11 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 
-export interface rule_object {
-  rule_type: string,              /* rule type C0-C4 */
-
-  modifier_prev_deadkey: string,  /* string of modifiers for the first key (e.g. "NCAPS RALT CTRL") */
-  prev_deadkey: string,           /* name of the first key (e.g. K_U) */
-  id_prev_deadkey: number,        /* dk id for prev-deadkeys */
-  unique_prev_deadkey: number,    /* marks the first prev_dk */
-
-  modifier_deadkey: string,       /* string of modifiers for the second key (e.g. "NCAPS RALT CTRL") */
-  deadkey: string,                /* name of the second key */
-  id_deadkey: number,             /* dk id for deadkeys */
-  unique_deadkey: number,         /* marks the first dk */
-
-  modifier_key: string,           /* string of modifiers for the third key (e.g. "NCAPS RALT CTRL") */
-  key: string,                    /* name of the third key (e.g. K_U) */
-  output: Uint8Array,             /* the output character */
-};
-
 export interface convert_object {
   keylayout_filename: string,
   kmn_filename: string,
   arrayOf_Modifiers: string[][],
-  arrayOf_Rules: rule_object[],
-  //arrayOf_Rules: any[],
+  arrayOf_Rules: Rule[],
 };
 
 export class KeylayoutToKmnConverter {
@@ -98,8 +79,7 @@ export class KeylayoutToKmnConverter {
   public convert(jsonObj: any, outputfilename: string = ""): convert_object {
 
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
-    const rules: rule_object[] = [];                   // an array of data for a kmn rule
-    //const rules: any[] = [];                   // an array of data for a kmn rule
+    const rules: Rule[] = [];                          // an array of data for a kmn rule
 
     const data_object: convert_object = {
       keylayout_filename: "",
@@ -152,8 +132,7 @@ export class KeylayoutToKmnConverter {
     */
   public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
 
-    const object_array: rule_object[] = [];
-    // const object_array = [];
+    const object_array: Rule[] = [];
     let dk_counter_C3: number = 0;
     let dk_counter_C2: number = 0;
     let action_id: string;
@@ -167,8 +146,7 @@ export class KeylayoutToKmnConverter {
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
 
-        let rule_obj: rule_object;
-        //let rule_obj;
+        let rule_obj: Rule;
 
         // ...............................................................................................................................
         // case C0: output ...............................................................................................................
@@ -446,8 +424,7 @@ export class KeylayoutToKmnConverter {
     let unique_dkB_count = 0;
     const list_of_unique_Text2_rules: string[][] = [];
 
-    const object_array: rule_object[] = data_ukelele.arrayOf_Rules;
-    //const object_array = data_ukelele.arrayOf_Rules;
+    const object_array: Rule[] = data_ukelele.arrayOf_Rules;
 
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
