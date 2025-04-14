@@ -921,20 +921,22 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
-export class IfStoreStoreStatementRule extends SingleChildRule {
+export class AbstractIfStoreStatementRule extends SingleChildRule {
+  protected ifRule: Rule;
+  protected leftBracket: Rule;
+  protected optWhitespace: Rule
+  protected whitespace: Rule;
+  protected comparison: Rule;
+  protected rightBracket: Rule;
+
   public constructor() {
     super();
-    const ifRule: Rule            = new TokenRule(TokenTypes.IF, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
-    const comparison: Rule        = new ComparisonRule();
-    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      ifRule, leftBracket, optWhitespace, variableStoreName, whitespace,
-      comparison, whitespace, variableStoreName, optWhitespace, rightBracket,
-    ]);
+    this.ifRule        = new TokenRule(TokenTypes.IF, true);
+    this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
+    this.optWhitespace = new OptionalWhiteSpaceRule();
+    this.whitespace    = new TokenRule(TokenTypes.WHITESPACE);
+    this.comparison    = new ComparisonRule();
+    this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
   }
 
   public parse(node: ASTNode): boolean {
@@ -947,6 +949,31 @@ export class IfStoreStoreStatementRule extends SingleChildRule {
       node.addChild(ifNode);
     }
     return parseSuccess;
+  }
+}
+
+export class IfStoreStoreStatementRule extends AbstractIfStoreStatementRule {
+  public constructor() {
+    super();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    this.rule = new SequenceRule([
+      this.ifRule, this.leftBracket, this.optWhitespace, variableStoreName,
+      this.whitespace, this.comparison, this.whitespace, variableStoreName,
+      this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
+
+export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
+  public constructor() {
+    super();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    this.rule = new SequenceRule([
+      this.ifRule, this.leftBracket, this.optWhitespace, variableStoreName,
+      this.whitespace, this.comparison, this.whitespace, stringRule,
+      this.optWhitespace, this.rightBracket,
+    ]);
   }
 }
 

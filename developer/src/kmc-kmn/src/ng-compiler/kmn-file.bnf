@@ -59,6 +59,8 @@ beepStatement: beep
 
 ifStoreStoreStatement: if leftBracket whitespace? variableStoreName whitespace
   comparison whitespace variableStoreName whitespace? rightBracket
+ifStoreStringStatement: if leftBracket whitespace? variableStoreName whitespace
+  comparison whitespace string whitespace? rightBracket
 ifSystemStoreName: platform|layer|baselayout|newLayer|oldLayer
 comparison:equal|notEqual
 

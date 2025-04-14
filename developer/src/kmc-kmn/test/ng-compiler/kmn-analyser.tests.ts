@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStoreStoreStatementRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1247,6 +1247,33 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNameNodes.length, 2);
       assert.equal(storeNameNodes[0].getText(), 'number');
       assert.equal(storeNameNodes[1].getText(), 'digit');
+    });
+  });
+  describe("IfStoreStringStatementRule Tests", () => {
+    it("can construct a IfStoreStringStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
+      assert.isNotNull(ifStoreStringStatement);
+    });
+    it("can parse correctly (equal)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
+      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
+      assert.isTrue(ifStoreStringStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
+    });
+    it("can parse correctly (not equal)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number != "1")');
+      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
+      assert.isTrue(ifStoreStringStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.NOT_EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
   });
   describe("IfSystemStoreNameRule Tests", () => {
