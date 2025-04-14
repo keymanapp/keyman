@@ -937,3 +937,12 @@ export class IfSystemStoreNameRule extends SingleChildRule {
     this.rule = new AlternateRule(tokenRules);
   }
 }
+
+export class ComparisonRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
+    const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
+    this.rule = new AlternateRule([equal, notEqual]);
+  }
+}

@@ -58,3 +58,4 @@ bracketedString: leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
 
 ifSystemStoreName: platform|layer|baselayout|newLayer|oldLayer
+comparison:equal|notEqual

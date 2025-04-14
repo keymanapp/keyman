@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1217,6 +1217,25 @@ describe("KMN Analyser Tests", () => {
       const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
       assert.isTrue(ifSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.OLDLAYER));
+    });
+  });
+  describe("ComparisonRule Tests", () => {
+    it("can construct a ComparisonRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const comparison: Rule = new ComparisonRule();
+      assert.isNotNull(comparison);
+    });
+    it("can parse correctly (=)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('=');
+      const comparison: Rule = new ComparisonRule();
+      assert.isTrue(comparison.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.EQUAL));
+    });
+    it("can parse correctly (!=)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('!=');
+      const comparison: Rule = new ComparisonRule();
+      assert.isTrue(comparison.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NOT_EQUAL));
     });
   });
   describe("Analyser Tests", () => {
