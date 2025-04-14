@@ -1,9 +1,9 @@
-import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
-import { CommonTypesMessages } from '../../src/common-messages.js';
-import { testReaderCases } from '../helpers/reader-callback-test.js';
+import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 import { Constants } from '@keymanapp/common-types';
+import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
+import { testReaderCases } from '../helpers/reader-callback-test.js';
 
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
@@ -19,7 +19,7 @@ describe('ldml keyboard xml reader tests', function () {
   testReaderCases([
     {
       subpath: 'invalid-structure-per-dtd.xml',
-      errors: [CommonTypesMessages.Error_SchemaValidationError({
+      errors: [DeveloperUtilsMessages.Error_SchemaValidationError({
         instancePath: '/keyboard3',
         keyword: 'required',
         message: `must have required property 'info'`,
@@ -28,7 +28,7 @@ describe('ldml keyboard xml reader tests', function () {
     },
     {
       subpath: 'invalid-conforms-to.xml',
-      errors: [CommonTypesMessages.Error_SchemaValidationError({
+      errors: [DeveloperUtilsMessages.Error_SchemaValidationError({
         instancePath: '/keyboard3/conformsTo',
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
@@ -150,7 +150,7 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'invalid-import-base.xml',
       loadfail: true,
       errors: [
-        CommonTypesMessages.Error_ImportInvalidBase({
+        DeveloperUtilsMessages.Error_ImportInvalidBase({
           base: 'SOME_INVALID_BASE',
           path: 'B',
           subtag: 'C'
@@ -161,7 +161,7 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'invalid-import-local.xml',
       loadfail: true,
       errors: [
-        CommonTypesMessages.Error_ImportReadFail({
+        DeveloperUtilsMessages.Error_ImportReadFail({
           base: undefined,
           path: 'keys-Zyyy-DOESNOTEXIST.xml',
           subtag: 'keys'
@@ -172,7 +172,7 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'invalid-import-path.xml',
       loadfail: true,
       errors: [
-        CommonTypesMessages.Error_ImportInvalidPath({
+        DeveloperUtilsMessages.Error_ImportInvalidPath({
           base: 'cldr',
           path: '45/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
           subtag: null,
@@ -183,7 +183,7 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'invalid-import-readfail.xml',
       loadfail: true,
       errors: [
-        CommonTypesMessages.Error_ImportReadFail({
+        DeveloperUtilsMessages.Error_ImportReadFail({
           base: 'cldr',
           path: '45/none-Zxxx-does-not-exist.xml',
           subtag: null,
@@ -194,12 +194,31 @@ describe('ldml keyboard xml reader tests', function () {
       subpath: 'invalid-import-wrongroot.xml',
       loadfail: true,
       errors: [
-        CommonTypesMessages.Error_ImportWrongRoot({
+        DeveloperUtilsMessages.Error_ImportWrongRoot({
           base: null,
           path: '45/keys-Zyyy-punctuation.xml',
           subtag: 'flicks',
         }),
       ],
+    },
+    {
+      subpath: 'numeric-id.xml',
+      callback: (data, source, subpath, callbacks) => {
+        assert.ok(source?.keyboard3?.keys);
+        const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['1', '2']);
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
+          {id: '1', output: '1'}, //default import
+          {id: '2', output: '2'}, //default import
+          {id: '1', output: 'ħ'}, //override
+          {id: '2', output: 'ថា'}, //override
+        ]);
+      },
     },
   ]);
 });

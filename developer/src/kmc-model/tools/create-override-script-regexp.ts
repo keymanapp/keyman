@@ -9,8 +9,8 @@
  * If you need to add more Unicode blocks, customize SPACELESS_SCRIPT_BLOCKS.
  */
 
-import {readFileSync} from "fs";
-import * as path from "path";
+import {readFileSync} from "node:fs";
+import * as path from "node:path";
 
 // Where to find UnicodeData.txt and Blocks.txt
 const UCD_DIR = path.join("..", "..", "..", "..", "resources", "standards-data", "unicode-character-database");

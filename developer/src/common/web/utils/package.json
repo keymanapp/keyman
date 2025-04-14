@@ -10,9 +10,8 @@
   ],
   "dependencies": {
     "@keymanapp/common-types": "*",
-    "@sentry/node": "^7.57.0",
     "eventemitter3": "^5.0.0",
-    "fast-xml-parser": "^4.5.0",
+    "fast-xml-parser": "^5.0.9",
     "path-browserify": "^1.0.1",
     "restructure": "^3.0.1",
     "sax": ">=0.6.0",

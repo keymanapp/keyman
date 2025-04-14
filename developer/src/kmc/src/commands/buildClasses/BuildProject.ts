@@ -8,7 +8,7 @@ import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } fr
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
-import { getOption } from '@keymanapp/developer-utils';
+import { getOption } from '../../util/options.js';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }

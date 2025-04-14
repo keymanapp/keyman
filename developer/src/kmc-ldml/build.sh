@@ -75,6 +75,11 @@ function do_build_fixtures() {
 
   # Generate a binary file from basic.txt for comparison purposes
   node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
+  if ! cmp ./build/test/fixtures/basic-xml.kmx ./build/test/fixtures/basic-txt.kmx; then
+    builder_die "basic-xml.kmx (compiled from basic.xml) and basic-txt.kmx (see basic.txt) are different!"
+  else
+    builder_echo grey "basic-xml.kmx and basic-txt.kmx are identical"
+  fi
 }
 
 builder_run_action clean           do_clean
@@ -82,7 +87,7 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            builder_do_typescript_tests  75
+builder_run_action test            builder_do_typescript_tests  90
 
 #-------------------------------------------------------------------------------------------------------------------
 
