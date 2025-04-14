@@ -921,6 +921,20 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
+export class IfStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifStoreStoreStatement: Rule        = new IfStoreStoreStatementRule();
+    const ifStoreStringStatement: Rule       = new IfStoreStringStatementRule();
+    const ifSystemStoreStoreStatement: Rule  = new IfSystemStoreStoreStatementRule();
+    const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
+    this.rule = new AlternateRule([
+      ifStoreStoreStatement, ifStoreStringStatement,
+      ifSystemStoreStoreStatement, ifSystemStoreStringStatement,
+    ]);
+  }
+}
+
 export class AbstractIfStoreStatementRule extends SingleChildRule {
   protected ifRule: Rule;
   protected leftBracket: Rule;

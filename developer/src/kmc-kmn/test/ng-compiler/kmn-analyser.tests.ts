@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1180,6 +1180,55 @@ describe("KMN Analyser Tests", () => {
       const beepStatement: Rule = new BeepStatementRule();
       assert.isTrue(beepStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
+  });
+  describe("IfStatementRule Tests", () => {
+    it("can construct a IfStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ifStatement: Rule = new IfStatementRule();
+      assert.isNotNull(ifStatement);
+    });
+    it("can parse correctly (store, store)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number = digit)');
+      const ifStatement: Rule = new IfStatementRule();
+      assert.isTrue(ifStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      const storeNameNodes = ifNode.getChildrenOfType(NodeTypes.STORENAME);
+      assert.equal(storeNameNodes.length, 2);
+      assert.equal(storeNameNodes[0].getText(), 'number');
+      assert.equal(storeNameNodes[1].getText(), 'digit');
+    });
+    it("can parse correctly (store, string)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
+      const ifStatement: Rule = new IfStatementRule();
+      assert.isTrue(ifStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
+    });
+    it("can parse correctly (system store, store)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = filename)');
+      const ifStatement: Rule = new IfStatementRule();
+      assert.isTrue(ifStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.BITMAP))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+    });
+    it("can parse correctly (system store, string)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
+      const ifStatement: Rule = new IfStatementRule();
+      assert.isTrue(ifStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.BITMAP))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
   });
   describe("IfStoreStoreStatementRule Tests", () => {

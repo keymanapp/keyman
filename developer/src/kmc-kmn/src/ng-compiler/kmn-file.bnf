@@ -57,6 +57,8 @@ baselayoutStatement: baselayout bracketedString
 bracketedString: leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
 
+ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
+  ifSystemStoreStringStatement
 ifStoreStoreStatement: if leftBracket whitespace? variableStoreName whitespace
   comparison whitespace variableStoreName whitespace? rightBracket
 ifStoreStringStatement: if leftBracket whitespace? variableStoreName whitespace
