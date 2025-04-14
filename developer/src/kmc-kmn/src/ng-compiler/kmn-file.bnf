@@ -61,6 +61,9 @@ ifStoreStoreStatement: if leftBracket whitespace? variableStoreName whitespace
   comparison whitespace variableStoreName whitespace? rightBracket
 ifStoreStringStatement: if leftBracket whitespace? variableStoreName whitespace
   comparison whitespace string whitespace? rightBracket
+ifSystemStoreStoreStatement: if leftBracket whitespace? amphasand systemStoreName
+  whitespace comparison whitespace variableStoreName whitespace? rightBracket
 ifSystemStoreName: platform|layer|baselayout|newLayer|oldLayer
 comparison:equal|notEqual
+systemStoreName: stringSystemStoreName|casedkeys|hotkey|layer|newLayer|oldLayer
 

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1276,6 +1276,23 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
   });
+  describe("IfSystemStoreStoreStatementRule Tests", () => {
+    it("can construct a IfSystemStoreStoreStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ifSystemStoreStoreStatement: Rule = new IfSystemStoreStoreStatementRule();
+      assert.isNotNull(ifSystemStoreStoreStatement);
+    });
+    it("can parse correctly (equal)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = filename)');
+      const ifSystemStoreStoreStatement: Rule = new IfSystemStoreStoreStatementRule();
+      assert.isTrue(ifSystemStoreStoreStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.BITMAP))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+    });
+  });
   describe("IfSystemStoreNameRule Tests", () => {
     it("can construct a IfSystemStoreNameRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1330,6 +1347,49 @@ describe("KMN Analyser Tests", () => {
       const comparison: Rule = new ComparisonRule();
       assert.isTrue(comparison.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NOT_EQUAL));
+    });
+  });
+  describe("SystemStoreNameRule Tests", () => {
+    it("can construct a SystemStoreNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isNotNull(systemStoreName);
+    });
+    it("can parse correctly (bitmap)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('bitmap');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+    });
+    it("can parse correctly (casedkeys)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('casedkeys');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CASEDKEYS));
+    });
+    it("can parse correctly (hotkey)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('hotkey');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY));
+    });
+    it("can parse correctly (layer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+    });
+    it("can parse correctly (newLayer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newLayer');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWLAYER));
+    });
+    it("can parse correctly (oldLayer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('oldLayer');
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isTrue(systemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OLDLAYER));
     });
   });
   describe("Analyser Tests", () => {

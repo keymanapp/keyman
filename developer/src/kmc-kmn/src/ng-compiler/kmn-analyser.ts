@@ -977,6 +977,21 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
   }
 }
 
+
+export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRule {
+  public constructor() {
+    super();
+    const amphasand: Rule         = new TokenRule(TokenTypes.AMPHASAND);
+    const systemStoreName: Rule   = new SystemStoreNameRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    this.rule = new SequenceRule([
+      this.ifRule, this.leftBracket, this.optWhitespace, amphasand,
+      systemStoreName, this.whitespace, this.comparison, this.whitespace,
+      variableStoreName, this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
+
 export class IfSystemStoreNameRule extends SingleChildRule {
   public constructor() {
     super();
@@ -1000,5 +1015,20 @@ export class ComparisonRule extends SingleChildRule {
     const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
     const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
     this.rule = new AlternateRule([equal, notEqual]);
+  }
+}
+
+export class SystemStoreNameRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+    const casedkeys: Rule             = new TokenRule(TokenTypes.CASEDKEYS, true);
+    const hotkey: Rule                = new TokenRule(TokenTypes.HOTKEY, true);
+    const layer: Rule                 = new TokenRule(TokenTypes.LAYER, true);
+    const newLayer: Rule              = new TokenRule(TokenTypes.NEWLAYER, true);
+    const oldLayer: Rule              = new TokenRule(TokenTypes.OLDLAYER, true);
+    this.rule = new AlternateRule([
+      stringSystemStoreName, casedkeys, hotkey, layer, newLayer, oldLayer,
+    ]);
   }
 }
