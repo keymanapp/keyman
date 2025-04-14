@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>hex_escape</kbdname>
+    <flags/>
+  </header>
+  <encoding name="unicode" fontname="arial" fontsize="-12">
+    <layer shift="">
+      <key vkey="K_1">&#x1234;</key>
+      <key vkey="K_2">&#256;</key>
+      <key vkey="K_3">&#65536;</key>
+      <key vkey="K_4">&#x12345;</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

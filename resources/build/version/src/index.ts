@@ -5,7 +5,7 @@ import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupH
 import { incrementVersion } from './incrementVersion.js';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { reportHistory } from './reportHistory.js';
 
 const argv = await yargs(hideBin(process.argv))
