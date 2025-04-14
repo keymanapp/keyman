@@ -977,7 +977,6 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
   }
 }
 
-
 export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
@@ -988,6 +987,20 @@ export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRul
       this.ifRule, this.leftBracket, this.optWhitespace, amphasand,
       systemStoreName, this.whitespace, this.comparison, this.whitespace,
       variableStoreName, this.optWhitespace, this.rightBracket,
+    ]);
+  }
+}
+
+export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
+  public constructor() {
+    super();
+    const amphasand: Rule         = new TokenRule(TokenTypes.AMPHASAND);
+    const systemStoreName: Rule   = new SystemStoreNameRule();
+    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    this.rule = new SequenceRule([
+      this.ifRule, this.leftBracket, this.optWhitespace, amphasand,
+      systemStoreName, this.whitespace, this.comparison, this.whitespace,
+      stringRule, this.optWhitespace, this.rightBracket,
     ]);
   }
 }
