@@ -56,3 +56,5 @@ anyStatement: any bracketedStoreName
 baselayoutStatement: baselayout bracketedString
 bracketedString: leftBracket whitespace? string whitespace? rightBracket
 beepStatement: beep
+
+ifSystemStoreName: platform|layer|baselayout|newLayer|oldLayer

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, IfSystemStoreNameRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1045,6 +1045,59 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
     });
   });
+  describe("ProductionBlockRule Tests", () => {
+    it("can construct a ProductionBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const lhsBlock: Rule = new ProductionBlockRule();
+      assert.isNotNull(lhsBlock);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
+      const productionBlock: Rule = new ProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const ruleNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      assert.isNotNull(ruleNode);
+      const lhsNode = ruleNode.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
+      const rhsNode = ruleNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.USE));
+    });
+  });
+  describe("LhsBlockRule Tests", () => {
+    it("can construct a LhsBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const lhsBlock: Rule = new LhsBlockRule();
+      assert.isNotNull(lhsBlock);
+    });
+    it("can parse correctly (single lhs statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      const lhsBlock: Rule = new LhsBlockRule();
+      assert.isTrue(lhsBlock.parse(root));
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("PlatformStatementRule Tests", () => {
+    it("can construct an PlatformStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const platformStatement: Rule = new PlatformStatementRule();
+      assert.isNotNull(platformStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      const platformStatement: Rule = new PlatformStatementRule();
+      assert.isTrue(platformStatement.parse(root));
+      const platformNode = root.getSoleChildOfType(NodeTypes.PLATFORM);
+      assert.isNotNull(platformNode);
+      const stringNode = platformNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"touch"');
+    });
+  });
   describe("AnyStatementRule Tests", () => {
     it("can construct an AnyStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1129,57 +1182,41 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
     });
   });
-  describe("ProductionBlockRule Tests", () => {
-    it("can construct a ProductionBlockRule", () => {
+  describe("IfSystemStoreNameRule Tests", () => {
+    it("can construct a IfSystemStoreNameRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const lhsBlock: Rule = new ProductionBlockRule();
-      assert.isNotNull(lhsBlock);
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isNotNull(ifSystemStoreName);
     });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
-      const productionBlock: Rule = new ProductionBlockRule();
-      assert.isTrue(productionBlock.parse(root));
-      const ruleNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
-      assert.isNotNull(ruleNode);
-      const lhsNode = ruleNode.getSoleChildOfType(NodeTypes.LHS);
-      assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
-      const rhsNode = ruleNode.getSoleChildOfType(NodeTypes.RHS)
-      assert.isNotNull(rhsNode);
-      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.USE));
+    it("can parse correctly (platform)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
     });
-  });
-  describe("LhsBlockRule Tests", () => {
-    it("can construct a LhsBlockRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const lhsBlock: Rule = new LhsBlockRule();
-      assert.isNotNull(lhsBlock);
+    it("can parse correctly (layer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
     });
-    it("can parse correctly (single lhs statement)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
-      const lhsBlock: Rule = new LhsBlockRule();
-      assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
-      assert.isNotNull(lhsNode);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
-      assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    it("can parse correctly (baselayout)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('baselayout');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BASELAYOUT));
     });
-  });
-  describe("PlatformStatementRule Tests", () => {
-    it("can construct an PlatformStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const platformStatement: Rule = new PlatformStatementRule();
-      assert.isNotNull(platformStatement);
+    it("can parse correctly (newLayer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newLayer');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWLAYER));
     });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
-      const platformStatement: Rule = new PlatformStatementRule();
-      assert.isTrue(platformStatement.parse(root));
-      const platformNode = root.getSoleChildOfType(NodeTypes.PLATFORM);
-      assert.isNotNull(platformNode);
-      const stringNode = platformNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"touch"');
+    it("can parse correctly (oldLayer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('oldLayer');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OLDLAYER));
     });
   });
   describe("Analyser Tests", () => {

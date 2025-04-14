@@ -739,68 +739,6 @@ export class UsingKeysRule extends SingleChildRule {
   }
 }
 
-export class AnyStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const any: Rule                = new TokenRule(TokenTypes.ANY, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([any, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      anyNode.addChild(storeNameNode);
-      node.addChild(anyNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class BaselayoutStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
-    const bracketedString: Rule = new BracketedStringRule();
-    this.rule = new SequenceRule([baselayout, bracketedString]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
-      const stringNode     = tmp.getSoleChildOfType(NodeTypes.STRING);
-      baselayoutNode.addChild(stringNode);
-      node.addChild(baselayoutNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class BracketedStringRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const string: Rule        = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      leftBracket, optWhitespace, string, optWhitespace, rightBracket,
-    ]);
-  }
-}
-
-export class BeepStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    this.rule = new TokenRule(TokenTypes.BEEP, true);
-  }
-}
-
 export class ProductionBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -918,5 +856,84 @@ export class RhsStatementRule extends SingleChildRule {
     super();
     const useStatement: Rule = new UseStatementRule();
     this.rule = new AlternateRule([useStatement]);
+  }
+}
+
+export class AnyStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const any: Rule                = new TokenRule(TokenTypes.ANY, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([any, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      anyNode.addChild(storeNameNode);
+      node.addChild(anyNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class BaselayoutStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const bracketedString: Rule = new BracketedStringRule();
+    this.rule = new SequenceRule([baselayout, bracketedString]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      const stringNode     = tmp.getSoleChildOfType(NodeTypes.STRING);
+      baselayoutNode.addChild(stringNode);
+      node.addChild(baselayoutNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class BracketedStringRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const string: Rule        = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      leftBracket, optWhitespace, string, optWhitespace, rightBracket,
+    ]);
+  }
+}
+
+export class BeepStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    this.rule = new TokenRule(TokenTypes.BEEP, true);
+  }
+}
+
+export class IfSystemStoreNameRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const tokenRules: TokenRule[] = [];
+    [
+      TokenTypes.PLATFORM,
+      TokenTypes.LAYER,
+      TokenTypes.BASELAYOUT,
+      TokenTypes.NEWLAYER,
+      TokenTypes.OLDLAYER,
+    ].forEach((tokenType) => {
+      tokenRules.push(new TokenRule(tokenType, true));
+    });
+    this.rule = new AlternateRule(tokenRules);
   }
 }
