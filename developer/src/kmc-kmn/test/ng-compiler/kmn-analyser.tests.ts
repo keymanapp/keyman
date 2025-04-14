@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LayerStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeepStatementRule, BeginBlockRule, BeginStatementRule, BracketedGroupNameRule, BracketedStringRule, ComparisonRule, IfLikeStatementRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule, IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule, LayerStatementRule, LhsBlockRule, PlatformStatementRule, ProductionBlockRule, SystemStoreNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1197,6 +1197,55 @@ describe("KMN Analyser Tests", () => {
       const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"shift"');
+    });
+  });
+  describe("IfLikeStatementRule Tests", () => {
+    it("can construct a IfLikeStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ifLikeStatement: Rule = new IfLikeStatementRule();
+      assert.isNotNull(ifLikeStatement);
+    });
+    it("can parse correctly (if)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number = digit)');
+      const ifLikeStatement: Rule = new IfLikeStatementRule();
+      assert.isTrue(ifLikeStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      const storeNameNodes = ifNode.getChildrenOfType(NodeTypes.STORENAME);
+      assert.equal(storeNameNodes.length, 2);
+      assert.equal(storeNameNodes[0].getText(), 'number');
+      assert.equal(storeNameNodes[1].getText(), 'digit');
+    });
+    it("can parse correctly (layer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
+      const ifLikeStatement: Rule = new IfLikeStatementRule();
+      assert.isTrue(ifLikeStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
+    });
+    it("can parse correctly (platform)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      const ifLikeStatement: Rule = new IfLikeStatementRule();
+      assert.isTrue(ifLikeStatement.parse(root));
+      const platformNode = root.getSoleChildOfType(NodeTypes.PLATFORM);
+      assert.isNotNull(platformNode);
+      const stringNode = platformNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"touch"');
+    });
+    it("can parse correctly (baselayout)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
+      const ifLikeStatement: Rule = new IfLikeStatementRule();
+      assert.isTrue(ifLikeStatement.parse(root));
+      const baselayoutNode = root.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      assert.isNotNull(baselayoutNode);
+      const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"en-US"');
     });
   });
   describe("IfStatementRule Tests", () => {

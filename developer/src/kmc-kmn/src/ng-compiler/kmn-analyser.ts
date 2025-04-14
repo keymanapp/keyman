@@ -942,6 +942,19 @@ export class LayerStatementRule extends SingleChildRule {
   }
 }
 
+export class IfLikeStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifStatement: Rule       = new IfStatementRule();
+    const layerStatement: Rule    = new LayerStatementRule();
+    const platformStatement: Rule = new PlatformStatementRule();
+    const baselayoutStatement: Rule = new BaselayoutStatementRule();
+    this.rule = new AlternateRule([
+      ifStatement, layerStatement, platformStatement, baselayoutStatement,
+    ]);
+  }
+}
+
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
     super();
