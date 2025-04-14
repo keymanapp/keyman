@@ -770,20 +770,19 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const lhsStatement           = new LhsStatementRule();
-    const paddedLhsStatemente    = new PaddedLhsStatementRule();
-    const manyPaddedLhsStatement = new ManyRule(paddedLhsStatemente);
-    this.rule = new SequenceRule([lhsStatement, manyPaddedLhsStatement]);
+    const inputBlock  = new InputBlockRule();
+    const ifLikeBlock = new IfLikeBlockRule();
+    this.rule = new AlternateRule([inputBlock, ifLikeBlock]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lineNodes         = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const lhsStatementNodes = tmp.getChildren();
-      const lhsNode           = new ASTNode(NodeTypes.LHS);
-      lhsNode.addChildren(lhsStatementNodes);
+      const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const children  = tmp.getChildren();
+      const lhsNode   = new ASTNode(NodeTypes.LHS);
+      lhsNode.addChildren(children);
       lhsNode.addChildren(lineNodes);
       node.addChild(lhsNode);
     }
@@ -791,20 +790,49 @@ export class LhsBlockRule extends SingleChildRule {
   }
 }
 
-export class PaddedLhsStatementRule extends SingleChildRule {
+export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const padding: Rule      = new PaddingRule();
-    const lhsStatement: Rule = new LhsStatementRule();
-    this.rule = new SequenceRule([padding, lhsStatement]);
+    const optIfLikeBlockRule: Rule = new OptionalIfLikeBlockRule();
+    const padding: Rule            = new PaddingRule();
+    const inputCharacter: Rule     = new InputCharacterRule();
+    this.rule = new SequenceRule([
+      optIfLikeBlockRule, padding, inputCharacter,
+    ]);
   }
 }
 
-export class LhsStatementRule extends SingleChildRule {
+export class OptionalIfLikeBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const platformStatement: Rule = new PlatformStatementRule();
-    this.rule = new AlternateRule([platformStatement]);
+    const ifLikeBlockRule: Rule = new IfLikeBlockRule();
+    this.rule = new OptionalRule(ifLikeBlockRule);
+  }
+}
+
+export class InputCharacterRule extends SingleChildRule {
+  public constructor() {
+    super();
+    this.rule = new AnyStatementRule();
+  }
+}
+
+export class IfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifLikeStatement           = new IfLikeStatementRule();
+    const paddedIfLikeStatement     = new PaddedIfLikeStatementRule();
+    const manyPaddedIfLikeStatement = new ManyRule(paddedIfLikeStatement);
+    this.rule = new SequenceRule([ifLikeStatement, manyPaddedIfLikeStatement]);
+  }
+}
+
+export class PaddedIfLikeStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule      = new PaddingRule();
+    const ifLikeStatement: Rule = new IfLikeStatementRule();
+    this.rule = new SequenceRule([padding, ifLikeStatement]);
   }
 }
 

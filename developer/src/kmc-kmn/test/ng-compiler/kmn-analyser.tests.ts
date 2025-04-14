@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1075,7 +1075,7 @@ describe("KMN Analyser Tests", () => {
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isNotNull(lhsBlock);
     });
-    it("can parse correctly (single lhs statement)", () => {
+    it("can parse correctly (if-like)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
       const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
@@ -1083,6 +1083,44 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
       assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (if-like, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(digit)');
+      const lhsBlock: Rule = new LhsBlockRule();
+      assert.isTrue(lhsBlock.parse(root));
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("IfLikeBlockRule Tests", () => {
+    it("can construct a IfLikeBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ifLikeBlock: Rule = new IfLikeBlockRule();
+      assert.isNotNull(ifLikeBlock);
+    });
+    it("can parse correctly (single if-like)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
+      const ifLikeBlock: Rule = new IfLikeBlockRule();
+      assert.isTrue(ifLikeBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+    });
+    it("can parse correctly (two if-like statements)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") layer("shift")');
+      const ifLikeBlock: Rule = new IfLikeBlockRule();
+      assert.isTrue(ifLikeBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+    });
+    it("can parse correctly (two if-likes, continuation)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")\\\nlayer("shift")');
+      const ifLikeBlock: Rule = new IfLikeBlockRule();
+      assert.isTrue(ifLikeBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
     });
   });
   describe("AnyStatementRule Tests", () => {

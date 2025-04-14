@@ -45,9 +45,11 @@ spacedGroupQualifier: whitespace groupQualifier
 groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
 productionBlock: lhsBlock spacedChevron rhsBlock
-lhsBlock: lhsStatement paddedLhsStatement*
-paddedLhsStatement: padding lhsStatement
-lhsStatement: platformStatement
+lhsBlock: inputBlock|ifLikeBlock
+inputBlock: ifLikeBlock? inputCharacter
+inputCharacter: anyStatement
+ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
+paddedIfLikeStatement: padding IfLikeStatement
 rhsBlock: rhsStatement
 rhsStatement: useStatement
 
