@@ -921,6 +921,35 @@ export class BeepStatementRule extends SingleChildRule {
   }
 }
 
+export class IfStoreStoreStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifRule: Rule            = new TokenRule(TokenTypes.IF, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
+    const comparison: Rule        = new ComparisonRule();
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      ifRule, leftBracket, optWhitespace, variableStoreName, whitespace,
+      comparison, whitespace, variableStoreName, optWhitespace, rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const ifNode   = tmp.removeSoleChildOfType(NodeTypes.IF);
+      const children = tmp.getChildren();
+      ifNode.addChildren(children);
+      node.addChild(ifNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class IfSystemStoreNameRule extends SingleChildRule {
   public constructor() {
     super();

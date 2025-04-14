@@ -23,6 +23,7 @@ export enum NodeTypes {
   GROUP            = "GROUP",
   GROUPNAME        = "GROUPNAME",
   HOTKEY           = "HOTKEY",
+  IF               = "IF",
   INCLUDECODES     = "INCLUDECODES",
   KEYBOARDVERSION  = "KEYBOARDVERSION",
   KEY_CODE         = "KEY_CODE",

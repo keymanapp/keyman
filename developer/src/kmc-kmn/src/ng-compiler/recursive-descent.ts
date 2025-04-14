@@ -199,6 +199,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.ETHNOLOGUECODE,   nodeType: NodeTypes.ETHNOLOGUECODE},
     {tokenType: TokenTypes.GROUP,            nodeType: NodeTypes.GROUP},
     {tokenType: TokenTypes.HOTKEY,           nodeType: NodeTypes.HOTKEY},
+    {tokenType: TokenTypes.IF,               nodeType: NodeTypes.IF},
     {tokenType: TokenTypes.INCLUDECODES,     nodeType: NodeTypes.INCLUDECODES},
     {tokenType: TokenTypes.KEYBOARDVERSION,  nodeType: NodeTypes.KEYBOARDVERSION},
     {tokenType: TokenTypes.KEY_CODE,         nodeType: NodeTypes.KEY_CODE},
