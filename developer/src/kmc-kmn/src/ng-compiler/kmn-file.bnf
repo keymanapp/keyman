@@ -48,15 +48,10 @@ productionBlock: lhsBlock spacedChevron rhsBlock
 lhsBlock: lhsStatement paddedLhsStatement*
 paddedLhsStatement: padding lhsStatement
 lhsStatement: platformStatement
-platformStatement: platform bracketedString
 rhsBlock: rhsStatement
 rhsStatement: useStatement
 
 anyStatement: any bracketedStoreName
-baselayoutStatement: baselayout bracketedString
-bracketedString: leftBracket whitespace? string whitespace? rightBracket
-beepStatement: beep
-layerStatement: layer bracketedString
 
 ifLikeStatement: ifStatement|layerStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
@@ -72,4 +67,7 @@ ifSystemStoreStringStatement: if leftBracket whitespace? amphasand systemStoreNa
 ifSystemStoreName: platform|layer|baselayout|newLayer|oldLayer
 comparison:equal|notEqual
 systemStoreName: stringSystemStoreName|casedkeys|hotkey|layer|newLayer|oldLayer
-
+layerStatement: layer bracketedString
+platformStatement: platform bracketedString
+baselayoutStatement: baselayout bracketedString
+bracketedString: leftBracket whitespace? string whitespace? rightBracket
