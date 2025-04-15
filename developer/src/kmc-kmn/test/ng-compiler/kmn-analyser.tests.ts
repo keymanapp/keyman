@@ -1709,7 +1709,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(groupNodes[2].getDescendents(NodeTypes.READONLY).length, 1);
       const productionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION);
       assert.equal(productionNodes.length, 5);
-      //assert.equal(root.toString(), '');
+      //""assert.equal(root.toString(), '');
     });
   });
 });
