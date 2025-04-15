@@ -193,6 +193,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.BEGIN,            nodeType: NodeTypes.BEGIN},
     {tokenType: TokenTypes.BITMAP,           nodeType: NodeTypes.BITMAP},
     {tokenType: TokenTypes.CASEDKEYS,        nodeType: NodeTypes.CASEDKEYS},
+    {tokenType: TokenTypes.CONTEXT,          nodeType: NodeTypes.CONTEXT},
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},
     {tokenType: TokenTypes.DISPLAYMAP,       nodeType: NodeTypes.DISPLAYMAP},
     {tokenType: TokenTypes.EQUAL,            nodeType: NodeTypes.EQUAL},

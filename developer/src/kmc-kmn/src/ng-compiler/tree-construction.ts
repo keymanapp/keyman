@@ -16,6 +16,7 @@ export enum NodeTypes {
   BEGIN            = "BEGIN",
   BITMAP           = "BITMAP",
   CASEDKEYS        = "CASEDKEYS",
+  CONTEXT          = "CONTEXT",
   COPYRIGHT        = "COPYRIGHT",
   DISPLAYMAP       = "DISPLAYMAP",
   EQUAL            = "EQUAL",

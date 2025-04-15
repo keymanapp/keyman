@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, RhsBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1121,6 +1121,75 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("RhsBlockRule Tests", () => {
+    it("can construct a RhsBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const rhsBlock: Rule = new RhsBlockRule();
+      assert.isNotNull(rhsBlock);
+    });
+    it("can parse correctly (context output block)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('context layer("shift")');
+      const rhsBlock: Rule = new RhsBlockRule();
+      assert.isTrue(rhsBlock.parse(root));
+      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER));
+    });
+  });
+  describe("OutputBlockRule Tests", () => {
+    it("can construct a OutputBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const outputBlock: Rule = new OutputBlockRule();
+      assert.isNotNull(outputBlock);
+    });
+    it("can parse correctly (single output statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(main)');
+      const outputBlock: Rule = new OutputBlockRule();
+      assert.isTrue(outputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.USE));
+    });
+    it("can parse correctly (two output statements)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(main) layer("shift")');
+      const outputBlock: Rule = new OutputBlockRule();
+      assert.isTrue(outputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.USE));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+    });
+    it("can parse correctly (two output statements, continuation)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(main)\\\nlayer("shift")');
+      const outputBlock: Rule = new OutputBlockRule();
+      assert.isTrue(outputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.USE));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("OutputStatementRule Tests", () => {
+    it("can construct a OutputStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isNotNull(outputStatement);
+    });
+    it("can parse correctly (use statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(main)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+    });
+    it("can parse correctly (layer statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
     });
   });
   describe("AnyStatementRule Tests", () => {

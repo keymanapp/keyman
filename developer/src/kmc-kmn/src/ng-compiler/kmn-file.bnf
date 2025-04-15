@@ -46,12 +46,16 @@ groupQualifier: usingKeys|readonly
 usingKeys: using whitespace keys
 productionBlock: lhsBlock spacedChevron rhsBlock
 lhsBlock: inputBlock|ifLikeBlock
-inputBlock: ifLikeBlock? inputCharacter
+inputBlock: ifLikeBlock? padding inputCharacter
 inputCharacter: anyStatement
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
 paddedIfLikeStatement: padding IfLikeStatement
-rhsBlock: rhsStatement
-rhsStatement: useStatement
+rhsBlock: contextOutputBlock|context
+contextOutputBlock: paddedContext? outputBlock
+paddedContext: context padding
+outputBlock: outputStatement paddedOutputStatement*
+paddedOutputStatement: padding outputStatement
+outputStatement: useStatement|layerStatement
 
 anyStatement: any bracketedStoreName
 
