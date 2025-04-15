@@ -6,7 +6,7 @@ import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTargetElementWrapper, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
-  type KeyboardInterface,
+  type KeyboardInterfaceBase,
   LegacyAPIEvents
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
@@ -344,7 +344,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.restoringFocus = false;
   }
 
-  insertText(kbdInterface: KeyboardInterface<ContextManager>, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: KeyboardInterfaceBase<ContextManager>, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.  The user has likely be interacting with a
     // 'help page' keyboard, like desktop `sil_euro_latin`, and active browser focus on the
     // original context element may have been lost.

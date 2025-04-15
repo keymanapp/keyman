@@ -1,11 +1,11 @@
 import { type OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
 import { FloatingOSKView } from 'keyman/engine/osk';
-import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
+import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
 import ContextManager from './contextManager.js';
 import { KeymanEngine } from './keymanEngine.js';
 
-export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
+export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   constructor(
     _jsGlobal: any,
     engine: KeymanEngine,

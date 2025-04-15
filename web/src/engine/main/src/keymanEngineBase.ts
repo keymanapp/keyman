@@ -9,7 +9,7 @@ import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
-import KeyboardInterface from "./keyboardInterface.js";
+import { KeyboardInterfaceBase } from "./keyboardInterfaceBase.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
@@ -42,7 +42,7 @@ export class KeymanEngineBase<
 > implements KeyboardKeymanGlobal {
   readonly config: Configuration;
   contextManager: ContextManager;
-  interface: KeyboardInterface<ContextManager>;
+  interface: KeyboardInterfaceBase<ContextManager>;
   readonly core: InputProcessor;
   keyboardRequisitioner: KeyboardRequisitioner;
   modelCache: ModelCache;
@@ -125,7 +125,7 @@ export class KeymanEngineBase<
 
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
-    this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
+    this.interface = processorConfiguration.keyboardInterface as KeyboardInterfaceBase<ContextManager>;
     this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
