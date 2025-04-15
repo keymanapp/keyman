@@ -24,8 +24,11 @@ export class KeylayoutToKmnConverter {
   static readonly USED_KEYS_COUNT = 51;
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
+  static readonly KMC_CONVERT_VERSION = "0.1";
 
-  //private callbacks: CompilerCallbacks;
+  static readonly DATA_SUBFOLDER = 'data';
+  static readonly TEST_DATA_SUBFOLDER = 'test/data';
+
   private options: CompilerOptions;
 
   async init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
@@ -93,7 +96,7 @@ export class KeylayoutToKmnConverter {
 
       // get filename from data that had been read
       const fileNameNoExtention = jsonObj.keyboard['@_name'];
-      const filePath = this.callbacks.path.join(process.cwd(), "data");
+      const filePath = this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_DATA_SUBFOLDER);
 
       data_object.keylayout_filename = this.callbacks.path.join(filePath, (fileNameNoExtention + ".keylayout"));
 
@@ -967,7 +970,7 @@ export class KeylayoutToKmnConverter {
 /**
  * @brief  class for all storing a rule containing data for key, deadkey, previous deadkey, output)
  */
-class Rule {
+export class Rule {
   constructor(
     public rule_type: string,             /* C0, C1, C2, C3, or C4 */
 

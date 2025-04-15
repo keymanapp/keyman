@@ -35,35 +35,35 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Unavailable.keylayout');
       await NodeAssert.rejects(async () => sut.run(inputFilename, null));
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Italian.keylayout');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, ""));
     });
 
     it('run() should return on correct input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Italian.keylayout');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
     });
 
     it('run() should return on correct input file name and given output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Italian.keylayout');
-      const outputFilename = makePathToFixture('../../data/OutputName.kmn');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+      const outputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/OutputName.kmn');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
     });
 
     it('run() should throw on incorrect input file extention and output file extention', async function () {
-      const inputFilename = makePathToFixture('../data/Italian_command.A');
-      const outputFilename = makePathToFixture('../../data/OutputXName.B');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian_command.A');
+      const outputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/data/OutputXName.B');
       await NodeAssert.rejects(async () => sut.run(inputFilename, outputFilename));
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {
-      const inputFilename = makePathToFixture('../data/Italian.keylayout');
-      const outputFilename = makePathToFixture('../../data/OutputXName.B');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+      const outputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/OutputXName.B');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
     });
   });
@@ -71,7 +71,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("convert() ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert(read);
 
@@ -231,7 +231,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_Modifier_array__From__KeyModifier_array ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert(read);
 
@@ -264,7 +264,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_KeyModifier_array__From__ActionID ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
@@ -293,7 +293,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_ActionID__From__ActionNext ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
@@ -320,7 +320,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_ActionIndex__From__ActionId ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
@@ -345,7 +345,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_Output__From__ActionId_None ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     [["a14", "u"],
@@ -375,7 +375,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     const b1_keycode_arr = [
@@ -487,7 +487,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_ActionStateOutput_array__From__ActionState ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     [["1", [
@@ -533,7 +533,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert(read);
 
@@ -570,7 +570,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe("get_KeyActionOutput_array__From__ActionStateOutput_array ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
     const read = sut_r.read(inputFilename);
 
     const b6_actionId_arr = [
