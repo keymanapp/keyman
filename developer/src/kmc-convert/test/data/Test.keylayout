@@ -95,7 +95,7 @@
             <key code="47" output="."/>
             <key code="48" output="&#x0009;"/>
             <key code="49" action="A_0"/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="1">
             <key code="0" action="A_1"/>
@@ -148,7 +148,7 @@
             <key code="47" output="."/>
             <key code="48" output="&#x0009;"/>
             <key code="49" action="A_0"/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="2">
             <key code="0" action="A_1"/>
@@ -201,7 +201,7 @@
             <key code="47" output=":"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" action="A_0"/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="3">
             <key code="0" output="U+1F600"/>
@@ -254,7 +254,7 @@
             <key code="47" output="/"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" action="A_0"/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="4">
             <key code="0" output="Å"/>
@@ -307,7 +307,7 @@
             <key code="47" output="·"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" output=" "/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="5">
             <key code="0" output="å"/>
@@ -360,7 +360,7 @@
             <key code="47" output="•"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" output=" "/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="6">
             <key code="0" output="å"/>
@@ -413,7 +413,7 @@
             <key code="47" output="•"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" output=" "/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
         <keyMap index="7">
             <key code="0" output="Å"/>
@@ -466,7 +466,7 @@
             <key code="47" output="•"/>
             <key code="48" output="&#x0009;"/>
             <key code="49" output=" "/>
-            <key code="50" output=""/>
+            <key code="50" output="-"/>
         </keyMap>
     </keyMapSet>
     <actions>
