@@ -20,7 +20,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe("write() ", function () {
-    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -46,7 +46,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe("writeData_Rules() ", function () {
-    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -74,7 +74,7 @@ describe('KmnFileWriter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert(read);
 
@@ -125,7 +125,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe("reviewRules() ", function () {
-    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian.keylayout');
+    const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);

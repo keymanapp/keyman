@@ -56,7 +56,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should throw on incorrect input file extention and output file extention', async function () {
-      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Italian_command.A');
+      const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test_command.A');
       const outputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/data/OutputXName.B');
       await NodeAssert.rejects(async () => sut.run(inputFilename, outputFilename));
     });

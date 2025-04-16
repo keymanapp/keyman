@@ -21,13 +21,13 @@ export class KeylayoutToKmnConverter {
 
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly USED_KEYS_COUNT = 50;               // we use key Nr 0 (A) -> key Nr 49 (Space)
+  static readonly USED_KEYS_COUNT = 51;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
   static readonly KMC_CONVERT_VERSION = "0.1";
 
   static readonly DATA_SUBFOLDER = 'data';
-  static readonly TEST_DATA_SUBFOLDER = 'test/data';
+  static readonly TEST_SUBFOLDER = 'test';
 
   private options: CompilerOptions;
 
@@ -96,7 +96,7 @@ export class KeylayoutToKmnConverter {
 
       // get filename from data that had been read
       const fileNameNoExtention = jsonObj.keyboard['@_name'];
-      const filePath = this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_DATA_SUBFOLDER);
+      const filePath = this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER);
 
       data_object.keylayout_filename = this.callbacks.path.join(filePath, (fileNameNoExtention + ".keylayout"));
 

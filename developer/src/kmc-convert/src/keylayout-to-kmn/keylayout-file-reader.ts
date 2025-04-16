@@ -57,7 +57,7 @@ export class KeylayoutFileReader {
     };
 
     try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_DATA_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
+      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
