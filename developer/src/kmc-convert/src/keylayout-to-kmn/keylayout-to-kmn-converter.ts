@@ -21,7 +21,7 @@ export class KeylayoutToKmnConverter {
 
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly USED_KEYS_COUNT = 51;
+  static readonly USED_KEYS_COUNT = 50;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
   static readonly KMC_CONVERT_VERSION = "0.1";
