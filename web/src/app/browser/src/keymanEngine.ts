@@ -26,7 +26,7 @@ import { UtilApiEndpoint} from './utilApiEndpoint.js';
 import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
-import KeyboardInterface from './keyboardInterface.js';
+import { KeyboardInterface } from './keyboardInterface.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 
 export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {

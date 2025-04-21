@@ -1,5 +1,5 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
-import { JSKeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface  } from 'keyman/engine/js-processor';
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/keyboard-storage';
 
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
@@ -9,7 +9,7 @@ import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.j
 import { KeymanEngineBase } from "./keymanEngineBase.js";
 import { EngineConfiguration } from "./engineConfiguration.js";
 
-export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
+export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase<any>> extends JSKeyboardInterface {
   protected readonly engine: KeymanEngineBase<EngineConfiguration, ContextManagerType, any>;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
@@ -122,5 +122,5 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
 }
 
 (function() {
-  KeyboardInterface.__publishShorthandAPI();
+  KeyboardInterfaceBase.__publishShorthandAPI();
 }());
