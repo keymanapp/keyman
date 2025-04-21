@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.24 alpha 2025-04-21
+
+* build(deps): bump koa from 2.15.3 to 2.16.1 (#13694)
+* chore: merge beta into master B18S5 (#13712)
+
 ## 19.0.23 alpha 2025-04-07
 
 * chore(web): remove dead methods regarding keyboard state (#13671)
