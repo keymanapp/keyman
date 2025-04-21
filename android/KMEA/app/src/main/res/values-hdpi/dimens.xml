@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dimens for hdpi Portrait (Phone) -->
+<resources>
+    <dimen name="banner_height">40dp</dimen>
+    <dimen name="keyboard_height">170dp</dimen>
+</resources>
