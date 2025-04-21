@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.233 beta 2025-04-21
+
+* chore: cleanup kps.xsd version typos (#13670)
+* fix(android): refresh system keyboard banner on reload (#13702)
+* chore(ios): update keyboard-size data for current iOS devices (#13697)
+* fix(ios): ensure update notification does not go translucent/transparent (#13698)
+* fix(ios): resummon keyboard when keyboard picker is dismissed (#13701)
+* fix(web): match banner font scaling to osk font scaling (#13646)
+* docs(common): Document Keyman website server-side dependencies (#13642)
+* docs(windows): update FAQ (#13708)
+
 ## 18.0.232 beta 2025-04-10
 
 * fix(android): Downgrade UnknownHostException error to info (#13692)
