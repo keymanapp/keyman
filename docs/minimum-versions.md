@@ -4,7 +4,7 @@ title: Keyman Minimum Versions
 
 Changes in [minimum-versions.inc.sh](minimum-versions.inc.sh) should manually be propagated to the linked help files below:
 
-## Keyman 18.0
+## Keyman 19.0
 
 Target Operating System and Platform Versions
 

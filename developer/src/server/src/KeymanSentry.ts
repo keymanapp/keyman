@@ -1,3 +1,4 @@
+// TODO: this is duplicated in kmc!
 import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { getOption } from "./options.js";

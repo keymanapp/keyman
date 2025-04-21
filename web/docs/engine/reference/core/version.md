@@ -22,7 +22,7 @@ Read only
 
 ### Return Value
 
-`'18.0'` (for KeymanWeb 18.0)
+`'19.0'` (for KeymanWeb 19.0)
 
 ## Description
 
