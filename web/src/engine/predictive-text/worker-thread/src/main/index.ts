@@ -30,9 +30,6 @@
  */
 
 /// <reference types="@keymanapp/lm-message-types" />
-import { extendString } from "@keymanapp/web-utils";
-
-extendString();
 
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';

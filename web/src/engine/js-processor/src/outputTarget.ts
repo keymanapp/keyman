@@ -1,9 +1,7 @@
-import { extendString, KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
 import { OutputTarget as OutputTargetInterface } from 'keyman/engine/keyboard';
-
-extendString();
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';

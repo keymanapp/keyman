@@ -25,8 +25,7 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-// Allows the kmwstring bindings to resolve.
-import { extendString, KMWString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
@@ -46,8 +45,6 @@ import Transform = LexicalModelTypes.Transform;
 import USVString = LexicalModelTypes.USVString;
 import WithOutcome = LexicalModelTypes.WithOutcome;
 import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
-
-extendString();
 
 /**
  * @file trie-model.ts

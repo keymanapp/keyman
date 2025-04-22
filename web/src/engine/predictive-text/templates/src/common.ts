@@ -6,9 +6,7 @@ import Outcome = LexicalModelTypes.Outcome;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import WithOutcome = LexicalModelTypes.WithOutcome;
-import { extendString, KMWString } from "@keymanapp/web-utils";
-
-extendString();
+import { KMWString } from "@keymanapp/web-utils";
 
 export const SENTINEL_CODE_UNIT = '\uFDD0';
 

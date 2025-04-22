@@ -1,6 +1,13 @@
 /***
-   KeymanWeb 19.0
-   Copyright 2025 SIL International
+ KeymanWeb 19.0
+  Copyright 2025 SIL International
+
+  NOTE: in previous versions of Keyman Engine for Web, these methods were set on the standard
+  JS String type in a manner considered a "side-effect".  (When inspecting older versions, it may help
+  to know that they were originally implemented within a file named kmwstring.ts.)
+  *
+  These methods seek to support SMP-aware string functionality within the Web engine, as many
+  keyboards exist that utilize characters within such ranges.
 ***/
 
 /**
@@ -57,7 +64,6 @@ export function charCodeAt(s: string, index: number) {
   }
   return first;
 }
-
 
 /**
  * Returns the code point index within the calling String object of the first occurrence
@@ -404,28 +410,3 @@ export function charAt(s: string, index: number) { // charAtPoint
     return ''
   };
 }
-
-/*
- * TODO:  Remove this file as part of addressing https://github.com/keymanapp/keyman/issues/2492.
- */
-
-declare global {
-  interface StringConstructor {
-    kmwEnableSupplementaryPlane(bEnable: boolean): void
-  }
-}
-
-export default function extendString() {
-  /**
-   * Enable or disable supplementary plane string handling
-   *
-   * @param  {boolean}  bEnable
-   */
-  String.kmwEnableSupplementaryPlane = function(bEnable)
-  {
-    enableSupplementaryPlane(bEnable);
-  }
-}
-
-// For side-effect imports:
-extendString();

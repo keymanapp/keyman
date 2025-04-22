@@ -13,15 +13,8 @@ import vm from 'vm';
 // Ensure that we can successfully load the module & apply kmwLength, as it's
 // needed for some of the unit tests.
 
-// // Verify that the KMW string extensions are loaded via side-effect.
-
-import { extendString } from '@keymanapp/web-utils';
-
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';
-
-// Ensure that our KMW string-extensions activate.
-extendString();
 
 /**
  * Creates a MessageEvent (for inter-worker communication), with the given data payload.

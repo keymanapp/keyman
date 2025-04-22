@@ -5,7 +5,7 @@ import { KMWString } from '@keymanapp/web-utils';
 describe('Unicode string handling', () => {
   describe('disabled: BMP-mode, BMP-only strings',  () => {
     before(() => {
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     });
 
     it('charAt', () => {
@@ -118,7 +118,7 @@ describe('Unicode string handling', () => {
 
   describe('enabled: SMP-mode, but BMP-only strings',  () => {
     before(() => {
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
     });
 
     it('charAt', () => {
@@ -237,7 +237,7 @@ describe('Unicode string handling', () => {
 
   describe('enabled: SMP-mode, with mixed-plane strings',  () => {
     before(() => {
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
     });
 
     it('charAt', () => {

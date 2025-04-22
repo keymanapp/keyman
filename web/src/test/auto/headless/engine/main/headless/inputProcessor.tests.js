@@ -25,7 +25,7 @@ let device = {
 };
 
 // Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
+KMWString.enableSupplementaryPlane(false);
 
 // Test the KeyboardProcessor interface.
 describe('InputProcessor', function() {
