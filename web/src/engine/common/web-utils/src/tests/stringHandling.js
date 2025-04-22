@@ -2,7 +2,7 @@ import { assert } from 'chai';
 // Trigger the String-extending methods.
 import * as utils from '@keymanapp/web-utils';
 
-describe.only('Unicode string handling', () => {
+describe('Unicode string handling', () => {
   describe('disabled: BMP-mode, BMP-only strings',  () => {
     before(() => {
       String.kmwEnableSupplementaryPlane(false);
