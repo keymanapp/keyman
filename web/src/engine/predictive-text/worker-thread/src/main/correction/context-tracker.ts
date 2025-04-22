@@ -18,7 +18,7 @@ function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
   for(let i=0; i < KMWString.length(text); i++) {
-    let char = text.kmwCharAt(i); // is SMP-aware
+    let char = KMWString.charAt(text, i); // is SMP-aware
 
     let transform: Transform = {
       insert: char,

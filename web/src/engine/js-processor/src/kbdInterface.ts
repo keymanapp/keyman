@@ -643,7 +643,7 @@ export default class KeyboardInterface extends KeyboardHarness {
       // Nope, so let's build its cache.
       var result: ComplexKeyboardStore = [];
       for(var i=0; i < KMWString.length(store); i++) {
-        result.push(store._kmwCharAt(i));
+        result.push(KMWString.charAt(store, i));
       }
 
       // Cache the result for later!

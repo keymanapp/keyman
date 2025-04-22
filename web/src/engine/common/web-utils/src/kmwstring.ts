@@ -384,6 +384,27 @@ export function codeUnitToCodePoint(s: string, codeUnitIndex: number) {
   }
 }
 
+/**
+ * Returns the character at a the code point index passed
+ *
+ * @param  {string}  s      The string
+ * @param  {number}  index  A code point index in the string
+ * @return {string}         The corresponding character
+ */
+export function charAt(s: string, index: number) { // charAtPoint
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return str.charAt(index);
+  }
+
+  if(index >= 0) {
+    return substr(str, index, 1);
+  } else {
+    return ''
+  };
+}
+
 /*
  * TODO:  Remove this file as part of addressing https://github.com/keymanapp/keyman/issues/2492.
  */
@@ -392,36 +413,9 @@ declare global {
   interface StringConstructor {
     kmwEnableSupplementaryPlane(bEnable: boolean): void
   }
-
-  interface String {
-    kmwCharAt(codePointIndex: number) : string,
-    _kmwCharAt(codePointIndex: number) : string,
-  }
 }
 
 export default function extendString() {
-  /*
-    Helper functions
-  */
-
-  /**
-   * Returns the character at a the code point index passed
-   *
-   * @param  {number}  codePointIndex  A code point index in the string
-   * @return {string}                  The corresponding character
-   */
-  String.prototype.kmwCharAt = function(codePointIndex) {
-    var str = String(this);
-
-    if(codePointIndex >= 0) return substr(str, codePointIndex,1); else return '';
-  }
-
-  /**
-   * String prototype library extensions for basic plane characters,
-   * to simplify enabling or disabling supplementary plane functionality (I3319)
-   */
-
-
   /**
    * Enable or disable supplementary plane string handling
    *
@@ -429,15 +423,7 @@ export default function extendString() {
    */
   String.kmwEnableSupplementaryPlane = function(bEnable)
   {
-    var p=String.prototype;
-    p._kmwCharAt = bEnable ? p.kmwCharAt : p.charAt;
-
     enableSupplementaryPlane(bEnable);
-  }
-
-  // Ensure that _all_ String extensions are established, even if disabled by default.
-  if(!""._kmwCharAt) {
-    String.kmwEnableSupplementaryPlane(false);
   }
 }
 

@@ -8,14 +8,14 @@ describe('Unicode string handling', () => {
       String.kmwEnableSupplementaryPlane(false);
     });
 
-    it('_kmwCharAt', () => {
+    it('charAt', () => {
       const str = "string";
-      assert.equal(str._kmwCharAt(-1), '');
-      assert.equal(str._kmwCharAt(6), '');
-      assert.equal(str._kmwCharAt(1000), '');
-      assert.equal(str._kmwCharAt(0), "s");
-      assert.equal(str._kmwCharAt(2), "r");
-      assert.equal(str._kmwCharAt(5), "g");
+      assert.equal(KMWString.charAt(str, -1), '');
+      assert.equal(KMWString.charAt(str, 6), '');
+      assert.equal(KMWString.charAt(str, 1000), '');
+      assert.equal(KMWString.charAt(str, 0), "s");
+      assert.equal(KMWString.charAt(str, 2), "r");
+      assert.equal(KMWString.charAt(str, 5), "g");
     });
 
     it('charCodeAt', () => {
@@ -121,14 +121,14 @@ describe('Unicode string handling', () => {
       String.kmwEnableSupplementaryPlane(true);
     });
 
-    it('_kmwCharAt', () => {
+    it('charAt', () => {
       const str = "string";
-      assert.equal(str._kmwCharAt(-1), '');
-      assert.equal(str._kmwCharAt(6), '');
-      assert.equal(str._kmwCharAt(1000), '');
-      assert.equal(str._kmwCharAt(0), "s");
-      assert.equal(str._kmwCharAt(2), "r");
-      assert.equal(str._kmwCharAt(5), "g");
+      assert.equal(KMWString.charAt(str, -1), '');
+      assert.equal(KMWString.charAt(str, 6), '');
+      assert.equal(KMWString.charAt(str, 1000), '');
+      assert.equal(KMWString.charAt(str, 0), "s");
+      assert.equal(KMWString.charAt(str, 2), "r");
+      assert.equal(KMWString.charAt(str, 5), "g");
     });
 
     it('charCodeAt', () => {
@@ -240,17 +240,17 @@ describe('Unicode string handling', () => {
       String.kmwEnableSupplementaryPlane(true);
     });
 
-    it('_kmwCharAt', () => {
+    it('charAt', () => {
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
       const apples = 'a' + String.fromCodePoint(0x1d5c9) + 'p' + 'l' + String.fromCodePoint(0x1d5be) + 's';
-      assert.equal(apples._kmwCharAt(-1), '');
-      assert.equal(apples._kmwCharAt(6), '');
-      assert.equal(apples._kmwCharAt(1000), '');
-      assert.equal(apples._kmwCharAt(0), "a");
-      assert.equal(apples._kmwCharAt(1), String.fromCodePoint(0x1d5c9));
-      assert.equal(apples._kmwCharAt(2), "p");
-      assert.equal(apples._kmwCharAt(5), "s");
+      assert.equal(KMWString.charAt(apples, -1), '');
+      assert.equal(KMWString.charAt(apples, 6), '');
+      assert.equal(KMWString.charAt(apples, 1000), '');
+      assert.equal(KMWString.charAt(apples, 0), "a");
+      assert.equal(KMWString.charAt(apples, 1), String.fromCodePoint(0x1d5c9));
+      assert.equal(KMWString.charAt(apples, 2), "p");
+      assert.equal(KMWString.charAt(apples, 5), "s");
     });
 
     it('charCodeAt', () => {
