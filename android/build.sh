@@ -23,7 +23,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 oemtargets=()
 if [ ! -z "${RELEASE_OEM+x}" ]; then
-  if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
+  if [ ! -z "${RELEASE_OEM_FIRSTVOICES+x}" ] && [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
     oemtargets+=(":fv=../oem/firstvoices/android           OEM FirstVoices for Android app")
   fi
 fi
