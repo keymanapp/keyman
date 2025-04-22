@@ -74,7 +74,7 @@ export function charCodeAt(s: string, index: number) {
  * @param  {number=} fromIndex    Optional code point index to start searching from
  * @return {number}               The code point index of the specified search value
  */
-export function indexOf(s: string, searchValue: string, fromIndex?: number) { // pointIndexOf()
+export function indexOf(s: string, searchValue: string, fromIndex?: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
@@ -102,7 +102,7 @@ export function indexOf(s: string, searchValue: string, fromIndex?: number) { //
  * @param  {number=} fromIndex      Optional code point index to start searching from
  * @return {number}                 The code point index of the specified search value
  */
-export function lastIndexOf(s: string, searchValue: string, fromIndex?: number) { // lastPointIndexOf()
+export function lastIndexOf(s: string, searchValue: string, fromIndex?: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
@@ -159,7 +159,7 @@ export function length(s: string) {
  * @return {string}                The substring as selected by beginSlice and
  *                                 endSlice
  */
-export function slice(s: string, beginSlice: number, endSlice?: number) { // sliceAtPoints()
+export function slice(s: string, beginSlice: number, endSlice?: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
@@ -185,7 +185,7 @@ export function slice(s: string, beginSlice: number, endSlice?: number) { // sli
  * @param  {number=}  len          Optional length to extract
  * @return {string}                The substring as selected by start and length
  */
-export function substr(s: string, start: number, len?: number) { // substrFromPoint()
+export function substr(s: string, start: number, len?: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
@@ -234,7 +234,7 @@ export function substr(s: string, start: number, len?: number) { // substrFromPo
    *                                 extract to
    * @return {string}                The substring as selected by indexA and indexB
    */
-export function substring(s: string, indexA: number, indexB?: number) { // substringBetweenPoints()
+export function substring(s: string, indexA: number, indexB?: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
@@ -397,7 +397,7 @@ export function codeUnitToCodePoint(s: string, codeUnitIndex: number) {
  * @param  {number}  index  A code point index in the string
  * @return {string}         The corresponding character
  */
-export function charAt(s: string, index: number) { // charAtPoint
+export function charAt(s: string, index: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
