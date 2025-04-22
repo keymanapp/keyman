@@ -1,5 +1,114 @@
 # Keyman Version History
 
+## 19.0.24 alpha 2025-04-21
+
+* build(deps): bump koa from 2.15.3 to 2.16.1 (#13694)
+* chore: merge beta into master B18S5 (#13712)
+
+## 19.0.23 alpha 2025-04-07
+
+* chore(web): remove dead methods regarding keyboard state (#13671)
+* chore(linux): Update debian changelog (#13675)
+
+## 19.0.22 alpha 2025-04-04
+
+* build(deps): bump tar-fs and puppeteer-core (#13661)
+
+## 19.0.21 alpha 2025-04-03
+
+* chore: use explicit `node:` prefix for node imports (#13650)
+* refactor(developer): rename developer/web/utils/common-messages.ts to developer-utils-messages.ts (#13653)
+* refactor(developer): move sentry and developer options into console apps (#13654)
+* refactor(developer): consolidate project loader (#13656)
+
+## 19.0.20 alpha 2025-04-01
+
+* fix(android): move responsibility for setting keyboard height preference into `applyKeyboardHeight()` (#13578)
+
+## 19.0.19 alpha 2025-03-31
+
+* chore: merge beta to master B18S4 (#13606)
+
+## 19.0.18 alpha 2025-03-25
+
+* chore(developer): improve ldml code coverage (#13516)
+
+## 19.0.17 alpha 2025-03-24
+
+* chore(deps-dev): bump esbuild from 0.18.20 to 0.25.0 (#13191)
+
+## 19.0.16 alpha 2025-03-19
+
+* feat(core): check on load for valid kmx_plus unicode (#13486)
+
+## 19.0.15 alpha 2025-03-18
+
+* chore: merge master into linux-mcompile (#13506)
+
+## 19.0.14 alpha 2025-03-14
+
+* chore: B18S3 merge beta to master (#13498)
+* feat(core): move kmx_plus.tests.cpp to GTest (#13494)
+
+## 19.0.13 alpha 2025-03-12
+
+* feat(windows): hard code key cap colour (#13444)
+
+## 19.0.12 alpha 2025-03-04
+
+* chore: remove legacy IIS setup notes (#13403)
+
+## 19.0.11 alpha 2025-03-03
+
+* chore(linux): Update debian changelog (#13347)
+* fix(common): improve resilience of build script trigger (#13402)
+
+## 19.0.10 alpha 2025-03-01
+
+* chore: merge beta into master B18S2 (#13391)
+
+## 19.0.9 alpha 2025-02-27
+
+* docs: move node.js before Emscripten (#13366)
+* chore: add a workflow to automatically close linked issues (#13368)
+
+## 19.0.8 alpha 2025-02-21
+
+* feat(windows): hack in some fun features for kmdevlink (#13237)
+* feat(developer): use ABNF to validate LDML transform (#13236)
+* fix(linux): remove `--platform amd64` from docker build script (#13318)
+
+## 19.0.7 alpha 2025-02-20
+
+* chore(linux): allow to build and use Debian docker image (#13284)
+
+## 19.0.6 alpha 2025-02-19
+
+* chore: merge beta to master B18S1 (#13239)
+* fix(linux): add missing dependency for uploading to llso (#13280)
+
+## 19.0.5 alpha 2025-02-15
+
+* fix(linux): update location of lcov.deb for Jammy (#13253)
+
+## 19.0.4 alpha 2025-02-14
+
+* feat(developer): serialize KMXPlus into XML (#13174)
+
+## 19.0.3 alpha 2025-02-13
+
+* docs: update keyboard processor build source (#13221)
+* chore(linux): additional code cleanup after Focal removal (#13206)
+
+## 19.0.2 alpha 2025-02-12
+
+* chore(linux): remove support of Ubuntu 20.04 Focal (#13203)
+
+## 19.0.1 alpha 2025-02-11
+
+* refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
+* chore: increment to alpha 19.0 (#13187)
+
 ## 18.0.233 beta 2025-04-21
 
 * chore: cleanup kps.xsd version typos (#13670)

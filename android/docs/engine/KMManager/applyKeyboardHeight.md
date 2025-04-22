@@ -3,8 +3,8 @@ title: KMManager.applyKeyboardHeight()
 ---
 
 ## Summary
-The **applyKeyboardHeight()** method sets the height of the keyboard frame for 
-the device's current [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) 
+The **applyKeyboardHeight()** method sets the height of the keyboard frame for
+the device's current [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali)
 (portrait vs landscape) or a specified orientation.
 
 ## Syntax
@@ -29,12 +29,12 @@ KMManager.applyKeyboardHeight(Context context, int height, int orientation)
 : Accepts a [screen orientation](https://developer.android.com/training/multiscreen/screensizes#TaskUseOriQuali) value. This is most useful if you want to change the size of the keyboard in the other (non-current) orientation. If `orientation` is not defined, keyboard height is set for the current device orientation.
 
 ## Description
-Use this method when you want to increase or decrease the keyboard height for 
-the device in the current screen orientation. This height is independent from 
+Use this method when you want to increase or decrease the keyboard height for
+the device in the current screen orientation. This height is independent from
 the height of the suggestion banner frame.
 
 For reference, here's a table of the default Keyman keyboard heights for various devices and screen orientation.
- 
+
  Device Type                    | Default height (dp)<br>Portrait | Default height (dp)<br>Landscape |
 |-------------------------------|---------------------------------|----------------------------------|
 | Default handset (160dpi)      | 205 | 120 |
@@ -44,7 +44,7 @@ For reference, here's a table of the default Keyman keyboard heights for various
 | 7" tablet                     | 305 | 200 |
 | 10" tablet                    | 405 | 280 |
 
-**Note:** This new keyboard height would be applied for all platforms, so an 
+**Note:** This new keyboard height would be applied for all platforms, so an
 adjusted keyboard height for a phone would appear too small for a tablet.
 
 ## Examples
