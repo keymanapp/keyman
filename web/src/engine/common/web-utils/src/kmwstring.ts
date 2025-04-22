@@ -18,6 +18,47 @@ export function enableSupplementaryPlane(bEnable: boolean) {
 }
 
 /**
+ * Returns a number indicating the Unicode value of the character at the given
+ * code point index, with support for supplementary plane characters.
+ *
+ * @param  {string}  s      The string
+ * @param  {number}  index  The code point index into the string (not
+                            the code unit index) to return
+ * @return {number}         The Unicode character value
+ */
+export function charCodeAt(s: string, index: number) {
+  // While String.codepointAt exists, it does not use code-point indexing and so is
+  // unsuited to our needs here.
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return s.charCodeAt(index);
+  }
+
+  let codeUnitIndex = 0;
+
+  if(index < 0 || index  >= str.length) {
+    return NaN;
+  }
+
+  for(let i = 0; i < index; i++) {
+    codeUnitIndex = nextChar(str, codeUnitIndex);
+    if(codeUnitIndex === null) {
+      return NaN;
+    }
+  }
+
+  let first = str.charCodeAt(codeUnitIndex);
+  if(first >= 0xD800 && first <= 0xDBFF && str.length > codeUnitIndex + 1) {
+    let second = str.charCodeAt(codeUnitIndex + 1);
+    if(second >= 0xDC00 && second <= 0xDFFF) {
+      return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
+    }
+  }
+  return first;
+}
+
+/**
  * Returns the length of the string in code points, as opposed to code units.
  *
  * @param  {string}  s      The string
@@ -175,7 +216,6 @@ declare global {
   }
 
   interface String {
-    kmwCharCodeAt(codePointIndex: number): number,
     kmwCharAt(codePointIndex: number) : string,
     kmwIndexOf(searchValue: string, fromIndex?: number) : number,
     kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
@@ -183,7 +223,6 @@ declare global {
     kmwSubstring(start: number, length: number) : string,
     kmwSubstr(start: number, length?: number) : string,
     kmwBMPSubstr(start: number, length?: number) : string,
-    _kmwCharCodeAt(codePointIndex: number): number,
     _kmwCharAt(codePointIndex: number) : string,
     _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
     _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
@@ -194,37 +233,6 @@ declare global {
 }
 
 export default function extendString() {
-  /**
-   * Returns a number indicating the Unicode value of the character at the given
-   * code point index, with support for supplementary plane characters.
-   *
-   * @param  {number}  codePointIndex  The code point index into the string (not
-                                       the code unit index) to return
-  * @return {number}                  The Unicode character value
-  */
-  String.prototype.kmwCharCodeAt = function(codePointIndex) {
-    var str = String(this);
-    var codeUnitIndex = 0;
-
-    if (codePointIndex < 0 || codePointIndex  >= str.length) {
-      return NaN;
-    }
-
-    for(var i = 0; i < codePointIndex; i++) {
-      codeUnitIndex = nextChar(str, codeUnitIndex);
-      if(codeUnitIndex === null) return NaN;
-    }
-
-    var first = str.charCodeAt(codeUnitIndex);
-    if (first >= 0xD800 && first <= 0xDBFF && str.length > codeUnitIndex + 1) {
-      var second = str.charCodeAt(codeUnitIndex + 1);
-      if (second >= 0xDC00 && second <= 0xDFFF) {
-        return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
-      }
-    }
-    return first;
-  }
-
   /**
    * Returns the code point index within the calling String object of the first occurrence
    * of the specified value, or -1 if not found.
@@ -398,7 +406,6 @@ export default function extendString() {
   {
     var p=String.prototype;
     p._kmwCharAt = bEnable ? p.kmwCharAt : p.charAt;
-    p._kmwCharCodeAt = bEnable ? p.kmwCharCodeAt : p.charCodeAt;
     p._kmwIndexOf = bEnable ? p.kmwIndexOf :p.indexOf;
     p._kmwLastIndexOf = bEnable ? p.kmwLastIndexOf : p.lastIndexOf ;
     p._kmwSlice = bEnable ? p.kmwSlice : p.slice;

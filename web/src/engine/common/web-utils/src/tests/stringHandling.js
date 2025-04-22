@@ -18,14 +18,14 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwCharAt(5), "g");
     });
 
-    it('_kmwCharCodeAt', () => {
+    it('charCodeAt', () => {
       const str = "string"
-      assert.isNaN(str._kmwCharCodeAt(-1));
-      assert.isNaN(str._kmwCharCodeAt(6));
-      assert.isNaN(str._kmwCharCodeAt(1000));
-      assert.equal(str._kmwCharCodeAt(0), "s".charCodeAt(0));
-      assert.equal(str._kmwCharCodeAt(2), "r".charCodeAt(0));
-      assert.equal(str._kmwCharCodeAt(5), "g".charCodeAt(0));
+      assert.isNaN(KMWString.charCodeAt(str, -1));
+      assert.isNaN(KMWString.charCodeAt(str, 6));
+      assert.isNaN(KMWString.charCodeAt(str, 1000));
+      assert.equal(KMWString.charCodeAt(str, 0), "s".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(str, 2), "r".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(str, 5), "g".charCodeAt(0));
     });
 
     it('_kmwIndexOf', () => {
@@ -131,14 +131,14 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwCharAt(5), "g");
     });
 
-    it('_kmwCharCodeAt', () => {
+    it('charCodeAt', () => {
       const str = "string";
-      assert.isNaN(str._kmwCharCodeAt(-1));
-      assert.isNaN(str._kmwCharCodeAt(6));
-      assert.isNaN(str._kmwCharCodeAt(1000));
-      assert.equal(str._kmwCharCodeAt(0), "s".charCodeAt(0));
-      assert.equal(str._kmwCharCodeAt(2), "r".charCodeAt(0));
-      assert.equal(str._kmwCharCodeAt(5), "g".charCodeAt(0));
+      assert.isNaN(KMWString.charCodeAt(str, -1));
+      assert.isNaN(KMWString.charCodeAt(str, 6));
+      assert.isNaN(KMWString.charCodeAt(str, 1000));
+      assert.equal(KMWString.charCodeAt(str, 0), "s".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(str, 2), "r".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(str, 5), "g".charCodeAt(0));
     });
 
     it('_kmwIndexOf', () => {
@@ -253,17 +253,17 @@ describe('Unicode string handling', () => {
       assert.equal(apples._kmwCharAt(5), "s");
     });
 
-    it('_kmwCharCodeAt', () => {
+    it('charCodeAt', () => {
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
       const apples = 'a' + String.fromCodePoint(0x1d5c9) + 'p' + 'l' + String.fromCodePoint(0x1d5be) + 's';
-      assert.isNaN(apples._kmwCharCodeAt(-1));
-      assert.isNaN(apples._kmwCharCodeAt(6));
-      assert.isNaN(apples._kmwCharCodeAt(1000));
-      assert.equal(apples._kmwCharCodeAt(0), "a".charCodeAt(0));
-      assert.equal(apples._kmwCharCodeAt(1), 0x1d5c9);
-      assert.equal(apples._kmwCharCodeAt(2), "p".charCodeAt(0));
-      assert.equal(apples._kmwCharCodeAt(5), "s".charCodeAt(0));
+      assert.isNaN(KMWString.charCodeAt(apples, -1));
+      assert.isNaN(KMWString.charCodeAt(apples, 6));
+      assert.isNaN(KMWString.charCodeAt(apples, 1000));
+      assert.equal(KMWString.charCodeAt(apples, 0), "a".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(apples, 1), 0x1d5c9);
+      assert.equal(KMWString.charCodeAt(apples, 2), "p".charCodeAt(0));
+      assert.equal(KMWString.charCodeAt(apples, 5), "s".charCodeAt(0));
     });
 
     it('_kmwIndexOf', () => {

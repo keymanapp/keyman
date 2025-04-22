@@ -158,7 +158,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
             // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
           default:
             // In case we extend the allowed set, but forget to implement its handling case above.
-            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + KMWString.charCodeAt(special as string, 0).toString(16) + ") went unhandled!";
         }
       } else {
         // Back to the standard default, pending normal matching.
