@@ -45,7 +45,7 @@ export default class TextArea extends OutputTarget<{}> {
   clearSelection(): void {
     // Processes our codepoint-based variants of selectionStart and selectionEnd.
     this.getCaret(); // updates processedSelectionStart if required
-    this.root.value = this.root.value._kmwSubstring(0, this.processedSelectionStart) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
+    this.root.value = KMWString.substr(this.root.value, 0, this.processedSelectionStart) + KMWString.substr(this.root.value, this.processedSelectionEnd); //I3319
 
     this.setCaret(this.processedSelectionStart);
   }
@@ -128,7 +128,7 @@ export default class TextArea extends OutputTarget<{}> {
 
   getTextBeforeCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(0, this.processedSelectionStart);
+    return KMWString.substring(this.getText(), 0, this.processedSelectionStart);
   }
 
   setTextBeforeCaret(text: string) {
@@ -136,7 +136,7 @@ export default class TextArea extends OutputTarget<{}> {
     let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
     let direction = this.getSelectionDirection();
     let newCaret = KMWString.length(text);
-    this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
+    this.root.value = text + KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.setSelection(newCaret, newCaret + selectionLength, direction);
   }
@@ -150,12 +150,12 @@ export default class TextArea extends OutputTarget<{}> {
 
   getTextAfterCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionEnd);
   }
 
   getSelectedText(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionStart, this.processedSelectionEnd);
   }
 
   getText(): string {
@@ -172,7 +172,7 @@ export default class TextArea extends OutputTarget<{}> {
       }
 
       this.adjustDeadkeys(-dn);
-      this.setTextBeforeCaret(curText.kmwSubstring(0, caret - dn));
+      this.setTextBeforeCaret(KMWString.substr(curText, 0, caret - dn));
       this.setCaret(caret - dn);
     }
   }
@@ -184,7 +184,7 @@ export default class TextArea extends OutputTarget<{}> {
 
     let caret = this.getCaret();
     let front = this.getTextBeforeCaret();
-    let back = this.getText()._kmwSubstring(this.processedSelectionStart);
+    let back = KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.adjustDeadkeys(KMWString.length(s));
     this.root.value = front + s + back;

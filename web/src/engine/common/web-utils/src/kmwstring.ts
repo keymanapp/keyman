@@ -141,6 +141,126 @@ export function length(s: string) {
   return i;
 }
 
+
+/**
+ * Extracts a section of a string and returns a new string.
+ *
+ * @param  {string}  s             The string
+ * @param  {number}  beginSlice    The start code point index in the string to
+ *                                 extract from
+ * @param  {number}  endSlice      Optional end code point index in the string
+ *                                 to extract to
+ * @return {string}                The substring as selected by beginSlice and
+ *                                 endSlice
+ */
+export function slice(s: string, beginSlice: number, endSlice?: number) { // sliceAtPoints()
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return str.slice(beginSlice, endSlice);
+  }
+
+  const beginSliceCodeUnit = codePointToCodeUnit(str, beginSlice);
+  const endSliceCodeUnit = codePointToCodeUnit(str, endSlice);
+  if(beginSliceCodeUnit === null || endSliceCodeUnit === null) {
+    return '';
+  } else {
+    return str.slice(beginSliceCodeUnit, endSliceCodeUnit);
+  }
+}
+
+/**
+ * Returns the characters in a string beginning at the specified location through
+ * the specified number of characters.
+ *
+ * @param  {string}  s             The string
+ * @param  {number}  start         The start code point index in the string to
+ *                                 extract from
+ * @param  {number=}  len          Optional length to extract
+ * @return {string}                The substring as selected by start and length
+ */
+export function substr(s: string, start: number, len?: number) { // substrFromPoint()
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    if(start > -1) {
+      return str.substr(start,len);
+    } else {
+      return str.substr(str.length+start,-start);
+    }
+  }
+
+  if(start < 0) {
+    start = length(str) + start;
+  }
+  if(start < 0) {
+    start = 0;
+  }
+  const startCodeUnit = codePointToCodeUnit(str, start);
+  let endCodeUnit = startCodeUnit;
+
+  if(startCodeUnit === null) {
+    return '';
+  }
+
+  if(arguments.length < 3) {
+    endCodeUnit = str.length;
+  } else {
+    for(let i = 0; i < len; i++) {
+      endCodeUnit = nextChar(str, endCodeUnit);
+    }
+  }
+
+  if(endCodeUnit === null) {
+    return str.substring(startCodeUnit);
+  } else {
+    return str.substring(startCodeUnit, endCodeUnit);
+  }
+}
+
+/**
+   * Returns the characters in a string between two indexes into the string.
+   *
+   * @param  {string}  s             The string
+   * @param  {number}  indexA        The start code point index in the string to
+   *                                 extract from
+   * @param  {number=}  indexB        The end code point index in the string to
+   *                                 extract to
+   * @return {string}                The substring as selected by indexA and indexB
+   */
+export function substring(s: string, indexA: number, indexB?: number) { // substringBetweenPoints()
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return str.substring(indexA, indexB);
+  }
+
+  let indexACodeUnit, indexBCodeUnit;
+
+  if(typeof(indexB) == 'undefined') {
+    indexACodeUnit = codePointToCodeUnit(str, indexA);
+    indexBCodeUnit =  str.length;
+  } else {
+    if(indexA > indexB) {
+      let c = indexA;
+      indexA = indexB;
+      indexB = c;
+    }
+
+    indexACodeUnit = codePointToCodeUnit(str, indexA);
+    indexBCodeUnit = codePointToCodeUnit(str, indexB);
+  }
+
+  if(isNaN(indexACodeUnit) || indexACodeUnit === null) {
+    indexACodeUnit = 0;
+  }
+  if(isNaN(indexBCodeUnit) || indexBCodeUnit === null) {
+    indexBCodeUnit = str.length;
+  }
+
+  return str.substring(indexACodeUnit, indexBCodeUnit);
+}
+
 /**
  * Returns the code unit index for the next code point in the string, accounting for
  * supplementary pairs
@@ -275,102 +395,11 @@ declare global {
 
   interface String {
     kmwCharAt(codePointIndex: number) : string,
-    kmwSlice(beginSlice: number, endSlice: number) : string,
-    kmwSubstring(start: number, length: number) : string,
-    kmwSubstr(start: number, length?: number) : string,
-    kmwBMPSubstr(start: number, length?: number) : string,
     _kmwCharAt(codePointIndex: number) : string,
-    _kmwSlice(beginSlice: number, endSlice: number) : string,
-    _kmwSubstring(start: number, length?: number) : string,
-    _kmwSubstr(start: number, length?: number) : string
   }
 }
 
 export default function extendString() {
-  /**
-   * Extracts a section of a string and returns a new string.
-   *
-   * @param  {number}  beginSlice    The start code point index in the string to
-   *                                 extract from
-   * @param  {number}  endSlice      Optional end code point index in the string
-   *                                 to extract to
-   * @return {string}                The substring as selected by beginSlice and
-   *                                 endSlice
-   */
-  String.prototype.kmwSlice = function(beginSlice, endSlice) {
-    var str = String(this);
-    var beginSliceCodeUnit = codePointToCodeUnit(str, beginSlice);
-    var endSliceCodeUnit = codePointToCodeUnit(str, endSlice);
-    if(beginSliceCodeUnit === null || endSliceCodeUnit === null)
-      return '';
-    else
-      return str.slice(beginSliceCodeUnit, endSliceCodeUnit);
-  }
-
-  /**
-   * Returns the characters in a string beginning at the specified location through
-   * the specified number of characters.
-   *
-   * @param  {number}  start         The start code point index in the string to
-   *                                 extract from
-   * @param  {number=}  len           Optional length to extract
-   * @return {string}                The substring as selected by start and length
-   */
-  String.prototype.kmwSubstr = function(start, len?)
-  {
-    var str = String(this);
-    if(start < 0)
-    {
-      start = length(str) + start;
-    }
-    if(start < 0) start = 0;
-    var startCodeUnit = codePointToCodeUnit(str, start);
-    var endCodeUnit = startCodeUnit;
-
-    if(startCodeUnit === null) return '';
-
-    if(arguments.length < 2) {
-      endCodeUnit = str.length;
-    } else {
-      for(var i = 0; i < len; i++) endCodeUnit = nextChar(str, endCodeUnit);
-    }
-    if(endCodeUnit === null)
-      return str.substring(startCodeUnit);
-    else
-      return str.substring(startCodeUnit, endCodeUnit);
-  }
-
-  /**
-   * Returns the characters in a string between two indexes into the string.
-   *
-   * @param  {number}  indexA        The start code point index in the string to
-   *                                 extract from
-   * @param  {number}  indexB        The end code point index in the string to
-   *                                 extract to
-   * @return {string}                The substring as selected by indexA and indexB
-   */
-  String.prototype.kmwSubstring = function(indexA, indexB)
-  {
-    var str = String(this),indexACodeUnit,indexBCodeUnit;
-
-    if(typeof(indexB) == 'undefined')
-    {
-      indexACodeUnit = codePointToCodeUnit(str, indexA);
-      indexBCodeUnit =  str.length;
-    }
-    else
-    {
-      if(indexA > indexB) { var c = indexA; indexA = indexB; indexB = c; }
-
-      indexACodeUnit = codePointToCodeUnit(str, indexA);
-      indexBCodeUnit = codePointToCodeUnit(str, indexB);
-    }
-    if(isNaN(indexACodeUnit) || indexACodeUnit === null) indexACodeUnit = 0;
-    if(isNaN(indexBCodeUnit) || indexBCodeUnit === null) indexBCodeUnit = str.length;
-
-    return str.substring(indexACodeUnit, indexBCodeUnit);
-  }
-
   /*
     Helper functions
   */
@@ -384,7 +413,7 @@ export default function extendString() {
   String.prototype.kmwCharAt = function(codePointIndex) {
     var str = String(this);
 
-    if(codePointIndex >= 0) return str.kmwSubstr(codePointIndex,1); else return '';
+    if(codePointIndex >= 0) return substr(str, codePointIndex,1); else return '';
   }
 
   /**
@@ -392,21 +421,6 @@ export default function extendString() {
    * to simplify enabling or disabling supplementary plane functionality (I3319)
    */
 
-  /**
-   * Returns a substring
-   *
-   * @param  {number}  n
-   * @param  {number=}  ln
-   * @return {string}
-   */
-  String.prototype.kmwBMPSubstr = function(n,ln?)
-  {
-    var str=String(this);
-    if(n > -1)
-      return str.substr(n,ln);
-    else
-      return str.substr(str.length+n,-n);
-  }
 
   /**
    * Enable or disable supplementary plane string handling
@@ -417,9 +431,6 @@ export default function extendString() {
   {
     var p=String.prototype;
     p._kmwCharAt = bEnable ? p.kmwCharAt : p.charAt;
-    p._kmwSlice = bEnable ? p.kmwSlice : p.slice;
-    p._kmwSubstring = bEnable ? p.kmwSubstring : p.substring;
-    p._kmwSubstr = bEnable ? p.kmwSubstr : p.kmwBMPSubstr;
 
     enableSupplementaryPlane(bEnable);
   }

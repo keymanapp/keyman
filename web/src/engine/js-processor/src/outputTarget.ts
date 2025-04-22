@@ -179,7 +179,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
     this.clearSelection();
 
     if(transform.deleteRight) {
-      this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      this.setTextAfterCaret(KMWString.substr(this.getTextAfterCaret(), transform.deleteRight));
     }
 
     if(transform.deleteLeft) {

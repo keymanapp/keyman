@@ -96,15 +96,15 @@ export class Mock extends OutputTarget {
   }
 
   getTextBeforeCaret(): string {
-    return this.text.kmwSubstr(0, this.selStart);
+    return KMWString.substr(this.text, 0, this.selStart);
   }
 
   getSelectedText(): string {
-    return this.text.kmwSubstr(this.selStart, this.selEnd - this.selStart);
+    return KMWString.substr(this.text, this.selStart, this.selEnd - this.selStart);
   }
 
   getTextAfterCaret(): string {
-    return this.text.kmwSubstr(this.selEnd);
+    return KMWString.substr(this.text, this.selEnd);
   }
 
   getText(): string {
@@ -117,7 +117,7 @@ export class Mock extends OutputTarget {
         dn = this.selStart;
       }
       this.adjustDeadkeys(-dn);
-      this.text = this.text.kmwSubstr(0, this.selStart - dn) + this.text.kmwSubstr(this.selStart);
+      this.text = KMWString.substr(this.text, 0, this.selStart - dn) + KMWString.substr(this.text, this.selStart);
       this.selStart -= dn;
       this.selEnd -= dn;
     }
@@ -125,7 +125,7 @@ export class Mock extends OutputTarget {
 
   insertTextBeforeCaret(s: string): void {
     this.adjustDeadkeys(KMWString.length(s));
-    this.text = this.getTextBeforeCaret() + s + this.text.kmwSubstr(this.selStart);
+    this.text = this.getTextBeforeCaret() + s + KMWString.substr(this.text, this.selStart);
     this.selStart += KMWString.length(s);
     this.selEnd += KMWString.length(s);
   }

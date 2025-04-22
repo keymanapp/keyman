@@ -283,7 +283,7 @@ export default class KeyboardInterface extends KeyboardHarness {
       tempContext = Array(n-KMWString.length(tempContext)+1).join("\uFFFE") + tempContext;
     }
 
-    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
+    return KMWString.substr(KMWString.substr(tempContext, -n), 0, ln);
   }
 
   /**

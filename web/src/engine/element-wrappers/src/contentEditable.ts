@@ -163,7 +163,7 @@ export default class ContentEditable extends OutputTarget<{}> {
     }
 
     let range = this.root.ownerDocument.createRange();
-    let dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
+    let dnOffset = start.offset - KMWString.substr(start.node.nodeValue.substr(0, start.offset), -dn).length;
 
     range.setStart(start.node, dnOffset);
     range.setEnd(start.node, start.offset);

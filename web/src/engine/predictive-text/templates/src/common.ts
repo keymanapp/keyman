@@ -18,13 +18,13 @@ export function applyTransform(transform: Transform, context: Context): Context 
   let lLen = KMWString.length(fullLeftContext);
   let lDel = lLen < transform.deleteLeft ? lLen : transform.deleteLeft;
 
-  let leftContext = fullLeftContext.kmwSubstr(0, lLen - lDel) + (transform.insert || '');
+  let leftContext = KMWString.substr(fullLeftContext, 0, lLen - lDel) + (transform.insert || '');
 
   let fullRightContext = context.right || '';
   let rLen = KMWString.length(fullRightContext);
   let rDel = (rLen < (transform.deleteRight ?? 0)) ? rLen : (transform.deleteRight ?? 0);
 
-  let rightContext = fullRightContext.kmwSubstr(rDel);
+  let rightContext = KMWString.substr(fullRightContext, rDel);
 
   return {
     left: leftContext,
@@ -52,7 +52,7 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
       mergedFirstInsert = '';
       mergedSecondDelete = second.deleteLeft - firstLength;
     } else {
-      mergedFirstInsert = first.insert.kmwSubstr(0, firstLength - second.deleteLeft);
+      mergedFirstInsert = KMWString.substr(first.insert, 0, firstLength - second.deleteLeft);
       mergedSecondDelete = 0;
     }
   }

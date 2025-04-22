@@ -61,44 +61,44 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.length("Life, the universe and everything. Answer:"), 42);
     });
 
-    it('_kmwSlice', () => {
+    it('slice', () => {
       // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice
       const str = "The quick brown fox jumps over the lazy dog.";
 
-      assert.equal(str._kmwSlice(31), "the lazy dog.");
-      assert.equal(str._kmwSlice(4, 19), "quick brown fox");
-      assert.equal(str._kmwSlice(-4), "dog.");
-      assert.equal(str._kmwSlice(-9, -5), "lazy");
-      assert.equal(str._kmwSlice(), str);
+      assert.equal(KMWString.slice(str, 31), "the lazy dog.");
+      assert.equal(KMWString.slice(str, 4, 19), "quick brown fox");
+      assert.equal(KMWString.slice(str, -4), "dog.");
+      assert.equal(KMWString.slice(str, -9, -5), "lazy");
+      assert.equal(KMWString.slice(str), str);
 
       // Per documented spec for slice...
-      assert.equal(str._kmwSlice(31, -5), "the lazy"); // " dog." = 5 chars
-      assert.equal(str._kmwSlice(-5, -9), "");
+      assert.equal(KMWString.slice(str, 31, -5), "the lazy"); // " dog." = 5 chars
+      assert.equal(KMWString.slice(str, -5, -9), "");
     });
 
-    it('_kmwSubstr', () => {
+    it('substr', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
 
-      assert.equal(str._kmwSubstr(1000), '');
-      assert.equal(str._kmwSubstr(31), "the lazy dog.");
-      assert.equal(str._kmwSubstr(-4), "dog.");
-      assert.equal(str._kmwSubstr(31, 31), "the lazy dog.");
-      assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
+      assert.equal(KMWString.substr(str, 1000), '');
+      assert.equal(KMWString.substr(str, 31), "the lazy dog.");
+      assert.equal(KMWString.substr(str, -4), "dog.");
+      assert.equal(KMWString.substr(str, 31, 31), "the lazy dog.");
+      assert.equal(KMWString.substr(str, 31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
 
-    it('_kmwSubstring', () => {
+    it('substring', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
 
-      assert.equal(str._kmwSubstring(1000), '');
-      assert.equal(str._kmwSubstring(31), "the lazy dog.");
-      assert.equal(str._kmwSubstring(31, 1000), "the lazy dog.");
-      assert.equal(str._kmwSubstring(4, 9), "quick");
+      assert.equal(KMWString.substring(str, 1000), '');
+      assert.equal(KMWString.substring(str, 31), "the lazy dog.");
+      assert.equal(KMWString.substring(str, 31, 1000), "the lazy dog.");
+      assert.equal(KMWString.substring(str, 4, 9), "quick");
 
       // negatives are coerced to 0 & parameters are used in order of ascending value.
-      assert.equal(str._kmwSubstring(9, 4), "quick");
-      assert.equal(str._kmwSubstring(31, -4), str.substring(0, 31));
-      assert.equal(str._kmwSubstring(-5, 9), str.substring(0, 9));
-      assert.equal(str._kmwSubstring(-9, -5), '');
+      assert.equal(KMWString.substring(str, 9, 4), "quick");
+      assert.equal(KMWString.substring(str, 31, -4), str.substring(0, 31));
+      assert.equal(KMWString.substring(str, -5, 9), str.substring(0, 9));
+      assert.equal(KMWString.substring(str, -9, -5), '');
     });
 
     it('codePointToCodeUnit', () => {
@@ -174,49 +174,49 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.length("Life, the universe and everything. Answer:"), 42);
     });
 
-    it('_kmwSlice', () => {
+    it('slice', () => {
       // From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/slice
       const str = "The quick brown fox jumps over the lazy dog.";
 
       // FAILS:  does not handle `undefined` length like the real .slice() method.
-      // assert.equal(str._kmwSlice(31), "the lazy dog.");
-      assert.equal(str._kmwSlice(4, 19), "quick brown fox");
+      // assert.equal(KMWString.slice(str, 31), "the lazy dog.");
+      assert.equal(KMWString.slice(str, 4, 19), "quick brown fox");
       // FAILS:  does not handle `undefined` length like the real .slice() method.
-      // assert.equal(str._kmwSlice(-4), "dog.");
-      assert.equal(str._kmwSlice(-9, -5), "lazy");
+      // assert.equal(KMWString.slice(str, -4), "dog.");
+      assert.equal(KMWString.slice(str, -9, -5), "lazy");
       // FAILS:  does not handle `undefined` start like the real .slice() method.
-      // assert.equal(str._kmwSlice(), str);
+      // assert.equal(KMWString.slice(str), str);
 
       // Per documented spec for slice...
-      assert.equal(str._kmwSlice(31, -5), "the lazy"); // " dog." = 5 chars
-      assert.equal(str._kmwSlice(-5, -9), "");
+      assert.equal(KMWString.slice(str, 31, -5), "the lazy"); // " dog." = 5 chars
+      assert.equal(KMWString.slice(str, -5, -9), "");
     });
 
-    it('_kmwSubstr', () => {
+    it('substr', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
 
-      assert.equal(str._kmwSubstr(1000), '');
-      assert.equal(str._kmwSubstr(31), "the lazy dog.");
-      assert.equal(str._kmwSubstr(-4), "dog.");
-      assert.equal(str._kmwSubstr(31, 31), "the lazy dog.");
-      assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
+      assert.equal(KMWString.substr(str, 1000), '');
+      assert.equal(KMWString.substr(str, 31), "the lazy dog.");
+      assert.equal(KMWString.substr(str, -4), "dog.");
+      assert.equal(KMWString.substr(str, 31, 31), "the lazy dog.");
+      assert.equal(KMWString.substr(str, 31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
 
-    it('_kmwSubstring', () => {
+    it('substring', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
 
       // FAILS - doesn't coerce the out-of-bounds value.
-      // assert.equal(str._kmwSubstring(1000), '');
-      assert.equal(str._kmwSubstring(31), "the lazy dog.");
-      assert.equal(str._kmwSubstring(31, 1000), "the lazy dog.");
-      assert.equal(str._kmwSubstring(4, 9), "quick");
+      // assert.equal(KMWString.substring(str, 1000), '');
+      assert.equal(KMWString.substring(str, 31), "the lazy dog.");
+      assert.equal(KMWString.substring(str, 31, 1000), "the lazy dog.");
+      assert.equal(KMWString.substring(str, 4, 9), "quick");
 
       // negatives are coerced to 0 & parameters are used in order of ascending value.
-      assert.equal(str._kmwSubstring(9, 4), "quick");
+      assert.equal(KMWString.substring(str, 9, 4), "quick");
       // FAILS:  these do not handle negative-valued inputs the same way the real .substring does.
-      // assert.equal(str._kmwSubstring(31, -4), str.substring(0, 31));
-      // assert.equal(str._kmwSubstring(-5, 9), str.substring(0, 9));
-      // assert.equal(str._kmwSubstring(-9, -5), '');
+      // assert.equal(KMWString.substring(str, 31, -4), str.substring(0, 31));
+      // assert.equal(KMWString.substring(str, -5, 9), str.substring(0, 9));
+      // assert.equal(KMWString.substring(str, -9, -5), '');
     });
 
     it('codePointToCodeUnit', () => {
@@ -336,7 +336,7 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.length(apples), 6);
     });
 
-    it('_kmwSlice', () => {
+    it('slice', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
@@ -350,20 +350,20 @@ describe('Unicode string handling', () => {
       const str = "Th" + e + " qu" + i + "ck brown fox jum" + p + "s over the l" + a + "zy dog.";
 
       // FAILS:  does not handle `undefined` length like the real .slice() method.
-      // assert.equal(str._kmwSlice(31), "the l" + a + "zy dog.");
-      assert.equal(str._kmwSlice(4, 19), "qu" + i + "ck brown fox");
+      // assert.equal(KMWString.slice(str, 31), "the l" + a + "zy dog.");
+      assert.equal(KMWString.slice(str, 4, 19), "qu" + i + "ck brown fox");
       // FAILS:  does not handle `undefined` length like the real .slice() method.
-      // assert.equal(str._kmwSlice(-4), "dog.");
-      assert.equal(str._kmwSlice(-9, -5), "l" + a + "zy");
+      // assert.equal(KMWString.slice(str, (-4), "dog.");
+      assert.equal(KMWString.slice(str, -9, -5), "l" + a + "zy");
       // FAILS:  does not handle `undefined` start like the real .slice() method.
-      // assert.equal(str._kmwSlice(), str);
+      // assert.equal(KMWString.slice(str, (), str);
 
       // Per documented spec for slice...
-      assert.equal(str._kmwSlice(31, -5), "the l" + a + "zy"); // " dog." = 5 chars
-      assert.equal(str._kmwSlice(-5, -9), "");
+      assert.equal(KMWString.slice(str, 31, -5), "the l" + a + "zy"); // " dog." = 5 chars
+      assert.equal(KMWString.slice(str, -5, -9), "");
     });
 
-    it('_kmwSubstr', () => {
+    it('substr', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
@@ -375,14 +375,14 @@ describe('Unicode string handling', () => {
 
       const str = "Th" + e + " qu" + i + "ck brown fox jum" + p + "s over the l" + a + "zy dog.";
 
-      assert.equal(str._kmwSubstr(1000), '');
-      assert.equal(str._kmwSubstr(31), "the l" + a + "zy dog.");
-      assert.equal(str._kmwSubstr(-4), "dog.");
-      assert.equal(str._kmwSubstr(31, 31), "the l" + a + "zy dog.");
-      assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
+      assert.equal(KMWString.substr(str, 1000), '');
+      assert.equal(KMWString.substr(str, 31), "the l" + a + "zy dog.");
+      assert.equal(KMWString.substr(str, -4), "dog.");
+      assert.equal(KMWString.substr(str, 31, 31), "the l" + a + "zy dog.");
+      assert.equal(KMWString.substr(str, 31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
 
-    it('_kmwSubstring', () => {
+    it('substring', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
@@ -395,17 +395,17 @@ describe('Unicode string handling', () => {
       const str = "Th" + e + " qu" + i + "ck brown fox jum" + p + "s over the l" + a + "zy dog.";
 
       // FAILS - doesn't coerce the out-of-bounds value.
-      // assert.equal(str._kmwSubstring(1000), '');
-      assert.equal(str._kmwSubstring(31), "the l" + a + "zy dog.");
-      assert.equal(str._kmwSubstring(31, 1000), "the l" + a + "zy dog.");
-      assert.equal(str._kmwSubstring(4, 9), "qu" + i + "ck");
+      // assert.equal(KMWString.substring(str, 1000), '');
+      assert.equal(KMWString.substring(str, 31), "the l" + a + "zy dog.");
+      assert.equal(KMWString.substring(str, 31, 1000), "the l" + a + "zy dog.");
+      assert.equal(KMWString.substring(str, 4, 9), "qu" + i + "ck");
 
       // negatives are coerced to 0 & parameters are used in order of ascending value.
-      assert.equal(str._kmwSubstring(9, 4), "qu" + i + "ck");
+      assert.equal(KMWString.substring(str, 9, 4), "qu" + i + "ck");
       // FAILS:  these do not handle negative-valued inputs the same way the real .substring does.
-      // assert.equal(str._kmwSubstring(31, -4), str.substring(0, 31));
-      // assert.equal(str._kmwSubstring(-5, 9), str.substring(0, 9));
-      // assert.equal(str._kmwSubstring(-9, -5), '');
+      // assert.equal(KMWString.substring(str, 31, -4), str.substring(0, 31));
+      // assert.equal(KMWString.substring(str, -5, 9), str.substring(0, 9));
+      // assert.equal(KMWString.substring(str, -9, -5), '');
     });
 
     it('codePointToCodeUnit', () => {

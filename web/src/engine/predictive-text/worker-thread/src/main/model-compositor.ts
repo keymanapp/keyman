@@ -200,7 +200,7 @@ export class ModelCompositor {
 
     if(unchangedLength > 0) {
       suggestion.transform.deleteLeft += unchangedLength;
-      suggestion.transform.insert = baseWord.kmwSubstr(0, unchangedLength) + suggestion.transform.insert;
+      suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
     }
 
     // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
@@ -211,7 +211,7 @@ export class ModelCompositor {
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
-    let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    let deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
     let insertedLength = KMWString.length(sourceTransform.insert);
 
     let reversionTransform: Transform = {

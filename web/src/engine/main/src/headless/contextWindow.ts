@@ -23,13 +23,13 @@ export default class ContextWindow implements LexicalModelTypes.Context {
     this.startOfBuffer = KMWString.length(this.left) <= config.leftContextCodePoints;
     if(!this.startOfBuffer) {
       // Our custom substring version will return the last n characters if param #1 is given -n.
-      this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
+      this.left = KMWString.substr(this.left, -config.leftContextCodePoints);
     }
 
     this.right = mock.getTextAfterCaret();
     this.endOfBuffer = KMWString.length(this.right) <= config.rightContextCodePoints;
     if(!this.endOfBuffer) {
-      this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
+      this.right = KMWString.substr(this.right, 0, config.rightContextCodePoints);
     }
 
     this.casingForm =
