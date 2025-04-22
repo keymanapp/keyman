@@ -92,7 +92,7 @@ export class KeylayoutToKmnConverter {
     };
 
     // ToDo in a new PR: check tags  ( issue # 13599)
-    if (jsonObj.hasOwnProperty("keyboard")) {
+    if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
 
       // get filename from data that had been read
       const fileNameNoExtention = jsonObj.keyboard['@_name'];

@@ -31,28 +31,28 @@ describe('KeylayoutFileReader', function () {
 
     it('read() should return empty array on null input', async function () {
       const result = sut_r.read(null);
-      assert.isEmpty(result);
+      assert.isNull(result);
     });
 
     it('read() should return empty array on empty input', async function () {
       const result = sut_r.read("");
-      assert.isEmpty(result);
+      assert.isNull(result);
     });
 
     it('read() should return empty array on space as input', async function () {
       const result = sut_r.read(" ");
-      assert.isEmpty(result);
+      assert.isNull(result);
     });
 
     it('read() should return empty array on unavailable file name', async function () {
       const inputFilename_unavailable = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/X.keylayout');
       const result = sut_r.read(inputFilename_unavailable);
-      assert.isEmpty(result);
+      assert.isNull(result);
     });
 
     it('read() should return empty array on typo in path', async function () {
       const result = sut_r.read(makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '|Test.keylayout'));
-      assert.isEmpty(result);
+      assert.isNull(result);
     });
   });
 });

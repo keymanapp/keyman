@@ -9,6 +9,7 @@ import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
 import { KeylayoutToKmnConverter } from './keylayout-to-kmn-converter.js';
+import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
@@ -45,7 +46,7 @@ export class KeylayoutFileReader {
    * @param  absolutefilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(absolutefilename: string): Object {
+  public read(inputFilename: string): Object {
 
     let xmlFile;
     let jsonObj = [];
@@ -57,13 +58,14 @@ export class KeylayoutFileReader {
     };
 
     try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(absolutefilename)), 'utf8');
+      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
       const parser = new XMLParser(options);
       jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
     }
     catch (err) {
-      console.log(err.message);
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      return null;
     }
     return jsonObj;
   }
