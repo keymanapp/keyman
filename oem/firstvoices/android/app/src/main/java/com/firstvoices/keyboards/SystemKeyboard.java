@@ -85,9 +85,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     @Override
     public void onInitializeInterface() {
       super.onInitializeInterface();
-
-      // KeymanWeb reloaded, so we have to pass the banner again
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to
@@ -231,7 +228,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     @Override
     public void onKeyboardShown() {
-        // Handle Keyman keyboard shown event here if needed
+      // Refresh banner theme
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override
