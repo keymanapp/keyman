@@ -104,6 +104,67 @@ export function prevChar(s: string, codeUnitIndex: number) { // prevCharBeforeUn
   return codeUnitIndex - 1;
 }
 
+/**
+ * Returns the corresponding code unit index to the code point index passed
+ *
+ * @param  {string}      s               The string
+ * @param  {number|null} codePointIndex  A code point index in the string
+ * @return {number|null}                 The corresponding code unit index
+ */
+export function codePointToCodeUnit(s: string, codePointIndex: number) { // <no change>
+  if(codePointIndex === null) {
+    return null;
+  }
+
+  if(!EXTENSION_ENABLED) {
+    return codePointIndex;
+  }
+
+  const str = s;
+  let codeUnitIndex = 0;
+
+  if(codePointIndex < 0) {
+    codeUnitIndex = str.length;
+    for(let i = 0; i > codePointIndex; i--) {
+      codeUnitIndex = prevChar(str, codeUnitIndex);
+    }
+    return codeUnitIndex;
+  }
+
+  if(codePointIndex == length(str)) {
+    return str.length;
+  }
+
+  for(let i = 0; i < codePointIndex; i++) {
+    codeUnitIndex = nextChar(str, codeUnitIndex);
+  }
+  return codeUnitIndex;
+}
+
+/**
+ * Returns the corresponding code point index to the code unit index passed
+ *
+ * @param  {number|null}  codeUnitIndex  A code unit index in the string
+ * @return {number|null}                 The corresponding code point index
+ */
+export function codeUnitToCodePoint(s: string, codeUnitIndex: number) { // <no change>
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return codeUnitIndex;
+  }
+
+  if(codeUnitIndex === null) {
+    return null;
+  } else if(codeUnitIndex == 0) {
+    return 0;
+  } else if(codeUnitIndex < 0) {
+    return length(str.substr(codeUnitIndex));
+  } else {
+    return length(str.substr(0,codeUnitIndex));
+  }
+}
+
 /*
  * TODO:  Remove this file as part of addressing https://github.com/keymanapp/keyman/issues/2492.
  */
@@ -122,19 +183,13 @@ declare global {
     kmwSubstring(start: number, length: number) : string,
     kmwSubstr(start: number, length?: number) : string,
     kmwBMPSubstr(start: number, length?: number) : string,
-    kmwCodePointToCodeUnit(codePointIndex: number) : number,
-    kmwBMPCodePointToCodeUnit(codePointIndex: number) : number,
-    kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
-    kmwBMPCodeUnitToCodePoint(codeUnitIndex: number) : number,
     _kmwCharCodeAt(codePointIndex: number): number,
     _kmwCharAt(codePointIndex: number) : string,
     _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
     _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
     _kmwSlice(beginSlice: number, endSlice: number) : string,
     _kmwSubstring(start: number, length?: number) : string,
-    _kmwSubstr(start: number, length?: number) : string,
-    _kmwCodePointToCodeUnit(codePointIndex: number) : number,
-    _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number
+    _kmwSubstr(start: number, length?: number) : string
   }
 }
 
@@ -225,8 +280,8 @@ export default function extendString() {
    */
   String.prototype.kmwSlice = function(beginSlice, endSlice) {
     var str = String(this);
-    var beginSliceCodeUnit = str.kmwCodePointToCodeUnit(beginSlice);
-    var endSliceCodeUnit = str.kmwCodePointToCodeUnit(endSlice);
+    var beginSliceCodeUnit = codePointToCodeUnit(str, beginSlice);
+    var endSliceCodeUnit = codePointToCodeUnit(str, endSlice);
     if(beginSliceCodeUnit === null || endSliceCodeUnit === null)
       return '';
     else
@@ -250,7 +305,7 @@ export default function extendString() {
       start = length(str) + start;
     }
     if(start < 0) start = 0;
-    var startCodeUnit = str.kmwCodePointToCodeUnit(start);
+    var startCodeUnit = codePointToCodeUnit(str, start);
     var endCodeUnit = startCodeUnit;
 
     if(startCodeUnit === null) return '';
@@ -281,15 +336,15 @@ export default function extendString() {
 
     if(typeof(indexB) == 'undefined')
     {
-      indexACodeUnit = str.kmwCodePointToCodeUnit(indexA);
+      indexACodeUnit = codePointToCodeUnit(str, indexA);
       indexBCodeUnit =  str.length;
     }
     else
     {
       if(indexA > indexB) { var c = indexA; indexA = indexB; indexB = c; }
 
-      indexACodeUnit = str.kmwCodePointToCodeUnit(indexA);
-      indexBCodeUnit = str.kmwCodePointToCodeUnit(indexB);
+      indexACodeUnit = codePointToCodeUnit(str, indexA);
+      indexBCodeUnit = codePointToCodeUnit(str, indexB);
     }
     if(isNaN(indexACodeUnit) || indexACodeUnit === null) indexACodeUnit = 0;
     if(isNaN(indexBCodeUnit) || indexBCodeUnit === null) indexBCodeUnit = str.length;
@@ -300,52 +355,6 @@ export default function extendString() {
   /*
     Helper functions
   */
-
-  /**
-   * Returns the corresponding code unit index to the code point index passed
-   *
-   * @param  {number|null} codePointIndex  A code point index in the string
-   * @return {number|null}                 The corresponding code unit index
-   */
-  String.prototype.kmwCodePointToCodeUnit = function(codePointIndex) {
-
-    if(codePointIndex === null) return null;
-
-    var str = String(this);
-    var codeUnitIndex = 0;
-
-    if(codePointIndex < 0) {
-      codeUnitIndex = str.length;
-      for(var i = 0; i > codePointIndex; i--)
-        codeUnitIndex = prevChar(str, codeUnitIndex);
-      return codeUnitIndex;
-    }
-
-    if(codePointIndex == length(str)) return str.length;
-
-    for(var i = 0; i < codePointIndex; i++)
-      codeUnitIndex = nextChar(str, codeUnitIndex);
-    return codeUnitIndex;
-  }
-
-  /**
-   * Returns the corresponding code point index to the code unit index passed
-   *
-   * @param  {number|null}  codeUnitIndex  A code unit index in the string
-   * @return {number|null}                 The corresponding code point index
-   */
-  String.prototype.kmwCodeUnitToCodePoint = function(codeUnitIndex) {
-    var str = String(this);
-
-    if(codeUnitIndex === null)
-      return null;
-    else if(codeUnitIndex == 0)
-      return 0;
-    else if(codeUnitIndex < 0)
-      return length(str.substr(codeUnitIndex));
-    else
-      return length(str.substr(0,codeUnitIndex));
-  }
 
   /**
    * Returns the character at a the code point index passed
@@ -363,29 +372,6 @@ export default function extendString() {
    * String prototype library extensions for basic plane characters,
    * to simplify enabling or disabling supplementary plane functionality (I3319)
    */
-
-
-  /**
-   * Returns the code unit index for a code point index
-   *
-   * @param  {number}  codePointIndex   A code point index in the string
-   * @return {number}                   The corresponding character
-   */
-  String.prototype.kmwBMPCodePointToCodeUnit = function(codePointIndex)
-  {
-    return codePointIndex;
-  }
-
-  /**
-   * Returns the code point index for a code unit index
-   *
-   * @param  {number}  codeUnitIndex    A code point index in the string
-   * @return {number}                   The corresponding character
-   */
-  String.prototype.kmwBMPCodeUnitToCodePoint = function(codeUnitIndex)
-  {
-    return codeUnitIndex;
-  }
 
   /**
    * Returns a substring
@@ -418,8 +404,6 @@ export default function extendString() {
     p._kmwSlice = bEnable ? p.kmwSlice : p.slice;
     p._kmwSubstring = bEnable ? p.kmwSubstring : p.substring;
     p._kmwSubstr = bEnable ? p.kmwSubstr : p.kmwBMPSubstr;
-    p._kmwCodePointToCodeUnit = bEnable ? p.kmwCodePointToCodeUnit : p.kmwBMPCodePointToCodeUnit;
-    p._kmwCodeUnitToCodePoint = bEnable ? p.kmwCodeUnitToCodePoint : p.kmwBMPCodeUnitToCodePoint;
 
     enableSupplementaryPlane(bEnable);
   }

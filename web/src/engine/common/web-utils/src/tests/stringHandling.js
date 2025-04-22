@@ -101,18 +101,18 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwSubstring(-9, -5), '');
     });
 
-    it('kmwCodePointToCodeUnit', () => {
+    it('codePointToCodeUnit', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
-      assert.equal(str.kmwCodePointToCodeUnit(2), 2);
-      assert.equal(str.kmwCodePointToCodeUnit(9), 9);
-      assert.equal(str.kmwCodePointToCodeUnit(31), 31);
+      assert.equal(KMWString.codePointToCodeUnit(str, 2), 2);
+      assert.equal(KMWString.codePointToCodeUnit(str, 9), 9);
+      assert.equal(KMWString.codePointToCodeUnit(str, 31), 31);
     });
 
-    it('kmwCodeUnitToCodePoint', () => {
+    it('codeUnitToCodePoint', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
-      assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
-      assert.equal(str.kmwCodeUnitToCodePoint(9), 9);
-      assert.equal(str.kmwCodeUnitToCodePoint(31), 31);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 2), 2);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 9), 9);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 31), 31);
     });
   });
 
@@ -219,18 +219,18 @@ describe('Unicode string handling', () => {
       // assert.equal(str._kmwSubstring(-9, -5), '');
     });
 
-    it('kmwCodePointToCodeUnit', () => {
+    it('codePointToCodeUnit', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
-      assert.equal(str.kmwCodePointToCodeUnit(2), 2);
-      assert.equal(str.kmwCodePointToCodeUnit(9), 9);
-      assert.equal(str.kmwCodePointToCodeUnit(31), 31);
+      assert.equal(KMWString.codePointToCodeUnit(str, 2), 2);
+      assert.equal(KMWString.codePointToCodeUnit(str, 9), 9);
+      assert.equal(KMWString.codePointToCodeUnit(str, 31), 31);
     });
 
-    it('kmwCodeUnitToCodePoint', () => {
+    it('codeUnitToCodePoint', () => {
       const str = "The quick brown fox jumps over the lazy dog.";
-      assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
-      assert.equal(str.kmwCodeUnitToCodePoint(9), 9);
-      assert.equal(str.kmwCodeUnitToCodePoint(31), 31);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 2), 2);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 9), 9);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 31), 31);
     });
   });
 
@@ -408,7 +408,7 @@ describe('Unicode string handling', () => {
       // assert.equal(str._kmwSubstring(-9, -5), '');
     });
 
-    it('kmwCodePointToCodeUnit', () => {
+    it('codePointToCodeUnit', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
@@ -420,12 +420,12 @@ describe('Unicode string handling', () => {
 
       const str = "Th" + e + " qu" + i + "ck brown fox jum" + p + "s over the l" + a + "zy dog.";
 
-      assert.equal(str.kmwCodePointToCodeUnit(2), 2);
-      assert.equal(str.kmwCodePointToCodeUnit(9), 11); // "The quick" = 9; 2 SMP replacements before then.
-      assert.equal(str.kmwCodePointToCodeUnit(31), 34); // "the lazy dog" is the remnant; 3 SMP replacements before then.
+      assert.equal(KMWString.codePointToCodeUnit(str, 2), 2);
+      assert.equal(KMWString.codePointToCodeUnit(str, 9), 11); // "The quick" = 9; 2 SMP replacements before then.
+      assert.equal(KMWString.codePointToCodeUnit(str, 31), 34); // "the lazy dog" is the remnant; 3 SMP replacements before then.
     });
 
-    it('kmwCodeUnitToCodePoint', () => {
+    it('codeUnitToCodePoint', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
@@ -438,9 +438,9 @@ describe('Unicode string handling', () => {
       const str = "Th" + e + " qu" + i + "ck brown fox jum" + p + "s over the l" + a + "zy dog.";
 
       // Inverting the tests from the prior section on `kmwCodePointToCodeUnit`...
-      assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
-      assert.equal(str.kmwCodeUnitToCodePoint(11), 9); // "The quick" = 9; 2 SMP replacements before then.
-      assert.equal(str.kmwCodeUnitToCodePoint(34), 31); // "the lazy dog" is the remnant; 3 SMP replacements before then.
+      assert.equal(KMWString.codeUnitToCodePoint(str, 2), 2);
+      assert.equal(KMWString.codeUnitToCodePoint(str, 11), 9); // "The quick" = 9; 2 SMP replacements before then.
+      assert.equal(KMWString.codeUnitToCodePoint(str, 34), 31); // "the lazy dog" is the remnant; 3 SMP replacements before then.
     });
   });
 });
