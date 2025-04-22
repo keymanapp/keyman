@@ -2,6 +2,11 @@
 #
 # Build Keyman Engine for Android, Keyman for Android, OEM FirstVoices Android app,
 # Samples: KMsample1 and KMSample2, Test - KeyboardHarness
+#
+# OEM FirstVoices Android app requires the following env vars set:
+# RELEASE_OEM should be set
+# RELEASE_OEM_FIRSTVOICES should be true
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -11,6 +16,19 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 ################################ Main script ################################
+
+#
+# Restrict available OEM publish targets to those that can be built on the current system
+#
+
+oemtargets=()
+if [ ! -z "${RELEASE_OEM+x}" ]; then
+  if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
+    oemtargets+=(":fv=../oem/firstvoices/android           OEM FirstVoices for Android app")
+  fi
+fi
+
+builder_warn "oemtargets: ${oemtargets[@]}"
 
 builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
@@ -28,7 +46,7 @@ builder_describe \
   ":sample1=Samples/KMSample1               Sample app: KMSample1" \
   ":sample2=Samples/KMSample2               Sample app: KMSample2" \
   ":keyboardharness=Tests/KeyboardHarness   Test app: KeyboardHarness" \
-  ":fv=../oem/firstvoices/android           OEM FirstVoices for Android app"
+  "${oemtargets[@]}" \
 
 builder_parse "$@"
 
