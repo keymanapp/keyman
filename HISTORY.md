@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.234 beta 2025-04-22
+
+* fix(android): Require RELEASE_OEM env vars to build FirstVoices Android (#13725)
+
 ## 18.0.233 beta 2025-04-21
 
 * chore: cleanup kps.xsd version typos (#13670)
