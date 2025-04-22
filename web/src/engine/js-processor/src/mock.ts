@@ -1,4 +1,5 @@
 import OutputTarget from './outputTarget.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 export class Mock extends OutputTarget {
   text: string;
@@ -13,7 +14,7 @@ export class Mock extends OutputTarget {
     super();
 
     this.text = text ? text : "";
-    var defaultLength = this.text._kmwLength();
+    var defaultLength = KMWString.length(this.text);
 
     // Ensures that `caretPos == 0` is handled correctly.
     this.selStart = typeof selStart == "number" ? selStart : defaultLength;
@@ -29,13 +30,13 @@ export class Mock extends OutputTarget {
     let clone: Mock;
 
     if (outputTarget instanceof Mock) {
-      // Avoids the need to run expensive kmwstring.ts / `_kmwLength()`
+      // Avoids the need to run expensive kmwstring.ts `length()`
       // calculations when deep-copying Mock instances.
       let priorMock = outputTarget as Mock;
       clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
       const text = outputTarget.getText();
-      const textLen = text._kmwLength();
+      const textLen = KMWString.length(text);
 
       // If !hasSelection()
       let selectionStart: number = textLen;
@@ -44,8 +45,8 @@ export class Mock extends OutputTarget {
       if (outputTarget.hasSelection()) {
         let beforeText = outputTarget.getTextBeforeCaret();
         let afterText = outputTarget.getTextAfterCaret();
-        selectionStart = beforeText._kmwLength();
-        selectionEnd = textLen - afterText._kmwLength();
+        selectionStart = KMWString.length(beforeText);
+        selectionEnd = textLen - KMWString.length(afterText);
       }
 
       // readonly group or not, the returned Mock remains the same.
@@ -123,10 +124,10 @@ export class Mock extends OutputTarget {
   }
 
   insertTextBeforeCaret(s: string): void {
-    this.adjustDeadkeys(s._kmwLength());
+    this.adjustDeadkeys(KMWString.length(s));
     this.text = this.getTextBeforeCaret() + s + this.text.kmwSubstr(this.selStart);
-    this.selStart += s.kmwLength();
-    this.selEnd += s.kmwLength();
+    this.selStart += KMWString.length(s);
+    this.selEnd += KMWString.length(s);
   }
 
   handleNewlineAtCaret(): void {

@@ -22,7 +22,6 @@ import { fileURLToPath } from 'url';
 
 // Ensure that our KMW string-extensions activate.
 extendString();
-assert.ok('💩'.kmwLength);
 
 /**
  * Creates a MessageEvent (for inter-worker communication), with the given data payload.

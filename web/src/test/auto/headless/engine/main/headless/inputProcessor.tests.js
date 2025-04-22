@@ -12,6 +12,7 @@ import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { Worker } from '@keymanapp/lexical-model-layer/node';
 import * as utils from '@keymanapp/web-utils';
+const KMWString = utils.KMWString;
 
 // Required initialization setup.
 global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
@@ -115,9 +116,9 @@ describe('InputProcessor', function() {
         assert.isNotNull(behavior);
       });
 
-      it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, no fat-fingers)', function() {
+      it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, coreSourceCode._kmwLength());
+        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -153,9 +154,9 @@ describe('InputProcessor', function() {
         assert.isNotNull(behavior);
       });
 
-      it('with extremely long context (' + coreSourceCode._kmwLength() + ' chars, with fat-fingers)', function() {
+      it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, coreSourceCode._kmwLength());
+        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.

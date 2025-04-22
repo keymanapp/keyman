@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { extendString } from 'keyman/engine/keyboard';
+import { extendString, KMWString } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
@@ -346,7 +346,7 @@ class MockTestHelper implements TestHelper {
   }
 
   setSelectionRange(pair: ElementPair<any>, start: number, end: number) {
-    const convert = (index: number) => pair.wrapper.text.kmwCodeUnitToCodePoint(index);
+    const convert = (index: number) => KMWString.codeUnitToCodePoint(pair.wrapper.text, index);
     pair.wrapper.setSelection(convert(start), convert(end));
   }
 

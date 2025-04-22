@@ -1,4 +1,5 @@
 import OutputTarget from './outputTarget.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
   node: Node;
@@ -103,7 +104,7 @@ export default class ContentEditable extends OutputTarget<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return this.getTextBeforeCaret().kmwLength();
+    return KMWString.length(this.getTextBeforeCaret());
   }
 
   getTextBeforeCaret(): string {
@@ -179,7 +180,7 @@ export default class ContentEditable extends OutputTarget<{}> {
     }
 
     let start = this.getCarets().start;
-    let delta = s._kmwLength();
+    let delta = KMWString.length(s);
     let Lsel = this.root.ownerDocument.getSelection();
 
     if(delta == 0) {
@@ -243,7 +244,7 @@ export default class ContentEditable extends OutputTarget<{}> {
     }
 
     let caret = this.getCarets().end;
-    let delta = s._kmwLength();
+    let delta = KMWString.length(s);
 
     if(delta == 0) {
       return;

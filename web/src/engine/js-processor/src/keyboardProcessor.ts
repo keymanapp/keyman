@@ -16,7 +16,7 @@ import { Mock } from "./mock.js";
 import type OutputTarget from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import KeyboardInterface from './kbdInterface.js';
-import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
@@ -214,7 +214,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     var matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
-    const nothingDeletable = outputTarget.getTextBeforeCaret().kmwLength() == 0 && outputTarget.isSelectionEmpty();
+    const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
 
     // Pass this key code and state to the keyboard program
     if(this.activeKeyboard && keyEvent.Lcode != 0) {

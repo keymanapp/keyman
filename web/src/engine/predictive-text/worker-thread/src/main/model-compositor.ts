@@ -1,6 +1,8 @@
 import * as models from '@keymanapp/models-templates';
 import * as correction from './correction/index.js'
 
+import { KMWString } from '@keymanapp/web-utils';
+
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
@@ -194,7 +196,7 @@ export class ModelCompositor {
   // Responsible for applying casing rules to suggestions.
   private applySuggestionCasing(suggestion: Suggestion, baseWord: USVString, casingForm: CasingForm) {
     // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
-    let unchangedLength  = baseWord.kmwLength() - suggestion.transform.deleteLeft;
+    let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
 
     if(unchangedLength > 0) {
       suggestion.transform.deleteLeft += unchangedLength;
@@ -210,7 +212,7 @@ export class ModelCompositor {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
     let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let insertedLength = sourceTransform.insert.kmwLength();
+    let insertedLength = KMWString.length(sourceTransform.insert);
 
     let reversionTransform: Transform = {
       insert: deletedLeftChars,

@@ -37,6 +37,7 @@ extendString();
 import * as models from './models/index.js';
 import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
+import { KMWString } from "@keymanapp/web-utils";
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
@@ -108,6 +109,9 @@ export default class LMLayerWorker {
     importScripts: null,
     postMessage: null
   }) {
+    // Within the worker, we can't infer this from the keyboard.
+    // Additionally, we always work with small text windows, so it's not _too_ expensive to keep on.
+    KMWString.enableSupplementaryPlane(true);
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
     this.setupConfigState();

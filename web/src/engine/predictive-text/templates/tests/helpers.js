@@ -13,7 +13,6 @@ import { createRequire } from "module";
 import { fileURLToPath } from 'url';
 
 extendString();
-assert.ok('💩'.kmwLength);
 
 /**
  * Load JSON fixtures from a well-known place.

@@ -1,4 +1,5 @@
 import OutputTarget from './outputTarget.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 interface EventMap  {
   /**
@@ -91,8 +92,8 @@ export default class Input extends OutputTarget<EventMap> {
   getCaret(): number {
     if(this.root.selectionStart != this._cachedSelectionStart) {
       this._cachedSelectionStart = this.root.selectionStart; // KMW-1
-      this.processedSelectionStart = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionStart); // I3319
-      this.processedSelectionEnd = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionEnd);     // I3319
+      this.processedSelectionStart = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionStart); // I3319
+      this.processedSelectionEnd = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionEnd);     // I3319
     }
     return this.root.selectionDirection == 'forward' ? this.processedSelectionEnd : this.processedSelectionStart;
   }
@@ -106,8 +107,8 @@ export default class Input extends OutputTarget<EventMap> {
   }
 
   setSelection(start: number, end: number, direction: "forward" | "backward" | "none") {
-    let domStart = this.root.value._kmwCodePointToCodeUnit(start);
-    let domEnd = this.root.value._kmwCodePointToCodeUnit(end);
+    let domStart = KMWString.codePointToCodeUnit(this.root.value, start);
+    let domEnd = KMWString.codePointToCodeUnit(this.root.value, end);
     this.root.setSelectionRange(domStart, domEnd, direction);
 
     this.processedSelectionStart = start;
@@ -164,7 +165,7 @@ export default class Input extends OutputTarget<EventMap> {
     this.getCaret();
     let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
     let direction = this.getSelectionDirection();
-    let newCaret = text._kmwLength();
+    let newCaret = KMWString.length(text);
     this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
 
     this.setSelection(newCaret, newCaret + selectionLength, direction);
@@ -210,9 +211,9 @@ export default class Input extends OutputTarget<EventMap> {
     let front = this.getTextBeforeCaret();
     let back = this.getText()._kmwSubstring(this.processedSelectionStart);
 
-    this.adjustDeadkeys(s._kmwLength());
+    this.adjustDeadkeys(KMWString.length(s));
     this.root.value = front + s + back;
-    this.setCaret(caret + s._kmwLength());
+    this.setCaret(caret + KMWString.length(s));
   }
 
   handleNewlineAtCaret(): void {

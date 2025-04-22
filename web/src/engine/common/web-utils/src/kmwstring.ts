@@ -51,7 +51,7 @@ export function length(s: string) {
  * @return {number|null}                 The index of the next code point in the string,
  *                                       in code units
  */
-export function nextChar(s: string, codeUnitIndex: number) { // nextCharAfterUnit
+export function nextChar(s: string, codeUnitIndex: number) {
   const str = s;
   if(codeUnitIndex === null || codeUnitIndex < 0 || codeUnitIndex >= str.length - 1) {
     return null;
@@ -83,7 +83,7 @@ export function nextChar(s: string, codeUnitIndex: number) { // nextCharAfterUni
  * @return {number|null}                 The index of the previous code point in the
  *                                       string, in code units
 */
-export function prevChar(s: string, codeUnitIndex: number) { // prevCharBeforeUnit
+export function prevChar(s: string, codeUnitIndex: number) {
   const str = s;
 
   if(codeUnitIndex == null || codeUnitIndex <= 0 || codeUnitIndex > str.length) {
@@ -111,7 +111,7 @@ export function prevChar(s: string, codeUnitIndex: number) { // prevCharBeforeUn
  * @param  {number|null} codePointIndex  A code point index in the string
  * @return {number|null}                 The corresponding code unit index
  */
-export function codePointToCodeUnit(s: string, codePointIndex: number) { // <no change>
+export function codePointToCodeUnit(s: string, codePointIndex: number) {
   if(codePointIndex === null) {
     return null;
   }
@@ -147,7 +147,7 @@ export function codePointToCodeUnit(s: string, codePointIndex: number) { // <no 
  * @param  {number|null}  codeUnitIndex  A code unit index in the string
  * @return {number|null}                 The corresponding code point index
  */
-export function codeUnitToCodePoint(s: string, codeUnitIndex: number) { // <no change>
+export function codeUnitToCodePoint(s: string, codeUnitIndex: number) {
   const str = s;
 
   if(!EXTENSION_ENABLED) {
