@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 // Trigger the String-extending methods.
-import * as utils from '@keymanapp/web-utils';
+import { KMWString } from '@keymanapp/web-utils';
 
 describe('Unicode string handling', () => {
   describe('disabled: BMP-mode, BMP-only strings',  () => {

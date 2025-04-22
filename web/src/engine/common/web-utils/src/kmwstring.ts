@@ -1,8 +1,83 @@
 /***
-   KeymanWeb 14.0
-   Copyright 2020 SIL International
+   KeymanWeb 19.0
+   Copyright 2025 SIL International
 ***/
 
+/**
+ * Indicates if functionality supporting Supplementary Multilingual Plane (SMP)
+ * characters should be enabled.
+ */
+let EXTENSION_ENABLED = false;
+
+/**
+ * Enables or disables support for SMP-aware string handling.
+ * @param bEnable
+ */
+export function enableSupplementaryPlane(bEnable: boolean) {
+  EXTENSION_ENABLED = bEnable;
+}
+
+/**
+ * Returns the code unit index for the next code point in the string, accounting for
+ * supplementary pairs
+ *
+ * @param  {string}  s      The string
+ * @param  {number|null}  codeUnitIndex  The code unit position to increment
+ * @return {number|null}                 The index of the next code point in the string,
+ *                                       in code units
+ */
+export function nextChar(s: string, codeUnitIndex: number) { // nextCharAfterUnit
+  const str = s;
+  if(codeUnitIndex === null || codeUnitIndex < 0 || codeUnitIndex >= str.length - 1) {
+    return null;
+  }
+
+  if(!EXTENSION_ENABLED) {
+    return codeUnitIndex+1;
+  }
+
+  const first = str.charCodeAt(codeUnitIndex);
+  if(first >= 0xD800 && first <= 0xDBFF && str.length > codeUnitIndex + 1) {
+    const second = str.charCodeAt(codeUnitIndex + 1);
+    if(second >= 0xDC00 && second <= 0xDFFF) {
+      if(codeUnitIndex == str.length - 2) {
+        return null;
+      }
+      return codeUnitIndex + 2;
+    }
+  }
+  return codeUnitIndex + 1;
+}
+
+/**
+ * Returns the code unit index for the previous code point in the string, accounting
+ * for supplementary pairs
+ *
+ * @param  {string}       s              The string
+ * @param  {number|null}  codeUnitIndex  The code unit position to decrement
+ * @return {number|null}                 The index of the previous code point in the
+ *                                       string, in code units
+*/
+export function prevChar(s: string, codeUnitIndex: number) { // prevCharBeforeUnit
+  const str = s;
+
+  if(codeUnitIndex == null || codeUnitIndex <= 0 || codeUnitIndex > str.length) {
+    return null;
+  }
+
+  if(!EXTENSION_ENABLED) {
+    return codeUnitIndex-1;
+  }
+
+  const second = str.charCodeAt(codeUnitIndex - 1);
+  if(second >= 0xDC00 && second <= 0xDFFF && codeUnitIndex > 1) {
+    const first = str.charCodeAt(codeUnitIndex - 2);
+    if(first >= 0xD800 && first <= 0xDBFF) {
+      return codeUnitIndex - 2;
+    }
+  }
+  return codeUnitIndex - 1;
+}
 
 /*
  * TODO:  Remove this file as part of addressing https://github.com/keymanapp/keyman/issues/2492.
@@ -24,10 +99,6 @@ declare global {
     kmwBMPSubstr(start: number, length?: number) : string,
     kmwLength(): number,
     kmwBMPLength(): number,
-    kmwNextChar(codeUnitIndex: number): number,
-    kmwBMPNextChar(codeUnitIndex: number): number,
-    kmwPrevChar(codeUnitIndex: number): number,
-    kmwBMPPrevChar(codeUnitIndex: number): number,
     kmwCodePointToCodeUnit(codePointIndex: number) : number,
     kmwBMPCodePointToCodeUnit(codePointIndex: number) : number,
     kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
@@ -40,8 +111,6 @@ declare global {
     _kmwSubstring(start: number, length?: number) : string,
     _kmwSubstr(start: number, length?: number) : string,
     _kmwLength(): number,
-    _kmwNextChar(codeUnitIndex: number): number,
-    _kmwPrevChar(codeUnitIndex: number): number,
     _kmwCodePointToCodeUnit(codePointIndex: number) : number,
     _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number
   }
@@ -65,7 +134,7 @@ export default function extendString() {
     }
 
     for(var i = 0; i < codePointIndex; i++) {
-      codeUnitIndex = str.kmwNextChar(codeUnitIndex);
+      codeUnitIndex = nextChar(str, codeUnitIndex);
       if(codeUnitIndex === null) return NaN;
     }
 
@@ -96,7 +165,7 @@ export default function extendString() {
     }
 
     var codePointIndex = 0;
-    for(var i = 0; i !== null && i < codeUnitIndex; i = str.kmwNextChar(i)) codePointIndex++;
+    for(var i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) codePointIndex++;
     return codePointIndex;
   }
 
@@ -118,7 +187,7 @@ export default function extendString() {
     }
 
     var codePointIndex = 0;
-    for(var i = 0; i !== null && i < codeUnitIndex; i = str.kmwNextChar(i)) codePointIndex++;
+    for(var i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) codePointIndex++;
     return codePointIndex;
   }
 
@@ -133,7 +202,7 @@ export default function extendString() {
     if(str.length == 0) return 0;
 
     for(var i = 0, codeUnitIndex = 0; codeUnitIndex !== null; i++)
-      codeUnitIndex = str.kmwNextChar(codeUnitIndex);
+      codeUnitIndex = nextChar(str, codeUnitIndex);
     return i;
   }
 
@@ -182,7 +251,7 @@ export default function extendString() {
     if(arguments.length < 2) {
       endCodeUnit = str.length;
     } else {
-      for(var i = 0; i < length; i++) endCodeUnit = str.kmwNextChar(endCodeUnit);
+      for(var i = 0; i < length; i++) endCodeUnit = nextChar(str, endCodeUnit);
     }
     if(endCodeUnit === null)
       return str.substring(startCodeUnit);
@@ -226,59 +295,6 @@ export default function extendString() {
   */
 
   /**
-   * Returns the code unit index for the next code point in the string, accounting for
-   * supplementary pairs
-   *
-   * @param  {number|null}  codeUnitIndex  The code unit position to increment
-   * @return {number|null}                 The index of the next code point in the string,
-   *                                       in code units
-   */
-  String.prototype.kmwNextChar = function(codeUnitIndex) {
-    var str = String(this);
-
-    if(codeUnitIndex === null || codeUnitIndex < 0 || codeUnitIndex >= str.length - 1) {
-      return null;
-    }
-
-    var first = str.charCodeAt(codeUnitIndex);
-    if (first >= 0xD800 && first <= 0xDBFF && str.length > codeUnitIndex + 1) {
-      var second = str.charCodeAt(codeUnitIndex + 1);
-      if (second >= 0xDC00 && second <= 0xDFFF) {
-        if(codeUnitIndex == str.length - 2) {
-          return null;
-        }
-        return codeUnitIndex + 2;
-      }
-    }
-    return codeUnitIndex + 1;
-  }
-
-  /**
-   * Returns the code unit index for the previous code point in the string, accounting
-   * for supplementary pairs
-   *
-   * @param  {number|null}  codeUnitIndex  The code unit position to decrement
-   * @return {number|null}                 The index of the previous code point in the
-   *                                       string, in code units
-  */
-  String.prototype.kmwPrevChar = function(codeUnitIndex) {
-    var str = String(this);
-
-    if(codeUnitIndex == null || codeUnitIndex <= 0 || codeUnitIndex > str.length) {
-      return null;
-    }
-
-    var second = str.charCodeAt(codeUnitIndex - 1);
-    if (second >= 0xDC00 && second <= 0xDFFF && codeUnitIndex > 1) {
-      var first = str.charCodeAt(codeUnitIndex - 2);
-      if(first >= 0xD800 && first <= 0xDBFF) {
-        return codeUnitIndex - 2;
-      }
-    }
-    return codeUnitIndex - 1;
-  }
-
-  /**
    * Returns the corresponding code unit index to the code point index passed
    *
    * @param  {number|null} codePointIndex  A code point index in the string
@@ -294,14 +310,14 @@ export default function extendString() {
     if(codePointIndex < 0) {
       codeUnitIndex = str.length;
       for(var i = 0; i > codePointIndex; i--)
-        codeUnitIndex = str.kmwPrevChar(codeUnitIndex);
+        codeUnitIndex = prevChar(str, codeUnitIndex);
       return codeUnitIndex;
     }
 
     if(codePointIndex == str.kmwLength()) return str.length;
 
     for(var i = 0; i < codePointIndex; i++)
-      codeUnitIndex = str.kmwNextChar(codeUnitIndex);
+      codeUnitIndex = nextChar(str, codeUnitIndex);
     return codeUnitIndex;
   }
 
@@ -340,37 +356,6 @@ export default function extendString() {
    * String prototype library extensions for basic plane characters,
    * to simplify enabling or disabling supplementary plane functionality (I3319)
    */
-
-  /**
-   * Returns the code unit index for the next code point in the string
-   *
-   * @param  {number}  codeUnitIndex    A code point index in the string
-   * @return {number|null}                   The corresponding character
-   */
-  String.prototype.kmwBMPNextChar = function(codeUnitIndex)
-  {
-    var str = String(this);
-    if(codeUnitIndex < 0 || codeUnitIndex >= str.length - 1) {
-      return null;
-    }
-    return codeUnitIndex + 1;
-  }
-
-  /**
-   * Returns the code unit index for the previous code point in the string
-   *
-   * @param  {number}  codeUnitIndex    A code unit index in the string
-   * @return {number|null}                   The corresponding character
-   */
-  String.prototype.kmwBMPPrevChar = function(codeUnitIndex)
-  {
-    var str = String(this);
-
-    if(codeUnitIndex <= 0 || codeUnitIndex > str.length) {
-      return null;
-    }
-    return codeUnitIndex - 1;
-  }
 
   /**
    * Returns the code unit index for a code point index
@@ -437,10 +422,10 @@ export default function extendString() {
     p._kmwSubstring = bEnable ? p.kmwSubstring : p.substring;
     p._kmwSubstr = bEnable ? p.kmwSubstr : p.kmwBMPSubstr;
     p._kmwLength = bEnable ? p.kmwLength : p.kmwBMPLength;
-    p._kmwNextChar = bEnable ? p.kmwNextChar : p.kmwBMPNextChar;
-    p._kmwPrevChar = bEnable ? p.kmwPrevChar : p.kmwBMPPrevChar;
     p._kmwCodePointToCodeUnit = bEnable ? p.kmwCodePointToCodeUnit : p.kmwBMPCodePointToCodeUnit;
     p._kmwCodeUnitToCodePoint = bEnable ? p.kmwCodeUnitToCodePoint : p.kmwBMPCodeUnitToCodePoint;
+
+    enableSupplementaryPlane(bEnable);
   }
 
   // Ensure that _all_ String extensions are established, even if disabled by default.

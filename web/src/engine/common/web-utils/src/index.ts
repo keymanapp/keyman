@@ -17,6 +17,7 @@ export { default as Version } from "./version.js";
 export { default as globalObject } from "./globalObject.js";
 
 export { default as extendString } from "./kmwstring.js";
+export * as KMWString from './kmwstring.js';
 
 export { default as ManagedPromise } from "./managedPromise.js";
 export { default as TimeoutPromise, timedPromise } from "./timeoutPromise.js";
