@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.25 alpha 2025-04-22
+
+* chore: merge beta to master (pre-release prep) (#13730)
+
 ## 19.0.24 alpha 2025-04-21
 
 * build(deps): bump koa from 2.15.3 to 2.16.1 (#13694)
