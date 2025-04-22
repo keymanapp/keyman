@@ -54,11 +54,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
     });
 
-    it('_kmwLength', () => {
-      assert.equal(""._kmwLength(), 0);
-      assert.equal("string"._kmwLength(), 6);
+    it('length', () => {
+      assert.equal(KMWString.length(""), 0);
+      assert.equal(KMWString.length("string"), 6);
       // From the current MDN example:
-      assert.equal("Life, the universe and everything. Answer:"._kmwLength(), 42);
+      assert.equal(KMWString.length("Life, the universe and everything. Answer:"), 42);
     });
 
     it('_kmwSlice', () => {
@@ -167,11 +167,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
     });
 
-    it('_kmwLength', () => {
-      assert.equal(""._kmwLength(), 0);
-      assert.equal("string"._kmwLength(), 6);
+    it('length', () => {
+      assert.equal(KMWString.length(""), 0);
+      assert.equal(KMWString.length("string"), 6);
       // From the current MDN example:
-      assert.equal("Life, the universe and everything. Answer:"._kmwLength(), 42);
+      assert.equal(KMWString.length("Life, the universe and everything. Answer:"), 42);
     });
 
     it('_kmwSlice', () => {
@@ -323,17 +323,17 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwLastIndexOf(na, 1000), 7);
     });
 
-    it('_kmwLength', () => {
-      assert.equal(""._kmwLength(), 0);
+    it('length', () => {
+      assert.equal(KMWString.length(""), 0);
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       const a = String.fromCodePoint(0x1d5ba);
       const banana_nation = "ban" + a + "na n" + a + "tion";
-      assert.equal(banana_nation._kmwLength(), 13);
+      assert.equal(KMWString.length(banana_nation), 13);
 
       // 0x1d5c9: MATHEMATICAL SANS-SERIF SMALL p
       // 0x1d5be: MATHEMATICAL SANS-SERIF SMALL e
       const apples = 'a' + String.fromCodePoint(0x1d5c9) + 'p' + 'l' + String.fromCodePoint(0x1d5be) + 's';
-      assert.equal(apples._kmwLength(), 6);
+      assert.equal(KMWString.length(apples), 6);
     });
 
     it('_kmwSlice', () => {

@@ -18,6 +18,31 @@ export function enableSupplementaryPlane(bEnable: boolean) {
 }
 
 /**
+ * Returns the length of the string in code points, as opposed to code units.
+ *
+ * @param  {string}  s      The string
+ * @return {number}         The length of the string in code points
+ */
+export function length(s: string) {
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return str.length;
+  }
+
+  if(str.length == 0) {
+    return 0;
+  }
+
+  let i: number;
+  let codeUnitIndex: number;
+  for(i = 0, codeUnitIndex = 0; codeUnitIndex !== null; i++) {
+    codeUnitIndex = nextChar(str, codeUnitIndex);
+  }
+  return i;
+}
+
+/**
  * Returns the code unit index for the next code point in the string, accounting for
  * supplementary pairs
  *
@@ -97,8 +122,6 @@ declare global {
     kmwSubstring(start: number, length: number) : string,
     kmwSubstr(start: number, length?: number) : string,
     kmwBMPSubstr(start: number, length?: number) : string,
-    kmwLength(): number,
-    kmwBMPLength(): number,
     kmwCodePointToCodeUnit(codePointIndex: number) : number,
     kmwBMPCodePointToCodeUnit(codePointIndex: number) : number,
     kmwCodeUnitToCodePoint(codeUnitIndex: number) : number,
@@ -110,7 +133,6 @@ declare global {
     _kmwSlice(beginSlice: number, endSlice: number) : string,
     _kmwSubstring(start: number, length?: number) : string,
     _kmwSubstr(start: number, length?: number) : string,
-    _kmwLength(): number,
     _kmwCodePointToCodeUnit(codePointIndex: number) : number,
     _kmwCodeUnitToCodePoint(codeUnitIndex: number) : number
   }
@@ -192,21 +214,6 @@ export default function extendString() {
   }
 
   /**
-   * Returns the length of the string in code points, as opposed to code units.
-   *
-   * @return {number}                 The length of the string in code points
-   */
-  String.prototype.kmwLength = function() {
-    var str = String(this);
-
-    if(str.length == 0) return 0;
-
-    for(var i = 0, codeUnitIndex = 0; codeUnitIndex !== null; i++)
-      codeUnitIndex = nextChar(str, codeUnitIndex);
-    return i;
-  }
-
-  /**
    * Extracts a section of a string and returns a new string.
    *
    * @param  {number}  beginSlice    The start code point index in the string to
@@ -232,15 +239,15 @@ export default function extendString() {
    *
    * @param  {number}  start         The start code point index in the string to
    *                                 extract from
-   * @param  {number=}  length        Optional length to extract
+   * @param  {number=}  len           Optional length to extract
    * @return {string}                The substring as selected by start and length
    */
-  String.prototype.kmwSubstr = function(start, length?)
+  String.prototype.kmwSubstr = function(start, len?)
   {
     var str = String(this);
     if(start < 0)
     {
-      start = str.kmwLength() + start;
+      start = length(str) + start;
     }
     if(start < 0) start = 0;
     var startCodeUnit = str.kmwCodePointToCodeUnit(start);
@@ -251,7 +258,7 @@ export default function extendString() {
     if(arguments.length < 2) {
       endCodeUnit = str.length;
     } else {
-      for(var i = 0; i < length; i++) endCodeUnit = nextChar(str, endCodeUnit);
+      for(var i = 0; i < len; i++) endCodeUnit = nextChar(str, endCodeUnit);
     }
     if(endCodeUnit === null)
       return str.substring(startCodeUnit);
@@ -314,7 +321,7 @@ export default function extendString() {
       return codeUnitIndex;
     }
 
-    if(codePointIndex == str.kmwLength()) return str.length;
+    if(codePointIndex == length(str)) return str.length;
 
     for(var i = 0; i < codePointIndex; i++)
       codeUnitIndex = nextChar(str, codeUnitIndex);
@@ -335,9 +342,9 @@ export default function extendString() {
     else if(codeUnitIndex == 0)
       return 0;
     else if(codeUnitIndex < 0)
-      return str.substr(codeUnitIndex).kmwLength();
+      return length(str.substr(codeUnitIndex));
     else
-      return str.substr(0,codeUnitIndex).kmwLength();
+      return length(str.substr(0,codeUnitIndex));
   }
 
   /**
@@ -356,6 +363,7 @@ export default function extendString() {
    * String prototype library extensions for basic plane characters,
    * to simplify enabling or disabling supplementary plane functionality (I3319)
    */
+
 
   /**
    * Returns the code unit index for a code point index
@@ -377,17 +385,6 @@ export default function extendString() {
   String.prototype.kmwBMPCodeUnitToCodePoint = function(codeUnitIndex)
   {
     return codeUnitIndex;
-  }
-
-  /**
-   * Returns the length of a BMP string
-   *
-   * @return {number}                   The length in code points
-   */
-  String.prototype.kmwBMPLength = function()
-  {
-    var str = String(this);
-    return str.length;
   }
 
   /**
@@ -421,7 +418,6 @@ export default function extendString() {
     p._kmwSlice = bEnable ? p.kmwSlice : p.slice;
     p._kmwSubstring = bEnable ? p.kmwSubstring : p.substring;
     p._kmwSubstr = bEnable ? p.kmwSubstr : p.kmwBMPSubstr;
-    p._kmwLength = bEnable ? p.kmwLength : p.kmwBMPLength;
     p._kmwCodePointToCodeUnit = bEnable ? p.kmwCodePointToCodeUnit : p.kmwBMPCodePointToCodeUnit;
     p._kmwCodeUnitToCodePoint = bEnable ? p.kmwCodeUnitToCodePoint : p.kmwBMPCodeUnitToCodePoint;
 
