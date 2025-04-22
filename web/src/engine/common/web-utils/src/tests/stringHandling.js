@@ -28,30 +28,30 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.charCodeAt(str, 5), "g".charCodeAt(0));
     });
 
-    it('_kmwIndexOf', () => {
+    it('indexOf', () => {
       const banana_nation = "banana nation";
-      assert.equal(banana_nation._kmwIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwIndexOf("na"), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", -1), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 0), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 2), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 3), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
-      assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
-      assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na"), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", -1), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 0), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 2), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 3), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 5), 7);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 8), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 1000), -1);
     });
 
-    it('_kmwLastIndexOf', () => {
+    it('lastIndexOf', () => {
       const banana_nation = "banana nation";
-      assert.equal(banana_nation._kmwLastIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na"), 7);
-      assert.equal(banana_nation._kmwLastIndexOf("na", -1), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 0), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 2), 2);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 3), 2);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 5), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 8), 7);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na"), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", -1), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 0), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 2), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 3), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 5), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 8), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 1000), 7);
     });
 
     it('length', () => {
@@ -141,30 +141,30 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.charCodeAt(str, 5), "g".charCodeAt(0));
     });
 
-    it('_kmwIndexOf', () => {
+    it('indexOf', () => {
       const banana_nation = "banana nation";
-      assert.equal(banana_nation._kmwIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwIndexOf("na"), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", -1), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 0), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 2), 2);
-      assert.equal(banana_nation._kmwIndexOf("na", 3), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
-      assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
-      assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na"), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", -1), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 0), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 2), 2);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 3), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 5), 7);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 8), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 1000), -1);
     });
 
-    it('_kmwLastIndexOf', () => {
+    it('lastIndexOf', () => {
       const banana_nation = "banana nation";
-      assert.equal(banana_nation._kmwLastIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na"), 7);
-      assert.equal(banana_nation._kmwLastIndexOf("na", -1), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 0), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 2), 2);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 3), 2);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 5), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 8), 7);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na"), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", -1), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 0), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 2), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 3), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 5), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 8), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 1000), 7);
     });
 
     it('length', () => {
@@ -266,61 +266,61 @@ describe('Unicode string handling', () => {
       assert.equal(KMWString.charCodeAt(apples, 5), "s".charCodeAt(0));
     });
 
-    it('_kmwIndexOf', () => {
+    it('indexOf', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       const a = String.fromCodePoint(0x1d5ba);
       const banana_nation = "ban" + a + "na n" + a + "tion";
-      assert.equal(banana_nation._kmwIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwIndexOf("na"), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", -1), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", 0), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", 2), 4);
-      assert.equal(banana_nation._kmwIndexOf("na", 3), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na"), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", -1), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 0), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 2), 4);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 3), 4);
       // ERROR:  returns 4 (!)
-      // assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
-      assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
-      assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
+      // assert.equal(KMWString.indexOf(banana_nation, "na", 5), 7);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 8), -1);
+      assert.equal(KMWString.indexOf(banana_nation, "na", 1000), -1);
 
       const na = "n" + a;
-      assert.equal(banana_nation._kmwIndexOf(na), 2);
-      assert.equal(banana_nation._kmwIndexOf(na, -1), 2);
-      assert.equal(banana_nation._kmwIndexOf(na, 0), 2);
-      assert.equal(banana_nation._kmwIndexOf(na, 2), 2);
-      assert.equal(banana_nation._kmwIndexOf(na, 3), 7);
-      assert.equal(banana_nation._kmwIndexOf(na, 5), 7);
+      assert.equal(KMWString.indexOf(banana_nation, na), 2);
+      assert.equal(KMWString.indexOf(banana_nation, na, -1), 2);
+      assert.equal(KMWString.indexOf(banana_nation, na, 0), 2);
+      assert.equal(KMWString.indexOf(banana_nation, na, 2), 2);
+      assert.equal(KMWString.indexOf(banana_nation, na, 3), 7);
+      assert.equal(KMWString.indexOf(banana_nation, na, 5), 7);
       // ERROR:  returns 7 (!)
-      // assert.equal(banana_nation._kmwIndexOf(na, 8), -1);
-      assert.equal(banana_nation._kmwIndexOf(na, 1000), -1);
+      // assert.equal(KMWString.indexOf(banana_nation, na, 8), -1);
+      assert.equal(KMWString.indexOf(banana_nation, na, 1000), -1);
     });
 
-    it('_kmwLastIndexOf', () => {
+    it('lastIndexOf', () => {
       // 0x1d5ba: MATHEMATICAL SANS-SERIF SMALL a
       const a = String.fromCodePoint(0x1d5ba);
       const banana_nation = "ban" + a + "na n" + a + "tion";
-      assert.equal(banana_nation._kmwLastIndexOf("XYZ"), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na"), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", -1), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 0), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 2), -1);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 3), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "XYZ"), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na"), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", -1), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 0), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 2), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 3), -1);
 
       // ERROR:  Can't find the instance at the starting index?
-      // assert.equal(banana_nation._kmwLastIndexOf("na", 4), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 5), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 8), 4);
-      assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 4);
+      // assert.equal(KMWString.lastIndexOf(banana_nation, "na", 4), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 5), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 8), 4);
+      assert.equal(KMWString.lastIndexOf(banana_nation, "na", 1000), 4);
 
       const na = "n" + a;
-      assert.equal(banana_nation._kmwLastIndexOf(na), 7);
-      assert.equal(banana_nation._kmwLastIndexOf(na, -1), -1);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 0), -1);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 2), 2);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 3), 2);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 5), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, -1), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 0), -1);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 2), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 3), 2);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 5), 2);
       // ERROR:  Inconsistent with the index-2 case above.
-      // assert.equal(banana_nation._kmwLastIndexOf(na, 7), 7);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 8), 7);
-      assert.equal(banana_nation._kmwLastIndexOf(na, 1000), 7);
+      // assert.equal(KMWString.lastIndexOf(banana_nation, na, 7), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 8), 7);
+      assert.equal(KMWString.lastIndexOf(banana_nation, na, 1000), 7);
     });
 
     it('length', () => {

@@ -58,6 +58,64 @@ export function charCodeAt(s: string, index: number) {
   return first;
 }
 
+
+/**
+ * Returns the code point index within the calling String object of the first occurrence
+ * of the specified value, or -1 if not found.
+ *
+ * @param  {string}  s            The string
+ * @param  {string}  searchValue  The value to search for
+ * @param  {number=} fromIndex    Optional code point index to start searching from
+ * @return {number}               The code point index of the specified search value
+ */
+export function indexOf(s: string, searchValue: string, fromIndex?: number) { // pointIndexOf()
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return s.indexOf(searchValue, fromIndex);
+  }
+
+  const codeUnitIndex = str.indexOf(searchValue, fromIndex);
+
+  if(codeUnitIndex < 0) {
+    return codeUnitIndex;
+  }
+
+  let codePointIndex = 0;
+  for(let i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) {
+    codePointIndex++;
+  }
+  return codePointIndex;
+}
+
+/**
+ * Returns the code point index within the calling String object of the last occurrence
+ * of the specified value, or -1 if not found.
+ *
+ * @param  {string}  searchValue    The value to search for
+ * @param  {number=} fromIndex      Optional code point index to start searching from
+ * @return {number}                 The code point index of the specified search value
+ */
+export function lastIndexOf(s: string, searchValue: string, fromIndex?: number) { // lastPointIndexOf()
+  const str = s;
+
+  if(!EXTENSION_ENABLED) {
+    return str.lastIndexOf(searchValue, fromIndex);
+  }
+
+  const codeUnitIndex = str.lastIndexOf(searchValue, fromIndex);
+
+  if(codeUnitIndex < 0) {
+    return codeUnitIndex;
+  }
+
+  let codePointIndex = 0;
+  for(let i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) {
+    codePointIndex++;
+  }
+  return codePointIndex;
+}
+
 /**
  * Returns the length of the string in code points, as opposed to code units.
  *
@@ -217,15 +275,11 @@ declare global {
 
   interface String {
     kmwCharAt(codePointIndex: number) : string,
-    kmwIndexOf(searchValue: string, fromIndex?: number) : number,
-    kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
     kmwSlice(beginSlice: number, endSlice: number) : string,
     kmwSubstring(start: number, length: number) : string,
     kmwSubstr(start: number, length?: number) : string,
     kmwBMPSubstr(start: number, length?: number) : string,
     _kmwCharAt(codePointIndex: number) : string,
-    _kmwIndexOf(searchValue: string, fromIndex?: number) : number,
-    _kmwLastIndexOf(searchValue: string, fromIndex?: number) : number,
     _kmwSlice(beginSlice: number, endSlice: number) : string,
     _kmwSubstring(start: number, length?: number) : string,
     _kmwSubstr(start: number, length?: number) : string
@@ -233,49 +287,6 @@ declare global {
 }
 
 export default function extendString() {
-  /**
-   * Returns the code point index within the calling String object of the first occurrence
-   * of the specified value, or -1 if not found.
-   *
-   * @param  {string}  searchValue    The value to search for
-   * @param  {number}  [fromIndex]    Optional code point index to start searching from
-   * @return {number}                 The code point index of the specified search value
-   */
-  String.prototype.kmwIndexOf = function(searchValue, fromIndex) {
-    var str = String(this);
-    var codeUnitIndex = str.indexOf(searchValue, fromIndex);
-
-    if(codeUnitIndex < 0) {
-      return codeUnitIndex;
-    }
-
-    var codePointIndex = 0;
-    for(var i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) codePointIndex++;
-    return codePointIndex;
-  }
-
-  /**
-   * Returns the code point index within the calling String object of the last occurrence
-   * of the specified value, or -1 if not found.
-   *
-   * @param  {string}  searchValue    The value to search for
-   * @param  {number}  fromIndex      Optional code point index to start searching from
-   * @return {number}                 The code point index of the specified search value
-   */
-  String.prototype.kmwLastIndexOf = function(searchValue, fromIndex)
-  {
-    var str = String(this);
-    var codeUnitIndex = str.lastIndexOf(searchValue, fromIndex);
-
-    if(codeUnitIndex < 0) {
-      return codeUnitIndex;
-    }
-
-    var codePointIndex = 0;
-    for(var i = 0; i !== null && i < codeUnitIndex; i = nextChar(str, i)) codePointIndex++;
-    return codePointIndex;
-  }
-
   /**
    * Extracts a section of a string and returns a new string.
    *
@@ -406,8 +417,6 @@ export default function extendString() {
   {
     var p=String.prototype;
     p._kmwCharAt = bEnable ? p.kmwCharAt : p.charAt;
-    p._kmwIndexOf = bEnable ? p.kmwIndexOf :p.indexOf;
-    p._kmwLastIndexOf = bEnable ? p.kmwLastIndexOf : p.lastIndexOf ;
     p._kmwSlice = bEnable ? p.kmwSlice : p.slice;
     p._kmwSubstring = bEnable ? p.kmwSubstring : p.substring;
     p._kmwSubstr = bEnable ? p.kmwSubstr : p.kmwBMPSubstr;
