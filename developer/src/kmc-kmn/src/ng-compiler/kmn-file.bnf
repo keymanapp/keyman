@@ -21,9 +21,9 @@ paddedText: padding text
 text: textRange|simpleText|outsStatement
 simpleText: STRING|virtualKey|U_CHAR
 textRange: simpleText rangeEnd+
-rangeEnd: WHITESPACE? range WHITESPACE? simpleText
-virtualKey: LEFT_SQ WHITESPACE? spacedShiftCode* keyCode WHITESPACE? RIGHT_SQ
-spacedShiftCode: shiftcode WHITESPACE
+rangeEnd: WHITESPACE? RANGE WHITESPACE? simpleText
+virtualKey: LEFT_SQ WHITESPACE? spacedShiftCode* KEY_CODE WHITESPACE? RIGHT_SQ
+spacedShiftCode: SHIFT_CODE WHITESPACE
 variableStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR WHITESPACE? variableStoreName WHITESPACE? RIGHT_BR
 variableStoreName: PARAMETER
