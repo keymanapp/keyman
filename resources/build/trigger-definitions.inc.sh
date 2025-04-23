@@ -136,7 +136,7 @@ bc_stable_17_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_17_0=HttpsGithubComKeymanappKeyman
 
-# Stable 17.0 Build Configurations
+# Stable 18.0 Build Configurations
 
 bc_stable_18_0_android=(KeymanAndroid_Build)
 bc_stable_18_0_ios=(Keyman_iOS_Master)
