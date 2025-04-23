@@ -191,9 +191,12 @@ get_version_notes() {
   get_history_file
   process_history_loop "${history_file}" get_version_helper "$vn_version" "$vn_tier" "$vn_product"
 
-  if [ $version_found = false ]; then
-    builder_die "Could not find changelog information for $vn_product version $vn_version $vn_tier."
-  fi
+  # We won't die if there is no relevant version history, because that can
+  # happen when a new stable release is made.
+
+  # if [ $version_found = false ]; then
+  #   builder_die "Could not find changelog information for $vn_product version $vn_version $vn_tier."
+  # fi
 }
 
 ###                      End Version Changelog Extraction                            ###
