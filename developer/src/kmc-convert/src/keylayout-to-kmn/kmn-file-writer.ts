@@ -8,6 +8,7 @@
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, convert_object, Rule } from './keylayout-to-kmn-converter.js';
 import { util } from '@keymanapp/common-types';
+import { ConverterMessages } from '../converter-messages.js';
 
 export class KmnFileWriter {
 
@@ -33,7 +34,8 @@ export class KmnFileWriter {
       this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
-      console.log('ERROR writing kmn file:' + err.message);
+      //console.log('ERROR writing kmn file:' + err.message);
+      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
       return false;
     }
   }
