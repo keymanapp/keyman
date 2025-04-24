@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, RhsBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -958,6 +958,25 @@ describe("KMN Analyser Tests", () => {
       const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
+    });
+  });
+  describe("PermittedKeywordRule Tests", () => {
+    it("can construct a PermittedKeywordRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isNotNull(permittedKeyword);
+    });
+    it("can parse correctly (newcontext)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isTrue(permittedKeyword.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
+    });
+    it("can parse correctly (postkeystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('postkeystroke');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isTrue(permittedKeyword.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
     });
   });
   describe("GroupBlockRule Tests", () => {

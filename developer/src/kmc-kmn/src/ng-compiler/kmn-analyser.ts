@@ -7,7 +7,7 @@
  */
 
 import { Token, TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule, ManyRule, AlternateTokenRule } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -156,11 +156,9 @@ export class StringSystemStoreRule extends AbstractSystemStoreRule {
   }
 }
 
-export class StringSystemStoreNameRule extends SingleChildRule {
+export class StringSystemStoreNameRule extends AlternateTokenRule {
   public constructor() {
-    super();
-    const tokenRules: TokenRule[] = [];
-    [
+    super([
       TokenTypes.BITMAP,
       TokenTypes.COPYRIGHT,
       TokenTypes.DISPLAYMAP,
@@ -181,10 +179,7 @@ export class StringSystemStoreNameRule extends SingleChildRule {
       TokenTypes.VERSION,
       TokenTypes.VISUALKEYBOARD,
       TokenTypes.WINDOWSLANGUAGES,
-    ].forEach((tokenType) => {
-      tokenRules.push(new TokenRule(tokenType, true));
-    });
-    this.rule = new AlternateRule(tokenRules);
+    ], true);
   }
 }
 
@@ -663,17 +658,12 @@ export class GroupNameOrKeywordRule extends SingleChildRule {
   }
 }
 
-export class PermittedKeywordRule extends SingleChildRule {
+export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
-    super();
-    const tokenRules: TokenRule[] = [];
-    [
+    super([
       TokenTypes.NEWCONTEXT,
       TokenTypes.POSTKEYSTROKE,
-    ].forEach((tokenType) => {
-      tokenRules.push(new TokenRule(tokenType, true));
-    });
-    this.rule = new AlternateRule(tokenRules);
+    ], true);
   }
 }
 
@@ -1045,20 +1035,15 @@ export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRu
   }
 }
 
-export class IfSystemStoreNameRule extends SingleChildRule {
+export class IfSystemStoreNameRule extends AlternateTokenRule {
   public constructor() {
-    super();
-    const tokenRules: TokenRule[] = [];
-    [
+    super([
       TokenTypes.PLATFORM,
       TokenTypes.LAYER,
       TokenTypes.BASELAYOUT,
       TokenTypes.NEWLAYER,
       TokenTypes.OLDLAYER,
-    ].forEach((tokenType) => {
-      tokenRules.push(new TokenRule(tokenType, true));
-    });
-    this.rule = new AlternateRule(tokenRules);
+    ], true);
   }
 }
 
