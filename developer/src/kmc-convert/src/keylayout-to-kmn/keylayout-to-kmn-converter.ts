@@ -55,13 +55,11 @@ export class KeylayoutToKmnConverter {
     const jsonO: object = KeylayoutReader.read(inputFilename);
     if (!jsonO) {
       throw new Error('Error while processing read()');
-      return null;
     }
 
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
     if (!outArray) {
       throw new Error('Error while processing convert()');
-      return null;
     }
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
@@ -69,7 +67,6 @@ export class KeylayoutToKmnConverter {
 
     if (!out_text_ok) {
       throw new Error('Error while processing write()');
-      return null;
     }
     return null;
   }
@@ -402,7 +399,7 @@ export class KeylayoutToKmnConverter {
             }
           }
         } else {
-          console.log("ERROR : some output characters can not be used in keyman \"",
+          console.log("ERROR : some output characters can not be used in Keyman \"",
             (jsonObj.keyboard['@_name'] + ".keylayout\""),
             "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
             jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
