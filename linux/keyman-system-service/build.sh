@@ -60,13 +60,13 @@ check_missing_coverage_configuration() {
 }
 
 configure_action() {
-  # shellcheck disable=SC2086,SC2154
-  meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
+  # shellcheck disable=SC2086,SC2154,SC2248
+  meson setup ${MESON_COVERAGE} --werror --buildtype ${MESON_TARGET} "${builder_extra_params[@]}" "${MESON_PATH}"
 }
 
 test_action() {
   # shellcheck disable=SC2086,SC2154
-  meson test --print-errorlogs $builder_verbose
+  meson test --print-errorlogs ${builder_verbose}
   if builder_has_option --coverage; then
     # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
     ninja coverage-html
@@ -88,7 +88,7 @@ fi
 builder_run_action clean       clean_action
 builder_run_action configure   configure_action
 
-[ -d "$MESON_PATH" ] && cd "$MESON_PATH"
+[[ -d "${MESON_PATH}" ]] && cd "${MESON_PATH}"
 
 builder_run_action build       ninja
 builder_run_action test        test_action
