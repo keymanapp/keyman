@@ -252,12 +252,45 @@ export class TokenRule extends Rule {
       Rule.tokenBuffer.popToken();
       if (this.addNode) {
         const nodeType: NodeTypes = TokenRule.tokenToNodeMap.get(token.tokenType);
-        if (nodeType != undefined) {
+        if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
         }
       }
     } else {
       parseSuccess = false;
+    }
+
+    return parseSuccess;
+  }
+
+  public static getNodeType(tokenType: TokenTypes): NodeTypes {
+    return TokenRule.tokenToNodeMap.get(tokenType);
+  }
+}
+
+export class AlternateTokenRule extends Rule {
+  private tokenTypes: Set<TokenTypes>;
+  private addNode: boolean;
+
+  public constructor(tokenTypes: TokenTypes[], addNode: boolean=false) {
+    super();
+    this.tokenTypes = new Set<TokenTypes>(tokenTypes);
+    this.addNode    = addNode;
+  }
+
+  public parse(node: ASTNode): boolean {
+    let parseSuccess: boolean = false;
+    const token: Token = Rule.tokenBuffer.nextToken();
+
+    if (this.tokenTypes.has(token.tokenType)) {
+      parseSuccess = true;
+      Rule.tokenBuffer.popToken();
+      if (this.addNode) {
+        const nodeType: NodeTypes = TokenRule.getNodeType(token.tokenType);
+        if (nodeType !== undefined) {
+          node.addChild(new ASTNode(nodeType, token));
+        }
+      }
     }
 
     return parseSuccess;

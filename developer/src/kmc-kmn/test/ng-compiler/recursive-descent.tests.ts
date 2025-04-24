@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule, parameterSequence } from '../../src/ng-compiler/recursive-descent.js';
+import { AlternateRule, TokenRule, ManyRule, OneOrManyRule, OptionalRule, Rule, SequenceRule, parameterSequence, AlternateTokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
@@ -239,6 +239,52 @@ describe("Recursive Descent Tests", () => {
     it("can parse with an unsuccessful child Rule", () => {
       const tokenRule: Rule = new TokenRule(TokenTypes.STORE);
       assert.isFalse(tokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+    });
+  });
+  describe("AlternateTokenRule Tests", () => {
+    it("can construct an AlternateTokenRule", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING]);
+      assert.isNotNull(alternateTokenRule);
+    });
+    it("can parse a matched token (from a list of one)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING]);
+      assert.isTrue(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+    });
+    it("can parse an unmatched token (from a list of one)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.PARAMETER]);
+      assert.isFalse(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+    });
+    it("can parse a matched token (from a list of three)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([
+        TokenTypes.BITMAP, TokenTypes.STRING, TokenTypes.PARAMETER,
+      ]);
+      assert.isTrue(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+    });
+    it("can parse an unmatched token (from a list of three)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([
+        TokenTypes.BITMAP, TokenTypes.COPYRIGHT, TokenTypes.PARAMETER,
+      ]);
+      assert.isFalse(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+    });
+    it("can parse a matched token (from a list of one, addNode is true)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([TokenTypes.STRING], true);
+      assert.isTrue(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 1);
+      assert.isTrue(root.hasChildOfType(NodeTypes.STRING));
+    });
+    it("can parse an unmatched token (from an empty list)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule([]);
+      assert.isFalse(alternateTokenRule.parse(root));
+      assert.equal(Rule.tokenBuffer.currentPosition, 0);
+    });
+    it("can parse an unmatched token (from a null list)", () => {
+      const alternateTokenRule: Rule = new AlternateTokenRule(null);
+      assert.isFalse(alternateTokenRule.parse(root));
       assert.equal(Rule.tokenBuffer.currentPosition, 0);
     });
   });
