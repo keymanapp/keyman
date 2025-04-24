@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.26 alpha 2025-04-24
+
+* chore: merge beta version 18.0.235 history to master (#13735)
+* chore(linux): Update debian changelog (#13738)
+* chore: comment out CODEOWNERS (#13739)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13740)
+
 ## 19.0.25 alpha 2025-04-22
 
 * chore: merge beta to master (pre-release prep) (#13730)
