@@ -16,15 +16,11 @@ android/app/: android/KMAPro/**
 android/engine/: android/KMEA/**
 android/samples/: android/Samples/**
 
-common/:
-  - common/**
-  - resources/**
+common/: common/**
 
-common/models/templates/: web/src/engine/predictive-text/templates/**
-common/models/wordbreakers/: web/src/engine/predictive-text/wordbreakers/**
-
-common/resources/: resources/**
 common/web/: common/web/**
+
+m:predictive-text: web/src/engine/predictive-text/**
 
 core/:
   - core/**
@@ -37,7 +33,7 @@ developer/compilers/:
   - developer/src/kmcmplib/**
   - developer/src/kmc-*/**
 
-developer/ide/:
+m:developer-ide:
   - developer/src/server/**
   - developer/src/tike/**
 
@@ -64,6 +60,8 @@ oem/fv/: oem/firstvoices/**
 oem/fv/android/: oem/firstvoices/android/**
 oem/fv/ios/: oem/firstvoices/ios/**
 oem/fv/windows/: oem/firstvoices/windows/**
+
+resources/: resources/**
 
 web/: web/**
 # web/bookmarklet/
