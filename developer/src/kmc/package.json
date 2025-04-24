@@ -39,6 +39,7 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-analyze": "*",
     "@keymanapp/kmc-copy": "*",
+    "@keymanapp/kmc-convert": "*",
     "@keymanapp/kmc-generate": "*",
     "@keymanapp/kmc-keyboard-info": "*",
     "@keymanapp/kmc-kmn": "*",
