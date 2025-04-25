@@ -178,7 +178,6 @@ begin
 
     // Add metadata about the lexical model
     plm := TPackageLexicalModel.Create(kps);
-    plm.Name := Name;
     plm.ID := ID;
     kps.LexicalModels.Add(plm);
 

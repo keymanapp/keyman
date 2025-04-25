@@ -1,7 +1,7 @@
 import SourcemapRemapper from "@keymanapp/sourcemap-path-remapper"
 import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
                                                    // Base64, stringified-JSON, end-of-file comment...
-import fs from 'fs';
+import fs from 'node:fs';
 
 function displayHelp() {
   console.log("KeymanWeb's sourcemap-cleansing tool.  This tool is designed to produce clean filepaths");

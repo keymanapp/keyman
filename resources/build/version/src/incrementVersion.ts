@@ -1,11 +1,11 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 // ------------------------------------------------------------------------------------
 // incrementVersion
 // ------------------------------------------------------------------------------------
 
 export const incrementVersion = () => {
-  // 1. 
+  // 1.
   const version = readFileSync('./VERSION.md', 'utf8');
   const triplet = version.split('.');
   const patch = parseInt(triplet[2], 10) + 1;

@@ -13,5 +13,5 @@ Windows operating systems:
 
 Keyman also runs on Android, iOS, Linux, macOS, and in websites. Visit https://keyman.com for more downloads.
 
-* **Note:** Keyman does not yet support Windows Insider Preview ARM64. 
-* Keyman works slightly differently in different versions of Windows. 
+* **Note:** Keyman does not yet support Windows on Arm64.
+* Keyman works slightly differently in different versions of Windows.

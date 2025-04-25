@@ -4,7 +4,23 @@
  * Copy a keyboard or lexical model project
  */
 
-import { CloudUrls, GitHubUrls, CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter, ValidIds, CompilerBaseOptions } from "@keymanapp/developer-utils";
+import {
+  CloudUrls,
+  GitHubUrls,
+  CompilerCallbacks,
+  KeymanCompiler,
+  KeymanCompilerArtifact,
+  KeymanCompilerArtifacts,
+  KeymanCompilerResult,
+  KeymanDeveloperProject,
+  KeymanDeveloperProjectOptions,
+  ProjectLoader,
+  KPJFileWriter,
+  KpsFileReader,
+  KpsFileWriter,
+  ValidIds,
+  CompilerBaseOptions,
+} from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -124,7 +140,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     this.sourceId = this.callbacks.path.basename(projectSource, KeymanFileTypes.Source.Project);
 
     // copy project file
-    const project = await this.loadProjectFromFile(projectSource);
+    const project = await ProjectLoader.loadProjectFromFile(projectSource, this.callbacks, this.asyncCallbacks);
     if(!project) {
       // loadProjectFromFile already reported errors
       return null;
@@ -635,31 +651,6 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     // source type is valid
     return this.callbacks.path.join(this.outPath, 'source');
-  }
-
-  private async loadProjectFromFile(filename: string): Promise<KeymanDeveloperProject> {
-    const kpjData = await this.asyncCallbacks.fsAsync.readFile(filename);
-    const reader = new KPJFileReader(this.asyncCallbacks);
-    let kpj = null;
-    try {
-      kpj = reader.read(kpjData);
-      if(!kpj) {
-        this.callbacks.reportMessage(CopierMessages.Error_ProjectFileCouldNotBeRead({filename}));
-        return null;
-      }
-
-      if(kpj.KeymanDeveloperProject?.Options?.Version && kpj.KeymanDeveloperProject.Options.Version != "1.0" && kpj.KeymanDeveloperProject.Options.Version != "2.0") {
-        this.callbacks.reportMessage(CopierMessages.Error_UnsupportedProjectVersion({filename, version: kpj.KeymanDeveloperProject.Options.Version}));
-        return null;
-      }
-      reader.validate(kpj);
-    } catch(e) {
-      this.callbacks.reportMessage(CopierMessages.Error_InvalidProjectFile({filename, message: (e ?? '').toString()}));
-      return null;
-    }
-    const project = await reader.transform(filename, kpj);
-
-    return project;
   }
 
   /**

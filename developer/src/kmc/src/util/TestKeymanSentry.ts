@@ -1,6 +1,6 @@
 import { KmnCompiler } from "@keymanapp/kmc-kmn";
 import { NodeCompilerCallbacks } from "./NodeCompilerCallbacks.js";
-import { KeymanSentry, SentryNodeOptions } from '@keymanapp/developer-utils';
+import { KeymanSentry, SentryNodeOptions } from './KeymanSentry.js';
 
 const cli = process.argv.join(' ');
 
