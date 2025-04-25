@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
@@ -16,7 +16,7 @@ const NUL = '\uFFFE';
  * ---------------------
  *
  * This suite contains two types of tests, both designed to test all possible variations
- * of behaviors that `KeyboardInterface.fullContextMatch` may be expected to handle.
+ * of behaviors that `JSKeyboardInterface.fullContextMatch` may be expected to handle.
  *
  * Type 1:  White-box tests for validity of the generated context-cache
  * - uses only the `baseSequence` of each test spec definition; does not
@@ -65,7 +65,7 @@ function runEngineRuleSet(ruleSet, defaultNoun) {
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor(device);
+      let processor = new JSKeyboardProcessor(device);
       processor.keyboardInterface = keyboardWithHarness;
       var res = processor.keyboardInterface.fullContextMatch(ruleDef.n, target, ruleDef.rule);
 
@@ -1101,7 +1101,7 @@ var NOTANY_NUL_RULE_SET = [ NOTANY_NUL_TEST_1, NOTANY_NUL_TEST_2, NOTANY_NUL_TES
 
 describe('Engine - Context Matching', function() {
   before(async function() {
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal));
     const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
@@ -1122,7 +1122,7 @@ describe('Engine - Context Matching', function() {
       ruleSeq.test(proctor, target);
 
       // Now for the real test!
-      let processor = new KeyboardProcessor(device);
+      let processor = new JSKeyboardProcessor(device);
       processor.keyboardInterface = keyboardWithHarness;
       var res = processor.keyboardInterface._BuildExtendedContext(ruleDef.n, ruleDef.ln, target);
 

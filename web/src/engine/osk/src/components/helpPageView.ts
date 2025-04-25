@@ -1,15 +1,15 @@
-import { Keyboard } from 'keyman/engine/keyboard';
+import { JSKeyboard } from 'keyman/engine/keyboard';
 
 import KeyboardView from './keyboardView.interface.js';
 import { ParsedLengthStyle } from "../lengthStyle.js";
 
 export default class HelpPageView implements KeyboardView {
-  private readonly kbd: Keyboard;
+  private readonly kbd: JSKeyboard;
   public readonly element: HTMLDivElement;
 
   private static readonly ID = 'kmw-osk-help-page';
 
-  constructor(keyboard: Keyboard) {
+  constructor(keyboard: JSKeyboard) {
     this.kbd = keyboard;
 
     var Ldiv = this.element = document.createElement('div');

@@ -1,12 +1,12 @@
-import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { JSKeyboard, type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
-import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
+import { DesignIFrame, OutputTargetElementWrapper, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
   ContextManagerBase,
-  type KeyboardInterface,
+  type KeyboardInterfaceBase,
   LegacyAPIEvents
 } from 'keyman/engine/main';
 import { BrowserConfiguration } from './configuration.js';
@@ -23,10 +23,12 @@ export interface KeyboardCookie {
  * has the same directionality, text runs will be re-ordered which is confusing and causes
  * incorrect caret positioning
  *
- * @param       {Object}      Ptarg      Target element
+ * @param       {Object}      Ptarg           Target element
+ * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
 function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
-  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
+  // TODO-web-core: do we need to support RTL in Core?
+  const elDir = activeKeyboard instanceof JSKeyboard && activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
@@ -41,14 +43,14 @@ function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
 }
 
 export default class ContextManager extends ContextManagerBase<BrowserConfiguration> {
-  private _activeKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private _activeKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
   private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
   readonly focusAssistant = new FocusAssistant(() => this.activeTarget?.isForcingScroll());
   readonly page: PageContextAttachment;
-  private mostRecentTarget: OutputTarget<any>;
-  private currentTarget: OutputTarget<any>;
+  private mostRecentTarget: OutputTargetElementWrapper<any>;
+  private currentTarget: OutputTargetElementWrapper<any>;
 
-  private globalKeyboard: {keyboard: Keyboard, metadata: KeyboardStub};
+  private globalKeyboard: {keyboard: JSKeyboard, metadata: KeyboardStub};
 
   private _eventsObj: () => LegacyEventEmitter<LegacyAPIEvents>;
   private domEventTracker = new DomEventTracker();
@@ -173,7 +175,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     });
   }
 
-  get activeTarget(): OutputTarget<any> {
+  get activeTarget(): OutputTargetElementWrapper<any> {
     /*
      * Assumption:  the maintainingFocus flag may only be set when there is a current target.
      * This is not enforced proactively at present, but the assumption should hold.  (2023-05-03)
@@ -182,7 +184,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return this.currentTarget || (maintainingFocus ? this.mostRecentTarget : null);
   }
 
-  get lastActiveTarget(): OutputTarget<any> {
+  get lastActiveTarget(): OutputTargetElementWrapper<any> {
     return this.mostRecentTarget;
   }
 
@@ -227,7 +229,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public setActiveTarget(target: OutputTarget<any>, sendEvents?: boolean) {
+  public setActiveTarget(target: OutputTargetElementWrapper<any>, sendEvents?: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
@@ -342,7 +344,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     this.focusAssistant.restoringFocus = false;
   }
 
-  insertText(kbdInterface: KeyboardInterface<ContextManager>, Ptext: string, PdeadKey: number) {
+  insertText(kbdInterface: KeyboardInterfaceBase<ContextManager>, Ptext: string, PdeadKey: number) {
     // Find the correct output target to manipulate.  The user has likely be interacting with a
     // 'help page' keyboard, like desktop `sil_euro_latin`, and active browser focus on the
     // original context element may have been lost.
@@ -367,7 +369,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *
    * This is based on the current `.activeTarget` and its related attachment metadata.
    */
-  protected currentKeyboardSrcTarget(): OutputTarget<any> {
+  protected currentKeyboardSrcTarget(): OutputTargetElementWrapper<any> {
     let target = this.currentTarget || this.mostRecentTarget;
 
     if(this.isTargetKeyboardIndependent(target)) {
@@ -377,7 +379,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
+  private isTargetKeyboardIndependent(target: OutputTargetElementWrapper<any>): boolean {
     let attachmentInfo = target?.getElement()._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
@@ -385,7 +387,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
+  activateKeyboardForTarget(kbd: { keyboard: JSKeyboard, metadata: KeyboardStub }, target: OutputTargetElementWrapper<any>) {
     let attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
@@ -419,7 +421,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @param target
    * @param metadata
    */
-  public setKeyboardForTarget(target: OutputTarget<any>, kbdId: string, langId: string) {
+  public setKeyboardForTarget(target: OutputTargetElementWrapper<any>, kbdId: string, langId: string) {
     if(target instanceof DesignIFrame) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -454,7 +456,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public getKeyboardStubForTarget(target: OutputTarget<any>) {
+  public getKeyboardStubForTarget(target: OutputTargetElementWrapper<any>) {
     if(!this.isTargetKeyboardIndependent(target)) {
       return this.globalKeyboard.metadata;
     } else {
@@ -612,7 +614,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *                      The return value indicates whether (true) or not (false) the calling event handler
    *                      should be terminated immediately after the call.
    */
-  _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
+  _CommonFocusHelper(outputTarget: OutputTargetElementWrapper<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
     let activeKeyboard = this.activeKeyboard?.keyboard;
@@ -736,7 +738,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     return true;
   }
 
-  doChangeEvent(target: OutputTarget<any>) {
+  doChangeEvent(target: OutputTargetElementWrapper<any>) {
     if(target.changed) {
       let event = new Event('change', {"bubbles": true, "cancelable": false});
       target.getElement().dispatchEvent(event);

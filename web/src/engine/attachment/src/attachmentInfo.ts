@@ -1,10 +1,10 @@
-import { OutputTarget } from 'keyman/engine/element-wrappers';
+import { OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
 
 export class AttachmentInfo {
   /**
    * Provides the core interface between the DOM and the actual keyboard.
    */
-  interface:      OutputTarget<any>;
+  interface: OutputTargetElementWrapper<any>;
 
   /**
    * Tracks the control's independent keyboard selection, when applicable.
@@ -21,7 +21,7 @@ export class AttachmentInfo {
    */
   inputMode?: string;
 
-  constructor(eleInterface: OutputTarget<any>, kbd: string, touch?: boolean) {
+  constructor(eleInterface: OutputTargetElementWrapper<any>, kbd: string, touch?: boolean) {
     this.interface = eleInterface;
     this.keyboard = kbd;
   }
