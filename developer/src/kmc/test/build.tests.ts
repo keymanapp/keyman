@@ -1,5 +1,5 @@
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { clearOptions } from '@keymanapp/developer-utils';
+import { clearOptions } from '../src/util/options.js';
 import { assert } from 'chai';
 import 'mocha';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';

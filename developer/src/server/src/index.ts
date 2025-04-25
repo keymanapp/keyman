@@ -5,12 +5,13 @@ import chalk from 'chalk';
 import express from 'express';
 import multer from 'multer';
 import * as ws from 'ws';
-import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 import { configuration } from './config.js';
 import { environment } from './environment.js';
 import setupRoutes from './routes.js';
 import { shutdown } from './shutdown.js';
 import { initTray } from './tray.js';
+import { loadOptions } from './options.js';
 
 const options = {
   ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console

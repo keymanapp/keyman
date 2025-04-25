@@ -279,6 +279,9 @@ keyman_add_custom_keyboards(
   gchar * kmx_path
 ) {
   GList * engines_list = kb_data->engines_list;
+  if (custom_keyboards == NULL)
+    return engines_list;
+
   GPtrArray *language_keyboards = g_hash_table_lookup(custom_keyboards, kmx_path);
   if (language_keyboards == NULL)
     return engines_list;

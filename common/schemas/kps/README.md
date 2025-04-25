@@ -2,6 +2,14 @@
 
 Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/kps/17.0/kps.xsd
 
+## 2025-04-02 18.0
+* Version 18.0 deprecates the following fields, and kmc-package does not use them (#13600):
+  - Keyboards/Keyboard/Version
+  - Keyboards/Keyboard/Name
+  - Keyboards/Keyboard/RTL
+  - LexicalModels/LexicalModel/Name
+  - LexicalModels/LexicalModel/RTL (Note: was never read or written by any Keyman tooling)
+
 ## 2023-10-19 17.0
 * Version 17.0 adds:
   - LicenseFile - a .md file, usually named LICENSE.md
@@ -9,13 +17,13 @@ Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/
   - Info/Description - a short Markdown description of the content of the package, e.g. shown in search results on keyman.com
   - RelatedPackages - a list of other packages which relate to this one, or are deprecated by it
   - Keyboards/Keyboard/Examples - a list of typing examples for the keyboard
-  - Keyboarsd/Keyboard/WebOSKFonts - a list of font filenames (not necessarily in package) suitable for rendering the on screen keyboard
-  - Keyboarsd/Keyboard/WebDisplayFonts - a list of font filenames (not necessarily in package) suitable for use with the keyboard
+  - Keyboards/Keyboard/WebOSKFonts - a list of font filenames (not necessarily in package) suitable for rendering the on screen keyboard
+  - Keyboards/Keyboard/WebDisplayFonts - a list of font filenames (not necessarily in package) suitable for use with the keyboard
 * Version 17.0 removes:
   - LexicalModels/LexicalModel/Version - version information is not stored in the models, but only in the package metadata (was unused)
 
 ## 2023-04-21 7.0.1
-* Removes LexicalModel.Version, as it was never read or written
+* Removes LexicalModels/LexicalModel/Version, as it was never read or written
 
 ## 2021-07-19 7.0
 * Initial version 7.0

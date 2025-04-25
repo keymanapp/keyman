@@ -518,7 +518,17 @@ export default abstract class OSKView
       this._baseFontSize = OSKView.defaultFontSize(this.targetDevice, this.computedHeight, this.isEmbedded);
     }
 
-    return this._baseFontSize;
+    // Set default OSK font size (Build 344, KMEW-90)
+    // If the layer group specifies a fontsize value, we need
+    // to apply that to the banner as well.
+    const layerFontSize = this.vkbd?.layerGroup?.spec.fontsize;
+
+    if(layerFontSize) {
+      const parsedSize = new ParsedLengthStyle(layerFontSize);
+      return parsedSize.absolute ? parsedSize : this._baseFontSize.scaledBy(parsedSize.val);
+    } else {
+      return this._baseFontSize;
+    }
   }
 
   public static defaultFontSize(device: DeviceSpec, computedHeight: number, isEmbedded: boolean): ParsedLengthStyle {
