@@ -40,7 +40,7 @@ export class KpsFileReader {
     }
 
     if(!KPS_FILE_VERSIONS.includes(kpsPackage.Package?.System?.FileVersion)) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_UnsupportedPackageFileVersion({version: kpsPackage.Package?.System?.FileVersion}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_UnsupportedPackageFileVersion({version: kpsPackage.Package?.System?.FileVersion}));
       return null;
     }
 

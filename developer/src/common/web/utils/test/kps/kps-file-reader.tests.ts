@@ -110,7 +110,7 @@ describe('kps-file-reader', function () {
 
       assert.isNull(kps);
       assert.lengthOf(callbacks.messages, 1);
-      assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_UnsupportedPackageFileVersion));
+      assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_UnsupportedPackageFileVersion));
     });
   });
 });
