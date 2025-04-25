@@ -1,4 +1,4 @@
-import { KeymanSentry } from "@keymanapp/developer-utils";
+import { KeymanSentry } from './KeymanSentry.js';
 
 /**
  * Exit codes defined in <sysexits.h>:

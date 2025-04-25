@@ -354,11 +354,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     this.layerGroup = new OSKLayerGroup(this, this.layoutKeyboard, formFactor);
 
-    // Now that we've properly processed the keyboard's layout, mark it as calibrated.
-    // TODO:  drop the whole 'calibration' thing.  The newer layout system supersedes the
-    // need for it.  (Is no longer really used, so the drop ought be clean.)
-    this.layoutKeyboard.markLayoutCalibrated(formFactor);
-
     // Append the OSK layer group container element to the containing element
     //osk.keyMap = divLayerContainer;
     Lkbd.appendChild(this.layerGroup.element);
