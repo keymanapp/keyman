@@ -6,7 +6,8 @@
 import { Command, Option } from 'commander';
 import { declareBuild } from './commands/build.js';
 import { declareAnalyze } from './commands/analyze.js';
-import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
+import { loadOptions } from './util/options.js';
+import { KeymanSentry } from './util/KeymanSentry.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 import { exitProcess } from './util/sysexits.js';

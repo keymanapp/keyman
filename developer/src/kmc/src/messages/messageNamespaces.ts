@@ -1,4 +1,4 @@
-import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/developer-utils';
+import { DeveloperUtilsMessages, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AnalyzerMessages } from '@keymanapp/kmc-analyze';
 import { CopierMessages } from '@keymanapp/kmc-copy';
 import { GeneratorMessages } from '@keymanapp/kmc-generate';
@@ -14,7 +14,7 @@ import { ConverterMessages } from '@keymanapp/kmc-convert';
 // Maps every compiler error namespace to the corresponding implementation
 const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.LdmlKeyboardCompiler]: LdmlCompilerMessages,
-  [CompilerErrorNamespace.CommonTypes]: CommonTypesMessages,
+  [CompilerErrorNamespace.DeveloperUtils]: DeveloperUtilsMessages,
   [CompilerErrorNamespace.KmnCompiler]: KmnCompilerMessages,
   [CompilerErrorNamespace.ModelCompiler]: ModelCompilerMessages,
   [CompilerErrorNamespace.PackageCompiler]: PackageCompilerMessages,
@@ -40,7 +40,7 @@ export type CompilerMessageSource = {
 // TODO: consolidate with messageNamespaces above
 export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSource> = {
   [CompilerErrorNamespace.LdmlKeyboardCompiler]: { module: 'kmc-ldml',          class: LdmlCompilerMessages },
-  [CompilerErrorNamespace.CommonTypes]:          { module: 'common-types',      class: CommonTypesMessages },
+  [CompilerErrorNamespace.DeveloperUtils]:       { module: 'developer-utils',   class: DeveloperUtilsMessages },
   [CompilerErrorNamespace.KmnCompiler]:          { module: 'kmc-kmn',           class: KmnCompilerMessages },
   [CompilerErrorNamespace.ModelCompiler]:        { module: 'kmc-model',         class: ModelCompilerMessages },
   [CompilerErrorNamespace.PackageCompiler]:      { module: 'kmc-package',       class: PackageCompilerMessages },

@@ -35,9 +35,7 @@
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Sample Project</Name>
       <ID>sample</ID>
-      <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>
       </Languages>

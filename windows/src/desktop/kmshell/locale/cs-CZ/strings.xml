@@ -328,7 +328,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Modified: 18.0.96.0 -->
-  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Automatically check for updates and download</string>
+  <string name="koCheckForUpdates" comment="Automatically check for updates and download">Automaticky kontrolovat aktualizace a stahování</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.236.0 -->
@@ -466,14 +466,22 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">K dispozici jsou aktualizace, které budou aplikovány při příštím restartu Windows:</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">Aktuálně nainstalovaná verze</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">Nová verze</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Aktualizace nyní vyžaduje restart počítače.</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Instalace aktualizace nyní bude vyžadovat restart počítače předtím, než budete moci znovu používat Keyman. Přesto aktualizovat?</string>
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Aktualizace Keyman je připravena k instalaci.</string>
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Aktualizace Keyman byla stažena a je připravena k instalaci.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -570,6 +578,10 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <string name="S_Update" comment="Update tab name">Aktualizovat</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update_Now" comment="Update now button">Aktualizovat nyní</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">K dispozici jsou aktualizované komponenty klíče</string>
   <!-- Context: Online Update Dialog -->
@@ -639,10 +651,18 @@ klávesnici, kterou používáte v systému Windows. Klávesnice se automaticky 
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <!-- Context: Install Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Later" comment="Apply Update Later">Později</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Aplikovat aktualizaci nyní</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">Nainstalovat aktualizaci nyní</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->

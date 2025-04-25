@@ -38,9 +38,7 @@ export class InfrastructureMessages {
   static Info_FileNotBuiltSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(this.INFO_FileNotBuiltSuccessfully,
     `${def(o.relativeFilename)} failed to build.`)});
 
-  static ERROR_InvalidProjectFile = SevError | 0x0008;
-  static Error_InvalidProjectFile = (o:{message:string}) => m(this.ERROR_InvalidProjectFile,
-    `Project file is not valid: ${def(o.message)}`);
+  // 0x0008: ERROR_InvalidProjectFile moved to DeveloperUtilsMessages
 
   static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
   static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
@@ -84,9 +82,7 @@ export class InfrastructureMessages {
   static Error_InvalidProjectFolder = (o:{folderName:string}) => m(this.ERROR_InvalidProjectFolder,
     `The folder ${def(o.folderName)} does not appear to be a Keyman Developer project.`);
 
-  static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
-  static Error_UnsupportedProjectVersion = (o:{version:string}) => m(this.ERROR_UnsupportedProjectVersion,
-    `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`);
+  // 0x0013: ERROR_UnsupportedProjectVersion moved to developer-utils-messages
 
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
