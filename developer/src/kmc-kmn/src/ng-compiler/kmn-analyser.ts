@@ -760,9 +760,13 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
+    const match       = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch     = new TokenRule(TokenTypes.NOMATCH, true);
     const inputBlock  = new InputBlockRule();
     const ifLikeBlock = new IfLikeBlockRule();
-    this.rule = new AlternateRule([inputBlock, ifLikeBlock]);
+    this.rule = new AlternateRule([
+      match, noMatch, inputBlock, ifLikeBlock,
+    ]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -807,102 +811,6 @@ export class InputCharacterRule extends SingleChildRule {
   }
 }
 
-export class IfLikeBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const ifLikeStatement           = new IfLikeStatementRule();
-    const paddedIfLikeStatement     = new PaddedIfLikeStatementRule();
-    const manyPaddedIfLikeStatement = new ManyRule(paddedIfLikeStatement);
-    this.rule = new SequenceRule([ifLikeStatement, manyPaddedIfLikeStatement]);
-  }
-}
-
-export class PaddedIfLikeStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const padding: Rule         = new PaddingRule();
-    const ifLikeStatement: Rule = new IfLikeStatementRule();
-    this.rule = new SequenceRule([padding, ifLikeStatement]);
-  }
-}
-
-export class RhsBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const contextOutputBlock: Rule = new ContextOutputBlockRule();
-    const context: Rule            = new TokenRule(TokenTypes.CONTEXT, true);
-    this.rule = new AlternateRule([contextOutputBlock, context]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const children  = tmp.getChildren();
-      const rhsNode   = new ASTNode(NodeTypes.RHS);
-      rhsNode.addChildren(children);
-      rhsNode.addChildren(lineNodes);
-      node.addChild(rhsNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class ContextOutputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const optPaddedContext: Rule = new OptionalPaddedContextRule();
-    const outputBlock: Rule      = new OutputBlockRule();
-    this.rule = new SequenceRule([optPaddedContext, outputBlock]);
-  }
-}
-
-export class OptionalPaddedContextRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const paddedContextRule: Rule = new PaddedContextRule();
-    this.rule = new OptionalRule(paddedContextRule);
-  }
-}
-
-export class PaddedContextRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const context: Rule = new TokenRule(TokenTypes.CONTEXT, true);
-    const padding: Rule = new PaddingRule();
-    this.rule = new SequenceRule([context, padding]);
-  }
-}
-
-export class OutputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const outputStatement           = new OutputStatementRule();
-    const paddedOutputStatement     = new PaddedOutputStatementRule();
-    const manyPaddedOutputStatement = new ManyRule(paddedOutputStatement);
-    this.rule = new SequenceRule([outputStatement, manyPaddedOutputStatement]);
-  }
-}
-
-export class PaddedOutputStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const padding: Rule         = new PaddingRule();
-    const outputStatement: Rule = new OutputStatementRule();
-    this.rule = new SequenceRule([padding, outputStatement]);
-  }
-}
-
-export class OutputStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const useStatement: Rule   = new UseStatementRule();
-    const layerStatement: Rule = new LayerStatementRule();
-    this.rule = new AlternateRule([useStatement, layerStatement]);
-  }
-}
-
 export class AnyStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -921,6 +829,25 @@ export class AnyStatementRule extends SingleChildRule {
       node.addChild(anyNode);
     }
     return parseSuccess;
+  }
+}
+
+export class IfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifLikeStatement           = new IfLikeStatementRule();
+    const paddedIfLikeStatement     = new PaddedIfLikeStatementRule();
+    const manyPaddedIfLikeStatement = new ManyRule(paddedIfLikeStatement);
+    this.rule = new SequenceRule([ifLikeStatement, manyPaddedIfLikeStatement]);
+  }
+}
+
+export class PaddedIfLikeStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule         = new PaddingRule();
+    const ifLikeStatement: Rule = new IfLikeStatementRule();
+    this.rule = new SequenceRule([padding, ifLikeStatement]);
   }
 }
 
@@ -1144,5 +1071,82 @@ export class BracketedStringRule extends SingleChildRule {
     this.rule = new SequenceRule([
       leftBracket, optWhitespace, string, optWhitespace, rightBracket,
     ]);
+  }
+}
+
+export class RhsBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const contextOutputBlock: Rule = new ContextOutputBlockRule();
+    const context: Rule            = new TokenRule(TokenTypes.CONTEXT, true);
+    this.rule = new AlternateRule([contextOutputBlock, context]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const children  = tmp.getChildren();
+      const rhsNode   = new ASTNode(NodeTypes.RHS);
+      rhsNode.addChildren(children);
+      rhsNode.addChildren(lineNodes);
+      node.addChild(rhsNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class ContextOutputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const optPaddedContext: Rule = new OptionalPaddedContextRule();
+    const outputBlock: Rule      = new OutputBlockRule();
+    this.rule = new SequenceRule([optPaddedContext, outputBlock]);
+  }
+}
+
+export class OptionalPaddedContextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const paddedContextRule: Rule = new PaddedContextRule();
+    this.rule = new OptionalRule(paddedContextRule);
+  }
+}
+
+export class PaddedContextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const context: Rule = new TokenRule(TokenTypes.CONTEXT, true);
+    const padding: Rule = new PaddingRule();
+    this.rule = new SequenceRule([context, padding]);
+  }
+}
+
+export class OutputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const outputStatement           = new OutputStatementRule();
+    const paddedOutputStatement     = new PaddedOutputStatementRule();
+    const manyPaddedOutputStatement = new ManyRule(paddedOutputStatement);
+    this.rule = new SequenceRule([outputStatement, manyPaddedOutputStatement]);
+  }
+}
+
+export class PaddedOutputStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule         = new PaddingRule();
+    const outputStatement: Rule = new OutputStatementRule();
+    this.rule = new SequenceRule([padding, outputStatement]);
+  }
+}
+
+export class OutputStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const useStatement: Rule   = new UseStatementRule();
+    const layerStatement: Rule = new LayerStatementRule();
+    this.rule = new AlternateRule([useStatement, layerStatement]);
   }
 }

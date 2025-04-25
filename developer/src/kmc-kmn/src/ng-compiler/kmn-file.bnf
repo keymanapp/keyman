@@ -45,20 +45,12 @@ spacedGroupQualifier: WHITESPACE groupQualifier
 groupQualifier: usingKeys|READONLY
 usingKeys: USING WHITESPACE KEYS
 productionBlock: lhsBlock spacedChevron rhsBlock
-lhsBlock: inputBlock|ifLikeBlock
+lhsBlock: MATCH|NOMATCH|inputBlock|ifLikeBlock
 inputBlock: ifLikeBlock? padding inputCharacter
 inputCharacter: anyStatement
+anyStatement: ANY bracketedStoreName
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
 paddedIfLikeStatement: padding IfLikeStatement
-rhsBlock: contextOutputBlock|CONTEXT
-contextOutputBlock: paddedContext? outputBlock
-paddedContext: CONTEXT padding
-outputBlock: outputStatement paddedOutputStatement*
-paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|layerStatement
-
-anyStatement: ANY bracketedStoreName
-
 ifLikeStatement: ifStatement|layerStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
   ifSystemStoreStringStatement
@@ -77,3 +69,9 @@ layerStatement: LAYER bracketedString
 platformStatement: PLATFORM bracketedString
 baselayoutStatement: BASELAYOUT bracketedString
 bracketedString: LEFT_BR WHITESPACE? STRING WHITESPACE? RIGHT_BR
+rhsBlock: contextOutputBlock|CONTEXT
+contextOutputBlock: paddedContext? outputBlock
+paddedContext: CONTEXT padding
+outputBlock: outputStatement paddedOutputStatement*
+paddedOutputStatement: padding outputStatement
+outputStatement: useStatement|layerStatement
