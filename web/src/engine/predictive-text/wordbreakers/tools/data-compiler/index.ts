@@ -2,8 +2,8 @@
 
 // Original version found at: https://github.com/eddieantonio/unicode-default-word-boundary/blob/master/libexec/compile-word-break.js
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
