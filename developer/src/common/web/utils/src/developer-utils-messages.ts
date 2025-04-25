@@ -65,13 +65,13 @@ export class DeveloperUtilsMessages {
     `Project file is not valid: ${def(o.message)}`,
   );
 
-  static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
+  static ERROR_UnsupportedProjectVersion = SevError | 0x000B;
   static Error_UnsupportedProjectVersion = (o:{version:string}) => m(
     this.ERROR_UnsupportedProjectVersion,
     `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`,
   );
 
-  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x0014;
+  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000C;
   static Error_ProjectFileCouldNotBeRead = () => m(
     this.ERROR_ProjectFileCouldNotBeRead,
     `Project file could not be read`

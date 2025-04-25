@@ -39,6 +39,15 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   
   private func setup() {
     barTintColor = Colors.statusToolbar
+    
+    // For scenarios where the system wants to make the toolbar translucent,
+    // we additionally need the actual background color to be set.
+    let appearance = UIToolbarAppearance()
+    appearance.configureWithOpaqueBackground()
+    appearance.backgroundColor = Colors.statusToolbar
+    standardAppearance = appearance
+    // And, for good measure, try to prevent special scrolling-edge appearance changes outright.
+    scrollEdgeAppearance = appearance
   }
   
   /**

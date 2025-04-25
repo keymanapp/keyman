@@ -28,7 +28,7 @@ Use this method to specify the HTML content to display in the banner to theme yo
 
 If the banner theme references assets (like .svg or .css files), ensure you've also called [copyHTMLBannerAssets()](copyHTMLBannerAssets).
 
-Note: The HTML banner needs to be updated whenever the keyboard is reloaded, so call this in `SystemKeyboard.onInitializeInterface(()`.
+Note: The HTML banner needs to be updated whenever the keyboard is reloaded, so call this in `SystemKeyboard.onKeyboardShown()`.
 
 ## Examples
 

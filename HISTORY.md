@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 19.0.25 alpha 2025-04-22
+
+* chore: merge beta to master (pre-release prep) (#13730)
+
+## 19.0.24 alpha 2025-04-21
+
+* build(deps): bump koa from 2.15.3 to 2.16.1 (#13694)
+* chore: merge beta into master B18S5 (#13712)
+
+## 19.0.23 alpha 2025-04-07
+
+* chore(web): remove dead methods regarding keyboard state (#13671)
+* chore(linux): Update debian changelog (#13675)
+
+## 19.0.22 alpha 2025-04-04
+
+* build(deps): bump tar-fs and puppeteer-core (#13661)
+
+## 19.0.21 alpha 2025-04-03
+
+* chore: use explicit `node:` prefix for node imports (#13650)
+* refactor(developer): rename developer/web/utils/common-messages.ts to developer-utils-messages.ts (#13653)
+* refactor(developer): move sentry and developer options into console apps (#13654)
+* refactor(developer): consolidate project loader (#13656)
+
 ## 19.0.20 alpha 2025-04-01
 
 * fix(android): move responsibility for setting keyboard height preference into `applyKeyboardHeight()` (#13578)
@@ -87,6 +112,91 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.234 beta 2025-04-22
+
+* fix(android): Require RELEASE_OEM env vars to build FirstVoices Android (#13725)
+
+## 18.0.233 beta 2025-04-21
+
+* chore: cleanup kps.xsd version typos (#13670)
+* fix(android): refresh system keyboard banner on reload (#13702)
+* chore(ios): update keyboard-size data for current iOS devices (#13697)
+* fix(ios): ensure update notification does not go translucent/transparent (#13698)
+* fix(ios): resummon keyboard when keyboard picker is dismissed (#13701)
+* fix(web): match banner font scaling to osk font scaling (#13646)
+* docs(common): Document Keyman website server-side dependencies (#13642)
+* docs(windows): update FAQ (#13708)
+
+## 18.0.232 beta 2025-04-10
+
+* fix(android): Downgrade UnknownHostException error to info (#13692)
+* change(web): add unique classname to mobile-device page-trailer element (#13632)
+* chore(android,mac,windows): Update crowdin strings for Spanish Latin America (#13691)
+
+## 18.0.231 beta 2025-04-09
+
+* docs(android): Document default keyboard height for xxxhdpi devices (#13673)
+* fix(ios): allow swipe-dismissal of Settings to be cancelled (#13686)
+* fix(ios): do not show notification for downloaded keyboard when showing its installer (#13687)
+* fix(ios): restore banner-hiding mechanism for keyboard calibration tool (#13689)
+
+## 18.0.230 beta 2025-04-08
+
+* docs(web): documentation for touch-keyboard gesture models (#13659)
+
+## 18.0.229 beta 2025-04-07
+
+* fix(ios): ensure keyboard height is set when engine settings view is used in a NavigationController (#13643)
+* chore(android,mac,windows): update Crowdin strings for Czech (#13680)
+* chore(android,mac,windows): update Crowdin strings for Khmer (#13681)
+* chore(linux): Update debian changelog (#13674)
+
+## 18.0.228 beta 2025-04-04
+
+* fix(ios): prevent re-display of keyboard when re-entering app to its menus (#13630)
+* fix(ios): slide dismissal of keyboard-height adjuster will properly resize the keyboard (#13631)
+* docs(web): improve section on motivation for gesture input serialization (#13652)
+* fix(linux): fix crash if kmp doesn't have name field (#13648)
+* chore(web): improve error logging in predictive-text worker message validation (#13660)
+* fix(android): Adjust keyboard and banner heights for mdpi and hdpi devices (#13651)
+* fix(android): adjust keyboard and banner height for xhdpi portrait (#13655)
+* fix(android): Adjust keyboard and banner height for 7" tablet landscape (#13667)
+* fix(android): Adjust keyboard height for 10" tablet landscape (#13668)
+
+## 18.0.227 beta 2025-04-03
+
+* fix(developer): remove redundant keyboard fields from .kps (#13600)
+* fix(developer): remove redundant Name and RTL fields from .kps `LexicalModel` (#13640)
+* fix(mac): reevaluate API compliance for each change in context (#13550)
+* fix(android): Move responsibility for setting keyboard height preference (#13635)
+* fix(android): Add back button to "Adjust Keyboard Height "menu (#13645)
+* fix(linux): allow unhandled keys to pass through to compliant apps (#13625)
+
+## 18.0.226 beta 2025-04-02
+
+* docs(web): document internals for gesture modeling and processing (#13587)
+* docs(web): document input-serialization aspects of gesture processing (#13597)
+* fix(android): Add dimensions for 320+dpi phones in landscape (#13592)
+* chore(common): Update crowdin strings for Mon (#13595)
+* docs(linux): add function headers for some of the engine methods (#13637)
+
+## 18.0.225 beta 2025-04-01
+
+* fix(web): remove extra px offset from last OSK row (#13621)
+* fix(developer): add special handling for 'und' in kmc-keyboard-info (#13622)
+* chore(mac,windows): Update Crowdin strings for Italian (#13594)
+* change(ios): prevent file erasure during copyWithOverwrite error state (#13548)
+* fix(ios): uninstalls keyboards upon failure to load (#13549)
+* refactor(linux): remove warning if no custom keyboards exist (#13624)
+
+## 18.0.224 beta 2025-03-31
+
+* fix(windows): reload right modifier key option (#13585)
+
+## 18.0.223 beta 2025-03-29
+
+* chore(developer): improve kmc-ldml 'invalid version' message (#13602)
 
 ## 18.0.222 beta 2025-03-28
 

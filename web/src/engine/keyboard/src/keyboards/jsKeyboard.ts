@@ -27,8 +27,7 @@ class CacheTag {
 
 export enum LayoutState {
   NOT_LOADED = undefined,
-  POLYFILLED = 1,
-  CALIBRATED = 2
+  POLYFILLED = 1
 }
 
 export interface VariableStoreDictionary {
@@ -454,22 +453,9 @@ export class JSKeyboard {
     let _this = this;
 
     formFactors.forEach(function(form) {
-      // Currently doesn't work if we reset it to POLYFILLED, likely due to how 'calibration'
-      // currently works.
       _this.layoutStates[form] = LayoutState.NOT_LOADED;
     });
   }
-
-  public markLayoutCalibrated(formFactor: DeviceSpec.FormFactor) {
-    if(this.layoutStates[formFactor] != LayoutState.NOT_LOADED) {
-      this.layoutStates[formFactor] = LayoutState.CALIBRATED;
-    }
-  }
-
-  public getLayoutState(formFactor: DeviceSpec.FormFactor) {
-    return this.layoutStates[formFactor];
-  }
-
 
   constructNullKeyEvent(device: DeviceSpec, stateKeys?: StateKeyMap): KeyEvent {
     stateKeys = stateKeys || {
