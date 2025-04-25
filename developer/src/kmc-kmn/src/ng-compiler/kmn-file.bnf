@@ -2,7 +2,7 @@ kmnTree: line*
 line: contentLine|blankLine
 contentLine: WHITESPACE? content WHITESPACE? COMMENT? NEWLINE
 blankLine: WHITESPACE? COMMENT? NEWLINE
-padding: WHITESPACE|continuationNewline
+padding: continuationNewline|WHITESPACE
 continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE WHITESPACE?
 content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
   variableStoreAssign|ruleBlock

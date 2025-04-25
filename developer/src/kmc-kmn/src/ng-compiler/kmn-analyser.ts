@@ -63,7 +63,7 @@ export class PaddingRule extends SingleChildRule {
     super();
     const whitespace          = new TokenRule(TokenTypes.WHITESPACE);
     const continuationNewline = new ContinuationNewlineRule();
-    this.rule = new AlternateRule([whitespace, continuationNewline]);
+    this.rule = new AlternateRule([continuationNewline, whitespace]);
   }
 }
 
@@ -74,7 +74,7 @@ export class ContinuationNewlineRule extends SingleChildRule {
     const continuation: Rule  = new TokenRule(TokenTypes.CONTINUATION);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(
-      [optWhitespace, continuation, optWhitespace, newline, optWhitespace,]
+      [optWhitespace, continuation, optWhitespace, newline, optWhitespace]
     );
   }
 }
