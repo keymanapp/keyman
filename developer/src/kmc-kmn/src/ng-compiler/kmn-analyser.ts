@@ -74,7 +74,7 @@ export class ContinuationNewlineRule extends SingleChildRule {
     const continuation: Rule  = new TokenRule(TokenTypes.CONTINUATION);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(
-      [optWhitespace, continuation, optWhitespace, newline]
+      [optWhitespace, continuation, optWhitespace, newline, optWhitespace,]
     );
   }
 }

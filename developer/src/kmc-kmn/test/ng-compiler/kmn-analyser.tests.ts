@@ -562,6 +562,19 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
     });
+    it("can parse correctly (multi line assignment)", () => {
+      const line1 = 'store(c_key)           [K_K] [K_X] [SHIFT K_K] [SHIFT K_X] [K_G] \\\n';
+      const line2 = '                       [K_C] [K_Q] [SHIFT K_C] [SHIFT K_Q] [SHIFT K_J] \\\n';
+      const line3 = '                       [K_D] [K_Z] [SHIFT K_D] [SHIFT K_Z] [SHIFT K_N] \\\n';
+      const line4 = '                       [K_T] [K_F] [SHIFT K_T] [SHIFT K_F] [K_N] \\\n';
+      const line5 = '                       [K_B] [K_P] [SHIFT K_B] [SHIFT K_P] [K_M] \\\n';
+      const line6 = '                       [K_Y] [K_R] [K_L] [K_V] [K_S] [K_H] [SHIFT K_L] [SHIFT K_G] \\\n';
+      const line7 = '                       [RALT K_K] [RALT K_B]\n';
+      const str = `${line1}${line2}${line3}${line4}${line5}${line6}${line7}`;
+      Rule.tokenBuffer = stringToTokenBuffer(str);
+      const variableStoreAssign: Rule = new VariableStoreAssignRule();
+      assert.isTrue(variableStoreAssign.parse(root));
+    });
   });
   describe("TextRule Tests", () => {
     it("can construct a TextRule", () => {
@@ -1703,7 +1716,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(stringNode.getText(), '"shift"');
     });
   });
-    describe("Analyser Tests", () => {
+  describe("Analyser Tests", () => {
     it("can parse (part of) Khmer Angkor correctly", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);

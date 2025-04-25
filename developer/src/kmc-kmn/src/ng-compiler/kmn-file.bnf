@@ -3,7 +3,7 @@ line: contentLine|blankLine
 contentLine: WHITESPACE? content WHITESPACE? COMMENT? NEWLINE
 blankLine: WHITESPACE? COMMENT? NEWLINE
 padding: WHITESPACE|continuationNewline
-continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE
+continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE WHITESPACE?
 content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
   variableStoreAssign|ruleBlock
 stringSystemStoreAssign: stringSystemStore padding STRING
