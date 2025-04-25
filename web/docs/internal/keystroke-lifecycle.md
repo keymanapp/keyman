@@ -17,7 +17,7 @@ Both the `app/browser` and `app/webview` products are capable of handling simula
 
 The `app/browser` version of the engine is designed to integrate with the active page of the user's browser, giving it far more direct access to the user's true context in addition to direct access to handling DOM events resulting from hardware keystrokes.  Its `HardwareEventKeyboard` class is the primary module for establishing the needed engine event hooks and for interpreting the corresponding DOM events as they arise.
 
-The bulk of DOM key events trigger keystroke processing on key-down, though modifier keys also receive key-up handling.  Key-press events are handled selectively for held backspaces and possibly certain keystrokes for mnemonic keyboards.  In all cases, DOM keyboard event objects are preprocessed by the centralized `preprocessKeyboardEvent` method, which converts the DOM event format into Web's `KeyEvent` format, which is the form required by the keyboard rules within compiled JS keyboards.  This includes mnemonic keystroke preprocessing and remapping.
+The bulk of DOM key events trigger keystroke processing on key-down, though modifier keys also receive key-up handling.  Key-press events are handled selectively for held backspaces and possibly certain keystrokes for mnemonic keyboards.  In all cases, DOM keyboard event objects are preprocessed by the centralized `preprocessKeyboardEvent` method, which converts the DOM event format into Web's `KeyEvent` format, which is the form required by the keyboard rules within compiled JS keyboards.  This includes mnemonic keystroke preprocessing and remapping in addition to AltGr emulation.
 
 ### `app/webview`
 
