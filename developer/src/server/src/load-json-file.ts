@@ -1,4 +1,4 @@
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 import { readFileSync, existsSync } from 'fs';
 
 export function loadJsonFile(filename: string): any {
