@@ -1,9 +1,9 @@
 /**
  * Helpers and utilities for the Mocha tests.
  */
-import * as path from 'path';
-import * as fs from "fs";
-import { fileURLToPath } from 'url';
+import * as path from 'node:path';
+import * as fs from "node:fs";
+import { fileURLToPath } from 'node:url';
 
 /**
  * Builds a path to the fixture with the given path components.

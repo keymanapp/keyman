@@ -3,8 +3,6 @@
  */
 
 export { validateMITLicense } from './utils/validate-mit-license.js';
-export { KeymanSentry, SentryNodeOptions } from './utils/KeymanSentry.js';
-export { getOption, loadOptions, clearOptions } from './utils/options.js';
 export { escapeMarkdownChar } from './utils/markdown.js';
 export { KeymanUrls } from './utils/keyman-urls.js';
 
@@ -63,7 +61,7 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerE
 
 export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.js';
 
-export { CommonTypesMessages } from './common-messages.js';
+export { DeveloperUtilsMessages } from './developer-utils-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
 export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
 
@@ -73,3 +71,5 @@ export * as CloudUrls from './cloud-urls.js';
 export { getFontFamily, getFontFamilySync } from './font-family.js';
 
 export * as ValidIds from './valid-ids.js';
+
+export * as ProjectLoader from './project-loader.js';

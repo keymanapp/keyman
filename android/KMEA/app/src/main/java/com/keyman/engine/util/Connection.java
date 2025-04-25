@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 public final class Connection {
   private static final String TAG = "Connection";
@@ -103,6 +104,9 @@ public final class Connection {
     } catch (SocketTimeoutException e) {
       KMLog.LogBreadcrumb(TAG, "Connection.initialize timeout for: " + originalUrl, true);
       KMLog.LogInfo(TAG, "SocketTimeoutException");
+    } catch (UnknownHostException e) {
+      KMLog.LogBreadcrumb(TAG, "Connection.initialize could not resolve host: " + originalUrl, true);
+      KMLog.LogInfo(TAG, "UnknownHostException");
     } catch (Exception e) {
       KMLog.LogException(TAG, "Initialization failed:", e);
     }
