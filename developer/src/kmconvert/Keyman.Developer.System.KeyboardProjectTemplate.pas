@@ -274,9 +274,7 @@ begin
 
     // Add metadata about the keyboard
     pk := TPackageKeyboard.Create(kps);
-    pk.Name := Name;
     pk.ID := ID;
-    pk.Version := Version;
     kps.Keyboards.Add(pk);
 
     SetPackageLanguageMetadata(kps, pk.Languages);

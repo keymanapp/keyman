@@ -67,8 +67,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "Copyright:";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to need grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "Per funzionare correttamente, Keyman richiede funzionalità di accessibilità:\n\nConsenti l'accesso nelle preferenze di sistema, Sicurezza e Privacy.\nRiavvia il sistema.";
+
+/* message displayed to alert user to need grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "Per funzionare correttamente, Keyman richiede funzioni di accessibilità:\n\nConsenti l'accesso nelle impostazioni di sistema, Riservatezza e Sicurezza.\nRiavvia il sistema.";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(Nessuna tastiera configurata)";

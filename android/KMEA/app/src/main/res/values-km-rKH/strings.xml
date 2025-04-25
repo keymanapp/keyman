@@ -80,6 +80,14 @@
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      មាន​បញ្ហាធ្ងន់ធ្ងរចំពោះក្ដារចុច %1$s:%2$s សម្រាប់​ភាសា %3$s។ កំពុង​ផ្ទុក​ក្ដារចុច​លំនាំដើម។</string>
     <!-- Context: Fatal keyboard error.  -->
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      បញ្ហាក្នុងក្ដារចុច %1$s:%2$s សម្រាប់ភាសា %3$s។</string>
+    <!-- Context: Alert Dialog body: System WebView not installed -->
+    <string name="body_install_webview" comment="Notification when WebView not installed">Keyman តម្រូវឱ្យដំឡើង WebView ។\"</string>
+    <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
+    <string name="body_enable_webview" comment="Notification when WebView installed but not enabled">Keyman តម្រូវឱ្យបើក WebView ។\"</string>
+    <!-- Context Button label: Install WebView -->
+    <string name="label_install_webview" comment="Button label to install webview">ដំឡើង WebView</string>
+    <!-- Context Button label: Enable WebView -->
+    <string name="label_enable_webview" comment="Button label to enable webview">បើក WebView</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">កំពុង​ពិនិត្យ​រក​បញ្ជី​ពាក្យ​ពាក់ព័ន្ធ​ដើម្បី​ទាញយក</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      មិនអាចភ្ជាប់ទៅម៉ាស៊ីនមេ Keyman ដើម្បីរកបញ្ជីពាក្យសម្រាប់ទាញយកបានទេ</string>
@@ -113,6 +121,8 @@
     <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">រក​មិន​ឃើញ​ឯកសារដែល​បាន​ទាញ​យក</string>
     <!-- Context: General Updates -->
     <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">មិន​អាច​ចូលប្រើ​ម៉ាស៊ីនមេ​បាន​ទេ!</string>
+    <!-- Context:  Update-check failure notification -->
+    <string name="update_check_download_manager_disabled" comment="Notification that a system service needed for updates is disabled">DownloadManager បានបិទដំណើរការ - មិនអាចពិនិត្យរកអាប់ដេតផ្សេងៗ</string>
     <!-- Context: General Updates -->
     <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
     <!-- Context: General Updates -->
