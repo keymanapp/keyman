@@ -4,7 +4,6 @@
 package com.tavultesoft.kmapro;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -34,7 +33,6 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   private static ImageView sampleKeyboard = null;
 
   // Keeps track of the adjusted keyboard height for saving
-  private static SharedPreferences.Editor editor = null;
   private static int currentHeight = 0;
   private static ViewGroup.LayoutParams layoutParams;
 
@@ -52,21 +50,18 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     if (actionBar != null) {
       actionBar.setTitle(null);
       actionBar.setDisplayUseLogoEnabled(false);
-      actionBar.setDisplayShowHomeEnabled(false);
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
       actionBar.setDisplayShowTitleEnabled(false);
       actionBar.setDisplayShowCustomEnabled(true);
       actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.keyman_blue)));
     }
 
     TextView adjustKeyboardHeightActivityTitle = (TextView) findViewById(R.id.bar_title);
-    adjustKeyboardHeightActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
 
     String titleStr = getString(R.string.adjust_keyboard_height);
     adjustKeyboardHeightActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
     adjustKeyboardHeightActivityTitle.setText(titleStr);
-
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    editor = prefs.edit();
 
     sampleKeyboard = (ImageView) findViewById(R.id.sample_keyboard);
     layoutParams = sampleKeyboard.getLayoutParams();
@@ -77,9 +72,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     resetButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Clear the keyboard height preferences to reset
-        editor.remove(KMManager.KMKey_KeyboardHeightPortrait);
-        editor.remove(KMManager.KMKey_KeyboardHeightLandscape);
-        editor.commit();
+        KMManager.applyKeyboardHeight(context, KMManager.KeyboardHeight_Reset);
 
         // Restore default height
         currentHeight = KMManager.getKeyboardHeight(context);
@@ -107,11 +100,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
-            int orientation = KMManager.getOrientation(context);
-            String keyboardHeightKey = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
-              KMManager.KMKey_KeyboardHeightLandscape : KMManager.KMKey_KeyboardHeightPortrait;
-            editor.putInt(keyboardHeightKey, currentHeight);
-            editor.commit();
+            KMManager.applyKeyboardHeight(context, currentHeight);
             break;
         }
         return true;
@@ -140,11 +129,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
   }
 
   @Override
-  public void onBackPressed() {
-    // Apply the adjusted height on exit
-    KMManager.applyKeyboardHeight(this, currentHeight);
-
-    super.onBackPressed();
+  public boolean onSupportNavigateUp() {
+    onBackPressed();
+    return true;
   }
-
 }
