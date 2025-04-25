@@ -138,12 +138,8 @@ type
     Label2: TLabel;
     Label3: TLabel;
     lblKeyboardFiles: TLabel;
-    lblKeyboardDescription: TLabel;
     lbKeyboards: TListBox;
-    editKeyboardDescription: TEdit;
     memoKeyboardFiles: TMemo;
-    lblKeyboardVersion: TLabel;
-    editKeyboardVersion: TEdit;
     lblKeyboardOSKFont: TLabel;
     cbKeyboardOSKFont: TComboBox;
     cbKeyboardDisplayFont: TComboBox;
@@ -153,8 +149,6 @@ type
     cmdKeyboardAddLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     chkFollowKeyboardVersion: TCheckBox;
-    lblKeyboardRTL: TLabel;
-    editKeyboardRTL: TEdit;
     cmdKeyboardEditLanguage: TButton;
     panBuildMobile: TPanel;
     lblDebugHostCaption: TLabel;
@@ -172,15 +166,12 @@ type
     lblLexlicalModels: TLabel;
     lblLexicalModelsSubtitle: TLabel;
     lblLexicalModelFilename: TLabel;
-    lblLexicalModelDescription: TLabel;
     lblLexicalModelLanguages: TLabel;
     lbLexicalModels: TListBox;
-    editLexicalModelDescription: TEdit;
     gridLexicalModelLanguages: TStringGrid;
     cmdLexicalModelLanguageAdd: TButton;
     cmdLexicalModelLanguageRemove: TButton;
     cmdLexicalModelLanguageEdit: TButton;
-    chkLexicalModelRTL: TCheckBox;
     editLexicalModelFilename: TEdit;
     imgQRCode: TImage;
     panOpenInExplorer: TPanel;
@@ -1628,10 +1619,7 @@ begin
     k := SelectedKeyboard;
     if not Assigned(k) then
     begin
-      editKeyboardDescription.Text := '';
-      editKeyboardVersion.Text := '';
       memoKeyboardFiles.Text := '';
-      editKeyboardRTL.Text := '';
       cbKeyboardOSKFont.ItemIndex := -1;
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
@@ -1645,12 +1633,6 @@ begin
     // Details
 
     memoKeyboardFiles.Text := '';
-    editKeyboardDescription.Text := k.Name;
-    editKeyboardVersion.Text := k.Version;
-
-    if k.RTL
-      then editKeyboardRTL.Text := 'True'
-      else editKeyboardRTL.Text := 'False (or not .js format)';
 
     for i := 0 to pack.Files.Count - 1 do
       if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
@@ -1779,12 +1761,8 @@ var
   e: Boolean;
 begin
   e := lbKeyboards.ItemIndex >= 0;
-  lblKeyboardDescription.Enabled := e;
-  editKeyboardDescription.Enabled := e;
   lblKeyboardFiles.Enabled := e;
   memoKeyboardFiles.Enabled := e;
-  lblKeyboardVersion.Enabled := e;
-  editKeyboardVersion.Enabled := e;
   lblKeyboardOSKFont.Enabled := e;
   cbKeyboardOSKFont.Enabled := e;
   lblKeyboardDisplayFont.Enabled := e;
@@ -2330,18 +2308,13 @@ begin
     lm := SelectedLexicalModel;
     if not Assigned(lm) then
     begin
-      editLexicalModelDescription.Text := '';
       editLexicalModelFilename.Text := '';
-      chkLexicalModelRTL.Checked := False;
       gridLexicalModelLanguages.RowCount := 1;
       EnableLexicalModelTabControls;
       Exit;
     end;
 
     // Details
-
-    editLexicalModelDescription.Text := lm.Name;
-    chkLexicalModelRTL.Checked := lm.RTL;
 
     for i := 0 to pack.Files.Count - 1 do
       if TLexicalModelUtils.LexicalModelFileNameToID(pack.Files[i].FileName) = lm.ID then
@@ -2364,13 +2337,10 @@ var
   e: Boolean;
 begin
   e := lbLexicalModels.ItemIndex >= 0;
-  lblLexicalModelDescription.Enabled := e;
-  editLexicalModelDescription.Enabled := e;
   lblLexicalModelFilename.Enabled := e;
   editLexicalModelFilename.Enabled := e;
   lblLexicalModelLanguages.Enabled := e;
   cmdLexicalModelLanguageAdd.Enabled := e;
-  chkLexicalModelRTL.Enabled := e;
 
   e := e and (gridLexicalModelLanguages.Row > 0);
   gridLexicalModelLanguages.Enabled := e;
@@ -2436,7 +2406,6 @@ begin
 
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.Name := editLexicalModelDescription.Text;
   Modified := True;
 end;
 
@@ -2448,7 +2417,6 @@ begin
     Exit;
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.RTL := chkLexicalModelRTL.Checked;
   Modified := True;
 end;
 

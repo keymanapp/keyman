@@ -67,8 +67,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "Autorská práva:";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "Ke správné funkci vyžaduje Keyman zpřístupnění:\n\nPovolte přístup v Předvolbách systému, Zabezpečení a soukromí.\nRestartujte systém.";
+
+/* message displayed to alert user to grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "Ke správné funkci vyžaduje Keyman zpřístupnění:\n\nPovolte přístup v Nastavení systému, Soukromí a zabezpečení.\nRestartujte systém.";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(Žádná klávesnice nenastavena)";
