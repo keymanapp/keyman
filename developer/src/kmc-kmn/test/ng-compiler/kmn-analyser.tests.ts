@@ -1803,7 +1803,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 143);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 227);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -1829,6 +1829,12 @@ describe("KMN Analyser Tests", () => {
         'v_out', 'v_any', 'v_combo_R', 'v_combo_N', 'v_combo',
         'ind_v_key', 'ind_v_out', 'diacritic_key', 'diacritic_out', 'c_shifter_key',
         'c_shifter', 'punct_key', 'punct_out', 'latin_punct_key', 'latin_punct_out',
+        'spaces_key', 'spaces_out', 'currency_key', 'currency_out', 'digit_key',
+        'digit_out', 'lek_attak_key', 'lek_attak_out', 'lunar_date_key', 'lunar_date_out',
+        'input_subcons', 'subcons', 'arabic_digit_key', 'arabic_digit_out', 'v_above',
+        'shiftable_c_1st', 'shiftable_BA', 'shiftable_c_2nd', 'shiftable_c_2nd_with_BA', 'c_2nd_combo_LO',
+        'c_2nd_combo_MO', 'c_1st_combo_LO', 'c_1st_combo_MO', 'c_combo_SA', 'c_combo_QA',
+        'c_combo_HA',
       ];
       assert.equal(storeNodes.length, storeNames.length);
       storeNames.forEach((name, idx) => {
