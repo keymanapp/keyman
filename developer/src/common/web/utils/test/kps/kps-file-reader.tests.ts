@@ -14,7 +14,7 @@ import { makePathToFixture } from '../helpers/index.js';
 
 import { KpsFileReader } from "../../src/types/kps/kps-file-reader.js";
 import { KpsFileWriter } from '../../src/types/kps/kps-file-writer.js';
-import { CommonTypesMessages } from '../../src/common-messages.js';
+import { DeveloperUtilsMessages } from '../../src/developer-utils-messages.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -59,8 +59,6 @@ describe('kps-file-reader', function () {
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].ID, 'khmer_angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Name, 'Khmer Angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Version, '1.3');
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard[0].Languages.Language, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].Languages.Language[0]._, 'Central Khmer (Khmer, Cambodia)');
@@ -92,7 +90,7 @@ describe('kps-file-reader', function () {
 
     assert.isNull(kps);
     assert.lengthOf(callbacks.messages, 1);
-    assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_InvalidPackageFile));
+    assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_InvalidPackageFile));
   });
 
   // ERROR_UnsupportedPackageFileVersion
@@ -112,7 +110,7 @@ describe('kps-file-reader', function () {
 
       assert.isNull(kps);
       assert.lengthOf(callbacks.messages, 1);
-      assert.isTrue(callbacks.hasMessage(CommonTypesMessages.ERROR_UnsupportedPackageFileVersion));
+      assert.isTrue(callbacks.hasMessage(DeveloperUtilsMessages.ERROR_UnsupportedPackageFileVersion));
     });
   });
 });

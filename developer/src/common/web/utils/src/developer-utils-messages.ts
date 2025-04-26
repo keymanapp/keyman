@@ -4,14 +4,14 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
-const CommonTypesErrMask   = CompilerErrorNamespace.CommonTypes;
-// const SevInfo = CompilerErrorSeverity.Info   | CommonTypesErrMask;
-// const SevHint = CompilerErrorSeverity.Hint   | CommonTypesErrMask;
-// const SevWarn = CompilerErrorSeverity.Warn   | CommonTypesErrMask;
-const SevError = CompilerErrorSeverity.Error | CommonTypesErrMask;
-// const SevFatal = CompilerErrorSeverity.Fatal | CommonTypesErrMask;
+const DeveloperUtilsErrMask   = CompilerErrorNamespace.DeveloperUtils;
+// const SevInfo = CompilerErrorSeverity.Info   | DeveloperUtilsErrMask;
+// const SevHint = CompilerErrorSeverity.Hint   | DeveloperUtilsErrMask;
+// const SevWarn = CompilerErrorSeverity.Warn   | DeveloperUtilsErrMask;
+const SevError = CompilerErrorSeverity.Error | DeveloperUtilsErrMask;
+// const SevFatal = CompilerErrorSeverity.Fatal | DeveloperUtilsErrMask;
 
-export class CommonTypesMessages {
+export class DeveloperUtilsMessages {
   // structured Ajv validation error
   static ERROR_SchemaValidationError = SevError | 0x0001;
   static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
@@ -59,7 +59,25 @@ export class CommonTypesMessages {
     `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`
   );
 
-  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000A;
+  static ERROR_InvalidProjectFile = SevError | 0x000A;
+  static Error_InvalidProjectFile = (o:{message:string}) => m(
+    this.ERROR_InvalidProjectFile,
+    `Project file is not valid: ${def(o.message)}`,
+  );
+
+  static ERROR_UnsupportedProjectVersion = SevError | 0x000B;
+  static Error_UnsupportedProjectVersion = (o:{version:string}) => m(
+    this.ERROR_UnsupportedProjectVersion,
+    `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`,
+  );
+
+  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000C;
+  static Error_ProjectFileCouldNotBeRead = () => m(
+    this.ERROR_ProjectFileCouldNotBeRead,
+    `Project file could not be read`
+  );
+
+  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000D;
   static Error_UnsupportedPackageFileVersion = (o:{version:string}) => m(
     this.ERROR_UnsupportedPackageFileVersion,
     `Package source file is an unsupported version '${def(o.version)}'`,

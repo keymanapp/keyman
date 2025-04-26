@@ -92,6 +92,22 @@ Refer to **Port lookup table** above for Docker container names
 
 ---------
 
+## Website Dependencies
+
+The table below shows server-side dependencies for each website
+
+|Website               | Depends On           |
+|----------------------|-------------         |
+| s.keyman.com         | <br><br>             |
+| downloads.keyman.com | <br><br>             |
+| api.keyman.com       | downloads.keyman.com<br>s.keyman.com |
+| keymanweb.com        | api.keyman.com       |
+| keyman.com           | api.keyman.com<br>downloads.keyman.com |
+| help.keyman.com      | api.keyman.com<br>downloads.keyman.com |
+
+
+---------
+
 ## Kubernetes Deployment
 For production, the websites are deployed with Kubernetes.
 

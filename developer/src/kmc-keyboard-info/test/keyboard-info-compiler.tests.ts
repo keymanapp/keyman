@@ -844,3 +844,73 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
   });
 });
+
+describe('fillLanguageMetadata', function() {
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  })
+
+  const tests: { bcp47: string, lang: KeyboardInfoFileLanguage, commonScript: string }[] = [
+
+    // 'und' language subtag
+
+    {
+      bcp47: 'und',
+      lang: { languageName: 'Undetermined', regionName: undefined, scriptName: undefined, displayName: 'Undetermined' },
+      commonScript: 'Zyyy',
+    },
+    {
+      bcp47: 'und-Latn',
+      lang: { languageName: 'Undetermined', regionName: undefined, scriptName: 'Latin', displayName: 'Undetermined (Latin)' },
+      commonScript: 'Latn',
+    },
+    {
+      bcp47: 'und-MX',
+      lang: { languageName: 'Undetermined', regionName: 'Mexico', scriptName: undefined, displayName: 'Undetermined (Mexico)' },
+      commonScript: 'Zyyy',
+    },
+    {
+      bcp47: 'und-Khmr-MX',
+      lang: { languageName: 'Undetermined', regionName: 'Mexico', scriptName: 'Khmer', displayName: 'Undetermined (Khmer, Mexico)' },
+      commonScript: 'Khmr',
+    },
+
+    // Private use subtags
+
+    {
+      bcp47: 'qaa-Qabx-QQ',
+      lang: { languageName: 'qaa-Qabx-QQ', regionName: 'QQ', scriptName: 'Qabx', displayName: 'qaa-Qabx-QQ (Qabx, QQ)' },
+      commonScript: 'Qabx',
+    }
+  ];
+
+  for(const test of tests) {
+    it(`should handle ${test.bcp47} correctly`, async function() {
+      const compiler = new KeyboardInfoCompiler();
+      await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES});
+      const lang: KeyboardInfoFileLanguage = {};
+      const result = compiler.unitTestEndPoints.fillLanguageMetadata(
+        lang,
+        test.bcp47,
+        null, null
+      );
+      assert.isOk(result);
+      assert.equal(result.firstBcp47, test.bcp47);
+      assert.equal(result.commonScript, test.commonScript);
+
+      assert.equal(lang.languageName, test.lang.languageName);
+      assert.equal(lang.regionName, test.lang.regionName);
+      assert.equal(lang.scriptName, test.lang.scriptName);
+      assert.equal(lang.displayName, test.lang.displayName);
+
+      assert.isEmpty(callbacks.messages);
+    });
+  }
+});

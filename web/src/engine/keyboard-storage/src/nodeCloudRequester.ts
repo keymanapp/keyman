@@ -7,9 +7,9 @@ import {
   default as CloudQueryEngine
 } from './cloud/queryEngine.js';
 
-import fs from 'fs';
-import https from 'https';
-import vm from 'vm';
+import fs from 'node:fs';
+import https from 'node:https';
+import vm from 'node:vm';
 
 export default class NodeCloudRequester implements CloudRequesterInterface {
   private static QUERY_SEED = 1;

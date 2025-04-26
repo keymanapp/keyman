@@ -9,7 +9,7 @@
 import { util } from '@keymanapp/common-types';
 import boxXmlArray = util.boxXmlArray;
 
-import { CommonTypesMessages } from "../../common-messages.js";
+import { DeveloperUtilsMessages } from "../../developer-utils-messages.js";
 import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { KeymanXMLReader } from "../../xml-utils.js";
 import { KPS_FILE_VERSIONS, KpsPackage } from "./kps-file.js";
@@ -30,7 +30,7 @@ export class KpsFileReader {
           a = new KeymanXMLReader('kps')
             .parse(data) as KpsPackage;
         } catch(e) {
-          this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidPackageFile({e}));
+          this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidPackageFile({e}));
         }
         return a;
     })();
@@ -40,7 +40,7 @@ export class KpsFileReader {
     }
 
     if(!KPS_FILE_VERSIONS.includes(kpsPackage.Package?.System?.FileVersion)) {
-      this.callbacks.reportMessage(CommonTypesMessages.Error_UnsupportedPackageFileVersion({version: kpsPackage.Package?.System?.FileVersion}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_UnsupportedPackageFileVersion({version: kpsPackage.Package?.System?.FileVersion}));
       return null;
     }
 
