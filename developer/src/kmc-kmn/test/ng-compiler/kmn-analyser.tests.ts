@@ -105,6 +105,46 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
       assert.equal(children[1].nodeType, NodeTypes.LINE);
     });
+    it("can parse correctly (variable store assign, comment)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 c a comment\n');
+      const contentLine: Rule = new ContentLineRule();
+      assert.isTrue(contentLine.parse(root));
+      const children = root.getChildren();
+      assert.equal(children.length, 2);
+      assert.equal(children[0].nodeType, NodeTypes.STORE);
+      assert.equal(children[0].getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
+      assert.equal(children[1].nodeType, NodeTypes.LINE);
+    });
+    it("can parse correctly (variable store assign, continuation, comment)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781 c a comment\n');
+      const contentLine: Rule = new ContentLineRule();
+      assert.isTrue(contentLine.parse(root));
+      const children = root.getChildren();
+      assert.equal(children.length, 2);
+      assert.equal(children[0].nodeType, NodeTypes.STORE);
+      assert.equal(children[0].getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
+      assert.equal(children[0].getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+      assert.equal(children[1].nodeType, NodeTypes.LINE);
+    });
+    it("can parse correctly (multi line variable store assignment, comment)", () => {
+      const line1 = 'store(c_out)           U+1780 U+1781 U+1782 U+1783 U+1784 \\\n';
+      const line2 = '    	   	   	          U+1785 U+1786 U+1787 U+1788 U+1789 \\\n';
+      const line3 = '    	   	   	          U+178A U+178B U+178C U+178D U+178E \\\n';
+      const line4 = '    	   	   	          U+178F U+1790 U+1791 U+1792 U+1793 \\\n';
+      const line5 = '    	   	   	          U+1794 U+1795 U+1796 U+1797 U+1798 \\\n';
+      const line6 = '    	   	   	          U+1799 U+179A U+179B U+179C U+179F U+17A0 U+17A1 U+17A2 \\\n';
+      const line7 = '    	   	   	          U+179D U+179E c deprecated, but they are used in minority languages\n';
+      const str = `${line1}${line2}${line3}${line4}${line5}${line6}${line7}`;
+      Rule.tokenBuffer = stringToTokenBuffer(str);
+      const contentLine: Rule = new ContentLineRule();
+      assert.isTrue(contentLine.parse(root));
+      const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
+      assert.isNotNull(storeNode);
+      const uCharNodes = storeNode.getChildrenOfType(NodeTypes.U_CHAR);
+      assert.equal(uCharNodes.length, 35);
+      const lineNodes = storeNode.getChildrenOfType(NodeTypes.LINE);
+      assert.equal(lineNodes.length, 6);
+    });
   });
   describe("BlankLineRule Tests", () => {
     it("can construct a BlankLineRule", () => {
@@ -1763,7 +1803,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 71);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 143);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -1782,16 +1822,18 @@ describe("KMN Analyser Tests", () => {
       assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
       assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
       const storeNodes = root.getChildrenOfType(NodeTypes.STORE);
-      assert.equal(storeNodes.length, 9);
-      assert.equal(storeNodes[0].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutSingle');
-      assert.equal(storeNodes[1].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo1');
-      assert.equal(storeNodes[2].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo2');
-      assert.equal(storeNodes[3].getDescendents(NodeTypes.STORENAME)[0].getText(), 'vCombo3');
-      assert.equal(storeNodes[4].getDescendents(NodeTypes.STORENAME)[0].getText(), 'ShiftOutAll');
-      assert.equal(storeNodes[5].getDescendents(NodeTypes.STORENAME)[0].getText(), 'digit');
-      assert.equal(storeNodes[6].getDescendents(NodeTypes.STORENAME)[0].getText(), 'number');
-      assert.equal(storeNodes[7].getDescendents(NodeTypes.STORENAME)[0].getText(), 'whitespace');
-      assert.equal(storeNodes[8].getDescendents(NodeTypes.STORENAME)[0].getText(), 'c_key');
+      const storeNames = [
+        'ShiftOutSingle', 'vCombo1', 'vCombo2', 'vCombo3', 'ShiftOutAll',
+        'digit', 'number', 'whitespace', 'c_key', 'c_out',
+        'v_gen_key', 'v_gen', 'v_pseudo_key', 'v_pseudo', 'v_key',
+        'v_out', 'v_any', 'v_combo_R', 'v_combo_N', 'v_combo',
+        'ind_v_key', 'ind_v_out', 'diacritic_key', 'diacritic_out', 'c_shifter_key',
+        'c_shifter', 'punct_key', 'punct_out', 'latin_punct_key', 'latin_punct_out',
+      ];
+      assert.equal(storeNodes.length, storeNames.length);
+      storeNames.forEach((name, idx) => {
+        assert.equal(storeNodes[idx].getDescendents(NodeTypes.STORENAME)[0].getText(), name);
+      });
       const groupNodes = root.getChildrenOfType(NodeTypes.GROUP);
       assert.equal(groupNodes.length, 3);
       assert.equal(groupNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'NewContext');
