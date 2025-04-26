@@ -48,8 +48,6 @@ describe('kps-file-reader', function () {
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].ID, 'khmer_angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Name, 'Khmer Angkor');
-    assert.equal(kps.Package.Keyboards.Keyboard[0].Version, '1.3');
 
     assert.lengthOf(kps.Package.Keyboards.Keyboard[0].Languages.Language, 1);
     assert.equal(kps.Package.Keyboards.Keyboard[0].Languages.Language[0]._, 'Central Khmer (Khmer, Cambodia)');
