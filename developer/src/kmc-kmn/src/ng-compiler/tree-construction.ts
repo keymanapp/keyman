@@ -26,6 +26,7 @@ export enum NodeTypes {
   HOTKEY           = "HOTKEY",
   IF               = "IF",
   INCLUDECODES     = "INCLUDECODES",
+  INDEX            = "INDEX",
   KEYBOARDVERSION  = "KEYBOARDVERSION",
   KEY_CODE         = "KEY_CODE",
   KMW_EMBEDCSS     = "KMW_EMBEDCSS",

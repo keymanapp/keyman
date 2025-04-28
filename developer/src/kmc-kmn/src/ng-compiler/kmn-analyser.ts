@@ -1172,6 +1172,17 @@ export class IndexStatementRule extends SingleChildRule {
       rightBracket,
     ]);
   }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const indexNode = tmp.removeSoleChildOfType(NodeTypes.INDEX);
+      indexNode.addChildren(tmp.getChildren());
+      node.addChild(indexNode);
+    }
+    return parseSuccess;
+  }
 }
 
 export class SpacedCommaRule extends SingleChildRule {

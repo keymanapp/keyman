@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1771,6 +1771,76 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.USE));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("IndexStatementRule Tests", () => {
+    it("can construct a IndexStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isNotNull(indexStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1)');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space after open)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1)');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space before close)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1 )');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space after open and before close)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1 )');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space before comma)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(digit ,1)');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space after comma)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(digit, 1)');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (space before and after comma)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(digit , 1)');
+      const indexStatement: Rule = new IndexStatementRule();
+      assert.isTrue(indexStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
     });
   });
   describe("OutputStatementRule Tests", () => {

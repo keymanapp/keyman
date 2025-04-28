@@ -202,6 +202,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.HOTKEY,           nodeType: NodeTypes.HOTKEY},
     {tokenType: TokenTypes.IF,               nodeType: NodeTypes.IF},
     {tokenType: TokenTypes.INCLUDECODES,     nodeType: NodeTypes.INCLUDECODES},
+    {tokenType: TokenTypes.INDEX,            nodeType: NodeTypes.INDEX},
     {tokenType: TokenTypes.KEYBOARDVERSION,  nodeType: NodeTypes.KEYBOARDVERSION},
     {tokenType: TokenTypes.KEY_CODE,         nodeType: NodeTypes.KEY_CODE},
     {tokenType: TokenTypes.KMW_EMBEDCSS,     nodeType: NodeTypes.KMW_EMBEDCSS},
