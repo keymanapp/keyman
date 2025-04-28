@@ -1178,7 +1178,7 @@ export class SpacedCommaRule extends SingleChildRule {
   public constructor() {
     super();
     const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const comma: Rule         = new TokenRule(TokenTypes.CHEVRON);
+    const comma: Rule         = new TokenRule(TokenTypes.COMMA);
     this.rule = new SequenceRule([optWhitespace, comma, optWhitespace]);
   }
 }

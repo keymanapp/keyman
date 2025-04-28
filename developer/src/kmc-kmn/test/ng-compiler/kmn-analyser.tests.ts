@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1796,6 +1796,33 @@ describe("KMN Analyser Tests", () => {
       const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"shift"');
+    });
+  });
+  describe("SpacedCommaRule Tests", () => {
+    it("can construct a SpacedCommaRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const spacedComma: Rule = new SpacedCommaRule();
+      assert.isNotNull(spacedComma);
+    });
+    it("can parse correctly (comma)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer(',');
+      const spacedComma: Rule = new SpacedCommaRule();
+      assert.isTrue(spacedComma.parse(root));
+    });
+    it("can parse correctly (comma, space before)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer(' ,');
+      const spacedComma: Rule = new SpacedCommaRule();
+      assert.isTrue(spacedComma.parse(root));
+    });
+    it("can parse correctly (comma, space after)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer(', ');
+      const spacedComma: Rule = new SpacedCommaRule();
+      assert.isTrue(spacedComma.parse(root));
+    });
+    it("can parse correctly (comma, space before and after)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer(' , ');
+      const spacedComma: Rule = new SpacedCommaRule();
+      assert.isTrue(spacedComma.parse(root));
     });
   });
   describe("Analyser Tests", () => {
