@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.27 alpha 2025-04-28
+
+* chore: update labels for v19 (#13744)
+
 ## 19.0.26 alpha 2025-04-24
 
 * chore: merge beta version 18.0.235 history to master (#13735)
