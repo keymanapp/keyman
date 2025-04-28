@@ -6,7 +6,6 @@
       "samples": null
     },
     "common": {
-      "resources": null,
       "web": null
     },
     "core": null,
@@ -36,11 +35,13 @@
         "windows": null
       }
     },
+    "resources": null,
     "web": {
       "bookmarklet": null,
       "engine": null,
       "ui": null,
-      "samples": null
+      "samples": null,
+      "predictive-text": null
     },
     "windows": {
       "config": null,
