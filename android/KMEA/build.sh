@@ -98,7 +98,7 @@ fi
 
 if builder_start_action test:engine; then
 
-  if builder_is_ci_test_build; then
+  if builder_is_ci_build; then
     # Report JUnit test results to CI
     echo "$JUNIT_RESULTS"
   fi
