@@ -1192,7 +1192,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(lhsNode);
       const ifNodes = lhsNode.getChildrenOfType(NodeTypes.IF);
       assert.equal(ifNodes.length, 2);
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CHAR));
       const rhsNode = ruleNode.getSoleChildOfType(NodeTypes.RHS)
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
@@ -1239,7 +1239,18 @@ describe("KMN Analyser Tests", () => {
       const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM));
-      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CHAR));
+      assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (plus, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
+      const lhsBlock: Rule = new LhsBlockRule();
+      assert.isTrue(lhsBlock.parse(root));
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      const inputCharNode = lhsNode.getSoleChildOfType(NodeTypes.INPUT_CHAR)
+      assert.isNotNull(inputCharNode);
+      assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
       assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
     });
   });
@@ -1863,9 +1874,16 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(outputStatement.parse(root));
       const layerNode = root.getSoleChildOfType(NodeTypes.LAYER);
       assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
+      assert.equal(layerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"shift"');
+    });
+    it("can parse correctly (index statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(c_out,1)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
     });
   });
   describe("SpacedCommaRule Tests", () => {

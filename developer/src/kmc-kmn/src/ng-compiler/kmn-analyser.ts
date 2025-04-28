@@ -760,12 +760,14 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const match       = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch     = new TokenRule(TokenTypes.NOMATCH, true);
-    const inputBlock  = new InputBlockRule();
-    const ifLikeBlock = new IfLikeBlockRule();
+    const match             = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch           = new TokenRule(TokenTypes.NOMATCH, true);
+    const inputContextBlock = new InputContextBlockRule();
+    const inputPlusBlock    = new InputPlusBlockRule();
+    const inputBlock        = new InputBlockRule();
+    const ifLikeBlock       = new IfLikeBlockRule();
     this.rule = new AlternateRule([
-      match, noMatch, inputBlock, ifLikeBlock,
+      match, noMatch, inputContextBlock, inputPlusBlock, inputBlock, ifLikeBlock,
     ]);
   }
 
@@ -774,9 +776,8 @@ export class LhsBlockRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const children  = tmp.getChildren();
       const lhsNode   = new ASTNode(NodeTypes.LHS);
-      lhsNode.addChildren(children);
+      lhsNode.addChildren(tmp.getChildren());
       lhsNode.addChildren(lineNodes);
       node.addChild(lhsNode);
     }
@@ -784,23 +785,87 @@ export class LhsBlockRule extends SingleChildRule {
   }
 }
 
-export class InputBlockRule extends SingleChildRule {
+export class InputContextBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optIfLikeBlockRule: Rule = new OptionalIfLikeBlockRule();
-    const padding: Rule            = new PaddingRule();
-    const inputCharacter: Rule     = new InputCharacterRule();
+    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const inputContext: Rule         = new InputContextRule();
+    const padding: Rule              = new PaddingRule();
+    const plus: Rule                 = new TokenRule(TokenTypes.PLUS);
+    const inputCharacter: Rule       = new InputCharacterRule();
     this.rule = new SequenceRule([
-      optIfLikeBlockRule, padding, inputCharacter,
+      optPaddedIfLikeBlock,
+      inputContext,
+      padding,
+      plus,
+      padding,
+      inputCharacter,
     ]);
   }
 }
 
-export class OptionalIfLikeBlockRule extends SingleChildRule {
+export class InputPlusBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const ifLikeBlockRule: Rule = new IfLikeBlockRule();
-    this.rule = new OptionalRule(ifLikeBlockRule);
+    const optPaddingIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
+    const padding: Rule               = new PaddingRule();
+    const inputCharacter: Rule        = new InputCharacterRule();
+    this.rule = new SequenceRule([
+      optPaddingIfLikeBlock,
+      plus,
+      padding,
+      inputCharacter,
+    ]);
+  }
+}
+
+export class InputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const optPaddingIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const inputCharacter: Rule        = new InputCharacterRule();
+    this.rule = new SequenceRule([
+      optPaddingIfLikeBlock,
+      inputCharacter,
+    ]);
+  }
+}
+
+export class OptionalPaddedIfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const paddedIfLikeBlock: Rule = new PaddedIfLikeBlockRule();
+    this.rule = new OptionalRule(paddedIfLikeBlock);
+  }
+}
+
+export class PaddedIfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const ifLikeBlock: Rule = new IfLikeBlockRule();
+    const padding: Rule     = new PaddingRule();
+    this.rule = new SequenceRule([ifLikeBlock, padding]);
+  }
+}
+
+export class InputContextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    this.rule = new AnyStatementRule();
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes        = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const inputContextNode = new ASTNode(NodeTypes.INPUT_CONTEXT);
+      inputContextNode.addChildren(tmp.getChildren());
+      inputContextNode.addChildren(lineNodes);
+      node.addChild(inputContextNode);
+    }
+    return parseSuccess;
   }
 }
 
@@ -808,6 +873,17 @@ export class InputCharacterRule extends SingleChildRule {
   public constructor() {
     super();
     this.rule = new AnyStatementRule();
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const inputCharNode = new ASTNode(NodeTypes.INPUT_CHAR);
+      inputCharNode.addChild(tmp.getSoleChild());
+      node.addChild(inputCharNode);
+    }
+    return parseSuccess;
   }
 }
 
@@ -1147,7 +1223,8 @@ export class OutputStatementRule extends SingleChildRule {
     super();
     const useStatement: Rule   = new UseStatementRule();
     const layerStatement: Rule = new LayerStatementRule();
-    this.rule = new AlternateRule([useStatement, layerStatement]);
+    const indexStatement: Rule = new IndexStatementRule();
+    this.rule = new AlternateRule([useStatement, layerStatement, indexStatement]);
   }
 }
 

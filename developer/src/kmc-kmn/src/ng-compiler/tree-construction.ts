@@ -27,6 +27,8 @@ export enum NodeTypes {
   IF               = "IF",
   INCLUDECODES     = "INCLUDECODES",
   INDEX            = "INDEX",
+  INPUT_CHAR       = "INPUT_CHAR",
+  INPUT_CONTEXT    = "INPUT_CONTEXT",
   KEYBOARDVERSION  = "KEYBOARDVERSION",
   KEY_CODE         = "KEY_CODE",
   KMW_EMBEDCSS     = "KMW_EMBEDCSS",
