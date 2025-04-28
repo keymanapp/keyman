@@ -46,6 +46,7 @@ export enum NodeTypes {
   NEWLAYER         = "NEWLAYER",
   NOMATCH          = "NOMATCH",
   NOT_EQUAL        = "NOT_EQUAL",
+  OFFSET           = "OFFSET",
   OLDLAYER         = "OLDLAYER",
   OUTS             = "OUTS",
   PLATFORM         = "PLATFORM",

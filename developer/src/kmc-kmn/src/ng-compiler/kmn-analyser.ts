@@ -1150,3 +1150,50 @@ export class OutputStatementRule extends SingleChildRule {
     this.rule = new AlternateRule([useStatement, layerStatement]);
   }
 }
+
+export class IndexStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const index: Rule             = new TokenRule(TokenTypes.INDEX, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const spacedComma: Rule       = new SpacedCommaRule();
+    const offset: Rule            = new OffsetRule();
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      index,
+      leftBracket,
+      optWhitespace,
+      variableStoreName,
+      spacedComma,
+      offset,
+      optWhitespace,
+      rightBracket,
+    ]);
+  }
+}
+
+export class SpacedCommaRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const comma: Rule         = new TokenRule(TokenTypes.CHEVRON);
+    this.rule = new SequenceRule([optWhitespace, comma, optWhitespace]);
+  }
+}
+
+export class OffsetRule extends SingleChildRule {
+  public constructor() {
+    super();
+  }
+
+  public parse(node: ASTNode): boolean {
+    const parameters: Token[]   = [];
+    const parseSuccess: boolean = parameterSequence(parameters, 1);
+    if (parseSuccess) {
+      node.addToken(NodeTypes.OFFSET, parameters[0]);
+    }
+    return parseSuccess;
+  };
+}
