@@ -14,7 +14,15 @@ fi
 
 if [[ -n "${TEAMCITY_VERSION}" ]]; then
   if ! pip3 list --format=columns | grep -q teamcity-messages; then
-      pip3 install teamcity-messages
+      if [[ -n "${TEAMCITY_PLATFORM}" ]] || [[ -n "${DOCKER_RUNNING}" ]]; then
+        # Ubuntu 24.04+ prevents mixing pip and system packages and wants us
+        # to use a virtualenv. However, that causes other problems, so we
+        # override this check only if we're running in a TC agent or docker
+        # so that we don't accidentally break the local system.
+        PIP_ARGS="--break-system-packages"
+      fi
+      # shellcheck disable=SC2086
+      pip3 install --user ${PIP_ARGS:-} teamcity-messages
   fi
   test_module=teamcity.unittestpy
 else
