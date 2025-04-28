@@ -2,44 +2,31 @@
   "scopes": {
     "android": {
       "app": null,
-      "browser": null,
       "engine": null,
-      "resources": null,
       "samples": null
     },
     "common": {
-      "models": {
-        "types": null,
-        "templates": null,
-        "wordbreakers": null
-      },
       "resources": null,
       "web": null
     },
     "core": null,
     "developer": {
       "compilers": null,
-      "ide": null,
-      "resources": null,
-      "tools": null
+      "ide": null
     },
     "ios": {
       "app": null,
-      "browser": null,
       "engine": null,
-      "resources": null,
       "samples": null
     },
     "linux": {
       "config": null,
       "engine": null,
-      "resources": null,
       "samples": null
     },
     "mac": {
       "config": null,
       "engine": null,
-      "resources": null,
       "samples": null
     },
     "oem": {
@@ -52,14 +39,12 @@
     "web": {
       "bookmarklet": null,
       "engine": null,
-      "resources": null,
       "ui": null,
       "samples": null
     },
     "windows": {
       "config": null,
       "engine": null,
-      "resources": null,
       "samples": null
     }
   }
