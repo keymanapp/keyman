@@ -3,7 +3,6 @@
   <Options>
     <BuildPath>$PROJECTPATH</BuildPath>
     <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
-    <WarnDeprecatedCode>True</WarnDeprecatedCode>
     <CheckFilenameConventions>True</CheckFilenameConventions>
     <ProjectType>lexicalmodel</ProjectType>
   </Options>
@@ -21,17 +20,9 @@
       </Details>
     </File>
     <File>
-      <ID>id_f9b1213d4e83cb32ce1ead1ee852d618</ID>
-      <Filename>chirality.js</Filename>
-      <Filepath>..\..\..\..\..\..\..\web\testing\chirality\chirality.js</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.js</FileType>
-      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
-    </File>
-    <File>
-      <ID>id_e01841691fa129428aea555142873f69</ID>
+      <ID>id_5b5a606dce86bc952da5c00065eae360</ID>
       <Filename>platformtest.js</Filename>
-      <Filepath>..\..\..\..\..\..\..\web\testing\platform\platformtest.js</Filepath>
+      <Filepath>..\..\..\..\..\..\..\web\src\test\manual\web\platform\platformtest.js</Filepath>
       <FileVersion></FileVersion>
       <FileType>.js</FileType>
       <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
@@ -48,6 +39,14 @@
       <ID>id_2d07bd2b8c94e9600ac1a920c8cb9e0a</ID>
       <Filename>longpress.js</Filename>
       <Filepath>longpress.js</Filepath>
+      <FileVersion></FileVersion>
+      <FileType>.js</FileType>
+      <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>
+    </File>
+    <File>
+      <ID>id_ea06744959cc2d8a055611c358eb2187</ID>
+      <Filename>test_chirality.js</Filename>
+      <Filepath>..\..\..\..\..\..\..\common\test\resources\keyboards\test_chirality.js</Filepath>
       <FileVersion></FileVersion>
       <FileType>.js</FileType>
       <ParentFileID>id_165fd1598b940efe4a973aeb6eb61aba</ParentFileID>

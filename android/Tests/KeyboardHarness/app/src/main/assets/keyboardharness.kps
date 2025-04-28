@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package>
   <System>
-    <KeymanDeveloperVersion>14.0.24.0</KeymanDeveloperVersion>
+    <KeymanDeveloperVersion>18.0.235.0</KeymanDeveloperVersion>
     <FileVersion>7.0</FileVersion>
   </System>
   <Options>
@@ -20,12 +20,6 @@
   </Info>
   <Files>
     <File>
-      <Name>..\..\..\..\..\..\..\web\src\test\manual\web\chirality\chirality.js</Name>
-      <Description>File chirality.js</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.js</FileType>
-    </File>
-    <File>
       <Name>..\..\..\..\..\..\..\web\src\test\manual\web\platform\platformtest.js</Name>
       <Description>File platformtest.js</Description>
       <CopyLocation>0</CopyLocation>
@@ -43,30 +37,30 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.js</FileType>
     </File>
+    <File>
+      <Name>..\..\..\..\..\..\..\common\test\resources\keyboards\test_chirality.js</Name>
+      <Description>File test_chirality.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
   </Files>
   <Keyboards>
     <Keyboard>
-      <Name>Development Chirality Test Keyboard</Name>
-      <ID>chirality</ID>
-      <Version></Version>
-      <Languages>
-        <Language ID="en">English</Language>
-      </Languages>
-    </Keyboard>
-    <Keyboard>
-      <Name>PlatformTest</Name>
       <ID>platformtest</ID>
-      <Version>1.0</Version>
       <Languages>
         <Language ID="en">English</Language>
       </Languages>
     </Keyboard>
     <Keyboard>
-      <Name>longpress '"\|5% +</Name>
       <ID>longpress</ID>
-      <Version>1.0</Version>
       <OSKFont>code2001.ttf</OSKFont>
       <DisplayFont>code2001.ttf</DisplayFont>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+    <Keyboard>
+      <ID>test_chirality</ID>
       <Languages>
         <Language ID="en">English</Language>
       </Languages>
