@@ -1918,7 +1918,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 227);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 246);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -1956,15 +1956,17 @@ describe("KMN Analyser Tests", () => {
         assert.equal(storeNodes[idx].getDescendents(NodeTypes.STORENAME)[0].getText(), name);
       });
       const groupNodes = root.getChildrenOfType(NodeTypes.GROUP);
-      assert.equal(groupNodes.length, 3);
+      assert.equal(groupNodes.length, 4);
       assert.equal(groupNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'NewContext');
       assert.equal(groupNodes[0].getDescendents(NodeTypes.READONLY).length, 1);
       assert.equal(groupNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
       assert.equal(groupNodes[1].getDescendents(NodeTypes.READONLY).length, 1);
       assert.equal(groupNodes[2].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'detectStartOfSentence');
       assert.equal(groupNodes[2].getDescendents(NodeTypes.READONLY).length, 1);
+      assert.equal(groupNodes[3].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
+      assert.equal(groupNodes[3].getDescendents(NodeTypes.USING_KEYS).length, 1);
       const productionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION);
-      assert.equal(productionNodes.length, 6);
+      assert.equal(productionNodes.length, 18);
       //assert.equal(root.toString(), '');
     });
   });
