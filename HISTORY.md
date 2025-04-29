@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.28 alpha 2025-04-29
+
+* chore(common): Update dependencies in crowdin GitHub action (#13775)
+* chore: additional tweaks to scopes/labels (#13765)
+* chore(common): rename `chore` GH label to `maint` (#13780)
+* change(linux): add link to issue (#13778)
+
 ## 19.0.27 alpha 2025-04-28
 
 * chore: update labels for v19 (#13744)
