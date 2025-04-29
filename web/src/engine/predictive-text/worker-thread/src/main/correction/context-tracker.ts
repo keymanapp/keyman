@@ -11,7 +11,6 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
@@ -40,7 +39,7 @@ export function getEditPathLastMatch(editPath: EditOperation[]) {
     return editPath.lastIndexOf('match', editLength - 2);
   } else {
     return editPath.lastIndexOf('match');
-  } 
+  }
 }
 
 export class TrackedContextSuggestion {
@@ -62,7 +61,7 @@ export class TrackedContextToken {
   constructor(instance?: TrackedContextToken) {
     if(instance) {
       Object.assign(this, instance);
-      // We don't alter the values in replacements, but we do wish to prevent aliasing 
+      // We don't alter the values in replacements, but we do wish to prevent aliasing
       // of the array containing them.
       this.replacements = instance.replacements.slice();
     }
@@ -94,7 +93,7 @@ export class TrackedContextToken {
    * @param tokenText
    * @param transformId
    */
-  updateWithBackspace(tokenText: USVString, transformId: number) {
+  updateWithBackspace(tokenText: string, transformId: number) {
     // It's a backspace transform; time for special handling!
     //
     // For now, with 14.0, we simply compress all remaining Transforms for the token into
@@ -109,11 +108,11 @@ export class TrackedContextToken {
     });
 
     this.raw = tokenText;
-    this.transformDistributions = backspacedTokenContext;  
+    this.transformDistributions = backspacedTokenContext;
     this.clearReplacements();
   }
 
-  update(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
+  update(transformDistribution: Distribution<Transform>, tokenText?: string) {
     // Preserve existing text if new text isn't specified.
     tokenText = tokenText || (tokenText === '' ? '' : this.raw);
 
@@ -210,7 +209,7 @@ export class TrackedContextState {
   }
 
   toRawTokenization() {
-    let sequence: USVString[] = [];
+    let sequence: string[] = [];
 
     for(let token of this.tokens) {
       // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
@@ -329,14 +328,14 @@ interface ContextMatchResult {
   /**
    * Indicates the portion of the incoming keystroke data, if any, that applies to
    * tokens before the last pre-caret token and thus should not be replaced by predictions
-   * based upon `state`.  If the provided context state + the incoming transform do not 
+   * based upon `state`.  If the provided context state + the incoming transform do not
    * adequately match the current context, the match attempt will fail with a `null` result.
    *
    * Should generally be non-null if the token before the caret did not previously exist.
-   * 
-   * The result may be null if it does not match the prior context state or if bookkeeping 
-   * based upon it is problematic - say, if wordbreaking effects shift due to new input, 
-   * causing a mismatch with the prior state's tokenization.  
+   *
+   * The result may be null if it does not match the prior context state or if bookkeeping
+   * based upon it is problematic - say, if wordbreaking effects shift due to new input,
+   * causing a mismatch with the prior state's tokenization.
    * (Refer to #12494 for an example case.)
    */
   preservationTransform?: Transform;
@@ -352,7 +351,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
-    let matchContext: USVString[] = matchState.toRawTokenization();
+    let matchContext: string[] = matchState.toRawTokenization();
 
     // Inverted order, since 'match' existed before our new context.
     let mapping = ClassicalDistanceCalculation.computeDistance(
@@ -591,7 +590,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // multitaps makes it tricky to reliably use in all situations.
           // It's best to handle `delete` cases directly for this reason.
           for(let j = i + 1; j < editPath.length; j++) {
-            // If something _other_ than delete follows a 'delete' on the edit path, 
+            // If something _other_ than delete follows a 'delete' on the edit path,
             // we probably have a context mismatch.
             //
             // It's possible to construct cases where this isn't true, but it's likely not
@@ -620,12 +619,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       priorEdit = editPath[i];
     }
 
-    return { 
-      state, 
-      baseState: matchState, 
-      preservationTransform, 
-      headTokensRemoved: poppedTokenCount, 
-      tailTokensAdded: pushedTokenCount 
+    return {
+      state,
+      baseState: matchState,
+      preservationTransform,
+      headTokensRemoved: poppedTokenCount,
+      tailTokensAdded: pushedTokenCount
     };
   }
 

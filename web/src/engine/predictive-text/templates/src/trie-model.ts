@@ -43,7 +43,6 @@ import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import Suggestion = LexicalModelTypes.Suggestion;
 import TextWithProbability = LexicalModelTypes.TextWithProbability;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 import WithOutcome = LexicalModelTypes.WithOutcome;
 import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 
@@ -112,7 +111,7 @@ class Traversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: USVString): LexiconTraversal | undefined {
+  child(char: string): LexiconTraversal | undefined {
     // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
       return this;
@@ -131,7 +130,7 @@ class Traversal implements LexiconTraversal {
   }
 
   // Handles one code unit at a time.
-  private _child(char: USVString): Traversal | undefined {
+  private _child(char: string): Traversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
@@ -157,7 +156,7 @@ class Traversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
+  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
@@ -302,7 +301,7 @@ export default class TrieModel implements LexicalModel {
     };
   }
 
-  toKey(text: USVString): USVString {
+  toKey(text: string): string {
     return this._trie.toKey(text);
   }
 
