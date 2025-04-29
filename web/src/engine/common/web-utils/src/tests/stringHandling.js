@@ -82,6 +82,8 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwSubstr(1000), '');
       assert.equal(str._kmwSubstr(31), "the lazy dog.");
       assert.equal(str._kmwSubstr(-4), "dog.");
+      // Standard string substr can handle this, but _kmwBMPSubstr doesn't handle it correctly!
+      // assert.equal(str._kmwSubstr(-4, 2), "do");
       assert.equal(str._kmwSubstr(31, 31), "the lazy dog.");
       assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
@@ -106,6 +108,7 @@ describe('Unicode string handling', () => {
       assert.equal(str.kmwCodePointToCodeUnit(2), 2);
       assert.equal(str.kmwCodePointToCodeUnit(9), 9);
       assert.equal(str.kmwCodePointToCodeUnit(31), 31);
+      assert.equal(str.kmwCodePointToCodeUnit(-4), 40);
     });
 
     it('kmwCodeUnitToCodePoint', () => {
@@ -113,6 +116,8 @@ describe('Unicode string handling', () => {
       assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
       assert.equal(str.kmwCodeUnitToCodePoint(9), 9);
       assert.equal(str.kmwCodeUnitToCodePoint(31), 31);
+      // Wait, why the wild functionality mismatch in contrast to kmwCodePointToCodeUnit?
+      assert.equal(str.kmwCodeUnitToCodePoint(-2), 2);
     });
   });
 
@@ -198,6 +203,7 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwSubstr(1000), '');
       assert.equal(str._kmwSubstr(31), "the lazy dog.");
       assert.equal(str._kmwSubstr(-4), "dog.");
+      assert.equal(str._kmwSubstr(-4, 2), "do");
       assert.equal(str._kmwSubstr(31, 31), "the lazy dog.");
       assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
@@ -224,6 +230,9 @@ describe('Unicode string handling', () => {
       assert.equal(str.kmwCodePointToCodeUnit(2), 2);
       assert.equal(str.kmwCodePointToCodeUnit(9), 9);
       assert.equal(str.kmwCodePointToCodeUnit(31), 31);
+      assert.equal(str.kmwCodePointToCodeUnit(-4), 40);
+      // This certainly doesn't seem right... for now, we're just verifying existing behaviors.
+      assert.equal(str.kmwCodePointToCodeUnit(1000), null);
     });
 
     it('kmwCodeUnitToCodePoint', () => {
@@ -231,6 +240,8 @@ describe('Unicode string handling', () => {
       assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
       assert.equal(str.kmwCodeUnitToCodePoint(9), 9);
       assert.equal(str.kmwCodeUnitToCodePoint(31), 31);
+      // Again, odd mismatch in contrast to kmwCodePointToCodeUnit
+      assert.equal(str.kmwCodeUnitToCodePoint(-2), 2);
     });
   });
 
@@ -276,8 +287,9 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwIndexOf("na", 0), 4);
       assert.equal(banana_nation._kmwIndexOf("na", 2), 4);
       assert.equal(banana_nation._kmwIndexOf("na", 3), 4);
-      // ERROR:  returns 4 (!)
-      // assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
+      assert.equal(banana_nation._kmwIndexOf("na", 4), 4);
+      // ERROR:  returns 4, not -1 as it should!
+      // assert.equal(banana_nation._kmwIndexOf("na", 5), -1);
       assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
       assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
 
@@ -378,6 +390,7 @@ describe('Unicode string handling', () => {
       assert.equal(str._kmwSubstr(1000), '');
       assert.equal(str._kmwSubstr(31), "the l" + a + "zy dog.");
       assert.equal(str._kmwSubstr(-4), "dog.");
+      assert.equal(str._kmwSubstr(-9, 4), "l" + a + "zy");
       assert.equal(str._kmwSubstr(31, 31), "the l" + a + "zy dog.");
       assert.equal(str._kmwSubstr(31, -5), ''); // The big difference from .slice:  length must be non-negative.
     });
@@ -422,7 +435,8 @@ describe('Unicode string handling', () => {
 
       assert.equal(str.kmwCodePointToCodeUnit(2), 2);
       assert.equal(str.kmwCodePointToCodeUnit(9), 11); // "The quick" = 9; 2 SMP replacements before then.
-      assert.equal(str.kmwCodePointToCodeUnit(31), 34); // "the lazy dog" is the remnant; 3 SMP replacements before then.
+      assert.equal(str.kmwCodePointToCodeUnit(31), 34); // "the lazy dog." is the remnant; 3 SMP replacements before then.
+      assert.equal(str.kmwCodePointToCodeUnit(-13), 34); // "the lazy dog." is the remnant, 13 codepoints long.
     });
 
     it('kmwCodeUnitToCodePoint', () => {
@@ -441,6 +455,8 @@ describe('Unicode string handling', () => {
       assert.equal(str.kmwCodeUnitToCodePoint(2), 2);
       assert.equal(str.kmwCodeUnitToCodePoint(11), 9); // "The quick" = 9; 2 SMP replacements before then.
       assert.equal(str.kmwCodeUnitToCodePoint(34), 31); // "the lazy dog" is the remnant; 3 SMP replacements before then.
+      // Clearly needs work in the future; only verifying behavioral stability for now.
+      assert.equal(str.kmwCodeUnitToCodePoint(-2), 2);
     });
   });
 });
