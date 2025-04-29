@@ -198,7 +198,7 @@ jobs:
     #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
     - name: Ignore
       run: |
-        echo "Ignored for now - until working solution is in place"
+        echo "Ignored for now - until working solution is in place (#13777)"
 
   deb_signing:
     name: Sign source and binary packages
