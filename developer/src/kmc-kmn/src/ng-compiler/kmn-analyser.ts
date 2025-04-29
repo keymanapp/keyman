@@ -807,12 +807,12 @@ export class InputContextBlockRule extends SingleChildRule {
 export class InputPlusBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddingIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
-    const padding: Rule               = new PaddingRule();
-    const inputCharacter: Rule        = new InputCharacterRule();
+    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const plus: Rule                 = new TokenRule(TokenTypes.PLUS);
+    const padding: Rule              = new PaddingRule();
+    const inputCharacter: Rule       = new InputCharacterRule();
     this.rule = new SequenceRule([
-      optPaddingIfLikeBlock,
+      optPaddedIfLikeBlock,
       plus,
       padding,
       inputCharacter,
@@ -823,10 +823,10 @@ export class InputPlusBlockRule extends SingleChildRule {
 export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddingIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const inputCharacter: Rule        = new InputCharacterRule();
+    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const inputCharacter: Rule       = new InputCharacterRule();
     this.rule = new SequenceRule([
-      optPaddingIfLikeBlock,
+      optPaddedIfLikeBlock,
       inputCharacter,
     ]);
   }
@@ -930,8 +930,8 @@ export class PaddedIfLikeStatementRule extends SingleChildRule {
 export class IfLikeStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const ifStatement: Rule       = new IfStatementRule();
-    const platformStatement: Rule = new PlatformStatementRule();
+    const ifStatement: Rule         = new IfStatementRule();
+    const platformStatement: Rule   = new PlatformStatementRule();
     const baselayoutStatement: Rule = new BaselayoutStatementRule();
     this.rule = new AlternateRule([
       ifStatement, platformStatement, baselayoutStatement,

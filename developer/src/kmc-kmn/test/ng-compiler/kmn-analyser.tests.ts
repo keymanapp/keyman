@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, InputBlockRule, InputContextBlockRule, InputPlusBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1252,6 +1252,85 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(inputCharNode);
       assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
       assert.isFalse(lhsNode.hasChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("InputContextBlockRule Tests", () => {
+    it("can construct a InputContextBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const inputContextBlock: Rule = new InputContextBlockRule();
+      assert.isNotNull(inputContextBlock);
+    });
+    it("can parse correctly (inputContext, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(output) + any(diacriticKey)');
+      const inputContextBlock: Rule = new InputContextBlockRule();
+      assert.isTrue(inputContextBlock.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      const inputCharNode = root.getSoleChildOfType(NodeTypes.INPUT_CHAR);
+      assert.isNotNull(inputCharNode);
+      assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (if-like, inputContext, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(output) + any(diacriticKey)');
+      const inputContextBlock: Rule = new InputContextBlockRule();
+      assert.isTrue(inputContextBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      const inputCharNode = root.getSoleChildOfType(NodeTypes.INPUT_CHAR);
+      assert.isNotNull(inputCharNode);
+      assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+  })
+  describe("InputPlusBlockRule Tests", () => {
+    it("can construct a InputPlusBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const inputPlusBlock: Rule = new InputPlusBlockRule();
+      assert.isNotNull(inputPlusBlock);
+    });
+    it("can parse correctly (inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
+      const inputPlusBlock: Rule = new InputPlusBlockRule();
+      assert.isTrue(inputPlusBlock.parse(root));
+      const inputCharNode = root.getSoleChildOfType(NodeTypes.INPUT_CHAR);
+      assert.isNotNull(inputCharNode);
+      assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(inputCharNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (if-like block, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") + any(c_key)');
+      const inputPlusBlock: Rule = new InputPlusBlockRule();
+      assert.isTrue(inputPlusBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INPUT_CHAR));
+    });
+  });
+  describe("InputBlockRule Tests", () => {
+    it("can construct a InputBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const inputBlock: Rule = new InputBlockRule();
+      assert.isNotNull(inputBlock);
+    });
+    it("can parse correctly (inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(c_key)');
+      const inputBlock: Rule = new InputBlockRule();
+      assert.isTrue(inputBlock.parse(root));
+      const inputCharNode = root.getSoleChildOfType(NodeTypes.INPUT_CHAR);
+      assert.isNotNull(inputCharNode);
+      assert.isNotNull(inputCharNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(inputCharNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (if-like block, inputCharacter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(c_key)');
+      const inputBlock: Rule = new InputBlockRule();
+      assert.isTrue(inputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INPUT_CHAR));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
     });
   });
   describe("AnyStatementRule Tests", () => {

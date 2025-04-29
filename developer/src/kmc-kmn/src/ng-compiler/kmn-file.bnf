@@ -48,7 +48,7 @@ productionBlock: lhsBlock spacedChevron rhsBlock
 lhsBlock: MATCH|NOMATCH|inputContextBlock|inputPlusBlock|inputBlock|ifLikeBlock
 inputContextBlock: paddedIfLikeBlock? inputContext padding PLUS padding inputCharacter
 inputPlusBlock: paddedIfLikeBlock? PLUS padding inputCharacter
-inputPlusBlock: paddedIfLikeBlock? inputCharacter
+inputBlock: paddedIfLikeBlock? inputCharacter
 inputContext: anyStatement
 inputCharacter: anyStatement
 anyStatement: ANY bracketedStoreName
