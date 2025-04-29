@@ -341,10 +341,6 @@ export function codePointToCodeUnit(s: string, codePointIndex: number) {
     return null;
   }
 
-  if(!EXTENSION_ENABLED) {
-    return codePointIndex;
-  }
-
   const str = s;
   let codeUnitIndex = 0;
 
@@ -374,10 +370,6 @@ export function codePointToCodeUnit(s: string, codePointIndex: number) {
  */
 export function codeUnitToCodePoint(s: string, codeUnitIndex: number) {
   const str = s;
-
-  if(!EXTENSION_ENABLED) {
-    return codeUnitIndex;
-  }
 
   if(codeUnitIndex === null) {
     return null;
