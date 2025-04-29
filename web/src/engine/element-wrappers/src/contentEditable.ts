@@ -49,7 +49,7 @@ export default class ContentEditable extends OutputTarget<{}> {
   }
 
   hasSelection(): boolean {
-    let Lsel = this.root.ownerDocument.getSelection();
+    const Lsel = this.root.ownerDocument.getSelection();
 
     if(this.root != Lsel.anchorNode && !this.root.contains(Lsel.anchorNode)) {
       return false;
@@ -64,7 +64,7 @@ export default class ContentEditable extends OutputTarget<{}> {
 
   clearSelection(): void {
     if(this.hasSelection()) {
-      let Lsel = this.root.ownerDocument.getSelection();
+      const Lsel = this.root.ownerDocument.getSelection();
 
       if(!Lsel.isCollapsed) {
         Lsel.deleteFromDocument();  // I2134, I2192
@@ -79,15 +79,15 @@ export default class ContentEditable extends OutputTarget<{}> {
                                   */  }
 
   getCarets(): SelectionRange {
-    let Lsel = this.root.ownerDocument.getSelection();
+    const Lsel = this.root.ownerDocument.getSelection();
     let code = Lsel.anchorNode.compareDocumentPosition(Lsel.focusNode);
 
     if(Lsel.isCollapsed) {
-      let caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
+      const caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
       return new SelectionRange(caret, caret);
     } else {
-      let anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
-      let focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
+      const anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
+      const focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
 
       if(anchor.node == focus.node) {
         code = (focus.offset - anchor.offset > 0) ? 2 : 4;
@@ -111,7 +111,7 @@ export default class ContentEditable extends OutputTarget<{}> {
       return this.getText();
     }
 
-    let caret = this.getCarets().start;
+    const caret = this.getCarets().start;
 
     if(caret.node.nodeType != 3) {
       return ''; // Must be a text node to provide a context.
@@ -131,7 +131,7 @@ export default class ContentEditable extends OutputTarget<{}> {
       return '';
     }
 
-    let caret = this.getCarets().end;
+    const caret = this.getCarets().end;
 
     if(caret.node.nodeType != 3) {
       return ''; // Must be a text node to provide a context.
@@ -149,7 +149,7 @@ export default class ContentEditable extends OutputTarget<{}> {
       return;
     }
 
-    let start = this.getCarets().start;
+    const start = this.getCarets().start;
 
     // Bounds-check on the number of chars to delete.
     if(dn > start.offset) {
@@ -161,8 +161,8 @@ export default class ContentEditable extends OutputTarget<{}> {
       return; // No context to delete characters from.
     }
 
-    let range = this.root.ownerDocument.createRange();
-    let dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
+    const range = this.root.ownerDocument.createRange();
+    const dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
 
     range.setStart(start.node, dnOffset);
     range.setEnd(start.node, start.offset);
@@ -178,9 +178,9 @@ export default class ContentEditable extends OutputTarget<{}> {
       return;
     }
 
-    let start = this.getCarets().start;
-    let delta = s._kmwLength();
-    let Lsel = this.root.ownerDocument.getSelection();
+    const start = this.getCarets().start;
+    const delta = s._kmwLength();
+    const Lsel = this.root.ownerDocument.getSelection();
 
     if(delta == 0) {
       return;
@@ -193,17 +193,17 @@ export default class ContentEditable extends OutputTarget<{}> {
     // able to manage the caret properly.
     //
     // TODO:  double-check that it was only IE-motivated, re-implement with Selection.extend().
-    let finalCaret = this.root.ownerDocument.createRange();
+    const finalCaret = this.root.ownerDocument.createRange();
 
     if(start.node.nodeType == 3) {
-      let textStart = <Text> start.node;
+      const textStart = <Text> start.node;
       textStart.insertData(start.offset, s);
       finalCaret.setStart(textStart, start.offset + s.length);
     } else {
       // Create a new text node - empty control
-      var n = start.node.ownerDocument.createTextNode(s);
+      const n = start.node.ownerDocument.createTextNode(s);
 
-      let range = this.root.ownerDocument.createRange();
+      const range = this.root.ownerDocument.createRange();
       range.setStart(start.node, start.offset);
       range.collapse(true);
       range.insertNode(n);
@@ -242,8 +242,8 @@ export default class ContentEditable extends OutputTarget<{}> {
       return;
     }
 
-    let caret = this.getCarets().end;
-    let delta = s._kmwLength();
+    const caret = this.getCarets().end;
+    const delta = s._kmwLength();
 
     if(delta == 0) {
       return;
@@ -253,13 +253,13 @@ export default class ContentEditable extends OutputTarget<{}> {
     // will be handled after this method.
 
     if(caret.node.nodeType == 3) {
-      let textStart = <Text> caret.node;
+      const textStart = <Text> caret.node;
       textStart.replaceData(caret.offset, textStart.length, s);
     } else {
       // Create a new text node - empty control
-      var n = caret.node.ownerDocument.createTextNode(s);
+      const n = caret.node.ownerDocument.createTextNode(s);
 
-      let range = this.root.ownerDocument.createRange();
+      const range = this.root.ownerDocument.createRange();
       range.setStart(caret.node, caret.offset);
       range.collapse(true);
       range.insertNode(n);
