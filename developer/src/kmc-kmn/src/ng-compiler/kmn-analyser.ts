@@ -762,12 +762,11 @@ export class LhsBlockRule extends SingleChildRule {
     super();
     const match             = new TokenRule(TokenTypes.MATCH, true);
     const noMatch           = new TokenRule(TokenTypes.NOMATCH, true);
-    const inputContextBlock = new InputContextBlockRule();
-    const inputPlusBlock    = new InputPlusBlockRule();
+    const inputContextBlock = new UkInputBlockRule();
     const roInputBlock      = new RoInputBlockRule();
     const ifLikeBlock       = new IfLikeBlockRule();
     this.rule = new AlternateRule([
-      match, noMatch, inputContextBlock, inputPlusBlock, roInputBlock, ifLikeBlock,
+      match, noMatch, inputContextBlock, roInputBlock, ifLikeBlock,
     ]);
   }
 
@@ -785,34 +784,17 @@ export class LhsBlockRule extends SingleChildRule {
   }
 }
 
-export class InputContextBlockRule extends SingleChildRule {
+export class UkInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const inputContext: Rule         = new InputContextRule();
-    const padding: Rule              = new PaddingRule();
-    const plus: Rule                 = new TokenRule(TokenTypes.PLUS);
-    const keystoke: Rule             = new KeystrokeRule();
+    const optPaddedIfLikeBlock: Rule  = new OptionalPaddedIfLikeBlockRule();
+    const optPaddedInputContext: Rule = new OptionalPaddedInputContextRule();
+    const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
+    const padding: Rule               = new PaddingRule();
+    const keystoke: Rule              = new KeystrokeRule();
     this.rule = new SequenceRule([
       optPaddedIfLikeBlock,
-      inputContext,
-      padding,
-      plus,
-      padding,
-      keystoke,
-    ]);
-  }
-}
-
-export class InputPlusBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const plus: Rule                 = new TokenRule(TokenTypes.PLUS);
-    const padding: Rule              = new PaddingRule();
-    const keystoke: Rule             = new KeystrokeRule();
-    this.rule = new SequenceRule([
-      optPaddedIfLikeBlock,
+      optPaddedInputContext,
       plus,
       padding,
       keystoke,
@@ -846,6 +828,23 @@ export class PaddedIfLikeBlockRule extends SingleChildRule {
     const ifLikeBlock: Rule = new IfLikeBlockRule();
     const padding: Rule     = new PaddingRule();
     this.rule = new SequenceRule([ifLikeBlock, padding]);
+  }
+}
+
+export class OptionalPaddedInputContextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const paddedInputContext: Rule = new PaddedInputContextRule();
+    this.rule = new OptionalRule(paddedInputContext);
+  }
+}
+
+export class PaddedInputContextRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const inputContext: Rule = new InputContextRule();
+    const padding: Rule      = new PaddingRule();
+    this.rule = new SequenceRule([inputContext, padding]);
   }
 }
 
