@@ -200,7 +200,7 @@ export default class Multitap implements GestureHandler {
     const baseProb = baseDistribution.splice(keyIndex, 1)[0].p;
 
     let totalWeight = 0;
-    let multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
+    const multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
     for(let i = 0; i < this.multitaps.length; i++) {
       const key = this.multitaps[i];
       // 'standard distance', no real modular effects needed.
