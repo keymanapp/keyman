@@ -33,6 +33,9 @@ labels:
   - label: 'fix'
     matcher:
       title: '^fix(\(|:)'
+  - label: 'maint'
+    matcher:
+      title: '^maint(\(|:)'
   - label: 'refactor'
     matcher:
       title: '^refactor(\(|:)'
