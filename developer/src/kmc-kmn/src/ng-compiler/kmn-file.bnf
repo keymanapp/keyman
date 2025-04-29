@@ -55,7 +55,7 @@ anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
 paddedIfLikeStatement: padding IfLikeStatement
-ifLikeStatement: ifStatement|layerStatement|platformStatement|baselayoutStatement
+ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
   ifSystemStoreStringStatement
 ifStoreStoreStatement: IF LEFT_BR WHITESPACE? variableStoreName WHITESPACE

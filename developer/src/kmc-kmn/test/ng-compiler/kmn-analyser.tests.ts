@@ -1282,18 +1282,18 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
     });
     it("can parse correctly (two if-like statements)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") layer("shift")');
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") baselayout("en-US")');
       const ifLikeBlock: Rule = new IfLikeBlockRule();
       assert.isTrue(ifLikeBlock.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BASELAYOUT));
     });
     it("can parse correctly (two if-likes, continuation)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")\\\nlayer("shift")');
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")\\\nbaselayout("en-US")');
       const ifLikeBlock: Rule = new IfLikeBlockRule();
       assert.isTrue(ifLikeBlock.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BASELAYOUT));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.LINE));
     });
   });
@@ -1314,16 +1314,6 @@ describe("KMN Analyser Tests", () => {
       assert.equal(storeNameNodes.length, 2);
       assert.equal(storeNameNodes[0].getText(), 'number');
       assert.equal(storeNameNodes[1].getText(), 'digit');
-    });
-    it("can parse correctly (layer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
-      const ifLikeStatement: Rule = new IfLikeStatementRule();
-      assert.isTrue(ifLikeStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER);
-      assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
     });
     it("can parse correctly (platform)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
