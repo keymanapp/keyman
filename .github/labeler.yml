@@ -17,10 +17,7 @@ android/engine/: android/KMEA/**
 android/samples/: android/Samples/**
 
 common/: common/**
-
 common/web/: common/web/**
-
-m:predictive-text: web/src/engine/predictive-text/**
 
 core/:
   - core/**
@@ -33,10 +30,9 @@ developer/compilers/:
   - developer/src/kmcmplib/**
   - developer/src/kmc-*/**
 
-m:developer-ide:
+developer/ide/:
   - developer/src/server/**
   - developer/src/tike/**
-
 
 ios/: ios/**
 ios/app/: ios/keyman/**
@@ -68,6 +64,7 @@ web/: web/**
 web/engine/: web/source/**
 web/ui/: web/source/kmwui*
 web/samples/: web/samples/**
+web/predictive-text/: web/src/engine/predictive-text/**
 
 windows/: windows/**
 windows/config/: windows/src/desktop/**

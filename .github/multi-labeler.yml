@@ -57,11 +57,6 @@ labels:
     matcher:
       title: '(🍒|:cherries:)'
 
-  # long-lived feature branches
-  - label: 'feature-branch'
-    matcher:
-      branch: '^feature-.+'
-
   #
   # Scopes that we look for in the PR title
   #
@@ -90,6 +85,9 @@ labels:
   - label: 'oem/'
     matcher:
       title: '\(.*oem.*\):'
+  - label: 'resources/'
+    matcher:
+      title: '\(.*resources.*\):'
   - label: 'web/'
     matcher:
       title: '\(.*web.*\):'
