@@ -1,21 +1,21 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
-import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface  } from 'keyman/engine/js-processor';
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/keyboard-storage';
 
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
-import KeymanEngine from "./keymanEngine.js";
+import { KeymanEngineBase } from "./keymanEngineBase.js";
 import { EngineConfiguration } from "./engineConfiguration.js";
 
-export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
-  protected readonly engine: KeymanEngine<EngineConfiguration, ContextManagerType, any>;
+export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase<any>> extends JSKeyboardInterface {
+  protected readonly engine: KeymanEngineBase<EngineConfiguration, ContextManagerType, any>;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
-    engine: KeymanEngine<any, ContextManagerType, any>,
+    engine: KeymanEngineBase<any, ContextManagerType, any>,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, engine, new VariableStoreCookieSerializer());
@@ -122,5 +122,5 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
 }
 
 (function() {
-  KeyboardInterface.__publishShorthandAPI();
+  KeyboardInterfaceBase.__publishShorthandAPI();
 }());
