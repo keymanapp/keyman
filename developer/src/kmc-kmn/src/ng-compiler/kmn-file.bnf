@@ -46,11 +46,11 @@ groupQualifier: usingKeys|READONLY
 usingKeys: USING WHITESPACE KEYS
 productionBlock: lhsBlock spacedChevron rhsBlock
 lhsBlock: MATCH|NOMATCH|inputContextBlock|inputPlusBlock|inputBlock|ifLikeBlock
-inputContextBlock: paddedIfLikeBlock? inputContext padding PLUS padding inputCharacter
-inputPlusBlock: paddedIfLikeBlock? PLUS padding inputCharacter
-inputBlock: paddedIfLikeBlock? inputCharacter
+inputContextBlock: paddedIfLikeBlock? inputContext padding PLUS padding keystroke
+inputPlusBlock: paddedIfLikeBlock? PLUS padding keystroke
+inputBlock: paddedIfLikeBlock? keystroke
 inputContext: anyStatement
-inputCharacter: anyStatement
+keystroke: anyStatement
 anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
