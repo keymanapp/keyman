@@ -45,10 +45,10 @@ spacedGroupQualifier: WHITESPACE groupQualifier
 groupQualifier: usingKeys|READONLY
 usingKeys: USING WHITESPACE KEYS
 productionBlock: lhsBlock spacedChevron rhsBlock
-lhsBlock: MATCH|NOMATCH|inputContextBlock|inputPlusBlock|inputBlock|ifLikeBlock
+lhsBlock: MATCH|NOMATCH|inputContextBlock|inputPlusBlock|roInputBlock|ifLikeBlock
 inputContextBlock: paddedIfLikeBlock? inputContext padding PLUS padding keystroke
 inputPlusBlock: paddedIfLikeBlock? PLUS padding keystroke
-inputBlock: paddedIfLikeBlock? keystroke
+roInputBlock: paddedIfLikeBlock? keystroke
 inputContext: anyStatement
 keystroke: anyStatement
 anyStatement: ANY bracketedStoreName

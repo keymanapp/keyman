@@ -764,10 +764,10 @@ export class LhsBlockRule extends SingleChildRule {
     const noMatch           = new TokenRule(TokenTypes.NOMATCH, true);
     const inputContextBlock = new InputContextBlockRule();
     const inputPlusBlock    = new InputPlusBlockRule();
-    const inputBlock        = new InputBlockRule();
+    const roInputBlock      = new RoInputBlockRule();
     const ifLikeBlock       = new IfLikeBlockRule();
     this.rule = new AlternateRule([
-      match, noMatch, inputContextBlock, inputPlusBlock, inputBlock, ifLikeBlock,
+      match, noMatch, inputContextBlock, inputPlusBlock, roInputBlock, ifLikeBlock,
     ]);
   }
 
@@ -820,7 +820,7 @@ export class InputPlusBlockRule extends SingleChildRule {
   }
 }
 
-export class InputBlockRule extends SingleChildRule {
+export class RoInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
@@ -879,7 +879,7 @@ export class KeystrokeRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const inputCharNode = new ASTNode(NodeTypes.INPUT_CHAR);
+      const inputCharNode = new ASTNode(NodeTypes.KEYSTROKE);
       inputCharNode.addChild(tmp.getSoleChild());
       node.addChild(inputCharNode);
     }
