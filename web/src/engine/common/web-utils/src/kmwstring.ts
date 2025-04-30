@@ -55,9 +55,9 @@ export function charCodeAt(s: string, index: number) {
     }
   }
 
-  let first = str.charCodeAt(codeUnitIndex);
+  const first = str.charCodeAt(codeUnitIndex);
   if(first >= 0xD800 && first <= 0xDBFF && str.length > codeUnitIndex + 1) {
-    let second = str.charCodeAt(codeUnitIndex + 1);
+    const second = str.charCodeAt(codeUnitIndex + 1);
     if(second >= 0xDC00 && second <= 0xDFFF) {
       return ((first - 0xD800) << 10) + (second - 0xDC00) + 0x10000;
     }
@@ -248,7 +248,7 @@ export function substring(s: string, indexA: number, indexB?: number) {
     indexBCodeUnit =  str.length;
   } else {
     if(indexA > indexB) {
-      let c = indexA;
+      const c = indexA;
       indexA = indexB;
       indexB = c;
     }
