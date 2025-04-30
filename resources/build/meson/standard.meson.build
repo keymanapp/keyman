@@ -42,8 +42,10 @@ message('compiler.get_id(): ' + cpp_compiler.get_id())
 #
 
 fs = import('fs')
-VERSION_WITH_TAG = fs.read('VERSION_WITH_TAG.md').strip()
-message('VERSION_WITH_TAG: ' + VERSION_WITH_TAG)
+if fs.exists('VERSION_WITH_TAG.md')
+  VERSION_WITH_TAG = fs.read('VERSION_WITH_TAG.md').strip()
+  message('VERSION_WITH_TAG: ' + VERSION_WITH_TAG)
+endif
 
 #
 # Standard compiler flags for all platforms
