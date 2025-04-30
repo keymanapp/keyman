@@ -2,7 +2,7 @@
 /**
  * Maps 'sp' properties on a touch-layout spec to their corresponding CSS class names.
  */
-let BUTTON_CLASSES = [
+const BUTTON_CLASSES = [
   'default',
   'shift',
   'shift-on',

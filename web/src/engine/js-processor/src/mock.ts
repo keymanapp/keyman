@@ -14,7 +14,7 @@ export class Mock extends OutputTarget {
     super();
 
     this.text = text ? text : "";
-    var defaultLength = KMWString.length(this.text);
+    const defaultLength = KMWString.length(this.text);
 
     // Ensures that `caretPos == 0` is handled correctly.
     this.selStart = typeof selStart == "number" ? selStart : defaultLength;
@@ -32,7 +32,7 @@ export class Mock extends OutputTarget {
     if (outputTarget instanceof Mock) {
       // Avoids the need to run expensive kmwstring.ts `length()`
       // calculations when deep-copying Mock instances.
-      let priorMock = outputTarget as Mock;
+      const priorMock = outputTarget as Mock;
       clone = new Mock(priorMock.text, priorMock.selStart, priorMock.selEnd);
     } else {
       const text = outputTarget.getText();
@@ -43,8 +43,8 @@ export class Mock extends OutputTarget {
       let selectionEnd: number = 0;
 
       if (outputTarget.hasSelection()) {
-        let beforeText = outputTarget.getTextBeforeCaret();
-        let afterText = outputTarget.getTextAfterCaret();
+        const beforeText = outputTarget.getTextBeforeCaret();
+        const afterText = outputTarget.getTextAfterCaret();
         selectionStart = KMWString.length(beforeText);
         selectionEnd = textLen - KMWString.length(afterText);
       }
@@ -89,7 +89,7 @@ export class Mock extends OutputTarget {
 
     this.selForward = end >= start;
     if (!this.selForward) {
-      let temp = this.selStart;
+      const temp = this.selStart;
       this.selStart = this.selEnd;
       this.selEnd = temp;
     }

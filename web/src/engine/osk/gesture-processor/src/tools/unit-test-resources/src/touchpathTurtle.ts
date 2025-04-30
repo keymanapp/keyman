@@ -113,7 +113,7 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
 
     // Base sample always exists in advance.
     for(let i = 1; i <= sampleCount; i++) {
-      let sample = {...startSample};
+      const sample = {...startSample};
       sample.t += timeDelta * i;
       this.trackSample(sample);
     }
@@ -131,9 +131,9 @@ export class TouchpathTurtle<HoveredItemType> extends EventEmitter<EventMap<Hove
       throw new Error("Invalid parameter value:  may not be negative!");
     }
 
-    let angle = (90 - angleInDegrees) * Math.PI / 180;
-    let xDistance = Math.cos(angle) * distance;
-    let yDistance = -Math.sin(angle) * distance;
+    const angle = (90 - angleInDegrees) * Math.PI / 180;
+    const xDistance = Math.cos(angle) * distance;
+    const yDistance = -Math.sin(angle) * distance;
 
     const xTickDist = xDistance / sampleCount;
     const yTickDist = yDistance / sampleCount;

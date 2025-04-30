@@ -32,7 +32,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_build() {
-  tsc --build $builder_verbose "$THIS_SCRIPT_PATH/tsconfig.json"
+  compile $SUBPROJECT_NAME
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.

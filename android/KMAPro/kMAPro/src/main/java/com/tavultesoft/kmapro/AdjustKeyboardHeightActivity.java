@@ -50,14 +50,14 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     if (actionBar != null) {
       actionBar.setTitle(null);
       actionBar.setDisplayUseLogoEnabled(false);
-      actionBar.setDisplayShowHomeEnabled(false);
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setDisplayShowHomeEnabled(true);
       actionBar.setDisplayShowTitleEnabled(false);
       actionBar.setDisplayShowCustomEnabled(true);
       actionBar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.keyman_blue)));
     }
 
     TextView adjustKeyboardHeightActivityTitle = (TextView) findViewById(R.id.bar_title);
-    adjustKeyboardHeightActivityTitle.setWidth((int) getResources().getDimension(R.dimen.package_label_width));
 
     String titleStr = getString(R.string.adjust_keyboard_height);
     adjustKeyboardHeightActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
@@ -128,5 +128,9 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
     refreshSampleKeyboard(this);
   }
 
-
+  @Override
+  public boolean onSupportNavigateUp() {
+    onBackPressed();
+    return true;
+  }
 }

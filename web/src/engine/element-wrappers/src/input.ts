@@ -107,8 +107,8 @@ export default class Input extends OutputTarget<EventMap> {
   }
 
   setSelection(start: number, end: number, direction: "forward" | "backward" | "none") {
-    let domStart = KMWString.codePointToCodeUnit(this.root.value, start);
-    let domEnd = KMWString.codePointToCodeUnit(this.root.value, end);
+    const domStart = KMWString.codePointToCodeUnit(this.root.value, start);
+    const domEnd = KMWString.codePointToCodeUnit(this.root.value, end);
     this.root.setSelectionRange(domStart, domEnd, direction);
 
     this.processedSelectionStart = start;
@@ -125,8 +125,8 @@ export default class Input extends OutputTarget<EventMap> {
     // We bypass this whenever operating in the embedded format.
     const element = this.getElement();
 
-    let selectionStart = element.selectionStart;
-    let selectionEnd = element.selectionEnd;
+    const selectionStart = element.selectionStart;
+    const selectionEnd = element.selectionEnd;
 
     this._activeForcedScroll = true;
 
@@ -163,16 +163,16 @@ export default class Input extends OutputTarget<EventMap> {
 
   setTextBeforeCaret(text: string) {
     this.getCaret();
-    let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
-    let direction = this.getSelectionDirection();
-    let newCaret = KMWString.length(text);
+    const selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
+    const direction = this.getSelectionDirection();
+    const newCaret = KMWString.length(text);
     this.root.value = text + KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.setSelection(newCaret, newCaret + selectionLength, direction);
   }
 
   protected setTextAfterCaret(s: string) {
-    let direction = this.getSelectionDirection();
+    const direction = this.getSelectionDirection();
 
     this.root.value = this.getTextBeforeCaret() + s;
     this.setSelection(this.processedSelectionStart, this.processedSelectionEnd, direction);
@@ -189,8 +189,8 @@ export default class Input extends OutputTarget<EventMap> {
 
   deleteCharsBeforeCaret(dn: number) {
     if(dn > 0) {
-      let curText = this.getTextBeforeCaret();
-      let caret = this.processedSelectionStart;
+      const curText = this.getTextBeforeCaret();
+      const caret = this.processedSelectionStart;
 
       if(dn > caret) {
         dn = caret;
@@ -207,9 +207,9 @@ export default class Input extends OutputTarget<EventMap> {
       return;
     }
 
-    let caret = this.getCaret();
-    let front = this.getTextBeforeCaret();
-    let back = KMWString.substring(this.getText(), this.processedSelectionStart);
+    const caret = this.getCaret();
+    const front = this.getTextBeforeCaret();
+    const back = KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.adjustDeadkeys(KMWString.length(s));
     this.root.value = front + s + back;

@@ -129,12 +129,12 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
    * @return  {string}
    */
   defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTarget, readonly: boolean): RuleBehavior {
-    let preInput = Mock.from(outputTarget, readonly);
-    let ruleBehavior = new RuleBehavior();
+    const preInput = Mock.from(outputTarget, readonly);
+    const ruleBehavior = new RuleBehavior();
 
     let matched = false;
-    var char = '';
-    var special: EmulationKeystrokes;
+    let char = '';
+    let special: EmulationKeystrokes;
     if(Lkc.isSynthetic || outputTarget.isSynthetic) {
       matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                         // if no match occurs.
@@ -166,7 +166,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       }
     }
 
-    let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
+    const isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
       if((char = this.defaultRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
@@ -192,7 +192,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       return ruleBehavior;
     }
 
-    let transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
+    const transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
     ruleBehavior.transcription = transcription;
 
     return ruleBehavior;
@@ -211,7 +211,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
-    var matchBehavior: RuleBehavior;
+    let matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
     const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
@@ -244,7 +244,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
       // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
       // Many keyboards rely upon these 'implied rules'.
-      let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
+      const defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
       if(defaultBehavior) {
         if(!matchBehavior) {
           matchBehavior = defaultBehavior;
@@ -355,9 +355,9 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
    *  @return {boolean}                               return true if keyboard layer changed
    */
   selectLayer(keyEvent: KeyEvent): boolean {
-    let keyName = keyEvent.kName;
-    var nextLayer = keyEvent.kNextLayer;
-    var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
+    const keyName = keyEvent.kName;
+    let nextLayer = keyEvent.kNextLayer;
+    const isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
     // Layer must be identified by name, not number (27/08/2015)
     if(typeof nextLayer == 'number') {
@@ -438,20 +438,20 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
    * @param       {string}      id      layer id (e.g. ctrlshift)
    */
   updateLayer(keyEvent: KeyEvent, id: string) {
-    let activeLayer = this.layerId;
-    var s = activeLayer;
+    const activeLayer = this.layerId;
+    let s = activeLayer;
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
       return;
     }
 
-    var idx=id;
-    var i;
+    let idx=id;
+    let i;
 
     if(keyEvent.device.formFactor == DeviceSpec.FormFactor.Desktop) {
       // Need to test if target layer is a standard layer (based on the plain 'default')
-      var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
+      const replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
       for(i=0; i < replacements.length; i++) {
         // Don't forget to remove the kebab-case hyphens!
@@ -471,7 +471,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       // if(idx == '') with accompanying if-else structural shift would be a far better test here.
       else {
         // Save our current modifier state.
-        var modifier=Codes.getModifierState(s);
+        let modifier=Codes.getModifierState(s);
 
         // Strip down to the base modifiable layer.
         for(i=0; i < replacements.length; i++) {
@@ -526,14 +526,14 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       s = id;
     }
 
-    let layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+    const layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
     if(layout.getLayer(s)) {
       this.layerId = s;
     } else {
       this.layerId = 'default';
     }
 
-    let baseModifierState = Codes.getModifierState(this.layerId);
+    const baseModifierState = Codes.getModifierState(this.layerId);
     this.modStateFlags = baseModifierState | keyEvent.Lstates;
   }
 
@@ -603,7 +603,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
   setNumericLayer(device: DeviceSpec) {
     if (this.activeKeyboard) {
-      let layout = this.activeKeyboard.layout(device.formFactor);
+      const layout = this.activeKeyboard.layout(device.formFactor);
       if(layout.getLayer('numeric')) {
         this.layerId = 'numeric';
       }

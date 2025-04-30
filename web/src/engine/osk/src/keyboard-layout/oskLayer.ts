@@ -46,7 +46,7 @@ export default class OSKLayer {
     const gs=gDiv.style;
     gDiv.className='kmw-key-layer';
 
-    var nRows=layer['row'].length;
+    const nRows=layer['row'].length;
     if(nRows > 4 && vkbd.device.formFactor == 'phone') {
       gDiv.className = gDiv.className + ' kmw-5rows';
     }
@@ -69,11 +69,11 @@ export default class OSKLayer {
     }
 
     // Create a DIV for each row of the group
-    let rows=layer['row'];
+    const rows=layer['row'];
     this.rows = [];
 
     for(let i=0; i<rows.length; i++) {
-      let rowObj = new OSKRow(vkbd, layer, rows[i]);
+      const rowObj = new OSKRow(vkbd, layer, rows[i]);
       rowObj.displaysKeyCaps = layout["displayUnderlying"];
       gDiv.appendChild(rowObj.element);
       this.rows.push(rowObj);
@@ -93,7 +93,7 @@ export default class OSKLayer {
 
     if(this.spaceBarKey) {
       const spacebarLabel = this.spaceBarKey.label;
-      let tButton = this.spaceBarKey.btn;
+      const tButton = this.spaceBarKey.btn;
 
       if (typeof (tButton.className) == 'undefined' || tButton.className == '') {
         tButton.className = 'kmw-spacebar';
@@ -182,9 +182,6 @@ export default class OSKLayer {
       }
 
       oskRow.refreshLayout(layoutParams);
-      if(nRow == nRows-1) {
-        oskRow.element.style.bottom = '1px';
-      }
     }
 
     for(const row of this.rows) {

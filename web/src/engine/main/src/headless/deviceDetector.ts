@@ -42,7 +42,9 @@ export class DeviceDetector {
    * @return      {number}
    */
   getDPI(): number {
-    var t=document.createElement('DIV') ,s=t.style,dpi=96;
+    const t=document.createElement('DIV');
+    const s=t.style;
+    let dpi=96;
     if(document.readyState !== 'complete') {
       return dpi;
     }
@@ -57,10 +59,10 @@ export class DeviceDetector {
   }
 
   detect() : DeviceSpec {
-    var possMacSpoof = false;
+    let possMacSpoof = false;
 
     if(navigator && navigator.userAgent) {
-      var agent=navigator.userAgent;
+      const agent=navigator.userAgent;
 
       if(agent.indexOf('iPad') >= 0) {
         this.OS='iOS';
@@ -76,7 +78,7 @@ export class DeviceDetector {
         this.dyPortrait=75;
         this.dyLandscape=25;
         try {
-          var rx=new RegExp("(?:Android\\s+)(\\d+\\.\\d+\\.\\d+)");
+          const rx=new RegExp("(?:Android\\s+)(\\d+\\.\\d+\\.\\d+)");
           this.version=agent.match(rx)[1];
         } catch(ex) {}
       } else if(agent.indexOf('Linux') >= 0) {
@@ -88,8 +90,8 @@ export class DeviceDetector {
         //
         // Firefox uses '.' between version components, while Chrome and Safari use
         // '_' instead.  So, we have to check for both.  Yay.
-        let regex = /Intel Mac OS X (\d+(?:[_\.]\d+)+)/i;
-        let results = regex.exec(agent);
+        const regex = /Intel Mac OS X (\d+(?:[_\.]\d+)+)/i;
+        const results = regex.exec(agent);
 
         // Match result:  a version string with components separated by underscores.
         if(!results) {
@@ -98,8 +100,8 @@ export class DeviceDetector {
           this.OS='MacOSX';
         } else if(results.length > 1 && results[1]) {
           // Convert version string into a usable form.
-          let versionString = results[1].replace('_', '.');
-          let version = new Version(versionString);
+          const versionString = results[1].replace('_', '.');
+          const version = new Version(versionString);
 
           possMacSpoof = Version.MAC_POSSIBLE_IPAD_ALIAS.compareTo(version) <= 0;
           this.OS='MacOSX';
@@ -136,7 +138,7 @@ export class DeviceDetector {
     }
 
     // Test for potential Chrome emulation on Windows or macOS X (used only in next if-check)
-    let possibleChromeEmulation = navigator.platform == 'Win32' || navigator.platform == 'MacIntel'
+    const possibleChromeEmulation = navigator.platform == 'Win32' || navigator.platform == 'MacIntel'
 
     //                           alert(sxx+'->'+device.formFactor);
     // Check for phony iOS devices (but don't undo for Chrome emulation used during development)
@@ -150,7 +152,7 @@ export class DeviceDetector {
       this.browser='safari';
     }
 
-    var bMatch=/Firefox|Chrome|OPR|Safari|Edge/;
+    const bMatch=/Firefox|Chrome|OPR|Safari|Edge/;
     if(bMatch.test(navigator.userAgent)) {
       if((navigator.userAgent.indexOf('Firefox') >= 0) && ('onmozorientationchange' in screen)) {
         this.browser='firefox';

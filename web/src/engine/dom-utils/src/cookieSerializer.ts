@@ -24,11 +24,11 @@ export default class CookieSerializer<Type extends Record<keyof Type, DecodedCoo
    * @return      {Object}                  array of names and strings
    */
   private _loadRawCookies(): Record<string, string> {
-    let v: Record<string, string> = {};
+    const v: Record<string, string> = {};
     if(typeof(document.cookie) != 'undefined' && document.cookie != '') {
-      let c = document.cookie.split(/;\s*/);
+      const c = document.cookie.split(/;\s*/);
       for(let i = 0; i < c.length; i++) {
-        let d = c[i].split('=');
+        const d = c[i].split('=');
         if(d.length == 2) {
           v[d[0]] = d[1];
         }
@@ -45,19 +45,19 @@ export default class CookieSerializer<Type extends Record<keyof Type, DecodedCoo
    * @return      {Object}                  array of variables and values
    */
   private loadCookie(cookieName: string, decoder: FilteredRecordDecoder): Record<string, DecodedCookieFieldValue> {
-    let cookie: Record<string, DecodedCookieFieldValue> = {};
-    let allCookies = this._loadRawCookies();
+    const cookie: Record<string, DecodedCookieFieldValue> = {};
+    const allCookies = this._loadRawCookies();
     const encodedCookie = allCookies[cookieName];
 
     if(encodedCookie) {
-      let rawDecode = decodeURIComponent(encodedCookie).split(';');
+      const rawDecode = decodeURIComponent(encodedCookie).split(';');
       for(let i=0; i<rawDecode.length; i++) {
         // Prevent accidental empty-key entries caused by cookie-final ';'.
         if(i == rawDecode.length - 1 && !rawDecode[i]) {
           break;
         }
 
-        let record = rawDecode[i].split('=');
+        const record = rawDecode[i].split('=');
         if(record.length > 1) {
           const [key, value] = record;
           // key, value
@@ -79,12 +79,12 @@ export default class CookieSerializer<Type extends Record<keyof Type, DecodedCoo
    */
   private saveCookie(cookieName: string, cookieValueMap: Record<string, DecodedCookieFieldValue>, encoder: FilteredRecordEncoder) {
     let serialization='';
-    for(let key in cookieValueMap) {
+    for(const key in cookieValueMap) {
       serialization += key + '=' + encoder(cookieValueMap[key], key) + ";";
     }
 
-    let d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
-    let cookieConfig = ' path=/; expires=' + d;  //Fri, 31 Dec 2099 23:59:59 GMT;';
+    const d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
+    const cookieConfig = ' path=/; expires=' + d;  //Fri, 31 Dec 2099 23:59:59 GMT;';
     document.cookie = `${cookieName}=${encodeURIComponent(serialization)}; ${cookieConfig}`;
   }
 }

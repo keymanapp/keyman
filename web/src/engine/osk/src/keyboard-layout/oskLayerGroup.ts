@@ -40,14 +40,6 @@ export default class OSKLayerGroup {
       return;
     }
 
-    // Set default OSK font size (Build 344, KMEW-90)
-    let layoutFS = layout['fontsize'];
-    if(typeof layoutFS == 'undefined' || layoutFS == null || layoutFS == '') {
-      ls.fontSize='1em';
-    } else {
-      ls.fontSize=layout['fontsize'];
-    }
-
     ls.width = '100%';
     ls.height = '100%';
 
@@ -113,7 +105,7 @@ export default class OSKLayerGroup {
     // Trigger construction of the layer if it does not already exist.
     this.getLayer(id);
 
-    for (let key of Object.keys(this._layers)) {
+    for (const key of Object.keys(this._layers)) {
       const layer = this._layers[key];
       const layerElement = layer.element;
       if (layer.id == id) {
@@ -172,7 +164,7 @@ export default class OSKLayerGroup {
     // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
     // explicitly to be temporary.
     if(layer.element.style.display != 'block') {
-      for(let id in this._layers) {
+      for(const id in this._layers) {
         if(this._layers[id].element.style.display == 'block') {
           const priorLayer = this._layers[id];
           priorLayer.element.style.display = 'none';
@@ -245,7 +237,7 @@ export default class OSKLayerGroup {
     // Is percentage-based!
     let minDistance = Number.MAX_VALUE;
 
-    for (let key of row.keys) {
+    for (const key of row.keys) {
       const keySpec = key.spec;
       if(keySpec.sp == ButtonClasses.blank || keySpec.sp == ButtonClasses.spacer) {
         continue;
@@ -320,8 +312,8 @@ export default class OSKLayerGroup {
       const computedGroupStyle = getComputedStyle(this.element);
 
       // parseInt('') => NaN, which is falsy; we want to fallback to zero.
-      let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
-      let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
+      const pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
+      const pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
       this._heightPadding = pt + pb;
     }
 

@@ -44,7 +44,7 @@ export class Transcription {
   private static tokenSeed: number = 0;
 
   constructor(keystroke: KeyEvent, transform: TextTransform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
-    let token = this.token = Transcription.tokenSeed++;
+    const token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;
     this.transform = transform;
@@ -92,7 +92,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
   }
 
   insertDeadkeyBeforeCaret(d: number) {
-    var dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
+    const dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
     this.deadkeys().add(dk);
   }
 
@@ -144,7 +144,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
   }
 
   buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
-    let transform = this.buildTransformFrom(original);
+    const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
 

@@ -38,7 +38,7 @@ export class GlobeHint implements GlobeHintInterface {
   constructor(vkbd: VisualKeyboard) {
     this.vkbd = vkbd;
 
-    let tipElement = this.element=document.createElement('div');
+    const tipElement = this.element=document.createElement('div');
     tipElement.className = 'kmw-globehint';
     tipElement.id = 'kmw-globehint';
 
@@ -77,28 +77,28 @@ export class GlobeHint implements GlobeHintInterface {
       // The key element is positioned relative to its key-square, which is,
       // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
       //
-      let rowElement = (key.key as OSKBaseKey).row.element;
+      const rowElement = (key.key as OSKBaseKey).row.element;
 
       // May need adjustment for borders if ever enabled for the desktop form-factor target.
-      let rkey = key.getClientRects()[0], rrow = rowElement.getClientRects()[0];
-      let xLeft = rkey.left - rrow.left,
+      const rkey = key.getClientRects()[0], rrow = rowElement.getClientRects()[0];
+      const xLeft = rkey.left - rrow.left,
           xWidth = rkey.width,
           xHeight = rkey.height;
 
-      let center = rkey.left + rkey.width/2;
+      const center = rkey.left + rkey.width/2;
 
-      let bubbleStyle = this.element.style;
+      const bubbleStyle = this.element.style;
 
       // Roughly matches how the subkey positioning is set.
       const _Box = this.vkbd.element.parentNode as HTMLDivElement;
       const _BoxRect = _Box.getBoundingClientRect();
       const keyRect = key.getBoundingClientRect();
-      let y = (keyRect.bottom - _BoxRect.top + 1);
+      const y = (keyRect.bottom - _BoxRect.top + 1);
 
       // Width dimensions must be set explicitly to prevent clipping.
       // We'll assume that the globe key is always positioned on the bottom row.
-      let oskBaseFontSize = new ParsedLengthStyle(this.vkbd.fontSize.styleString);
-      let bubbleWidth = Math.ceil(xWidth * 3);
+      const oskBaseFontSize = new ParsedLengthStyle(this.vkbd.fontSize.styleString);
+      const bubbleWidth = Math.ceil(xWidth * 3);
 
       bubbleStyle.bottom = Math.floor(this.vkbd.height - y) + 'px';
       // CSS already defines transform: translateX(-50%) - this centers the element.
@@ -132,7 +132,7 @@ export class GlobeHint implements GlobeHintInterface {
         this.element.style.fontSize = this.vkbd.fontSize.styleString;
       }
 
-      let capHeight = xHeight / 3;
+      const capHeight = xHeight / 3;
 
       this.cap.style.bottom = (rrow.height - capHeight) + 'px';
       this.cap.style.width = '0px';
