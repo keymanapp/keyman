@@ -80,11 +80,11 @@ export default class PriorityQueue<Type> {
     // Use of 'indices' here is a bit of a customization.
     // At the cost of (temporary) extra storage space, we can more efficiently enqueue
     // multiple elements simultaneously.
-    let queuedIndices: number[] = [];
+    const queuedIndices: number[] = [];
     let lastParent = -1;
 
     for(let i = end; i >= start; i--) {
-      let parent = PriorityQueue.parentIndex(i);
+      const parent = PriorityQueue.parentIndex(i);
       if(this.siftDown(i) && parent < start && lastParent != parent) {
         // We only need to queue examination for a heap node if its children have changed
         // and it isn't already being examined.
@@ -95,8 +95,8 @@ export default class PriorityQueue<Type> {
 
     lastParent = -1;
     while(queuedIndices.length > 0) {
-      let index = queuedIndices.shift() as number;
-      let parent = PriorityQueue.parentIndex(index);
+      const index = queuedIndices.shift() as number;
+      const parent = PriorityQueue.parentIndex(index);
       if(this.siftDown(index) && parent >= 0 && lastParent != parent) {
           // We only need to queue examination for a heap node if its children have changed.
         queuedIndices.push(parent);
@@ -131,10 +131,10 @@ export default class PriorityQueue<Type> {
     let index = this.heap.length;
     this.heap.push(element);
 
-    let parent = PriorityQueue.parentIndex;
+    const parent = PriorityQueue.parentIndex;
     let parentIndex = parent(index);
     while(index !== 0 && this.comparator(this.heap[index], this.heap[parentIndex]) < 0) {
-      let a = this.heap[index];
+      const a = this.heap[index];
       this.heap[index] = this.heap[parentIndex];
       this.heap[parentIndex] = a;
 
@@ -156,9 +156,9 @@ export default class PriorityQueue<Type> {
       return;
     }
 
-    let firstIndex = this.count
+    const firstIndex = this.count
     this.heap = this.heap.concat(elements);
-    let firstParent = PriorityQueue.parentIndex(firstIndex);
+    const firstParent = PriorityQueue.parentIndex(firstIndex);
 
     // The 'parent' of index 0 will return -1, which is illegal.
     this.heapify(firstParent >= 0 ? firstParent : 0, PriorityQueue.parentIndex(this.count-1));
@@ -175,7 +175,7 @@ export default class PriorityQueue<Type> {
     }
 
     const root = this.heap[0];
-    let tail = this.heap.pop() as Type;
+    const tail = this.heap.pop() as Type;
     if(this.heap.length > 0) {
       this.heap[0] = tail;
       this.siftDown(0);
@@ -195,8 +195,8 @@ export default class PriorityQueue<Type> {
    * @returns `true` if a swap occurred, `false` otherwise.
    */
   private siftDown(index: number): boolean {
-    let leftIndex = PriorityQueue.leftChildIndex(index);
-    let rightIndex = PriorityQueue.rightChildIndex(index);
+    const leftIndex = PriorityQueue.leftChildIndex(index);
+    const rightIndex = PriorityQueue.rightChildIndex(index);
     let topMostIndex = index;
 
     if(leftIndex < this.heap.length && this.comparator(this.heap[leftIndex], this.heap[topMostIndex]) < 0) {
@@ -208,7 +208,7 @@ export default class PriorityQueue<Type> {
     }
 
     if(topMostIndex != index) {
-      let a = this.heap[index];
+      const a = this.heap[index];
       this.heap[index] = this.heap[topMostIndex];
       this.heap[topMostIndex] = a;
 
