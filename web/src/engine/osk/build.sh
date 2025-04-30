@@ -51,7 +51,12 @@ do_build() {
   node validate-gesture-specs.js
 }
 
+do_test() {
+  test-headless-typescript "${SUBPROJECT_NAME}"
+  ./gesture-processor/build.sh test
+}
+
 builder_run_action configure do_configure
 builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
 builder_run_action build do_build
-builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"
+builder_run_action test do_test
