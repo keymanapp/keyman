@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('The join word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
-    let breakWords = decorateWithJoin(defaultWordBreaker, ['-']);
+    const breakWords = decorateWithJoin(defaultWordBreaker, ['-']);
     assert.isFunction(breakWords);
   });
 
@@ -79,12 +79,12 @@ describe('The join word breaker decorator', function () {
     ],
   ]
 
-  for (let [phrase, joiners, unjoined, expected] of TEST_CASES) {
+  for (const [phrase, joiners, unjoined, expected] of TEST_CASES) {
     it(`should break «${[phrase]}» as [${expected.join(' ;; ')}]`, function () {
-      let breakWords = decorateWithJoin(defaultWordBreaker, joiners);
-      let unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
+      const breakWords = decorateWithJoin(defaultWordBreaker, joiners);
+      const unjoinedResult = defaultWordBreaker(phrase).map(onlyText);
       assert.deepEqual(unjoinedResult, unjoined);
-      let actualResult = breakWords(phrase).map(onlyText);
+      const actualResult = breakWords(phrase).map(onlyText);
       assert.deepEqual(actualResult, expected);
     });
   }
