@@ -64,8 +64,6 @@ builder_describe_outputs \
   build:arch         build/arch/$BUILDER_CONFIGURATION/src/libkmcmplib.a \
   build:wasm         build/wasm/$BUILDER_CONFIGURATION/src/libkmcmplib.a
 
-TARGET_PATH="$THIS_SCRIPT_PATH/build"
-
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
@@ -74,7 +72,7 @@ targets=(wasm x86 x64 arch)
 do_action() {
   local action_function=do_$1
   for target in "${targets[@]}"; do
-    MESON_PATH="$TARGET_PATH/$target/$BUILDER_CONFIGURATION"
+    MESON_PATH="$THIS_SCRIPT_PATH/build/$target/$BUILDER_CONFIGURATION"
     $action_function $target
   done
 }
@@ -109,6 +107,12 @@ if builder_start_action configure; then
   fi
 
   builder_finish_action success configure
+fi
+
+# Setup Windows environment for VC++
+if [[ $BUILDER_OS == win ]]; then
+  source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+  configure_windows_build_environment
 fi
 
 do_action configure

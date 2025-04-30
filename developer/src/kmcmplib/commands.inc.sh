@@ -40,14 +40,11 @@ do_configure() {
     FULL_TEST_WIN=--full-test
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION configure $FULL_TEST_WIN "${builder_extra_params[@]}"
-  else
-    pushd "$THIS_SCRIPT_PATH" > /dev/null
-    # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS $FULL_TEST "${builder_extra_params[@]}"
-    popd > /dev/null
-  fi
+  pushd "$THIS_SCRIPT_PATH" > /dev/null
+  # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
+  meson setup "$MESON_PATH" --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS $FULL_TEST "${builder_extra_params[@]}"
+  popd > /dev/null
+
   builder_finish_action success configure:$target
 }
 
@@ -58,19 +55,7 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    # Build the meson targets, both x86 and x64 also
-    # We need to use a batch file here so we can get
-    # the Visual Studio build environment with vcvarsall.bat
-    # TODO: if PATH is the only variable required, let's try and
-    #       eliminate this difference in the build process
-    cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
-  else
-    pushd "$MESON_PATH" > /dev/null
-    ninja
-    popd > /dev/null
-  fi
+  meson compile -C "$MESON_PATH"
   builder_finish_action success build:$target
 }
 
@@ -89,13 +74,8 @@ do_test() {
     checkout_keyboards
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
-  else
-    pushd "$MESON_PATH" > /dev/null
-    meson test "${builder_extra_params[@]}"
-    popd > /dev/null
-  fi
+  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+
   builder_finish_action success test:$target
 }
 
