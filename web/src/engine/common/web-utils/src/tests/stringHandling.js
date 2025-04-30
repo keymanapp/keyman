@@ -39,6 +39,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
       assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
       assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
+      assert.equal(banana_nation._kmwIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwIndexOf("ba", -1), 0);
+      assert.equal(banana_nation._kmwIndexOf("on", 11), 11);
+      assert.equal(banana_nation._kmwIndexOf("on", 12), -1);
+      assert.equal(banana_nation._kmwIndexOf("on", 1000), -1);
     });
 
     it('_kmwLastIndexOf', () => {
@@ -52,6 +57,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwLastIndexOf("na", 5), 4);
       assert.equal(banana_nation._kmwLastIndexOf("na", 8), 7);
       assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", -1), 0);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 12), 11);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 11), 11);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 10), -1);
     });
 
     it('_kmwLength', () => {
@@ -157,6 +167,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwIndexOf("na", 5), 7);
       assert.equal(banana_nation._kmwIndexOf("na", 8), -1);
       assert.equal(banana_nation._kmwIndexOf("na", 1000), -1);
+      assert.equal(banana_nation._kmwIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwIndexOf("ba", -1), 0);
+      assert.equal(banana_nation._kmwIndexOf("on", 11), 11);
+      assert.equal(banana_nation._kmwIndexOf("on", 12), -1);
+      assert.equal(banana_nation._kmwIndexOf("on", 1000), -1);
     });
 
     it('_kmwLastIndexOf', () => {
@@ -170,6 +185,11 @@ describe('Unicode string handling', () => {
       assert.equal(banana_nation._kmwLastIndexOf("na", 5), 4);
       assert.equal(banana_nation._kmwLastIndexOf("na", 8), 7);
       assert.equal(banana_nation._kmwLastIndexOf("na", 1000), 7);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", -1), 0);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 12), 11);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 11), 11);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 10), -1);
     });
 
     it('_kmwLength', () => {
@@ -303,6 +323,12 @@ describe('Unicode string handling', () => {
       // ERROR:  returns 7 (!)
       // assert.equal(banana_nation._kmwIndexOf(na, 8), -1);
       assert.equal(banana_nation._kmwIndexOf(na, 1000), -1);
+      assert.equal(banana_nation._kmwIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwIndexOf("ba", -1), 0);
+      assert.equal(banana_nation._kmwIndexOf("on", 11), 11);
+      // ERROR:  returns 11 (!)
+      // assert.equal(banana_nation._kmwIndexOf("on", 12), -1);
+      assert.equal(banana_nation._kmwIndexOf("on", 1000), -1);
     });
 
     it('_kmwLastIndexOf', () => {
@@ -333,6 +359,12 @@ describe('Unicode string handling', () => {
       // assert.equal(banana_nation._kmwLastIndexOf(na, 7), 7);
       assert.equal(banana_nation._kmwLastIndexOf(na, 8), 7);
       assert.equal(banana_nation._kmwLastIndexOf(na, 1000), 7);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", 0), 0);
+      assert.equal(banana_nation._kmwLastIndexOf("ba", -1), 0);
+      // ERROR:  Both return -1 instead!
+      // assert.equal(banana_nation._kmwLastIndexOf("on", 12), 11);
+      // assert.equal(banana_nation._kmwLastIndexOf("on", 11), 11);
+      assert.equal(banana_nation._kmwLastIndexOf("on", 10), -1);
     });
 
     it('_kmwLength', () => {
