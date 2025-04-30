@@ -10,13 +10,32 @@ import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
 import { KeylayoutToKmnConverter } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
+import { SchemaValidators } from '@keymanapp/common-types';
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
+  /**
+   * @returns true if valid, false if invalid
+   */
+  public validate(source: any): boolean {
+    if(!SchemaValidators.default.keylayout(source)) {
+      console.log("SchemaValidators.default.keylayout).errors ",(<any>SchemaValidators.default.keylayout).errors);
 
+      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
+        this.callbacks.reportMessage(ConverterMessages.Error_SchemaValidationError({
+          instancePath: err.instancePath,
+          keyword: err.keyword,
+          message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
+          params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
+        }));
+      }
+      return false;
+    }
+    return true;
+  }
 
   /**
    * @brief  member function to box single-entry objects into arrays

@@ -9,6 +9,7 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
+import { ConverterMessages } from '../converter-messages.js';
 
 export interface convert_object {
   keylayout_filename: string,
@@ -53,6 +54,24 @@ export class KeylayoutToKmnConverter {
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: object = KeylayoutReader.read(inputFilename);
+
+
+    // just to check if it works: validate file with stevens schema file -------------------------------------------------
+
+    console.log("stop ",);
+    try {
+      // validate the object tree against the .xsd schema
+     if (!KeylayoutReader.validate(jsonO)) {
+       //if (KeylayoutReader.validate(jsonO)) {
+        return null;
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
+    // just to check if it works: validate file with stevens schema file -------------------------------------------------
+
+
     if (!jsonO) {
       throw new Error('Error while processing read()');
     }

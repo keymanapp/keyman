@@ -27,4 +27,16 @@ export class ConverterMessages {
   static ERROR_FileNotFound = SevError | 0x0003;
   static Error_FileNotFound = (o: { inputFilename: string; }) =>
     m(this.ERROR_FileNotFound, `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`);
+
+  // from SRL
+  static ERROR_InvalidFile = SevError | 0x0007;
+  static Error_InvalidFile = (o:{errorText: string}) =>
+  m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
+
+  // from SRL
+  static ERROR_SchemaValidationError = SevError | 0x0011;
+  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
+    `Error validating Keylayout XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
+
+
 }
