@@ -27,7 +27,7 @@ export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboa
     // Positional Layout
 
     /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-    var Lbase = KeyMapping.languageMap[baseLayout];
+    const Lbase = KeyMapping.languageMap[baseLayout];
     if(Lbase && Lbase['k'+s.Lcode]) {
       s.Lcode=Lbase['k'+s.Lcode];
     }

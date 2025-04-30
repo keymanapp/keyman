@@ -43,9 +43,9 @@ export default class OSKRow {
     // All key widths and paddings are rounded for uniformity
     for(let j=0; j<keys.length; j++) {
       const key = keys[j];
-      var keyObj = new OSKBaseKey(key as ActiveKey, layerSpec.id, this);
+      const keyObj = new OSKBaseKey(key as ActiveKey, layerSpec.id, this);
 
-      var element = keyObj.construct(vkbd);
+      const element = keyObj.construct(vkbd);
       this.keys.push(keyObj);
 
       rDiv.appendChild(element);

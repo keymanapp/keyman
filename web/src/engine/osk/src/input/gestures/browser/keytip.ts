@@ -41,7 +41,7 @@ export default class KeyTip implements KeyTipInterface {
    */
   constructor(vkbd: VisualKeyboard, constrain: boolean) {
     this.vkbd = vkbd;
-    let tipElement = this.element=document.createElement('div');
+    const tipElement = this.element=document.createElement('div');
     tipElement.className='kmw-keytip';
     tipElement.id = 'kmw-keytip';
 
@@ -84,16 +84,16 @@ export default class KeyTip implements KeyTipInterface {
       // The key element is positioned relative to its key-square, which is,
       // in turn, relative to its row.  Rows take 100% width, so this is sufficient.
       //
-      let rowElement = (key.key as OSKBaseKey).row.element;
+      const rowElement = (key.key as OSKBaseKey).row.element;
 
       // May need adjustment for borders if ever enabled for the desktop form-factor target.
-      let rkey = key.getClientRects()[0], rrow = rowElement.getClientRects()[0];
-      let xLeft = rkey.left - rrow.left,
-          xWidth = rkey.width,
-          xHeight = rkey.height,
-          previewFontScale = 1.8;
+      const rkey = key.getClientRects()[0], rrow = rowElement.getClientRects()[0];
+      let xLeft = rkey.left - rrow.left;
+      const xWidth = rkey.width,
+            xHeight = rkey.height,
+            previewFontScale = 1.8;
 
-      let kts = this.element.style;
+      const kts = this.element.style;
 
       // Roughly matches how the subkey positioning is set.
       const _Box = vkbd.topContainer as HTMLDivElement;
@@ -104,12 +104,12 @@ export default class KeyTip implements KeyTipInterface {
       const orientation = this.orientation;
       const distFromTop = keyRect.bottom - _BoxRect.top;
       y = (distFromTop + (orientation == 'top' ? 1 : -1));
-      let ySubPixelPadding = y - Math.floor(y);
+      const ySubPixelPadding = y - Math.floor(y);
 
       // Canvas dimensions must be set explicitly to prevent clipping
       // This gives us exactly the same number of pixels on left and right
-      let canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
-      let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
+      const canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
+      const canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
       if(orientation == 'bottom') {
         y += canvasHeight - xHeight;
@@ -134,13 +134,13 @@ export default class KeyTip implements KeyTipInterface {
       const ckts = getComputedStyle(vkbd.element);
       kts.fontFamily = key.key.spec.font || layerFontFamily || ckts.fontFamily;
 
-      var px=parseInt(ckts.fontSize,10);
+      let px=parseInt(ckts.fontSize,10);
       if(px == Number.NaN) {
         px = 0;
       }
 
       if(px != 0) {
-        let scaleStyle = {
+        const scaleStyle = {
           keyWidth: 1.6 * xWidth,
           keyHeight: 1.6 * xHeight, // as opposed to the canvas height of 2.3 * xHeight.
           baseEmFontSize: vkbd.getKeyEmFontSize(),
@@ -151,7 +151,7 @@ export default class KeyTip implements KeyTipInterface {
       }
 
       // Adjust shape if at edges
-      var xOverflow = (canvasWidth - xWidth) / 2;
+      const xOverflow = (canvasWidth - xWidth) / 2;
       if(xLeft < xOverflow) {
         this.cap.style.left = '1px';
         xLeft += xOverflow - 1;
@@ -164,11 +164,11 @@ export default class KeyTip implements KeyTipInterface {
 
       kts.left=(xLeft - xOverflow) + 'px';
 
-      let cs = getComputedStyle(this.element);
-      let oskHeight = _BoxRect.height;
-      let bottomY = parseFloat(cs.bottom);
-      let tipHeight = parseFloat(cs.height);
-      let halfHeight = Math.ceil(canvasHeight / 2);
+      const cs = getComputedStyle(this.element);
+      const oskHeight = _BoxRect.height;
+      const bottomY = parseFloat(cs.bottom);
+      const tipHeight = parseFloat(cs.height);
+      const halfHeight = Math.ceil(canvasHeight / 2);
 
       this.cap.style.width = xWidth + 'px';
       this.tip.style.height = halfHeight + 'px';

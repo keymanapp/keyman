@@ -12,7 +12,7 @@ export default class HelpPageView implements KeyboardView {
   constructor(keyboard: Keyboard) {
     this.kbd = keyboard;
 
-    var Ldiv = this.element = document.createElement('div');
+    const Ldiv = this.element = document.createElement('div');
     Ldiv.style.userSelect = "none";
     Ldiv.className = 'kmw-osk-static';
     Ldiv.id = HelpPageView.ID;

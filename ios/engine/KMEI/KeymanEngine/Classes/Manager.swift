@@ -351,6 +351,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       try inputViewController.setKeyboard(kb)
     } catch {
       // Here, errors are logged by the error's thrower.
+      // But we should remove the keyboard's entry in the registered-keyboards list.
+      _ = self.removeKeyboard(withFullID: kb.fullID)
       return false
     }
 

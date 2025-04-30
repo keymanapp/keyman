@@ -263,7 +263,7 @@ export default abstract class OSKView
     // Temp-hack:  embedded products prefer their stylesheet, etc linkages without the /osk path component.
     const resourcePath = getResourcePath(this.config);
 
-    for(let sheetFile of OSKView.STYLESHEET_FILES) {
+    for(const sheetFile of OSKView.STYLESHEET_FILES) {
       const sheetHref = `${resourcePath}${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
@@ -321,7 +321,7 @@ export default abstract class OSKView
 
   private setBaseTouchEventListeners() {
     // To prevent touch event default behaviour on mobile devices
-    let commonPrevention = function(e: TouchEvent) {
+    const commonPrevention = function(e: TouchEvent) {
       if(e.cancelable) {
         e.preventDefault();
       }
@@ -336,7 +336,7 @@ export default abstract class OSKView
 
     this._boxBaseTouchStart = (e) => {
       for(let i = 0; i < e.changedTouches.length; i++) {
-        let promise = this.touchEventPromiseManager.promiseForTouchpoint(e.changedTouches[i].identifier);
+        const promise = this.touchEventPromiseManager.promiseForTouchpoint(e.changedTouches[i].identifier);
         this.emit('pointerinteraction', promise.corePromise);
       }
 
@@ -518,7 +518,17 @@ export default abstract class OSKView
       this._baseFontSize = OSKView.defaultFontSize(this.targetDevice, this.computedHeight, this.isEmbedded);
     }
 
-    return this._baseFontSize;
+    // Set default OSK font size (Build 344, KMEW-90)
+    // If the layer group specifies a fontsize value, we need
+    // to apply that to the banner as well.
+    const layerFontSize = this.vkbd?.layerGroup?.spec.fontsize;
+
+    if(layerFontSize) {
+      const parsedSize = new ParsedLengthStyle(layerFontSize);
+      return parsedSize.absolute ? parsedSize : this._baseFontSize.scaledBy(parsedSize.val);
+    } else {
+      return this._baseFontSize;
+    }
   }
 
   public static defaultFontSize(device: DeviceSpec, computedHeight: number, isEmbedded: boolean): ParsedLengthStyle {
@@ -783,7 +793,7 @@ export default abstract class OSKView
   }
 
   private _GenerateKeyboardView(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): KeyboardView {
-    let device = this.targetDevice;
+    const device = this.targetDevice;
 
     this._Box.className = "";
 
@@ -816,12 +826,12 @@ export default abstract class OSKView
    * Description  Generates the visual keyboard element and attaches it to KMW
    */
   private _GenerateVisualKeyboard(keyboard: Keyboard, keyboardMetadata: KeyboardProperties): VisualKeyboard {
-    let device = this.targetDevice;
+    const device = this.targetDevice;
 
     const resourcePath = getResourcePath(this.config);
 
     // Root element sets its own classes, one of which is 'kmw-osk-inner-frame'.
-    let vkbd = new VisualKeyboard({
+    const vkbd = new VisualKeyboard({
       keyboard: keyboard,
       keyboardMetadata: keyboardMetadata,
       device: device,
@@ -924,7 +934,7 @@ export default abstract class OSKView
 
     // If OSK still hidden, make visible only after all calculation finished
     if(this._Box.style.visibility == 'hidden') {
-      let _this = this;
+      const _this = this;
       window.setTimeout(function() {
         _this._Box.style.visibility = 'visible';
       }, 0);
@@ -991,7 +1001,7 @@ export default abstract class OSKView
     }
 
     if(this._Box) {
-      let bs=this._Box.style;
+      const bs=this._Box.style;
       bs.display = 'none';
       bs.transition = '';
       bs.opacity = '1';
@@ -1147,7 +1157,7 @@ export default abstract class OSKView
 
     // Remove the OSK's elements from the document, allowing them to be properly cleaned up.
     // Necessary for clean engine testing.
-    var _box = this._Box;
+    const _box = this._Box;
     if(_box.parentElement) {
       _box.parentElement.removeChild(_box);
     }
@@ -1167,7 +1177,7 @@ export default abstract class OSKView
    * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/getRect
    */
   public getRect(): OSKRect {		// I2405
-    var p: OSKRect = {};
+    const p: OSKRect = {};
 
     // Always return these based upon _Box; using this.vkbd will fail to account for banner and/or
     // the desktop OSK border.

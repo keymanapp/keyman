@@ -10,7 +10,7 @@ export class ParsedLengthStyle implements LengthStyle {
   public readonly special: 'em' | 'rem';
 
   public constructor(style: LengthStyle | string) {
-    let parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
+    const parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
 
     // While Object.assign would be nice (and previously, was used), it will break
     // on old but still supported versions of Android if their Chrome isn't updated.

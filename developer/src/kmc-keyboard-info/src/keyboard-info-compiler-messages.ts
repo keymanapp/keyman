@@ -3,7 +3,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -63,8 +63,29 @@ export class KeyboardInfoCompilerMessages {
     `The Info.Description field in the package ${def(o.filename)} is required, but is missing or empty.`);
 
   static HINT_ScriptDoesNotMatch = SevHint | 0x0011;
-  static Hint_ScriptDoesNotMatch = (o:{script: string, bcp47:string, commonScript: string}) => m(
+  static Hint_ScriptDoesNotMatch = (o:{script: string, bcp47:string, commonScript: string, firstBcp47: string}) => m(
     this.HINT_ScriptDoesNotMatch,
-    `The script '${def(o.script)}' associated with language tag '${def(o.bcp47)}' does not match the script '${def(o.commonScript)}' for the first language in the package.`);
+    `The script '${def(o.script)}' associated with language tag '${def(o.bcp47)}' does not match the script '${def(o.commonScript)}' for the first language ('${def(o.firstBcp47)}') in the package.`,
+  );
+
+  static WARN_LanguageTagNotFound = SevWarn | 0x0012;
+  static Warn_LanguageTagNotFound = (o:{bcp47:string, langSubtag:string}) => m(
+    this.WARN_LanguageTagNotFound,
+    `Neither the listed BCP 47 tag '${def(o.bcp47)}' nor the language subtag '${def(o.langSubtag)}' were found in langtags.json`,
+    `The [langtags.json dataset](https://github.com/silnrsi/langtags?tab=readme-ov-file) lists all
+    the registered language tags. If a tag is not found, then it will not be
+    searchable in the Keyman keyboard catalogue, and it may indicate that the
+    tag is incorrect.`
+  );
+
+  static WARN_LanguageTagNotFound2 = SevWarn | 0x0013;
+  static Warn_LanguageTagNotFound2 = (o:{bcp47:string}) => m(
+    this.WARN_LanguageTagNotFound2,
+    `The listed BCP 47 tag '${def(o.bcp47)}' was not found in langtags.json`,
+    `The [langtags.json dataset](https://github.com/silnrsi/langtags?tab=readme-ov-file) lists all
+    the registered language tags. If a tag is not found, then it will not be
+    searchable in the Keyman keyboard catalogue, and it may indicate that the
+    tag is incorrect.`
+  );
 }
 
