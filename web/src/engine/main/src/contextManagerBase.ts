@@ -350,13 +350,13 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
         const completionPromise = new ManagedPromise<Error>();
         this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
 
-        let keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
-        let timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
+        const keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
+        const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
           const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
           window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
         });
 
-        let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
+        const combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
 
         // Ensure the async-load Promise completes properly.
         combinedPromise.then(() => {
@@ -373,7 +373,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
       });
 
       // Now the fun part:  note the original call's parameters as a pending activation.
-      let promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTarget());
+      const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTarget());
       return {
         keyboard: promise.then(async (activation) => {
           // Is the activation we requested still pending, or was it cancelled in favor of a

@@ -82,7 +82,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
-        let suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
+        const suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
         // We want to avoid altering flags that indicate our post-reversion state.
         this.swallowPrediction = true;
         this.updateSuggestions(new ReadySuggestions(suggestions, reversion.id ? -reversion.id : undefined));
@@ -110,7 +110,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   }
 
   public get currentSuggestions(): Suggestion[] {
-    let suggestions: Suggestion[] = [];
+    const suggestions: Suggestion[] = [];
     // Insert 'current text' if/when valid as the leading option.
     // Since we don't yet do auto-corrections, we only show 'keep' whenever it's
     // a valid word (according to the model).
@@ -161,7 +161,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
   public accept(suggestion: Suggestion): Promise<Reversion> | Promise<null> {
-    let _this = this;
+    const _this = this;
 
     // Selecting a suggestion or a reversion should both clear selection
     // and clear the reversion-displaying state of the banner.
@@ -311,7 +311,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * Description    Update the displayed suggestions in the SuggestionBanner
    */
   private updateSuggestions = (prediction: ReadySuggestions): void => {
-    let suggestions = prediction.suggestions;
+    const suggestions = prediction.suggestions;
 
     this._currentSuggestions = suggestions;
     this.selected = null;
@@ -319,7 +319,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
     this.keepSuggestion = null;
-    for (let s of suggestions) {
+    for (const s of suggestions) {
       if(s.tag == 'keep') {
         this.keepSuggestion = s as Keep;
       }

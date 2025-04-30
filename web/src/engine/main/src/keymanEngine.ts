@@ -289,7 +289,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('stubadded', (stub) => {
-      let eventRaiser = () => {
+      const eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
           internalName: stub.KI,
@@ -314,7 +314,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('keyboardadded', (keyboard) => {
-      let eventRaiser = () => {
+      const eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.callEvent('keyboardloaded', {
           keyboardName: keyboard.id
