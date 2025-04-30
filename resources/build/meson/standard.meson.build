@@ -5,15 +5,10 @@
 # and is copied into each project's <project>/resources/meson.build in the
 # configure step, so that it can be referenced by meson directly.
 #
-# Standard code block for copying this file into a meson project:
+# Use standard_meson_build.inc.sh to make the file copy
 #
-#        # Import our standard compiler defines; this is copied from
-#        # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-#        # allow us to reference a file outside its root
-#        mkdir -p "$THIS_SCRIPT_PATH/resources"
-#        cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
-#        # Write our tagged version environment variable into a file so meson can read it
-#        echo "$VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/VERSION_WITH_TAG.md"
+
+
 #
 # Where possible, we want to use these flags everywhere
 #

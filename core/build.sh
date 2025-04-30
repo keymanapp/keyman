@@ -115,14 +115,10 @@ builder_describe_outputs \
   build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root
 if builder_has_action configure; then
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
-  # Write our tagged version environment variable into a file so meson can read it
-  echo "$VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/VERSION_WITH_TAG.md"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built

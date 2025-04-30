@@ -23,12 +23,12 @@ builder_describe \
 
 builder_parse "$@"
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
-# then includes `resources` as a subdir.
 if builder_has_action configure; then
-  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
+
+  # TODO: it would be cleaner to split this from the standard.meson.build file/folder
   cat "${THIS_SCRIPT_PATH}/resources/meson.build.in" >> "${THIS_SCRIPT_PATH}/resources/meson.build"
 fi
 
