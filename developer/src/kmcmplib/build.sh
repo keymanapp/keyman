@@ -98,6 +98,8 @@ if builder_start_action configure; then
   # allow us to reference a file outside its root
   mkdir -p "$THIS_SCRIPT_PATH/resources"
   cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+  # Write our tagged version environment variable into a file so meson can read it
+  echo "$VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/VERSION_WITH_TAG.md"
 
   # We have to checkout the keyboards repo in a 'configure' action because
   # otherwise meson will not get the right list of keyboard source files,

@@ -5,6 +5,16 @@
 # and is copied into each project's <project>/resources/meson.build in the
 # configure step, so that it can be referenced by meson directly.
 #
+# Standard code block for copying this file into a meson project:
+#
+#        # Import our standard compiler defines; this is copied from
+#        # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
+#        # allow us to reference a file outside its root
+#        mkdir -p "$THIS_SCRIPT_PATH/resources"
+#        cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+#        # Write our tagged version environment variable into a file so meson can read it
+#        echo "$VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/VERSION_WITH_TAG.md"
+#
 # Where possible, we want to use these flags everywhere
 #
 
@@ -25,6 +35,15 @@ endif
 message('meson.project_version(): ' + meson.project_version())
 message('host_machine.system(): ' + host_machine.system())
 message('compiler.get_id(): ' + cpp_compiler.get_id())
+
+#
+# Import `VERSION_WITH_TAG` which we can use where appropriate instead of
+# meson.project_version() which is only major.minor.patch.
+#
+
+fs = import('fs')
+VERSION_WITH_TAG = fs.read('VERSION_WITH_TAG.md').strip()
+message('VERSION_WITH_TAG: ' + VERSION_WITH_TAG)
 
 #
 # Standard compiler flags for all platforms

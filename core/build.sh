@@ -121,6 +121,8 @@ builder_describe_outputs \
 if builder_has_action configure; then
   mkdir -p "$THIS_SCRIPT_PATH/resources"
   cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+  # Write our tagged version environment variable into a file so meson can read it
+  echo "$VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/VERSION_WITH_TAG.md"
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built
