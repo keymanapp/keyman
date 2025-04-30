@@ -233,7 +233,7 @@ export class MarkerParser {
       }
     }
     // Then, take each codepoint (from back to front)
-    for (let p of [...s].reverse()) {
+    for (const p of [...s].reverse()) {
       // reverse order code units, prepend to out
       out = p + out;
 
@@ -525,7 +525,7 @@ export class ElementParser {
       throw Error(`Unsupported: nested square brackets in element segment: ${str}`);
     }
     const list: ElementSegment[] = [];
-    for(let m of str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)) {
+    for(const m of str.match(ElementParser.MATCH_ELEMENT_SEGMENTS)) {
       const e = new ElementSegment(m);
       if (e.type === ElementType.escaped) {
         // unescape
@@ -534,7 +534,7 @@ export class ElementParser {
           list.push(e);
         } else {
           // need to split the escaped segment, \u{41 42} -> \u{41}, \u{42}
-          for (let s of unescaped) {
+          for (const s of unescaped) {
             list.push(new ElementSegment(`\\u{${s.codePointAt(0).toString(16)}}`));
           }
         }
