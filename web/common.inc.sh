@@ -23,6 +23,8 @@ function compile() {
     builder_die "Scripting error: insufficient argument count!"
   fi
 
+  eslint .
+
   local COMPILE_TARGET="$1"
   local SRC_DIR=${2:-"${KEYMAN_ROOT}/web/src"}
   local BUILD_DIR=${3:-"${KEYMAN_ROOT}/web/build"}

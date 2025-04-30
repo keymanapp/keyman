@@ -4,7 +4,7 @@
  * @return      {boolean}
  */
 export default function landscapeView(): boolean	{ // new for I3363 (Build 301)
-  var orientation: number;
+  let orientation: number;
 
   // Assume portrait mode if orientation undefined
   if(typeof window.orientation != 'undefined') { // Used by iOS Safari
