@@ -296,6 +296,27 @@ describe('KeyboardInfoCompilerMessages', function () {
   it('should generate ERROR_DescriptionIsMissing if there is no description in .kps', async function() {
     await testMessage(KeyboardInfoCompilerMessages.ERROR_DescriptionIsMissing,'error_description_is_missing', false);
   });
+
+  // WARN_LanguageTagNotFound
+
+  it('should generate WARN_LanguageTagNotFound if a language tag is not found (and no other subtags)', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES}));
+    const result = compiler.unitTestEndPoints.fillLanguageMetadata({}, 'grk-Latn', null, null);
+    assert.isOk(result);
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.WARN_LanguageTagNotFound));
+  });
+
+  // WARN_LanguageTagNotFound2
+
+  it('should generate WARN_LanguageTagNotFound2 if a language tag is not found', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES}));
+    const result = compiler.unitTestEndPoints.fillLanguageMetadata({}, 'grk', null, null);
+    assert.isOk(result);
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.WARN_LanguageTagNotFound2));
+  });
+
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {

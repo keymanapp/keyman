@@ -202,11 +202,12 @@ export default class LMLayer {
   //       Worker code must recognize message and call self.close().
 
   private onMessage(event: MessageEvent): void {
-    let payload: OutgoingMessage = event.data;
+    const payload: OutgoingMessage = event.data;
     if (payload.message === 'error') {
-      console.error(payload.log);
-      if(payload.error) {
-        console.error(payload.error);
+      if (payload.error) {
+        console.error(`${payload.log}\n${payload.error}`);
+      } else {
+        console.error(payload.log);
       }
     }
     else if (payload.message === 'ready') {

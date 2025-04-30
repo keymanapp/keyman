@@ -7,7 +7,7 @@ import { nestedInstanceOf } from "keyman/engine/element-wrappers";
  * @returns
  */
 export function eventOutputTarget(e: Event) {
-  let Ltarg: HTMLElement = e?.target as HTMLElement;
+  const Ltarg: HTMLElement = e?.target as HTMLElement;
   return outputTargetForElement(Ltarg);
 }
 

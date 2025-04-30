@@ -38,7 +38,7 @@ export default class ContextWindow implements LexicalModelTypes.Context {
   }
 
   public toMock(): Mock {
-    let caretPos = this.left._kmwLength();
+    const caretPos = this.left._kmwLength();
 
     return new Mock(this.left + (this.right || ""), caretPos);
   }
