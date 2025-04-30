@@ -2,6 +2,7 @@
 
 # This script contains common meson functions
 
+source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
 
 # ----------------------------------------------------------------------------
 # clean
@@ -17,11 +18,8 @@ do_meson_clean() {
 # ----------------------------------------------------------------------------
 
 do_meson_configure() {
-  # Import our standard compiler defines; this is copied from
-  # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-  # allow us to reference a file outside its root
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+  # Import our standard compiler defines
+  standard_meson_build
 
   pushd "$THIS_SCRIPT_PATH" > /dev/null
   # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}

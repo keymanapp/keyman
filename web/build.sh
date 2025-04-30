@@ -26,6 +26,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
+  ":engine/common/web-utils  Low-level, headless utility methods and classes used across multiple modules" \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
@@ -70,6 +71,7 @@ builder_describe_outputs \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
   build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  build:engine/common/web-utils "/web/src/engine/common/web-utils/build/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
@@ -163,6 +165,7 @@ coverage_action() {
   rm -rf build/coverage/tmp
 }
 
+builder_run_child_actions build:engine/common/web-utils
 builder_run_child_actions build:engine/dom-utils
 
 builder_run_child_actions build:engine/keyboard
