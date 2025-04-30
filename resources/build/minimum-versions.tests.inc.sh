@@ -51,7 +51,9 @@ _minver_test_KEYMAN_VERSION_LANGTAGS() {
 
 _minver_test_KEYMAN_VERSION_CLDR() {
   # finds the folder with the expected name
-  find "$1" -name '[0-9][0-9]' -type d -printf '%f'
+  ## find "$1" -name '[0-9][0-9]' -type d -printf '%f'
+  # note macos find does not support -printf, so went with this:
+  find "$1" -name '[0-9][0-9]' -type d -exec basename {} \;
 }
 
 _minver_test_KEYMAN_VERSION_ISO639_3() {
@@ -66,7 +68,7 @@ _minver_test_KEYMAN_VERSION_ICU() {
 
 _minver_test_KEYMAN_MIN_VERSION_NODE_MAJOR() {
   # package.json, major.minor.patch, we use only major
-  jq -r '.engines.node' "$1" | cut -d. -f 1 -
+  "$JQ" -r '.engines.node' "$1" | cut -d. -f 1 -
 }
 
 #
