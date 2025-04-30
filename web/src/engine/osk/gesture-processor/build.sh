@@ -58,7 +58,7 @@ function do_test_tools() {
 }
 
 builder_run_action configure     do_configure
-builder_run_action clean         rm -rf build/ intermediate/
+builder_run_action clean         rm -rf build/
 builder_run_action build:module  do_build_module
 builder_run_action build:tools   src/tools/build.sh build
 builder_run_action test:module   test-headless-typescript "${SUBPROJECT_NAME}"
