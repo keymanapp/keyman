@@ -13,9 +13,9 @@ export class PackageVersionValidator {
 
   public getMinKeymanVersion(keyboardMetadata: KeyboardMetadataCollection): string {
     let minKeymanVersion = MIN_KBD_FILEVERSION_KMP_JSON;
-    for(let id of Object.keys(keyboardMetadata)) {
+    for(const id of Object.keys(keyboardMetadata)) {
       // minKeymanVersion is always a float so float comparison is safe
-      let kbdMinKeymanVersion = parseFloat(keyboardMetadata[id].data.minKeymanVersion);
+      const kbdMinKeymanVersion = parseFloat(keyboardMetadata[id].data.minKeymanVersion);
       if(kbdMinKeymanVersion > 14.0) {
         // Keyman for Windows 14 and earlier only accepted version 7.0 for keyboard
         // packages, so we must not write any other version in order to allow
@@ -54,11 +54,11 @@ export class PackageVersionValidator {
       return true;
     }
 
-    let result = true;
+    const result = true;
 
     // We now know we have at least one keyboard in the package
 
-    for(let keyboard of kmp.keyboards) {
+    for(const keyboard of kmp.keyboards) {
       const data = keyboardMetadata[keyboard.id];
       if(!data) {
         // Warnings or errors will have been raised by getKeyboardFileData

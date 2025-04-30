@@ -52,7 +52,7 @@ export class MetaCompiler extends SectionCompiler {
   }
 
   public compile(sections: DependencySections): Meta {
-    let result = new Meta();
+    const result = new Meta();
     result.author        = sections.strs.allocString(this.keyboard3.info?.author);
     result.conform       = sections.strs.allocString(this.keyboard3.conformsTo);
     result.layout        = sections.strs.allocString(this.keyboard3.info?.layout);

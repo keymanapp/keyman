@@ -12,7 +12,7 @@ describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal metadata', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
@@ -24,7 +24,7 @@ describe('meta', function () {
   });
 
   it('should compile maximal metadata', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(meta.author.value, 'The Keyman Team');
@@ -36,7 +36,7 @@ describe('meta', function () {
   });
 
   it('should hint when normalization=disabled', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
     assert.isNotNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Hint_NormalizationDisabled());
