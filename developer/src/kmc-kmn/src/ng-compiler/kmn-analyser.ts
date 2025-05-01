@@ -781,10 +781,11 @@ export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
   }
 }
 
-export class UsingKeysLhsBlockRule extends SingleChildRule {
+export class AbstractLhsBlockRule extends SingleChildRule {
+  protected lhsNodeType: NodeTypes;
+
   public constructor() {
     super();
-    this.rule = new UsingKeysInputBlockRule();
   }
 
   public parse(node: ASTNode): boolean {
@@ -792,7 +793,7 @@ export class UsingKeysLhsBlockRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const lhsNode   = new ASTNode(NodeTypes.LHS_USING_KEYS);
+      const lhsNode   = new ASTNode(this.lhsNodeType);
       lhsNode.addChildren(tmp.getChildren());
       lhsNode.addChildren(lineNodes);
       node.addChild(lhsNode);
@@ -801,9 +802,18 @@ export class UsingKeysLhsBlockRule extends SingleChildRule {
   }
 }
 
-export class ReadOnlyLhsBlockRule extends SingleChildRule {
+export class UsingKeysLhsBlockRule extends AbstractLhsBlockRule {
   public constructor() {
     super();
+    this.lhsNodeType = NodeTypes.LHS_USING_KEYS;
+    this.rule        = new UsingKeysInputBlockRule();
+  }
+}
+
+export class ReadOnlyLhsBlockRule extends AbstractLhsBlockRule {
+  public constructor() {
+    super();
+    this.lhsNodeType          = NodeTypes.LHS_READONLY;
     const match               = new TokenRule(TokenTypes.MATCH, true);
     const noMatch             = new TokenRule(TokenTypes.NOMATCH, true);
     const readOnlyInputBlock  = new ReadOnlyInputBlockRule();
@@ -811,19 +821,6 @@ export class ReadOnlyLhsBlockRule extends SingleChildRule {
     this.rule = new AlternateRule([
       match, noMatch, readOnlyInputBlock, ifLikeBlock,
     ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const lhsNode   = new ASTNode(NodeTypes.LHS_READONLY);
-      lhsNode.addChildren(tmp.getChildren());
-      lhsNode.addChildren(lineNodes);
-      node.addChild(lhsNode);
-    }
-    return parseSuccess;
   }
 }
 
