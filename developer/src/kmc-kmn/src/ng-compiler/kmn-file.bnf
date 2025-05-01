@@ -45,9 +45,9 @@ spacedGroupQualifier: WHITESPACE groupQualifier
 groupQualifier: usingKeys|READONLY
 usingKeys: USING WHITESPACE KEYS
 productionBlock: lhsBlock spacedChevron rhsBlock
-lhsBlock: MATCH|NOMATCH|ukInputBlock|roInputBlock|ifLikeBlock
-ukInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
-roInputBlock: paddedIfLikeBlock? keystroke
+lhsBlock: MATCH|NOMATCH|usingKeysInputBlock|readOnlyInputBlock|ifLikeBlock
+usingKeysInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
+readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding
 inputContext: anyStatement
 keystroke: anyStatement

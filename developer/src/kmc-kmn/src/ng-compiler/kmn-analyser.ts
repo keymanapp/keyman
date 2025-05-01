@@ -760,13 +760,13 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const match             = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch           = new TokenRule(TokenTypes.NOMATCH, true);
-    const inputContextBlock = new UkInputBlockRule();
-    const roInputBlock      = new RoInputBlockRule();
-    const ifLikeBlock       = new IfLikeBlockRule();
+    const match               = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch             = new TokenRule(TokenTypes.NOMATCH, true);
+    const usingKeysInputBlock = new UsingKeysInputBlockRule();
+    const readOnlyInputBlock  = new ReadOnlyInputBlockRule();
+    const ifLikeBlock         = new IfLikeBlockRule();
     this.rule = new AlternateRule([
-      match, noMatch, inputContextBlock, roInputBlock, ifLikeBlock,
+      match, noMatch, usingKeysInputBlock, readOnlyInputBlock, ifLikeBlock,
     ]);
   }
 
@@ -784,7 +784,7 @@ export class LhsBlockRule extends SingleChildRule {
   }
 }
 
-export class UkInputBlockRule extends SingleChildRule {
+export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const optPaddedIfLikeBlock: Rule  = new OptionalPaddedIfLikeBlockRule();
@@ -802,7 +802,7 @@ export class UkInputBlockRule extends SingleChildRule {
   }
 }
 
-export class RoInputBlockRule extends SingleChildRule {
+export class ReadOnlyInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
