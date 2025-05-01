@@ -52,7 +52,7 @@ usingKeysInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystro
 readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding
 inputContext: anyStatement
-keystroke: anyStatement
+keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
@@ -80,6 +80,6 @@ contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|layerStatement|indexStatement
+outputStatement: useStatement|layerStatement|indexStatement|text
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?

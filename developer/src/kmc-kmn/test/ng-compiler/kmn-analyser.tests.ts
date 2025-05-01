@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1340,6 +1340,29 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
     });
   });
+  describe("KeystrokeRule Tests", () => {
+    it("can construct an KeystrokeRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const keystroke: Rule = new KeystrokeRule();
+      assert.isNotNull(keystroke);
+    });
+    it("can parse correctly (any)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
+      const keystroke: Rule = new KeystrokeRule();
+      assert.isTrue(keystroke.parse(root));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+1780');
+      const keystroke: Rule = new KeystrokeRule();
+      assert.isTrue(keystroke.parse(root));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+  });
   describe("AnyStatementRule Tests", () => {
     it("can construct an AnyStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1960,6 +1983,12 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
       assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+1780');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
   describe("SpacedCommaRule Tests", () => {

@@ -781,7 +781,7 @@ export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
   }
 }
 
-export class AbstractLhsBlockRule extends SingleChildRule {
+abstract class AbstractLhsBlockRule extends SingleChildRule {
   protected lhsNodeType: NodeTypes;
 
   public constructor() {
@@ -908,7 +908,9 @@ export class InputContextRule extends SingleChildRule {
 export class KeystrokeRule extends SingleChildRule {
   public constructor() {
     super();
-    this.rule = new AnyStatementRule();
+    const any: Rule  = new AnyStatementRule();
+    const text: Rule = new TextRule();
+    this.rule = new AlternateRule([any, text]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -1259,7 +1261,10 @@ export class OutputStatementRule extends SingleChildRule {
     const useStatement: Rule   = new UseStatementRule();
     const layerStatement: Rule = new LayerStatementRule();
     const indexStatement: Rule = new IndexStatementRule();
-    this.rule = new AlternateRule([useStatement, layerStatement, indexStatement]);
+    const text: Rule           = new TextRule();
+    this.rule = new AlternateRule([
+      useStatement, layerStatement, indexStatement, text,
+    ]);
   }
 }
 
