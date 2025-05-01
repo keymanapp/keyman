@@ -1372,6 +1372,15 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.U_CHAR));
       assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
     });
+    it("can parse correctly (any, context)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(digit) context(1)');
+      const inputContext: Rule = new InputContextRule();
+      assert.isTrue(inputContext.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.CONTEXT));
+    });
     it("can parse correctly (two anys, continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit)\\\nany(number)');
       const inputContext: Rule = new InputContextRule();
@@ -2026,6 +2035,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(indexNode);
       assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'c_out');
       assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (context statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('context(1)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
+      assert.isNotNull(contextNode);
+      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
     });
     it("can parse correctly (text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+1780');

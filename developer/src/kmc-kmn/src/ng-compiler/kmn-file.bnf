@@ -53,7 +53,7 @@ readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement
-inputElement: anyStatement|text
+inputElement: anyStatement|contextStatement|text
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
@@ -82,7 +82,8 @@ contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|layerStatement|indexStatement|text|BEEP
+outputStatement: useStatement|layerStatement|indexStatement|contextStatement|
+  text|BEEP
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?
 contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR

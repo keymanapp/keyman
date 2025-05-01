@@ -920,9 +920,10 @@ export class PaddedInputElementRule extends SingleChildRule {
 export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const any: Rule  = new AnyStatementRule();
-    const text: Rule = new TextRule();
-    this.rule = new AlternateRule([any, text]);
+    const any: Rule              = new AnyStatementRule();
+    const text: Rule             = new TextRule();
+    const contextStatement: Rule = new ContextStatementRule();
+    this.rule = new AlternateRule([any, contextStatement, text]);
   }
 }
 
@@ -1279,13 +1280,14 @@ export class PaddedOutputStatementRule extends SingleChildRule {
 export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const useStatement: Rule   = new UseStatementRule();
-    const layerStatement: Rule = new LayerStatementRule();
-    const indexStatement: Rule = new IndexStatementRule();
-    const text: Rule           = new TextRule();
-    const beep: Rule           = new TokenRule(TokenTypes.BEEP, true);
+    const useStatement: Rule     = new UseStatementRule();
+    const layerStatement: Rule   = new LayerStatementRule();
+    const indexStatement: Rule   = new IndexStatementRule();
+    const contextStatement: Rule = new ContextStatementRule();
+    const text: Rule             = new TextRule();
+    const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
-      useStatement, layerStatement, indexStatement, text, beep,
+      useStatement, layerStatement, indexStatement, contextStatement, text, beep,
     ]);
   }
 }
