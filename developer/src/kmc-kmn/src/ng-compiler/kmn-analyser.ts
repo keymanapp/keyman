@@ -888,7 +888,10 @@ export class PaddedInputContextRule extends SingleChildRule {
 export class InputContextRule extends SingleChildRule {
   public constructor() {
     super();
-    this.rule = new AnyStatementRule();
+    const inputElement           = new InputElementRule();
+    const paddedInputElement     = new PaddedInputElementRule();
+    const manyPaddedInputElement = new ManyRule(paddedInputElement);
+    this.rule = new SequenceRule([inputElement, manyPaddedInputElement]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -902,6 +905,23 @@ export class InputContextRule extends SingleChildRule {
       node.addChild(inputContextNode);
     }
     return parseSuccess;
+  }
+}
+
+export class PaddedInputElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule      = new PaddingRule();
+    const inputElement: Rule = new InputElementRule();
+    this.rule = new SequenceRule([padding, inputElement]);
+  }
+}
+
+export class InputElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const any: Rule = new AnyStatementRule();
+    this.rule = new AlternateRule([any]);
   }
 }
 

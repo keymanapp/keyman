@@ -51,7 +51,9 @@ readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
 usingKeysInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
 readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding
-inputContext: anyStatement
+inputContext: inputElement paddedInputElement*
+paddedInputElement: padding inputElement
+inputElement: anyStatement
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
