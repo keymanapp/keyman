@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -2065,6 +2065,26 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' , ');
       const spacedComma: Rule = new SpacedCommaRule();
       assert.isTrue(spacedComma.parse(root));
+    });
+  });
+  describe("ContextStatementRule Tests", () => {
+    it("can construct a ContextStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const contextStatement: Rule = new ContextStatementRule();
+      assert.isNotNull(contextStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('context(1)');
+      const contextStatement: Rule = new ContextStatementRule();
+      assert.isTrue(contextStatement.parse(root));
+      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
+      assert.isNotNull(contextNode);
+      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("rejects a context without brackets", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('context');
+      const contextStatement: Rule = new ContextStatementRule();
+      assert.isFalse(contextStatement.parse(root));
     });
   });
   describe("Analyser Tests", () => {

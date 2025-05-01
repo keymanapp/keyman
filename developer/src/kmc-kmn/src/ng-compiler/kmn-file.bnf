@@ -85,3 +85,4 @@ paddedOutputStatement: padding outputStatement
 outputStatement: useStatement|layerStatement|indexStatement|text|BEEP
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?
+contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR
