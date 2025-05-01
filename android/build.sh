@@ -15,6 +15,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/sevenz.inc.sh"
 
 ################################ Main script ################################
 
@@ -37,6 +38,7 @@ builder_describe \
   build \
   test \
   "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
+  "archive                                  Copy release artifacts to upload/ and rsync to downloads.keyman" \
   "--ci+                                    Deprecated build option. Remove in 20.0" \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
@@ -71,3 +73,39 @@ function do_test_help() {
 builder_run_action        test:help    do_test_help
 
 builder_run_child_actions publish
+
+# Copy release artifacts to upload/ and rsync to downloads.keyman.com
+if builder_start_action archive; then
+  UPLOAD_PATH="$KEYMAN_ROOT/android/upload/${VERSION}"
+  KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${VERSION}.zip"
+  KEYMAN_APK="keyman-${VERSION}.apk"
+  FIRSTVOICES_APK="firstvoices-${VERSION}.apk"
+
+  mkdir -p "${UPLOAD_PATH}"
+
+  # Build Keyman Engine for Android archive
+  cd KMAPro/kMAPro/libs
+  "${SEVENZ}" a -bd -bb0 "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples '-xr!build.sh'
+  cd ../../../
+
+  # Copy APKs
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" \
+    "${UPLOAD_PATH}/${KEYMAN_APK}"
+  cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" \
+    "${UPLOAD_PATH}/${FIRSTVOICES_APK}"
+
+  #
+  # Write download info files
+  #
+
+  cd "${UPLOAD_PATH}"
+
+  write_download_info "Keyman Engine for Android" "${KEYMAN_ENGINE_ANDROID_ZIP}" "${VERSION}" "${TIER}" "android"
+  write_download_info "Keyman for Android" "${KEYMAN_APK}" "${VERSION}" "${TIER}" "android"
+
+  if [ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]; then
+    write_download_info "FirstVoices Keyboards" "${FIRSTVOICES_APK}" "${VERSION}" "${TIER}" "android"
+  fi
+
+  builder_finish_action success archive
+fi
