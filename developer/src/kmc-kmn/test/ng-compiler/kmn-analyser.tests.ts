@@ -1990,6 +1990,12 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(outputStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
     });
+    it("can parse correctly (beep)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('beep');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
   });
   describe("SpacedCommaRule Tests", () => {
     it("can construct a SpacedCommaRule", () => {

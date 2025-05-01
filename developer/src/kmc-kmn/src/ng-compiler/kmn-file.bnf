@@ -80,6 +80,6 @@ contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|layerStatement|indexStatement|text
+outputStatement: useStatement|layerStatement|indexStatement|text|BEEP
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?

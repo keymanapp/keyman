@@ -1262,8 +1262,9 @@ export class OutputStatementRule extends SingleChildRule {
     const layerStatement: Rule = new LayerStatementRule();
     const indexStatement: Rule = new IndexStatementRule();
     const text: Rule           = new TextRule();
+    const beep: Rule           = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
-      useStatement, layerStatement, indexStatement, text,
+      useStatement, layerStatement, indexStatement, text, beep,
     ]);
   }
 }
