@@ -28,7 +28,7 @@ variableStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR WHITESPACE? variableStoreName WHITESPACE? RIGHT_BR
 variableStoreName: PARAMETER
 outsStatement: OUTS bracketedStoreName
-ruleBlock: beginBlock|groupBlock|productionBlock
+ruleBlock: beginBlock|groupBlock|usingKeysProductionBlock|readOnlyProductionBlock
 beginBlock: beginStatement spacedChevron useStatement
 beginStatement: BEGIN spacedEntryPoint?
 spacedEntryPoint: WHITESPACE entryPoint
@@ -44,8 +44,10 @@ groupStatement: GROUP bracketedGroupName
 spacedGroupQualifier: WHITESPACE groupQualifier
 groupQualifier: usingKeys|READONLY
 usingKeys: USING WHITESPACE KEYS
-productionBlock: lhsBlock spacedChevron rhsBlock
-lhsBlock: MATCH|NOMATCH|usingKeysInputBlock|readOnlyInputBlock|ifLikeBlock
+usingKeysProductionBlock: usingKeysLhsBlock spacedChevron rhsBlock
+readOnlyProductionBlock: readOnlyLhsBlock spacedChevron rhsBlock
+usingKeysLhsBlock: usingKeysInputBlock
+readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
 usingKeysInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
 readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding

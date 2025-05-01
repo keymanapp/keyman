@@ -469,11 +469,12 @@ export class OutsStatementRule extends SingleChildRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginBlock: Rule      = new BeginBlockRule();
-    const groupBlock: Rule      = new GroupBlockRule();
-    const productionBlock: Rule = new ProductionBlockRule()
+    const beginBlock: Rule               = new BeginBlockRule();
+    const groupBlock: Rule               = new GroupBlockRule();
+    const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule()
+    const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule()
     this.rule = new AlternateRule([
-      beginBlock, groupBlock, productionBlock,
+      beginBlock, groupBlock, usingKeysProductionBlock, readOnlyProductionBlock,
     ]);
   }
 }
@@ -729,24 +730,24 @@ export class UsingKeysRule extends SingleChildRule {
   }
 }
 
-export class ProductionBlockRule extends SingleChildRule {
+export class UsingKeysProductionBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const lhsBlock      = new LhsBlockRule();
-    const spacedChevron = new SpacedChevronRule();
-    const rhsBlock      = new RhsBlockRule();
-    this.rule = new SequenceRule([lhsBlock, spacedChevron, rhsBlock]);
+    const usingKeysLhsBlock = new UsingKeysLhsBlockRule();
+    const spacedChevron     = new SpacedChevronRule();
+    const rhsBlock          = new RhsBlockRule();
+    this.rule = new SequenceRule([usingKeysLhsBlock, spacedChevron, rhsBlock]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS);
+      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
       const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
       const lhsLines       = lhsNode.removeChildrenOfType(NodeTypes.LINE);
       const rhsLines       = rhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const productionNode = new ASTNode(NodeTypes.PRODUCTION);
+      const productionNode = new ASTNode(NodeTypes.PRODUCTION_USING_KEYS);
       productionNode.addChild(lhsNode);
       productionNode.addChild(rhsNode);
       productionNode.addChildren(lhsLines);
@@ -757,16 +758,63 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 }
 
-export class LhsBlockRule extends SingleChildRule {
+export class ReadOnlyProductionBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const readOnlyLhsBlock = new ReadOnlyLhsBlockRule();
+    const spacedChevron    = new SpacedChevronRule();
+    const rhsBlock         = new RhsBlockRule();
+    this.rule = new SequenceRule([readOnlyLhsBlock, spacedChevron, rhsBlock]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_READONLY);
+      const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
+      const lhsLines       = lhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const rhsLines       = rhsNode.removeChildrenOfType(NodeTypes.LINE);
+      const productionNode = new ASTNode(NodeTypes.PRODUCTION_READONLY);
+      productionNode.addChild(lhsNode);
+      productionNode.addChild(rhsNode);
+      productionNode.addChildren(lhsLines);
+      productionNode.addChildren(rhsLines);
+      node.addChild(productionNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class UsingKeysLhsBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    this.rule = new UsingKeysInputBlockRule();
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const lhsNode   = new ASTNode(NodeTypes.LHS_USING_KEYS);
+      lhsNode.addChildren(tmp.getChildren());
+      lhsNode.addChildren(lineNodes);
+      node.addChild(lhsNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class ReadOnlyLhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const match               = new TokenRule(TokenTypes.MATCH, true);
     const noMatch             = new TokenRule(TokenTypes.NOMATCH, true);
-    const usingKeysInputBlock = new UsingKeysInputBlockRule();
     const readOnlyInputBlock  = new ReadOnlyInputBlockRule();
     const ifLikeBlock         = new IfLikeBlockRule();
     this.rule = new AlternateRule([
-      match, noMatch, usingKeysInputBlock, readOnlyInputBlock, ifLikeBlock,
+      match, noMatch, readOnlyInputBlock, ifLikeBlock,
     ]);
   }
 
@@ -775,7 +823,7 @@ export class LhsBlockRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const lineNodes = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const lhsNode   = new ASTNode(NodeTypes.LHS);
+      const lhsNode   = new ASTNode(NodeTypes.LHS_READONLY);
       lhsNode.addChildren(tmp.getChildren());
       lhsNode.addChildren(lineNodes);
       node.addChild(lhsNode);
@@ -807,10 +855,7 @@ export class ReadOnlyInputBlockRule extends SingleChildRule {
     super();
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
     const keystoke: Rule             = new KeystrokeRule();
-    this.rule = new SequenceRule([
-      optPaddedIfLikeBlock,
-      keystoke,
-    ]);
+    this.rule = new SequenceRule([optPaddedIfLikeBlock, keystoke]);
   }
 }
 
