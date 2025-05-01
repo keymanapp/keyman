@@ -1363,6 +1363,15 @@ describe("KMN Analyser Tests", () => {
       const anyNodes = inputContextNode.getChildrenOfType(NodeTypes.ANY);
       assert.equal(anyNodes.length, 2);
     });
+    it("can parse correctly (text, any)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17D2 any(c_out)');
+      const inputContext: Rule = new InputContextRule();
+      assert.isTrue(inputContext.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+    });
     it("can parse correctly (two anys, continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('any(digit)\\\nany(number)');
       const inputContext: Rule = new InputContextRule();

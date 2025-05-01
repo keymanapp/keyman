@@ -53,7 +53,7 @@ readOnlyInputBlock: paddedIfLikeBlock? keystroke
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement
-inputElement: anyStatement
+inputElement: anyStatement|text
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding

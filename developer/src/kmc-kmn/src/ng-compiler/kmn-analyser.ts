@@ -920,8 +920,9 @@ export class PaddedInputElementRule extends SingleChildRule {
 export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const any: Rule = new AnyStatementRule();
-    this.rule = new AlternateRule([any]);
+    const any: Rule  = new AnyStatementRule();
+    const text: Rule = new TextRule();
+    this.rule = new AlternateRule([any, text]);
   }
 }
 
