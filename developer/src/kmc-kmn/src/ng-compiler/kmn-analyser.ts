@@ -730,24 +730,27 @@ export class UsingKeysRule extends SingleChildRule {
   }
 }
 
-export class UsingKeysProductionBlockRule extends SingleChildRule {
+abstract class AbstractProductionBlockRule extends SingleChildRule {
+  protected spacedChevron: Rule;
+  protected rhsBlock: Rule;
+  protected lhsNodeType: NodeTypes;
+  protected productionNodeType: NodeTypes;
+
   public constructor() {
     super();
-    const usingKeysLhsBlock = new UsingKeysLhsBlockRule();
-    const spacedChevron     = new SpacedChevronRule();
-    const rhsBlock          = new RhsBlockRule();
-    this.rule = new SequenceRule([usingKeysLhsBlock, spacedChevron, rhsBlock]);
+    this.spacedChevron = new SpacedChevronRule();
+    this.rhsBlock      = new RhsBlockRule();
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode        = tmp.getSoleChildOfType(this.lhsNodeType);
       const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
       const lhsLines       = lhsNode.removeChildrenOfType(NodeTypes.LINE);
       const rhsLines       = rhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const productionNode = new ASTNode(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = new ASTNode(this.productionNodeType);
       productionNode.addChild(lhsNode);
       productionNode.addChild(rhsNode);
       productionNode.addChildren(lhsLines);
@@ -758,31 +761,23 @@ export class UsingKeysProductionBlockRule extends SingleChildRule {
   }
 }
 
-export class ReadOnlyProductionBlockRule extends SingleChildRule {
+export class UsingKeysProductionBlockRule extends AbstractProductionBlockRule {
   public constructor() {
     super();
-    const readOnlyLhsBlock = new ReadOnlyLhsBlockRule();
-    const spacedChevron    = new SpacedChevronRule();
-    const rhsBlock         = new RhsBlockRule();
-    this.rule = new SequenceRule([readOnlyLhsBlock, spacedChevron, rhsBlock]);
+    this.lhsNodeType        = NodeTypes.LHS_USING_KEYS;
+    this.productionNodeType = NodeTypes.PRODUCTION_USING_KEYS;
+    const usingKeysLhsBlock = new UsingKeysLhsBlockRule();
+    this.rule = new SequenceRule([usingKeysLhsBlock, this.spacedChevron, this.rhsBlock]);
   }
+}
 
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_READONLY);
-      const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
-      const lhsLines       = lhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const rhsLines       = rhsNode.removeChildrenOfType(NodeTypes.LINE);
-      const productionNode = new ASTNode(NodeTypes.PRODUCTION_READONLY);
-      productionNode.addChild(lhsNode);
-      productionNode.addChild(rhsNode);
-      productionNode.addChildren(lhsLines);
-      productionNode.addChildren(rhsLines);
-      node.addChild(productionNode);
-    }
-    return parseSuccess;
+export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
+  public constructor() {
+    super();
+    this.lhsNodeType        = NodeTypes.LHS_READONLY;
+    this.productionNodeType = NodeTypes.PRODUCTION_READONLY;
+    const readOnlyLhsBlock  = new ReadOnlyLhsBlockRule();
+    this.rule = new SequenceRule([readOnlyLhsBlock, this.spacedChevron, this.rhsBlock]);
   }
 }
 
