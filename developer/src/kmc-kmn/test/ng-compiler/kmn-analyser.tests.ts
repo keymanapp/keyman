@@ -2109,7 +2109,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 262);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 276);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -2159,7 +2159,7 @@ describe("KMN Analyser Tests", () => {
       const readOnlyProductionNodes  = root.getChildrenOfType(NodeTypes.PRODUCTION_READONLY);
       assert.equal(readOnlyProductionNodes.length, 6);
       const usingKeysProductionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION_USING_KEYS);
-      assert.equal(usingKeysProductionNodes.length, 22);
+      assert.equal(usingKeysProductionNodes.length, 26);
       //assert.equal(root.toString(), '');
     });
   });
