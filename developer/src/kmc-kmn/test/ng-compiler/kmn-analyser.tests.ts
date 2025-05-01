@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1338,6 +1338,40 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
       assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("InputContextRule Tests", () => {
+    it("can construct an InputContextRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const inputContext: Rule = new InputContextRule();
+      assert.isNotNull(inputContext);
+    });
+    it("can parse correctly (any)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(c_shifter)');
+      const inputContext: Rule = new InputContextRule();
+      assert.isTrue(inputContext.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (two anys)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(digit) any(number)');
+      const inputContext: Rule = new InputContextRule();
+      assert.isTrue(inputContext.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      const anyNodes = inputContextNode.getChildrenOfType(NodeTypes.ANY);
+      assert.equal(anyNodes.length, 2);
+    });
+    it("can parse correctly (two anys, continuation)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(digit)\\\nany(number)');
+      const inputContext: Rule = new InputContextRule();
+      assert.isTrue(inputContext.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      const anyNodes = inputContextNode.getChildrenOfType(NodeTypes.ANY);
+      assert.equal(anyNodes.length, 2);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.LINE));
     });
   });
   describe("KeystrokeRule Tests", () => {
