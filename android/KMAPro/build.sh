@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
@@ -28,7 +29,6 @@ builder_describe "Builds Keyman for Android app." \
   "build" \
   "test             Runs lint and unit tests." \
   "publish          Publishes symbols to Sentry and the APK to the Play Store." \
-  "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
 # parse before describe_outputs to check debug flags
@@ -50,7 +50,7 @@ builder_describe_outputs \
 
 # Parse args
 
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   DAEMON_FLAG=--no-daemon
 fi
 

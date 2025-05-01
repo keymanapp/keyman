@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
 
@@ -22,8 +23,7 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "configure" \
   "build" \
   "test" \
-  ":app                   KeyboardHarness" \
-  "--ci                   Don't start the Gradle daemon. Use for CI"
+  ":app                   KeyboardHarness" 
 
 # parse before describe outputs to check debug flags
 builder_parse "$@"
@@ -55,7 +55,7 @@ SHLVL=0
 # Parse args
 
 # Build flags that apply to all targets
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   BUILD_FLAGS="$BUILD_FLAGS -no-daemon"
   TEST_FLAGS="$TEST_FLAGS -no-daemon"
 fi
