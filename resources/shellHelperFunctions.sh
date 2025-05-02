@@ -139,7 +139,7 @@ write_download_info() {
 
   builder_echo "BUILDER_OS: ${BUILDER_OS}"
   # stat flags to get filesize in bytes
-  if [[ "$BUILDER_OS" == mac ]] && [[ $(which stat) == /usr/bin/stat ]]; then
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
     STAT_FLAGS="-f%z"
   else
     STAT_FLAGS="-c%s"
