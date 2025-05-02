@@ -21,8 +21,7 @@ builder_describe "Builds predictive-text components used within Keyman Engine fo
   ":wordbreakers             Builds the wordbreakers provided for lexical model use" \
   ":worker-main              Builds the predictive-text worker interface module" \
   ":worker-thread            Builds the predictive-text worker" \
-  ":_all                     (Meta build target used when targets are not specified)" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  ":_all                     (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \

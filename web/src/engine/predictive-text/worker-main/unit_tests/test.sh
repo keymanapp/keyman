@@ -22,19 +22,11 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   "test+" \
   ":libraries  Runs unit tests for in-repo libraries used by this module"\
   ":headless   Runs this module's headless user tests" \
-  ":browser    Runs this module's browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
+  ":browser    Runs this module's browser-based user tests"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
 builder_parse "$@"
-
-TEST_OPTS=
-if builder_has_option --ci && builder_is_debug_build; then
-  builder_die "Options --ci and --debug are incompatible."
-elif builder_has_option --ci; then
-  TEST_OPTS=--ci
-fi
 
 if builder_start_action configure; then
   verify_npm_setup
@@ -49,18 +41,18 @@ if builder_start_action test:libraries; then
   # addition to fair bit of `pushd` and `popd`.
   echo
   echo "### Running $(builder_term web/src/engine/predictive-text/wordbreakers) tests"
-  "$KEYMAN_ROOT/web/src/engine/predictive-text/wordbreakers/build.sh" test $TEST_OPTS
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/wordbreakers/build.sh" test
 
   pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/"
   echo
   echo "### Running $(builder_term web/src/engine/predictive-text/templates/) tests"
-  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/build.sh" test $TEST_OPTS
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/build.sh" test
   popd
 
   pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread"
   echo
   echo "### Running ${BUILDER_TERM_START}web/src/engine/predictive-text/worker-thread${BUILDER_TERM_END} tests"
-  ./build.sh test $TEST_OPTS
+  ./build.sh test
   popd
 
   builder_finish_action success test:libraries
@@ -69,7 +61,7 @@ fi
 if builder_start_action test:headless; then
   MOCHA_FLAGS=$FLAGS
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
@@ -109,7 +101,7 @@ if builder_start_action test:browser; then
   WTR_CONFIG=
   WTR_DEBUG=
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     WTR_CONFIG=.CI
   fi
 

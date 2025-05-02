@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 # ################################ Main script ################################
 
@@ -41,8 +42,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
-  ":_all                     (Meta build target used when targets are not specified)" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  ":_all                     (Meta build target used when targets are not specified)"
 
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -133,14 +133,6 @@ build_action() {
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
-test_action() {
-  TEST_OPTS=
-  if builder_has_option --ci; then
-    TEST_OPTS=--ci
-  fi
-  ./test.sh "${TEST_OPTS}"
-}
-
 coverage_action() {
   builder_echo "Creating coverage report..."
 
@@ -211,7 +203,7 @@ builder_run_action build:_all build_action
 
 # Run tests
 builder_run_child_actions test
-builder_run_action test:_all test_action
+builder_run_action test:_all ./test.sh
 
 function do_test_help() {
   check-markdown  "$KEYMAN_ROOT/web/docs/engine"
