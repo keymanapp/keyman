@@ -59,7 +59,7 @@ function do_test() {
   if builder_has_option --ci; then
     TEST_OPTIONS=--ci
   fi
-    ./unit_tests/test.sh test:headless test:browser ${TEST_OPTIONS}
+  ./unit_tests/test.sh test:headless test:browser ${TEST_OPTIONS}
 }
 
 builder_run_action configure  do_configure
