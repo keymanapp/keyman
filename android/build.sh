@@ -15,7 +15,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/resources/build/sevenz.inc.sh"
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 ################################ Main script ################################
 
@@ -83,10 +83,18 @@ if builder_start_action archive; then
 
   mkdir -p "${UPLOAD_PATH}"
 
-  # Build Keyman Engine for Android archive
+  # Build Keyman Engine for Android archive (disable progress), output log level 0
   cd KMAPro/kMAPro/libs
-  "${SEVENZ}" a -bd -bb0 "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples '-xr!build.sh'
-  cd ../../../
+  if [ "$BUILDER_OS" == "win" ]; then
+    # win uses 7zip flags
+    zip_files "a -bd -bb0" "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples
+    cd ../../../
+  else  
+    zip_files "-q" "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar 
+    cd ../../../
+    # update zip with Samples/
+    zip_files "-urq" "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" Samples/
+  fi
 
   # Copy APKs
   cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" \
@@ -99,7 +107,6 @@ if builder_start_action archive; then
   #
 
   cd "${UPLOAD_PATH}"
-
   write_download_info "Keyman Engine for Android" "${KEYMAN_ENGINE_ANDROID_ZIP}" "${VERSION}" "${TIER}" "android"
   write_download_info "Keyman for Android" "${KEYMAN_APK}" "${VERSION}" "${TIER}" "android"
 
