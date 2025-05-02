@@ -521,7 +521,13 @@ export default abstract class OSKView
     // Set default OSK font size (Build 344, KMEW-90)
     // If the layer group specifies a fontsize value, we need
     // to apply that to the banner as well.
-    const layerFontSize = this.vkbd?.layerGroup?.spec.fontsize;
+    const layerFontSizeRaw = this.vkbd?.layerGroup?.spec.fontsize;
+    // Addresses issue with touch-layouts specifying a unitless fontsize; this
+    // coerces them to `pt` style sizing, like how word-processors present font-size.
+    //
+    // Returns NaN if not 100% a number.  "12px", "12pt", "12%" all return NaN.
+    const fsRaw = Number(layerFontSizeRaw);
+    const layerFontSize = isNaN(fsRaw) ? layerFontSizeRaw : (fsRaw + 'pt');
 
     if(layerFontSize) {
       const parsedSize = new ParsedLengthStyle(layerFontSize);
