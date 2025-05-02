@@ -89,6 +89,12 @@ fi
 builder_parse_test() {
   local expected="$1"
   local expected_options="$2"
+
+  # Minor override for local testing of builder-script mechanics:  --debug will always be added.
+  if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+    expected_options="${expected_options} --debug"
+  fi
+
   shift
   shift
   local parameters="$@"
@@ -97,8 +103,10 @@ builder_parse_test() {
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
     builder_die "  Test: builder_parse $parameters action:target != \"$expected\""
   fi
-  if [[ "$expected_options" != "${_builder_chosen_options[@]}" ]]; then
-    builder_die "  Test: builder_parse $parameters, options != \"$expected\""
+  if [[ "${expected_options}" != "${_builder_chosen_options[@]}" ]]; then
+    echo "${_builder_chosen_options[@]}"
+    echo "${_builder_chosen_options[@]}"
+    builder_die "  Test: builder_parse $parameters, options != \"${expected_options}\""
   fi
 }
 
@@ -184,6 +192,14 @@ fi
 echo -e "${COLOR_BLUE}## Testing output of: builder_parse --feature xyzzy --bar abc --baz def test${COLOR_RESET}"
 parse_output=$(builder_parse --feature xyzzy --bar abc --baz def test)
 expected="$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test>")"
+
+if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+  expected="$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test --debug>")"
+  # Yay, the fun of getting the second line... that newline before the closing brace is intentional.  :(
+  parse_output=${parse_output#*
+}
+
+fi
 if [[ "${parse_output[*]}" != "${expected}" ]]; then
   builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : ${parse_output[*]}\n  Expected: ${expected}"
 fi
