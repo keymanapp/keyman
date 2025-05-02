@@ -108,6 +108,6 @@ function launchWin32Bash() {
 }
 
 function launchNixBash() {
-  const child_args = ['bash', ...args.slice(1)];
+  const child_args = args.slice(1);
   return child_process.spawnSync(args[0], child_args, {shell: '/bin/bash', stdio:'inherit'});
 }
