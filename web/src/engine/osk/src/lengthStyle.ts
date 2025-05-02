@@ -13,7 +13,7 @@ export class ParsedLengthStyle implements LengthStyle {
     let parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
 
     const fallback: LengthStyle = {
-      val: 1,
+      val: 1, // 100%
       absolute: false
     };
 
