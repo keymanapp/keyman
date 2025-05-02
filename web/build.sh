@@ -84,6 +84,8 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 
 # We can run all clean & configure actions at once without much issue.
 
+builder_run_action clean:_all rm -rf build/
+
 builder_run_child_actions clean
 
 ## Clean actions

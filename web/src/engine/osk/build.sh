@@ -35,6 +35,12 @@ builder_parse "$@"
 
 #### Build action definitions ####
 
+do_clean() {
+  rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
+
+  ./gesture-processor/build.sh clean
+}
+
 do_configure() {
   verify_npm_setup
   cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$KEYMAN_ROOT/web/src/resources/osk/"
@@ -51,7 +57,13 @@ do_build() {
   node validate-gesture-specs.js
 }
 
+do_test() {
+  test-headless-typescript "${SUBPROJECT_NAME}"
+
+  ./gesture-recognizer/build.sh test
+}
+
 builder_run_action configure do_configure
-builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
+builder_run_action clean do_clean
 builder_run_action build do_build
-builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"
+builder_run_action test
