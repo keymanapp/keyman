@@ -1461,6 +1461,16 @@ _builder_parse_expanded_parameters() {
     done
   fi
 
+  # Per #11106, local builds are now automatically forced into the --debug configuration.
+  # Set now so that the automatic --debug shows up in the parameter list reported from
+  # the final 'else' block in the following if-else chain.
+  if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]]; then
+    builder_echo grey "Local build environment detected:  setting --debug"
+    _params+=(--debug)
+    _builder_chosen_options+=(--debug)
+    builder_debug=--debug
+  fi
+
   if builder_is_dep_build; then
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
