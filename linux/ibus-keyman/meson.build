@@ -1,5 +1,5 @@
 project('ibus-keyman', 'c', 'cpp',
-        version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
+        version: files('../../VERSION.md'),
         license: 'GPL-2+',
         meson_version: '>=1.0')
 
