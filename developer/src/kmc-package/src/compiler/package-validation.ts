@@ -32,7 +32,7 @@ export class PackageValidation {
   }
 
   private checkForDuplicatedOrNonMinimalLanguages(resourceType: 'keyboard'|'model', id: string, languages: KmpJsonFile.KmpJsonFileLanguage[]): boolean {
-    let minimalTags: {[tag: string]: string} = {};
+    const minimalTags: {[tag: string]: string} = {};
 
     if(languages.length == 0) {
       if(resourceType == 'keyboard') {
@@ -43,7 +43,7 @@ export class PackageValidation {
       }
     }
 
-    for(let lang of languages) {
+    for(const lang of languages) {
       let locale;
       try {
         locale = new Intl.Locale(lang.id);
@@ -99,7 +99,7 @@ export class PackageValidation {
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowLexicalModelConventions({filename}));
     }
 
-    for(let model of kmpJson.lexicalModels) {
+    for(const model of kmpJson.lexicalModels) {
       if(!this.checkForDuplicatedOrNonMinimalLanguages('model', model.id, model.languages)) {
         return false;
       }
@@ -119,7 +119,7 @@ export class PackageValidation {
       this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
     }
 
-    for(let keyboard of kmpJson.keyboards) {
+    for(const keyboard of kmpJson.keyboards) {
       if(!this.checkForDuplicatedOrNonMinimalLanguages('keyboard', keyboard.id, keyboard.languages)) {
         return false;
       }
@@ -131,7 +131,7 @@ export class PackageValidation {
   }
 
   private checkContentFiles(kmpJson: KmpJsonFile.KmpJsonFile, outputFilename: string): boolean {
-    for(let file of kmpJson.files) {
+    for(const file of kmpJson.files) {
       if(!this.checkContentFile(file, outputFilename)) {
         return false;
       }

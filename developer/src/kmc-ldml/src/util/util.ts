@@ -171,7 +171,7 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
       throw Error(`translateModifierSubsetToLayer only takes a single subset of the modifiers`);
     }
     let mod = constants.keys_mod_none;
-    for (let str of modifiers.split(' ')) {
+    for (const str of modifiers.split(' ')) {
       const submod = constants.keys_mod_map.get(str);
       mod |= submod;
     }
@@ -188,8 +188,8 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
 export function validModifier(modifier?: string) : boolean {
   if (!modifier) return true;  // valid to have no modifier, == none
   // TODO-LDML: enforce illegal combinations per spec.
-  for (let sub of modifier.trim().split(',')) {
-    for (let str of sub.trim().split(' ')) {
+  for (const sub of modifier.trim().split(',')) {
+    for (const str of sub.trim().split(' ')) {
       if (!constants.keys_mod_map.has(str)) {
         return false;
       }

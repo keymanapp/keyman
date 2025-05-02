@@ -32,8 +32,8 @@ function IsValidUnicodeValue(ch: number): boolean {   // I4198
 enum TKeyIdType { Key_Invalid, Key_Constant, Key_Touch, Key_Unicode, Key_Unicode_Multi };   // I4142
 
 function GetKeyIdUnicodeType(value: string): TKeyIdType {
-  let values = value.split('_');
-  for(let v of values) {
+  const values = value.split('_');
+  for(const v of values) {
     if(!IsValidUnicodeValue(parseInt(v,16))) {
       return TKeyIdType.Key_Invalid;
     }
@@ -104,7 +104,7 @@ function CheckKey(
   // Check that each touch layer has K_LOPT, [K_ROPT,] K_BKSP, K_ENTER
   //
 
-  for(let key of CRequiredKeys) {
+  for(const key of CRequiredKeys) {
     if(TRequiredKey[key].toLowerCase() == FId.toLowerCase()) {
       if(FRequiredKeys.indexOf(key) < 0) {
         FRequiredKeys.push(key);
@@ -140,7 +140,7 @@ function CheckKey(
     return true;
   }
 
-  let FValid = KeyIdType(FId);
+  const FValid = KeyIdType(FId);
 
   if(FValid == TKeyIdType.Key_Invalid) {
     callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutInvalidIdentifier({keyId: FId, platformName: platformId, layerId: layer.id, address}));
@@ -197,9 +197,9 @@ function CheckDictionaryKeyValidity(fk: KMX.KEYBOARD, FDictionary: string[]) {  
     }
 
     if([TKeyIdType.Key_Invalid, TKeyIdType.Key_Constant].includes(KeyIdType(FDictionary[i]))) {
-      for(let fgp of fk.groups) {
+      for(const fgp of fk.groups) {
         if(fgp.fUsingKeys) {
-          for(let fkp of fgp.keys) {
+          for(const fkp of fgp.keys) {
             if(JavaScript_Key(fkp, fk.isMnemonic) == i+256) {
               callbacks.reportMessage(KmwCompilerMessages.Error_InvalidKeyCode({keyId: FDictionary[i]}));
             }
@@ -243,11 +243,11 @@ function TransformSpecialKeys17(FDebug: boolean, sLayoutFile: string): string {
 }
 
 export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string, displayMap: Osk.PuaMap): VLFOutput {   // I4060   // I4139
-  let FDictionary: string[] = sVKDictionary.split(/\s+/);
+  const FDictionary: string[] = sVKDictionary.split(/\s+/);
 
   CheckDictionaryKeyValidity(fk, FDictionary);   // I4142
 
-  let reader = new TouchLayoutFileReader();
+  const reader = new TouchLayoutFileReader();
   let data: TouchLayout.TouchLayoutFile;
   try {
     if(!callbacks.fs.existsSync(sLayoutFile)) {
@@ -275,7 +275,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
   let FTouchLayoutFont = '';   // I4872
   let pid: keyof TouchLayout.TouchLayoutFile;
   for(pid in data) {
-    let platform = data[pid];
+    const platform = data[pid];
 
     // Test that the font matches on all platforms   // I4872
 
@@ -288,18 +288,18 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     }
 
     // Test that all required keys are present
-    for(let layer of platform.layer) {
-      let FRequiredKeys: TRequiredKey[] = [];
+    for(const layer of platform.layer) {
+      const FRequiredKeys: TRequiredKey[] = [];
       let rowIndex = 0;
-      for(let row of layer.row) {
+      for(const row of layer.row) {
         rowIndex++;
         let keyIndex = 0;
-        for(let key of row.key) {
+        for(const key of row.key) {
           keyIndex++;
           result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}) && result;   // I4119
           if(key.sk) {
             let subKeyIndex = 0;
-            for(let subkey of key.sk) {
+            for(const subkey of key.sk) {
               subKeyIndex++;
               result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
                 {rowIndex, keyIndex, subKeyIndex}) && result;
@@ -316,7 +316,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
 
           if(key.multitap) {
             let multitapIndex = 0;
-            for(let subkey of key.multitap) {
+            for(const subkey of key.multitap) {
               multitapIndex++;
               warnGesturesIfNeeded(key.id);
               result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
@@ -343,7 +343,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
 
   // If not debugging, then this strips out formatting for a big saving in file size
   // This also normalises any values such as Pad or Width which should be strings
-  let writer = new TouchLayoutFileWriter({formatted: FDebug});
+  const writer = new TouchLayoutFileWriter({formatted: FDebug});
 
   sLayoutFile = writer.compile(data);
 

@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.29 alpha 2025-04-30
+
+* change(web): enable linting for Keyman Engine for Web modules (#13787)
+* fix(web): reconnect unit tests for low-level web utility classes/methods (#13714)
+* fix(android): Change Alert Dialog instead of Toast if package missing languages (#13786)
+* maint(common): remove platform advocates from CODEOWNERS (#13801)
+* chore(common): allow to run tests in virtual environment (#13793)
+* chore: increase linter strictness (#13788)
+
 ## 19.0.28 alpha 2025-04-29
 
 * chore(common): Update dependencies in crowdin GitHub action (#13775)

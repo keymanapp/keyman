@@ -5,8 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  // TODO: we need to move to the following, but this gets us started with infrastructure without breaking our build
-  // extends: [ "eslint:recommended", "plugin:@typescript-eslint/eslint-recommended"],
+  extends: [ "eslint:recommended", "plugin:@typescript-eslint/eslint-recommended"],
   extends: ["plugin:@typescript-eslint/eslint-recommended"],
   parser: "@typescript-eslint/parser",
   parserOptions: {

@@ -26,7 +26,7 @@ export class LocaCompiler extends SectionCompiler {
   public validate(): boolean {
     let valid = true;
     const locales = this.getLocales(this.keyboard3);
-    for(let tag of locales) {
+    for(const tag of locales) {
       try {
         new Intl.Locale(tag);
       } catch(e) {
@@ -43,7 +43,7 @@ export class LocaCompiler extends SectionCompiler {
   }
 
   public compile(sections: DependencySections): Loca {
-    let result = new Loca();
+    const result = new Loca();
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:
     // https://www.unicode.org/reports/tr35/#Likely_Subtags

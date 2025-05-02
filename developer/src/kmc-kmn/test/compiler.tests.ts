@@ -65,7 +65,7 @@ describe('Compiler class', function() {
     assert(compiler.verifyInitialized());
 
     const files = fs.readdirSync(baselineDir);
-    for(let file of files) {
+    for(const file of files) {
       if(file.match(/\.kmx$/)) {
         const fixtureName = baselineDir + file;
         const infile = baselineDir + file.replace(/x$/, 'n');
