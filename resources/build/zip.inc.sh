@@ -16,29 +16,29 @@ function zip_files() {
   shift 1
   local FILE_LIST="$@"
 
-  # Determine if using zip or 7z
   COMPRESS_CMD=zip
   if ! command -v zip 2>&1 > /dev/null; then
-    if [[ ! -z "${SEVENZ+x}" ]]; then
+    # Fallback to 7z
+    if [[ -z "${SEVENZ+x}" ]]; then
       case "${OSTYPE}" in
         "cygwin")
-          SEVENZ=${SEVENZ_HOME}/7z.exe
+          SEVENZ="${SEVENZ_HOME}"/7z.exe
           ;;
         "msys")
-          SEVENZ=${SEVENZ_HOME}/7z.exe
+          SEVENZ="${SEVENZ_HOME}"/7z.exe
           ;;
         *)
           SEVENZ=7z
           ;;
       esac
 
-      COMPRESS_CMD=${SEVENZ}
-    else
-      # zip not installed or SEVENZ not set
-      builder_die "zip not installed or SEVENZ not set"
+      # 7z command, excluding build.sh files
+      "${SEVENZ}" ${FLAGS} ${ZIP_FILE} ${FILE_LIST} '-xr!build.sh'
     fi
+  else  
+    # zip command, excluding build.sh files
+    ${COMPRESS_CMD} ${FLAGS} ${ZIP_FILE} ${FILE_LIST} -x \*\*/build\.sh
   fi
 
-  ${COMPRESS_CMD} ${FLAGS} ${ZIP_FILE} ${FILE_LIST} -x \*\*/build\.sh # Exclude build.sh files
 }
 
