@@ -62,10 +62,10 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\^'/);
       assert.match(code, /§/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      let modelInitIndex = code.indexOf('const rawTrie');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
-      modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
+      modelInitCode = modelInitCode.substring(0, modelInitCode.indexOf('\nLMLayerWorker.loadModel'));
 
       // Check that the prepended symbols from applyCasing do not appear in the Trie.
       assert.notMatch(modelInitCode, /['"]-['"]/);
@@ -111,10 +111,10 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\+'/);
       assert.match(code, /'\^'/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      let modelInitIndex = code.indexOf('const rawTrie');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
-      modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
+      modelInitCode = modelInitCode.substring(0, modelInitCode.indexOf('\nLMLayerWorker.loadModel'));
 
       // Check that the prepended lowercase "-" DOES appear within the Trie, as keying
       // does not remove it in this variant.  Verifies that the compiler actually
@@ -150,10 +150,10 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\+'/);
       assert.match(code, /'\^'/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      let modelInitIndex = code.indexOf('const rawTrie');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
-      modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
+      modelInitCode = modelInitCode.substring(0, modelInitCode.indexOf('\nLMLayerWorker.loadModel'));
 
       // Check that the prepended lowercase "-" DOES appear within the Trie, as keying
       // does not remove it in this variant.  Verifies that the compiler actually
