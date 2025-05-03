@@ -137,14 +137,14 @@ write_download_info() {
 
   FILE_EXTENSION="${BASE_FILE##*.}"
 
-  builder_echo "BUILDER_OS: ${BUILDER_OS}"
   # stat flags to get filesize in bytes
-  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /opt/homebrew/opt/coreutils/libexec/gnubin/stat ]]; then
+    # Handle coreutils flags
     STAT_FLAGS="-f%z"
   else
     STAT_FLAGS="-c%s"
   fi
-  FILE_SIZE=$(/usr/bin/stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
+  FILE_SIZE=$(stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
   MD5_HASH=$(md5sum "${BASE_PATH}/${BASE_FILE}" | cut -d" " -f 1 -) # hash is the first element returned
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
