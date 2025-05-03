@@ -168,6 +168,9 @@ do_build_engine ( ) {
   ### Build Keyman Engine (kmx, ldml processor) ###
 
   execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
+}
+
+do_update_engine_metadata ( ) {
   execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
   updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
 }
@@ -180,6 +183,9 @@ do_build_app ( ) {
   builder_heading "Building Keyman.app"
 
   execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+}
+
+do_update_app_metadata ( ) {
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
   if builder_is_debug_build; then
@@ -297,12 +303,16 @@ builder_run_action clean          do_clean
 builder_run_action configure      do_configure
 
 builder_run_action build:engine   do_build_engine
-builder_run_action build:app      do_build_app
-builder_run_action build:testapp  do_build_testapp
-
 builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS test -scheme $ENGINE_NAME"
+builder_run_action build:engine   do_update_engine_metadata
+
+builder_run_action build:app      do_build_app
 builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 builder_run_action test:help      check-markdown  "$KEYMAN_ROOT/mac/docs/help"
+builder_run_action build:app      do_update_app_metadata
+
+builder_run_action build:testapp  do_build_testapp
+
 
 builder_run_action install do_install
 
