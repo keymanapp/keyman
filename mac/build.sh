@@ -303,6 +303,10 @@ do_publish() {
 builder_run_action clean          do_clean
 builder_run_action configure      do_configure
 
+# Note: `xcodebuild test` rewrites info.plist, so we need to patch the metadata
+# after testing for use in install/publish, hence the multiple build:engine /
+# build:app runs
+
 builder_run_action build:engine   do_build_engine
 builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS test -scheme $ENGINE_NAME"
 builder_run_action build:engine   do_update_engine_metadata
