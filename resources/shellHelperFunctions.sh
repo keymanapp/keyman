@@ -138,8 +138,8 @@ write_download_info() {
   FILE_EXTENSION="${BASE_FILE##*.}"
 
   # stat flags to get filesize in bytes
-  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) != /usr/bin/stat ]]; then
-    # BSD
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
+    # /usr/bin/stat on mac is BSD
     STAT_FLAGS="-f%z"
   else
     # GNU (coreutils)
