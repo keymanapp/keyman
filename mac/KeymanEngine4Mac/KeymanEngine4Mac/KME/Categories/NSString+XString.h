@@ -11,9 +11,6 @@
 
 @interface NSString (XString)
 
-- (NSUInteger)xLength;
-- (NSUInteger)xLengthIncludingIf;
-- (NSUInteger)deadKeyCount;
 - (NSString *)lastNChars:(NSUInteger)n;
 - (NSString *)codeString;
 - (BOOL)isValidCode;
@@ -23,11 +20,6 @@
 
 @interface NSMutableString (XString)
 
-- (void)appendDeadkey:(NSUInteger)index;
-- (void)appendNullChar;
-- (NSUInteger)deleteLastDeadkeys;
-- (NSUInteger)deleteLastNullChars;
-- (NSUInteger)removeAllNullChars;
 - (void)deleteLastNChars:(NSUInteger)n;
 
 @end
