@@ -29,8 +29,8 @@ export class InputSequenceSimulator<HoveredItemType> {
   }
 
   getSampleClientPos(sample: JSONObject<InputSample<HoveredItemType>>): {clientX: number, clientY: number} {
-    let targetRoot = this.controller.recognizer.config.targetRoot;
-    let targetRect = targetRoot.getBoundingClientRect();
+    const targetRoot = this.controller.recognizer.config.targetRoot;
+    const targetRect = targetRoot.getBoundingClientRect();
 
     return {
       clientX: sample.targetX + targetRect.left,
@@ -39,9 +39,9 @@ export class InputSequenceSimulator<HoveredItemType> {
   }
 
   private buildSyntheticTouchEvent(name: string, dict: TouchEventInit): TouchEvent {
-    let config = this.controller.recognizer.config;
+    const config = this.controller.recognizer.config;
 
-    let baseDict = {
+    const baseDict = {
       srcElement: config.touchEventRoot,
       view: window
     } as any;
@@ -66,7 +66,7 @@ export class InputSequenceSimulator<HoveredItemType> {
     //@ts-ignore
     dict.changedTouches = arrToTouchList(dict.changedTouches);
 
-    let event = new Event(name, baseDict) as TouchEvent;
+    const event = new Event(name, baseDict) as TouchEvent;
 
     // Since touch-related properties aren't expected by some browsers' Event constructors,
     // we must add them "in post" when testing in some non-touch environments.  For those,
@@ -79,7 +79,7 @@ export class InputSequenceSimulator<HoveredItemType> {
                     state: InputState,
                     recentTouches: Touch[],
                     targetElement?: HTMLElement): Touch[] {
-    let config = this.controller.recognizer.config;
+    const config = this.controller.recognizer.config;
 
     let event: TouchEvent;
 
@@ -87,7 +87,7 @@ export class InputSequenceSimulator<HoveredItemType> {
       const mappedSample = this.getSampleClientPos(data.sample);
 
       let touch: Touch;
-      let touchDict = {
+      const touchDict = {
         identifier: data.identifier,
         target: targetElement || config.targetRoot,
         ...mappedSample
@@ -108,14 +108,14 @@ export class InputSequenceSimulator<HoveredItemType> {
     let otherTouches = recentTouches.concat([]).filter((entry) => !!entry);
     otherTouches = otherTouches.filter((a) => !changedTouches.find((b) => a.identifier == b.identifier));
 
-    let touchEventDict: TouchEventInit = {
+    const touchEventDict: TouchEventInit = {
       bubbles: true,
       // Ending touchpoints should NOT show up in `touches`.
       touches: state == 'end' ? otherTouches : changedTouches.concat(otherTouches),
       changedTouches: changedTouches,
     }
 
-    let buildEvent = (type: string, dict: TouchEventInit) => {
+    const buildEvent = (type: string, dict: TouchEventInit) => {
       if(window['TouchEvent'] !== undefined) {
         // Nothing beats the real thing.
         try {
@@ -145,10 +145,10 @@ export class InputSequenceSimulator<HoveredItemType> {
   }
 
   replayMouseSample(sample: JSONObject<InputSample<HoveredItemType>>, state: string, targetElement?: HTMLElement) {
-    let config = this.controller.recognizer.config;
+    const config = this.controller.recognizer.config;
 
     let event: MouseEvent;
-    let eventDict: MouseEventInit = {
+    const eventDict: MouseEventInit = {
       bubbles: true,
       buttons: state == 'end' ? 0 : 1,
       ...this.getSampleClientPos(sample)
@@ -186,7 +186,7 @@ export class InputSequenceSimulator<HoveredItemType> {
    */
   private replayCore(sequenceTestSpec: RecordedCoordSequenceSet,
     replayExecutor: (func: () => void, timestamp: number) => void): number {
-    let inputs = sequenceTestSpec.inputs;
+    const inputs = sequenceTestSpec.inputs;
     const config = sequenceTestSpec.config;
 
     this.controller.layoutConfiguration = new FixtureLayoutConfiguration(config);
@@ -198,8 +198,8 @@ export class InputSequenceSimulator<HoveredItemType> {
      * next sample to be 'replayed'.  If the full sequence has already been
      * replayed, its corresponding entry will be set to Number.MAX_VALUE instead.
      */
-    let sequenceProgress: number[] = new Array(inputs.length).fill(0);
-    let sequenceTouches: Touch[] = new Array(inputs.length).fill(null);
+    const sequenceProgress: number[] = new Array(inputs.length).fill(0);
+    const sequenceTouches: Touch[] = new Array(inputs.length).fill(null);
 
     let lastTimestamp = null;
 
@@ -320,7 +320,7 @@ export class InputSequenceSimulator<HoveredItemType> {
     // We technically don't have access to 'samples' for the actual recorded object.
     // Obtaining a 'deep copy' (though methodless) works around this nicely and
     // matches the original `sequenceTestSpec`'s format to boot.
-    let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
+    const recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
     recorder.clear();
     return recording;
   }
@@ -357,7 +357,7 @@ export class InputSequenceSimulator<HoveredItemType> {
         // We technically don't have access to 'samples' for the actual recorded object.
         // Obtaining a 'deep copy' (though methodless) works around this nicely and
         // matches the original `sequenceTestSpec`'s format to boot.
-        let recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
+        const recording = JSON.parse(recorder.recordingsToJSON()) as RecordedCoordSequenceSet;
         recorder.clear();
         resolve(recording);
       }, finalTimestamp + 30);

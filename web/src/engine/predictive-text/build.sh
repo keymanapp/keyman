@@ -57,8 +57,4 @@ builder_run_child_actions build:templates
 builder_run_child_actions build:worker-thread
 builder_run_child_actions build:worker-main
 
-# If doing CI testing, the predictive-text child actions have their own build configuration.
-# For local testing, though, we can allow them to proceed.
-if ! builder_has_option --ci; then
-  builder_run_child_actions test
-fi
+builder_run_child_actions test

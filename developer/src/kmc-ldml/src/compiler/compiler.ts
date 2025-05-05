@@ -122,16 +122,16 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
 
-    let compilerOptions: LdmlCompilerOptions = {
+    const compilerOptions: LdmlCompilerOptions = {
       ...defaultCompilerOptions,
       ...this.options,
     };
 
-    let source = this.load(inputFilename);
+    const source = this.load(inputFilename);
     if (!source) {
       return null;
     }
-    let kmx = await this.compile(source);
+    const kmx = await this.compile(source);
     if (!kmx) {
       return null;
     }
@@ -352,7 +352,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     const kmx = new KMXPlusFile();
 
-    for (let section of sections) {
+    for (const section of sections) {
       if (!section.validate()) {
         // TODO-LDML: coverage
         passed = false;
@@ -405,7 +405,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     // give all sections a chance to postValidate
     if (postValidate) {
-      for (let section of sections) {
+      for (const section of sections) {
         if (!section.postValidate(kmx.kmxplus[section.id])) {
           passed = false;
         }

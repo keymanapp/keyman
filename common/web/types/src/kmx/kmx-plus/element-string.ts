@@ -69,7 +69,7 @@ export class ElementString extends Array<ElemElement> {
     }
 
     for(let i = 0; i < items.length; i++) {
-      let elem = new ElemElement();
+      const elem = new ElemElement();
       const item = items[i];
       let typeFlag = 0;
       if (item.type === ElementType.uset) {

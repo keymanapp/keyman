@@ -47,7 +47,7 @@ export class BannerView implements OSKViewComponent {
    * Constructs the <div> element used to contain hot-swapped `Banner` instances.
    */
   private constructContainer(): HTMLDivElement {
-    let d = createUnselectableElement('div');
+    const d = createUnselectableElement('div');
     d.id = "keymanweb_banner_container";
     d.className = "kmw-banner-container";
     return this.bannerContainer = d;
@@ -83,7 +83,7 @@ export class BannerView implements OSKViewComponent {
       if(banner == this.currentBanner) {
         return;
       } else {
-        let prevBanner = this.currentBanner;
+        const prevBanner = this.currentBanner;
         this.currentBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
         prevBanner.shutdown();

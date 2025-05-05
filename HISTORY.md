@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 19.0.30 alpha 2025-05-02
+
+* chore(android): Use `builder_is_ci_build` rather than `--ci` flag (#13772)
+* docs: add `--deps` flags and move builder.md into /docs (#13815)
+* chore(web): improve clean actions (#13804)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13773)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13807)
+* maint(core): batch build kmx in tests for performance (#13795)
+* maint(common): cleanup meson versioning (#13796)
+* maint(common): test imported resource versions (#13803)
+
+## 19.0.29 alpha 2025-04-30
+
+* change(web): enable linting for Keyman Engine for Web modules (#13787)
+* fix(web): reconnect unit tests for low-level web utility classes/methods (#13714)
+* fix(android): Change Alert Dialog instead of Toast if package missing languages (#13786)
+* maint(common): remove platform advocates from CODEOWNERS (#13801)
+* chore(common): allow to run tests in virtual environment (#13793)
+* chore: increase linter strictness (#13788)
+
+## 19.0.28 alpha 2025-04-29
+
+* chore(common): Update dependencies in crowdin GitHub action (#13775)
+* chore: additional tweaks to scopes/labels (#13765)
+* chore(common): rename `chore` GH label to `maint` (#13780)
+* change(linux): add link to issue (#13778)
+
+## 19.0.27 alpha 2025-04-28
+
+* chore: update labels for v19 (#13744)
+
 ## 19.0.26 alpha 2025-04-24
 
 * chore: merge beta version 18.0.235 history to master (#13735)
