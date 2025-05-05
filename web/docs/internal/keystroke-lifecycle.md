@@ -1,27 +1,41 @@
 # The Keyman Engine for Web keystroke lifecycle
 
-Depending on the variant of Keyman Engine for Web in play, the engine integrates either with a host app or with the current browser page to interpret and/or intercept keystroke events and produce the desired context manipulations corresponding to them.  While some details diverge between `app/browser` and `app/webview` builds, the general structure and pattern for this process holds.
-
-This document will break down the full keystroke lifecycle into four distinct phases, as follows:
+The phases of Keyman Engine for Web keystroke processings are as follows:
 
 1. Keystroke pre-processing: event interception + interpretation (pre-processing)
 2. Keystroke processing: keystroke main-group rule evaluation
 3. Keystroke post-processing: keystroke post-keystroke evaluation + side-effects
 4. Keystroke resolution: UI state updating
 
+Keyman Engine for Web currently has two different builds, each used in specific contexts:
+
+* app/browser - for direct use on a page or site within a web browser
+* app/webview - for integration with a host app, such as Keyman itself
+
+The overall phases for the keystroke lifecycle are the same for both; the implementation is merely a bit different for each within specific phases.  These differences are documented after the common structure and patterns for each phase.
+
+Also note that Keyman Engine for Web supports keystroke processing for different keyboard specification formats:
+- JS
+- KMX (via web-core)
+- KMX+ / LDML (via web-core)
+
+The `KeyboardProcessor` classes each handle keystroke processing for one specification format while adhering to a common interface exposed and accessible to the other layers of the keystroke lifecycle.
+
 ## Keystroke pre-processing
 
-Both the `app/browser` and `app/webview` products are capable of handling simulated keystrokes from the on-screen keyboard as well as hardware keystrokes.  For hardware keystrokes, this varies between the two, while the majority of on-screen keyboard keystrokes are handled identically.
+Both the `app/browser` and `app/webview` products are capable of handling keystrokes from the on-screen keyboard as well as hardware keystrokes.  For hardware keystrokes, this varies between the two, while the majority of on-screen keyboard keystrokes are handled identically.
 
-### `app/browser`
+### `app/browser` - hardware keystrokes
 
-The `app/browser` version of the engine is designed to integrate with the active page of the user's browser, giving it far more direct access to the user's true context in addition to direct access to handling DOM events resulting from hardware keystrokes.  Its `HardwareEventKeyboard` class is the primary module for establishing the needed engine event hooks and for interpreting the corresponding DOM events as they arise.
+The `app/browser` version of the engine is designed to integrate with the active page of the user's browser.  As a result of this, contexts for text manipulation are directly implemented within Web elements that the engine has direct access to.  It can thus attach DOM event handlers (for [`keydown`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event), [`keyup`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keyup_event), and [`keypress`](https://developer.mozilla.org/en-US/docs/Web/API/Element/keypress_event)) in order to process hardware keystrokes.  Its `HardwareEventKeyboard` class is the primary module for handling hardware keystrokes - it establishes the needed engine event hooks and methods used to fully handle and preprocess their keystroke data for further use later in the keystroke lifecycle.
 
-The bulk of DOM key events trigger keystroke processing on key-down, though modifier keys also receive key-up handling.  Key-press events are handled selectively for held backspaces and possibly certain keystrokes for mnemonic keyboards.  In all cases, DOM keyboard event objects are preprocessed by the centralized `preprocessKeyboardEvent` method, which converts the DOM event format into Web's `KeyEvent` format, which is the form required by the keyboard rules within compiled JS keyboards.  This includes mnemonic keystroke preprocessing and remapping in addition to AltGr emulation.
+The bulk of DOM key events trigger keystroke processing on key-down, though modifier keys also receive key-up handling.  Key-press events are handled selectively for held backspaces and possibly certain keystrokes for mnemonic keyboards.  In all cases, DOM keyboard event objects are preprocessed by the centralized `preprocessKeyboardEvent` method, which converts the DOM event [`KeyboardEvent`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent) format into the Web engine's `KeyEvent` format, which is the form required by the keyboard rules within compiled JS keyboards.  This includes mnemonic keystroke preprocessing and remapping in addition to AltGr emulation.
 
-### `app/webview`
+### `app/webview` - hardware keystrokes
 
-The `app/webview` version of the engine, which is designed to be used while embedded in a platform-specific host app, does not have direct access to standard hardware keystroke events.  It's run in a WebView that does not take input - a WebView owned by the host app.  It is the responsibility of the host app to handle hardware keystroke events and preprocess them on behalf of the Web engine, then forward them to the Web engine via a carefully-constructed JS call from the host upon the WebView.  The `PassthroughKeyboard` class within `app/webview` space provides the method `raiseKeyEvent` as an internal API for this purpose, which converts the mobile-app format for hardware keystroke into the internal `KeyEvent` format.  This includes mnemonic keystroke processing and remapping.
+The `app/webview` version of the engine, which is designed to be used while embedded in a platform-specific host app, does not have direct access to standard hardware keystroke events, as those are handled by the host app's OS and by native code handlers run outside the host app's WebView containing the app/webview Web engine. It is the responsibility of the host app to handle hardware keystroke events and preprocess them on behalf of the Web engine, then forward them to the Web engine via JS call into the WebView.  The `PassthroughKeyboard` class within `app/webview` space provides the method `raiseKeyEvent` as an internal API for this purpose, which converts the mobile-app format for hardware keystroke into the internal `KeyEvent` format.  `raiseKeyEvent` also handles mnemonic keystroke processing and remapping.
+
+Also note that this variant does not model the user's text context with Web elements - it is entirely managed through the `Mock` type.
 
 ### On-screen keyboard
 
@@ -29,7 +43,7 @@ For both `app/browser` and `app/webview`, the on-screen keyboard delegates mouse
 
 OSK keystroke preprocessing operates a little differently from hardware keystrokes.  The `ActiveLayout` object for the current form-factor of the `Keyboard` maintains a "base" `KeyEvent` object, per key, that is lazy-constructed (by the `.baseKeyEvent` property) when first needed - the meat of which is performed by the `ActiveKeyBase.constructBaseKeyEvent` method.  This is only evaluated up to once per key per activation of the keyboard.  As keystrokes are received during OSK use, `VisualKeyboard.keyEventFromSpec` calls the `Keyboard.constructKeyEvent` method to clone that base `KeyEvent` object for the incoming keystroke and then adjust it to match current modifier and state-key settings.
 
-### Final steps
+### Passing `KeyEvent` on for processing
 
 Regardless of the path taken to generate the `KeyEvent` object, _all_ keystroke handling modules of Keyman Engine for Web then raise that `KeyEvent` object via their `keyevent` event as specified by the `KeyEventSourceInterface` type.  This event also permits a callback that is used by the final phase of the lifecycle - keystroke resolution - as needed.  The main `KeymanEngine` base class listens for these events and forwards them for next phase of the lifecycle - keystroke processing - to the `InputProcessor` module, which passes control to whichever `KeystrokeProcessor` type is active for the keyboard when appropriate.
 
@@ -47,7 +61,7 @@ Once this phase is reached, the engine will then snapshot the current state of t
 
 ### Determining direct keystroke effects
 
-The `KeyboardProcessor` classes are responsible for determining the effects that should arise when evaluating the incoming keystroke with the current context state.  While the exact mechanisms of this may vary depending upon the type of keyboard, the role is the same - interpreting the keystroke in context.
+The `KeyboardProcessor` classes, which each embody how one keyboard specification pattern interprets keystrokes, are responsible for determining the effects that should arise when evaluating the incoming keystroke with the current context state.  While the exact mechanisms of this may vary depending upon the type of keyboard - be it JS, KMX, or KMX+ (LDML), the role is the same - interpreting the keystroke in context.
 
 ### JS keyboards
 
