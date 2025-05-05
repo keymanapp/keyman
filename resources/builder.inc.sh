@@ -205,7 +205,7 @@ builder_echo() {
   message="$*"
 
   if [[ "${action}" == "start" ]] && ${is_running_on_teamcity}; then
-    echo -e "##teamcity[blockOpened name='${block}']"
+    echo -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 
   if ${do_output}; then
@@ -235,7 +235,7 @@ builder_echo() {
   fi
 
   if [[ "${action}" == "end" ]] && ${is_running_on_teamcity}; then
-    echo -e "##teamcity[blockClosed name='${block}']"
+    echo -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 }
 
