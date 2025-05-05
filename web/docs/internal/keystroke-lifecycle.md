@@ -28,6 +28,76 @@ The `KeyboardProcessor` classes each handle keystroke processing for one
 specification format while adhering to a common interface exposed and accessible
 to the other layers of the keystroke lifecycle.
 
+```mermaid
+---
+title: Keystroke lifecycle flowchart
+---
+%% For rendering, use e.g. https://mermaid.live
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+sequenceDiagram;
+
+actor User as User + UI
+participant Keystroke interpreter
+
+Note over User, KeymanEngine:  Start:  Keystroke preprocessing
+User ->> Keystroke interpreter: Types a key
+Keystroke interpreter ->> Keystroke interpreter: Preprocess keystroke events
+Keystroke interpreter ->> KeymanEngine: Raise preprocessed event
+Note over User, KeymanEngine:  End: Keystroke preprocessing
+KeymanEngine ->>+ InputProcessor: Forward keystroke data
+
+Note over InputProcessor, KeyboardProcessor:  Start:  Keystroke processing
+InputProcessor ->> InputProcessor:  Validate context, keyboard
+InputProcessor ->> InputProcessor:  Snapshot context state
+
+InputProcessor ->>+ KeyboardProcessor:  Process keystroke
+KeyboardProcessor ->> KeyboardProcessor:  Determine effects
+KeyboardProcessor -->> User:  Update raw context
+KeyboardProcessor ->>- InputProcessor:  Return effects
+
+opt Predictive Text
+    loop For each nearby key
+        InputProcessor ->>+ KeyboardProcessor:  Fat-finger (alternate) keystrokes
+        KeyboardProcessor ->> KeyboardProcessor:  Determine effects
+        KeyboardProcessor ->>- InputProcessor:  Return effects
+    end
+end
+
+Note over InputProcessor, KeyboardProcessor:  End:  Keystroke processing
+Note over InputProcessor, KeyboardProcessor:  Start:  Keystroke post-processing
+
+InputProcessor ->> InputProcessor:  Apply keystroke effects
+InputProcessor ->> InputProcessor:  Cache context state, keystroke effects
+InputProcessor -->> User:  Update OSK layer
+InputProcessor ->>+ KeyboardProcessor:  Process post-keystroke effects
+KeyboardProcessor ->>- InputProcessor:  Return effects
+InputProcessor -->> User:  Update OSK layer
+
+opt Predictive Text
+    InputProcessor --)+ Predictive-text engine:  Request corrections, predictions
+    InputProcessor -->> User:  Invalidate outdated predictions
+end
+
+Note over InputProcessor, KeyboardProcessor:  End:  Keystroke post-processing
+
+opt app/browser
+    InputProcessor ->> InputProcessor:  Trigger DOM `input` event
+end
+
+Note over Keystroke interpreter, InputProcessor:  Start:  Keystroke resolution
+InputProcessor ->>- KeymanEngine:  Return effects
+
+KeymanEngine ->> Keystroke interpreter:  Store state token for multitaps
+KeymanEngine ->> Keystroke interpreter:  Determine TAB, ENTER, etc effects
+Note over Keystroke interpreter, InputProcessor:  End:  Keystroke resolution
+
+opt Predictive Text
+    Predictive-text engine ->> Predictive-text engine:  Determine corrections,<br>predictions (async)
+    Note over User, Predictive-text engine:  After async delay
+    Predictive-text engine --)- User:  Return new predictions, update banner
+end
+```
+
 ## Keystroke pre-processing
 
 Both the `app/browser` and `app/webview` products are capable of handling
