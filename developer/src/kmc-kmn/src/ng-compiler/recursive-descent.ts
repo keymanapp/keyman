@@ -221,6 +221,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.NEWLAYER,         nodeType: NodeTypes.NEWLAYER},
     {tokenType: TokenTypes.NOMATCH,          nodeType: NodeTypes.NOMATCH},
     {tokenType: TokenTypes.NOT_EQUAL,        nodeType: NodeTypes.NOT_EQUAL},
+    {tokenType: TokenTypes.NUL,              nodeType: NodeTypes.NUL},
     {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.OLDLAYER,         nodeType: NodeTypes.OLDLAYER},
     {tokenType: TokenTypes.OUTS,             nodeType: NodeTypes.OUTS},

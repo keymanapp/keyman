@@ -1214,7 +1214,8 @@ export class RhsBlockRule extends SingleChildRule {
     super();
     const contextOutputBlock: Rule = new ContextOutputBlockRule();
     const context: Rule            = new TokenRule(TokenTypes.CONTEXT, true);
-    this.rule = new AlternateRule([contextOutputBlock, context]);
+    const nul: Rule                = new TokenRule(TokenTypes.NUL, true);
+    this.rule = new AlternateRule([contextOutputBlock, context, nul]);
   }
 
   public parse(node: ASTNode): boolean {

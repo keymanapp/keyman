@@ -77,7 +77,7 @@ layerStatement: LAYER bracketedString
 platformStatement: PLATFORM bracketedString
 baselayoutStatement: BASELAYOUT bracketedString
 bracketedString: LEFT_BR WHITESPACE? STRING WHITESPACE? RIGHT_BR
-rhsBlock: contextOutputBlock|CONTEXT
+rhsBlock: contextOutputBlock|CONTEXT|NUL
 contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
