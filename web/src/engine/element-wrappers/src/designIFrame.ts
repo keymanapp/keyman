@@ -1,4 +1,5 @@
 import OutputTarget from './outputTarget.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
   node: Node;
@@ -125,7 +126,7 @@ export default class DesignIFrame extends OutputTarget<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return this.getTextBeforeCaret().kmwLength();
+    return KMWString.length(this.getTextBeforeCaret());
   }
 
   getTextBeforeCaret(): string {
@@ -184,7 +185,7 @@ export default class DesignIFrame extends OutputTarget<{}> {
     }
 
     const range = this.doc.createRange();
-    const dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
+    const dnOffset = start.offset - KMWString.substr(start.node.nodeValue.substr(0, start.offset), -dn).length;
 
     range.setStart(start.node, dnOffset);
     range.setEnd(start.node, start.offset);
@@ -201,7 +202,7 @@ export default class DesignIFrame extends OutputTarget<{}> {
     }
 
     const start = this.getCarets().start;
-    const delta = s._kmwLength();
+    const delta = KMWString.length(s);
     const Lsel = this.doc.getSelection();
 
     if(delta == 0) {
@@ -265,7 +266,7 @@ export default class DesignIFrame extends OutputTarget<{}> {
     }
 
     const caret = this.getCarets().end;
-    const delta = s._kmwLength();
+    const delta = KMWString.length(s);
 
     if(delta == 0) {
       return;

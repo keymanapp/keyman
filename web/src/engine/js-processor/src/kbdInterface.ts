@@ -5,7 +5,7 @@
 
 //#region Imports
 
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec, KMWString } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { Codes, type KeyEvent, KeyMapping, Keyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
 import type OutputTarget from './outputTarget.js';
@@ -279,11 +279,11 @@ export default class KeyboardInterface extends KeyboardHarness {
     // If we have a selection, we have an empty context
     tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
 
-    if(tempContext._kmwLength() < n) {
-      tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
+    if(KMWString.length(tempContext) < n) {
+      tempContext = Array(n-KMWString.length(tempContext)+1).join("\uFFFE") + tempContext;
     }
 
-    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
+    return KMWString.substr(KMWString.substr(tempContext, -n), 0, ln);
   }
 
   /**
@@ -642,8 +642,8 @@ export default class KeyboardInterface extends KeyboardHarness {
 
       // Nope, so let's build its cache.
       const result: ComplexKeyboardStore = [];
-      for(let i=0; i < store._kmwLength(); i++) {
-        result.push(store._kmwCharAt(i));
+      for(let i=0; i < KMWString.length(store); i++) {
+        result.push(KMWString.charAt(store, i));
       }
 
       // Cache the result for later!
