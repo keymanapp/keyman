@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, ContextProductionBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1169,6 +1169,33 @@ describe("KMN Analyser Tests", () => {
       const productionBlock: Rule = new UsingKeysProductionBlockRule();
       assert.isNotNull(productionBlock);
     });
+    it("can parse correctly (plus, any, index)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
+      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.INDEX));
+    });
+    it("can parse correctly (plus, virtual key, two uChars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ [SHIFT K_A] > U+17B6 U+17C6');
+      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      const uCharNodes = rhsNode.getChildrenOfType(NodeTypes.U_CHAR);
+      assert.equal(uCharNodes.length, 2);
+    });
   });
   describe("ReadOnlyProductionBlockRule Tests", () => {
     it("can construct a ReadOnlyProductionBlockRule", () => {
@@ -1204,6 +1231,26 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER));
+    });
+  });
+  describe("ContextProductionBlockRule Tests", () => {
+    it("can construct a ContextProductionBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const productionBlock: Rule = new ContextProductionBlockRule();
+      assert.isNotNull(productionBlock);
+    });
+    it("can parse correctly (two uChars, uChar)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
+      const productionBlock: Rule = new ContextProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
   describe("UsingKeysLhsBlockRule Tests", () => {
@@ -2117,8 +2164,9 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 338);
-      Rule.tokenBuffer = new TokenBuffer(subset);
+      //const subset: Token[] = tokens.filter((token) => token.lineNum <= 660);
+      //Rule.tokenBuffer = new TokenBuffer(subset);
+      Rule.tokenBuffer = new TokenBuffer(tokens);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
@@ -2169,8 +2217,10 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
       const readOnlyProductionNodes  = root.getChildrenOfType(NodeTypes.PRODUCTION_READONLY);
       const usingKeysProductionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const contextProductionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.equal(readOnlyProductionNodes.length, 7);
       assert.equal(usingKeysProductionNodes.length, 53);
+      assert.equal(contextProductionNodes.length, 208);
       //assert.equal(root.toString(), '');
     });
   });

@@ -39,6 +39,7 @@ export enum NodeTypes {
   LANGUAGE              = "LANGUAGE",
   LAYER                 = "LAYER",
   LAYOUTFILE            = "LAYOUTFILE",
+  LHS_CONTEXT           = "LHS_CONTEXT",
   LHS_READONLY          = "LHS_READONLY",
   LHS_USING_KEYS        = "LHS_USING_KEYS",
   LINE                  = "LINE",
@@ -75,6 +76,7 @@ export enum NodeTypes {
   VIRTUAL_KEY           = "VIRTUAL_KEY",
   VISUALKEYBOARD        = "VISUALKEYBOARD",
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",
+  PRODUCTION_CONTEXT = "PRODUCTION_CONTEXT",
 }
 
 export class ASTNode {

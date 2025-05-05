@@ -471,10 +471,15 @@ export class RuleBlockRule extends SingleChildRule {
     super();
     const beginBlock: Rule               = new BeginBlockRule();
     const groupBlock: Rule               = new GroupBlockRule();
-    const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule()
-    const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule()
+    const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule();
+    const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule();
+    const contextProductionBlock: Rule   = new ContextProductionBlockRule();
     this.rule = new AlternateRule([
-      beginBlock, groupBlock, usingKeysProductionBlock, readOnlyProductionBlock,
+      beginBlock,
+      groupBlock,
+      usingKeysProductionBlock,
+      readOnlyProductionBlock,
+      contextProductionBlock,
     ]);
   }
 }
@@ -781,6 +786,16 @@ export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
   }
 }
 
+export class ContextProductionBlockRule extends AbstractProductionBlockRule {
+  public constructor() {
+    super();
+    this.lhsNodeType        = NodeTypes.LHS_CONTEXT;
+    this.productionNodeType = NodeTypes.PRODUCTION_CONTEXT;
+    const contextLhsBlock   = new ContextLhsBlockRule();
+    this.rule = new SequenceRule([contextLhsBlock, this.spacedChevron, this.rhsBlock]);
+  }
+}
+
 abstract class AbstractLhsBlockRule extends SingleChildRule {
   protected lhsNodeType: NodeTypes;
 
@@ -824,6 +839,14 @@ export class ReadOnlyLhsBlockRule extends AbstractLhsBlockRule {
   }
 }
 
+export class ContextLhsBlockRule extends AbstractLhsBlockRule {
+  public constructor() {
+    super();
+    this.lhsNodeType = NodeTypes.LHS_CONTEXT;
+    this.rule        = new ContextInputBlockRule();
+  }
+}
+
 export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
@@ -848,6 +871,15 @@ export class ReadOnlyInputBlockRule extends SingleChildRule {
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
     const keystoke: Rule             = new KeystrokeRule();
     this.rule = new SequenceRule([optPaddedIfLikeBlock, keystoke]);
+  }
+}
+
+export class ContextInputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    const inputContext: Rule         = new InputContextRule();
+    this.rule = new SequenceRule([optPaddedIfLikeBlock, inputContext]);
   }
 }
 
