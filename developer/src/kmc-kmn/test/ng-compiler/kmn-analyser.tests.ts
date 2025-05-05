@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, ContextProductionBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, ContextProductionBlockRule, ContextInputBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1252,6 +1252,20 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
+    it("can parse correctly (two uChars, two uChars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17C6 U+17BB > U+17BB U+17C6');
+      const productionBlock: Rule = new ContextProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      const uCharNodes = rhsNode.getChildrenOfType(NodeTypes.U_CHAR);
+      assert.equal(uCharNodes.length, 2);
+    });
   });
   describe("UsingKeysLhsBlockRule Tests", () => {
     it("can construct a UsingKeysLhsBlockRule", () => {
@@ -1385,6 +1399,38 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
       assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+  });
+  describe("ContextInputBlockRule Tests", () => {
+    it("can construct a ContextInputBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isNotNull(contextInputBlock);
+    });
+    it("can parse correctly (two uChars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      const uCharNodes = inputContextNode.getChildrenOfType(NodeTypes.U_CHAR);
+      assert.equal(uCharNodes.length, 2);
+      assert.equal(uCharNodes[0].getText(), 'U+17C1');
+      assert.equal(uCharNodes[1].getText(), 'U+17B6');
+      assert.isFalse(inputContextNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (if-like block, two uChars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") U+17C1 U+17B6)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      const uCharNodes = inputContextNode.getChildrenOfType(NodeTypes.U_CHAR);
+      assert.equal(uCharNodes.length, 2);
+      assert.equal(uCharNodes[0].getText(), 'U+17C1');
+      assert.equal(uCharNodes[1].getText(), 'U+17B6');
+      assert.isFalse(inputContextNode.hasChildOfType(NodeTypes.LINE));
     });
   });
   describe("InputContextRule Tests", () => {
