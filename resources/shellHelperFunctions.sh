@@ -138,10 +138,11 @@ write_download_info() {
   FILE_EXTENSION="${BASE_FILE##*.}"
 
   # stat flags to get filesize in bytes
-  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /opt/homebrew/opt/coreutils/libexec/gnubin/stat ]]; then
-    # Handle coreutils flags
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) != /usr/bin/stat ]]; then
+    # BSD
     STAT_FLAGS="-f%z"
   else
+    # GNU (coreutils)
     STAT_FLAGS="-c%s"
   fi
   FILE_SIZE=$(stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
