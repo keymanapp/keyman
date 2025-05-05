@@ -1,6 +1,17 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Dr Mark C. Sinclair on 2025-05-05
+ *
+ * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
+ * 
+ * System and Variable Store Rules
+ */
+
 import { PaddingRule, OptionalWhiteSpaceRule, PaddedTextRule, VirtualKeyRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
-import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, OneOrManyRule, parameterSequence, AlternateRule } from "./recursive-descent.js";
+import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
+import { OneOrManyRule, parameterSequence, AlternateRule } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 
