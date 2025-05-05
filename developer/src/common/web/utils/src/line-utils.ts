@@ -18,7 +18,13 @@ export type LineList = number[];
 export class LineFinder {
     private list: LineList;
     constructor(public text: string) {
-        this.list = LineFinder.textToLines(text);
+    }
+
+    public getLineList(): LineList {
+        if (!this.list) {
+            this.list = LineFinder.textToLines(this.text);
+        }
+        return this.list;
     }
 
     /**
@@ -27,7 +33,7 @@ export class LineFinder {
      * @returns line:column information
      */
     public findOffset(offset: number): LineColumn {
-        return LineFinder.offsetToLineColumn(offset, this.list);
+        return LineFinder.offsetToLineColumn(offset, this.getLineList());
     }
 
     /** 
@@ -58,4 +64,30 @@ export class LineFinder {
     }
 }
 
+/**
+ * Interface for a class which can receive file contents,
+ * keyed by the filename
+ */
+export interface FileConsumer {
+    /**
+     * @param filename name of the file
+     * @param contents string contents of the file
+     */
+    addFile(filename: string, contents: string): void;
+}
+
+/** Cache of LineFinder elements, organized by filename */
+export class LineFinderCache implements FileConsumer {
+    contentsCache: Map<string, LineFinder> = new Map();
+
+    /** add or update a source file */
+    addFile(filename: string, contents: string): void {
+        this.contentsCache.set(filename, new LineFinder(contents));
+    }
+
+    getByFilename(filename: string) : LineFinder | undefined {
+        const lf = this.contentsCache.get(filename);
+        return lf;
+    }
+}
 

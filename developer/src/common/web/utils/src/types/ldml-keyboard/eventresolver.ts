@@ -6,20 +6,19 @@
  * Implementation of a hook on LDML events
  */
 
-import { CompilerEvent, EventResolver, LineFinder } from "../../index.js";
-export class LdmlEventResolver implements EventResolver {
+import { LineFinderCache, FileConsumer } from "../../line-utils.js";
+import { CompilerEvent, EventResolver } from "../../index.js";
+export class LineFinderEventResolver implements EventResolver, FileConsumer {
+  private lfcache = new LineFinderCache();
 
-  contentsCache: Map<string, LineFinder> = new Map();
-
-  /** add or update a source file */
-  addFile(filename: string, xml: any) {
-    this.contentsCache.set(filename, new LineFinder(xml));
+  addFile(filename: string, contents: string): void {
+    this.lfcache.addFile(filename, contents);
   }
 
   /** resolve a CompilerEvent by expanding the line numbers */
   resolve(event: CompilerEvent) {
     if (event.offset && !event.line && event.filename) {
-      const lf = this.contentsCache.get(event.filename);
+      const lf = this.lfcache.getByFilename(event.filename);
       const loc = lf.findOffset(event.offset);
       event.line = loc.line;
       event.column = loc.column;

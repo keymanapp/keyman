@@ -11,7 +11,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
 import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
-import { LdmlEventResolver } from './eventresolver.js';
+import { LineFinderEventResolver } from './eventresolver.js';
 import { XML_FILENAME_SYMBOL } from '../../xml-utils.js';
 
 interface NameAndProps  {
@@ -28,7 +28,7 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
 };
 
 export class LDMLKeyboardXMLSourceFileReader {
-  static eventResolver: LdmlEventResolver = new LdmlEventResolver();
+  static eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {  
   }
 
