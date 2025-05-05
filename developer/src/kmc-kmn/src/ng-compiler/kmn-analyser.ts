@@ -7,7 +7,10 @@
  */
 
 import { Token, TokenTypes } from "./lexer.js";
-import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, SingleChildRule, parameterSequence, OneOrManyRule, ManyRule, AlternateTokenRule } from "./recursive-descent.js";
+import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
+import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
+import { AlternateTokenRule } from "./recursive-descent.js";
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -97,201 +100,11 @@ export class ContentRule extends SingleChildRule {
   }
 }
 
-export class StringSystemStoreAssignRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const stringSystemStore: Rule = new StringSystemStoreRule();
-    const padding: Rule           = new PaddingRule();
-    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
-    this.rule = new SequenceRule([
-      stringSystemStore, padding, stringRule,
-    ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const stringNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STRING);
-      const lineNode: ASTNode   = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const storeNode: ASTNode  = tmp.getSoleChild();
-      storeNode.addChild(stringNode);
-      storeNode.addChild(lineNode);
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
-  }
-}
-
-abstract class AbstractSystemStoreRule extends SingleChildRule {
-  protected store: Rule;
-  protected leftBracket: Rule;
-  protected optWhitespace: Rule;
-  protected amphasand: Rule;
-  protected rightBracket: Rule;
-
-  public constructor() {
-    super();
-    this.store         = new TokenRule(TokenTypes.STORE);
-    this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
-    this.optWhitespace = new OptionalWhiteSpaceRule();
-    this.amphasand     = new TokenRule(TokenTypes.AMPHASAND);
-    this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
-  }
-}
-
-export class StringSystemStoreRule extends AbstractSystemStoreRule {
-  public constructor() {
-    super();
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-    this.rule = new SequenceRule([
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.amphasand,
-      stringSystemStoreName,
-      this.optWhitespace,
-      this.rightBracket,
-    ]);
-  }
-}
-
-export class StringSystemStoreNameRule extends AlternateTokenRule {
-  public constructor() {
-    super([
-      TokenTypes.BITMAP,
-      TokenTypes.COPYRIGHT,
-      TokenTypes.DISPLAYMAP,
-      TokenTypes.ETHNOLOGUECODE,
-      TokenTypes.INCLUDECODES,
-      TokenTypes.KEYBOARDVERSION,
-      TokenTypes.KMW_EMBEDCSS,
-      TokenTypes.KMW_EMBEDJS,
-      TokenTypes.KMW_HELPFILE,
-      TokenTypes.KMW_HELPTEXT,
-      TokenTypes.KMW_RTL,
-      TokenTypes.LANGUAGE,
-      TokenTypes.LAYOUTFILE,
-      TokenTypes.MESSAGE,
-      TokenTypes.MNEMONICLAYOUT,
-      TokenTypes.NAME,
-      TokenTypes.TARGETS,
-      TokenTypes.VERSION,
-      TokenTypes.VISUALKEYBOARD,
-      TokenTypes.WINDOWSLANGUAGES,
-    ], true);
-  }
-}
-
-export class CasedkeysStoreAssignRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const casedkeysStore: Rule      = new CasedkeysStoreRule();
-    const paddedText: Rule          = new PaddedTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
-    this.rule = new SequenceRule([casedkeysStore, oneOrManyPaddedText]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const casedkeysNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.CASEDKEYS);
-      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const textNodes: ASTNode[]   = tmp.getChildren();
-      casedkeysNode.addChildren(textNodes);
-      casedkeysNode.addChildren(lineNodes);
-      node.addChild(casedkeysNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class CasedkeysStoreRule extends AbstractSystemStoreRule {
-  public constructor() {
-    super();
-    const casedkeys: Rule = new TokenRule(TokenTypes.CASEDKEYS, true);
-    this.rule = new SequenceRule([
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.amphasand,
-      casedkeys,
-      this.optWhitespace,
-      this.rightBracket,
-    ]);
-  }
-}
-
-export class HotkeyStoreAssignRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const hotkeyStore: Rule = new HotkeyStoreRule();
-    const padding: Rule     = new PaddingRule();
-    const virtualKey: Rule  = new VirtualKeyRule();
-    this.rule = new SequenceRule([hotkeyStore, padding, virtualKey]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const hotkeyNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.HOTKEY);
-      const lineNode: ASTNode       = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const virtualKeyNode: ASTNode = tmp.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
-      hotkeyNode.addChild(virtualKeyNode);
-      hotkeyNode.addChild(lineNode);
-      node.addChild(hotkeyNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class HotkeyStoreRule extends AbstractSystemStoreRule {
-  public constructor() {
-    super();
-    const hotkey: Rule = new TokenRule(TokenTypes.HOTKEY, true);
-    this.rule = new SequenceRule([
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.amphasand,
-      hotkey,
-      this.optWhitespace,
-      this.rightBracket,
-    ]);
-  }
-}
-
 export class OptionalWhiteSpaceRule extends SingleChildRule {
   public constructor() {
     super();
     const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
     this.rule = new OptionalRule(whitespace);
-  }
-}
-
-export class VariableStoreAssignRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const variableStore: Rule       = new VariableStoreRule();
-    const paddedText: Rule          = new PaddedTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
-    this.rule = new SequenceRule([variableStore, oneOrManyPaddedText]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const storeNode: ASTNode     = tmp.removeSoleChildOfType(NodeTypes.STORE);
-      const lineNodes: ASTNode[]   = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const textNodes: ASTNode[]   = tmp.getChildren();
-      storeNode.addChildren(textNodes);
-      storeNode.addChildren(lineNodes);
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
   }
 }
 
@@ -394,55 +207,6 @@ export class SpacedShiftCodeRule extends SingleChildRule {
     const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
     this.rule = new SequenceRule([shiftCode, whitespace]);
   }
-}
-
-export class VariableStoreRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const store: Rule              = new TokenRule(TokenTypes.STORE, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([store, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const storeNode     = tmp.getSoleChildOfType(NodeTypes.STORE);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      storeNode.addChild(storeNameNode);
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class BracketedStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
-    ]);
-  }
-}
-
-export class VariableStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-  }
-
-  public parse(node: ASTNode): boolean {
-    const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(parameters, 1);
-    if (parseSuccess) {
-      node.addToken(NodeTypes.STORENAME, parameters[0]);
-    }
-    return parseSuccess;
-  };
 }
 
 export class OutsStatementRule extends SingleChildRule {
@@ -661,15 +425,6 @@ export class GroupNameOrKeywordRule extends SingleChildRule {
       }
     }
     return parseSuccess;
-  }
-}
-
-export class PermittedKeywordRule extends AlternateTokenRule {
-  public constructor() {
-    super([
-      TokenTypes.NEWCONTEXT,
-      TokenTypes.POSTKEYSTROKE,
-    ], true);
   }
 }
 
@@ -1147,21 +902,6 @@ export class ComparisonRule extends SingleChildRule {
     const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
     const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
     this.rule = new AlternateRule([equal, notEqual]);
-  }
-}
-
-export class SystemStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-    const casedkeys: Rule             = new TokenRule(TokenTypes.CASEDKEYS, true);
-    const hotkey: Rule                = new TokenRule(TokenTypes.HOTKEY, true);
-    const layer: Rule                 = new TokenRule(TokenTypes.LAYER, true);
-    const newLayer: Rule              = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldLayer: Rule              = new TokenRule(TokenTypes.OLDLAYER, true);
-    this.rule = new AlternateRule([
-      stringSystemStoreName, casedkeys, hotkey, layer, newLayer, oldLayer,
-    ]);
   }
 }
 

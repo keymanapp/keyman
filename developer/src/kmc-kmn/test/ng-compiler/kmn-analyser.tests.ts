@@ -11,19 +11,20 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, PermittedKeywordRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, ContextProductionBlockRule, ContextInputBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
-import { BlankLineRule, BracketedGroupNameRule, BracketedStoreNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
-import { CasedkeysStoreAssignRule, CasedkeysStoreRule, ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, IfLikeBlockRule, IndexStatementRule, ReadOnlyInputBlockRule, UsingKeysInputBlockRule, OutputBlockRule, OutputStatementRule, RhsBlockRule, SpacedCommaRule, UsingKeysLhsBlockRule, UsingKeysProductionBlockRule, KeystrokeRule, InputContextRule, ContextStatementRule, ContextProductionBlockRule, ContextInputBlockRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { BlankLineRule, BracketedGroupNameRule, BracketedStringRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { ComparisonRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule, ContinuationNewlineRule, EntryPointRule, GroupBlockRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { GroupStatementRule, HotkeyStoreAssignRule, HotkeyStoreRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { GroupStatementRule, } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfStoreStoreStatementRule, IfStoreStringStatementRule,  } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfSystemStoreNameRule, IfSystemStoreStoreStatementRule, IfSystemStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KmnTreeRule, LayerStatementRule, ReadOnlyLhsBlockRule, LineRule, OutsStatementRule, PlatformStatementRule, ReadOnlyProductionBlockRule,  } from '../../src/ng-compiler/kmn-analyser.js';
-import { PaddingRule, SimpleTextRule, StringSystemStoreNameRule, StringSystemStoreAssignRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { StringSystemStoreRule, SystemStoreNameRule, TextRangeRule, TextRule, UseStatementRule, UsingKeysRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { VariableStoreAssignRule, VariableStoreRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { PaddingRule, SimpleTextRule, } from '../../src/ng-compiler/kmn-analyser.js';
+import { TextRangeRule, TextRule, UseStatementRule, UsingKeysRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { readFileSync } from 'fs';
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
