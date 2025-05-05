@@ -10,8 +10,6 @@
 
 declare global {
   interface StringConstructor {
-    kmwFromCharCode(cp0: number): string,
-    _kmwFromCharCode(cp0: number): string,
     kmwEnableSupplementaryPlane(bEnable: boolean): void
   }
 
@@ -50,31 +48,6 @@ declare global {
 }
 
 export default function extendString() {
-  /**
-   * Constructs a string from one or more Unicode character codepoint values
-   * passed as integer parameters.
-   *
-   * @param  {number} cp0,...   1 or more Unicode codepoints, e.g. 0x0065, 0x10000
-   * @return {string|null}      The new String object.
-   */
-  String.kmwFromCharCode = function(cp0) {
-    var chars = [], i;
-    for (i = 0; i < arguments.length; i++) {
-      var c = Number(arguments[i]);
-      if (!isFinite(c) || c < 0 || c > 0x10FFFF || Math.floor(c) !== c) {
-        throw new RangeError("Invalid code point " + c);
-      }
-      if (c < 0x10000) {
-        chars.push(c);
-      } else {
-        c -= 0x10000;
-        chars.push((c >> 10) + 0xD800);
-        chars.push((c % 0x400) + 0xDC00);
-      }
-    }
-    return String.fromCharCode.apply(undefined, chars);
-  }
-
   /**
    * Returns a number indicating the Unicode value of the character at the given
    * code point index, with support for supplementary plane characters.
@@ -456,7 +429,6 @@ export default function extendString() {
   String.kmwEnableSupplementaryPlane = function(bEnable)
   {
     var p=String.prototype;
-    String._kmwFromCharCode = bEnable ? String.kmwFromCharCode : String.fromCharCode;
     p._kmwCharAt = bEnable ? p.kmwCharAt : p.charAt;
     p._kmwCharCodeAt = bEnable ? p.kmwCharCodeAt : p.charCodeAt;
     p._kmwIndexOf = bEnable ? p.kmwIndexOf :p.indexOf;
@@ -472,7 +444,7 @@ export default function extendString() {
   }
 
   // Ensure that _all_ String extensions are established, even if disabled by default.
-  if(!String._kmwFromCharCode) {
+  if(!""._kmwCharAt) {
     String.kmwEnableSupplementaryPlane(false);
   }
 }
