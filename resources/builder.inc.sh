@@ -1270,7 +1270,7 @@ _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
-  builder_release=
+  local builder_release=
   local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
