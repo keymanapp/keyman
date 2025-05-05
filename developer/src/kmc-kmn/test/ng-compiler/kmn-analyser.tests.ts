@@ -2117,7 +2117,7 @@ describe("KMN Analyser Tests", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse();
-      const subset: Token[] = tokens.filter((token) => token.lineNum <= 276);
+      const subset: Token[] = tokens.filter((token) => token.lineNum <= 338);
       Rule.tokenBuffer = new TokenBuffer(subset);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -2155,7 +2155,7 @@ describe("KMN Analyser Tests", () => {
         assert.equal(storeNodes[idx].getDescendents(NodeTypes.STORENAME)[0].getText(), name);
       });
       const groupNodes = root.getChildrenOfType(NodeTypes.GROUP);
-      assert.equal(groupNodes.length, 4);
+      assert.equal(groupNodes.length, 5);
       assert.equal(groupNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'NewContext');
       assert.equal(groupNodes[0].getDescendents(NodeTypes.READONLY).length, 1);
       assert.equal(groupNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
@@ -2164,10 +2164,13 @@ describe("KMN Analyser Tests", () => {
       assert.equal(groupNodes[2].getDescendents(NodeTypes.READONLY).length, 1);
       assert.equal(groupNodes[3].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
       assert.equal(groupNodes[3].getDescendents(NodeTypes.USING_KEYS).length, 1);
+      assert.equal(groupNodes[4].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'normalise');
+      assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.USING_KEYS));
+      assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
       const readOnlyProductionNodes  = root.getChildrenOfType(NodeTypes.PRODUCTION_READONLY);
-      assert.equal(readOnlyProductionNodes.length, 6);
       const usingKeysProductionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION_USING_KEYS);
-      assert.equal(usingKeysProductionNodes.length, 26);
+      assert.equal(readOnlyProductionNodes.length, 7);
+      assert.equal(usingKeysProductionNodes.length, 53);
       //assert.equal(root.toString(), '');
     });
   });
