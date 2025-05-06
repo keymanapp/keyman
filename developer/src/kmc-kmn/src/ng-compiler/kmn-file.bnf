@@ -70,10 +70,12 @@ contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|layerStatement|indexStatement|contextStatement|
+outputStatement: useStatement|callStatement|layerStatement|indexStatement|contextStatement|
   text|BEEP
+callStatement: CALL bracketedStoreName
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?
+offset: PARAMETER
 contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR
 
 # System and Variable Store Rules

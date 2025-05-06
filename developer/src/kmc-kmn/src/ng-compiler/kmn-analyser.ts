@@ -1054,14 +1054,30 @@ export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const useStatement: Rule     = new UseStatementRule();
+    const callStatement: Rule    = new CallStatementRule();
     const layerStatement: Rule   = new LayerStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
     const text: Rule             = new TextRule();
     const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
-      useStatement, layerStatement, indexStatement, contextStatement, text, beep,
+      useStatement,
+      callStatement,
+      layerStatement,
+      indexStatement,
+      contextStatement,
+      text,
+      beep,
     ]);
+  }
+}
+
+export class CallStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const call: Rule               = new TokenRule(TokenTypes.CALL, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([call, bracketedStoreName]);
   }
 }
 

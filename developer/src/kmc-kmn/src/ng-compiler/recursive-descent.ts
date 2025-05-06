@@ -192,6 +192,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.BEEP,             nodeType: NodeTypes.BEEP},
     {tokenType: TokenTypes.BEGIN,            nodeType: NodeTypes.BEGIN},
     {tokenType: TokenTypes.BITMAP,           nodeType: NodeTypes.BITMAP},
+    {tokenType: TokenTypes.CALL,             nodeType: NodeTypes.CALL},
     {tokenType: TokenTypes.CASEDKEYS,        nodeType: NodeTypes.CASEDKEYS},
     {tokenType: TokenTypes.CONTEXT,          nodeType: NodeTypes.CONTEXT},
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},

@@ -15,6 +15,7 @@ export enum NodeTypes {
   BEEP                  = "BEEP",
   BEGIN                 = "BEGIN",
   BITMAP                = "BITMAP",
+  CALL                  = "CALL",
   CASEDKEYS             = "CASEDKEYS",
   CONTEXT               = "CONTEXT",
   COPYRIGHT             = "COPYRIGHT",
@@ -57,6 +58,7 @@ export enum NodeTypes {
   OUTS                  = "OUTS",
   PLATFORM              = "PLATFORM",
   POSTKEYSTROKE         = "POSTKEYSTROKE",
+  PRODUCTION_CONTEXT    = "PRODUCTION_CONTEXT",
   PRODUCTION_READONLY   = "PRODUCTION_READONLY",
   PRODUCTION_USING_KEYS = "PRODUCTION_USING_KEYS",
   RANGE                 = "RANGE",
@@ -76,7 +78,6 @@ export enum NodeTypes {
   VIRTUAL_KEY           = "VIRTUAL_KEY",
   VISUALKEYBOARD        = "VISUALKEYBOARD",
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",
-  PRODUCTION_CONTEXT = "PRODUCTION_CONTEXT",
 }
 
 export class ASTNode {
