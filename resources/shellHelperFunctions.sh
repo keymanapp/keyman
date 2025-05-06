@@ -337,7 +337,7 @@ check-markdown() {
 builder_do_typescript_tests() {
   local MOCHA_FLAGS=
 
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+  if builder_is_running_on_teamcity; then
     # we're running in TeamCity
     MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
   fi
