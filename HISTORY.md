@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 19.0.32 alpha 2025-05-06
+
+* change(web): replace USVString with string in predictive-text engine (#13785)
+* chore(web): replace --ci flag with builder_is_ci_build (#13819)
+* maint(web): simplify worker-main test.sh (#13820)
+* change(web): lint kmwstring web-utility (#13800)
+* fix(web): fix extraction of gesture-engine fixture used in DOM-based unit tests (#13805)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13774)
+* fix(web): fix var declaration affected by linter strictness + length-style fix (#13839)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13840)
+* chore(common): override check when running on TC (#13779)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13842)
+* maint(common): add support for TC blocks (#13810)
+
 ## 19.0.31 alpha 2025-05-05
 
 * fix(mac): add version metadata after building tests (#13818)
