@@ -10,7 +10,8 @@ import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { AlternateTokenRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule } from "./store-analyser.js";
+import { StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -1078,6 +1079,18 @@ export class CallStatementRule extends SingleChildRule {
     const call: Rule               = new TokenRule(TokenTypes.CALL, true);
     const bracketedStoreName: Rule = new BracketedStoreNameRule();
     this.rule = new SequenceRule([call, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const callNode      = tmp.getSoleChildOfType(NodeTypes.CALL);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      callNode.addChild(storeNameNode);
+      node.addChild(callNode);
+    }
+    return parseSuccess;
   }
 }
 
