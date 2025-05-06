@@ -192,7 +192,7 @@ fi
 function builder_echo_tests() {
   echo -e "${COLOR_BLUE}## Testing builder_echo${COLOR_RESET}"
   _old_builder_debug_internal=${_builder_debug_internal}
-  _OLD_TEAMICITY_GIT_PATH=${TEAMCITY_GIT_PATH}
+  _OLD_TEAMICITY_GIT_PATH=${TEAMCITY_GIT_PATH:-}
 
   # regular build, no internal debug
   TEAMCITY_GIT_PATH=""
@@ -235,20 +235,20 @@ function builder_echo_tests() {
   TEAMCITY_GIT_PATH="foo"
   # TC build, no internal debug
   _builder_debug_internal=false
-  expected="##teamcity[blockOpened name='foo']
+  expected="##teamcity[blockOpened name='|[resources/build/test|] foo']
 $(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo start foo description' on TC (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo success "description")
-##teamcity[blockClosed name='foo']"
+##teamcity[blockClosed name='|[resources/build/test|] foo']"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo success description' on TC (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo error "description")
-##teamcity[blockClosed name='foo']"
+##teamcity[blockClosed name='|[resources/build/test|] foo']"
   result=$(builder_echo end "foo" error "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo error description' on TC (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
@@ -256,20 +256,20 @@ $(builder_echo heading "description")"
 
   # TC build, with internal debug
   _builder_debug_internal=true
-  expected="##teamcity[blockOpened name='foo']
+  expected="##teamcity[blockOpened name='|[resources/build/test|] foo']
 $(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo start foo description' on TC (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo success "description")
-##teamcity[blockClosed name='foo']"
+##teamcity[blockClosed name='|[resources/build/test|] foo']"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo success description' on TC (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo error "description")
-##teamcity[blockClosed name='foo']"
+##teamcity[blockClosed name='|[resources/build/test|] foo']"
   result=$(builder_echo end "foo" error "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo error description' on TC (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
