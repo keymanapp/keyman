@@ -11,15 +11,6 @@
 
 @interface NSString (XString)
 
-- (NSString *)lastNChars:(NSUInteger)n;
-- (NSString *)codeString;
-- (BOOL)isValidCode;
 + (NSString *)nullChar;
-
-@end
-
-@interface NSMutableString (XString)
-
-- (void)deleteLastNChars:(NSUInteger)n;
 
 @end

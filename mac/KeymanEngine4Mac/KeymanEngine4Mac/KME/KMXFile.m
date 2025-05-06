@@ -8,8 +8,8 @@
 
 #import "KMXFile.h"
 #import "KMCompStore.h"
-#import "KMCompGroup.h"
-#import "KMCompKey.h"
+//#import "KMCompGroup.h"
+//#import "KMCompKey.h"
 #import "NSString+XString.h"
 #import "KMELogs.h"
 
@@ -22,6 +22,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 @implementation KMXFile
 
 - (id)initWithFilePath:(NSString *)path {
+  os_log_info([KMELogs configLog], "initWithFilePath, path: %{public}@", path);
   self = [super init];
   if (self) {
     if (path == nil) {
@@ -56,43 +57,53 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     _keyboardID = cmp_kb.KeyboardID;
     _isRegistered = (cmp_kb.IsRegistered == 0?NO:YES);
     _version = cmp_kb.version;
+
+/*
     NSMutableArray *mStartGroup = [[NSMutableArray alloc] initWithCapacity:2];
     [mStartGroup addObject:[NSNumber numberWithInt:cmp_kb.StartGroup[0]]];
     [mStartGroup addObject:[NSNumber numberWithInt:cmp_kb.StartGroup[1]]];
     _startGroup = [[NSArray alloc] initWithArray:mStartGroup];
-    _flags = cmp_kb.dwFlags;
-    _hotKey = cmp_kb.dwHotKey;
     
+ */
     struct COMP_STORE cmp_str[cmp_kb.cxStoreArray];
     [file seekToFileOffset:cmp_kb.dpStoreArray];
     size = sizeof(cmp_str);
     dataBuffer = [file readDataOfLength:size];
     [dataBuffer getBytes:cmp_str length:size];
     NSMutableArray *mStore = [[NSMutableArray alloc] initWithCapacity:cmp_kb.cxStoreArray];
+    os_log_info([KMELogs configLog], "COMP_STORE, number of entries: %u", cmp_kb.cxStoreArray);
     for (int i = 0; i < cmp_kb.cxStoreArray; i++) {
       KMCompStore *kmStore = [[KMCompStore alloc] init];
       kmStore.dwSystemID = cmp_str[i].dwSystemID;
-      kmStore.name = [KMXFile UTF16StringWithPointer:cmp_str[i].dpName inFile:file];
       
-      if (kmStore.dwSystemID == TSS_VERSION)
-        kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-      else {
-        kmStore.string = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
-        if (kmStore.dwSystemID == TSS_MNEMONIC && [kmStore.string isEqualToString:@"1"])
-          _isMnemonic = YES;
+      /* Keyman for Mac is not processing keys, so no need to save normal stores.
+       If dwSystemID is not zero, then this is a system store and may contain
+       useful metadata */
+      
+      if (kmStore.dwSystemID != 0) {
+        kmStore.name = [KMXFile UTF16StringWithPointer:cmp_str[i].dpName inFile:file];
+        
+        if (kmStore.dwSystemID == TSS_VERSION)
+          kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        else {
+          kmStore.string = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
+          if (kmStore.dwSystemID == TSS_MNEMONIC && [kmStore.string isEqualToString:@"1"])
+            _isMnemonic = YES;
+        }
+        
+        if (kmStore.dwSystemID == TSS_VERSION)
+          kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        else
+          kmStore.string = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
+        
+        [mStore addObject:kmStore];
+        os_log_info([KMELogs configLog], "loaded store, systemId: %u name: %{public}@ string: %{public}@", kmStore.dwSystemID, kmStore.name, kmStore.string);
       }
-      
-      if (kmStore.dwSystemID == TSS_VERSION)
-        kmStore.string = [[KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-      else
-        kmStore.string = [KMXFile UTF16StringWithPointer:cmp_str[i].dpString inFile:file];
-      
-      [mStore addObject:kmStore];
     }
-    
     _store = [[NSArray alloc] initWithArray:mStore];
-    _storeSaved = [[NSArray alloc] initWithArray:mStore copyItems:YES];
-    
+    //_storeSaved = [[NSArray alloc] initWithArray:mStore copyItems:YES];
+ 
+    /*
     struct COMP_GROUP cmp_grp[cmp_kb.cxGroupArray];
     [file seekToFileOffset:cmp_kb.dpGroupArray];
     size = sizeof(cmp_grp);
@@ -126,6 +137,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
       [mGroup addObject:kmGrp];
     }
     _group = [[NSArray alloc] initWithArray:mGroup];
+  */
     
     [file seekToFileOffset:cmp_kb.dpBitmapOffset];
     NSData *bitmapData = [file readDataOfLength:cmp_kb.dwBitmapSize];
@@ -139,12 +151,13 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 }
 
 - (NSString *)description {
-  NSString *format = @"<%@: %p, File version: 0x%X Flags: 0x%X Store: %@ Group: %@>";
+  NSString *format = @"<%@: %p, File version: 0x%X>";
   NSString *str = [NSString stringWithFormat:format,
-                   self.className, self, self.fileVersion, self.flags, self.store, self.group];
+                   self.className, self, self.fileVersion];
   return str;
 }
 
+/*
 - (BOOL)isValid {
   for (KMCompGroup *gp in self.group) {
     if ((gp.match && ![gp.match isValidCode]) || (gp.noMatch && ![gp.noMatch isValidCode]))
@@ -158,6 +171,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
   
   return YES;
 }
+*/
 
 + (NSDictionary *)keyboardInfoFromKmxFile:(NSString *)path {
   NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];

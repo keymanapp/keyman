@@ -36,10 +36,12 @@
   XCTAssert(kmxFile == nil, @"Expected nil file");
 }
 
+/*
 - (void)testinitWithFilePath_Valid_ReturnsInitializedKmxFile {
   KMXFile *kmxFile = [KeymanEngineTestsStaticHelperMethods getKmxFileTestMacEngine];
   XCTAssert(kmxFile != nil, @"Expected non-nil file");
   XCTAssert([kmxFile isValid], @"Expected valid KMX file.");
 }
+ */
 
 @end

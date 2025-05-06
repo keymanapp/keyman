@@ -196,6 +196,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self clearContext];
     NSString *kmxPath = [self.kmxList objectAtIndex:self.kbComboBox.indexOfSelectedItem-1];
     KMXFile *kmx = [[KMXFile alloc] initWithFilePath:kmxPath];
+    
+    /*
     if (![kmx isValid]) {
       NSAlert *alert = [[NSAlert alloc] init];
       [alert addButtonWithTitle:@"OK"];
@@ -204,6 +206,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       [alert setAlertStyle:NSAlertStyleWarning];
       [alert runModal];
     }
+    */
     
     NSString *packagePath = [kmxPath stringByDeletingLastPathComponent];
     NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:kmxPath];
@@ -218,11 +221,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.kbData setObject:kmx forKey:kKMXFileKey];
     self.imgView.image = kmx.bitmap;
     
+    /*
     int index = 0;
     for (NSObject *kmStore in kmx.store) {
       NSLog(@"%d: %@", index, kmStore);
       index++;
     }
+     */
   }
 }
 

@@ -22,9 +22,9 @@
 }
 
 - (NSString *)description {
-  NSString *format = @"<%@:%p K:0x%X L:0x%X F:0x%X O:%@ C:%@>";
+  NSString *format = @"<%@:%p K:0x%X L:0x%X F:0x%X>";
   NSString *str = [NSString stringWithFormat:format,
-                   self.className, self, self.key, self.line, self.shiftFlags, [self.output codeString], [self.context codeString]];
+                   self.className, self, self.key, self.line, self.shiftFlags];
   return str;
 }
 

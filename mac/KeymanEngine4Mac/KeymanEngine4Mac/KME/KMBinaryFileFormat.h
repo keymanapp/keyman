@@ -49,6 +49,7 @@ struct COMP_KEYBOARD {
 #define VERSION_MIN VERSION_50
 #define VERSION_MAX VERSION_170
 
+/*
 struct COMP_GROUP {
   DWORD dpName;           // string (only debug)
   DWORD dpKeyArray;       // [LPCOMP_KEY] address of first item in key array
@@ -57,6 +58,7 @@ struct COMP_GROUP {
   DWORD cxKeyArray;       // in array entries
   BOOL  fUsingKeys;       // group(xx) [using keys] <-- specified or not
 };
+*/
 
 struct COMP_STORE {
   DWORD dwSystemID;
