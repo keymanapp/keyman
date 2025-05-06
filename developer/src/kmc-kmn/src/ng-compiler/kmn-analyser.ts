@@ -210,24 +210,34 @@ export class SpacedShiftCodeRule extends SingleChildRule {
   }
 }
 
-export class OutsStatementRule extends SingleChildRule {
+abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
+  protected bracketedStoreName: Rule;
+  protected cmdNodeType: NodeTypes;
+
   public constructor() {
     super();
-    const outs: Rule               = new TokenRule(TokenTypes.OUTS, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([outs, bracketedStoreName]);
+    this.bracketedStoreName = new BracketedStoreNameRule();
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const outsNode      = tmp.getSoleChildOfType(NodeTypes.OUTS);
+      const cmdNode       = tmp.getSoleChildOfType(this.cmdNodeType);
       const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      outsNode.addChild(storeNameNode);
-      node.addChild(outsNode);
+      cmdNode.addChild(storeNameNode);
+      node.addChild(cmdNode);
     }
     return parseSuccess;
+  }
+}
+
+export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
+  public constructor() {
+    super();
+    const outs: Rule = new TokenRule(TokenTypes.OUTS, true);
+    this.cmdNodeType = NodeTypes.OUTS;
+    this.rule = new SequenceRule([outs, this.bracketedStoreName]);
   }
 }
 
@@ -735,45 +745,21 @@ export class KeystrokeRule extends SingleChildRule {
   }
 }
 
-export class AnyStatementRule extends SingleChildRule {
+export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const any: Rule                = new TokenRule(TokenTypes.ANY, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([any, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const anyNode       = tmp.getSoleChildOfType(NodeTypes.ANY);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      anyNode.addChild(storeNameNode);
-      node.addChild(anyNode);
-    }
-    return parseSuccess;
+    const any: Rule  = new TokenRule(TokenTypes.ANY, true);
+    this.cmdNodeType = NodeTypes.ANY;
+    this.rule = new SequenceRule([any, this.bracketedStoreName]);
   }
 }
 
-export class NotAnyStatementRule extends SingleChildRule {
+export class NotAnyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const notAny: Rule             = new TokenRule(TokenTypes.NOTANY, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([notAny, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const notAnyNode    = tmp.getSoleChildOfType(NodeTypes.NOTANY);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      notAnyNode.addChild(storeNameNode);
-      node.addChild(notAnyNode);
-    }
-    return parseSuccess;
+    const notAny: Rule = new TokenRule(TokenTypes.NOTANY, true);
+    this.cmdNodeType   = NodeTypes.NOTANY;
+    this.rule = new SequenceRule([notAny, this.bracketedStoreName]);
   }
 }
 
@@ -1094,24 +1080,12 @@ export class OutputStatementRule extends SingleChildRule {
   }
 }
 
-export class CallStatementRule extends SingleChildRule {
+export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const call: Rule               = new TokenRule(TokenTypes.CALL, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([call, bracketedStoreName]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const callNode      = tmp.getSoleChildOfType(NodeTypes.CALL);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      callNode.addChild(storeNameNode);
-      node.addChild(callNode);
-    }
-    return parseSuccess;
+    const call: Rule = new TokenRule(TokenTypes.CALL, true);
+    this.cmdNodeType = NodeTypes.CALL;
+    this.rule = new SequenceRule([call, this.bracketedStoreName]);
   }
 }
 
