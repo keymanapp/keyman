@@ -525,7 +525,7 @@ export default abstract class OSKView
     // Addresses issue with touch-layouts specifying a unitless fontsize; this
     // coerces them to `pt` style sizing, like how word-processors present font-size.
     //
-    // Returns NaN if not 100% a number.  "12px", "12pt", "12%" all return NaN.
+    // Number() returns NaN if not 100% a number.  "12px", "12pt", "12%" all return NaN.
     const fsRaw = Number(layerFontSizeRaw);
     const layerFontSize = isNaN(fsRaw) ? layerFontSizeRaw : (fsRaw + 'pt');
 
