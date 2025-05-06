@@ -59,10 +59,10 @@ do_build() {
 do_test() {
   test-headless-typescript "${SUBPROJECT_NAME}"
 
-  ./gesture-recognizer/build.sh test
+  ./gesture-processor/build.sh test
 }
 
 builder_run_action configure do_configure
 builder_run_action clean do_clean
 builder_run_action build do_build
-builder_run_action test
+builder_run_action test do_test
