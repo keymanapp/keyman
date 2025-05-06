@@ -66,6 +66,7 @@ export enum NodeTypes {
   READONLY              = "READONLY",
   RHS                   = "RHS",
   SAVE                  = "SAVE",
+  SET                   = "SET",
   SHIFT_CODE            = "SHIFT_CODE",
   STORE                 = "STORE",
   STORENAME             = "STORENAME",

@@ -278,3 +278,40 @@ export class PermittedKeywordRule extends AlternateTokenRule {
   }
 }
 
+export class SetStoreStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const set: Rule               = new TokenRule(TokenTypes.SET, true);
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
+    const variableStoreName: Rule = new VariableStoreNameRule();
+    const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
+    const equal: Rule             = new TokenRule(TokenTypes.EQUAL);
+    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+
+    this.rule = new SequenceRule([
+      set,
+      leftBracket,
+      optWhitespace,
+      variableStoreName,
+      whitespace,
+      equal,
+      whitespace,
+      stringRule,
+      optWhitespace,
+      rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const setNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.SET);
+      setNode.addChildren(tmp.getChildren());
+      node.addChild(setNode);
+    }
+    return parseSuccess;
+  }
+}

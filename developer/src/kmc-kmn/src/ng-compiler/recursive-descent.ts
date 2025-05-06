@@ -231,6 +231,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.POSTKEYSTROKE,    nodeType: NodeTypes.POSTKEYSTROKE},
     {tokenType: TokenTypes.READONLY,         nodeType: NodeTypes.READONLY},
     {tokenType: TokenTypes.SAVE,             nodeType: NodeTypes.SAVE},
+    {tokenType: TokenTypes.SET,              nodeType: NodeTypes.SET},
     {tokenType: TokenTypes.SHIFT_CODE,       nodeType: NodeTypes.SHIFT_CODE},
     {tokenType: TokenTypes.STORE,            nodeType: NodeTypes.STORE},
     {tokenType: TokenTypes.STRING,           nodeType: NodeTypes.STRING},

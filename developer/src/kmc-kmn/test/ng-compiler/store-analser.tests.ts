@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -524,6 +524,21 @@ describe("KMN Store Analyser Tests", () => {
       const permittedKeyword: Rule = new PermittedKeywordRule();
       assert.isTrue(permittedKeyword.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
+    });
+  });
+  describe("SetStoreStatementRule Tests", () => {
+    it("can construct a SetStoreStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const setStoreStatement: Rule = new SetStoreStatementRule();
+      assert.isNotNull(setStoreStatement);
+    });
+    it("can parse a SetStoreStatementRule correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
+      const setStoreStatement: Rule = new SetStoreStatementRule();
+      assert.isTrue(setStoreStatement.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
     });
   });
 });
