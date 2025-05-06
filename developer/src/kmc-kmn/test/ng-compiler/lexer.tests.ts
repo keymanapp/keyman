@@ -111,8 +111,17 @@ describe("Lexer Tests", () => {
     it("can recognise a SHIFTFREECAPS token", () => {
       recogniseToken(TokenTypes.SHIFTFREESCAPS, 'shiftfreescaps');
     });
-    it("can recognise a ANY token", () => {
+    it("can recognise an ANY token", () => {
       recogniseToken(TokenTypes.ANY, 'any');
+    });
+    it("can recognise an ANY token (followed by comma)", () => {
+      recogniseTokens(
+        'any,',
+        [
+          new Token(TokenTypes.ANY, 'any'),
+          new Token(TokenTypes.COMMA, ',', 1, 4),
+        ]
+      );
     });
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenTypes.BASELAYOUT, 'baselayout');
@@ -483,6 +492,24 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
           new Token(TokenTypes.PARAMETER, '2', 1, 7),
           new Token(TokenTypes.RIGHT_BR,   ')', 1, 8),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (that starts with any, then a)", () => {
+      recogniseTokens(
+        'anya)',
+        [
+          new Token(TokenTypes.PARAMETER, 'anya'),
+          new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (that starts with any, then A)", () => {
+      recogniseTokens(
+        'anyA)',
+        [
+          new Token(TokenTypes.PARAMETER, 'anyA'),
+          new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
         ]
       );
     });
