@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, NotAnyStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1611,6 +1611,21 @@ describe("KMN Analyser Tests", () => {
       const callNode = root.getSoleChildOfType(NodeTypes.CALL);
       assert.isNotNull(callNode);
       assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("SaveStatementRule Tests", () => {
+    it("can construct an SaveStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const saveStatement: Rule = new SaveStatementRule();
+      assert.isNotNull(saveStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
+      const saveStatement: Rule = new SaveStatementRule();
+      assert.isTrue(saveStatement.parse(root));
+      const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
+      assert.isNotNull(saveNode);
+      assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("IndexStatementRule Tests", () => {

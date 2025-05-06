@@ -65,6 +65,7 @@ export enum NodeTypes {
   RANGE                 = "RANGE",
   READONLY              = "READONLY",
   RHS                   = "RHS",
+  SAVE                  = "SAVE",
   SHIFT_CODE            = "SHIFT_CODE",
   STORE                 = "STORE",
   STORENAME             = "STORENAME",

@@ -1063,6 +1063,7 @@ export class OutputStatementRule extends SingleChildRule {
     super();
     const useStatement: Rule     = new UseStatementRule();
     const callStatement: Rule    = new CallStatementRule();
+    const saveStatement: Rule    = new SaveStatementRule();
     const layerStatement: Rule   = new LayerStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
@@ -1071,6 +1072,7 @@ export class OutputStatementRule extends SingleChildRule {
     this.rule = new AlternateRule([
       useStatement,
       callStatement,
+      saveStatement,
       layerStatement,
       indexStatement,
       contextStatement,
@@ -1086,6 +1088,15 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
     const call: Rule = new TokenRule(TokenTypes.CALL, true);
     this.cmdNodeType = NodeTypes.CALL;
     this.rule = new SequenceRule([call, this.bracketedStoreName]);
+  }
+}
+
+export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
+  public constructor() {
+    super();
+    const save: Rule = new TokenRule(TokenTypes.SAVE, true);
+    this.cmdNodeType = NodeTypes.SAVE;
+    this.rule = new SequenceRule([save, this.bracketedStoreName]);
   }
 }
 
