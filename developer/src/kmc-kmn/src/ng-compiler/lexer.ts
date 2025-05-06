@@ -158,7 +158,6 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.GROUP,              new RegExp("^group", "i")),
     new ScanRecogniser(TokenTypes.IF,                 new RegExp("^if", "i")),
     new ScanRecogniser(TokenTypes.INDEX,              new RegExp("^index", "i")),
-    new ScanRecogniser(TokenTypes.LAYER,              new RegExp("^layer", "i")),
     new ScanRecogniser(TokenTypes.MATCH,              new RegExp("^match", "i")),
     new ScanRecogniser(TokenTypes.NOMATCH,            new RegExp("^nomatch", "i")),
     new ScanRecogniser(TokenTypes.NOTANY,             new RegExp("^notany", "i")),
