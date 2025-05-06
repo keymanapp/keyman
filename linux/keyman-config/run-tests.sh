@@ -19,6 +19,11 @@ if [[ -n "${TEAMCITY_VERSION}" ]]; then
         # to use a virtualenv. However, that causes other problems, so we
         # override this check only if we're running in a TC agent or docker
         # so that we don't accidentally break the local system.
+        # Note: it is intentional that we use TEAMCITY_VERSION as well
+        # as TEAMCITY_PLATFORM here so that it is possible to simulate
+        # running in a TC agent and still not break your local system
+        # (run in a docker container or explicitly set TEAMCITY_PLATFORM
+        # to cause the script to install the package).
         PIP_ARGS="--break-system-packages"
       fi
       # shellcheck disable=SC2086
