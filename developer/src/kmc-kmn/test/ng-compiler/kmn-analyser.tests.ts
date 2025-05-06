@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, NotAnyStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1059,6 +1059,21 @@ describe("KMN Analyser Tests", () => {
       const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
       assert.isNotNull(anyNode);
       assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("NotAnyStatementRule Tests", () => {
+    it("can construct an NotAnyStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const notAnyStatement: Rule = new NotAnyStatementRule();
+      assert.isNotNull(notAnyStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
+      const notAnyStatement: Rule = new NotAnyStatementRule();
+      assert.isTrue(notAnyStatement.parse(root));
+      const notAnyNode = root.getSoleChildOfType(NodeTypes.NOTANY);
+      assert.isNotNull(notAnyNode);
+      assert.isNotNull(notAnyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("IfLikeBlockRule Tests", () => {

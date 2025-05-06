@@ -756,6 +756,27 @@ export class AnyStatementRule extends SingleChildRule {
   }
 }
 
+export class NotAnyStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const notAny: Rule             = new TokenRule(TokenTypes.NOTANY, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([notAny, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const notAnyNode    = tmp.getSoleChildOfType(NodeTypes.NOTANY);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      notAnyNode.addChild(storeNameNode);
+      node.addChild(notAnyNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class IfLikeBlockRule extends SingleChildRule {
   public constructor() {
     super();

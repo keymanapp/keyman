@@ -42,9 +42,10 @@ contextInputBlock: paddedIfLikeBlock? inputContext
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement
-inputElement: anyStatement|contextStatement|text
+inputElement: anyStatement|notAnyStatement|contextStatement|text
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
+notAnyStatement: NOTANY bracketedStoreName
 paddedIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
 paddedIfLikeStatement: padding IfLikeStatement
