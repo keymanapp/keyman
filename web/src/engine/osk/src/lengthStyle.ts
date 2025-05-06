@@ -10,7 +10,7 @@ export class ParsedLengthStyle implements LengthStyle {
   public readonly special: 'em' | 'rem';
 
   public constructor(style: LengthStyle | string) {
-    const parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
+    let parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
 
     const fallback: LengthStyle = {
       val: 1, // 100%
