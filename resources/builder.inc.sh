@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2310
 
 # Note: these two lines can be uncommented for debugging and profiling build
 # scripts:
@@ -169,10 +170,7 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark= block= action= do_output=true is_running_on_teamcity=false
-  if [[ -n "${TEAMCITY_GIT_PATH:-}" ]]; then
-    is_running_on_teamcity=true
-  fi
+  local color=white message= mark= block= action= do_output=true
 
   if [[ $# -gt 1 ]]; then
     if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
@@ -184,9 +182,7 @@ builder_echo() {
       block="$2"
       shift 2
       color="heading"
-      if ${is_running_on_teamcity}; then
-        do_output=true
-      else
+      if ! builder_is_running_on_teamcity; then
         do_output=${_builder_debug_internal:-false}
       fi
     elif [[ $1 == "end" ]]; then
@@ -195,16 +191,14 @@ builder_echo() {
       block="$2"
       color="$3"
       shift 3
-      if [[ "${color}" == "error" ]] || ${is_running_on_teamcity}; then
-        do_output=true
-      else
+      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity; then
         do_output=${_builder_debug_internal:-false}
       fi
     fi
   fi
   message="$*"
 
-  if [[ "${action}" == "start" ]] && ${is_running_on_teamcity}; then
+  if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
     echo -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 
@@ -234,7 +228,7 @@ builder_echo() {
     fi
   fi
 
-  if [[ "${action}" == "end" ]] && ${is_running_on_teamcity}; then
+  if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
     echo -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 }
@@ -1693,7 +1687,7 @@ builder_finish_action() {
       # Sanity check:  if there is a described output for this action, does the corresponding
       # file or directory exist now?
       if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
-        builder_echo end "$action_name" warning "Expected output: '${_builder_dep_path[$matched_action]}'."
+        builder_echo warning "Expected output: '${_builder_dep_path[$matched_action]}'."
         builder_echo end "$action_name" warning "## $action_name completed successfully, but output does not exist"
       else
         builder_echo end "$action_name" success "## $action_name completed successfully"
@@ -2127,6 +2121,15 @@ builder_is_target_excluded_by_platform() {
     return 0
   fi
   return 1
+}
+
+# Returns 0 if the script is running on TeamCity
+builder_is_running_on_teamcity() {
+  if [[ -z "${TEAMCITY_GIT_PATH:-}" ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 ################################################################################
