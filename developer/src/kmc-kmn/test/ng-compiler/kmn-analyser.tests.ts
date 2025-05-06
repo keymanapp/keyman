@@ -1560,6 +1560,22 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(useNode);
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
+    it("can parse correctly (call statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('call(storeName)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const callNode = root.getSoleChildOfType(NodeTypes.CALL);
+      assert.isNotNull(callNode);
+      assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (save statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
+      assert.isNotNull(saveNode);
+      assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
     it("can parse correctly (layer statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
       const outputStatement: Rule = new OutputStatementRule();
