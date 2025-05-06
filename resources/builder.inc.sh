@@ -1270,7 +1270,7 @@ _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
-  local is_release=
+  local is_release=false
   local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
@@ -1395,7 +1395,7 @@ _builder_parse_expanded_parameters() {
           _builder_chosen_options+=(--release)
           # As of #13827, this is only checked when detecting if --debug should be auto-applied.
           # There is no `builder_is_release_build` function yet.
-          is_release=--release
+          is_release=true
           ;;
         --deps|--no-deps|--force-deps)
           _builder_build_deps=$key
@@ -1484,7 +1484,7 @@ _builder_parse_expanded_parameters() {
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
-    if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && [[ $is_release != --release ]]; then
+    if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
       builder_echo grey "Local build environment detected:  setting --debug"
       _params+=(--debug)
       _builder_chosen_options+=(--debug)
