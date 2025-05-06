@@ -6,6 +6,8 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import * as models from '@keymanapp/models-templates';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
+import { KMWString } from '@keymanapp/web-utils';
+
 /**
  * The default punctuation and spacing produced by the model.
  */
@@ -99,7 +101,7 @@ export function detectCurrentCasing(lexicalModel: LexicalModel, context: Context
     return 'lower';
   } else if(model.applyCasing('upper', text) == text) {
     // If only a single character has been input, assume we're in 'initial' mode.
-    return text.kmwLength() > 1 ? 'upper' : 'initial';
+    return KMWString.length(text) > 1 ? 'upper' : 'initial';
   } else if(model.applyCasing('initial', text) == text) {
     // We check 'initial' last, as upper-case input is indistinguishable.
     return 'initial';

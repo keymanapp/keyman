@@ -1,11 +1,10 @@
 import { assert } from 'chai';
 
-import { extendString } from 'keyman/engine/keyboard';
+import { KMWString } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 import { Input } from 'keyman/engine/element-wrappers';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
-extendString();
 
 const host = document.createElement('div');
 document.body.appendChild(host);
@@ -69,7 +68,7 @@ describe('OutputTarget Mocking', function() {
 
   before(function() {
     // Make sure the basic SMP extension hooks exist to prevent errors later.
-    String.kmwEnableSupplementaryPlane(true);
+    KMWString.enableSupplementaryPlane(true);
   });
 
   afterEach(function() {
@@ -77,7 +76,7 @@ describe('OutputTarget Mocking', function() {
   });
 
   after(function() {
-    String.kmwEnableSupplementaryPlane(false);
+    KMWString.enableSupplementaryPlane(false);
   })
 
   describe('The "Mock" output target', function() {

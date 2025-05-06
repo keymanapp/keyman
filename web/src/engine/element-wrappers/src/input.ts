@@ -1,4 +1,5 @@
 import OutputTarget from './outputTarget.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 interface EventMap  {
   /**
@@ -69,7 +70,7 @@ export default class Input extends OutputTarget<EventMap> {
   clearSelection(): void {
     // Processes our codepoint-based variants of selectionStart and selectionEnd.
     this.getCaret(); // updates processedSelectionStart if required
-    this.root.value = this.root.value._kmwSubstring(0, this.processedSelectionStart) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
+    this.root.value = KMWString.substr(this.root.value, 0, this.processedSelectionStart) + KMWString.substr(this.root.value, this.processedSelectionEnd); //I3319
 
     this.setCaret(this.processedSelectionStart);
   }
@@ -91,8 +92,8 @@ export default class Input extends OutputTarget<EventMap> {
   getCaret(): number {
     if(this.root.selectionStart != this._cachedSelectionStart) {
       this._cachedSelectionStart = this.root.selectionStart; // KMW-1
-      this.processedSelectionStart = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionStart); // I3319
-      this.processedSelectionEnd = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionEnd);     // I3319
+      this.processedSelectionStart = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionStart); // I3319
+      this.processedSelectionEnd = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionEnd);     // I3319
     }
     return this.root.selectionDirection == 'forward' ? this.processedSelectionEnd : this.processedSelectionStart;
   }
@@ -106,8 +107,8 @@ export default class Input extends OutputTarget<EventMap> {
   }
 
   setSelection(start: number, end: number, direction: "forward" | "backward" | "none") {
-    const domStart = this.root.value._kmwCodePointToCodeUnit(start);
-    const domEnd = this.root.value._kmwCodePointToCodeUnit(end);
+    const domStart = KMWString.codePointToCodeUnit(this.root.value, start);
+    const domEnd = KMWString.codePointToCodeUnit(this.root.value, end);
     this.root.setSelectionRange(domStart, domEnd, direction);
 
     this.processedSelectionStart = start;
@@ -152,20 +153,20 @@ export default class Input extends OutputTarget<EventMap> {
 
   getTextBeforeCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(0, this.processedSelectionStart);
+    return KMWString.substring(this.getText(), 0, this.processedSelectionStart);
   }
 
   getSelectedText(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionStart, this.processedSelectionEnd);
   }
 
   setTextBeforeCaret(text: string) {
     this.getCaret();
     const selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
     const direction = this.getSelectionDirection();
-    const newCaret = text._kmwLength();
-    this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
+    const newCaret = KMWString.length(text);
+    this.root.value = text + KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.setSelection(newCaret, newCaret + selectionLength, direction);
   }
@@ -179,7 +180,7 @@ export default class Input extends OutputTarget<EventMap> {
 
   getTextAfterCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionEnd);
   }
 
   getText(): string {
@@ -196,7 +197,7 @@ export default class Input extends OutputTarget<EventMap> {
       }
 
       this.adjustDeadkeys(-dn);
-      this.setTextBeforeCaret(curText.kmwSubstring(0, caret - dn));
+      this.setTextBeforeCaret(KMWString.substring(curText, 0, caret - dn));
       this.setCaret(caret - dn);
     }
   }
@@ -208,11 +209,11 @@ export default class Input extends OutputTarget<EventMap> {
 
     const caret = this.getCaret();
     const front = this.getTextBeforeCaret();
-    const back = this.getText()._kmwSubstring(this.processedSelectionStart);
+    const back = KMWString.substring(this.getText(), this.processedSelectionStart);
 
-    this.adjustDeadkeys(s._kmwLength());
+    this.adjustDeadkeys(KMWString.length(s));
     this.root.value = front + s + back;
-    this.setCaret(caret + s._kmwLength());
+    this.setCaret(caret + KMWString.length(s));
   }
 
   handleNewlineAtCaret(): void {

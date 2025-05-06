@@ -182,12 +182,12 @@ a user or called by another script:
   An option will be inherited by child scripts if you append a `+` to the option
   name.
 
-* **dependencies**: these are other builder scripts which must be configured and
-  built before the actions in this script can continue. Only `configure` and
-  `build` actions are ever passed to dependency scripts; these actions will
-  execute by default, for all targets of the dependency script.  If you are
-  working on code within a dependency, you are currently expected to rebuild and
-  test that dependency locally.
+* **module dependencies**: these are other builder scripts which must be
+  configured and built before the actions in this script can continue. Only
+  `configure` and `build` actions are ever passed to dependency scripts; these
+  actions will execute by default, for all targets of the dependency script.  If
+  you are working on code within a dependency, you are currently expected to
+  rebuild and test that dependency locally.
 
   A module dependency is similar to, but not the same as, a child project. Child
   projects live in sub-folders of the parent project, whereas generally a
@@ -198,6 +198,9 @@ a user or called by another script:
 
   A module dependency can be on a single target within a module, instead of all
   targets within the module.
+
+  Configuration and build of module dependencies can be controlled through the
+  use of the `--deps`, `--no-deps`, and `--force-deps` parameters.
 
   **Dependency definitions**
 
@@ -328,6 +331,9 @@ The following parameters are pre-defined and should not be overridden:
 * `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
 * `--offline`: allow to build while offline. This might fail if not all
   dependencies are cached.
+* `--deps`: Build dependencies if required (default)
+* `--no-deps`: Skip build of dependencies
+* `--force-deps`: Reconfigure and rebuild all dependencies
 
 --------------------------------------------------------------------------------
 

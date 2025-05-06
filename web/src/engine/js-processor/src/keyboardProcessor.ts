@@ -16,7 +16,7 @@ import { Mock } from "./mock.js";
 import type OutputTarget from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import KeyboardInterface from './kbdInterface.js';
-import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
@@ -158,7 +158,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
             // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
           default:
             // In case we extend the allowed set, but forget to implement its handling case above.
-            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + KMWString.charCodeAt(special as string, 0).toString(16) + ") went unhandled!";
         }
       } else {
         // Back to the standard default, pending normal matching.
@@ -214,7 +214,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     let matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
-    const nothingDeletable = outputTarget.getTextBeforeCaret().kmwLength() == 0 && outputTarget.isSelectionEmpty();
+    const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
 
     // Pass this key code and state to the keyboard program
     if(this.activeKeyboard && keyEvent.Lcode != 0) {

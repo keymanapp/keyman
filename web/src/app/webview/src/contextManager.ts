@@ -4,6 +4,7 @@ import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { KMWString } from '@keymanapp/web-utils';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
@@ -64,7 +65,7 @@ export class ContextHost extends Mock {
 
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
-    const tempMock = new Mock(text, selStart ?? text._kmwLength(), selEnd ?? text._kmwLength());
+    const tempMock = new Mock(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
     const newLeft = tempMock.getTextBeforeCaret();
     const oldLeft = this.getTextBeforeCaret();
 
@@ -79,7 +80,7 @@ export class ContextHost extends Mock {
       this.selEnd = selEnd;
     } else {
       // Transform selection coordinates to their location within the longform context window.
-      const delta = oldLeft._kmwLength() - newLeft._kmwLength();
+      const delta = KMWString.length(oldLeft) - KMWString.length(newLeft);
       this.selStart = selStart - delta;
       this.selEnd = selEnd - delta;
     }
@@ -89,7 +90,7 @@ export class ContextHost extends Mock {
       // Our host app will not know whether or not the keyboard uses SMP chars,
       // and we want a consistent interface for context synchronization between
       // host app + app/webview KMW.
-      this.setSelection(this.text._kmwLength());
+      this.setSelection(KMWString.length(this.text));
     }
 
     this.saveState();
@@ -105,7 +106,7 @@ export class ContextHost extends Mock {
     // Our host app will not know whether or not the keyboard uses SMP chars,
     // and we want a consistent interface for context synchronization between
     // host app + app/webview KMW.
-    this.setSelection(this.text._kmwLength());
+    this.setSelection(KMWString.length(this.text));
     this.savedState = Mock.from(this);
   }
 }

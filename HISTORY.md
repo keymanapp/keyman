@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 19.0.31 alpha 2025-05-05
+
+* fix(mac): add version metadata after building tests (#13818)
+* maint(common): remove `eslint:recommended` configuration for .ts (#13825)
+* maint(common): Update write_download_info() to be cross-platform (#13813)
+* change(ios): limit reports about devices without predefined scaling entries (#13806)
+* change(web): lint engine/common/web-utils (#13797)
+* chore(web): replace kmwFromCharCode with its ES6 equivalent (#13716)
+* chore(web): add unit tests for SMP-aware string-handling helper methods (#13719)
+* refactor(web): refactor string-helper library to eliminate its module side-effect (#13726)
+
+## 19.0.30 alpha 2025-05-02
+
+* chore(android): Use `builder_is_ci_build` rather than `--ci` flag (#13772)
+* docs: add `--deps` flags and move builder.md into /docs (#13815)
+* chore(web): improve clean actions (#13804)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13773)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13807)
+* maint(core): batch build kmx in tests for performance (#13795)
+* maint(common): cleanup meson versioning (#13796)
+* maint(common): test imported resource versions (#13803)
+
 ## 19.0.29 alpha 2025-04-30
 
 * change(web): enable linting for Keyman Engine for Web modules (#13787)

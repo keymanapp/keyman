@@ -1,5 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Mock } from "keyman/engine/js-processor";
+import { KMWString } from '@keymanapp/web-utils';
 
 export default class ContextWindow implements LexicalModelTypes.Context {
   // Used to limit the range of context replicated for use of keyboard rules within
@@ -19,16 +20,16 @@ export default class ContextWindow implements LexicalModelTypes.Context {
 
   constructor(mock: Mock, config: LexicalModelTypes.Configuration, layerId: string) {
     this.left = mock.getTextBeforeCaret();
-    this.startOfBuffer = this.left._kmwLength() <= config.leftContextCodePoints;
+    this.startOfBuffer = KMWString.length(this.left) <= config.leftContextCodePoints;
     if(!this.startOfBuffer) {
       // Our custom substring version will return the last n characters if param #1 is given -n.
-      this.left = this.left._kmwSubstr(-config.leftContextCodePoints);
+      this.left = KMWString.substr(this.left, -config.leftContextCodePoints);
     }
 
     this.right = mock.getTextAfterCaret();
-    this.endOfBuffer = this.right._kmwLength() <= config.rightContextCodePoints;
+    this.endOfBuffer = KMWString.length(this.right) <= config.rightContextCodePoints;
     if(!this.endOfBuffer) {
-      this.right = this.right._kmwSubstr(0, config.rightContextCodePoints);
+      this.right = KMWString.substr(this.right, 0, config.rightContextCodePoints);
     }
 
     this.casingForm =
@@ -38,7 +39,7 @@ export default class ContextWindow implements LexicalModelTypes.Context {
   }
 
   public toMock(): Mock {
-    const caretPos = this.left._kmwLength();
+    const caretPos = KMWString.length(this.left);
 
     return new Mock(this.left + (this.right || ""), caretPos);
   }
