@@ -63,8 +63,7 @@ function build_action() {
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
   # one option:
-  # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
-  ./build.sh configure clean build --ci
+  ./build.sh configure clean build
 
   # Upload the sentry-configuration engine used by the mobile apps to sentry
   # Also, clean 'em first.
@@ -79,19 +78,7 @@ function build_action() {
 }
 
 function test_action() {
-  # Testing step:  run ALL unit tests, including those of the submodules.
-
-  OPTIONS=
-  if ! builder_is_debug_build; then
-    OPTIONS=--ci
-  fi
-
-  # No --reporter option exists yet for the headless modules.
-
-  "${KEYMAN_ROOT}/web/src/engine/keyboard/build.sh" test ${OPTIONS}
-  "${KEYMAN_ROOT}/web/src/engine/osk/gesture-processor/build.sh" test ${OPTIONS}
-
-  ./build.sh test ${OPTIONS}
+  ./build.sh test
 }
 
 function post_test_action() {

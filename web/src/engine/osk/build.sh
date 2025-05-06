@@ -21,8 +21,7 @@ builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package 
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  "test"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
