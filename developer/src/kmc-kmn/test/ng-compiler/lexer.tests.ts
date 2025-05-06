@@ -144,9 +144,6 @@ describe("Lexer Tests", () => {
     it("can recognise a INDEX token", () => {
       recogniseToken(TokenTypes.INDEX, 'index');
     });
-    it("can recognise a LAYER token", () => {
-      recogniseToken(TokenTypes.LAYER, 'layer');
-    });
     it("can recognise a MATCH token", () => {
       recogniseToken(TokenTypes.MATCH, 'match');
     });
@@ -198,6 +195,9 @@ describe("Lexer Tests", () => {
     it("can recognise a POSTKEYSTROKE token", () => {
       recogniseToken(TokenTypes.POSTKEYSTROKE, 'postkeystroke');
     });
+    it("can recognise a ANSI token", () => {
+      recogniseToken(TokenTypes.ANSI, 'ansi');
+    });
     it("can recognise a READONLY token", () => {
       recogniseToken(TokenTypes.READONLY, 'readonly');
     });
@@ -206,9 +206,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a KEYS token", () => {
       recogniseToken(TokenTypes.KEYS, 'keys');
-    });
-    it("can recognise a ANSI token", () => {
-      recogniseToken(TokenTypes.ANSI, 'ansi');
     });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenTypes.LEFT_BR, '(');
