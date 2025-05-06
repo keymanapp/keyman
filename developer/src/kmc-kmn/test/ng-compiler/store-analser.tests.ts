@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -538,6 +538,21 @@ describe("KMN Store Analyser Tests", () => {
       assert.isTrue(setStoreStatement.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+  });
+  describe("SetLayerStatementRule Tests", () => {
+    it("can construct a SetLayerStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const setLayerStatement: Rule = new SetLayerStatementRule();
+      assert.isNotNull(setLayerStatement);
+    });
+    it("can parse a SetLayerStatementRule correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
+      const setLayerStatement: Rule = new SetLayerStatementRule();
+      assert.isTrue(setLayerStatement.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
     });
   });

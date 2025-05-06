@@ -10,7 +10,7 @@ import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { AlternateTokenRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule } from "./store-analyser.js";
 import { StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -1061,18 +1061,22 @@ export class PaddedOutputStatementRule extends SingleChildRule {
 export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const useStatement: Rule     = new UseStatementRule();
-    const callStatement: Rule    = new CallStatementRule();
-    const saveStatement: Rule    = new SaveStatementRule();
-    const layerStatement: Rule   = new LayerStatementRule();
-    const indexStatement: Rule   = new IndexStatementRule();
-    const contextStatement: Rule = new ContextStatementRule();
-    const text: Rule             = new TextRule();
-    const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
+    const useStatement: Rule      = new UseStatementRule();
+    const callStatement: Rule     = new CallStatementRule();
+    const setStoreStatement: Rule = new SetStoreStatementRule();
+    const saveStatement: Rule     = new SaveStatementRule();
+    const setLayerStatement: Rule = new SetLayerStatementRule();
+    const layerStatement: Rule    = new LayerStatementRule();
+    const indexStatement: Rule    = new IndexStatementRule();
+    const contextStatement: Rule  = new ContextStatementRule();
+    const text: Rule              = new TextRule();
+    const beep: Rule              = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
       useStatement,
       callStatement,
+      setStoreStatement,
       saveStatement,
+      setLayerStatement,
       layerStatement,
       indexStatement,
       contextStatement,

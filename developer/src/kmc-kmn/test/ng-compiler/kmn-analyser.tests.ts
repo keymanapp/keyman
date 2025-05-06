@@ -1568,6 +1568,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(callNode);
       assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
+    it("can parse correctly (set store statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
     it("can parse correctly (save statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
@@ -1575,6 +1583,14 @@ describe("KMN Analyser Tests", () => {
       const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
       assert.isNotNull(saveNode);
       assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (set layer statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse correctly (layer statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');

@@ -71,8 +71,8 @@ contextOutputBlock: paddedContext? outputBlock
 paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
-outputStatement: useStatement|callStatement|saveStatement|layerStatement|
-  indexStatement|contextStatement|text|BEEP
+outputStatement: useStatement|callStatement|setStoreStatement|saveStatement|
+  setLayerStatement|layerStatement|indexStatement|contextStatement|text|BEEP
 callStatement: CALL bracketedStoreName
 saveStatement: SAVE bracketedStoreName
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
@@ -98,4 +98,6 @@ variableStoreName: PARAMETER
 systemStoreName: stringSystemStoreName|CASEDKEYS|HOTKEY|LAYER|NEWLAYER|OLDLAYER
 permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 setStoreStatement: SET LEFT_BR WHITESPACE? variableStoreName WHITESPACE EQUAL
+  WHITESPACE STRING WHITESPACE? RIGHT_BR
+setLayerStatement: SET LEFT_BR WHITESPACE? AMPHASAND LAYER WHITESPACE EQUAL
   WHITESPACE STRING WHITESPACE? RIGHT_BR
