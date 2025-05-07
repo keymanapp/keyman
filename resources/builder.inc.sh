@@ -1076,6 +1076,7 @@ _builder_get_default_description() {
     :module)   description="this module" ;;
     :tools)    description="build tools for this project" ;;
     --debug)   description="debug build" ;;
+    --release) description="release build (prevents --debug in local-env builds)" ;;
   esac
   echo "$description"
 }
@@ -1297,6 +1298,7 @@ _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
+  local is_release=false
   local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
@@ -1413,9 +1415,14 @@ _builder_parse_expanded_parameters() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
-        --debug|-d)
+        --debug)
           _builder_chosen_options+=(--debug)
           builder_debug=--debug
+          ;;
+        --release)
+          _builder_chosen_options+=(--release)
+          # As of #13827, this is only checked when detecting if --debug should be auto-applied.
+          is_release=true
           ;;
         --deps|--no-deps|--force-deps)
           _builder_build_deps=$key
@@ -1500,11 +1507,21 @@ _builder_parse_expanded_parameters() {
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
+    export _builder_deps_built=`mktemp`
+
+    # Per #11106, local builds use --debug by default.
+    # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
+    if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+      builder_echo grey "Local build environment detected:  setting --debug"
+      _params+=(--debug)
+      _builder_chosen_options+=(--debug)
+      builder_debug=--debug
+    fi
+
     builder_echo setmark "$(basename "$0") parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "$(basename "$0") extra parameters: <${builder_extra_params[@]}>"
     fi
-    export _builder_deps_built=`mktemp`
   fi
 
   if builder_is_debug_build; then

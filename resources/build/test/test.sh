@@ -89,6 +89,12 @@ fi
 builder_parse_test() {
   local expected="$1"
   local expected_options="$2"
+
+  # When testing in a local environment, --debug will be added by default (see #11106)
+  if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+    expected_options="${expected_options} --debug"
+  fi
+
   shift
   shift
   local parameters="$@"
@@ -97,8 +103,8 @@ builder_parse_test() {
   if [[ "$expected" != "${_builder_chosen_action_targets[@]}" ]]; then
     builder_die "  Test: builder_parse $parameters action:target != \"$expected\""
   fi
-  if [[ "$expected_options" != "${_builder_chosen_options[@]}" ]]; then
-    builder_die "  Test: builder_parse $parameters, options != \"$expected\""
+  if [[ "${expected_options}" != "${_builder_chosen_options[@]}" ]]; then
+    builder_die "  Test: builder_parse $parameters, options != \"${expected_options}\""
   fi
 }
 
@@ -184,6 +190,11 @@ fi
 echo -e "${COLOR_BLUE}## Testing output of: builder_parse --feature xyzzy --bar abc --baz def test${COLOR_RESET}"
 parse_output=$(builder_parse --feature xyzzy --bar abc --baz def test)
 expected="$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test>")"
+
+if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+  # When run in a local-dev environment, an extra line appears about the automatic --debug option.
+  expected="$(builder_echo grey "Local build environment detected:  setting --debug")"$'\n'"$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test --debug>")"
+fi
 if [[ "${parse_output[*]}" != "${expected}" ]]; then
   builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : ${parse_output[*]}\n  Expected: ${expected}"
 fi
