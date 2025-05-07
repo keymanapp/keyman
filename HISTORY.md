@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.33 alpha 2025-05-07
+
+* maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
+* docs(web): add a Web engine keystroke lifecycle internal doc (#13759)
+* maint(common): use function to detect if running on TC (#13844)
+* docs(common): document new `builder_is_running_on_teamcity` function (#13852)
+
 ## 19.0.32 alpha 2025-05-06
 
 * change(web): replace USVString with string in predictive-text engine (#13785)
