@@ -12,9 +12,9 @@ including this file...
 
 ## Various tools
 
-### build-utils.sh
+### build-utils.sh, builder.inc.sh
 
-See [build-utils.md](build-utils.md)
+See [builder.md](builder.md)
 
 ### jq-win64
 
