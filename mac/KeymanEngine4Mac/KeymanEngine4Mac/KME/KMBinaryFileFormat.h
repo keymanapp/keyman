@@ -6,12 +6,18 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+/**
+ * Note that many of the constants defined here are also defined in the common header`kmx_file.h`
+ * Keyman for Mac only reads the kmx file to pass the contents to Keyman Core and for meta data.
+ * If the meta data can instead be returned by Keyman Core in the future, then the duplicate definitions
+ * found here can be removed.
+ */
+
 #ifndef KMBinaryFileFormat_h
 #define KMBinaryFileFormat_h
 
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
-//typedef wchar_t* PWSTR;
 
 struct COMP_KEYBOARD {
   DWORD dwIdentifier;     // 0000 Keyman compiled keyboard id
@@ -48,17 +54,6 @@ struct COMP_KEYBOARD {
 #define VERSION_170 0x00001100
 #define VERSION_MIN VERSION_50
 #define VERSION_MAX VERSION_170
-
-/*
-struct COMP_GROUP {
-  DWORD dpName;           // string (only debug)
-  DWORD dpKeyArray;       // [LPCOMP_KEY] address of first item in key array
-  DWORD dpMatch;          // extended string
-  DWORD dpNoMatch;        // extended string
-  DWORD cxKeyArray;       // in array entries
-  BOOL  fUsingKeys;       // group(xx) [using keys] <-- specified or not
-};
-*/
 
 struct COMP_STORE {
   DWORD dwSystemID;
@@ -149,14 +144,6 @@ struct COMP_STORE {
 #define VIRTUALCHARKEY  0x8000      // Keyman 6.0: Virtual Key Cap Sequence
 #define K_MODIFIERFLAG  0x007F
 #define K_CAPITALMASK (CAPITALFLAG|NOTCAPITALFLAG)
-
-struct COMP_KEY {
-  WORD Key;  // Windows VK code or character value (VIRTUALCHARKEY, ISVIRTUALKEY)
-  DWORD Line;
-  DWORD ShiftFlags;
-  DWORD dpOutput;   // extended string
-  DWORD dpContext;  // extended string
-};
 
 #define UC_SENTINEL             0xFFFF
 #define UC_SENTINEL_EXTENDEDEND 0x10
