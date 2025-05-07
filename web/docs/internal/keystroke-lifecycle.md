@@ -37,13 +37,13 @@ title: Keystroke lifecycle flowchart
 sequenceDiagram;
 
 actor User as User + UI
-participant Keystroke interpreter
+participant Keystroke interpretation functionality
 
-Note over User, KeymanEngine:  Start:  Keystroke preprocessing
+Note over User, KeymanEngine:  Start:  Keystroke pre-processing
 User ->> Keystroke interpreter: Types a key
 Keystroke interpreter ->> Keystroke interpreter: Preprocess keystroke events
 Keystroke interpreter ->> KeymanEngine: Raise preprocessed event
-Note over User, KeymanEngine:  End: Keystroke preprocessing
+Note over User, KeymanEngine:  End: Keystroke pre-processing
 KeymanEngine ->>+ InputProcessor: Forward keystroke data
 
 Note over InputProcessor, KeyboardProcessor:  Start:  Keystroke processing
@@ -173,7 +173,7 @@ against keyboard rules.
 ### Pre-keystroke state management
 
 First, the engine checks the keyboard associated with the `KeyEvent`, ensuring
-that it is still in place.  (See #7543 for more details.)   With that assertion
+that it is still in place.  (See [#7543](https://github.com/keymanapp/keyman/issues/7543) for more details.)  With that assertion
 in place, it then performs a check needed to support multitaps - it checks to
 see if the key event has an associated "base context" and reverts the current
 context to match it if so.  Once those checks are fulfilled, the engine then
