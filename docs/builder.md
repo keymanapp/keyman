@@ -867,6 +867,21 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_is_running_on_teamcity` function
+
+Returns `true` (aka 0) if the script runs on TeamCity (i.e. if the
+`TEAMCITY_GIT_PATH` environment variable is set).
+
+### Usage
+
+```bash
+if builder_is_running_on_teamcity; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_parse` function
 
 Initializes a build.sh script, parses command line. Will abort the script if
