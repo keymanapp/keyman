@@ -28,7 +28,7 @@ builder_parse "$@"
 cd "${KEYMAN_ROOT}/linux"
 
 function additional_dependencies_action() {
-  builder_heading "Installing additional dependencies"
+  builder_echo start additional_dependencies "Installing additional dependencies"
   TOINSTALL=""
   for p in lcov libdatetime-perl gcovr python3-venv jq
   do
@@ -68,28 +68,14 @@ function additional_dependencies_action() {
     nvm install --lts --default --save
     nvm use --lts
   fi
-}
-
-function build_action() {
-  INSTALLDIR="$(mktemp -d)"
-  DESTDIR="${INSTALLDIR}" "${KEYMAN_ROOT}/linux/build.sh" --coverage clean configure build install
-}
-
-function unit_tests_action() {
-  rm -f /tmp/ibus-engine-keyman.log
-  rm -f /tmp/ibus-daemon.log
-  # symlink might point to wrong location, so delete it - will be re-created during tests
-  rm -rf ~/.local/share/keyman/test_kmx
-
-  export NO_AT_BRIDGE=1
-  "${KEYMAN_ROOT}/linux/build.sh" test --coverage --report --no-integration
+  builder_echo end additional_dependencies success "Installing additional dependencies"
 }
 
 function make_source_tarball_action() {
-  cd "${KEYMAN_ROOT}/linux"
-
+  builder_echo start "make source tarball" "Make source tarball"
   rm -rf dist
   make tmpsources
+  builder_echo end "make source tarball" success "Make source tarball"
 }
 
 builder_run_action  configure   linux_install_dependencies_action
@@ -97,6 +83,6 @@ builder_run_action  configure   additional_dependencies_action
 
 set_variables_for_nvm
 
-builder_run_action  build       build_action
-builder_run_action  test        unit_tests_action
+builder_run_action  build       linux_build_action --coverage
+builder_run_action  test        linux_unit_tests_action --coverage --report --no-integration
 builder_run_action  publish     make_source_tarball_action

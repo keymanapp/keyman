@@ -4,7 +4,7 @@
 # Parameter:
 #   $1 - OS version to compare against (e.g., "20.04")
 is_os_version_or_higher() {
-  OS_VERSION=$1
+  local OS_VERSION=$1
 
   # we use `dpkg --compare-versions` to compare the current Ubuntu version
   # shellcheck disable=SC2312
@@ -15,12 +15,14 @@ is_os_version_or_higher() {
 # Parameter:
 #   $1 - Package name to check (e.g., "curl")
 is_package_installed() {
-  PACKAGE=$1
+  local PACKAGE=$1
 
   dpkg -l "${PACKAGE}" >/dev/null 2>&1
 }
 
 set_variables_for_nvm() {
+  # nvm.sh uses some variables that might not be initialized, so we
+  # disable the "unbound variable" check temporarily
   set -u
   export NVM_DIR="${HOME}/.nvm"
   # shellcheck disable=SC1091
