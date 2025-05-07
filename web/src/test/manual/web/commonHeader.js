@@ -96,7 +96,7 @@
       filename:(prefix + 'web_context_tests.js')});
 
     doAddKeyboards({id:'test_chirality',name:'test_chirality',languages:{id:'en',name:'English'},
-      filename:(prefix + 'test_chirality.js')});
+      filename:(prefix + '../../../../../common/test/resources/keyboards/test_chirality.js')});
 
     doAddKeyboards({id:'obolo_chwerty_6351',name:'obolo_chwerty_6351',languages:{id:'en',name:'English'},
       filename:(prefix + 'obolo_chwerty_6351.js')});
