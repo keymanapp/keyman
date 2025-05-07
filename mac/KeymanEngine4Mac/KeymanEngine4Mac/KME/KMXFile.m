@@ -8,7 +8,6 @@
 
 #import "KMXFile.h"
 #import "KMCompStore.h"
-#import "NSString+XString.h"
 #import "KMELogs.h"
 
 NSString *const kKMKeyboardNameKey = @"KMKeyboardNameKey";

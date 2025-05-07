@@ -7,7 +7,6 @@
 //
 
 #import "KMCompGroup.h"
-#import "NSString+XString.h"
 
 @implementation KMCompGroup
 

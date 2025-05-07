@@ -7,7 +7,6 @@
 //
 
 #import "KMCompKey.h"
-#import "NSString+XString.h"
 
 @implementation KMCompKey
 
