@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # TC build script for Keyman Linux/Test
 # shellcheck disable=SC2164
+# shellcheck disable=SC1091
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -10,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 
 ################################ Main script ################################
@@ -22,6 +24,8 @@ builder_describe \
   "publish        make a source tarball"
 
 builder_parse "$@"
+
+cd "${KEYMAN_ROOT}/linux"
 
 function additional_dependencies_action() {
   builder_heading "Installing additional dependencies"
@@ -44,6 +48,7 @@ function additional_dependencies_action() {
 
   if [[ -n "${TOINSTALL}" ]]; then
     sudo apt-get update
+    # shellcheck disable=SC2086
     sudo DEBIAN_FRONTEND="noninteractive" apt-get install -qy ${TOINSTALL}
   fi
 
@@ -55,10 +60,12 @@ function additional_dependencies_action() {
   builder_heading "Checking and installing nvm"
   if [[ ! -f "${HOME}/.nvm/nvm.sh" ]]; then
     # Install nvm
+    # shellcheck disable=SC2312
     NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2)
+    # shellcheck disable=SC2312
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
-    . "${HOME}/.nvm/nvm.sh"
-    nvm install --lts
+    set_variables_for_nvm
+    nvm install --lts --default --save
     nvm use --lts
   fi
 }
@@ -85,8 +92,11 @@ function make_source_tarball_action() {
   make tmpsources
 }
 
-builder_run_action  configure   install_dependencies_action
+builder_run_action  configure   linux_install_dependencies_action
 builder_run_action  configure   additional_dependencies_action
+
+set_variables_for_nvm
+
 builder_run_action  build       build_action
 builder_run_action  test        unit_tests_action
 builder_run_action  publish     make_source_tarball_action

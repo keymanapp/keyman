@@ -20,9 +20,12 @@ is_package_installed() {
   dpkg -l "${PACKAGE}" >/dev/null 2>&1
 }
 
-install_dependencies_action() {
-  builder_heading "Installing dependencies"
-  # shellcheck disable=SC2154
-  . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
-  checkAndInstallRequirements
+set_variables_for_nvm() {
+  set -u
+  export NVM_DIR="${HOME}/.nvm"
+  # shellcheck disable=SC1091
+  . "${NVM_DIR}/nvm.sh"
+  set +u
+  export KEYMAN_USE_NVM=1
+  PATH=${HOME}/.keyman/node:${PATH}
 }
