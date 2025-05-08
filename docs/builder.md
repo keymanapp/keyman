@@ -880,6 +880,53 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_is_running_on_ci` function
+
+Returns `true` (aka 0) if the script runs on TeamCity or as a GitHub action.
+
+### Usage
+
+```bash
+if builder_is_running_on_ci; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_running_on_docker` function
+
+Returns `true` (aka 0) if the script runs in a Docker container (i.e. if
+the `DOCKER_RUNNING` environment variable is set).
+
+**Note** that this environment variable is not set automatically, so you'll have
+to set it before starting a build, or set it in the docker image.
+
+### Usage
+
+```bash
+if builder_is_running_on_docker; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_running_on_gha` function
+
+Returns `true` (aka 0) if the script runs as a GitHub action (i.e. if the
+`GITHUB_RUN_ID` environment variable is set).
+
+### Usage
+
+```bash
+if builder_is_running_on_gha; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_is_running_on_teamcity` function
 
 Returns `true` (aka 0) if the script runs on TeamCity (i.e. if the

@@ -2140,6 +2140,33 @@ builder_is_target_excluded_by_platform() {
   return 1
 }
 
+# Returns 0 if the script is running on a CI server (TeamCity or GitHub Actions)
+builder_is_running_on_ci() {
+  if builder_is_running_on_teamcity || builder_is_running_on_gha; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Returns 0 if the script is running in a Docker container
+builder_is_running_on_docker() {
+  if [[ -z ${DOCKER_RUNNING:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running in a GitHub Actions environment
+builder_is_running_on_gha() {
+  if [[ -z ${GITHUB_RUN_ID:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
 # Returns 0 if the script is running on TeamCity
 builder_is_running_on_teamcity() {
   if [[ -z "${TEAMCITY_GIT_PATH:-}" ]]; then
