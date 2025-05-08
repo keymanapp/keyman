@@ -146,6 +146,23 @@ export class KeymanXMLReader {
     return m;
   }
 
+  /** set metadata on this and children with the default filename - if not already set */
+  public static setDefaultFilename(data: any, filename: string) {
+    if (!data || !filename) return;
+    if (typeof data === 'object') {
+      const m = KeymanXMLReader.getMetaData(data) || {};
+      if (!m[XML_FILENAME_SYMBOL]) {
+        (m as any)[XML_FILENAME_SYMBOL] = filename;
+        KeymanXMLReader.setMetaData(data, m);
+      }
+      if (Array.isArray(data)) {
+        data.forEach(e => KeymanXMLReader.setDefaultFilename(e, filename));
+      } else for(const k of Object.keys(data)) {
+        KeymanXMLReader.setDefaultFilename(data[k], filename);
+      }
+    }
+  }
+
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
   private static fixupDollarAttributes(data: any) : any {
     if (typeof data === 'object') {

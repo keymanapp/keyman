@@ -6,6 +6,8 @@
  * Abstraction for line number processing
  */
 
+import { CompilerEvent, EventResolver } from "./index.js";
+
 /** line number with an optional column number */
 export interface LineColumn {
     line: number;
@@ -90,4 +92,21 @@ export class LineFinderCache implements FileConsumer {
         return lf;
     }
 }
+export class LineFinderEventResolver implements EventResolver, FileConsumer {
+  private lfcache = new LineFinderCache();
 
+  addFile(filename: string, contents: string): void {
+    this.lfcache.addFile(filename, contents);
+  }
+
+  /** resolve a CompilerEvent by expanding the line numbers */
+  resolve(event: CompilerEvent) {
+    if (event.offset && !event.line && event.filename) {
+      const lf = this.lfcache.getByFilename(event.filename);
+      const loc = lf.findOffset(event.offset);
+      event.line = loc.line;
+      event.column = loc.column;
+    }
+    return event;
+  }
+}

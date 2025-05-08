@@ -125,14 +125,64 @@ export interface CompilerFileSystemAsyncCallbacks {
   resolveFilename(baseFilename: string, filename: string): string;
 }
 
+/** a CompilerCallbacks implementation that delegates to a parent */
+export class DelegatingCompilerCallbacks implements CompilerCallbacks {
+  constructor(protected options: CompilerCallbackOptions, protected parent: CompilerCallbacks) {
+  }
+
+  loadFile(filename: string): Uint8Array {
+    return this.parent.loadFile(filename);
+  }
+
+  fileSize(filename: string): number {
+    return this.parent.fileSize(filename);
+  }
+
+  isDirectory(filename: string): boolean {
+    return this.parent.isDirectory(filename);
+  }
+
+  get path(): CompilerPathCallbacks {
+    return this.parent.path;
+  }
+
+  get fs(): CompilerFileSystemCallbacks {
+    return this.parent.fs;
+  }
+
+  get net(): CompilerNetAsyncCallbacks {
+    return this.parent.net;
+  }
+
+  get fsAsync(): CompilerFileSystemAsyncCallbacks {
+    return this.parent.fsAsync;
+  }
+
+  resolveFilename(baseFilename: string, filename: string): string {
+    return this.parent.resolveFilename(baseFilename, filename);
+  }
+
+  debug(msg: string): void {
+    return this.parent.debug(msg);
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return this.parent.fileURLToPath(url);
+  }
+
+  reportMessage(event: CompilerEvent) {
+    this.parent.reportMessage(event);
+  }
+}
 
 /**
  * Wrapper class for CompilerCallbacks for a given input file
  */
-export class CompilerFileCallbacks implements CompilerCallbacks {
+export class CompilerFileCallbacks extends DelegatingCompilerCallbacks {
   messages: CompilerEvent[] = [];
 
-  constructor(private filename: string, private options: CompilerCallbackOptions, private parent: CompilerCallbacks) {
+  constructor(private filename: string, options: CompilerCallbackOptions, parent: CompilerCallbacks) {
+    super(options, parent);
   }
 
   /**
@@ -189,52 +239,12 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
     this.messages = [];
   }
 
-  loadFile(filename: string): Uint8Array {
-    return this.parent.loadFile(filename);
-  }
-
-  fileSize(filename: string): number {
-    return this.parent.fileSize(filename);
-  }
-
-  isDirectory(filename: string): boolean {
-    return this.parent.isDirectory(filename);
-  }
-
-  get path(): CompilerPathCallbacks {
-    return this.parent.path;
-  }
-
-  get fs(): CompilerFileSystemCallbacks {
-    return this.parent.fs;
-  }
-
-  get net(): CompilerNetAsyncCallbacks {
-    return this.parent.net;
-  }
-
-  get fsAsync(): CompilerFileSystemAsyncCallbacks {
-    return this.parent.fsAsync;
-  }
-
-  resolveFilename(baseFilename: string, filename: string): string {
-    return this.parent.resolveFilename(baseFilename, filename);
-  }
-
   reportMessage(event: CompilerEvent): void {
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
     this.messages.push(event);
     if (!disable) {
       this.parent.reportMessage({ filename: this.filename, ...event });
     }
-  }
-
-  debug(msg: string): void {
-    return this.parent.debug(msg);
-  }
-
-  fileURLToPath(url: string | URL): string {
-    return this.parent.fileURLToPath(url);
   }
 }
 
@@ -259,5 +269,17 @@ export class DefaultCompilerFileSystemAsyncCallbacks implements CompilerFileSyst
 
   resolveFilename(baseFilename: string, filename: string): string {
     return this.owner.resolveFilename(baseFilename, filename);
+  }
+}
+
+/** a CompilerCallbacks that applies the EventResolver to any reported message */
+export class ResolvingCompilerCallbacks extends DelegatingCompilerCallbacks {
+  constructor(private eventResolver: EventResolver, options: CompilerCallbackOptions, parent: CompilerCallbacks) {
+    super(options, parent);
+  }
+
+  reportMessage(event: CompilerEvent) {
+    this.eventResolver.resolve(event);
+    this.parent.reportMessage(event);
   }
 }

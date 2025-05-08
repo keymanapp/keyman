@@ -11,7 +11,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
 import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
-import { LineFinderEventResolver } from './eventresolver.js';
+import { LineFinderEventResolver } from '../../index.js';
 import { XML_FILENAME_SYMBOL } from '../../xml-utils.js';
 
 interface NameAndProps  {
@@ -28,7 +28,9 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
 };
 
 export class LDMLKeyboardXMLSourceFileReader {
-  static eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
+  /** for resolving messages involving line numbers */
+  eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
+
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {  
   }
 
@@ -40,7 +42,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   readFile(path: string): Uint8Array {
     const data = this.callbacks.loadFile(path);
     if (data) {
-      LDMLKeyboardXMLSourceFileReader.eventResolver.addFile(path, new TextDecoder().decode(data));
+      this.eventResolver.addFile(path, new TextDecoder().decode(data));
     }
     return data;
   }
@@ -260,7 +262,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
-    LDMLKeyboardXMLSourceFileReader.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
+    this.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
