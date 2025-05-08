@@ -634,6 +634,10 @@ Wraps the `echo` command with color and a script identifier prefix.
 
 ```bash
 builder_echo [mode] message
+or
+builder_echo start blockname message
+or
+builder_echo end blockname status message
 ```
 
 ### Parameters
@@ -647,6 +651,12 @@ mode will be `white`.
   * `warning`: A warning message, represented with yellow text
   * `error`: An error message, represented with red text (consider [`builder_die`])
   * `debug`: A debug string, represented with teal text (consider [`builder_echo_debug`])
+  * `start`: The beginning of a foldable block when running on TeamCity. The
+             blockname will show up as the title of the collapsable block,
+             the message as heading inside of the block. If not running on TeamCity
+             the message is output as heading.
+  * `end`:   The end of the foldable block `blockname` when running on TeamCity.
+             Ignored if not running on TeamCity identical to `builder_echo status message`.
 
   Or color identifiers:
   * `white`: Normal white text, the default if **mode** is omitted
@@ -666,6 +676,9 @@ mode will be `white`.
   * `setmark`: A marker for a section heading, represented with purple text
 
 * **message**: a string (surround with quote marks)
+* **blockname**: a string with the name of the collapsable block (surround with quote marks)
+* **status**: one of the `mode` values representing the result of an action
+              (`success`, `warning`, or `error`)
 
 ### Description
 
@@ -861,6 +874,21 @@ it is for a different platform, or because the required tools are not installed.
 
 ```bash
 if builder_is_target_excluded_by_platform $target; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_running_on_teamcity` function
+
+Returns `true` (aka 0) if the script runs on TeamCity (i.e. if the
+`TEAMCITY_GIT_PATH` environment variable is set).
+
+### Usage
+
+```bash
+if builder_is_running_on_teamcity; then
   ...
 fi
 ```

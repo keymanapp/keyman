@@ -16,9 +16,9 @@ including this file...
 
 See [build-utils.md](build-utils.md)
 
-### jq-win64
+### jq/jq-win64
 
-jq-win64.exe is used by various builds for json query.
+jq resp. jq-win64.exe is used by various builds for json query.
 
 Official source: <https://stedolan.github.io/jq/>.
 [License](jq-license.txt)

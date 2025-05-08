@@ -12,7 +12,6 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
@@ -95,7 +94,7 @@ export class TrackedContextToken {
    * @param tokenText
    * @param transformId
    */
-  updateWithBackspace(tokenText: USVString, transformId: number) {
+  updateWithBackspace(tokenText: string, transformId: number) {
     // It's a backspace transform; time for special handling!
     //
     // For now, with 14.0, we simply compress all remaining Transforms for the token into
@@ -114,7 +113,7 @@ export class TrackedContextToken {
     this.clearReplacements();
   }
 
-  update(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
+  update(transformDistribution: Distribution<Transform>, tokenText?: string) {
     // Preserve existing text if new text isn't specified.
     tokenText = tokenText || (tokenText === '' ? '' : this.raw);
 
@@ -211,7 +210,7 @@ export class TrackedContextState {
   }
 
   toRawTokenization() {
-    let sequence: USVString[] = [];
+    let sequence: string[] = [];
 
     for(let token of this.tokens) {
       // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
@@ -353,7 +352,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
-    let matchContext: USVString[] = matchState.toRawTokenization();
+    let matchContext: string[] = matchState.toRawTokenization();
 
     // Inverted order, since 'match' existed before our new context.
     let mapping = ClassicalDistanceCalculation.computeDistance(

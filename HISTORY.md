@@ -1,5 +1,45 @@
 # Keyman Version History
 
+## 19.0.34 alpha 2025-05-08
+
+* docs(common): update `builder_echo` documentation for TC blocks (#13855)
+* fix(windows): add breadcrumb to download failures (#13826)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13860)
+* maint(common): remove obsolete code from docker-images `build.sh` (#13861)
+* maint(common): output start/end messages if not running on TC (#13868)
+
+## 19.0.33 alpha 2025-05-07
+
+* maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
+* docs(web): add a Web engine keystroke lifecycle internal doc (#13759)
+* maint(common): use function to detect if running on TC (#13844)
+* docs(common): document new `builder_is_running_on_teamcity` function (#13852)
+
+## 19.0.32 alpha 2025-05-06
+
+* change(web): replace USVString with string in predictive-text engine (#13785)
+* chore(web): replace --ci flag with builder_is_ci_build (#13819)
+* maint(web): simplify worker-main test.sh (#13820)
+* change(web): lint kmwstring web-utility (#13800)
+* fix(web): fix extraction of gesture-engine fixture used in DOM-based unit tests (#13805)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13774)
+* fix(web): fix var declaration affected by linter strictness + length-style fix (#13839)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13840)
+* chore(common): override check when running on TC (#13779)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13842)
+* maint(common): add support for TC blocks (#13810)
+
+## 19.0.31 alpha 2025-05-05
+
+* fix(mac): add version metadata after building tests (#13818)
+* maint(common): remove `eslint:recommended` configuration for .ts (#13825)
+* maint(common): Update write_download_info() to be cross-platform (#13813)
+* change(ios): limit reports about devices without predefined scaling entries (#13806)
+* change(web): lint engine/common/web-utils (#13797)
+* chore(web): replace kmwFromCharCode with its ES6 equivalent (#13716)
+* chore(web): add unit tests for SMP-aware string-handling helper methods (#13719)
+* refactor(web): refactor string-helper library to eliminate its module side-effect (#13726)
+
 ## 19.0.30 alpha 2025-05-02
 
 * chore(android): Use `builder_is_ci_build` rather than `--ci` flag (#13772)
