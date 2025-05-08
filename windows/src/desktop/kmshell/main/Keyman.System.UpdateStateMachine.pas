@@ -1010,19 +1010,20 @@ function InstallingState.DoInstallKeyman: Boolean;
 var
   FResult: Boolean;
   SavePath: String;
-  fileExt: String;
   FileName: String;
   FileNames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  ucrFileName: String;
   found: Boolean;
 begin
-
+  TUpdateCheckStorage.LoadUpdateCacheData(ucr);
+  ucrFileName := ucr.FileName;
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   GetFileNamesInDirectory(SavePath, FileNames);
   found := False;
   for FileName in FileNames do
   begin
-    fileExt := LowerCase(ExtractFileExt(FileName));
-    if fileExt = '.exe' then
+    if ucrFileName = ExtractFileName(FileName) then
     begin
       found := True;
       break;
