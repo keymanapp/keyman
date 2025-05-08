@@ -50,14 +50,10 @@ do_configure() {
     STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
-  else
-    pushd "$THIS_SCRIPT_PATH" > /dev/null
-    # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
-    popd > /dev/null
-  fi
+  pushd "$THIS_SCRIPT_PATH" > /dev/null
+  # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
+  meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+  popd > /dev/null
 
   builder_finish_action success configure:$target
 }
@@ -69,15 +65,7 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
-  elif $MESON_LOW_VERSION; then
-    pushd "$MESON_PATH" > /dev/null
-    ninja
-    popd
-  else
-    meson compile -C "$MESON_PATH"
-  fi
+  meson compile -C "$MESON_PATH"
   builder_finish_action success build:$target
 }
 
@@ -88,17 +76,12 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
+  if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
+    # 11794 -- parallel tests failing on some mac build agents; temporary
+    # mitigation until we diagnose root cause
+    meson test -j 1 -C "$MESON_PATH" $testparams
   else
-    if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
-      # 11794 -- parallel tests failing on some mac build agents; temporary
-      # mitigation until we diagnose root cause
-      meson test -j 1 -C "$MESON_PATH" $testparams
-    else
-      meson test -C "$MESON_PATH" $testparams
-    fi
-
+    meson test -C "$MESON_PATH" $testparams
   fi
   builder_finish_action success test:$target
 }
@@ -110,13 +93,7 @@ do_test() {
 do_install() {
   local target=$1
   builder_start_action install:$target || return 0
-  if $MESON_LOW_VERSION; then
-    pushd "$MESON_PATH" > /dev/null
-    ninja install
-    popd > /dev/null
-  else
-    meson install -C "$MESON_PATH"
-  fi
+  meson install -C "$MESON_PATH"
   builder_finish_action success install:$target
 }
 
@@ -142,27 +119,4 @@ build_meson_cross_file_for_wasm() {
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
   sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
-}
-
-#
-# Remove Visual Studio from the path so that meson goes looking for it rather than
-# assuming that it's all available. If we don't do this, we get an error with link.exe:
-#
-#     meson.build:8:0: ERROR: Found GNU link.exe instead of MSVC link.exe in C:\Program Files\Git\usr\bin\link.EXE.
-#     This link.exe is not a linker.
-#     You may need to reorder entries to your %PATH% variable to resolve this.
-#
-# TODO: is this still required with meson 1.0?
-#
-
-cleanup_visual_studio_path() {
-  local _split_path _new_path=""
-  IFS=':' read -ra _split_path <<<"$PATH"
-  for p in "${_split_path[@]}"; do
-    if ! [[ $p =~ Visual\ Studio ]]; then
-      _new_path="$_new_path:$p"
-    fi
-  done
-  PATH="${_new_path:1}"
-  unset VSINSTALLDIR
 }
