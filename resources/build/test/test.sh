@@ -201,45 +201,110 @@ fi
 
 #----------------------------------------------------------------------
 function builder_echo_tests() {
-  echo -e "${COLOR_BLUE}## Testing builder_echo${COLOR_RESET}"
-  _old_builder_debug_internal=${_builder_debug_internal}
-  _OLD_TEAMICITY_GIT_PATH=${TEAMCITY_GIT_PATH:-}
+  echo -e "${COLOR_BLUE}## Testing builder_echo (heading)${COLOR_RESET}"
+  local _old_builder_debug_internal=${_builder_debug_internal}
 
   # regular build, no internal debug
-  TEAMCITY_GIT_PATH=""
   _builder_debug_internal=false
-  expected=""
-  result=$(builder_echo start "foo" "description")
+  expected="$(echo -e "${BUILDER_BOLD}${COLOR_BRIGHT_WHITE}[resources/build/test]${COLOR_RESET} ${COLOR_BLUE}description${COLOR_RESET}")"
+  result=$(builder_echo heading "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
-  fi
-  expected=""
-  result=$(builder_echo end "foo" success "description")
-  if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
-  fi
-  expected="$(builder_echo error "description")"
-  result=$(builder_echo end "foo" error "description")
-  if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+    builder_die "FAIL: Wrong output for 'builder_echo heading description' (no debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
 
   # regular build, with internal debug
   _builder_debug_internal=true
+  expected="$(echo -e "${BUILDER_BOLD}${COLOR_BRIGHT_WHITE}[resources/build/test]${COLOR_RESET} ${COLOR_BLUE}description${COLOR_RESET}")"
+  result=$(builder_echo heading "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  _builder_debug_internal=${_old_builder_debug_internal}
+}
+
+#----------------------------------------------------------------------
+function builder_echo_start_end_tests() {
+  echo -e "${COLOR_BLUE}## Testing builder_echo (start/end)${COLOR_RESET}"
+  local _old_builder_debug_internal=${_builder_debug_internal}
+  local _OLD_TEAMICITY_GIT_PATH=${TEAMCITY_GIT_PATH:-}
+  local _old_builder_is_child=${_builder_is_child}
+
+  # regular build, no internal debug, no child build
+  TEAMCITY_GIT_PATH=""
+  _builder_debug_internal=false
+  _builder_is_child=1
   expected="$(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo success "description")"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
   expected="$(builder_echo error "description")"
   result=$(builder_echo end "foo" error "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
-    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (debug):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (no debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+
+  # regular build, no internal debug, is child build
+  TEAMCITY_GIT_PATH=""
+  _builder_debug_internal=false
+  _builder_is_child=0
+  expected=""
+  result=$(builder_echo start "foo" "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected=""
+  result=$(builder_echo end "foo" success "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected="$(builder_echo error "description")"
+  result=$(builder_echo end "foo" error "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+
+  # regular build, with internal debug, no child build
+  _builder_debug_internal=true
+  _builder_is_child=1
+  expected="$(builder_echo heading "description")"
+  result=$(builder_echo start "foo" "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected="$(builder_echo success "description")"
+  result=$(builder_echo end "foo" success "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected="$(builder_echo error "description")"
+  result=$(builder_echo end "foo" error "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (debug, no child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+
+  # regular build, with internal debug, is child build
+  _builder_debug_internal=true
+  _builder_is_child=0
+  expected="$(builder_echo heading "description")"
+  result=$(builder_echo start "foo" "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo start foo description' (debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected="$(builder_echo success "description")"
+  result=$(builder_echo end "foo" success "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
+  fi
+  expected="$(builder_echo error "description")"
+  result=$(builder_echo end "foo" error "description")
+  if [[ "${result[*]}" != "${expected}" ]]; then
+    builder_die "FAIL: Wrong output for 'builder_echo end foo error description' (debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
 
   # simulate running on TeamCity
@@ -287,8 +352,10 @@ $(builder_echo heading "description")"
   fi
   TEAMCITY_GIT_PATH="${_OLD_TEAMICITY_GIT_PATH}"
   _builder_debug_internal=${_old_builder_debug_internal}
+  _builder_is_child=${_old_builder_is_child}
 }
 builder_echo_tests
+builder_echo_start_end_tests
 
 # Run tests based in separate scripts to facilitate their operation
 

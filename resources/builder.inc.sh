@@ -182,7 +182,7 @@ builder_echo() {
       block="$2"
       shift 2
       color="heading"
-      if ! builder_is_running_on_teamcity; then
+      if ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
     elif [[ $1 == "end" ]]; then
@@ -191,7 +191,7 @@ builder_echo() {
       block="$2"
       color="$3"
       shift 3
-      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity; then
+      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
     fi
