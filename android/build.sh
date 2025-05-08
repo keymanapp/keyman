@@ -87,7 +87,11 @@ if builder_start_action archive; then
   cd KMAPro/kMAPro/libs
   if [ "$BUILDER_OS" == "win" ]; then
     # win uses 7zip flags
-    zip_files "a -bd -bb0" "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples
+    FLAGS=("a" "-bd" "-bb0")
+    ZIP_FILE=("${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}")
+    INCLUDE=("keyman-engine.aar" "../../../Samples")
+    EXCLUDE=("build.sh")
+    zip_files FLAGS ZIP_FILE INCLUDE EXCLUDE
     cd ../../../
   else  
     zip_files "-q" "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar 
