@@ -7,9 +7,9 @@
 //
 
 def getVersionCode = { ->
-    String env_version_major = System.getenv("VERSION_MAJOR")
-    String env_version_minor = System.getenv("VERSION_MINOR")
-    String env_version_patch = System.getenv("VERSION_PATCH")
+    String env_version_major = System.getenv("KEYMAN_VERSION_MAJOR")
+    String env_version_minor = System.getenv("KEYMAN_VERSION_MINOR")
+    String env_version_patch = System.getenv("KEYMAN_VERSION_PATCH")
     if(env_version_patch != null && env_version_minor != null && env_version_patch != null) {
         // Version code is, for 17.1.33: 1810033. This supports up to 9999
         // builds for a given major.minor version. We only support up to 9 minor
@@ -36,10 +36,10 @@ def getVersionCode = { ->
 }
 
 def getVersionMD = { ->
-    String env_version = System.getenv("VERSION")
+    String env_version = System.getenv("KEYMAN_VERSION")
     if (env_version != null) {
-        // If building from script, we have build number in VERSION
-        println "Using build $env_version from VERSION"
+        // If building from script, we have build number in KEYMAN_VERSION
+        println "Using build $env_version from KEYMAN_VERSION"
         return "$env_version"
     } else {
         String version_md = file("$rootPath/../VERSION.md").text.trim()
@@ -48,15 +48,15 @@ def getVersionMD = { ->
 }
 
 def getVersionName = { ->
-    String env_version = System.getenv("VERSION_WITH_TAG")
+    String env_version = System.getenv("KEYMAN_VERSION_WITH_TAG")
     if (env_version != null) {
-        // If building from script, we have build number in VERSION_WITH_TAG
-        println "Using build $env_version from VERSION_WITH_TAG"
+        // If building from script, we have build number in KEYMAN_VERSION_WITH_TAG
+        println "Using build $env_version from KEYMAN_VERSION_WITH_TAG"
         return "$env_version"
     } else {
         // Building probably from IDE, so let's use VERSION.md and TIER.md directly
-        // This is a close match with VERSION_WITH_TAG, except that 'stable' tier
-        // is not normally included with VERSION_WITH_TAG
+        // This is a close match with KEYMAN_VERSION_WITH_TAG, except that 'stable' tier
+        // is not normally included with KEYMAN_VERSION_WITH_TAG
         String version_md = file("$rootPath/../VERSION.md").text.trim()
         String tier_md = file("$rootPath/../TIER.md").text.trim()
         println "Using build $version_md-$tier_md-local from project VERSION.md/TIER.md"
@@ -65,10 +65,10 @@ def getVersionName = { ->
 }
 
 def getVersionEnvironment = { ->
-    String env_environment = System.getenv("VERSION_ENVIRONMENT")
+    String env_environment = System.getenv("KEYMAN_VERSION_ENVIRONMENT")
     if (env_environment != null) {
-        // If building from script, we have build number in VERSION_ENVIRONMENT
-        println "Using $env_environment from VERSION_ENVIRONMENT"
+        // If building from script, we have build number in KEYMAN_VERSION_ENVIRONMENT
+        println "Using $env_environment from KEYMAN_VERSION_ENVIRONMENT"
         return "$env_environment"
     } else {
         // Building probably from IDE, so use "local"
@@ -78,23 +78,23 @@ def getVersionEnvironment = { ->
 }
 
 def getVersionGitTag = { ->
-    String env_git_tag = System.getenv("VERSION_GIT_TAG")
+    String env_git_tag = System.getenv("KEYMAN_VERSION_GIT_TAG")
     if (env_git_tag != null) {
-        println "Using $env_git_tag from VERSION_GIT_TAG"
+        println "Using $env_git_tag from KEYMAN_VERSION_GIT_TAG"
         return "$env_git_tag"
     } else {
         // Building probably from IDE
-        println "Using release@$VERSION_NAME"
-        return "release@$VERSION_NAME"
+        println "Using release@$KEYMAN_VERSION_NAME"
+        return "release@$KEYMAN_VERSION_NAME"
     }
 }
 ext {
-    VERSION_CODE=getVersionCode()
-    VERSION_MD=getVersionMD()
-    VERSION_NAME=getVersionName()
-    VERSION_ENVIRONMENT=getVersionEnvironment()
-    VERSION_TAG=System.getenv("VERSION_TAG")
-    VERSION_GIT_TAG=getVersionGitTag()
+    KEYMAN_VERSION_CODE=getVersionCode()
+    KEYMAN_VERSION_MD=getVersionMD()
+    KEYMAN_VERSION_NAME=getVersionName()
+    KEYMAN_VERSION_ENVIRONMENT=getVersionEnvironment()
+    KEYMAN_VERSION_TAG=System.getenv("KEYMAN_VERSION_TAG")
+    KEYMAN_VERSION_GIT_TAG=getVersionGitTag()
 }
 
-//println "version.gradle: VERSION_TAG: " + VERSION_TAG
+//println "version.gradle: KEYMAN_VERSION_TAG: " + KEYMAN_VERSION_TAG

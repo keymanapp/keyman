@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product UpgradeCode="f212edf7-0bef-43bb-8fc2-2625ae7bbfca" Manufacturer="SIL International"
-           Id="*" Name="$(var.PRODUCTNAME) $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
+           Id="*" Name="$(var.PRODUCTNAME) $(var.RELEASE)" Version="$(var.KEYMAN_VERSION)" Language="1033">
     <Package Keywords="Keyman,$(var.PRODUCTNAME),Keyboard,Engine"
              Description="$(var.PRODUCTNAME) $(var.RELEASE)" Comments="Contact:  Your local administrator" Compressed="yes"
              Manufacturer="SIL International" InstallerVersion="400" Platform="x86" Languages="1033" SummaryCodepage="1252" />
@@ -25,10 +25,10 @@
     <!-- PREVENT or ALLOW Upgrade from 11.0 or later versions -->
     <Upgrade Id="f212edf7-0bef-43bb-8fc2-2625ae7bbfca">
       <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
-                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
-                      Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
+                      Maximum="$(var.KEYMAN_VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.KEYMAN_VERSION)" IncludeMinimum="yes"
+                      Maximum="$(var.KEYMAN_VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.KEYMAN_VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
 
     <Property Id='OLDINSTALLDIR'>
@@ -88,7 +88,7 @@
 
               <Component Id="Reg_RootPath" Guid="*">
                 <RegistryValue KeyPath="yes" Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="root path" Type="string" Value="[INSTALLDIR]" />
-                <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="version" Type="string" Value="$(var.VERSION)" />
+                <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="version" Type="string" Value="$(var.KEYMAN_VERSION)" />
                 <RegistryValue Root="HKLM" Key="SOFTWARE\$(var.OEMNAME)\$(var.PRODUCTNAME)" Name="release" Type="string" Value="$(var.RELEASE)" />
                 <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKLM" Key="Software\$(var.OEMNAME)\$(var.PRODUCTNAME)" />
               </Component>

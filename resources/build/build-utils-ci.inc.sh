@@ -22,7 +22,7 @@ builder_is_ci_build() {
 # Returns 0 if current build is running as a release build in CI
 #
 builder_is_ci_release_build() {
-  if [[ "$VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+  if [[ "$KEYMAN_VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
     return 0
   fi
   return 1
@@ -33,7 +33,7 @@ builder_is_ci_release_build() {
 # mainline branch test
 #
 builder_is_ci_test_build() {
-  if [[ "$VERSION_ENVIRONMENT" == test ]]; then
+  if [[ "$KEYMAN_VERSION_ENVIRONMENT" == test ]]; then
     return 0
   fi
   return 1
@@ -115,7 +115,7 @@ function builder_pull_has_label() {
 function builder_publish_npm() {
   if builder_has_option --npm-publish; then
     # Require --dry-run if local or test to avoid accidentally clobbering npm packages
-    if [[ $VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
+    if [[ $KEYMAN_VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
       builder_die "publish --npm-publish must use --dry-run flag for local or test builds"
     fi
     _builder_publish_npm_package publish
@@ -126,9 +126,9 @@ function builder_publish_npm() {
 
 function _builder_publish_npm_package() {
   local action=$1
-  local dist_tag=$TIER dry_run=
+  local dist_tag=$KEYMAN_TIER dry_run=
 
-  if [[ $TIER == stable ]]; then
+  if [[ $KEYMAN_TIER == stable ]]; then
     dist_tag=latest
   fi
 
@@ -164,7 +164,7 @@ function _builder_write_npm_version() {
   # git tagging. :)
   if ! "$JQ" -e '.version' package.json > /dev/null; then
     pushd "$KEYMAN_ROOT" > /dev/null
-    npm version --allow-same-version --no-git-tag-version --no-commit-hooks --workspaces "$VERSION_WITH_TAG"
+    npm version --allow-same-version --no-git-tag-version --no-commit-hooks --workspaces "$KEYMAN_VERSION_WITH_TAG"
     popd > /dev/null
   fi
 
@@ -174,12 +174,12 @@ function _builder_write_npm_version() {
   # the local package.json files, so they do need to be restored afterwards
   find "$KEYMAN_ROOT" -name "package.json" -not -path '*/node_modules/*' -print0 | \
     while IFS= read -r -d '' line; do
-      cat "$line" | "$JQ" --arg VERSION_WITH_TAG "$VERSION_WITH_TAG" \
+      cat "$line" | "$JQ" --arg KEYMAN_VERSION_WITH_TAG "$KEYMAN_VERSION_WITH_TAG" \
         '
           . +
-          (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-          (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {}) +
-          (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $VERSION_WITH_TAG) | from_entries) } catch {})
+          (try { dependencies: (.dependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $KEYMAN_VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { devDependencies: (.devDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $KEYMAN_VERSION_WITH_TAG) | from_entries) } catch {}) +
+          (try { optionalDependencies: (.optionalDependencies | to_entries | . + map(select(.key | match("@keymanapp/.*")) .value |= $KEYMAN_VERSION_WITH_TAG) | from_entries) } catch {})
         ' > "${line}_"
       mv -f "${line}_" "$line"
     done

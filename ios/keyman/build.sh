@@ -87,9 +87,9 @@ function build_app() {
               -archivePath "$ARCHIVE_PATH" \
               archive \
               -allowProvisioningUpdates \
-              VERSION=$VERSION \
-              VERSION_WITH_TAG=$VERSION_WITH_TAG \
-              VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+              KEYMAN_VERSION=$KEYMAN_VERSION \
+              KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG \
+              KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
               UPLOAD_SENTRY=$UPLOAD_SENTRY
 
   assertDirExists "$ARCHIVE_PATH"
@@ -112,9 +112,9 @@ function build_app() {
                 $CODE_SIGN \
                 -scheme Keyman \
                 -sdk iphonesimulator \
-                VERSION=$VERSION \
-                VERSION_WITH_TAG=$VERSION_WITH_TAG \
-                VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+                KEYMAN_VERSION=$KEYMAN_VERSION \
+                KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG \
+                KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
                 UPLOAD_SENTRY=$UPLOAD_SENTRY
   fi
 }

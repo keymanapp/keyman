@@ -1511,7 +1511,7 @@ _builder_parse_expanded_parameters() {
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
-    if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+    if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
       builder_echo grey "Local build environment detected:  setting --debug"
       _params+=(--debug)
       _builder_chosen_options+=(--debug)

@@ -1,5 +1,5 @@
 #ifndef __KEYMAN_VERSION_H__
 #define __KEYMAN_VERSION_H__
 
-#define KEYMAN_VERSION "@VERSION@"
+#define KEYMAN_VERSION "@KEYMAN_VERSION@"
 #endif

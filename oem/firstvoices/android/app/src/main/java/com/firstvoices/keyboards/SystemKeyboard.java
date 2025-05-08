@@ -50,8 +50,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
                 options.setEnableAutoSessionTracking(false);
-                options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
-                options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
+                options.setRelease(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+                options.setEnvironment(com.firstvoices.keyboards.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
             });
         }
 

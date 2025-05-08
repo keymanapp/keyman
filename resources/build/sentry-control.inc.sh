@@ -27,14 +27,14 @@ function makeSentryRelease() {
   if isSentryConfigured; then
     if isSentryCliAvailable; then
       # This version tag matches the repository version tag release@x.y.z
-      echo "Making a Sentry release for tag $VERSION_GIT_TAG"
-      sentry-cli releases new -p keyman-android -p keyman-developer -p keyman-ios -p keyman-linux -p keyman-mac -p keyman-web -p keyman-windows $VERSION_GIT_TAG
+      echo "Making a Sentry release for tag $KEYMAN_VERSION_GIT_TAG"
+      sentry-cli releases new -p keyman-android -p keyman-developer -p keyman-ios -p keyman-linux -p keyman-mac -p keyman-web -p keyman-windows $KEYMAN_VERSION_GIT_TAG
 
-      echo "Setting commits for release tag $VERSION_GIT_TAG"
-      sentry-cli releases set-commits --auto $VERSION_GIT_TAG
+      echo "Setting commits for release tag $KEYMAN_VERSION_GIT_TAG"
+      sentry-cli releases set-commits --auto $KEYMAN_VERSION_GIT_TAG
 
-      echo "Finalizing release tag $VERSION_GIT_TAG"
-      sentry-cli releases finalize "$VERSION_GIT_TAG"
+      echo "Finalizing release tag $KEYMAN_VERSION_GIT_TAG"
+      sentry-cli releases finalize "$KEYMAN_VERSION_GIT_TAG"
     fi
   fi
 }

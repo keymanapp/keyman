@@ -32,7 +32,7 @@ check_api_not_changed() {
   trap "rm -rf \"${tmpDir}\"" ERR
   dpkg -x "${BIN_PKG}" "${tmpDir}"
   mkdir -p debian/tmp/DEBIAN
-  if dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4; then
+  if dpkg-gensymbols -v"${KEYMAN_VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4; then
     output_ok "${LIB_NAME} API didn't change"
   else
     output_error "${LIB_NAME} API changed"
@@ -205,7 +205,7 @@ get_api_version_from_core() {
 # NOTE: it is up to the caller to check if this is a major version
 # change that requires an API version update.
 is_api_version_updated() {
-  local OLD_API_VERSION NEW_API_VERSION TIER
+  local OLD_API_VERSION NEW_API_VERSION KEYMAN_TIER
   OLD_API_VERSION=$(get_api_version_in_symbols_file "${GIT_BASE}")
   NEW_API_VERSION=$(get_api_version_in_symbols_file "${GIT_SHA}")
   if (( NEW_API_VERSION > OLD_API_VERSION )); then
@@ -215,11 +215,11 @@ is_api_version_updated() {
 
   # API version didn't change. However, that might be ok if we're in alpha
   # and a major change happened previously.
-  TIER=$(cat "${REPO_ROOT}/TIER.md")
-  case ${TIER} in
+  KEYMAN_TIER=$(cat "${REPO_ROOT}/TIER.md")
+  case ${KEYMAN_TIER} in
     alpha)
       local STABLE_VERSION STABLE_API_VERSION STABLE_BRANCH
-      STABLE_VERSION=$((${VERSION%%.*} - 1))
+      STABLE_VERSION=$((${KEYMAN_VERSION%%.*} - 1))
       STABLE_BRANCH="origin/stable-${STABLE_VERSION}.0"
       STABLE_API_VERSION=$(get_api_version_in_symbols_file "${STABLE_BRANCH}")
       if (( STABLE_API_VERSION == -1 )); then

@@ -16,11 +16,11 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        // VERSION_CODE and VERSION_NAME from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
-        buildConfigField "String", "VERSION_GIT_TAG", "\""+VERSION_GIT_TAG+"\""
+        // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
+        buildConfigField "String", "KEYMAN_VERSION_GIT_TAG", "\""+KEYMAN_VERSION_GIT_TAG+"\""
     }
 
     String env_release_store_file = System.getenv("oem_firstvoices_release_store_file")
@@ -55,9 +55,9 @@ android {
     }
 
     applicationVariants.all { variant ->
-        // Adjust output name to "firstvoices-${VERSION_MD}.apk"
+        // Adjust output name to "firstvoices-${KEYMAN_VERSION_MD}.apk"
         variant.outputs.all {
-            outputFileName = "firstvoices-" + VERSION_MD + ".apk"
+            outputFileName = "firstvoices-" + KEYMAN_VERSION_MD + ".apk"
         }
     }
     lintOptions {

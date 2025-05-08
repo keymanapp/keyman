@@ -32,7 +32,7 @@ COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
 OUTLIB="$WINDOWS_ROOT/lib"
 COMMON_OUTLIB="$KEYMAN_ROOT/common/windows/lib"
 
-if builder_is_debug_build || [[ $VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
+if builder_is_debug_build || [[ $KEYMAN_VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
   # We do a fast build for debug builds, local builds, test PR builds but not for master/beta/stable release builds
   GO_FAST=1
 else
@@ -125,8 +125,8 @@ wrap-symstore() {
   "$ProgramFilesx86/Windows Kits/10/Debuggers/x64/symstore.exe" \
     add \
     //s "$KEYMAN_SYMSTOREPATH" \
-    //v "$VERSION_WIN" \
-    //c "Version: $VERSION_WITH_TAG" \
+    //v "$KEYMAN_VERSION_WIN" \
+    //c "Version: $KEYMAN_VERSION_WITH_TAG" \
     //compress //f "$@"
 }
 

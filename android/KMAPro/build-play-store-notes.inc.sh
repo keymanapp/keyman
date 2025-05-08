@@ -12,7 +12,7 @@ function generateReleaseNotes() {
   # Reference: https://github.com/Triple-T/gradle-play-publisher#uploading-release-notes
   #
   local PLAY_RELEASE_NOTES="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/$TIER.txt"
-  if [ $TIER = "stable" ]; then
+  if [ $KEYMAN_TIER = "stable" ]; then
     PLAY_RELEASE_NOTES="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/play/release-notes/en-US/default.txt"
   fi
   builder_heading "Generating Play Store release notes to $PLAY_RELEASE_NOTES"

@@ -20,7 +20,7 @@ mockDebPkgTools() {
 }
 
 createBase() {
-  TIER=$1
+  KEYMAN_TIER=$1
   remoteDir=$(mktemp -d)
   cd "${remoteDir}"
   git init --bare --initial-branch=master .
@@ -68,7 +68,7 @@ createBase() {
   git tag -m "16.0.145" release-16.0.145
   git push origin release-16.0.145
 
-  echo "${TIER}" > TIER.md
+  echo "${KEYMAN_TIER}" > TIER.md
   git add TIER.md
 
   echo "17.0.255" > VERSION.md

@@ -4,12 +4,12 @@
 # 1) we don't load dependencies by storing it in __init__.py
 # 2) we can import it in setup.py for the same reason
 # 3) we can import it into your module module
-__version__ = "_VERSION_"
-__versionwithtag__ = "_VERSIONWITHTAG_"
-__majorversion__ = "_MAJORVERSION_"
-__releaseversion__ = "_RELEASEVERSION_"
-__tier__ = "_TIER_"
+__version__ = "_KEYMAN_VERSION_"
+__versionwithtag__ = "_KEYMAN_VERSION_WITH_TAG_"
+__majorversion__ = "_KEYMAN_VERSION_MAJOR_"
+__releaseversion__ = "_KEYMAN_VERSION_RELEASE_"
+__tier__ = "_KEYMAN_TIER_"
 __pkgversion__ = "(local)"
-__environment__ = "_ENVIRONMENT_"
-__uploadsentry__ = "_UPLOADSENTRY_"
-__versiongittag__ = "_VERSIONGITTAG_"
+__environment__ = "_KEYMAN_VERSION_ENVIRONMENT_"
+__uploadsentry__ = "_UPLOAD_SENTRY_"
+__versiongittag__ = "_KEYMAN_VERSION_GIT_TAG_"

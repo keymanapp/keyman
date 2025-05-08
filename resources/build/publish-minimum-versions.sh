@@ -31,7 +31,17 @@ generate_table() {
   # echo "${strarr[@]}"
 
   for n in ${!strarr[@]}; do
-    echo "| ${strarr[n]} | ${!strarr[n]} |"
+    case "${strarr[n]}" in
+    KEYMAN_VERSION | KEYMAN_VERSION_MAJOR | KEYMAN_VERSION_MINOR | \
+    KEYMAN_VERSION_PATCH | KEYMAN_VERSION_RELEASE | KEYMAN_VERSION_WIN | \
+    KEYMAN_VERSION_TAG | KEYMAN_VERSION_WITH_TAG | \
+    KEYMAN_VERSION_ENVIRONMENT | KEYMAN_VERSION_GIT_TAG)
+      # ignore the variables that contain the Keyman version
+      ;;
+    *)
+      echo "| ${strarr[n]} | ${!strarr[n]} |"
+      ;;
+    esac
   done
 
   echo ""

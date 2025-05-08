@@ -118,9 +118,9 @@ function build_engine() {
 
   echo
   echo "Build products will be set with the following version metadata:"
-  echo "  * VERSION=$VERSION"
-  echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
-  echo "  * VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT"
+  echo "  * KEYMAN_VERSION=$KEYMAN_VERSION"
+  echo "  * KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG"
+  echo "  * KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT"
   echo "  * UPLOAD_SENTRY=$UPLOAD_SENTRY"
   echo
   echo "Building KMEI..."
@@ -130,9 +130,9 @@ function build_engine() {
   run_xcodebuild $XCODEFLAGS_EXT \
             $CODE_SIGN \
             -scheme KME-universal \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG \
-            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG \
+            KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
             UPLOAD_SENTRY=$UPLOAD_SENTRY
 
   assertDirExists "$KEYMAN_XCFRAMEWORK"

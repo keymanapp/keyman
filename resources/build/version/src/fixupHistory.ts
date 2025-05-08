@@ -39,7 +39,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[], base?: string): Pr
       tier = (await spawnChild('git', ['show', base+':TIER.md'])).trim();
     }
   }
-  //logInfo(`VERSION="${version}"`);
+  //logInfo(`KEYMAN_VERSION="${version}"`);
 
   //
   // Load and parse history file, looking for our version

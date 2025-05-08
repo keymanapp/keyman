@@ -15,7 +15,7 @@ builder_describe "Installation files for Keyman for Windows" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /windows/release/${VERSION}/keyman-${VERSION}.exe
+  publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe
 
 builder_parse "$@"
 
@@ -24,8 +24,8 @@ builder_parse "$@"
 . "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
-if [[ -z ${TIER+x} ]]; then
-  TIER=alpha
+if [[ -z ${KEYMAN_TIER+x} ]]; then
+  KEYMAN_TIER=alpha
 fi
 
 # We use different directories so that heat generates
@@ -101,15 +101,15 @@ function do_publish() {
 function copy-installer() {
   builder_heading copy-installer
 
-  mkdir -p "$KEYMAN_ROOT/windows/release/${VERSION}"
-  cp keymandesktop.msi "$KEYMAN_ROOT/windows/release/${VERSION}/keymandesktop.msi"
-  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${VERSION}/keyman-${VERSION}.exe"
-  cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${VERSION}/setup.exe"
+  mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
+  cp keymandesktop.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keymandesktop.msi"
+  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe"
+  cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup.exe"
 
   verify-installer-signatures
 
   # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
-  wzzip "$KEYMAN_ROOT/windows/release/${VERSION}/setup-redist.zip" "$WINDOWS_PROGRAM_APP/setup-redist.exe"
+  wzzip "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "$WINDOWS_PROGRAM_APP/setup-redist.exe"
 }
 
 function verify-program-signatures() {
@@ -121,12 +121,12 @@ function verify-program-signatures() {
 function verify-installer-signatures() {
   builder_heading verify-installer-signatures
 
-  verify-all-executable-signatures-in-folder "$KEYMAN_ROOT/windows/release/${VERSION}"
+  verify-all-executable-signatures-in-folder "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
 }
 
 function test-releaseexists() {
-  if [[ -d "$KEYMAN_ROOT/windows/release/${VERSION}" ]]; then
-    builder_die "Release ${VERSION} already exists. Delete it or update VERSION.md and try again"
+  if [[ -d "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}" ]]; then
+    builder_die "Release ${KEYMAN_VERSION} already exists. Delete it or update VERSION.md and try again"
   fi
 }
 
@@ -138,7 +138,7 @@ function do_candle() {
   local GUID1=$(generate_uuid)
   "$WIXHEAT" dir ../kmshell/xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   "$WIXHEAT" dir ../kmshell/locale -o locale.wxs -ag -cg Locale -dr INSTALLDIR -var var.LOCALESOURCE -wx -nologo
-  "$WIXCANDLE" -dVERSION_WITH_TAG=${VERSION_WITH_TAG} -dVERSION=${VERSION_WIN} -dRELEASE=${VERSION_RELEASE} -dPRODUCTID=$GUID1 \
+  "$WIXCANDLE" -dKEYMAN_VERSION_WITH_TAG=${KEYMAN_VERSION_WITH_TAG} -dKEYMAN_VERSION=${KEYMAN_VERSION_WIN} -dRELEASE=${KEYMAN_VERSION_RELEASE} -dPRODUCTID=$GUID1 \
     -dDESKTOPUISOURCE=../kmshell/xml -dLOCALESOURCE=../kmshell/locale "-dCefSourceDir=$KEYMAN_CEF4DELPHI_ROOT" \
     keymandesktop.wxs desktopui.wxs locale.wxs cef.wxs
 }
@@ -160,7 +160,7 @@ function create-setup-inf() {
   builder_heading create-setup-inf
 
   echo "[Setup]" > setup.inf
-  echo "Version=${VERSION_WIN}" >> setup.inf
+  echo "Version=${KEYMAN_VERSION_WIN}" >> setup.inf
   echo "MSIFileName=keymandesktop.msi" >> setup.inf
   echo "MSIOptions=" >> setup.inf
   echo "License=license.html" >> setup.inf

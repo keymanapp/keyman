@@ -38,9 +38,9 @@ build_archive ( ) {
              -quiet \
              BUILD_DIR="${BUILD_DIR}" \
              BUILD_ROOT="${BUILD_ROOT}" \
-             VERSION=$VERSION \
-             VERSION_WITH_TAG=$VERSION_WITH_TAG \
-             VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+             KEYMAN_VERSION=$KEYMAN_VERSION \
+             KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG \
+             KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
              UPLOAD_SENTRY=$UPLOAD_SENTRY
 }
 

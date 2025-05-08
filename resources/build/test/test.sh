@@ -91,7 +91,7 @@ builder_parse_test() {
   local expected_options="$2"
 
   # When testing in a local environment, --debug will be added by default (see #11106)
-  if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+  if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]]; then
     expected_options="${expected_options} --debug"
   fi
 
@@ -191,7 +191,7 @@ echo -e "${COLOR_BLUE}## Testing output of: builder_parse --feature xyzzy --bar 
 parse_output=$(builder_parse --feature xyzzy --bar abc --baz def test)
 expected="$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test>")"
 
-if [[ $VERSION_ENVIRONMENT == "local" ]]; then
+if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]]; then
   # When run in a local-dev environment, an extra line appears about the automatic --debug option.
   expected="$(builder_echo grey "Local build environment detected:  setting --debug")"$'\n'"$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test --debug>")"
 fi

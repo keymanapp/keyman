@@ -106,8 +106,8 @@ function do_build() {
             -archivePath "$ARCHIVE_PATH" \
             archive \
             -allowProvisioningUpdates \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
 
     assertDirExists "$ARCHIVE_PATH"
 
@@ -120,14 +120,14 @@ function do_build() {
             -exportOptionsPlist exportAppStore.plist \
             -exportPath "$BUILD_PATH/${CONFIG}-iphoneos" \
             -allowProvisioningUpdates \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   else
     run_xcodebuild $CODE_SIGN \
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   fi
 
   if builder_has_option --sim-artifact; then
@@ -136,8 +136,8 @@ function do_build() {
             $XCODEFLAGS_EXT \
             -scheme "$TARGET" \
             -sdk iphonesimulator \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
   fi
 }
 

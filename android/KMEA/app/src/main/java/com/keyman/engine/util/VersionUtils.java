@@ -12,11 +12,11 @@ public final class VersionUtils {
   public static final String TAG = "VersionUtils";
 
   public static boolean isLocalBuild() {
-    return BuildConfig.VERSION_ENVIRONMENT.equalsIgnoreCase("local");
+    return BuildConfig.KEYMAN_VERSION_ENVIRONMENT.equalsIgnoreCase("local");
   }
 
   public static boolean isTestBuild() {
-    return BuildConfig.VERSION_ENVIRONMENT.equalsIgnoreCase("test");
+    return BuildConfig.KEYMAN_VERSION_ENVIRONMENT.equalsIgnoreCase("test");
   }
 
   // Utility for local and PR test builds - e.g. force check of keyboard updates

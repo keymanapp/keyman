@@ -74,38 +74,38 @@ function upload {
 function upload_keyman_help {
   case $platform in
     android)
-      upload android/docs/help products/android/$VERSION_RELEASE
-      upload android/docs/engine developer/engine/android/$VERSION_RELEASE
+      upload android/docs/help products/android/$KEYMAN_VERSION_RELEASE
+      upload android/docs/engine developer/engine/android/$KEYMAN_VERSION_RELEASE
       ;;
     ios)
-      upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
-      upload ios/docs/engine developer/engine/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/help products/iphone-and-ipad/$KEYMAN_VERSION_RELEASE
+      upload ios/docs/engine developer/engine/iphone-and-ipad/$KEYMAN_VERSION_RELEASE
       ;;
     linux)
       pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
       ./build.sh build
       popd > /dev/null
-      upload linux/docs/help products/linux/$VERSION_RELEASE
+      upload linux/docs/help products/linux/$KEYMAN_VERSION_RELEASE
       ;;
     mac)
-      upload mac/docs/help products/mac/$VERSION_RELEASE
+      upload mac/docs/help products/mac/$KEYMAN_VERSION_RELEASE
       ;;
     web)
-      upload web/docs/engine developer/engine/web/$VERSION_RELEASE
+      upload web/docs/engine developer/engine/web/$KEYMAN_VERSION_RELEASE
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
-      upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
-      upload windows/docs/engine developer/engine/windows/$VERSION_RELEASE
+      upload windows/bin/help/md/desktop products/windows/$KEYMAN_VERSION_RELEASE
+      upload windows/docs/engine developer/engine/windows/$KEYMAN_VERSION_RELEASE
       ;;
     developer)
       # Note: `/developer/build.sh api` must be run first - covers both uploads
-      upload developer/docs/help developer/$VERSION_RELEASE
-      upload developer/build/docs developer/$VERSION_RELEASE/reference/api
-      upload developer/src/kmc/build/messages developer/$VERSION_RELEASE/reference/messages
+      upload developer/docs/help developer/$KEYMAN_VERSION_RELEASE
+      upload developer/build/docs developer/$KEYMAN_VERSION_RELEASE/reference/api
+      upload developer/src/kmc/build/messages developer/$KEYMAN_VERSION_RELEASE/reference/messages
       # Note: we publish the core help alongside developer because we don't have
       # a core CI release build
-      upload core/docs/api developer/core/$VERSION_RELEASE
+      upload core/docs/api developer/core/$KEYMAN_VERSION_RELEASE
       ;;
     *)
       display_usage
@@ -152,6 +152,6 @@ if ! ci_repo_has_cached_changes "$HELP_KEYMAN_COM"; then
   exit 0
 fi
 
-ci_open_pull_request "$HELP_KEYMAN_COM" "auto/$platform-help-$VERSION_WITH_TAG" "auto: Keyman for $platform help deployment"
+ci_open_pull_request "$HELP_KEYMAN_COM" "auto/$platform-help-$KEYMAN_VERSION_WITH_TAG" "auto: Keyman for $platform help deployment"
 
 exit 0

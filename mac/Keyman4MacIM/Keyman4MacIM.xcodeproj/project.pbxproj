@@ -954,7 +954,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# check that our PRODUCT_VERSION matches this git branch's VERSION from ../../VERSION.md\n(cd .. ; ./is_same_version.sh Keyman4MacIM || exit 1 ; cd -)\n";
+			shellScript = "# check that our PRODUCT_VERSION matches this git branch's KEYMAN_VERSION from ../../VERSION.md\n(cd .. ; ./is_same_version.sh Keyman4MacIM || exit 1 ; cd -)\n";
 			showEnvVarsInLog = 0;
 		};
 		D2FF67BB6C749BA6861F5E25 /* [CP] Check Pods Manifest.lock */ = {

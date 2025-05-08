@@ -97,7 +97,7 @@ if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
     . "$THIS_SCRIPT_PATH/localenv.sh"
 fi
 
-BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
+BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$KEYMAN_VERSION"
 
 ### START OF THE BUILD ###
 
@@ -151,16 +151,16 @@ updatePlist() {
             builder_die "File not found: $KM_PLIST"
         fi
         local YEAR=`date "+%Y"`
-        echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $VERSION_ENVIRONMENT" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:Tier $TIER" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionTag $VERSION_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $VERSION_WITH_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $VERSION_GIT_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $VERSION_RELEASE" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
+        echo "Setting version and related fields to $KEYMAN_VERSION_WITH_TAG in $KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $KEYMAN_VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KEYMAN_VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $KEYMAN_VERSION_ENVIRONMENT" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:Tier $KEYMAN_TIER" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionTag $KEYMAN_VERSION_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $KEYMAN_VERSION_WITH_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $KEYMAN_VERSION_GIT_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $KEYMAN_VERSION_RELEASE" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $KEYMAN_VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
     fi
 }

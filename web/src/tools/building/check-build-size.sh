@@ -88,15 +88,15 @@ LOCAL_FILE=web/build/publish/release/keymanweb.js
 LOCAL_FILE_SIZE=`stat --printf="%s" $KEYMAN_ROOT/$LOCAL_FILE`
 
 #
-# Get the most recent build for $TIER from downloads.keyman.com
+# Get the most recent build for $KEYMAN_TIER from downloads.keyman.com
 #
 
 DOWNLOADS_VERSION_API=https://downloads.keyman.com/api/version/web
 REMOTE_KEYMANWEB_VERSIONS=`curl -s $DOWNLOADS_VERSION_API`
-REMOTE_VERSION=`echo $REMOTE_KEYMANWEB_VERSIONS | $JQ -r ".web.$TIER"`
+REMOTE_VERSION=`echo $REMOTE_KEYMANWEB_VERSIONS | $JQ -r ".web.$KEYMAN_TIER"`
 
-REMOTE_FILE_NEW=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/build/app/browser/release/keymanweb.js
-REMOTE_FILE_OLD=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/build/app/web/release/keymanweb.js
+REMOTE_FILE_NEW=https://downloads.keyman.com/web/$KEYMAN_TIER/$REMOTE_VERSION/static/build/app/browser/release/keymanweb.js
+REMOTE_FILE_OLD=https://downloads.keyman.com/web/$KEYMAN_TIER/$REMOTE_VERSION/static/build/app/web/release/keymanweb.js
 
 # If the remote file does not exist at the 'new' location, try the 'old' one instead.
 # Allows reorganization 'fallback' for the file-size check.
