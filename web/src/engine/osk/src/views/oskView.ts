@@ -625,14 +625,18 @@ export default abstract class OSKView
       return;
     }
 
+    const vkbd = this.vkbd;
     try {
       this.deferLayout = true;
-      if(this.vkbd) {
-        this.vkbd.deferLayout = true;
+      if(vkbd) {
+        vkbd.deferLayout = true;
       }
       closure();
     } finally {
       this.deferLayout = false;
+      if(vkbd) {
+        vkbd.deferLayout = false;
+      }
       if(this.vkbd) {
         this.vkbd.deferLayout = false;
       }
@@ -781,6 +785,9 @@ export default abstract class OSKView
     this.banner.appendStyles();
 
     if(this.vkbd) {
+      // Layout-deferral mode may be active during a keyboard-swap; the newly-incoming keyboard
+      // should inherit that value!
+      this.vkbd.deferLayout = this.deferLayout;
       // Create the key preview (for phones)
       this.vkbd.createKeyTip();
 

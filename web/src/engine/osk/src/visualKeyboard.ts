@@ -804,9 +804,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   get layoutHeight(): ParsedLengthStyle {
+    // currently:  equivalent to if(is touch keyboard)
     if (this.usesFixedHeightScaling) {
-      let baseHeight = this.height;
+      let baseHeight = this.height; // initially undefined!
       baseHeight -= this._borderWidth * 2;
+      // For robustness, as there are legal cases where this.height may be undefined.
+      baseHeight = (isNaN(baseHeight) || baseHeight < 0) ? 0 : baseHeight;
       return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
