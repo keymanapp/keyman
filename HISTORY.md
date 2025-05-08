@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.34 alpha 2025-05-08
+
+* docs(common): update `builder_echo` documentation for TC blocks (#13855)
+* fix(windows): add breadcrumb to download failures (#13826)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13860)
+* maint(common): remove obsolete code from docker-images `build.sh` (#13861)
+* maint(common): output start/end messages if not running on TC (#13868)
+
 ## 19.0.33 alpha 2025-05-07
 
 * maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
