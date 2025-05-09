@@ -49,7 +49,7 @@ export interface CompilerCallbacks {
   get net(): CompilerNetAsyncCallbacks;
 
   /**
-   * Resolves a file path relative to the baseFilename.
+   * Resolves a file path relative to the baseFilename
    * @param baseFilename
    * @param filename
    */

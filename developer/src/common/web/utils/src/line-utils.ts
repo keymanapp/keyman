@@ -38,7 +38,7 @@ export class LineFinder {
         return LineFinder.offsetToLineColumn(offset, this.getLineList());
     }
 
-    /** 
+    /**
      * preprocess text to turn it into arrays of line lengths.
      * This is effectively a 1-based line length, since line 0 has length of
      * 0.

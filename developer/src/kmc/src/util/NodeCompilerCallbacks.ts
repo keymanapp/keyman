@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { platform } from 'os';
-import { CompilerCallbacks, CompilerEvent, 
+import { CompilerCallbacks, CompilerEvent,
          CompilerPathCallbacks, CompilerFileSystemCallbacks,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,

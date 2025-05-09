@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks,
   CompilerError, CompilerNetAsyncCallbacks, DefaultCompilerFileSystemAsyncCallbacks,
-  CompilerFileSystemAsyncCallbacks, 
+  CompilerFileSystemAsyncCallbacks,
   CompilerErrorSeverity} from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
 

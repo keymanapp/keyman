@@ -31,7 +31,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   /** for resolving messages involving line numbers */
   eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
 
-  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {  
+  constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
   static get defaultImportsURL(): [string,string] {
