@@ -14,7 +14,7 @@ including this file...
 
 ### build-utils.sh, builder.inc.sh
 
-See [builder.md](builder.md)
+See [builder.md](../../docs/builder.md)
 
 ### jq-win64
 
