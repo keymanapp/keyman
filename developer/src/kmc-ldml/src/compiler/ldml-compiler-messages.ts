@@ -9,12 +9,31 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
 
-// like m() but takes an XML object for line numbers
-const mx = (x: any, code: number, message: string, detail?: string): CompilerEvent => {
+/**
+ * Any object with metadata, for line number errs.
+ * Could be for example an LKKeys or KMXPlus.KeysKeys object.
+ * Defined as 'any' here to reduce noise on the client side.
+ * @see {@link KeymanXMLReader.getMetaData()}
+ */
+type ObjectWithMetadata = any;
+
+/**
+ * Convenience function for constructing CompilerEvents with line numbers
+ * @param x        Object to be used as a source for line number information
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
+ * @see CompilerMessageSpec
+ * @returns
+ */
+function CompilerMessageObjectSpec(x: ObjectWithMetadata, code: number, message: string, detail?: string): CompilerEvent {
   let evt = m(code, message, detail);        // raw message
   evt = LdmlCompilerMessages.offset(evt, x); // with offset
   return evt;
 };
+
+const mx = CompilerMessageObjectSpec;
 
 /**
  * @internal
@@ -28,7 +47,8 @@ export class LdmlCompilerMessages {
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
   static Error_HardwareLayerHasTooManyRows = (x: any) => mx(x,
-    this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
+    this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`,
+  );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
   static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`);
@@ -105,8 +125,10 @@ export class LdmlCompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
-  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x: any) => mx(x,
-    this.ERROR_KeyMissingToGapOrSwitch, `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`);
+  static Error_KeyMissingToGapOrSwitch = (x: any, o:{keyId: string}) => mx(x,
+    this.ERROR_KeyMissingToGapOrSwitch,
+    `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`,
+  );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
   static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,

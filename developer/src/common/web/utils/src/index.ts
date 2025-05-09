@@ -69,7 +69,7 @@ export { DeveloperUtilsMessages } from './developer-utils-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
 export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader, KeymanXMLMetadata, XML_FILENAME_SYMBOL } from './xml-utils.js';
 export { SymbolUtils } from './symbol-utils.js';
-export { LineFinder, LineColumn, LineFinderEventResolver } from './line-utils.js';
+export * as LineUtils from './line-utils.js';
 export * as GitHubUrls from './github-urls.js';
 export * as CloudUrls from './cloud-urls.js';
 

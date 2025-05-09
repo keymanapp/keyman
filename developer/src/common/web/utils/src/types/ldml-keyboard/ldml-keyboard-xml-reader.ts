@@ -9,9 +9,9 @@ import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import { KeymanXMLReader } from '@keymanapp/developer-utils';
+import { CompilerEvent, EventResolver, KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
-import { LineFinderEventResolver } from '../../index.js';
+import { LineFinderEventResolver } from '../../line-utils.js';
 import { XML_FILENAME_SYMBOL } from '../../xml-utils.js';
 
 interface NameAndProps  {
@@ -27,11 +27,14 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
   localImportsPaths: string[];
 };
 
-export class LDMLKeyboardXMLSourceFileReader {
+export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
   /** for resolving messages involving line numbers */
-  eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
+  private eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
 
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  }
+  resolve(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
   }
 
   static get defaultImportsURL(): [string,string] {

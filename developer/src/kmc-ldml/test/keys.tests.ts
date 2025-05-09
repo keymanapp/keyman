@@ -464,7 +464,9 @@ describe('keys.kmap', function () {
     const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}, withColumn(188)));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(withColumn(188),
+      {keyId: 'Q'}
+    ));
   });
   it('should accept layouts with gap/switch keys', async function() {
     const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, keysDependencies) as Keys;

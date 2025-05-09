@@ -110,7 +110,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     this.options = { ...options };
     this.reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, callbacks);
     // wrap the callbacks so that the eventresolver is called
-    this.callbacks = new ResolvingCompilerCallbacks(this.reader.eventResolver, this.options, callbacks);
+    this.callbacks = new ResolvingCompilerCallbacks(this.reader, this.options, callbacks);
     return true;
   }
 
