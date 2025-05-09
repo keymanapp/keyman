@@ -19,6 +19,7 @@ export enum NodeTypes {
   CASEDKEYS             = "CASEDKEYS",
   CONTEXT               = "CONTEXT",
   COPYRIGHT             = "COPYRIGHT",
+  DEADKEY               = "DEADKEY",
   DISPLAYMAP            = "DISPLAYMAP",
   EQUAL                 = "EQUAL",
   ETHNOLOGUECODE        = "ETHNOLOGUECODE",

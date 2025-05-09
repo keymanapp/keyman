@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1658,6 +1658,21 @@ describe("KMN Analyser Tests", () => {
       const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
       assert.isNotNull(saveNode);
       assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("DeadKeyStatementRule Tests", () => {
+    it("can construct an DeadKeyStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const deadKeyStatement: Rule = new DeadKeyStatementRule();
+      assert.isNotNull(deadKeyStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      const deadKeyStatement: Rule = new DeadKeyStatementRule();
+      assert.isTrue(deadKeyStatement.parse(root));
+      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
+      assert.isNotNull(deadKeyNode);
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("IndexStatementRule Tests", () => {

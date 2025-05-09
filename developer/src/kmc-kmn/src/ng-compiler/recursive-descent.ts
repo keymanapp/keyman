@@ -196,6 +196,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.CASEDKEYS,        nodeType: NodeTypes.CASEDKEYS},
     {tokenType: TokenTypes.CONTEXT,          nodeType: NodeTypes.CONTEXT},
     {tokenType: TokenTypes.COPYRIGHT,        nodeType: NodeTypes.COPYRIGHT},
+    {tokenType: TokenTypes.DEADKEY,          nodeType: NodeTypes.DEADKEY},
     {tokenType: TokenTypes.DISPLAYMAP,       nodeType: NodeTypes.DISPLAYMAP},
     {tokenType: TokenTypes.EQUAL,            nodeType: NodeTypes.EQUAL},
     {tokenType: TokenTypes.ETHNOLOGUECODE,   nodeType: NodeTypes.ETHNOLOGUECODE},

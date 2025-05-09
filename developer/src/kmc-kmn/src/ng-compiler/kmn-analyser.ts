@@ -1104,6 +1104,15 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
+export class DeadKeyStatementRule extends AbstractBracketedStoreNameStatementRule {
+  public constructor() {
+    super();
+    const deadKey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
+    this.cmdNodeType = NodeTypes.DEADKEY;
+    this.rule = new SequenceRule([deadKey, this.bracketedStoreName]);
+  }
+}
+
 export class IndexStatementRule extends SingleChildRule {
   public constructor() {
     super();

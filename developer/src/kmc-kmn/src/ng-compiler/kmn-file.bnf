@@ -75,6 +75,7 @@ outputStatement: useStatement|callStatement|setStoreStatement|saveStatement|
   setLayerStatement|layerStatement|indexStatement|contextStatement|text|BEEP
 callStatement: CALL bracketedStoreName
 saveStatement: SAVE bracketedStoreName
+deadKeyStatement: DEADKEY bracketedStoreName
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?
 offset: PARAMETER
