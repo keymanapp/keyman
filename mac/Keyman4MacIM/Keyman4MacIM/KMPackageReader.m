@@ -17,11 +17,14 @@
 static NSString *const kPackageJsonFile = @"kmp.json";
 static NSString *const kPackageInfFile = @"kmp.inf";
 
+// kmp.info section names
 static NSString *const kPackage = @"[Package]";
 static NSString *const kButtons = @"[Buttons]";
 static NSString *const kStartMenu = @"[StartMenu]";
 static NSString *const kStartMenuEntries = @"[StartMenuEntries]";
 static NSString *const kInfo = @"[Info]";
+// for older kmp.inf files, [PackageInfo] may be used instead of [Info]
+static NSString *const kPackageInfo = @"[PackageInfo]";
 static NSString *const kFiles = @"[Files]";
 
 static NSString *const kAuthor = @"Author";
@@ -212,6 +215,11 @@ typedef enum {
         continue;
       }
       else if ([[line lowercaseString] hasPrefix:[kInfo lowercaseString]]) {
+        contentType = ctInfo;
+        continue;
+      }
+      // for older kmp.inf files, [PackageInfo] may be used instead of [Info]
+      else if ([[line lowercaseString] hasPrefix:[kPackageInfo lowercaseString]]) {
         contentType = ctInfo;
         continue;
       }
