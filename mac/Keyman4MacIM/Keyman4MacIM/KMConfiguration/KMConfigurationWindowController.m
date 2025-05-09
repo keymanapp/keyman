@@ -337,7 +337,7 @@
   NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
   NSMutableArray *kmpFiles = nil;
   for (NSString *filename in filenames) {
-    if ([[filename lastNChars:4] isEqualTo:@".kmp"]) {
+    if ([filename hasSuffix:@".kmp"]) {
       if (kmpFiles == nil)
         kmpFiles = [NSMutableArray arrayWithObject:filename];
       else

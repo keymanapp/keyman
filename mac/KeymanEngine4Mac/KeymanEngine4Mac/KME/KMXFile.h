@@ -27,17 +27,10 @@ extern NSString *const kKMVisualKeyboardKey;
 @property (assign, nonatomic, readonly) BOOL isRegistered;
 @property (assign, nonatomic, readonly) BOOL isMnemonic;
 @property (assign, nonatomic, readonly) DWORD version;
-@property (strong, nonatomic, readonly) NSArray *store;
-@property (strong, nonatomic, readonly) NSArray *storeSaved;
-@property (strong, nonatomic, readonly) NSArray *group;
-@property (strong, nonatomic, readonly) NSArray *startGroup;
-@property (assign, nonatomic, readonly) DWORD flags;
-@property (assign, nonatomic, readonly) DWORD hotKey;
 @property (strong, nonatomic, readonly) NSImage *bitmap;
 @property (strong, nonatomic, readonly) NSString *filePath;
 
 - (id)initWithFilePath:(NSString *)path;
-- (BOOL)isValid;
 
 /*!
 * Provides an info dictionary from a KMX file which includes keyboard name, version, copyright information and keyboard icon.
