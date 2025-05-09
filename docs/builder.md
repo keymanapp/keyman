@@ -880,20 +880,6 @@ fi
 
 --------------------------------------------------------------------------------
 
-## `builder_is_running_on_ci` function
-
-Returns `true` (aka 0) if the script runs on TeamCity or as a GitHub action.
-
-### Usage
-
-```bash
-if builder_is_running_on_ci; then
-  ...
-fi
-```
-
---------------------------------------------------------------------------------
-
 ## `builder_is_running_on_docker` function
 
 Returns `true` (aka 0) if the script runs in a Docker container (i.e. if
@@ -915,7 +901,7 @@ fi
 ## `builder_is_running_on_gha` function
 
 Returns `true` (aka 0) if the script runs as a GitHub action (i.e. if the
-`GITHUB_RUN_ID` environment variable is set).
+`GITHUB_ACTIONS` environment variable is set).
 
 ### Usage
 
