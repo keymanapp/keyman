@@ -52,6 +52,7 @@ function configure_server() {
   verify_npm_setup
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
   # TODO: this is horrible; is there a way we can avoid this?
+  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok
   rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
 }
 
@@ -128,6 +129,7 @@ function installer_server() {
   pushd "$PRODBUILDTEMP"
   npm install --omit=dev --omit=optional
   # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
+  rm -f node_modules/ngrok/bin/ngrok
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
