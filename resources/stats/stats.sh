@@ -76,10 +76,10 @@ echo -e "Platform\tAll PRs\t${stableBranch}\tFeatures\tIssues" > "${STATS_ROOT}s
 for p in "${platforms[@]}"; do
   echo "Getting stats for $p"
   mkdir -p "$STATS_ROOT/$p"
-  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE -label:auto label:$p" --state all > "$STATS_ROOT/${p}pulls.tsv"
-  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "base:$stableBranch $SEARCH_RANGE -label:auto label:$p" --state all > "$STATS_ROOT/${p}pulls-stable.tsv"
-  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE -label:auto label:feat label:$p" --state all > "$STATS_ROOT/${p}pulls-feat.tsv"
-  gh issue list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE -label:auto label:$p" --state all > "$STATS_ROOT/${p}issues.tsv"
+  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE -author:keyman-server AND -label:auto AND label:$p" --state all > "$STATS_ROOT/${p}pulls.tsv"
+  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "base:$stableBranch $SEARCH_RANGE AND -author:keyman-server AND -label:auto AND label:$p" --state all > "$STATS_ROOT/${p}pulls-stable.tsv"
+  gh pr list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE AND -author:keyman-server AND -label:auto AND (label:feat OR label:$p)" --state all > "$STATS_ROOT/${p}pulls-feat.tsv"
+  gh issue list --json author,createdAt,number,title,labels,state --template "$(cat gh-pr.txt)" --limit 1000 --search "$SEARCH_RANGE AND -author:keyman-server AND -label:auto AND label:$p" --state all > "$STATS_ROOT/${p}issues.tsv"
   stat_all=`cat "$STATS_ROOT/${p}pulls.tsv" | wc -l`
   stat_stable=`cat "$STATS_ROOT/${p}pulls-stable.tsv" | wc -l`
   stat_feat=`cat "$STATS_ROOT/${p}pulls-feat.tsv" | wc -l`
