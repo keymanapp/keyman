@@ -84,7 +84,8 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [[ -z "${TEAMCITY_VERSION-}" && -z "${GITHUB_ACTIONS-}" && -z "${KEYMAN_PKG_BUILD-}" ]]; then
+    if ! builder_is_running_on_teamcity && ! builder_is_running_on_gha \
+      && [[ -z "${KEYMAN_PKG_BUILD-}" ]]; then
         # Local dev machine, not TeamCity or GitHub Action and not .deb package build
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
@@ -98,7 +99,7 @@ function findVersion() {
         else
             VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
         fi
-    elif [ -n "${GITHUB_ACTIONS-}" ] && ${GHA_TEST_BUILD-}; then
+    elif builder_is_running_on_gha && ${GHA_TEST_BUILD-}; then
         VERSION_ENVIRONMENT="test"
         # Note GHA_BRANCH can be 'master', 'beta', or 'stable-x.y'
         # This indicates we are running a Test build.
