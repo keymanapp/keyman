@@ -5,14 +5,14 @@
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
 import { DeveloperUtilsMessages } from '../../developer-utils-messages.js';
-import { CompilerCallbacks } from "../../compiler-callbacks.js";
+import { CompilerCallbacks, EventResolver } from "../../compiler-callbacks.js";
+import { CompilerEvent } from "../../compiler-interfaces.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import { CompilerEvent, EventResolver, KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
 import { LineFinderEventResolver } from '../../line-utils.js';
-import { XML_FILENAME_SYMBOL } from '../../xml-utils.js';
+import { XML_FILENAME_SYMBOL, KeymanXMLReader } from '../../xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
