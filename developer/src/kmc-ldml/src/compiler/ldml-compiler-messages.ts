@@ -19,15 +19,15 @@ type ObjectWithMetadata = any;
 
 /**
  * Convenience function for constructing CompilerEvents with line numbers
- * @param x        Object to be used as a source for line number information
  * @param code     Unique numeric value of the event
  * @param message  A short description of the error presented to the user
+ * @param x        Object to be used as a source for line number information
  * @param detail   Detailed Markdown-formatted description of the error
  *                 including references to documentation, remediation options.
  * @see CompilerMessageSpec
  * @returns
  */
-function CompilerMessageObjectSpec(x: ObjectWithMetadata, code: number, message: string, detail?: string): CompilerEvent {
+function CompilerMessageObjectSpec(code: number, message: string, x: ObjectWithMetadata, detail?: string): CompilerEvent {
   let evt = m(code, message, detail);        // raw message
   evt = LdmlCompilerMessages.offset(evt, x); // with offset
   return evt;
@@ -46,8 +46,10 @@ export class LdmlCompilerMessages {
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
-  static Error_HardwareLayerHasTooManyRows = (x: any) => mx(x,
-    this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`,
+  static Error_HardwareLayerHasTooManyRows = (x: any) => mx(
+    this.ERROR_HardwareLayerHasTooManyRows,
+    `'hardware' layer has too many rows`,
+    x,
   );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
@@ -125,9 +127,10 @@ export class LdmlCompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
-  static Error_KeyMissingToGapOrSwitch = (x: any, o:{keyId: string}) => mx(x,
+  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x: ObjectWithMetadata) => mx(
     this.ERROR_KeyMissingToGapOrSwitch,
     `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`,
+    x,
   );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
