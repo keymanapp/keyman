@@ -130,8 +130,15 @@
         NSArray *pArray = (NSArray *)obj;
         NSString *packageFolder = [self packageFolderFromPath:[pArray objectAtIndex:0]];
         NSString *packageName = [self.AppDelegate packageNameFromPackageInfo:packageFolder];
-        os_log_debug([KMLogs uiLog], "tableContents, packageFolder: %{public}@, packageName: %{public}@", packageFolder, packageName);
-        [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
+                
+        if (packageName) {
+          os_log_debug([KMLogs testLog], "tableContents, packageFolder: %{public}@, packageName: %{public}@", packageFolder, packageName);
+          [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
+       } else {
+         os_log_error([KMLogs testLog], "tableContents, no packageName for packageFolder: %{public}@", packageFolder);
+         NSString *noPackageName = NSLocalizedString(@"unknown-package-name", nil);
+         [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:noPackageName, @"HeaderTitle", nil]];
+        }
         for (NSString *path in pArray) {
           os_log_debug([KMLogs uiLog], "tableContents, path = '%{public}@'", path);
           NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];

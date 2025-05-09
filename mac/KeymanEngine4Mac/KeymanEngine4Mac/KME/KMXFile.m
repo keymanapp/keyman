@@ -161,7 +161,8 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
 
 + (NSDictionary *)keyboardInfoFromKmxFile:(NSString *)path {
   NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
-  
+  os_log_debug([KMELogs configLog], "keyboardInfoFromKmxFile, path: %{public}@", path);
+
   if (file == nil) {
     os_log_error([KMELogs configLog], "Failed to open file");
     return nil;
