@@ -465,15 +465,23 @@
   <!-- Context: Configuration Dialog - Update tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Sono disponibili aggiornamenti che saranno operativi al prossimo riavvio di Windows.</string>
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">Sono disponibili aggiornamenti che saranno operativi al prossimo riavvio di Windows:</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">Versione attualmente installata</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">Nuova versione</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Aggiornare ora richiederà un riavvio del computer.</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Installare l\'aggiornamento ora richiederà un riavvio del computer prima di poter usare nuovamente Keyman. Aggiornare adesso?</string>
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Aggiornamento Keyman pronto per l\'installazione.</string>
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Un aggiornamento per Keyman è stato scaricato ed è pronto per l\'installazione.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -570,6 +578,10 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <string name="S_Update" comment="Update tab name">Aggiorna</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update_Now" comment="Update now button">Aggiorna ora</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">Componenti Keyman Aggiornati Disponibili</string>
   <!-- Context: Online Update Dialog -->
@@ -639,10 +651,18 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">E&amp;xit online update check</string>
+  <!-- Context: Install Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Later" comment="Apply Update Later">Più tardi</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">Applica aggiornamento ora</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">Installa aggiornamento ora</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
