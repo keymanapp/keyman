@@ -11,6 +11,10 @@ android {
     compileSdk 34
     namespace="com.firstvoices.keyboards"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
@@ -66,12 +70,6 @@ android {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
-}
-
 // how to configure the sentry android gradle plugin
 task publishSentry {
     doLast {
@@ -124,10 +122,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:6.9.2'
+    implementation 'io.sentry:sentry-android:7.8.0'
     implementation 'androidx.preference:preference:1.2.1'
 }
 

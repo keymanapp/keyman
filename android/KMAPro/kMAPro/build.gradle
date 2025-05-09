@@ -20,6 +20,15 @@ android {
         noCompress "kmp"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
@@ -156,7 +165,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
