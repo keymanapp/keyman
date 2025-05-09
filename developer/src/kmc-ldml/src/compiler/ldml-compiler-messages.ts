@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -8,6 +8,32 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
+
+/**
+ * Any object with metadata, for line number errs.
+ * Could be for example an LKKeys or KMXPlus.KeysKeys object.
+ * Defined as 'any' here to reduce noise on the client side.
+ * @see {@link KeymanXMLReader.getMetaData()}
+ */
+type ObjectWithMetadata = any;
+
+/**
+ * Convenience function for constructing CompilerEvents with line numbers
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param x        Object to be used as a source for line number information
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
+ * @see CompilerMessageSpec
+ * @returns
+ */
+function CompilerMessageObjectSpec(code: number, message: string, x: ObjectWithMetadata, detail?: string): CompilerEvent {
+  let evt = m(code, message, detail);        // raw message
+  evt = LdmlCompilerMessages.offset(evt, x); // with offset
+  return evt;
+};
+
+const mx = CompilerMessageObjectSpec;
 
 /**
  * @internal
@@ -20,7 +46,11 @@ export class LdmlCompilerMessages {
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
-  static Error_HardwareLayerHasTooManyRows = () => m(this.ERROR_HardwareLayerHasTooManyRows, `'hardware' layer has too many rows`);
+  static Error_HardwareLayerHasTooManyRows = (x: any) => mx(
+    this.ERROR_HardwareLayerHasTooManyRows,
+    `'hardware' layer has too many rows`,
+    x,
+  );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
   static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`);
@@ -97,8 +127,11 @@ export class LdmlCompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
-  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
-  m(this.ERROR_KeyMissingToGapOrSwitch, `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`);
+  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x: ObjectWithMetadata) => mx(
+    this.ERROR_KeyMissingToGapOrSwitch,
+    `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`,
+    x,
+  );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
   static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,
@@ -274,5 +307,18 @@ export class LdmlCompilerMessages {
     `Invalid transform to="${def(o.to)}": "${def(o.message)}"`,
   );
 
-
+  /**
+   * Get an offset from o and set e's offset field
+   * @param event a compiler event, such as from functions in this class
+   * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
+   * @returns modified event object
+   */
+  static offset(event: CompilerEvent, x?: any): CompilerEvent {
+    if(x) {
+      const metadata = KeymanXMLReader.getMetaData(x) || {};
+      event.offset = metadata?.startIndex;
+      event.filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+    }
+    return event;
+  }
 }

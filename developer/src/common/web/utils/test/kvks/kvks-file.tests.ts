@@ -5,6 +5,7 @@ import KvksFileReader from "../../src/types/kvks/kvks-file-reader.js";
 import KvksFileWriter from "../../src/types/kvks/kvks-file-writer.js";
 import { verify_khmer_angkor, verify_balochi_inpage } from './kvk-utils.tests.js';
 import { assert } from 'chai';
+import { SymbolUtils } from '../../src/symbol-utils.js';
 
 describe('kvks-file-reader', function() {
   it('should read a valid file', function() {
@@ -63,7 +64,8 @@ describe('kvks-file-writer', function() {
     const input = fs.readFileSync(path);
 
     const reader = new KvksFileReader();
-    const kvksExpected = reader.read(input);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    const kvksExpected = SymbolUtils.removeSymbols(reader.read(input));
     const invalidVkeys: string[] = [];
     const vk = reader.transform(kvksExpected, invalidVkeys);
     assert.isEmpty(invalidVkeys);
@@ -74,6 +76,7 @@ describe('kvks-file-writer', function() {
     // We compare the (re)loaded data, because there may be
     // minor, irrelevant formatting differences in the emitted xml
     const kvks = reader.read(Buffer.from(output, 'utf8'));
-    assert.deepEqual(kvks, kvksExpected);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    assert.deepEqual(SymbolUtils.removeSymbols(kvks), kvksExpected);
   });
 });
