@@ -719,9 +719,13 @@ export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
     const any: Rule              = new AnyStatementRule();
-    const text: Rule             = new TextRule();
+    const notAny: Rule           = new NotAnyStatementRule();
+    const deadKey: Rule          = new DeadKeyStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
-    this.rule = new AlternateRule([any, contextStatement, text]);
+    const text: Rule             = new TextRule();
+    this.rule = new AlternateRule([
+      any, notAny, deadKey, contextStatement, text,
+    ]);
   }
 }
 
@@ -1065,6 +1069,7 @@ export class OutputStatementRule extends SingleChildRule {
     const callStatement: Rule     = new CallStatementRule();
     const setStoreStatement: Rule = new SetStoreStatementRule();
     const saveStatement: Rule     = new SaveStatementRule();
+    const deadKeyStatement: Rule  = new DeadKeyStatementRule();
     const setLayerStatement: Rule = new SetLayerStatementRule();
     const layerStatement: Rule    = new LayerStatementRule();
     const indexStatement: Rule    = new IndexStatementRule();
@@ -1076,6 +1081,7 @@ export class OutputStatementRule extends SingleChildRule {
       callStatement,
       setStoreStatement,
       saveStatement,
+      deadKeyStatement,
       setLayerStatement,
       layerStatement,
       indexStatement,

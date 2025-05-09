@@ -42,7 +42,7 @@ contextInputBlock: paddedIfLikeBlock? inputContext
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement
-inputElement: anyStatement|notAnyStatement|contextStatement|text
+inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 notAnyStatement: NOTANY bracketedStoreName
@@ -72,7 +72,8 @@ paddedContext: CONTEXT padding
 outputBlock: outputStatement paddedOutputStatement*
 paddedOutputStatement: padding outputStatement
 outputStatement: useStatement|callStatement|setStoreStatement|saveStatement|
-  setLayerStatement|layerStatement|indexStatement|contextStatement|text|BEEP
+  deadKeyStatement|setLayerStatement|layerStatement|indexStatement|
+  contextStatement|text|BEEP
 callStatement: CALL bracketedStoreName
 saveStatement: SAVE bracketedStoreName
 deadKeyStatement: DEADKEY bracketedStoreName

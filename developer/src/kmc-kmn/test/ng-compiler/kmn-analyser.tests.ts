@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1023,6 +1023,51 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.LINE));
     });
   });
+  describe("InputElementRule Tests", () => {
+    it("can construct an InputElementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const inputElement: Rule = new InputElementRule();
+      assert.isNotNull(inputElement);
+    });
+    it("can parse correctly (any)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
+      assert.isNotNull(anyNode);
+      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (notAny)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      const notAnyNode = root.getSoleChildOfType(NodeTypes.NOTANY);
+      assert.isNotNull(notAnyNode);
+      assert.isNotNull(notAnyNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (deadKey)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
+      assert.isNotNull(deadKeyNode);
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (contextStatement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('context(1)');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
+      assert.isNotNull(contextNode);
+      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
+    it("can parse correctly (text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+1780');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+  });
   describe("KeystrokeRule Tests", () => {
     it("can construct an KeystrokeRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1568,7 +1613,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(callNode);
       assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
-    it("can parse correctly (set store statement)", () => {
+    it("can parse correctly (set statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
@@ -1583,6 +1628,14 @@ describe("KMN Analyser Tests", () => {
       const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
       assert.isNotNull(saveNode);
       assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+    it("can parse correctly (deadkey statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
+      assert.isNotNull(deadKeyNode);
+      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
     it("can parse correctly (set layer statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
