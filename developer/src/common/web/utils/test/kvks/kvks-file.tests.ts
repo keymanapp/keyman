@@ -64,6 +64,7 @@ describe('kvks-file-writer', function() {
     const input = fs.readFileSync(path);
 
     const reader = new KvksFileReader();
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     const kvksExpected = SymbolUtils.removeSymbols(reader.read(input));
     const invalidVkeys: string[] = [];
     const vk = reader.transform(kvksExpected, invalidVkeys);
@@ -75,6 +76,7 @@ describe('kvks-file-writer', function() {
     // We compare the (re)loaded data, because there may be
     // minor, irrelevant formatting differences in the emitted xml
     const kvks = reader.read(Buffer.from(output, 'utf8'));
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     assert.deepEqual(SymbolUtils.removeSymbols(kvks), kvksExpected);
   });
 });

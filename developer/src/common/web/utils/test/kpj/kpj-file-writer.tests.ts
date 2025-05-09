@@ -22,6 +22,7 @@ describe('kpj-file-writer', function () {
 
     const writer = new KPJFileWriter();
     const output = writer.write(project);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     const outputKpj = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
 
     // The outputKpj may not contain all the fields from the inputKpj, only the
@@ -61,6 +62,7 @@ describe('kpj-file-writer', function () {
 
     const writer = new KPJFileWriter();
     const output = writer.write(project);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     const outputKpj = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
 
     // The outputKpj may not contain all the fields from the inputKpj, only the

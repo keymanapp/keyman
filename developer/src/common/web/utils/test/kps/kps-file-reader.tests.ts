@@ -60,12 +60,14 @@ describe('kps-file-reader', function () {
   it('kps-file-reader should round-trip with kps-file-writer', function() {
     const input = fs.readFileSync(makePathToFixture('kps', 'khmer_angkor.kps'));
     const reader = new KpsFileReader(callbacks);
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     const kps = SymbolUtils.removeSymbols(reader.read(input));
 
     const writer = new KpsFileWriter();
     const output = writer.write(kps);
 
     // Round Trip
+    // Remove XML metadata symbols to reduce clutter for testing purposes
     const kps2 = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
     assert.deepEqual(kps2, kps);
   });
