@@ -111,6 +111,27 @@ describe("Lexer Tests", () => {
     it("can recognise a SHIFTFREECAPS token", () => {
       recogniseToken(TokenTypes.SHIFTFREESCAPS, 'shiftfreescaps');
     });
+    it("can recognise a CAPS token", () => {
+      recogniseToken(TokenTypes.CAPS, 'caps');
+    });
+    it("can recognise a ALWAYS token", () => {
+      recogniseToken(TokenTypes.ALWAYS, 'always');
+    });
+    it("can recognise a OFF token", () => {
+      recogniseToken(TokenTypes.OFF, 'off');
+    });
+    it("can recognise a ON token", () => {
+      recogniseToken(TokenTypes.ON, 'on');
+    });
+    it("can recognise a ONLY token", () => {
+      recogniseToken(TokenTypes.ONLY, 'only');
+    });
+    it("can recognise a SHIFT token", () => {
+      recogniseToken(TokenTypes.SHIFT, 'shift');
+    });
+    it("can recognise a FREES token", () => {
+      recogniseToken(TokenTypes.FREES, 'frees');
+    });
     it("can recognise an ANY token", () => {
       recogniseToken(TokenTypes.ANY, 'any');
     });
@@ -278,14 +299,12 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.STRING, '"store"');
     });
     it("can recognise a SHIFT_CODE token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'SHIFT');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'CTRL');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'LCTRL');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'RCTRL');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'ALT');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'LALT');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'RALT');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'CAPS');
       recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'NCAPS');
     });
     it("can recognise a KEY_CODE token", () => {
@@ -546,11 +565,47 @@ describe("Lexer Tests", () => {
     it("can recognise a capsalwaysoff store", () => {
       recogniseStoreWithString(TokenTypes.CAPSALWAYSOFF, "1");
     });
+    it("can recognise a 'caps always off' statement", () => {
+      recogniseTokens(
+        'caps always off',
+        [
+          new Token(TokenTypes.CAPS, 'caps'),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
+          new Token(TokenTypes.ALWAYS, 'always', 1, 6),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 12),
+          new Token(TokenTypes.OFF, 'off', 1, 13),
+        ]
+      );
+    });
     it("can recognise a capsononly store", () => {
       recogniseStoreWithString(TokenTypes.CAPSONONLY, "1");
     });
+    it("can recognise a 'caps on only' statement", () => {
+      recogniseTokens(
+        'caps on only',
+        [
+          new Token(TokenTypes.CAPS, 'caps'),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
+          new Token(TokenTypes.ON, 'on', 1, 6),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
+          new Token(TokenTypes.ONLY, 'only', 1, 9),
+        ]
+      );
+    });
     it("can recognise a shiftfreescaps store", () => {
       recogniseStoreWithString(TokenTypes.SHIFTFREESCAPS, "1");
+    });
+    it("can recognise a 'shift frees caps' statement", () => {
+      recogniseTokens(
+        'shift frees caps',
+        [
+          new Token(TokenTypes.SHIFT, 'shift'),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.FREES, 'frees', 1, 7),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 12),
+          new Token(TokenTypes.CAPS, 'caps', 1, 13),
+        ]
+      );
     });
     it("can recognise a begin statement (unicode)", () => {
       recogniseTokens(
