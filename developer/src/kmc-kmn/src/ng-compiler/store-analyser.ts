@@ -358,3 +358,66 @@ export class SetLayerStatementRule extends SingleChildRule {
     return parseSuccess;
   }
 }
+
+abstract class CapsLockStatementRule extends SingleChildRule {
+  protected whitespace: Rule;
+  protected tokenType: TokenTypes;
+  protected nodeType: NodeTypes;
+
+  public constructor() {
+    super();
+    this.whitespace = new TokenRule(TokenTypes.WHITESPACE);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const token: Token = new Token(this.tokenType, '1');
+      node.addToken(this.nodeType, token);
+    }
+    return parseSuccess;
+  }
+}
+
+export class CapsAlwaysOffStatementRule extends CapsLockStatementRule {
+  public constructor() {
+    super();
+    this.tokenType     = TokenTypes.CAPSALWAYSOFF;
+    this.nodeType      = NodeTypes.CAPSALWAYSOFF;
+    const caps: Rule   = new TokenRule(TokenTypes.CAPS);
+    const always: Rule = new TokenRule(TokenTypes.ALWAYS);
+    const off: Rule    = new TokenRule(TokenTypes.OFF);
+    this.rule = new SequenceRule([
+      caps, this.whitespace, always, this.whitespace, off,
+    ]);
+  }
+}
+
+export class CapsOnlyOnStatementRule extends CapsLockStatementRule {
+  public constructor() {
+    super();
+    this.tokenType     = TokenTypes.CAPSONONLY;
+    this.nodeType      = NodeTypes.CAPSONONLY;
+    const caps: Rule   = new TokenRule(TokenTypes.CAPS);
+    const on: Rule     = new TokenRule(TokenTypes.ON);
+    const only: Rule   = new TokenRule(TokenTypes.ONLY);
+    this.rule = new SequenceRule([
+      caps, this.whitespace, on, this.whitespace, only,
+    ]);
+  }
+}
+
+export class ShiftFreesCapsStatementRule extends CapsLockStatementRule {
+  public constructor() {
+    super();
+    this.tokenType    = TokenTypes.SHIFTFREESCAPS;
+    this.nodeType     = NodeTypes.SHIFTFREESCAPS;
+    const shift: Rule = new TokenRule(TokenTypes.SHIFT);
+    const frees: Rule = new TokenRule(TokenTypes.FREES);
+    const caps: Rule  = new TokenRule(TokenTypes.CAPS);
+    this.rule = new SequenceRule([
+      shift, this.whitespace, frees, this.whitespace, caps,
+    ]);
+  }
+}
