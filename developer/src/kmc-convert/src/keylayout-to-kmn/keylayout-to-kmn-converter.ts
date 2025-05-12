@@ -1,6 +1,8 @@
 /*
  * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
+ * Created by S. Schmitt on 2025-05-12
+ *
  * Convert macOS/Ukelele .keylayout files to Keyman .kmn
  *
  */

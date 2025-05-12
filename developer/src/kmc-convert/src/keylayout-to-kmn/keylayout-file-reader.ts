@@ -1,6 +1,8 @@
 /*
  * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
+ * Created by S. Schmitt on 2025-05-12
+ *
  * Read macOS/Ukelele .keylayout files
  *
  */
@@ -48,8 +50,6 @@ export class KeylayoutFileReader {
    */
   public read(inputFilename: string): Object {
 
-    let xmlFile;
-    let jsonObj = [];
 
     const options = {
       ignoreAttributes: false,
@@ -58,16 +58,16 @@ export class KeylayoutFileReader {
     };
 
     try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
+      const xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
       const parser = new XMLParser(options);
-      jsonObj = parser.parse(xmlFile);       // get plain Object
+      const jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
+      return jsonObj;
     }
     catch (err) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
-    return jsonObj;
   }
 }
 
