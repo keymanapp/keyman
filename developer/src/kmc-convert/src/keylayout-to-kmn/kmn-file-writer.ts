@@ -140,7 +140,7 @@ export class KmnFileWriter {
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character and add a warning
         if ((output_character_unicode.length > 1)
           && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
           if (warn_text[2] == "")
@@ -181,7 +181,7 @@ export class KmnFileWriter {
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character and add a warning
         if ((output_character_unicode.length > 1)
           && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
           if (warn_text[2] == "")
@@ -241,7 +241,7 @@ export class KmnFileWriter {
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character and add a warning
         if ((output_character_unicode.length > 1)
           && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
           if (warn_text[2] == "")
@@ -319,8 +319,8 @@ export class KmnFileWriter {
   }
 
   /**
-   * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings
-   *         definition of comparisons e.g. 1-1, 2-4, 6-6
+   * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings.
+   *         Definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
    * @param  rule : Rule[] - an array of all rules
    * @param  index the index of a rule in array[rule]

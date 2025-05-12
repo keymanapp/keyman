@@ -56,20 +56,18 @@ export class KeylayoutToKmnConverter {
     const jsonO: object = KeylayoutReader.read(inputFilename);
 
 
-    // just to check if it works: validate file with stevens schema file -------------------------------------------------
+    // to check if it works: validate file with stevens schema file -------------------------------------------------
 
-    console.log("stop ",);
+    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ I will validate ",inputFilename, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     try {
-      // validate the object tree against the .xsd schema
      if (!KeylayoutReader.validate(jsonO)) {
-       //if (KeylayoutReader.validate(jsonO)) {
         return null;
       }
     } catch (e) {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
     }
-    // just to check if it works: validate file with stevens schema file -------------------------------------------------
+    // to check if it works: validate file with stevens schema file -------------------------------------------------
 
 
     if (!jsonO) {

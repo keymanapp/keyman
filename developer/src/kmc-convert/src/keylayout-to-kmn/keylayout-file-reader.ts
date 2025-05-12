@@ -1,6 +1,8 @@
 /*
  * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
+ * Created by S. Schmitt on 2025-05-12
+ *
  * Read macOS/Ukelele .keylayout files
  *
  */
@@ -10,32 +12,13 @@ import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
 import { KeylayoutToKmnConverter } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { SchemaValidators } from '@keymanapp/common-types';
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
-  /**
-   * @returns true if valid, false if invalid
-   */
-  public validate(source: any): boolean {
-    if(!SchemaValidators.default.keylayout(source)) {
-      console.log("SchemaValidators.default.keylayout).errors ",(<any>SchemaValidators.default.keylayout).errors);
 
-      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
-        this.callbacks.reportMessage(ConverterMessages.Error_SchemaValidationError({
-          instancePath: err.instancePath,
-          keyword: err.keyword,
-          message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
-          params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
-        }));
-      }
-      return false;
-    }
-    return true;
-  }
 
   /**
    * @brief  member function to box single-entry objects into arrays
@@ -67,8 +50,6 @@ export class KeylayoutFileReader {
    */
   public read(inputFilename: string): Object {
 
-    let xmlFile;
-    let jsonObj = [];
 
     const options = {
       ignoreAttributes: false,
@@ -77,16 +58,16 @@ export class KeylayoutFileReader {
     };
 
     try {
-      xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
+      const xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
       const parser = new XMLParser(options);
-      jsonObj = parser.parse(xmlFile);       // get plain Object
+      const jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
+      return jsonObj;
     }
     catch (err) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
-    return jsonObj;
   }
 }
 
