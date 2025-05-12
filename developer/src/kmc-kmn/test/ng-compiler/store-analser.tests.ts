@@ -95,125 +95,35 @@ describe("KMN Store Analyser Tests", () => {
       const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
       assert.isNotNull(stringSystemStoreName);
     });
-    it("can parse correctly (bitmap)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('bitmap');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
-    });
-    it("can parse correctly (copyright)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('copyright');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
-    });
-    it("can parse correctly (displaymap)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('displaymap');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DISPLAYMAP));
-    });
-    it("can parse correctly (ethnologuecode)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('ethnologuecode');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.ETHNOLOGUECODE));
-    });
-    it("can parse correctly (includecodes)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('includecodes');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
-    });
-    it("can parse correctly (keyboardversion)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('keyboardversion');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
-    });
-    it("can parse correctly (kmw_embedcss)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('kmw_embedcss');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_EMBEDCSS));
-    });
-    it("can parse correctly (kmw_embedjs)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('kmw_embedjs');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_EMBEDJS));
-    });
-    it("can parse correctly (kmw_helpfile)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('kmw_helpfile');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_HELPFILE));
-    });
-    it("can parse correctly (kmw_helptext)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('kmw_helptext');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_HELPTEXT));
-    });
-    it("can parse correctly (kmw_rtl)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('kmw_rtl');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KMW_RTL));
-    });
-    it("can parse correctly (language)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('language');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LANGUAGE));
-    });
-    it("can parse correctly (layoutfile)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layoutfile');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYOUTFILE));
-    });
-    it("can parse correctly (message)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('message');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MESSAGE));
-    });
-    it("can parse correctly (mnemoniclayout)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('mnemoniclayout');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MNEMONICLAYOUT));
-    });
-    it("can parse correctly (name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('name');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAME));
-    });
-    it("can parse correctly (targets)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('targets');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.TARGETS));
-    });
-    it("can parse correctly (version)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('version');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
-    });
-    it("can parse correctly (visualkeyboard)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('visualkeyboard');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
-    });
-    it("can parse correctly (windowslanguages)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('windowslanguages');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isTrue(stringSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.WINDOWSLANGUAGES));
+    it("can parse correctly", () => {
+      [
+        {code: 'bitmap',           nodeType: NodeTypes.BITMAP},
+        {code: 'copyright',        nodeType: NodeTypes.COPYRIGHT},
+        {code: 'displaymap',       nodeType: NodeTypes.DISPLAYMAP},
+        {code: 'ethnologuecode',   nodeType: NodeTypes.ETHNOLOGUECODE},
+        {code: 'includecodes',     nodeType: NodeTypes.INCLUDECODES},
+        {code: 'keyboardversion',  nodeType: NodeTypes.KEYBOARDVERSION},
+        {code: 'kmw_embedcss',     nodeType: NodeTypes.KMW_EMBEDCSS},
+        {code: 'kmw_embedjs',      nodeType: NodeTypes.KMW_EMBEDJS},
+        {code: 'kmw_helpfile',     nodeType: NodeTypes.KMW_HELPFILE},
+        {code: 'kmw_helptext',     nodeType: NodeTypes.KMW_HELPTEXT},
+        {code: 'kmw_rtl',          nodeType: NodeTypes.KMW_RTL},
+        {code: 'language',         nodeType: NodeTypes.LANGUAGE},
+        {code: 'layoutfile',       nodeType: NodeTypes.LAYOUTFILE},
+        {code: 'message',          nodeType: NodeTypes.MESSAGE},
+        {code: 'mnemoniclayout',   nodeType: NodeTypes.MNEMONICLAYOUT},
+        {code: 'name',             nodeType: NodeTypes.NAME},
+        {code: 'targets',          nodeType: NodeTypes.TARGETS},
+        {code: 'version',          nodeType: NodeTypes.VERSION},
+        {code: 'visualkeyboard',   nodeType: NodeTypes.VISUALKEYBOARD},
+        {code: 'windowslanguages', nodeType: NodeTypes.WINDOWSLANGUAGES},
+      ].forEach((testCase) => {
+        Rule.tokenBuffer = stringToTokenBuffer(testCase.code);
+        const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(stringSystemStoreName.parse(root));
+        assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
+      });
     });
   });
   describe("CasedkeysStoreAssignRule Tests", () => {

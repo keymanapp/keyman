@@ -97,6 +97,9 @@ export class StringSystemStoreNameRule extends AlternateTokenRule {
       TokenTypes.VERSION,
       TokenTypes.VISUALKEYBOARD,
       TokenTypes.WINDOWSLANGUAGES,
+      TokenTypes.CAPSALWAYSOFF,
+      TokenTypes.CAPSONONLY,
+      TokenTypes.SHIFTFREESCAPS,
     ], true);
   }
 }
