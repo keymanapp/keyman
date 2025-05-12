@@ -191,6 +191,23 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.236 stable 2025-05-12
+
+* chore(linux): Update debian changelog (#13737)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13741)
+* fix(android): Use Alert Dialog if keyboard pkg missing languages (#13802)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13808)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13817)
+* change(ios): limit reports about devices without predefined scaling entries (#13828)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13841)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13838)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13843)
+* fix(mac): add version metadata after building tests (#13853)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13863)
+* fix(developer): remove ngrok binary at build time (#13873)
+* maint(common): apply new codeowners from master (#13874)
+* chore(mac,windows): Update Crowdin strings for Italian (#13872)
+
 ## 18.0.234 beta 2025-04-22
 
 * fix(android): Require RELEASE_OEM env vars to build FirstVoices Android (#13725)
