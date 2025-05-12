@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, SaveStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, SaveStatementRule, ShiftCodeRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -464,6 +464,32 @@ describe("KMN Analyser Tests", () => {
       const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+    });
+  });
+  describe("ShiftCodeRule Tests", () => {
+    it("can construct a ShiftCodeRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const shiftCode: Rule = new ShiftCodeRule();
+      assert.isNotNull(shiftCode);
+    });
+    it("can parse correctly", () => {
+      [
+        'shift',
+        'caps',
+        'ctrl',
+        'lctrl',
+        'rctrl',
+        'alt',
+        'lalt',
+        'ralt',
+        'ncaps',
+      ].forEach((code) => {
+        Rule.tokenBuffer = stringToTokenBuffer(`${code} `);
+        const shiftCode: Rule = new ShiftCodeRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(shiftCode.parse(root));
+        assert.equal(root.getSoleChildOfType(NodeTypes.SHIFT_CODE).getText(), code);
+      });
     });
   });
   describe("OutsStatementRule Tests", () => {
