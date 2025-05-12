@@ -71,7 +71,7 @@ function zip_files() {
   done
 
   COMPRESS_CMD=zip
-  IGNORE=
+  IGNORE=()
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
@@ -89,20 +89,20 @@ function zip_files() {
 
       for ignoreFile in "${EXCLUDE[@]}"
       do
-        IGNORE+= ' -xr!${ignoreFile}'
+        IGNORE+=" -xr!${ignoreFile}"
       done
       # 7z command, excluding build.sh files
-      "${SEVENZ}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE}
+      "${SEVENZ}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
     fi
   else
 
     for ignoreFile in "${EXCLUDE[@]}"
     do
-      IGNORE+= ' -x ${ignoreFile}'
+      IGNORE+=" -x \\*\\*/${ignoreFile}"
     done
     # zip command, excluding build.sh files
-    echo ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE}
-    exit
+    echo ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
+    ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
   fi
 
 }
