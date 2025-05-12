@@ -28,9 +28,9 @@ fi
 #. ../resources/shellHelperFunctions.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`
-TIER=`cat ../TIER.md`
+KEYMAN_TIER=`cat ../TIER.md`
 
-KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${TIER}.txt"
+KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${KEYMAN_TIER}.txt"
 CHANGELOG_PATH="upload/$BUILD_NUMBER/$KEYMAN_CHANGELOG"
 
 WORK_DIR=`pwd`
@@ -46,7 +46,7 @@ mkdir -p "${UPLOAD_DIR}"
 # First, we prep the files for publication: write changelog
 
 echo "Writing changelog to $CHANGELOG_PATH"
-get_version_notes "ios" "${BUILD_NUMBER}" "$TIER" > $CHANGELOG_PATH
+get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
 assertFileExists "${CHANGELOG_PATH}"
 
@@ -128,9 +128,9 @@ fi
 
 cd "${UPLOAD_DIR}"
 
-write_download_info "Keyman Engine for iOS" "${KMEI_DST_NAME}" "${BUILD_NUMBER}" "${TIER}" "ios"
-write_download_info "Keyman for iPhone and iPad" "${KEYMANAPP_IPA_DST}" "${BUILD_NUMBER}" "${TIER}" "ios"
+write_download_info "Keyman Engine for iOS" "${KMEI_DST_NAME}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
+write_download_info "Keyman for iPhone and iPad" "${KEYMANAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
 
 if [ ${RELEASE_OEM_FIRSTVOICES} = true ]; then
-  write_download_info "FirstVoices Keyboards" "${FIRSTVOICESAPP_IPA_DST}" "${BUILD_NUMBER}" "${TIER}" "ios"
+  write_download_info "FirstVoices Keyboards" "${FIRSTVOICESAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
 fi

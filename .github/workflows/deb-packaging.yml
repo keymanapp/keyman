@@ -37,7 +37,7 @@ jobs:
     if: github.repository == 'keymanapp/keyman'
     runs-on: ubuntu-24.04
     outputs:
-      VERSION: ${{ steps.version_step.outputs.VERSION }}
+      KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
@@ -72,10 +72,10 @@ jobs:
     - name: Build source package
       id: build_source_package
       run: |
-        export TIER=$(cat TIER.md)
+        export KEYMAN_TIER=$(cat TIER.md)
         export GHA_TEST_BUILD="${{ github.event.client_payload.isTestBuild }}"
         export GHA_BRANCH="${{ github.event.client_payload.branch }}"
-        echo "TIER=$TIER" >> $GITHUB_ENV
+        echo "KEYMAN_TIER=$KEYMAN_TIER" >> $GITHUB_ENV
         echo "GHA_TEST_BUILD=${GHA_TEST_BUILD}" >> $GITHUB_ENV
         echo "GHA_BRANCH=${GHA_BRANCH}" >> $GITHUB_ENV
         cd linux
@@ -87,7 +87,7 @@ jobs:
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
         . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
-        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "KEYMAN_VERSION=$KEYMAN_VERSION" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
       id: prerelease_tag
@@ -103,9 +103,9 @@ jobs:
     - name: Output which branch or PR we're building plus name of .dsc file
       run: |
         if [ "${{ github.event.client_payload.isTestBuild }}" == "true" ]; then
-          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":checkered_flag: **Test build of version ${{ steps.version_step.outputs.KEYMAN_VERSION }} for ${{ github.event.client_payload.branch }}**" >> $GITHUB_STEP_SUMMARY
         else
-          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo ":ship: **Release build of ${{ github.event.client_payload.branch }} branch (${{ github.event.client_payload.branch}}), version ${{ steps.version_step.outputs.KEYMAN_VERSION }}**" >> $GITHUB_STEP_SUMMARY
         fi
         echo "" >> $GITHUB_STEP_SUMMARY
         echo ":gift: Generated source package:" >> $GITHUB_STEP_SUMMARY
@@ -140,7 +140,7 @@ jobs:
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
-        version: ${{ needs.sourcepackage.outputs.VERSION }}
+        version: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
         deb_fullname: ${{env.DEBFULLNAME}}
         deb_email: ${{env.DEBEMAIL}}
@@ -166,7 +166,7 @@ jobs:
       uses: ./.github/actions/build-binary-packages
       with:
         dist: ${{ matrix.dist }}
-        version: ${{ needs.sourcepackage.outputs.VERSION }}
+        version: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
         prerelease_tag: ${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}
         deb_fullname: ${{env.DEBFULLNAME}}
         deb_email: ${{env.DEBEMAIL}}
@@ -211,8 +211,8 @@ jobs:
       - name: Sign packages
         uses: sillsdev/gha-deb-signing@a38dbde6bc9afabede5e07609105acc83c760ad4 # v0.6
         with:
-          src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1_source.changes"
-          bin-pkg-name: "keyman_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+"
+          src-pkg-name: "keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}-1_source.changes"
+          bin-pkg-name: "keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+"
           artifacts-prefix: "keyman-"
           artifacts-result-name: "keyman-signedpkgs"
           gpg-signing-key: "${{ secrets.GPG_SIGNING_KEY }}"
@@ -293,7 +293,7 @@ jobs:
         echo "::endgroup::"
 
         echo -e "::group::${COLOR_GREEN}Uploading binary packages"
-        pattern="keyman_${{ needs.sourcepackage.outputs.VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
+        pattern="keyman_${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}.+\+(.*)[0-9]_[^.]+.changes"
         for f in *_amd64.changes; do
           if [[ $f =~ $pattern ]]; then
             dist=${BASH_REMATCH[1]}
@@ -316,7 +316,7 @@ jobs:
 
     - name: Save environment
       run: |
-        echo "VERSION=${{ needs.sourcepackage.outputs.VERSION }}" > artifacts/env
+        echo "KEYMAN_VERSION=${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}" > artifacts/env
         echo "PRERELEASE_TAG=${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}" >> artifacts/env
         echo "GIT_SHA=${{ github.event.client_payload.buildSha }}" >> artifacts/env
         echo "GIT_BASE=${{ github.event.client_payload.baseRef }}" >> artifacts/env
