@@ -14,9 +14,9 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
-        buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+        // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle but Gradle removes them for libraries
+        buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+KEYMAN_VERSION_NAME+"\""
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
 
         // Sepcify library filename keyman-engine-$CONFIG.aar
         setProperty("archivesBaseName", "keyman-engine")

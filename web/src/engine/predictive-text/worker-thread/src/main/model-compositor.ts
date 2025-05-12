@@ -15,7 +15,6 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -194,7 +193,7 @@ export class ModelCompositor {
   }
 
   // Responsible for applying casing rules to suggestions.
-  private applySuggestionCasing(suggestion: Suggestion, baseWord: USVString, casingForm: CasingForm) {
+  private applySuggestionCasing(suggestion: Suggestion, baseWord: string, casingForm: CasingForm) {
     // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
     let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
 

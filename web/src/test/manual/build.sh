@@ -18,8 +18,7 @@ builder_describe "Builds the Keyman Engine for Web's sample page setups." \
   "configure           Does nothing for this project" \
   "clean" \
   "build" \
-  "test                Does nothing for this project" \
-  "--ci                Does nothing for this project"
+  "test                Does nothing for this project"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \

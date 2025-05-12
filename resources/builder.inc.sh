@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2310
 
 # Note: these two lines can be uncommented for debugging and profiling build
 # scripts:
@@ -169,35 +170,66 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark=
-  if [[ $# -gt 1 && $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
-    color="$1"
-    shift
+  local color=white message= mark= block= action= do_output=true
+
+  if [[ $# -gt 1 ]]; then
+    if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
+      color="$1"
+      shift
+    elif [[ $1 == "start" ]]; then
+      # builder_echo start block message
+      action="$1"
+      block="$2"
+      shift 2
+      color="heading"
+      if ! builder_is_running_on_teamcity && builder_is_child_build; then
+        do_output=${_builder_debug_internal:-false}
+      fi
+    elif [[ $1 == "end" ]]; then
+      # builder_echo end block status message
+      action="$1"
+      block="$2"
+      color="$3"
+      shift 3
+      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
+        do_output=${_builder_debug_internal:-false}
+      fi
+    fi
   fi
   message="$*"
 
-  if [[ ! -z ${COLOR_RED+x} ]]; then
-    case $color in
-      white) color="$COLOR_WHITE" ;;
-      grey) color="$COLOR_GREY" ;;
-      green|success) color="$COLOR_GREEN" ;;
-      blue|heading) color="$COLOR_BLUE" ;;
-      yellow|warning) color="$COLOR_YELLOW" ;;
-      red|error) color="$COLOR_RED" ;;
-      purple) color="$COLOR_PURPLE" ;;
-      brightwhite) color="$COLOR_BRIGHTWHITE" ;;
-      teal|debug) color="$COLOR_TEAL" ;;
-      setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
-    esac
+  if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
+    echo -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+  fi
 
-    if builder_is_dep_build; then
-      echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+  if ${do_output}; then
+    if [[ ! -z ${COLOR_RED+x} ]]; then
+      case $color in
+        white) color="$COLOR_WHITE" ;;
+        grey) color="$COLOR_GREY" ;;
+        green|success) color="$COLOR_GREEN" ;;
+        blue|heading) color="$COLOR_BLUE" ;;
+        yellow|warning) color="$COLOR_YELLOW" ;;
+        red|error) color="$COLOR_RED" ;;
+        purple) color="$COLOR_PURPLE" ;;
+        brightwhite) color="$COLOR_BRIGHTWHITE" ;;
+        teal|debug) color="$COLOR_TEAL" ;;
+        setmark) mark="$HEADING_SETMARK" color="$COLOR_PURPLE" ;;
+      esac
+
+      if builder_is_dep_build; then
+        echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      else
+        echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      fi
     else
-      echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+      # Cope with the case of pre-init message and just emit plain text
+      echo -e "$message"
     fi
-  else
-    # Cope with the case of pre-init message and just emit plain text
-    echo -e "$message"
+  fi
+
+  if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
+    echo -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 }
 
@@ -393,9 +425,7 @@ _builder_execute_child() {
 
   local script="$THIS_SCRIPT_PATH/${_builder_target_paths[$target]}/build.sh"
 
-  if $_builder_debug_internal; then
-    builder_echo heading "## $action$target starting..."
-  fi
+  builder_echo start "$action$target" "## $action$target starting..."
 
   # Build array of specified inheritable options
   local child_options=()
@@ -424,12 +454,10 @@ _builder_execute_child() {
     $builder_debug \
     $_builder_offline \
   && (
-    if $_builder_debug_internal; then
-      builder_echo success "## $action$target completed successfully"
-    fi
+    builder_echo end "$action$target" success "## $action$target completed successfully"
   ) || (
     result=$?
-    builder_echo error "## $action$target failed with exit code $result"
+    builder_echo end "$action$target" error "## $action$target failed with exit code $result"
     exit $result
   ) || exit $? # Required due to above subshell masking exit
 }
@@ -619,19 +647,19 @@ builder_start_action() {
     # verify whether a target output is present.
     if builder_is_dep_build &&
         ! builder_is_full_dep_build &&
-        _builder_dep_output_exists $_builder_matched_action; then
-      builder_echo "skipping $_builder_matched_action_name, up-to-date"
+        _builder_dep_output_exists "${_builder_matched_action}"; then
+      builder_echo "skipping ${_builder_matched_action_name}, up-to-date"
       return 1
     fi
 
-    builder_echo blue "## $_builder_matched_action_name starting..."
-    if [ -n "${_builder_current_action}" ]; then
+    builder_echo start "${_builder_matched_action_name}" "## ${_builder_matched_action_name} starting..."
+    if [[ -n "${_builder_current_action}" ]]; then
       _builder_warn_if_incomplete
     fi
-    _builder_current_action="$_builder_matched_action"
+    _builder_current_action="${_builder_matched_action}"
 
     # Build dependencies as required
-    _builder_do_build_deps "$_builder_matched_action"
+    _builder_do_build_deps "${_builder_matched_action}"
     return 0
   else
     return 1
@@ -1048,6 +1076,7 @@ _builder_get_default_description() {
     :module)   description="this module" ;;
     :tools)    description="build tools for this project" ;;
     --debug)   description="debug build" ;;
+    --release) description="release build (prevents --debug in local-env builds)" ;;
   esac
   echo "$description"
 }
@@ -1269,6 +1298,7 @@ _builder_parse_expanded_parameters() {
   _builder_build_deps=--deps
   builder_verbose=
   builder_debug=
+  local is_release=false
   local _params=($@)
   _builder_chosen_action_targets=()
   _builder_chosen_options=()
@@ -1385,9 +1415,14 @@ _builder_parse_expanded_parameters() {
           _builder_chosen_options+=(--verbose)
           builder_verbose=--verbose
           ;;
-        --debug|-d)
+        --debug)
           _builder_chosen_options+=(--debug)
           builder_debug=--debug
+          ;;
+        --release)
+          _builder_chosen_options+=(--release)
+          # As of #13827, this is only checked when detecting if --debug should be auto-applied.
+          is_release=true
           ;;
         --deps|--no-deps|--force-deps)
           _builder_build_deps=$key
@@ -1472,11 +1507,21 @@ _builder_parse_expanded_parameters() {
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
+    export _builder_deps_built=`mktemp`
+
+    # Per #11106, local builds use --debug by default.
+    # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
+    if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+      builder_echo grey "Local build environment detected:  setting --debug"
+      _params+=(--debug)
+      _builder_chosen_options+=(--debug)
+      builder_debug=--debug
+    fi
+
     builder_echo setmark "$(basename "$0") parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
       builder_echo grey "$(basename "$0") extra parameters: <${builder_extra_params[@]}>"
     fi
-    export _builder_deps_built=`mktemp`
   fi
 
   if builder_is_debug_build; then
@@ -1660,14 +1705,14 @@ builder_finish_action() {
       # file or directory exist now?
       if _builder_dep_output_defined $matched_action && ! _builder_dep_output_exists "$matched_action"; then
         builder_echo warning "Expected output: '${_builder_dep_path[$matched_action]}'."
-        builder_echo warning "## $action_name completed successfully, but output does not exist"
+        builder_echo end "$action_name" warning "## $action_name completed successfully, but output does not exist"
       else
-        builder_echo success "## $action_name completed successfully"
+        builder_echo end "$action_name" success "## $action_name completed successfully"
       fi
     elif [[ $result == failure ]]; then
-      builder_echo error "## $action_name failed"
+      builder_echo end "$action_name" error "## $action_name failed"
     else
-      builder_echo error "## $action_name failed with message: $result"
+      builder_echo end "$action_name" error "## $action_name failed with message: $result"
     fi
 
     # Remove $action$target from the array; it is no longer a current action
@@ -2093,6 +2138,33 @@ builder_is_target_excluded_by_platform() {
     return 0
   fi
   return 1
+}
+
+# Returns 0 if the script is running in a Docker container
+builder_is_running_on_docker() {
+  if [[ -z ${DOCKER_RUNNING:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running in a GitHub Actions environment
+builder_is_running_on_gha() {
+  if [[ -z ${GITHUB_ACTIONS:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running on TeamCity
+builder_is_running_on_teamcity() {
+  if [[ -z "${TEAMCITY_GIT_PATH:-}" ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 ################################################################################

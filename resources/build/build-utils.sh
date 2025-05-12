@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# This script sets build environment variables. VERSION vars are also exported:
-#   VERSION:          Full current build version, e.g. "14.0.1"
-#   VERSION_WIN:      Full current build version for Windows, e.g. "14.0.1.0"
-#   VERSION_RELEASE:  Current release version, e.g. "14.0"
-#   VERSION_MAJOR:    Major version, e.g. "14"
-#   VERSION_MINOR:    Minor version, e.g. "0"
-#   VERSION_PATCH:    Patch version, e.g. "1"
-#   TIER:             Current tier, one of "alpha", "beta" or "stable"
-#   VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
-#   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
-#   VERSION_GIT_TAG:  Git tag for the release, "release@$VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
+# This script sets build environment variables. KEYMAN_VERSION vars are also exported:
+#   KEYMAN_VERSION:          Full current build version, e.g. "14.0.1"
+#   KEYMAN_VERSION_WIN:      Full current build version for Windows, e.g. "14.0.1.0"
+#   KEYMAN_VERSION_RELEASE:  Current release version, e.g. "14.0"
+#   KEYMAN_VERSION_MAJOR:    Major version, e.g. "14"
+#   KEYMAN_VERSION_MINOR:    Minor version, e.g. "0"
+#   KEYMAN_VERSION_PATCH:    Patch version, e.g. "1"
+#   KEYMAN_TIER:             Current tier, one of "alpha", "beta" or "stable"
+#   KEYMAN_VERSION_TAG:      Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
+#   KEYMAN_VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
+#   KEYMAN_VERSION_GIT_TAG:  Git tag for the release, "release@$KEYMAN_VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
 #   KEYMAN_ROOT:      fully resolved root path of Keyman repository
-#   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
-#   UPLOAD_SENTRY:    true - if VERSION_ENVIRONMENT is one of alpha, beta, stable
+#   KEYMAN_VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
+#   UPLOAD_SENTRY:    true - if KEYMAN_VERSION_ENVIRONMENT is one of alpha, beta, stable
 #                     false - if local, test.  Indicates if debug artifacts should be uploaded to Sentry
 #   BUILDER_OS:       win|mac|linux -- current build environment
 #
@@ -57,20 +57,20 @@ function findKeymanRoot() {
 }
 
 function findVersion() {
-    local VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-    VERSION=$(builder_trim $(<"$VERSION_MD"))
-    [[ "$VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
-        VERSION_MAJOR="${BASH_REMATCH[1]}"
-        VERSION_MINOR="${BASH_REMATCH[2]}"
-        VERSION_PATCH="${BASH_REMATCH[3]}"
-        VERSION_RELEASE="$VERSION_MAJOR.$VERSION_MINOR"
+    local KEYMAN_VERSION_MD="$KEYMAN_ROOT/VERSION.md"
+    KEYMAN_VERSION=$(builder_trim $(<"$KEYMAN_VERSION_MD"))
+    [[ "$KEYMAN_VERSION" =~ ^([[:digit:]]+)\.([[:digit:]]+)\.([[:digit:]]+)$ ]] && {
+        KEYMAN_VERSION_MAJOR="${BASH_REMATCH[1]}"
+        KEYMAN_VERSION_MINOR="${BASH_REMATCH[2]}"
+        KEYMAN_VERSION_PATCH="${BASH_REMATCH[3]}"
+        KEYMAN_VERSION_RELEASE="$KEYMAN_VERSION_MAJOR.$KEYMAN_VERSION_MINOR"
     } || {
         echo "Invalid VERSION.md file: expected major.minor.patch";
         exit 1;
     }
 
     # Used for Windows, which requires a four part version string
-    VERSION_WIN="$VERSION.0"
+    KEYMAN_VERSION_WIN="$KEYMAN_VERSION.0"
 
     #
     # Build a tag to append to the version string. This is not assigned
@@ -78,70 +78,71 @@ function findVersion() {
     # display string and in TeamCity configuration
     #
 
-    if [ "$TIER" == "alpha" ] || [ "$TIER" == "beta" ]; then
-        VERSION_TAG="-$TIER"
+    if [ "$KEYMAN_TIER" == "alpha" ] || [ "$KEYMAN_TIER" == "beta" ]; then
+        KEYMAN_VERSION_TAG="-$KEYMAN_TIER"
     else
-        VERSION_TAG=
+        KEYMAN_VERSION_TAG=
     fi
 
-    if [[ -z "${TEAMCITY_VERSION-}" && -z "${GITHUB_ACTIONS-}" && -z "${KEYMAN_PKG_BUILD-}" ]]; then
+    if ! builder_is_running_on_teamcity && ! builder_is_running_on_gha \
+      && [[ -z "${KEYMAN_PKG_BUILD-}" ]]; then
         # Local dev machine, not TeamCity or GitHub Action and not .deb package build
-        VERSION_TAG="$VERSION_TAG-local"
-        VERSION_ENVIRONMENT=local
+        KEYMAN_VERSION_TAG="$KEYMAN_VERSION_TAG-local"
+        KEYMAN_VERSION_ENVIRONMENT=local
     elif [ -n "${TEAMCITY_PR_NUMBER-}" ]; then
         # On TeamCity: are we running a pull request build or a master/beta/stable build?
-        VERSION_ENVIRONMENT="test"
+        KEYMAN_VERSION_ENVIRONMENT="test"
         # Note TEAMCITY_PR_NUMBER can also be 'master', 'beta', or 'stable-x.y'
         # This indicates we are running a Test build.
         if [[ $TEAMCITY_PR_NUMBER =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
-            VERSION_TAG="$VERSION_TAG-test"
+            KEYMAN_VERSION_TAG="$KEYMAN_VERSION_TAG-test"
         else
-            VERSION_TAG="$VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
+            KEYMAN_VERSION_TAG="$KEYMAN_VERSION_TAG-test-$TEAMCITY_PR_NUMBER"
         fi
-    elif [ -n "${GITHUB_ACTIONS-}" ] && ${GHA_TEST_BUILD-}; then
-        VERSION_ENVIRONMENT="test"
+    elif builder_is_running_on_gha && ${GHA_TEST_BUILD-}; then
+        KEYMAN_VERSION_ENVIRONMENT="test"
         # Note GHA_BRANCH can be 'master', 'beta', or 'stable-x.y'
         # This indicates we are running a Test build.
         if [[ ${GHA_BRANCH-} =~ ^(master|beta|stable(-[0-9]+\.[0-9]+)?)$ ]]; then
-            VERSION_TAG="${VERSION_TAG}-test"
+            KEYMAN_VERSION_TAG="${KEYMAN_VERSION_TAG}-test"
         else
-            VERSION_TAG="${VERSION_TAG}-test-${GHA_BRANCH-unset}"
+            KEYMAN_VERSION_TAG="${KEYMAN_VERSION_TAG}-test-${GHA_BRANCH-unset}"
         fi
     else
-        VERSION_ENVIRONMENT="$TIER"
+        KEYMAN_VERSION_ENVIRONMENT="$KEYMAN_TIER"
     fi
 
-    VERSION_WITH_TAG="$VERSION$VERSION_TAG"
-    VERSION_GIT_TAG="release@$VERSION_WITH_TAG"
+    KEYMAN_VERSION_WITH_TAG="$KEYMAN_VERSION$KEYMAN_VERSION_TAG"
+    KEYMAN_VERSION_GIT_TAG="release@$KEYMAN_VERSION_WITH_TAG"
 
-    readonly VERSION
-    readonly VERSION_MAJOR
-    readonly VERSION_MINOR
-    readonly VERSION_PATCH
-    readonly VERSION_RELEASE
-    readonly VERSION_WIN
-    readonly VERSION_TAG
-    readonly VERSION_WITH_TAG
-    readonly VERSION_ENVIRONMENT
-    readonly VERSION_GIT_TAG
+    readonly KEYMAN_VERSION
+    readonly KEYMAN_VERSION_MAJOR
+    readonly KEYMAN_VERSION_MINOR
+    readonly KEYMAN_VERSION_PATCH
+    readonly KEYMAN_VERSION_RELEASE
+    readonly KEYMAN_VERSION_WIN
+    readonly KEYMAN_VERSION_TAG
+    readonly KEYMAN_VERSION_WITH_TAG
+    readonly KEYMAN_VERSION_ENVIRONMENT
+    readonly KEYMAN_VERSION_GIT_TAG
 
     # Export version strings so places like version.gradle can access them
-    export VERSION
-    export VERSION_MAJOR
-    export VERSION_MINOR
-    export VERSION_PATCH
-    export VERSION_RELEASE
-    export VERSION_WIN
-    export VERSION_TAG
-    export VERSION_WITH_TAG
-    export VERSION_ENVIRONMENT
-    export VERSION_GIT_TAG
+    export KEYMAN_VERSION
+    export KEYMAN_VERSION_MAJOR
+    export KEYMAN_VERSION_MINOR
+    export KEYMAN_VERSION_PATCH
+    export KEYMAN_VERSION_RELEASE
+    export KEYMAN_VERSION_WIN
+    export KEYMAN_VERSION_TAG
+    export KEYMAN_VERSION_WITH_TAG
+    export KEYMAN_VERSION_ENVIRONMENT
+    export KEYMAN_VERSION_GIT_TAG
 }
 
 function findTier() {
-  local TIER_MD="$KEYMAN_ROOT/TIER.md"
-  TIER=$(builder_trim $(<"$TIER_MD"))
-  [[ "$TIER" =~ ^(alpha|beta|stable)$ ]] || {
+  local KEYMAN_TIER_MD="$KEYMAN_ROOT/TIER.md"
+  KEYMAN_TIER=$(builder_trim $(<"$KEYMAN_TIER_MD"))
+  [[ "$KEYMAN_TIER" =~ ^(alpha|beta|stable)$ ]] || {
       echo "Invalid TIER.md file: expected alpha, beta or stable."
       exit 1;
   }
@@ -150,39 +151,40 @@ function findTier() {
 function printBuildNumberForTeamCity() {
     if [ ! -z "${TEAMCITY_VERSION-}" ]; then
         if [ ! -z "${TEAMCITY_PR_NUMBER-}" ]; then
-            echo "##teamcity[buildNumber '$VERSION_WITH_TAG']"
+            echo "##teamcity[buildNumber '$KEYMAN_VERSION_WITH_TAG']"
         else
             # For alpha/beta builds, for now we don't append the
             # version tag as buildNumber is used in the delivery
             # of the build version. We may improve this in the
             # future.
-            echo "##teamcity[buildNumber '$VERSION']"
+            echo "##teamcity[buildNumber '$KEYMAN_VERSION']"
         fi
     fi
 }
 
 function printVersionUtilsDebug() {
-    echo "KEYMAN_ROOT:         $KEYMAN_ROOT"
-    echo "VERSION:             $VERSION"
-    echo "VERSION_WIN:         $VERSION_WIN"
-    echo "VERSION_RELEASE:     $VERSION_RELEASE"
-    echo "VERSION_MAJOR:       $VERSION_MAJOR"
-    echo "VERSION_MINOR:       $VERSION_MINOR"
-    echo "VERSION_PATCH:       $VERSION_PATCH"
-    echo "TIER:                $TIER"
-    echo "VERSION_TAG:         $VERSION_TAG"
-    echo "VERSION_WITH_TAG:    $VERSION_WITH_TAG"
-    echo "VERSION_GIT_TAG:     $VERSION_GIT_TAG"
-    echo "VERSION_ENVIRONMENT: $VERSION_ENVIRONMENT"
+    echo "KEYMAN_ROOT:                $KEYMAN_ROOT"
+    echo "KEYMAN_VERSION:             $KEYMAN_VERSION"
+    echo "KEYMAN_VERSION_WIN:         $KEYMAN_VERSION_WIN"
+    echo "KEYMAN_VERSION_RELEASE:     $KEYMAN_VERSION_RELEASE"
+    echo "KEYMAN_VERSION_MAJOR:       $KEYMAN_VERSION_MAJOR"
+    echo "KEYMAN_VERSION_MINOR:       $KEYMAN_VERSION_MINOR"
+    echo "KEYMAN_VERSION_PATCH:       $KEYMAN_VERSION_PATCH"
+    echo "KEYMAN_TIER:                $KEYMAN_TIER"
+    echo "KEYMAN_VERSION_TAG:         $KEYMAN_VERSION_TAG"
+    echo "KEYMAN_VERSION_WITH_TAG:    $KEYMAN_VERSION_WITH_TAG"
+    echo "KEYMAN_VERSION_GIT_TAG:     $KEYMAN_VERSION_GIT_TAG"
+    echo "KEYMAN_VERSION_ENVIRONMENT: $KEYMAN_VERSION_ENVIRONMENT"
 }
 
 function findShouldSentryRelease() {
-    # Default, for 'test' or 'local' environment, or in case $VERSION_ENVIRONMENT is improperly specified.
+    # Default, for 'test' or 'local' environment, or in case
+    # $KEYMAN_VERSION_ENVIRONMENT is improperly specified.
     # (May be overridden by -upload-sentry in supporting build scripts.)
     UPLOAD_SENTRY=false
 
     # Default: override to `true` for release builds.
-    case $VERSION_ENVIRONMENT in
+    case $KEYMAN_VERSION_ENVIRONMENT in
     # Actual release tiers
     alpha | beta | stable)
         UPLOAD_SENTRY=true
@@ -236,12 +238,12 @@ function exportEnvironmentDefinitionScript() {
     echo "# This file redefines critical environment variables for import to Xcode build phases." >> "$ENVIRONMENT_SH"
     echo "" >> "$ENVIRONMENT_SH"
 
-    # Defining variables for VERSION here will leave static definitions that don't automatically update when a user
+    # Defining variables for KEYMAN_VERSION here will leave static definitions that don't automatically update when a user
     # changes branches; some branches are 'similar enough' to not require full command-line based rebuilds.
-    # We want that VERSION number to properly mirror the state of its branch during development so that it matches
+    # We want that KEYMAN_VERSION number to properly mirror the state of its branch during development so that it matches
     # any error reports that get logged to Sentry.
     #
-    # As a result, we explicitly do NOT define VERSION or VERSION_TAG as part of ENVIRONMENT_SH.
+    # As a result, we explicitly do NOT define KEYMAN_VERSION or KEYMAN_VERSION_TAG as part of ENVIRONMENT_SH.
 
     echo "# Required for successful dSYM upload for Sentry error reporting" >> "$ENVIRONMENT_SH"
     echo "export SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN:-}" >> "$ENVIRONMENT_SH"
@@ -267,17 +269,17 @@ replaceVersionStrings() {
   local outfile=$2
 
   sed "
-    s/\$VERSION_WIN/$VERSION_WIN/g;
-    s/\$VERSION_RELEASE/$VERSION_RELEASE/g;
-    s/\$VERSION_MAJOR/$VERSION_MAJOR/g;
-    s/\$VERSION_MINOR/$VERSION_MINOR/g;
-    s/\$VERSION_PATCH/$VERSION_PATCH/g;
-    s/\$TIER/$TIER/g;
-    s/\$VERSION_TAG/$VERSION_TAG/g;
-    s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
-    s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
-    s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
-    s/\$VERSION/$VERSION/g;
+    s/\$KEYMAN_VERSION_WIN/$KEYMAN_VERSION_WIN/g;
+    s/\$KEYMAN_VERSION_RELEASE/$KEYMAN_VERSION_RELEASE/g;
+    s/\$KEYMAN_VERSION_MAJOR/$KEYMAN_VERSION_MAJOR/g;
+    s/\$KEYMAN_VERSION_MINOR/$KEYMAN_VERSION_MINOR/g;
+    s/\$KEYMAN_VERSION_PATCH/$KEYMAN_VERSION_PATCH/g;
+    s/\$KEYMAN_TIER/$KEYMAN_TIER/g;
+    s/\$KEYMAN_VERSION_TAG/$KEYMAN_VERSION_TAG/g;
+    s/\$KEYMAN_VERSION_WITH_TAG/$KEYMAN_VERSION_WITH_TAG/g;
+    s/\$KEYMAN_VERSION_GIT_TAG/$KEYMAN_VERSION_GIT_TAG/g;
+    s/\$KEYMAN_VERSION_ENVIRONMENT/$KEYMAN_VERSION_ENVIRONMENT/g;
+    s/\$KEYMAN_VERSION/$KEYMAN_VERSION/g;
     " "$infile" > "$outfile"
 }
 
@@ -287,39 +289,39 @@ replaceVersionStrings_Mkver() {
   local infile=$1
   local outfile=$2
 
-  # Note that $VERSION differs between the two functions!
+  # Note that $KEYMAN_VERSION differs between the two functions!
   # We should be deprecating all the mkver strings
 
   sed "
-    s/\$VersionWin/$VERSION_WIN/g;
-    s/\$VersionRelease/$VERSION_RELEASE/g;
-    s/\$VersionMajor/$VERSION_MAJOR/g;
-    s/\$VersionMinor/$VERSION_MINOR/g;
-    s/\$VersionPatch/$VERSION_PATCH/g;
-    s/\$Tier/$TIER/g;
-    s/\$Tag/$VERSION_TAG/g;
-    s/\$VersionWithTag/$VERSION_WITH_TAG/g;
-    s/\$VersionGitTag/$VERSION_GIT_TAG/g;
-    s/\$VersionRc/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
-    s/\$Environment/$VERSION_ENVIRONMENT/g;
-    s/\$Version/$VERSION/g;
-    s/\$VERSIONNUM/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
-    s/\$RELEASE_MAJOR/$VERSION_MAJOR/g;
-    s/\$RELEASE_MINOR/$VERSION_MINOR/g;
-    s/\$RELEASE/$VERSION_RELEASE/g;
+    s/\$VersionWin/$KEYMAN_VERSION_WIN/g;
+    s/\$VersionRelease/$KEYMAN_VERSION_RELEASE/g;
+    s/\$VersionMajor/$KEYMAN_VERSION_MAJOR/g;
+    s/\$VersionMinor/$KEYMAN_VERSION_MINOR/g;
+    s/\$VersionPatch/$KEYMAN_VERSION_PATCH/g;
+    s/\$Tier/$KEYMAN_TIER/g;
+    s/\$Tag/$KEYMAN_VERSION_TAG/g;
+    s/\$VersionWithTag/$KEYMAN_VERSION_WITH_TAG/g;
+    s/\$VersionGitTag/$KEYMAN_VERSION_GIT_TAG/g;
+    s/\$VersionRc/$KEYMAN_VERSION_MAJOR,$KEYMAN_VERSION_MINOR,$KEYMAN_VERSION_PATCH,0/g;
+    s/\$Environment/$KEYMAN_VERSION_ENVIRONMENT/g;
+    s/\$Version/$KEYMAN_VERSION/g;
+    s/\$KEYMAN_VERSIONNUM/$KEYMAN_VERSION_MAJOR,$KEYMAN_VERSION_MINOR,$KEYMAN_VERSION_PATCH,0/g;
+    s/\$RELEASE_MAJOR/$KEYMAN_VERSION_MAJOR/g;
+    s/\$RELEASE_MINOR/$KEYMAN_VERSION_MINOR/g;
+    s/\$RELEASE/$KEYMAN_VERSION_RELEASE/g;
 
-    s/\$VERSION_WIN/$VERSION_WIN/g;
-    s/\$VERSION_RELEASE/$VERSION_RELEASE/g;
-    s/\$VERSION_MAJOR/$VERSION_MAJOR/g;
-    s/\$VERSION_MINOR/$VERSION_MINOR/g;
-    s/\$VERSION_PATCH/$VERSION_PATCH/g;
-    s/\$TIER/$TIER/g;
-    s/\$VERSION_TAG/$VERSION_TAG/g;
-    s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
-    s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
-    s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
+    s/\$KEYMAN_VERSION_WIN/$KEYMAN_VERSION_WIN/g;
+    s/\$KEYMAN_VERSION_RELEASE/$KEYMAN_VERSION_RELEASE/g;
+    s/\$KEYMAN_VERSION_MAJOR/$KEYMAN_VERSION_MAJOR/g;
+    s/\$KEYMAN_VERSION_MINOR/$KEYMAN_VERSION_MINOR/g;
+    s/\$KEYMAN_VERSION_PATCH/$KEYMAN_VERSION_PATCH/g;
+    s/\$KEYMAN_TIER/$KEYMAN_TIER/g;
+    s/\$KEYMAN_VERSION_TAG/$KEYMAN_VERSION_TAG/g;
+    s/\$KEYMAN_VERSION_WITH_TAG/$KEYMAN_VERSION_WITH_TAG/g;
+    s/\$KEYMAN_VERSION_GIT_TAG/$KEYMAN_VERSION_GIT_TAG/g;
+    s/\$KEYMAN_VERSION_ENVIRONMENT/$KEYMAN_VERSION_ENVIRONMENT/g;
 
-    s/\$VERSION/$VERSION_WIN/g;
+    s/\$KEYMAN_VERSION/$KEYMAN_VERSION_WIN/g;
 
     " "$infile" > "$outfile"
 }

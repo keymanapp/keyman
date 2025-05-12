@@ -26,7 +26,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
-  "publish          Publishes symbols to Sentry and the APK to the Play Store." 
+  "publish          Publishes symbols to Sentry and the APK to the Play Store."
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -38,7 +38,7 @@ if builder_is_debug_build; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
-ARTIFACT="firstvoices-$VERSION.apk"
+ARTIFACT="firstvoices-$KEYMAN_VERSION.apk"
 
 builder_describe_outputs \
   configure     /oem/firstvoices/android/app/libs/keyman-engine.aar \
