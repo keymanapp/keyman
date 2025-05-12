@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ShiftFreesCapsStatementRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -447,7 +447,7 @@ describe("KMN Store Analyser Tests", () => {
       const setStoreStatement: Rule = new SetStoreStatementRule();
       assert.isNotNull(setStoreStatement);
     });
-    it("can parse a SetStoreStatementRule correctly", () => {
+    it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
       const setStoreStatement: Rule = new SetStoreStatementRule();
       assert.isTrue(setStoreStatement.parse(root));
@@ -462,13 +462,52 @@ describe("KMN Store Analyser Tests", () => {
       const setLayerStatement: Rule = new SetLayerStatementRule();
       assert.isNotNull(setLayerStatement);
     });
-    it("can parse a SetLayerStatementRule correctly", () => {
+    it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
       const setLayerStatement: Rule = new SetLayerStatementRule();
       assert.isTrue(setLayerStatement.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+  });
+  describe("CapsAlwaysOffStatementRule Tests", () => {
+    it("can construct a CapsAlwaysOffStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const capsAlwaysOffStatement: Rule = new CapsAlwaysOffStatementRule();
+      assert.isNotNull(capsAlwaysOffStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('caps always off');
+      const capsAlwaysOffStatement: Rule = new CapsAlwaysOffStatementRule();
+      assert.isTrue(capsAlwaysOffStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSALWAYSOFF));
+    });
+  });
+  describe("CapsOnOnlyStatementRule Tests", () => {
+    it("can construct a CapsOnOnlyStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const capsOnOnlyStatement: Rule = new CapsOnOnlyStatementRule();
+      assert.isNotNull(capsOnOnlyStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('caps on only');
+      const capsOnOnlyStatement: Rule = new CapsOnOnlyStatementRule();
+      assert.isTrue(capsOnOnlyStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSONONLY));
+    });
+  });
+  describe("ShiftFreesCapsStatementRule Tests", () => {
+    it("can construct a ShiftFreesCapsStatementRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const shiftFreesCapsStatement: Rule = new ShiftFreesCapsStatementRule();
+      assert.isNotNull(shiftFreesCapsStatement);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('shift frees caps');
+      const shiftFreesCapsStatement: Rule = new ShiftFreesCapsStatementRule();
+      assert.isTrue(shiftFreesCapsStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
     });
   });
 });

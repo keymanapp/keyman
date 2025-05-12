@@ -260,6 +260,24 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(hotkeyNode);
       assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
     });
+    it("can parse correctly (caps always off)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('caps always off');
+      const content: Rule = new ContentRule();
+      assert.isTrue(content.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSALWAYSOFF));
+    });
+    it("can parse correctly (caps on only)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('caps on only');
+      const content: Rule = new ContentRule();
+      assert.isTrue(content.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSONONLY));
+    });
+    it("can parse correctly (shift frees caps)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('shift frees caps');
+      const content: Rule = new ContentRule();
+      assert.isTrue(content.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
+    });
     it("can parse correctly (variable store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780');
       const content: Rule = new ContentRule();

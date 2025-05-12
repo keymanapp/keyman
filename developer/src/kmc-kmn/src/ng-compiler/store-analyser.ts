@@ -373,6 +373,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
+      // TODO: warning deprecated
       const token: Token = new Token(this.tokenType, '1');
       node.addToken(this.nodeType, token);
     }
@@ -394,7 +395,7 @@ export class CapsAlwaysOffStatementRule extends CapsLockStatementRule {
   }
 }
 
-export class CapsOnlyOnStatementRule extends CapsLockStatementRule {
+export class CapsOnOnlyStatementRule extends CapsLockStatementRule {
   public constructor() {
     super();
     this.tokenType     = TokenTypes.CAPSONONLY;
