@@ -186,7 +186,6 @@ export class TokenRule extends Rule {
   }
 
   private static tokenToNode = [
-    {tokenType: TokenTypes.ALWAYS,           nodeType: NodeTypes.ALWAYS},
     {tokenType: TokenTypes.ANSI,             nodeType: NodeTypes.ANSI},
     {tokenType: TokenTypes.ANY,              nodeType: NodeTypes.ANY},
     {tokenType: TokenTypes.BASELAYOUT,       nodeType: NodeTypes.BASELAYOUT},
@@ -202,7 +201,6 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.DISPLAYMAP,       nodeType: NodeTypes.DISPLAYMAP},
     {tokenType: TokenTypes.EQUAL,            nodeType: NodeTypes.EQUAL},
     {tokenType: TokenTypes.ETHNOLOGUECODE,   nodeType: NodeTypes.ETHNOLOGUECODE},
-    {tokenType: TokenTypes.FREES,            nodeType: NodeTypes.FREES},
     {tokenType: TokenTypes.GROUP,            nodeType: NodeTypes.GROUP},
     {tokenType: TokenTypes.HOTKEY,           nodeType: NodeTypes.HOTKEY},
     {tokenType: TokenTypes.IF,               nodeType: NodeTypes.IF},
@@ -230,9 +228,6 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.NUL,              nodeType: NodeTypes.NUL},
     {tokenType: TokenTypes.NEWLINE,          nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.OLDLAYER,         nodeType: NodeTypes.OLDLAYER},
-    {tokenType: TokenTypes.OFF,              nodeType: NodeTypes.OFF},
-    {tokenType: TokenTypes.ON,               nodeType: NodeTypes.ON},
-    {tokenType: TokenTypes.ONLY,             nodeType: NodeTypes.ONLY},
     {tokenType: TokenTypes.OUTS,             nodeType: NodeTypes.OUTS},
     {tokenType: TokenTypes.PLATFORM,         nodeType: NodeTypes.PLATFORM},
     {tokenType: TokenTypes.POSTKEYSTROKE,    nodeType: NodeTypes.POSTKEYSTROKE},
