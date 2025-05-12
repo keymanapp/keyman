@@ -82,6 +82,13 @@ export enum NodeTypes {
   VIRTUAL_KEY           = "VIRTUAL_KEY",
   VISUALKEYBOARD        = "VISUALKEYBOARD",
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",
+  ALWAYS = "ALWAYS",
+  CAPS = "CAPS",
+  ON = "ON",
+  OFF = "OFF",
+  ONLY = "ONLY",
+  FREES = "FREES",
+  SHIFT = "SHIFT",
 }
 
 export class ASTNode {

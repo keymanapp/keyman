@@ -204,9 +204,32 @@ export class VirtualKeyRule extends SingleChildRule {
 export class SpacedShiftCodeRule extends SingleChildRule {
   public constructor() {
     super();
-    const shiftCode: Rule  = new TokenRule(TokenTypes.SHIFT_CODE, true);
+    const shiftCode: Rule  = new ShiftCodeRule();
     const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
     this.rule = new SequenceRule([shiftCode, whitespace]);
+  }
+}
+
+export class ShiftCodeRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const shift: Rule     = new TokenRule(TokenTypes.SHIFT, true);
+    const caps: Rule      = new TokenRule(TokenTypes.CAPS, true);
+    const shiftCode: Rule = new TokenRule(TokenTypes.SHIFT_CODE, true);
+    this.rule = new AlternateRule([shift, caps, shiftCode]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      let shiftCodeNode = tmp.getSoleChildOfType(NodeTypes.SHIFT_CODE);
+      if (shiftCodeNode === null) {
+        shiftCodeNode = new ASTNode(NodeTypes.SHIFT_CODE, tmp.getSoleChild().token);
+      }
+      node.addChild(shiftCodeNode);
+    }
+    return parseSuccess;
   }
 }
 
