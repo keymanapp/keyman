@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.35 alpha 2025-05-12
+
+* maint(common): add two more functions to detect if running on CI (#13869)
+* maint(common): use unique names for Keyman version variables (#13854)
+* maint(common): use new `builder_is_running_on_*` functions (#13875)
+* maint(common): remove obsolete code from docker-images `run.sh` (#13879)
+* chore(mac): remove obsolete key processing code (#13848)
+
 ## 19.0.34 alpha 2025-05-08
 
 * docs(common): update `builder_echo` documentation for TC blocks (#13855)
