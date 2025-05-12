@@ -2167,6 +2167,38 @@ builder_is_running_on_teamcity() {
   fi
 }
 
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test, or as a release build
+#
+builder_is_ci_build() {
+  if builder_is_ci_release_build || builder_is_ci_test_build; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running as a release build in CI
+#
+builder_is_ci_release_build() {
+  if [[ "$KEYMAN_VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test
+#
+builder_is_ci_test_build() {
+  if [[ "$KEYMAN_VERSION_ENVIRONMENT" == test ]]; then
+    return 0
+  fi
+  return 1
+}
+
 ################################################################################
 # Final initialization
 ################################################################################
