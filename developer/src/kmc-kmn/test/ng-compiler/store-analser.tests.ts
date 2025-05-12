@@ -13,7 +13,9 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule, StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -117,6 +119,9 @@ describe("KMN Store Analyser Tests", () => {
         {code: 'version',          nodeType: NodeTypes.VERSION},
         {code: 'visualkeyboard',   nodeType: NodeTypes.VISUALKEYBOARD},
         {code: 'windowslanguages', nodeType: NodeTypes.WINDOWSLANGUAGES},
+        {code: 'capsalwaysoff',    nodeType: NodeTypes.CAPSALWAYSOFF},
+        {code: 'capsononly',       nodeType: NodeTypes.CAPSONONLY},
+        {code: 'shiftfreescaps',   nodeType: NodeTypes.SHIFTFREESCAPS},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(testCase.code);
         const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
