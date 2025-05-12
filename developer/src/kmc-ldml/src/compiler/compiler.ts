@@ -8,7 +8,9 @@ import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
   defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
   LDMLKeyboardTestDataXMLSourceFile, KMXBuilder,
-  KeymanCompilerArtifactOptional
+  KeymanCompilerArtifactOptional,
+  ResolvingCompilerCallbacks,
+  KeymanXMLReader,
 } from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
@@ -94,6 +96,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
   // uset parser
   private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
+  private reader?: LDMLKeyboardXMLSourceFileReader;
 
   /**
    * Initialize the compiler, including loading the WASM host for uset parsing.
@@ -105,7 +108,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
     this.options = { ...options };
-    this.callbacks = callbacks;
+    this.reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, callbacks);
+    // wrap the callbacks so that the eventresolver is called
+    this.callbacks = new ResolvingCompilerCallbacks(this.reader, this.options, callbacks);
     return true;
   }
 
@@ -238,9 +243,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          the source file, or null if invalid
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    const reader = this.reader;
     // load the file from disk into a string
-    const data = this.callbacks.loadFile(filename);
+    const data = reader.readFile(filename);
     if (!data) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
@@ -261,6 +266,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       return null;
     }
 
+    // record the default filename - for error reporting.
+    KeymanXMLReader.setDefaultFilename(source, filename);
+
     return source;
   }
 
@@ -272,7 +280,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          the source file, or null if invalid
    */
   public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    const reader = this.reader;
     const data = this.callbacks.loadFile(filename);
     if (!data) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
