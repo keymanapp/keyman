@@ -341,13 +341,6 @@ set_java_home_21() {
   fi
 }
 
-set_java_home_17() {
-  if [[ ! -z ${JAVA_HOME_17+x} ]]; then
-    builder_echo "Setting JAVA_HOME to JAVA_HOME_17 (${JAVA_HOME_17})"
-    export JAVA_HOME="${JAVA_HOME_17}"
-  fi
-}
-
 set_java_home_11() {
   if [[ ! -z ${JAVA_HOME_11+x} ]]; then
     builder_echo "Setting JAVA_HOME to JAVA_HOME_11 (${JAVA_HOME_11})"
