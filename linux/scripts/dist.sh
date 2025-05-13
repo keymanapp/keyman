@@ -57,8 +57,19 @@ dpkg-source \
   --tar-ignore=keyman/common/models \
   --tar-ignore=keyman/common/resources \
   --tar-ignore=keyman/common/schemas \
+  --tar-ignore=keyman/common/test/keyboards/baseline/kmcomp-*.zip \
   --tar-ignore=keyman/common/test/keyboards/build.* \
+  --tar-ignore=keyman/common/test/keyboards/caps* \
+  --tar-ignore=keyman/common/test/keyboards/full* \
+  --tar-ignore=keyman/common/test/keyboards/invalid \
+  --tar-ignore=keyman/common/test/keyboards/issue \
+  --tar-ignore=keyman/common/test/keyboards/obolo* \
+  --tar-ignore=keyman/common/test/keyboards/start* \
+  --tar-ignore=keyman/common/test/keyboards/text* \
+  --tar-ignore=keyman/common/test/keyboards/u* \
+  --tar-ignore=keyman/common/test/keyboards/web* \
   --tar-ignore=keyman/common/test/resources \
+  --tar-ignore=keyman/common/tools \
   --tar-ignore=keyman/common/web \
   --tar-ignore=keyman/common/windows \
   \
@@ -76,9 +87,11 @@ dpkg-source \
   --tar-ignore=keyman/mac \
   --tar-ignore=keyman/oem \
   --tar-ignore=keyman/resources/devbox \
+  --tar-ignore=keyman/resources/docker-images \
   --tar-ignore=keyman/resources/environment.sh \
   --tar-ignore=keyman/resources/git-hooks \
   --tar-ignore=keyman/resources/scopes \
+  --tar-ignore=keyman/resources/teamcity \
   --tar-ignore=keyman/resources/build/*.lua \
   --tar-ignore=keyman/resources/build/jq* \
   --tar-ignore=keyman/results \
