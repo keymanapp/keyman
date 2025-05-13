@@ -182,7 +182,7 @@ builder_echo() {
       block="$2"
       shift 2
       color="heading"
-      if ! builder_is_running_on_teamcity; then
+      if ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
     elif [[ $1 == "end" ]]; then
@@ -191,7 +191,7 @@ builder_echo() {
       block="$2"
       color="$3"
       shift 3
-      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity; then
+      if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
     fi
@@ -1511,7 +1511,7 @@ _builder_parse_expanded_parameters() {
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
-    if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+    if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
       builder_echo grey "Local build environment detected:  setting --debug"
       _params+=(--debug)
       _builder_chosen_options+=(--debug)
@@ -2138,6 +2138,24 @@ builder_is_target_excluded_by_platform() {
     return 0
   fi
   return 1
+}
+
+# Returns 0 if the script is running in a Docker container
+builder_is_running_on_docker() {
+  if [[ -z ${DOCKER_RUNNING:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Returns 0 if the script is running in a GitHub Actions environment
+builder_is_running_on_gha() {
+  if [[ -z ${GITHUB_ACTIONS:-} ]]; then
+    return 1
+  else
+    return 0
+  fi
 }
 
 # Returns 0 if the script is running on TeamCity

@@ -8,7 +8,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
+import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, KeymanXMLMetadata, KeymanXMLReader } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -290,7 +290,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         // no warnings, so expect zero messages
         assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
       }
-      
+
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result failure (null)');
       } else {
@@ -326,4 +326,14 @@ const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
 
 export function hex_str(s?: string) : string {
   return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
+}
+
+/** return an object simulating an XML object with a column number */
+export function withColumn(c: number) : KeymanXMLMetadata {
+  // set metadata on an empty object
+  const o = {};
+  KeymanXMLReader.setMetaData(o, {
+    startIndex: c
+  });
+  return o;
 }

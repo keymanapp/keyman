@@ -38,11 +38,11 @@ android {
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
         //println "===END DUMP==="
 
-        // VERSION strings from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField 'String', 'VERSION_ENVIRONMENT', '"'+VERSION_ENVIRONMENT+'"'
-        buildConfigField 'String', 'VERSION_GIT_TAG', '"'+VERSION_GIT_TAG+'"'
+        // KEYMAN_VERSION strings from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField 'String', 'KEYMAN_VERSION_ENVIRONMENT', '"'+KEYMAN_VERSION_ENVIRONMENT+'"'
+        buildConfigField 'String', 'KEYMAN_VERSION_GIT_TAG', '"'+KEYMAN_VERSION_GIT_TAG+'"'
     }
 
     String env_release_store_file = System.getenv("release_store_file")
@@ -86,7 +86,7 @@ android {
         //  - PR builds also have "-test-1234" suffix (where 1234 is PR#)
         // Gradle sync will nullify these values, so have a fallback
         String appSuffix = ''
-        String tag = VERSION_TAG ? VERSION_TAG : '-' + tier;
+        String tag = KEYMAN_VERSION_TAG ? KEYMAN_VERSION_TAG : '-' + tier;
         if (tag.startsWithAny("-beta", "beta")) {
             appSuffix = ' Beta';
         } else if (tag.startsWithAny("-alpha", "alpha")) {
@@ -97,16 +97,16 @@ android {
             // -test-PR_NUMBER
             appSuffix = appSuffix + match.group(1)
         } else {
-            String environment = VERSION_ENVIRONMENT ? VERSION_ENVIRONMENT : 'local';
+            String environment = KEYMAN_VERSION_ENVIRONMENT ? KEYMAN_VERSION_ENVIRONMENT : 'local';
             if (environment.matches("local")) {
                 appSuffix = appSuffix + '-' + environment;
             }
         }
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
 
-        // Adjust output name to "keyman-${VERSION_MD}.apk"
+        // Adjust output name to "keyman-${KEYMAN_VERSION_MD}.apk"
         variant.outputs.all {
-            outputFileName = "keyman-" + VERSION_MD + ".apk"
+            outputFileName = "keyman-" + KEYMAN_VERSION_MD + ".apk"
         }
     }
     lintOptions {

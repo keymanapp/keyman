@@ -29,7 +29,7 @@ mkdir -p dist
 cp -a debian ../
 cd ..
 echo "3.0 (native)" > debian/source/format
-dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
+dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 # Note: the files end up in subdirectories under `keyman`, so we can
@@ -87,17 +87,17 @@ dpkg-source \
   --tar-ignore=keyman/windows \
   \
   -Zgzip -b .
-mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
+mv ../keyman_"${KEYMAN_VERSION}".tar.gz linux/dist/keyman-"${KEYMAN_VERSION}".tar.gz
 echo "3.0 (quilt)" > debian/source/format
 cd "${BASEDIR}"
 
 # create orig.tar.gz
 if [[ ! -z "${create_origdist+x}" ]]; then
     cd dist
-    pkgvers="keyman-$VERSION"
-    tar xfz keyman-"${VERSION}".tar.gz
+    pkgvers="keyman-$KEYMAN_VERSION"
+    tar xfz keyman-"${KEYMAN_VERSION}".tar.gz
     mv -v keyman "${pkgvers}" 2>/dev/null || mv -v "$(find . -mindepth 1 -maxdepth 1 -type d)" "${pkgvers}"
-    tar cfz "keyman_${VERSION}.orig.tar.gz" "${pkgvers}"
-    rm "keyman-${VERSION}.tar.gz"
+    tar cfz "keyman_${KEYMAN_VERSION}.orig.tar.gz" "${pkgvers}"
+    rm "keyman-${KEYMAN_VERSION}.tar.gz"
     rm -rf "${pkgvers}"
 fi

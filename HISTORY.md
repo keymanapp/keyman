@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 19.0.35 alpha 2025-05-12
+
+* maint(common): add two more functions to detect if running on CI (#13869)
+* maint(common): use unique names for Keyman version variables (#13854)
+* maint(common): use new `builder_is_running_on_*` functions (#13875)
+* maint(common): remove obsolete code from docker-images `run.sh` (#13879)
+* chore(mac): remove obsolete key processing code (#13848)
+
+## 19.0.34 alpha 2025-05-08
+
+* docs(common): update `builder_echo` documentation for TC blocks (#13855)
+* fix(windows): add breadcrumb to download failures (#13826)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13860)
+* maint(common): remove obsolete code from docker-images `build.sh` (#13861)
+* maint(common): output start/end messages if not running on TC (#13868)
+
 ## 19.0.33 alpha 2025-05-07
 
 * maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
@@ -182,6 +198,23 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.236 stable 2025-05-12
+
+* chore(linux): Update debian changelog (#13737)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13741)
+* fix(android): Use Alert Dialog if keyboard pkg missing languages (#13802)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13808)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13817)
+* change(ios): limit reports about devices without predefined scaling entries (#13828)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13841)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13838)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13843)
+* fix(mac): add version metadata after building tests (#13853)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13863)
+* fix(developer): remove ngrok binary at build time (#13873)
+* maint(common): apply new codeowners from master (#13874)
+* chore(mac,windows): Update Crowdin strings for Italian (#13872)
 
 ## 18.0.234 beta 2025-04-22
 

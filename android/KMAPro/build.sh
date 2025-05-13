@@ -43,7 +43,7 @@ fi
 
 builder_describe_outputs \
   configure     /android/KMAPro/kMAPro/libs/keyman-engine.aar \
-  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk
 
 #### Build
 
@@ -57,12 +57,12 @@ fi
 #### Build action definitions ####
 
 function makeLocalSentryRelease() {
-  echo "Making a Sentry release for tag $VERSION_GIT_TAG"
+  echo "Making a Sentry release for tag $KEYMAN_VERSION_GIT_TAG"
   sentry-cli upload-dif -p keyman-android --include-sources
-  sentry-cli releases -p keyman-android files $VERSION_GIT_TAG upload-sourcemaps ./
+  sentry-cli releases -p keyman-android files $KEYMAN_VERSION_GIT_TAG upload-sourcemaps ./
 
-  echo "Finalizing release tag $VERSION_GIT_TAG"
-  sentry-cli releases finalize "$VERSION_GIT_TAG"
+  echo "Finalizing release tag $KEYMAN_VERSION_GIT_TAG"
+  sentry-cli releases finalize "$KEYMAN_VERSION_GIT_TAG"
 }
 
 
