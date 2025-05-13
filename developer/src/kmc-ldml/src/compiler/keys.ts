@@ -15,8 +15,9 @@ import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 /** reserved name for the special gap key. space is not allowed in key ids. */
 const reserved_gap = "gap (reserved)";
 
-
 export class KeysCompiler extends SectionCompiler {
+  /** keys that are of a reserved type */
+  public static RESERVED_KEY = Symbol('Reserved Key');
   static validateSubstitutions(
     keyboard: LDMLKeyboard.LKKeyboard,
     st: Substitutions
@@ -33,7 +34,7 @@ export class KeysCompiler extends SectionCompiler {
     KeysCompiler.addUsedGestureKeys(layerKeyIds, keyBag, usedKeys);
 
     // process each used key. unused keys don't get checked.
-    for (let keyId of usedKeys.values()) {
+    for (const keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // key not found is handled elsewhere.
       st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
@@ -130,8 +131,8 @@ export class KeysCompiler extends SectionCompiler {
 
     if (hardwareLayers.length >= 1) {
       // validate all errors
-      for (let layers of hardwareLayers) {
-        for (let layer of layers.layer) {
+      for (const layers of hardwareLayers) {
+        for (const layer of layers.layer) {
           valid =
             this.validateHardwareLayerForKmap(layers.formId, layer, keyBag) && valid; // note: always validate even if previously invalid results found
         }
@@ -143,7 +144,7 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   static addKeysFromFlicks(usedFlicks: Set<string>, flickHash: Map<string, LDMLKeyboard.LKFlick>, usedKeys: Set<string>) {
-    for (let flickId of usedFlicks.values()) {
+    for (const flickId of usedFlicks.values()) {
       const flick = flickHash.get(flickId);
       if (!flick) continue;
       const flickKeys = allUsedKeyIdsInFlick(flick);
@@ -173,7 +174,7 @@ export class KeysCompiler extends SectionCompiler {
       return null;
     }
 
-    let sect = new Keys(sections.strs);
+    const sect = new Keys(sections.strs);
 
     // TODO-LDML: some duplication with validate()
     const keyBag = this.getKeyBag();
@@ -203,7 +204,7 @@ export class KeysCompiler extends SectionCompiler {
     } else if (hardwareLayers.length === 1) {
       const theLayers = hardwareLayers[0];
       const { formId } = theLayers;
-      for (let layer of theLayers.layer) {
+      for (const layer of theLayers.layer) {
         this.compileHardwareLayerToKmap(sections, layer, sect, formId);
       }
     } // else: TODO-LDML do nothing if only touch layers
@@ -222,6 +223,19 @@ export class KeysCompiler extends SectionCompiler {
   /** count of reserved keys, for tests */
   public static readonly reserved_count = KeysCompiler.reserved_keys.length;
 
+  /** mark as reserved */
+  private static asReserved(k : KeysKeys) : KeysKeys {
+    const o = k as any;
+    o[KeysCompiler.RESERVED_KEY] = true;
+    return k;
+  }
+
+  /** true if a reserved key */
+  public static isReserved(k : KeysKeys) : boolean {
+    const o = k as any;
+    return !!o[KeysCompiler.RESERVED_KEY];
+  }
+
   /** load up all reserved keys */
   getReservedKeys(sections: KMXPlus.DependencySections) : Map<String, KeysKeys> {
     const r = new Map<String, KeysKeys>();
@@ -231,7 +245,7 @@ export class KeysCompiler extends SectionCompiler {
     const no_list = sections.list.allocList([], {}, sections);
 
     // now add the reserved key(s).
-    r.set(reserved_gap, {
+    r.set(reserved_gap, KeysCompiler.asReserved({
       flags: constants.keys_key_flags_gap | constants.keys_key_flags_extend,
       id: sections.strs.allocString(reserved_gap),
       flicks: '',
@@ -241,7 +255,7 @@ export class KeysCompiler extends SectionCompiler {
       switch: no_string,
       to: no_string,
       width: 10.0, // 10 * .1
-    });
+    }));
 
     if (r.size !== KeysCompiler.reserved_count) {
       throw Error(`Internal Error: KeysCompiler.reserved_count=${KeysCompiler.reserved_count} != ${r.size} actual reserved keys.`);
@@ -251,10 +265,10 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   static addUsedGestureKeys(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>, usedKeys: Set<string>) {
-    for (let keyId of layerKeyIds) {
+    for (const keyId of layerKeyIds) {
       const key = keyBag.get(keyId);
       if (!key) continue;
-      for (let gestureKeyId of allUsedKeyIdsInKey(key).keys()) {
+      for (const gestureKeyId of allUsedKeyIdsInKey(key).keys()) {
         usedKeys.add(gestureKeyId);
       }
     }
@@ -274,19 +288,19 @@ export class KeysCompiler extends SectionCompiler {
     // only include used flicks in the table
     // this way, extra unused imported flicks are ignored
     // in id order, for now
-    for (let flickId of Array.from(usedFlicks.values()).sort()) {
+    for (const flickId of Array.from(usedFlicks.values()).sort()) {
       const flick = flickHash.get(flickId);
       if (!flick) continue; // already reported by validate()
 
       // allocate the in-memory <flick id=…>
-      let flicks: KeysFlicks = new KeysFlicks(
+      const flicks: KeysFlicks = new KeysFlicks(
         sections.strs.allocString(flickId)
       );
 
       // add data from each segment
-      for (let { keyId, directions } of flick.flickSegment) {
+      for (const { keyId, directions } of flick.flickSegment) {
         const keyIdStr = sections.strs.allocString(keyId);
-        let directionsList: ListItem = sections.list.allocListFromSpaces(
+        const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
           { },
           sections);
@@ -303,7 +317,7 @@ export class KeysCompiler extends SectionCompiler {
 
   static getUsedFlicks(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>) {
     const usedFlicks = new Set<string>();
-    for (let keyId of layerKeyIds) {
+    for (const keyId of layerKeyIds) {
       const key = keyBag.get(keyId);
       if (!key?.flickId) continue;
       usedFlicks.add(key.flickId);
@@ -316,7 +330,7 @@ export class KeysCompiler extends SectionCompiler {
 
     // for each used key (whether from layer, gesture, etc.)
     // push these in id order, for tidiness
-    for (let keyId of Array.from(usedKeys.values()).sort()) {
+    for (const keyId of Array.from(usedKeys.values()).sort()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // missing key
 
@@ -357,7 +371,7 @@ export class KeysCompiler extends SectionCompiler {
         flags |= constants.keys_key_flags_extend;
       }
       const width = Math.ceil((key.width || 1) * 10.0); // default, width=1
-      sect.keys.push({
+      sect.keys.push(SectionCompiler.copySymbols({
         flags,
         flicks: flickId,
         id,
@@ -367,7 +381,7 @@ export class KeysCompiler extends SectionCompiler {
         switch: keySwitch, // 'switch' is a reserved word
         to,
         width,
-      });
+      }, key));
     }
   }
 
@@ -452,10 +466,10 @@ export class KeysCompiler extends SectionCompiler {
       }
 
       let x = -1;
-      for (let key of keys) {
+      for (const key of keys) {
         x++;
 
-        let keydef = keyHash.get(key);
+        const keydef = keyHash.get(key);
         if (!keydef) {
           this.callbacks.reportMessage(
             LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({

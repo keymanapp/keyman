@@ -7,12 +7,6 @@ import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { NodeProctor, RecordedKeystrokeSequence } from '@keymanapp/recorder-core';
-import { extendString } from '@keymanapp/web-utils';
-
-extendString();  // Ensure KMW's string-extension functionality is available.
-
-// Initialize supplementary plane string extensions
-String.kmwEnableSupplementaryPlane(false);
 
 const device = {
   formFactor: 'desktop',

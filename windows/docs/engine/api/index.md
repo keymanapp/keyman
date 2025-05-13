@@ -1,13 +1,13 @@
 ---
-title: Keyman Engine for Windows 18.0 API
+title: Keyman Engine for Windows API
 ---
 
 ## Introduction
 
-The Keyman Engine for Windows 18.0 API is implemented in COM. It can be
+The Keyman Engine for Windows API is implemented in COM. It can be
 instantiated with `CreateObject("keymanapi.Keyman")`.
 
-> [!Note] 
+> [!Note]
 > This documentation applies to Keyman Engine for Windows versions 14.0 and up.
 
 ## Interface Hierarchy

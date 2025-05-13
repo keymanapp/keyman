@@ -51,9 +51,9 @@ export abstract class Banner {
    * Description   Update the height and display styling of the banner
    */
   protected update() : boolean {
-    let ds = this.div.style;
-    let currentHeightStyle = ds.height;
-    let currentDisplayStyle = ds.display;
+    const ds = this.div.style;
+    const currentHeightStyle = ds.height;
+    const currentDisplayStyle = ds.display;
 
     if (this._height > 0) {
       ds.height = this._height + 'px';
@@ -68,7 +68,7 @@ export abstract class Banner {
   }
 
   public constructor(height?: number) {
-    let d = createUnselectableElement('div');
+    const d = createUnselectableElement('div');
     d.id = Banner.BANNER_ID;
     d.className = Banner.BANNER_CLASS;
     this.div = d;

@@ -137,8 +137,16 @@ write_download_info() {
 
   FILE_EXTENSION="${BASE_FILE##*.}"
 
-  FILE_SIZE=$(/usr/bin/stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
-  MD5_HASH=$(md5 -q "${BASE_PATH}/${BASE_FILE}")
+  # stat flags to get filesize in bytes
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
+    # /usr/bin/stat on mac is BSD
+    STAT_FLAGS="-f%z"
+  else
+    # GNU (coreutils)
+    STAT_FLAGS="-c%s"
+  fi
+  FILE_SIZE=$(stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
+  MD5_HASH=$(md5sum "${BASE_PATH}/${BASE_FILE}" | cut -d" " -f 1 -) # hash is the first element returned
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
     builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
@@ -329,7 +337,7 @@ check-markdown() {
 builder_do_typescript_tests() {
   local MOCHA_FLAGS=
 
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+  if builder_is_running_on_teamcity; then
     # we're running in TeamCity
     MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
   fi

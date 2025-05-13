@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as rd from 'readline';
+import * as fs from 'node:fs';
+import * as rd from 'node:readline';
 
 export default async function hextobin(inputFilename: string, outputFilename?: string, options?: {silent?: boolean}): Promise<Uint8Array> {
 

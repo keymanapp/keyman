@@ -35,7 +35,7 @@ export default class OSKBaseKey extends OSKKey {
   // Produces a small reference label for the corresponding physical key on a US keyboard.
   private generateKeyCapLabel(): HTMLDivElement {
     // Create the default key cap labels (letter keys, etc.)
-    var x = Codes.keyCodes[this.spec.baseKeyID];
+    let x = Codes.keyCodes[this.spec.baseKeyID];
     switch(x) {
       // Converts the keyman key id code for common symbol keys into its representative ASCII code.
       // K_COLON -> K_BKQUOTE
@@ -58,7 +58,7 @@ export default class OSKBaseKey extends OSKKey {
         }
     }
 
-    let q = document.createElement('div');
+    const q = document.createElement('div');
     q.className='kmw-key-label';
     if(x > 0) {
       q.innerText=String.fromCharCode(x);
@@ -71,11 +71,12 @@ export default class OSKBaseKey extends OSKKey {
 
   private processSubkeys(btn: KeyElement, vkbd: VisualKeyboard) {
     // Add reference to subkey array if defined
-    var bsn: number, bsk=btn['subKeys'] = this.spec['sk'];
+    let bsn: number;
+    const bsk=btn['subKeys'] = this.spec['sk'];
     // Transform any special keys into their PUA representations.
     for(bsn=0; bsn<bsk.length; bsn++) {
       if(bsk[bsn]['sp'] == 1 || bsk[bsn]['sp'] == 2) {
-        var oldText=bsk[bsn]['text'];
+        const oldText=bsk[bsn]['text'];
         bsk[bsn]['text']=renameSpecialKey(oldText, vkbd);
       }
 
@@ -87,19 +88,19 @@ export default class OSKBaseKey extends OSKKey {
   }
 
   construct(vkbd: VisualKeyboard): HTMLDivElement {
-    let spec = this.spec;
+    const spec = this.spec;
 
-    let kDiv = document.createElement('div');
+    const kDiv = document.createElement('div');
     kDiv.className='kmw-key-square';
 
-    let btnEle = document.createElement('div');
-    let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
+    const btnEle = document.createElement('div');
+    const btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
     // Set button class
     this.setButtonClass();
 
     // Add the (US English) keycap label for layouts requesting display of underlying keys
-    let keyCap = this.capLabel = this.generateKeyCapLabel();
+    const keyCap = this.capLabel = this.generateKeyCapLabel();
     btn.appendChild(keyCap);
 
     // Define each key element id by layer id and key id (duplicate possible for SHIFT - does it matter?)

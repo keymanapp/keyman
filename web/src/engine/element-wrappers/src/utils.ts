@@ -10,7 +10,7 @@
  * @return {boolean}
  */
 export function nestedInstanceOf(Pelem: EventTarget, className: string): boolean {
-  var scopedClass;
+  let scopedClass;
 
   if(!Pelem) {
     // If we're bothering to check something's type, null references don't match

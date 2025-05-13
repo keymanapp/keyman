@@ -23,12 +23,12 @@ builder_describe \
 
 builder_parse "$@"
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
-# then includes `resources` as a subdir.
 if builder_has_action configure; then
-  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
+
+  # TODO: it would be cleaner to split this from the standard.meson.build file/folder
   cat "${THIS_SCRIPT_PATH}/resources/meson.build.in" >> "${THIS_SCRIPT_PATH}/resources/meson.build"
 fi
 
@@ -60,13 +60,13 @@ check_missing_coverage_configuration() {
 }
 
 configure_action() {
-  # shellcheck disable=SC2086,SC2154
-  meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
+  # shellcheck disable=SC2086,SC2154,SC2248
+  meson setup ${MESON_COVERAGE} --werror --buildtype ${MESON_TARGET} "${builder_extra_params[@]}" "${MESON_PATH}"
 }
 
 test_action() {
   # shellcheck disable=SC2086,SC2154
-  meson test --print-errorlogs $builder_verbose
+  meson test --print-errorlogs ${builder_verbose}
   if builder_has_option --coverage; then
     # Note: requires lcov > 1.16 to properly work (see https://github.com/mesonbuild/meson/issues/6747)
     ninja coverage-html
@@ -88,7 +88,7 @@ fi
 builder_run_action clean       clean_action
 builder_run_action configure   configure_action
 
-[ -d "$MESON_PATH" ] && cd "$MESON_PATH"
+[[ -d "${MESON_PATH}" ]] && cd "${MESON_PATH}"
 
 builder_run_action build       ninja
 builder_run_action test        test_action

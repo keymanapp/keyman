@@ -25,7 +25,7 @@ export class DispCompiler extends SectionCompiler {
   }
 
   public validate(): boolean {
-    let valid = true;
+    const valid = true;
 
     const tos = new Set();
     const ids = new Set();
@@ -57,7 +57,7 @@ export class DispCompiler extends SectionCompiler {
   }
 
   public compile(sections: DependencySections): Disp {
-    let result = new Disp();
+    const result = new Disp();
 
     // displayOptions
     result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, {unescape: true});

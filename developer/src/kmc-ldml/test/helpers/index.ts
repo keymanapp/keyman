@@ -80,7 +80,7 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
     return null;
   }
 
-  let sections: DependencySections = {
+  const sections: DependencySections = {
     usetparser: await getTestUnicodeSetParser(callbacks)
   };
 
@@ -263,7 +263,7 @@ export interface CompilationCase {
 export function testCompilationCases(compiler: SectionCompilerNew, cases : CompilationCase[], dependencies?: (SectionCompilerNew)[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
-  for (let testcase of cases) {
+  for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
                                         `should compile: ${testcase.subpath}`;
@@ -274,13 +274,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
         return;
       }
-      let section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
-      if (expectFailure) {
-        assert.isNull(section, 'expected compilation result failure (null)');
-      } else {
-        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
-      }
-
+      const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
       const testcaseErrors = matchCompilerEventsOrBoolean(callbacks.messages, testcase.errors);
       const testcaseWarnings = matchCompilerEvents(callbacks.messages, testcase.warnings);
       // if we expected errors or warnings, show them
@@ -295,6 +289,12 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
         assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
+      }
+      
+      if (expectFailure) {
+        assert.isNull(section, 'expected compilation result failure (null)');
+      } else {
+        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
       }
 
       // run the user-supplied callback if any

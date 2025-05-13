@@ -153,7 +153,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
     }
 
 
-    let model_info: ModelInfoFile = {
+    const model_info: ModelInfoFile = {
       languages: [],
     };
 

@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 # ################################ Main script ################################
 
@@ -28,8 +29,7 @@ builder_describe "Builds Keyman Engine for Android." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  ":engine          Builds Engine" \
-  "--ci             Don't start the Gradle daemon. For CI"
+  ":engine          Builds Engine" 
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -51,7 +51,7 @@ builder_describe_outputs \
 # Parse args
 
 DAEMON_FLAG=
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   DAEMON_FLAG=--no-daemon
 fi
 
@@ -98,7 +98,7 @@ fi
 
 if builder_start_action test:engine; then
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     # Report JUnit test results to CI
     echo "$JUNIT_RESULTS"
   fi

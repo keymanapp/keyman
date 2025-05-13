@@ -4,7 +4,7 @@ title: Keyman Minimum Versions
 
 Changes in [minimum-versions.inc.sh](minimum-versions.inc.sh) should manually be propagated to the linked help files below:
 
-## Keyman 18.0
+## Keyman 19.0
 
 Target Operating System and Platform Versions
 
@@ -66,7 +66,7 @@ https://help.keyman.com/developer/engine/android/latest-version/
 | KEYMAN_MIN_VERSION_NODE_MAJOR | 20 |
 | KEYMAN_MIN_VERSION_NPM | 10.5.1 |
 | KEYMAN_MIN_VERSION_VISUAL_STUDIO | 2019 |
-| KEYMAN_VERSION_CLDR | 45 |
+| KEYMAN_VERSION_CLDR | 46 |
 | KEYMAN_VERSION_GRADLE | 7.6.4 |
 | KEYMAN_VERSION_ICU | 73.1 |
 | KEYMAN_VERSION_ISO639_3 | 2024-05-22 |

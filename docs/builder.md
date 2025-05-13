@@ -182,12 +182,12 @@ a user or called by another script:
   An option will be inherited by child scripts if you append a `+` to the option
   name.
 
-* **dependencies**: these are other builder scripts which must be configured and
-  built before the actions in this script can continue. Only `configure` and
-  `build` actions are ever passed to dependency scripts; these actions will
-  execute by default, for all targets of the dependency script.  If you are
-  working on code within a dependency, you are currently expected to rebuild and
-  test that dependency locally.
+* **module dependencies**: these are other builder scripts which must be
+  configured and built before the actions in this script can continue. Only
+  `configure` and `build` actions are ever passed to dependency scripts; these
+  actions will execute by default, for all targets of the dependency script.  If
+  you are working on code within a dependency, you are currently expected to
+  rebuild and test that dependency locally.
 
   A module dependency is similar to, but not the same as, a child project. Child
   projects live in sub-folders of the parent project, whereas generally a
@@ -198,6 +198,9 @@ a user or called by another script:
 
   A module dependency can be on a single target within a module, instead of all
   targets within the module.
+
+  Configuration and build of module dependencies can be controlled through the
+  use of the `--deps`, `--no-deps`, and `--force-deps` parameters.
 
   **Dependency definitions**
 
@@ -328,6 +331,9 @@ The following parameters are pre-defined and should not be overridden:
 * `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
 * `--offline`: allow to build while offline. This might fail if not all
   dependencies are cached.
+* `--deps`: Build dependencies if required (default)
+* `--no-deps`: Skip build of dependencies
+* `--force-deps`: Reconfigure and rebuild all dependencies
 
 --------------------------------------------------------------------------------
 
@@ -628,6 +634,10 @@ Wraps the `echo` command with color and a script identifier prefix.
 
 ```bash
 builder_echo [mode] message
+or
+builder_echo start blockname message
+or
+builder_echo end blockname status message
 ```
 
 ### Parameters
@@ -641,6 +651,12 @@ mode will be `white`.
   * `warning`: A warning message, represented with yellow text
   * `error`: An error message, represented with red text (consider [`builder_die`])
   * `debug`: A debug string, represented with teal text (consider [`builder_echo_debug`])
+  * `start`: The beginning of a foldable block when running on TeamCity. The
+             blockname will show up as the title of the collapsable block,
+             the message as heading inside of the block. If not running on TeamCity
+             the message is output as heading.
+  * `end`:   The end of the foldable block `blockname` when running on TeamCity.
+             Ignored if not running on TeamCity identical to `builder_echo status message`.
 
   Or color identifiers:
   * `white`: Normal white text, the default if **mode** is omitted
@@ -660,6 +676,9 @@ mode will be `white`.
   * `setmark`: A marker for a section heading, represented with purple text
 
 * **message**: a string (surround with quote marks)
+* **blockname**: a string with the name of the collapsable block (surround with quote marks)
+* **status**: one of the `mode` values representing the result of an action
+              (`success`, `warning`, or `error`)
 
 ### Description
 
@@ -855,6 +874,21 @@ it is for a different platform, or because the required tools are not installed.
 
 ```bash
 if builder_is_target_excluded_by_platform $target; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_running_on_teamcity` function
+
+Returns `true` (aka 0) if the script runs on TeamCity (i.e. if the
+`TEAMCITY_GIT_PATH` environment variable is set).
+
+### Usage
+
+```bash
+if builder_is_running_on_teamcity; then
   ...
 fi
 ```

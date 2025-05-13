@@ -8,12 +8,7 @@ from urllib.parse import parse_qsl, urlencode
 import gi
 
 gi.require_version('Gtk', '3.0')
-try:
-    gi.require_version('WebKit2', '4.1')
-except ValueError:
-    # TODO: Remove once we drop support for Ubuntu 20.04 Focal
-    gi.require_version('WebKit2', '4.0')
-
+gi.require_version('WebKit2', '4.1')
 from gi.repository import Gtk, WebKit2
 
 from keyman_config import _

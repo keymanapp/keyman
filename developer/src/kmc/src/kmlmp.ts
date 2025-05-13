@@ -3,7 +3,7 @@
  * kmlmp - Keyman Lexical Model Package Compiler
  */
 
-// Note: this is a deprecated package and will be removed in Keyman 18.0
+// Note: this is a deprecated package and will be removed in Keyman 19.0
 
 import { Command } from 'commander';
 import { KmpCompiler } from '@keymanapp/kmc-package';
@@ -30,19 +30,19 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model package source file.');
 }
 
-let outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
+const outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
 
 //
 // Run the compiler
 //
 
 const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
-let kmpCompiler = new KmpCompiler();
+const kmpCompiler = new KmpCompiler();
 if(!await kmpCompiler.init(callbacks, null)) {
   process.exit(1);
 }
 
-let result = await kmpCompiler.run(inputFilename, outputFilename);
+const result = await kmpCompiler.run(inputFilename, outputFilename);
 if(!result) {
   process.exit(1);
 }

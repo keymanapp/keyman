@@ -83,7 +83,6 @@ function triggerGitHubActionsBuild() {
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
     local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
-
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
     GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"

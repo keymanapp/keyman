@@ -203,7 +203,7 @@ interface LayoutGestureSupportFlags {
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
 // @ts-ignore // so that we don't trigger "unused local" warnings.
-let dummy2: LayoutGestureSupportFlags = dummy;
+const dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman

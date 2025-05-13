@@ -17,6 +17,7 @@ builder_describe \
   ":engine=ibus-keyman               ibus-keyman" \
   ":help                             Online documentation" \
   ":service=keyman-system-service    keyman-system-service" \
+  ":mcompile=mcompile/keymap         mnemonic layout recompiler for Linux" \
   "clean" \
   "configure" \
   "build" \
@@ -39,5 +40,5 @@ test_action() {
   fi
 }
 
-builder_run_action test test_action
-builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/linux/docs/help"
+builder_run_action  test        test_action
+builder_run_action  test:help   check-markdown  "${KEYMAN_ROOT}/linux/docs/help"
