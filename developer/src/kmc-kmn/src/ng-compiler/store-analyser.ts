@@ -8,7 +8,7 @@
  * System and Variable Store Rules
  */
 
-import { PaddingRule, OptionalWhiteSpaceRule, PaddedTextRule, VirtualKeyRule } from "./kmn-analyser.js";
+import { PaddingRule, OptionalWhiteSpaceRule, PrePadTextRule, VirtualKeyRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { OneOrManyRule, parameterSequence, AlternateRule } from "./recursive-descent.js";
@@ -108,8 +108,8 @@ export class CasedkeysStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
     const casedkeysStore: Rule = new CasedkeysStoreRule();
-    const paddedText: Rule = new PaddedTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
+    const prePadText: Rule = new PrePadTextRule();
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
     this.rule = new SequenceRule([casedkeysStore, oneOrManyPaddedText]);
   }
 
@@ -188,8 +188,8 @@ export class VariableStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
     const variableStore: Rule = new VariableStoreRule();
-    const paddedText: Rule = new PaddedTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(paddedText);
+    const prePadText: Rule = new PrePadTextRule();
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
     this.rule = new SequenceRule([variableStore, oneOrManyPaddedText]);
   }
 

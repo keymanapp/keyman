@@ -115,7 +115,7 @@ export class OptionalWhiteSpaceRule extends SingleChildRule {
   }
 }
 
-export class PaddedTextRule extends SingleChildRule {
+export class PrePadTextRule extends SingleChildRule {
   public constructor() {
     super();
     const padding: Rule = new PaddingRule();
@@ -647,16 +647,16 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
 export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
-    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
-    const optPaddedInputContext: Rule = new OptionalPaddedInputContextRule();
-    const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
-    const padding: Rule               = new PaddingRule();
-    const keystoke: Rule              = new KeystrokeRule();
+    const optPostPadNul: Rule          = new OptionalPostPadNulRule();
+    const optPostPadIfLikeBlock: Rule  = new OptionalPostPadIfLikeBlockRule();
+    const optPostPadInputContext: Rule = new OptionalPostPadInputContextRule();
+    const plus: Rule                   = new TokenRule(TokenTypes.PLUS);
+    const padding: Rule                = new PaddingRule();
+    const keystoke: Rule               = new KeystrokeRule();
     this.rule = new SequenceRule([
       optPostPadNul,
       optPostPadIfLikeBlock,
-      optPaddedInputContext,
+      optPostPadInputContext,
       plus,
       padding,
       keystoke,
@@ -748,15 +748,15 @@ export class PostPadIfLikeBlockRule extends SingleChildRule {
   }
 }
 
-export class OptionalPaddedInputContextRule extends SingleChildRule {
+export class OptionalPostPadInputContextRule extends SingleChildRule {
   public constructor() {
     super();
-    const paddedInputContext: Rule = new PaddedInputContextRule();
-    this.rule = new OptionalRule(paddedInputContext);
+    const postPadInputContext: Rule = new PostPadInputContextRule();
+    this.rule = new OptionalRule(postPadInputContext);
   }
 }
 
-export class PaddedInputContextRule extends SingleChildRule {
+export class PostPadInputContextRule extends SingleChildRule {
   public constructor() {
     super();
     const inputContext: Rule = new InputContextRule();
@@ -769,9 +769,9 @@ export class InputContextRule extends SingleChildRule {
   public constructor() {
     super();
     const inputElement           = new InputElementRule();
-    const paddedInputElement     = new PaddedInputElementRule();
-    const manyPaddedInputElement = new ManyRule(paddedInputElement);
-    this.rule = new SequenceRule([inputElement, manyPaddedInputElement]);
+    const prePadInputElement     = new PrePadInputElementRule();
+    const manyPrePadInputElement = new ManyRule(prePadInputElement);
+    this.rule = new SequenceRule([inputElement, manyPrePadInputElement]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -788,7 +788,7 @@ export class InputContextRule extends SingleChildRule {
   }
 }
 
-export class PaddedInputElementRule extends SingleChildRule {
+export class PrePadInputElementRule extends SingleChildRule {
   public constructor() {
     super();
     const padding: Rule      = new PaddingRule();
@@ -853,13 +853,13 @@ export class IfLikeBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const ifLikeStatement           = new IfLikeStatementRule();
-    const paddedIfLikeStatement     = new PaddedIfLikeStatementRule();
-    const manyPaddedIfLikeStatement = new ManyRule(paddedIfLikeStatement);
-    this.rule = new SequenceRule([ifLikeStatement, manyPaddedIfLikeStatement]);
+    const prePadIfLikeStatement     = new PrePadIfLikeStatementRule();
+    const manyPrePadIfLikeStatement = new ManyRule(prePadIfLikeStatement);
+    this.rule = new SequenceRule([ifLikeStatement, manyPrePadIfLikeStatement]);
   }
 }
 
-export class PaddedIfLikeStatementRule extends SingleChildRule {
+export class PrePadIfLikeStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const padding: Rule         = new PaddingRule();
@@ -1103,21 +1103,21 @@ export class RhsBlockRule extends SingleChildRule {
 export class ContextOutputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddedContext: Rule = new OptionalPaddedContextRule();
-    const outputBlock: Rule      = new OutputBlockRule();
-    this.rule = new SequenceRule([optPaddedContext, outputBlock]);
+    const optPostPadContext: Rule = new OptionalPostPadContextRule();
+    const outputBlock: Rule       = new OutputBlockRule();
+    this.rule = new SequenceRule([optPostPadContext, outputBlock]);
   }
 }
 
-export class OptionalPaddedContextRule extends SingleChildRule {
+export class OptionalPostPadContextRule extends SingleChildRule {
   public constructor() {
     super();
-    const paddedContextRule: Rule = new PaddedContextRule();
-    this.rule = new OptionalRule(paddedContextRule);
+    const postPadContextRule: Rule = new PostPadContextRule();
+    this.rule = new OptionalRule(postPadContextRule);
   }
 }
 
-export class PaddedContextRule extends SingleChildRule {
+export class PostPadContextRule extends SingleChildRule {
   public constructor() {
     super();
     const context: Rule = new TokenRule(TokenTypes.CONTEXT, true);
@@ -1130,13 +1130,13 @@ export class OutputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const outputStatement           = new OutputStatementRule();
-    const paddedOutputStatement     = new PaddedOutputStatementRule();
-    const manyPaddedOutputStatement = new ManyRule(paddedOutputStatement);
-    this.rule = new SequenceRule([outputStatement, manyPaddedOutputStatement]);
+    const prePadOutputStatement     = new PrePadOutputStatementRule();
+    const manyPrePadOutputStatement = new ManyRule(prePadOutputStatement);
+    this.rule = new SequenceRule([outputStatement, manyPrePadOutputStatement]);
   }
 }
 
-export class PaddedOutputStatementRule extends SingleChildRule {
+export class PrePadOutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const padding: Rule         = new PaddingRule();
