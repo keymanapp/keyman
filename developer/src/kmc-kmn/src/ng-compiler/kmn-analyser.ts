@@ -623,11 +623,11 @@ export class UsingKeysLhsBlockRule extends AbstractLhsBlockRule {
 export class ReadOnlyLhsBlockRule extends AbstractLhsBlockRule {
   public constructor() {
     super();
-    this.lhsNodeType          = NodeTypes.LHS_READONLY;
-    const match               = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch             = new TokenRule(TokenTypes.NOMATCH, true);
-    const readOnlyInputBlock  = new ReadOnlyInputBlockRule();
-    const ifLikeBlock         = new IfLikeBlockRule();
+    this.lhsNodeType                = NodeTypes.LHS_READONLY;
+    const match: Rule               = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch: Rule             = new TokenRule(TokenTypes.NOMATCH, true);
+    const readOnlyInputBlock: Rule  = new ReadOnlyInputBlockRule();
+    const ifLikeBlock: Rule         = new IfLikeBlockRule();
     this.rule = new AlternateRule([
       match, noMatch, readOnlyInputBlock, ifLikeBlock,
     ]);
@@ -637,8 +637,10 @@ export class ReadOnlyLhsBlockRule extends AbstractLhsBlockRule {
 export class ContextLhsBlockRule extends AbstractLhsBlockRule {
   public constructor() {
     super();
-    this.lhsNodeType = NodeTypes.LHS_CONTEXT;
-    this.rule        = new ContextInputBlockRule();
+    this.lhsNodeType              = NodeTypes.LHS_CONTEXT;
+    const contextInputBlock: Rule = new ContextInputBlockRule();
+    const nulInputBlock: Rule     = new NulInputBlockRule();
+    this.rule = new AlternateRule([contextInputBlock, nulInputBlock]);
   }
 }
 
@@ -683,6 +685,15 @@ export class ContextInputBlockRule extends SingleChildRule {
     this.rule = new SequenceRule([
       optPaddedNul, optPaddedIfLikeBlock, inputContext,
     ]);
+  }
+}
+
+export class NulInputBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const nulRule: Rule              = new TokenRule(TokenTypes.NUL, true);
+    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
+    this.rule = new SequenceRule([nulRule, optPaddedIfLikeBlock]);
   }
 }
 
