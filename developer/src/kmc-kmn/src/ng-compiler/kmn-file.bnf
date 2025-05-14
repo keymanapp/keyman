@@ -37,11 +37,11 @@ contextProductionBlock: contextLhsBlock spacedChevron rhsBlock
 usingKeysLhsBlock: usingKeysInputBlock
 readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
 contextLhsBlock: contextInputBlock|nulInputBlock
-usingKeysInputBlock: paddedNul? paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
-readOnlyInputBlock: paddedNul? paddedIfLikeBlock? keystroke
-contextInputBlock: paddedNul? paddedIfLikeBlock? inputContext
-nulInputBlock: NUL paddedIfLikeBlock?
-paddedNul: NUL padding
+usingKeysInputBlock: postPadNul? postPadIfLikeBlock? paddedInputContext? PLUS padding keystroke
+readOnlyInputBlock: postPadNul? postPadIfLikeBlock? keystroke
+contextInputBlock: postPadNul? postPadIfLikeBlock? inputContext
+nulInputBlock: NUL prePadIfLikeBlock?
+postPadNul: NUL padding
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement
@@ -49,7 +49,8 @@ inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|tex
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 notAnyStatement: NOTANY bracketedStoreName
-paddedIfLikeBlock: ifLikeBlock padding
+prePadIfLikeBlock: padding IfLikeBlock
+postPadIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement paddedIfLikeStatement*
 paddedIfLikeStatement: padding IfLikeStatement
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement

@@ -647,15 +647,15 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
 export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddedNul: Rule          = new OptionalPaddedNulRule();
-    const optPaddedIfLikeBlock: Rule  = new OptionalPaddedIfLikeBlockRule();
+    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
+    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
     const optPaddedInputContext: Rule = new OptionalPaddedInputContextRule();
     const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
     const padding: Rule               = new PaddingRule();
     const keystoke: Rule              = new KeystrokeRule();
     this.rule = new SequenceRule([
-      optPaddedNul,
-      optPaddedIfLikeBlock,
+      optPostPadNul,
+      optPostPadIfLikeBlock,
       optPaddedInputContext,
       plus,
       padding,
@@ -667,11 +667,11 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
 export class ReadOnlyInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddedNul: Rule         = new OptionalPaddedNulRule();
-    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const keystoke: Rule             = new KeystrokeRule();
+    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
+    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
+    const keystoke: Rule              = new KeystrokeRule();
     this.rule = new SequenceRule([
-      optPaddedNul, optPaddedIfLikeBlock, keystoke,
+      optPostPadNul, optPostPadIfLikeBlock, keystoke,
     ]);
   }
 }
@@ -679,11 +679,11 @@ export class ReadOnlyInputBlockRule extends SingleChildRule {
 export class ContextInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPaddedNul: Rule         = new OptionalPaddedNulRule();
-    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    const inputContext: Rule         = new InputContextRule();
+    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
+    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
+    const inputContext: Rule          = new InputContextRule();
     this.rule = new SequenceRule([
-      optPaddedNul, optPaddedIfLikeBlock, inputContext,
+      optPostPadNul, optPostPadIfLikeBlock, inputContext,
     ]);
   }
 }
@@ -692,20 +692,20 @@ export class NulInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const nulRule: Rule              = new TokenRule(TokenTypes.NUL, true);
-    const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
-    this.rule = new SequenceRule([nulRule, optPaddedIfLikeBlock]);
+    const optPrePadIfLikeBlock: Rule = new OptionalPrePadIfLikeBlockRule();
+    this.rule = new SequenceRule([nulRule, optPrePadIfLikeBlock]);
   }
 }
 
-export class OptionalPaddedNulRule extends SingleChildRule {
+export class OptionalPostPadNulRule extends SingleChildRule {
   public constructor() {
     super();
-    const paddedNul: Rule = new PaddedNulRule();
-    this.rule = new OptionalRule(paddedNul);
+    const postPadNul: Rule = new PostPadNulRule();
+    this.rule = new OptionalRule(postPadNul);
   }
 }
 
-export class PaddedNulRule extends SingleChildRule {
+export class PostPadNulRule extends SingleChildRule {
   public constructor() {
     super();
     const nulRule: Rule = new TokenRule(TokenTypes.NUL, true);
@@ -714,15 +714,32 @@ export class PaddedNulRule extends SingleChildRule {
   }
 }
 
-export class OptionalPaddedIfLikeBlockRule extends SingleChildRule {
+export class OptionalPrePadIfLikeBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const paddedIfLikeBlock: Rule = new PaddedIfLikeBlockRule();
-    this.rule = new OptionalRule(paddedIfLikeBlock);
+    const prePadIfLikeBlock: Rule = new PrePadIfLikeBlockRule();
+    this.rule = new OptionalRule(prePadIfLikeBlock);
   }
 }
 
-export class PaddedIfLikeBlockRule extends SingleChildRule {
+export class OptionalPostPadIfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const postPadIfLikeBlock: Rule = new PostPadIfLikeBlockRule();
+    this.rule = new OptionalRule(postPadIfLikeBlock);
+  }
+}
+
+export class PrePadIfLikeBlockRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const padding: Rule     = new PaddingRule();
+    const ifLikeBlock: Rule = new IfLikeBlockRule();
+    this.rule = new SequenceRule([padding, ifLikeBlock]);
+  }
+}
+
+export class PostPadIfLikeBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const ifLikeBlock: Rule = new IfLikeBlockRule();
