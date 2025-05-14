@@ -9,6 +9,7 @@ import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
@@ -330,7 +331,11 @@ describe('keys.kmap', function () {
       // warning on custom form
       subpath: 'sections/layr/warn-custom-us-form.xml',
       warnings: [
-        LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
+        // most tests will want to leave retainOffsetInMessages: false  to
+        // not require maintaining the offset here, which will break if
+        // the XML changes.
+        // However, it's worthwhile having at least one test that verifies in this way.
+        LdmlCompilerMessages.Warn_CustomForm(withOffset(367, {id: "us"}) as LDMLKeyboard.LKForm),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -355,6 +360,9 @@ describe('keys.kmap', function () {
           },
         ]);
       },
+      // Note: Most tests will NOT want to set this.
+      // We set this here to test the test mechanism.
+      retainOffsetInMessages: true,
     },
     {
       // warning on a custom unknown form - but no error!

@@ -73,7 +73,7 @@ export class KeysCompiler extends SectionCompiler {
     this.keyboard3.forms?.form?.forEach((form) => {
       if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
         // If it's not an implied import, give a warning.
-        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm({ id: form.id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm(form));
       }
     });
 

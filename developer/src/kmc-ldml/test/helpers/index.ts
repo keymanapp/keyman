@@ -252,6 +252,11 @@ export interface CompilationCase {
    * Optional, if true, postValidate() must return false. (must be != postValidate())
    */
   postValidateFail?: boolean;
+  /**
+   * retain offset (line number) information. otherwise, scrub it to reduce testing noise.
+   * only tests that specifically are checking offsets will set this to true
+   */
+  retainOffsetInMessages?: boolean;
 }
 
 /**
@@ -275,20 +280,29 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         return;
       }
       const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
-      const testcaseErrors = matchCompilerEventsOrBoolean(callbacks.messages, testcase.errors);
-      const testcaseWarnings = matchCompilerEvents(callbacks.messages, testcase.warnings);
+      let messagesToCheck = callbacks.messages;
+      // scrub offsets from messages to reduce churn in the test casws
+      if (!testcase.retainOffsetInMessages && callbacks.messages) {
+        messagesToCheck = callbacks.messages.map(m => {
+          const scrubbed = Object.assign({}, m);
+          delete scrubbed.offset;
+          return scrubbed;
+        });
+      }
+      const testcaseErrors = matchCompilerEventsOrBoolean(messagesToCheck, testcase.errors);
+      const testcaseWarnings = matchCompilerEvents(messagesToCheck, testcase.warnings);
       // if we expected errors or warnings, show them
       if (testcaseErrors && testcaseErrors !== true) {
-        assert.includeDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected errors to be included');
+        assert.includeDeepMembers(messagesToCheck, <CompilerEventOrMatch[]>testcaseErrors, 'expected errors to be included');
       }
       if (testcaseErrors && testcase.strictErrors) {
-        assert.sameDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected same errors to be included');
+        assert.sameDeepMembers(messagesToCheck, <CompilerEventOrMatch[]>testcaseErrors, 'expected same errors to be included');
       }
       if (testcaseWarnings) {
-        assert.includeDeepMembers(callbacks.messages, testcaseWarnings, 'expected warnings to be included');
+        assert.includeDeepMembers(messagesToCheck, testcaseWarnings, 'expected warnings to be included');
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
-        assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
+        assert.sameDeepMembers(messagesToCheck, [], 'expected zero messages but got ' + callbacks.messages);
       }
 
       if (expectFailure) {
@@ -328,10 +342,15 @@ export function hex_str(s?: string) : string {
   return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
 }
 
-/** return an object simulating an XML object with an offset number */
-export function withOffset(c: number) : KeymanXMLMetadata {
+/**
+ * Return an object simulating an XML object with an offset number
+ * For use in calling message functions
+ * @param c number for the offset setting
+ * @param x if set, this object will be used as the base object instead of {}
+ */
+export function withOffset(c: number, x?: any) : KeymanXMLMetadata {
   // set metadata on an empty object
-  const o = {};
+  const o = Object.assign({}, x);
   KeymanXMLReader.setMetaData(o, {
     startIndex: c
   });

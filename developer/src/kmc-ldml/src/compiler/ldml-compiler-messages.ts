@@ -1,5 +1,6 @@
 import { util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -76,8 +77,11 @@ export class LdmlCompilerMessages {
   m(this.ERROR_InvalidScanCode, `Form '${def(o.form)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`);
 
   static WARN_CustomForm = SevWarn | 0x000A;
-  static Warn_CustomForm = (o:{id: string}) =>
-  m(this.WARN_CustomForm, `Custom <form id="${def(o.id)}"> element. Key layout may not be as expected.`);
+  static Warn_CustomForm = (o: LDMLKeyboard.LKForm) => mx(
+    this.WARN_CustomForm,
+    `Custom <form id="${def(o.id)}"> element. Key layout may not be as expected.`,
+    o,
+  );
 
   static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
   static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
@@ -316,8 +320,14 @@ export class LdmlCompilerMessages {
   static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
       const metadata = KeymanXMLReader.getMetaData(x) || {};
-      event.offset = metadata?.startIndex;
-      event.filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      const offset = metadata?.startIndex;
+      if (offset) {
+        event.offset = offset;
+      }
+      const filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      if (filename) {
+        event.filename = filename;
+      }
     }
     return event;
   }
