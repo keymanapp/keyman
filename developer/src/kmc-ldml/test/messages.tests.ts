@@ -48,6 +48,9 @@ describe('LdmlCompilerMessages', function () {
     }
     expect(lines).to.not.be.equal(0, `None of ${total} messages had offset reporting.`);
     if (noLines > 0) {
+      // Once this goes to zero, make it an error if it goes up!
+      // Oh, and while you're here, once this is zero, uncomment the code in testCompilationCases
+      // that asserts that all messages are actually generated with an offset.
       console.warn(`TODO-LDML (#10622) ${noLines}/${total} messages did not have detectable offset (line number) reporting.`);
     }
   });

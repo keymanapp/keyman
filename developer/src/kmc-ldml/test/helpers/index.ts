@@ -8,7 +8,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, KeymanXMLMetadata, KeymanXMLReader } from "@keymanapp/developer-utils";
+import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, KeymanXMLMetadata, KeymanXMLReader, CompilerError } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -285,6 +285,10 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       if (!testcase.retainOffsetInMessages && callbacks.messages) {
         messagesToCheck = callbacks.messages.map(m => {
           const scrubbed = Object.assign({}, m);
+          // Turn this on once all messages have offsets, see messages.tests.ts
+          // if (!scrubbed.offset) {
+          //   throw Error(`Error, no offset detected in message ${CompilerError.formatEvent(m)}`);
+          // }
           delete scrubbed.offset;
           return scrubbed;
         });
@@ -308,7 +312,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result failure (null)');
       } else {
-        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
+        assert.isNotNull(section, `failed with ${CompilerError.formatEvent(callbacks.messages)}`);
       }
 
       // run the user-supplied callback if any

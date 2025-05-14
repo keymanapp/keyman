@@ -312,7 +312,7 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
+        LdmlCompilerMessages.Error_InvalidModifier({id:'base',modifiers:'altR-shift'}),
       ]
     },
     {
@@ -400,7 +400,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: 'us' }),
       ],
     },
     {
@@ -409,7 +409,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: "zzz" }),
       ],
     },
     {

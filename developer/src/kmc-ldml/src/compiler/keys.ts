@@ -100,7 +100,7 @@ export class KeysCompiler extends SectionCompiler {
         if (!flickHash.has(flickId)) {
           valid = false;
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_MissingFlicks({ flickId, id: keyId })
+            LdmlCompilerMessages.Error_MissingFlicks(key)
           );
         }
       }
@@ -109,10 +109,13 @@ export class KeysCompiler extends SectionCompiler {
       for(const [gestureKeyId, attrs] of gestureKeys.entries()) {
         const gestureKey = keyBag.get(gestureKeyId);
         if (gestureKey == null) {
-          // TODO-LDML: could keep track of already missing keys so we don't warn multiple times on gesture keys
+          // We don't keep track of already missing keys - might warn multiple times on gesture keys,
+          // however we leave it to the caller to handle eliding duplicate messages
           valid = false;
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_GestureKeyNotFoundInKeyBag({keyId: gestureKeyId, parentKeyId: keyId, attribute: attrs.join(',')})
+            LdmlCompilerMessages.Error_GestureKeyNotFoundInKeyBag({
+              keyId: gestureKeyId, parentKeyId: keyId, attribute: attrs.join(',')
+            }, key)
           );
         } else {
           usedKeys.add(gestureKeyId);
@@ -132,15 +135,42 @@ export class KeysCompiler extends SectionCompiler {
     if (hardwareLayers.length >= 1) {
       // validate all errors
       for (const layers of hardwareLayers) {
-        for (const layer of layers.layer) {
-          valid =
-            this.validateHardwareLayerForKmap(layers.formId, layer, keyBag) && valid; // note: always validate even if previously invalid results found
+        const keymap = this.validateAndGetKeymapFromLayers(layers);
+        if (!keymap) {
+          valid = false;
+        } else {
+          for (const layer of layers.layer) {
+            valid =
+              this.validateHardwareLayerForKmap(keymap, layers, layer, keyBag) && valid; // note: always validate even if previously invalid results found
+          }
         }
       }
       // TODO-LDML: } else { touch?
     }
 
     return valid;
+  }
+
+  private validateAndGetKeymapFromLayers(layers: LDMLKeyboard.LKLayers) : Constants.KeyMap {
+    const { formId } = layers;
+    const badScans = new Set<number>();
+    const form = this.getForm(formId);
+    if (!form) {
+      this.callbacks.reportMessage(
+        LdmlCompilerMessages.Error_InvalidHardware(layers)
+      );
+      return null;
+    }
+    const keymap = KeysCompiler.getKeymapFromScancodes(form, badScans);
+    if (!keymap) {
+    } else if (badScans.size !== 0) {
+      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
+      this.callbacks.reportMessage(
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes }, form)
+      );
+      return null;
+    }
+    return keymap;
   }
 
   static addKeysFromFlicks(usedFlicks: Set<string>, flickHash: Map<string, LDMLKeyboard.LKFlick>, usedKeys: Set<string>) {
@@ -390,12 +420,20 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public static getKeymapFromForms(forms: LDMLKeyboard.LKForm[], hardware: string, badScans?: Set<number>): Constants.KeyMap {
-    // seach in reverse form because of overrides
-    const ldmlForm = [...forms].reverse().find((f) => f.id === hardware);
+    const ldmlForm = KeysCompiler.findForm(forms, hardware);
     if (!ldmlForm) {
       return undefined;
     }
     return KeysCompiler.getKeymapFromScancodes(ldmlForm, badScans);
+  }
+
+  private getForm(hardware: string) {
+    return KeysCompiler.findForm(this.keyboard3?.forms.form, hardware);
+  }
+
+  public static findForm(forms: LDMLKeyboard.LKForm[], hardware: string) {
+    // seach in reverse form because of overrides
+    return [...forms].reverse().find((f) => f.id === hardware);
   }
 
   public static getKeymapFromScancodes(ldmlForm: LDMLKeyboard.LKForm, badScans?: Set<number>) {
@@ -413,7 +451,8 @@ export class KeysCompiler extends SectionCompiler {
    * @returns true if valid
    */
   private validateHardwareLayerForKmap(
-    hardware: string,
+    keymap: Constants.KeyMap,
+    layers: LDMLKeyboard.LKLayers,
     layer: LDMLKeyboard.LKLayer,
     keyHash: Map<string, LDMLKeyboard.LKKey>
   ): boolean {
@@ -422,26 +461,9 @@ export class KeysCompiler extends SectionCompiler {
     const { modifiers } = layer;
     if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers, layer: layer.id })
+        LdmlCompilerMessages.Error_InvalidModifier(layer)
       );
       valid = false;
-    }
-
-    const badScans = new Set<number>();
-    const keymap = this.getKeymapFromForm(hardware, badScans);
-    if (!keymap) {
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidHardware({ formId: hardware })
-      );
-      valid = false;
-      return valid;
-    } else if (badScans.size !== 0) {
-      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: hardware, codes })
-      );
-      valid = false;
-      return valid;
     }
 
     if (layer.row.length > keymap.length) {
@@ -458,7 +480,7 @@ export class KeysCompiler extends SectionCompiler {
         this.callbacks.reportMessage(
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
-            hardware,
+            hardware: layers.formId,
             modifiers,
           })
         );

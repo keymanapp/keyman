@@ -37,10 +37,10 @@ export class LayrCompiler extends SectionCompiler {
         }
       }
       layers.layer.forEach((layer) => {
-        const { modifiers, id } = layer;
+        const { modifiers } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers, layer: id || '' }));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier(layer));
           valid = false;
         }
       });

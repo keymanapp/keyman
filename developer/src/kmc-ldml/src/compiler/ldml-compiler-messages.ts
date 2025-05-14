@@ -73,8 +73,11 @@ export class LdmlCompilerMessages {
   m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
 
   static ERROR_InvalidScanCode = SevError | 0x0009;
-  static Error_InvalidScanCode = (o:{form?: string, codes?: string[]}) =>
-  m(this.ERROR_InvalidScanCode, `Form '${def(o.form)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`);
+  static Error_InvalidScanCode = (o:{codes?: string[]}, x: LDMLKeyboard.LKForm) => mx(
+    this.ERROR_InvalidScanCode,
+    `Form '${def(x.id)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`,
+    o,
+  );
 
   static WARN_CustomForm = SevWarn | 0x000A;
   static Warn_CustomForm = (o: LDMLKeyboard.LKForm) => mx(
@@ -84,8 +87,12 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
-  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
-  m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`);
+  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x: LDMLKeyboard.LKKey) =>
+  mx(
+    this.ERROR_GestureKeyNotFoundInKeyBag,
+    `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`,
+    x,
+  );
 
   static HINT_NoDisplayForMarker = SevHint | 0x000C;
   static Hint_NoDisplayForMarker = (o: { id: string }) =>
@@ -142,8 +149,11 @@ export class LdmlCompilerMessages {
     `layers formId=${def(o.formId)}: Can only have one non-'touch' element`);
 
   static ERROR_InvalidHardware = SevError | 0x0013;
-  static Error_InvalidHardware = (o:{formId: string}) => m(this.ERROR_InvalidHardware,
-    `layers has invalid value formId=${def(o.formId)}`);
+  static Error_InvalidHardware = (o:LDMLKeyboard.LKLayers) => mx(
+    this.ERROR_InvalidHardware,
+    `layers has invalid value formId=${def(o.formId)}`,
+    o,
+  );
 
   private static layerIdOrEmpty(layer : string) {
     if (layer) {
@@ -154,12 +164,18 @@ export class LdmlCompilerMessages {
   }
 
   static ERROR_InvalidModifier = SevError | 0x0014;
-  static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,
-    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.layer));
+  static Error_InvalidModifier = (o:LDMLKeyboard.LKLayer) => mx(
+    this.ERROR_InvalidModifier,
+    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.id),
+    o,
+  );
 
   static ERROR_MissingFlicks = SevError | 0x0015;
-  static Error_MissingFlicks = (o:{flickId: string, id: string}) => m(this.ERROR_MissingFlicks,
-    `key id=${def(o.id)} refers to missing flickId=${def(o.flickId)}`);
+  static Error_MissingFlicks = (o: LDMLKeyboard.LKKey) => mx(
+    this.ERROR_MissingFlicks,
+    `key id=${def(o.id)} refers to missing flickId=${def(o.flickId)}`,
+    o,
+  );
 
   static ERROR_DuplicateVariable = SevError | 0x0016;
   static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
