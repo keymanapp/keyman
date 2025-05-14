@@ -1598,6 +1598,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
     });
+    it("can parse correctly (return only)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('return');
+      const rhsBlock: Rule = new RhsBlockRule();
+      assert.isTrue(rhsBlock.parse(root));
+      const rhsNode = root.getSoleChildOfType(NodeTypes.RHS);
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.RETURN));
+    });
     it("can parse correctly (nul only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
       const rhsBlock: Rule = new RhsBlockRule();

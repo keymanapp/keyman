@@ -68,6 +68,7 @@ export enum NodeTypes {
   PRODUCTION_USING_KEYS = "PRODUCTION_USING_KEYS",
   RANGE                 = "RANGE",
   READONLY              = "READONLY",
+  RETURN                = "RETURN",
   RHS                   = "RHS",
   SAVE                  = "SAVE",
   SET                   = "SET",
