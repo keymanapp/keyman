@@ -43,11 +43,6 @@ endif
 
 env = find_program('env')
 
-# Check if we have patched ibus (https://github.com/ibus/ibus/pull/2440)
-if c_compiler.has_header_symbol('ibus.h', 'IBUS_CAP_PREFILTER', dependencies: [ibus], required: false)
-  conf.set('IBUS_HAS_PREFILTER', 1)
-endif
-
 conf.set('HAVE_CONFIG_H', 1)
 configure_file(output : 'config.h',
                configuration : conf)
