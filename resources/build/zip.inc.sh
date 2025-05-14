@@ -62,19 +62,13 @@ function zip_files() {
           ;;
       esac
 
-      for ignoreFile in "${EXCLUDE[@]}"
-      do
-        IGNORE+=" -xr!${ignoreFile}"
-      done
-      # 7z command, excluding build.sh files
-      "${SEVENZ}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
+      # 7z command
+      COMPRESS_CMD="${SEVENZ}"
     fi
-  else
-
-    # zip command
-    builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}"
-    ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}
-  fi
-
+  fi  
+  
+  # Create archive
+  builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}"
+  "${COMPRESS_CMD}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}
+  
 }
-
