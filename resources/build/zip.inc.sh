@@ -5,67 +5,42 @@
 # zip is not available by default on Windows, but can be manually installed.
 # If zip is not available, then fall back to 7z for zipping.
 #
+# TODO: refactor with /resources/build/win/zip.inc.sh
 
-# convert parameters into array
-# $1 - count of parameters
-# $@ - remaining parameters to convert into array
-# returns array of strings
-function _parse_args() {
-  count=$1
-  shift
-  value=()
-  for (( i=0; i<$count; i++)); do
-    value+=($1)
-    shift
-  done
-  echo ${value[@]}
-}
-
-# [--name zip filename]
-# [--flags   n  list of n flags to pass to zip command]
-# [--include n  list of n files to include in zip]
-# [--exclude n  list of n files to exclude from zip]
+# zip/7z to create an archive with the following parameters (in order)
+# [zip filename]
+# [filename of files to exclude in the zip]
+# [list of flags to pass to zip command, 'a' or leading with single-dash]
+# [list of files to include in zip]
 function zip_files() {
+
+  # Parse parameters
+
+  # $1 for zip filename
+  local ZIP_FILE="$1"
+  shift
+
+  # $2 for filename containing files to exclude
+  EXCLUDE=$1
+  shift
+  pwd
+  if ! test -f ${EXCLUDE}; then
+    builder_die "Filename of files to exclude '${EXCLUDE}' does not exist"
+  fi
 
   # Parse parameters
   FLAGS=()
   INCLUDE=()
-  EXCLUDE=()
   while [[ $# -gt 0 ]] ; do
     case "$1" in
-      --name|-n)
-        local ZIP_FILE="$2"
-        shift 2
-        echo "ZIP_FILE: ${ZIP_FILE}"
-        ;;
-      --flags|-f)
-        count="$2"
-        shift 2
-        FLAGS=$(_parse_args $count $@)
-        shift $count
-        echo "FLAGS: ${FLAGS[@]}"
-        ;;
-
-      --include|-i)
-        count="$2"
-        shift 2
-        INCLUDE=$(_parse_args $count $@)
-        shift $count
-        echo "INCLUDE: ${INCLUDE[@]}"
-        ;;
-
-      --exclude|-e)
-        count="$2"
-        shift 2
-        EXCLUDE=$(_parse_args $count $@)
-        shift $count
-        echo "EXCLUDE: ${EXCLUDE[@]}"
-        break
+      a|-*)
+        FLAGS+=($1)
+        shift
         ;;
 
       *)
-        echo "Error: Unexpected argument \"$1\". Exiting."
-        exit 1
+        INCLUDE+=($1)
+        shift
         ;;
     esac
   done
@@ -96,13 +71,9 @@ function zip_files() {
     fi
   else
 
-    for ignoreFile in "${EXCLUDE[@]}"
-    do
-      IGNORE+=" -x \\*\\*/${ignoreFile}"
-    done
-    # zip command, excluding build.sh files
-    echo ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
-    ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${IGNORE[@]}
+    # zip command
+    builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}"
+    ${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}
   fi
 
 }
