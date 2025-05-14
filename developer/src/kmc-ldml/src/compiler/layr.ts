@@ -65,7 +65,8 @@ export class LayrCompiler extends SectionCompiler {
           const erow: LayrRow = {
             keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id)),
           };
-          return erow;
+          // include linenumber info for row
+          return SectionCompiler.copySymbols(erow, row);
         });
         const mods = translateLayerAttrToModifier(layer);
         // push a layer entry for each modifier set

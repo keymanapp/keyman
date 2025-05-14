@@ -474,7 +474,8 @@ export class KeysCompiler extends SectionCompiler {
     }
 
     for (let y = 0; y < layer.row.length && y < keymap.length; y++) {
-      const keys = layer.row[y].keys.split(" ");
+      const row = layer.row[y];
+      const keys = row.keys.split(" ");
 
       if (keys.length > keymap[y].length) {
         this.callbacks.reportMessage(
@@ -482,7 +483,7 @@ export class KeysCompiler extends SectionCompiler {
             row: y + 1,
             hardware: layers.formId,
             modifiers,
-          })
+          }, row)
         );
         valid = false;
       }
@@ -500,7 +501,7 @@ export class KeysCompiler extends SectionCompiler {
               row: y + 1,
               layer: layer.id,
               form: "hardware",
-            })
+            }, row)
           );
           valid = false;
           continue;

@@ -1,4 +1,4 @@
-import { util } from "@keymanapp/common-types";
+import { KMXPlus, util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
 import { LDMLKeyboard } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -54,11 +54,18 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
-  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`);
+  static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x: LDMLKeyboard.LKRow) => mx(
+    this.ERROR_RowOnHardwareLayerHasTooManyKeys,
+    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`,
+    x,
+  );
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
-  static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
-    m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
+  static Error_KeyNotFoundInKeyBag = (o: { keyId: string, col: number, row: number, layer: string, form: string }, x: LDMLKeyboard.LKRow | KMXPlus.LayrRow) => mx(
+    this.ERROR_KeyNotFoundInKeyBag,
+    `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`,
+    x,
+  );
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
   static Hint_OneOrMoreRepeatedLocales = () =>
