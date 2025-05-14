@@ -10,7 +10,7 @@ import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { AlternateTokenRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerStatementRule, SetStoreStatementRule, ShiftFreesCapsRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule } from "./store-analyser.js";
 import { StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -89,18 +89,18 @@ export class ContentRule extends SingleChildRule {
     const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
     const casedkeysStoreAssign: Rule    = new CasedkeysStoreAssignRule();
     const hotkeyStoreAssign: Rule       = new HotkeyStoreAssignRule();
-    const capsAlwaysOffStatement: Rule  = new CapsAlwaysOffRule();
-    const capsOnOnlyStatement: Rule     = new CapsOnOnlyRule();
-    const shiftFreesCapsStatement: Rule = new ShiftFreesCapsRule();
+    const capsAlwaysOff: Rule           = new CapsAlwaysOffRule();
+    const capsOnOnly: Rule              = new CapsOnOnlyRule();
+    const shiftFreesCaps: Rule          = new ShiftFreesCapsRule();
     const variableStoreAssign: Rule     = new VariableStoreAssignRule();
     const ruleBlock: Rule               = new RuleBlockRule();
     this.rule = new AlternateRule([
       stringSystemStoreAssign,
       casedkeysStoreAssign,
       hotkeyStoreAssign,
-      capsAlwaysOffStatement,
-      capsOnOnlyStatement,
-      shiftFreesCapsStatement,
+      capsAlwaysOff,
+      capsOnOnly,
+      shiftFreesCaps,
       variableStoreAssign,
       ruleBlock,
     ]);
@@ -1095,26 +1095,26 @@ export class PaddedOutputStatementRule extends SingleChildRule {
 export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const useStatement: Rule      = new UseStatementRule();
-    const callStatement: Rule     = new CallStatementRule();
-    const setStoreStatement: Rule = new SetStoreStatementRule();
-    const saveStatement: Rule     = new SaveStatementRule();
-    const resetStore: Rule        = new ResetStoreRule();
-    const deadKeyStatement: Rule  = new DeadKeyStatementRule();
-    const setLayerStatement: Rule = new SetLayerStatementRule();
-    const layerStatement: Rule    = new LayerStatementRule();
-    const indexStatement: Rule    = new IndexStatementRule();
-    const contextStatement: Rule  = new ContextStatementRule();
-    const text: Rule              = new TextRule();
-    const beep: Rule              = new TokenRule(TokenTypes.BEEP, true);
+    const useStatement: Rule     = new UseStatementRule();
+    const callStatement: Rule    = new CallStatementRule();
+    const setStore: Rule         = new SetStoreRule();
+    const saveStatement: Rule    = new SaveStatementRule();
+    const resetStore: Rule       = new ResetStoreRule();
+    const deadKeyStatement: Rule = new DeadKeyStatementRule();
+    const setLayer: Rule         = new SetLayerRule();
+    const layerStatement: Rule   = new LayerStatementRule();
+    const indexStatement: Rule   = new IndexStatementRule();
+    const contextStatement: Rule = new ContextStatementRule();
+    const text: Rule             = new TextRule();
+    const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
       useStatement,
       callStatement,
-      setStoreStatement,
+      setStore,
       saveStatement,
       resetStore,
       deadKeyStatement,
-      setLayerStatement,
+      setLayer,
       layerStatement,
       indexStatement,
       contextStatement,

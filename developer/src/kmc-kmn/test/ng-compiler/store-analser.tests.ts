@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { PermittedKeywordRule, SetLayerRule, SetStoreRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -441,31 +441,31 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
     });
   });
-  describe("SetStoreStatementRule Tests", () => {
-    it("can construct a SetStoreStatementRule", () => {
+  describe("SetStoreRule Tests", () => {
+    it("can construct a SetStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const setStoreStatement: Rule = new SetStoreStatementRule();
-      assert.isNotNull(setStoreStatement);
+      const setStore: Rule = new SetStoreRule();
+      assert.isNotNull(setStore);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
-      const setStoreStatement: Rule = new SetStoreStatementRule();
-      assert.isTrue(setStoreStatement.parse(root));
+      const setStore: Rule = new SetStoreRule();
+      assert.isTrue(setStore.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
     });
   });
-  describe("SetLayerStatementRule Tests", () => {
-    it("can construct a SetLayerStatementRule", () => {
+  describe("SetLayerRule Tests", () => {
+    it("can construct a SetLayerRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const setLayerStatement: Rule = new SetLayerStatementRule();
-      assert.isNotNull(setLayerStatement);
+      const setLayer: Rule = new SetLayerRule();
+      assert.isNotNull(setLayer);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
-      const setLayerStatement: Rule = new SetLayerStatementRule();
-      assert.isTrue(setLayerStatement.parse(root));
+      const setLayer: Rule = new SetLayerRule();
+      assert.isTrue(setLayer.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));

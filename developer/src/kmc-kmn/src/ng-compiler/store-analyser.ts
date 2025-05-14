@@ -281,7 +281,7 @@ export class PermittedKeywordRule extends AlternateTokenRule {
   }
 }
 
-export class SetStoreStatementRule extends SingleChildRule {
+export class SetStoreRule extends SingleChildRule {
   public constructor() {
     super();
     const set: Rule               = new TokenRule(TokenTypes.SET, true);
@@ -319,7 +319,7 @@ export class SetStoreStatementRule extends SingleChildRule {
   }
 }
 
-export class SetLayerStatementRule extends SingleChildRule {
+export class SetLayerRule extends SingleChildRule {
   public constructor() {
     super();
     const set: Rule               = new TokenRule(TokenTypes.SET, true);
