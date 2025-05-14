@@ -958,6 +958,31 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
       assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
     });
+    it("can parse correctly (nul, if-like, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") + any(diacriticKey)');
+      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
+      assert.isTrue(usingKeysInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (nul, if-like, inputContext, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1) + any(diacriticKey)');
+      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
+      assert.isTrue(usingKeysInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
   })
   describe("ReadOnlyInputBlockRule Tests", () => {
     it("can construct a ReadOnlyInputBlockRule", () => {
@@ -978,6 +1003,15 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(c_key)');
       const readOnlyInputBlock: Rule = new ReadOnlyInputBlockRule();
       assert.isTrue(readOnlyInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (nul, if-like block, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") any(c_key)');
+      const readOnlyInputBlock: Rule = new ReadOnlyInputBlockRule();
+      assert.isTrue(readOnlyInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
       assert.isFalse(root.hasChildOfType(NodeTypes.LINE));
@@ -1012,6 +1046,17 @@ describe("KMN Analyser Tests", () => {
       assert.equal(uCharNodes.length, 2);
       assert.equal(uCharNodes[0].getText(), 'U+17C1');
       assert.equal(uCharNodes[1].getText(), 'U+17B6');
+      assert.isFalse(inputContextNode.hasChildOfType(NodeTypes.LINE));
+    });
+    it("can parse correctly (nul, if-like block, deadkey)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
       assert.isFalse(inputContextNode.hasChildOfType(NodeTypes.LINE));
     });
   });
