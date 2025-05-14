@@ -328,8 +328,8 @@ export function hex_str(s?: string) : string {
   return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
 }
 
-/** return an object simulating an XML object with a column number */
-export function withColumn(c: number) : KeymanXMLMetadata {
+/** return an object simulating an XML object with an offset number */
+export function withOffset(c: number) : KeymanXMLMetadata {
   // set metadata on an empty object
   const o = {};
   KeymanXMLReader.setMetaData(o, {

@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withColumn } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withOffset } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -442,7 +442,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withColumn(276)));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withOffset(276)));
   });
 
   it('should reject layouts with too many hardware keys', async function() {
@@ -466,7 +466,7 @@ describe('keys.kmap', function () {
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(
       {keyId: 'Q'},
-      withColumn(188)
+      withOffset(188)
     ));
   });
   it('should accept layouts with gap/switch keys', async function() {
