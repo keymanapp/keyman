@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsStatementRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -486,42 +486,42 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
-  describe("CapsAlwaysOffStatementRule Tests", () => {
-    it("can construct a CapsAlwaysOffStatementRule", () => {
+  describe("CapsAlwaysOffRule Tests", () => {
+    it("can construct a CapsAlwaysOffRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const capsAlwaysOffStatement: Rule = new CapsAlwaysOffStatementRule();
-      assert.isNotNull(capsAlwaysOffStatement);
+      const capsAlwaysOff: Rule = new CapsAlwaysOffRule();
+      assert.isNotNull(capsAlwaysOff);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps always off');
-      const capsAlwaysOffStatement: Rule = new CapsAlwaysOffStatementRule();
-      assert.isTrue(capsAlwaysOffStatement.parse(root));
+      const capsAlwaysOff: Rule = new CapsAlwaysOffRule();
+      assert.isTrue(capsAlwaysOff.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSALWAYSOFF));
     });
   });
-  describe("CapsOnOnlyStatementRule Tests", () => {
-    it("can construct a CapsOnOnlyStatementRule", () => {
+  describe("CapsOnOnlyRule Tests", () => {
+    it("can construct a CapsOnOnlyRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const capsOnOnlyStatement: Rule = new CapsOnOnlyStatementRule();
-      assert.isNotNull(capsOnOnlyStatement);
+      const capsOnOnly: Rule = new CapsOnOnlyRule();
+      assert.isNotNull(capsOnOnly);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('caps on only');
-      const capsOnOnlyStatement: Rule = new CapsOnOnlyStatementRule();
-      assert.isTrue(capsOnOnlyStatement.parse(root));
+      const capsOnOnly: Rule = new CapsOnOnlyRule();
+      assert.isTrue(capsOnOnly.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.CAPSONONLY));
     });
   });
-  describe("ShiftFreesCapsStatementRule Tests", () => {
-    it("can construct a ShiftFreesCapsStatementRule", () => {
+  describe("ShiftFreesCapsRule Tests", () => {
+    it("can construct a ShiftFreesCapsRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const shiftFreesCapsStatement: Rule = new ShiftFreesCapsStatementRule();
-      assert.isNotNull(shiftFreesCapsStatement);
+      const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
+      assert.isNotNull(shiftFreesCaps);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('shift frees caps');
-      const shiftFreesCapsStatement: Rule = new ShiftFreesCapsStatementRule();
-      assert.isTrue(shiftFreesCapsStatement.parse(root));
+      const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
+      assert.isTrue(shiftFreesCaps.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
     });
   });

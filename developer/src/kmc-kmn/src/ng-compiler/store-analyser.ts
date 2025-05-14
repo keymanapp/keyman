@@ -402,7 +402,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
   }
 }
 
-export class CapsAlwaysOffStatementRule extends CapsLockStatementRule {
+export class CapsAlwaysOffRule extends CapsLockStatementRule {
   public constructor() {
     super();
     this.tokenType     = TokenTypes.CAPSALWAYSOFF;
@@ -416,7 +416,7 @@ export class CapsAlwaysOffStatementRule extends CapsLockStatementRule {
   }
 }
 
-export class CapsOnOnlyStatementRule extends CapsLockStatementRule {
+export class CapsOnOnlyRule extends CapsLockStatementRule {
   public constructor() {
     super();
     this.tokenType     = TokenTypes.CAPSONONLY;
@@ -430,7 +430,7 @@ export class CapsOnOnlyStatementRule extends CapsLockStatementRule {
   }
 }
 
-export class ShiftFreesCapsStatementRule extends CapsLockStatementRule {
+export class ShiftFreesCapsRule extends CapsLockStatementRule {
   public constructor() {
     super();
     this.tokenType    = TokenTypes.SHIFTFREESCAPS;
