@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.37 alpha 2025-05-14
+
+* maint(linux): remove generated file that got accidentally committed (#13902)
+* maint(linux): remove check for patched ibus from `meson.build` (#13909)
+* maint(common): report builder errors to stderr (#13882)
+
 ## 19.0.36 alpha 2025-05-13
 
 * feat(developer): line numbers for XML parsing and kmc-ldml (#13375)
