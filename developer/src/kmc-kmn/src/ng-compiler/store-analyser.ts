@@ -359,6 +359,27 @@ export class SetLayerStatementRule extends SingleChildRule {
   }
 }
 
+export class ResetStoreRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const reset: Rule = new TokenRule(TokenTypes.RESET, true);
+    const bracketedStoreName: Rule = new BracketedStoreNameRule();
+    this.rule = new SequenceRule([reset, bracketedStoreName]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const resetNode = tmp.getSoleChildOfType(NodeTypes.RESET);
+      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
+      resetNode.addChild(storeNameNode);
+      node.addChild(resetNode);
+    }
+    return parseSuccess;
+  }
+}
+
 abstract class CapsLockStatementRule extends SingleChildRule {
   protected whitespace: Rule;
   protected tokenType: TokenTypes;

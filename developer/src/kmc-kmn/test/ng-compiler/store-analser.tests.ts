@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ShiftFreesCapsStatementRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsStatementRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -469,6 +469,21 @@ describe("KMN Store Analyser Tests", () => {
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+  });
+  describe("ResetStoreRule Tests", () => {
+    it("can construct a ResetStoreRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const resetStore: Rule = new ResetStoreRule();
+      assert.isNotNull(resetStore);
+    });
+    it("can parse correctly", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('reset(digit)');
+      const resetStore: Rule = new ResetStoreRule();
+      assert.isTrue(resetStore.parse(root));
+      const resetNode = root.getSoleChildOfType(NodeTypes.RESET);
+      assert.isNotNull(resetNode);
+      assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("CapsAlwaysOffStatementRule Tests", () => {
