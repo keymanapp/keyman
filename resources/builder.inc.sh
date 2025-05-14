@@ -143,14 +143,25 @@ function builder_term() {
 }
 
 function builder_die() {
-  echo
+  _builder_error_echo
   if [[ $# -eq 0 ]]; then
     builder_echo error "Unspecified error, aborting script"
   else
     builder_echo error "$*"
   fi
-  echo
+  _builder_error_echo
   exit 1
+}
+
+# Emit message to stderr instead of stdout
+function _builder_error_echo() {
+  # we only need to support -e flag
+  if [[ $# -gt 0 ]] && [[ $1 == -e ]]; then
+    shift
+    2>&1 echo -e "$*"
+  else
+    2>&1 echo "$*"
+  fi
 }
 
 function builder_warn() {
@@ -171,6 +182,7 @@ function builder_heading() {
 
 builder_echo() {
   local color=white message= mark= block= action= do_output=true
+  local echo_target=echo
 
   if [[ $# -gt 1 ]]; then
     if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
@@ -199,7 +211,7 @@ builder_echo() {
   message="$*"
 
   if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
-    echo -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 
   if ${do_output}; then
@@ -210,7 +222,7 @@ builder_echo() {
         green|success) color="$COLOR_GREEN" ;;
         blue|heading) color="$COLOR_BLUE" ;;
         yellow|warning) color="$COLOR_YELLOW" ;;
-        red|error) color="$COLOR_RED" ;;
+        red|error) color="$COLOR_RED"; echo_target=_builder_error_echo ;;
         purple) color="$COLOR_PURPLE" ;;
         brightwhite) color="$COLOR_BRIGHTWHITE" ;;
         teal|debug) color="$COLOR_TEAL" ;;
@@ -218,18 +230,18 @@ builder_echo() {
       esac
 
       if builder_is_dep_build; then
-        echo -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+        $echo_target -e "$mark$COLOR_GREY[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
       else
-        echo -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
+        $echo_target -e "$mark$BUILDER_BOLD$COLOR_BRIGHT_WHITE[$THIS_SCRIPT_IDENTIFIER]$COLOR_RESET $color$message$COLOR_RESET"
       fi
     else
       # Cope with the case of pre-init message and just emit plain text
-      echo -e "$message"
+      $echo_target -e "$message"
     fi
   fi
 
   if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
-    echo -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
   fi
 }
 
