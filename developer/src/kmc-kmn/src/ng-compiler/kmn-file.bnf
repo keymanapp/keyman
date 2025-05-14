@@ -37,9 +37,10 @@ contextProductionBlock: contextLhsBlock spacedChevron rhsBlock
 usingKeysLhsBlock: usingKeysInputBlock
 readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
 contextLhsBlock: contextInputBlock
-usingKeysInputBlock: paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
-readOnlyInputBlock: paddedIfLikeBlock? keystroke
-contextInputBlock: paddedIfLikeBlock? inputContext
+usingKeysInputBlock: paddedNul? paddedIfLikeBlock? paddedInputContext? PLUS padding keystroke
+readOnlyInputBlock: paddedNul? paddedIfLikeBlock? keystroke
+contextInputBlock: paddedNul? paddedIfLikeBlock? inputContext
+paddedNul: NUL padding
 paddedInputContext: inputContext padding
 inputContext: inputElement paddedInputElement*
 paddedInputElement: padding inputElement

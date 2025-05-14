@@ -645,12 +645,14 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
 export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
+    const optPaddedNul: Rule          = new OptionalPaddedNulRule();
     const optPaddedIfLikeBlock: Rule  = new OptionalPaddedIfLikeBlockRule();
     const optPaddedInputContext: Rule = new OptionalPaddedInputContextRule();
     const plus: Rule                  = new TokenRule(TokenTypes.PLUS);
     const padding: Rule               = new PaddingRule();
     const keystoke: Rule              = new KeystrokeRule();
     this.rule = new SequenceRule([
+      optPaddedNul,
       optPaddedIfLikeBlock,
       optPaddedInputContext,
       plus,
@@ -663,18 +665,41 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
 export class ReadOnlyInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
+    const optPaddedNul: Rule         = new OptionalPaddedNulRule();
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
     const keystoke: Rule             = new KeystrokeRule();
-    this.rule = new SequenceRule([optPaddedIfLikeBlock, keystoke]);
+    this.rule = new SequenceRule([
+      optPaddedNul, optPaddedIfLikeBlock, keystoke,
+    ]);
   }
 }
 
 export class ContextInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
+    const optPaddedNul: Rule         = new OptionalPaddedNulRule();
     const optPaddedIfLikeBlock: Rule = new OptionalPaddedIfLikeBlockRule();
     const inputContext: Rule         = new InputContextRule();
-    this.rule = new SequenceRule([optPaddedIfLikeBlock, inputContext]);
+    this.rule = new SequenceRule([
+      optPaddedNul, optPaddedIfLikeBlock, inputContext,
+    ]);
+  }
+}
+
+export class OptionalPaddedNulRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const paddedNul: Rule = new PaddedNulRule();
+    this.rule = new OptionalRule(paddedNul);
+  }
+}
+
+export class PaddedNulRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const nulRule: Rule = new TokenRule(TokenTypes.NUL, true);
+    const padding: Rule = new PaddingRule();
+    this.rule = new SequenceRule([nulRule, padding]);
   }
 }
 
