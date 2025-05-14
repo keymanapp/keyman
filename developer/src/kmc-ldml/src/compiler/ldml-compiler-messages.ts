@@ -82,7 +82,7 @@ export class LdmlCompilerMessages {
   static ERROR_InvalidScanCode = SevError | 0x0009;
   static Error_InvalidScanCode = (o:{codes?: string[]}, x: LDMLKeyboard.LKForm) => mx(
     this.ERROR_InvalidScanCode,
-    `Form '${def(x.id)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`,
+    `Form '${def(x?.id)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`,
     o,
   );
 
