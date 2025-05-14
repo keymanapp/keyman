@@ -10,7 +10,7 @@ import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { AlternateTokenRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, SetLayerStatementRule, SetStoreStatementRule, ShiftFreesCapsStatementRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffStatementRule, CapsOnOnlyStatementRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerStatementRule, SetStoreStatementRule, ShiftFreesCapsStatementRule } from "./store-analyser.js";
 import { StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -1099,6 +1099,7 @@ export class OutputStatementRule extends SingleChildRule {
     const callStatement: Rule     = new CallStatementRule();
     const setStoreStatement: Rule = new SetStoreStatementRule();
     const saveStatement: Rule     = new SaveStatementRule();
+    const resetStore: Rule        = new ResetStoreRule();
     const deadKeyStatement: Rule  = new DeadKeyStatementRule();
     const setLayerStatement: Rule = new SetLayerStatementRule();
     const layerStatement: Rule    = new LayerStatementRule();
@@ -1111,6 +1112,7 @@ export class OutputStatementRule extends SingleChildRule {
       callStatement,
       setStoreStatement,
       saveStatement,
+      resetStore,
       deadKeyStatement,
       setLayerStatement,
       layerStatement,

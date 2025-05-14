@@ -1681,6 +1681,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(saveNode);
       assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
+    it("can parse correctly (reset statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('reset(storeName)');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      const resetNode = root.getSoleChildOfType(NodeTypes.RESET);
+      assert.isNotNull(resetNode);
+      assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
     it("can parse correctly (deadkey statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
