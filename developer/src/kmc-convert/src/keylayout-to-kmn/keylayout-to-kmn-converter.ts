@@ -11,6 +11,8 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
+import { ConverterMessages } from '../converter-messages.js';
+
 
 export interface convert_object {
   keylayout_filename: string,
@@ -21,9 +23,10 @@ export interface convert_object {
 
 export class KeylayoutToKmnConverter {
 
+
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly USED_KEYS_COUNT = 51;               // we use key Nr 0 (A) -> key Nr 49 (Space)
+  static readonly USED_KEYS_COUNT = 49;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
   static readonly KMC_CONVERT_VERSION = "0.1";
@@ -50,7 +53,8 @@ export class KeylayoutToKmnConverter {
   async run(inputFilename: string, outputFilename: string = ""): Promise<ConverterToKmnArtifacts> {
 
     if (!inputFilename) {
-      throw new Error('Invalid parameters');
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      return null;
     }
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
@@ -143,7 +147,7 @@ export class KeylayoutToKmnConverter {
     const isCapsused: boolean = this.checkIfCapsIsUsed(data_ukelele.arrayOf_Modifiers);
 
     // loop keys 0-50 (= all keys we use)
-    for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+    for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
 
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
@@ -799,7 +803,7 @@ export class KeylayoutToKmnConverter {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           const returnarray: string[] = [];
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USED_KEYS_COUNT) {
             returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
             returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])));
             returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
@@ -905,7 +909,7 @@ export class KeylayoutToKmnConverter {
 
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
             const returnarray: string[] = [];
@@ -951,7 +955,7 @@ export class KeylayoutToKmnConverter {
   public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
     const mapIndexArray_2D: number[][] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         const mapIndexArrayperKey: number[] = [];
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
