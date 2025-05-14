@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2016
 builder_describe \
-  "Create a daily release of 'master' or 'stable-*' branch." \
+  "Create a daily release of 'master', 'beta',  or 'stable-*' branch." \
   "all            run all actions" \
   "configure      install dependencies" \
   "build          make a release build" \
@@ -35,14 +35,14 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/linux"
 
-function cleanup_before_creating_source_package() {
+function _cleanup_before_creating_source_package() {
   # Cleanup before creating the source package.
   builder_echo start cleanup "Cleanup before creating the source package"
   git clean -dxf
   builder_echo end cleanup success "Cleanup before creating the source package"
 }
 
-function make_release_source_tarball() {
+function _make_release_source_tarball() {
   builder_echo start "make source tarball" "Make source tarball"
   rm -rf dist
   ./scripts/reconf.sh
@@ -56,7 +56,7 @@ function make_release_source_tarball() {
   )
 }
 
-function sign_source_tarball() {
+function _sign_source_tarball() {
   (
     builder_echo start "sign source tarball" "Sign source tarball"
     cd "upload/${KEYMAN_VERSION}"
@@ -69,7 +69,7 @@ function sign_source_tarball() {
   )
 }
 
-function publish_to_downloads() {
+function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
   local DATE, UPLOAD_BASE, UPLOAD_FOLDER, UPLOAD_DIR
@@ -128,7 +128,7 @@ function publish_to_downloads() {
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
 }
 
-function upload_to_launchpad() {
+function _publish_to_launchpad() {
   builder_echo start "upload to launchpad" "Upload to launchpad"
 
   git reset --hard
@@ -140,7 +140,7 @@ function upload_to_launchpad() {
   builder_echo end "upload to launchpad" success "Upload to launchpad"
 }
 
-function upload_linux_help() {
+function _publish_linux_help() {
   builder_echo start "upload linux help" "Upload new Keyman Linux help to help.keyman.com"
 
   (
@@ -155,12 +155,12 @@ function upload_linux_help() {
 }
 
 function publish_action() {
-  cleanup_before_creating_source_package
-  make_release_source_tarball
-  sign_source_tarball
-  publish_to_downloads
-  upload_to_launchpad
-  upload_linux_help
+  _cleanup_before_creating_source_package
+  _make_release_source_tarball
+  _sign_source_tarball
+  _publish_to_downloads
+  _publish_to_launchpad
+  _publish_linux_help
 }
 
 if builder_has_action all; then

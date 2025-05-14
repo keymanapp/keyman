@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 
+# Run the clean action in the `linux` directory.`
 linux_clean_action() {
   builder_heading "Cleaning up"
   # shellcheck disable=SC2154
   "${KEYMAN_ROOT}/linux/build.sh" clean
 }
 
+# Install required dependencies for building Keyman on Linux.
 linux_install_dependencies_action() {
   builder_heading "Installing dependencies"
   . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
   checkAndInstallRequirements
 }
 
+# Install additional dependencies required for determining test coverage.
 linux_additional_dependencies_action() {
   builder_echo start additional_dependencies "Installing additional dependencies"
   local TOINSTALL="lcov libdatetime-perl gcovr python3-venv jq"
@@ -34,12 +37,14 @@ linux_additional_dependencies_action() {
   builder_echo end additional_dependencies success "Finished installing additional dependencies"
 }
 
+# Build Keyman for Linux.
 linux_build_action() {
   INSTALLDIR="$(mktemp -d)"
   # shellcheck disable=SC2068
   DESTDIR="${INSTALLDIR}" "${KEYMAN_ROOT}/linux/build.sh" clean configure build install $@
 }
 
+# Run unit tests for Keyman for Linux.
 linux_unit_tests_action() {
   builder_echo start unit_tests "Running unit tests"
   rm -f /tmp/ibus-engine-keyman.log

@@ -41,6 +41,9 @@ check_and_install_packages() {
   fi
 }
 
+# Set the environment variables required to use node/nvm and set the
+# `KEYMAN_USE_NVM` variable so that the build can automatically install
+# the required node version.
 set_variables_for_nvm() {
   # nvm.sh uses some variables that might not be initialized, so we
   # disable the "unbound variable" check temporarily
@@ -53,6 +56,7 @@ set_variables_for_nvm() {
   PATH=${HOME}/.keyman/node:${PATH}
 }
 
+# Install nvm if it is not already installed and install the latest LTS
 linux_install_nvm() {
   builder_echo start install_nvm "Checking and installing nvm"
   if [[ -f "${HOME}/.nvm/nvm.sh" ]]; then
@@ -70,6 +74,7 @@ linux_install_nvm() {
   builder_echo end install_nvm success "Finished checking and installing nvm"
 }
 
+# Install additional dependencies required for running integration tests.
 linux_install_dependencies_for_tests() {
   builder_echo start install_dependencies_for_tests "Installing dependencies for tests"
 
