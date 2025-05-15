@@ -10,8 +10,9 @@
 
 # zip/7z to create an archive with the following parameters (in order)
 # [zip filename]
-# [filename of files to exclude in the zip]
-# [list of flags to pass to zip command, 'a' or leading with single-dash]
+# [list of flags to pass to zip command. Flags start with a single-dash
+#   -x@filename for a file containing list of files to exclude from the archive
+#   -* all other flags]
 # [list of files to include in zip]
 function zip_files() {
 
@@ -19,25 +20,27 @@ function zip_files() {
 
   # $1 for zip filename
   local ZIP_FILE="$1"
-
-  # $2 for filename containing files to exclude
-  local EXCLUDE="$2"
-  shift 2
-  if ! test -f ${EXCLUDE}; then
-    builder_die "Filename of files to exclude '${EXCLUDE}' does not exist"
-  fi
+  shift
 
   # Parse rest of parameters
+  EXCLUDE=
   FLAGS=()
   INCLUDE=()
   while [[ $# -gt 0 ]] ; do
     case "$1" in
-      a|-*)
+      -x@*)
+        # filename of files to exclude
+        EXCLUDE="$1"
+        builder_echo_debug "EXCLUDE: ${EXCLUDE}"
+        shift
+        ;;
+      -*)
+        # zip/7z flags
         FLAGS+=($1)
         shift
         ;;
-
       *)
+        # files to include in the archive
         INCLUDE+=($1)
         shift
         ;;
@@ -63,7 +66,7 @@ function zip_files() {
   fi
 
   # Create archive
-  builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}"
-  "${COMPRESS_CMD}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}
+  builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}"
+  "${COMPRESS_CMD}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}
 
 }
