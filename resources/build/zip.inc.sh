@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 #
-# This script contains zip and unzip utilities to function for all environments.
+# This script contains zip and unzip (TODO) utilities to function for all environments.
 # unzip is available in all environments
 # zip is not available by default on Windows, but can be manually installed.
 # If zip is not available, then fall back to 7z for zipping.
+# 7z requires env SEVENZ_HOME.
 #
 # TODO: refactor with /resources/build/win/zip.inc.sh
 
@@ -20,14 +21,13 @@ function zip_files() {
   local ZIP_FILE="$1"
 
   # $2 for filename containing files to exclude
-  EXCLUDE=$2
+  local EXCLUDE="$2"
   shift 2
-  pwd
   if ! test -f ${EXCLUDE}; then
     builder_die "Filename of files to exclude '${EXCLUDE}' does not exist"
   fi
 
-  # Parse parameters
+  # Parse rest of parameters
   FLAGS=()
   INCLUDE=()
   while [[ $# -gt 0 ]] ; do
@@ -45,7 +45,6 @@ function zip_files() {
   done
 
   COMPRESS_CMD=zip
-  IGNORE=()
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
@@ -61,10 +60,10 @@ function zip_files() {
       # 7z command
       COMPRESS_CMD="${SEVENZ}"
     fi
-  fi  
-  
+  fi
+
   # Create archive
   builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}"
   "${COMPRESS_CMD}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} -x@${EXCLUDE}
-  
+
 }
