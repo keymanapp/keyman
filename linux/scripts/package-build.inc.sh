@@ -59,24 +59,24 @@ function wait_for_apt_deb {
 
 function checkAndInstallRequirements()
 {
-	local TOINSTALL=""
+  local TOINSTALL=""
 
-	for p in devscripts equivs python3-dev
-	do
-		if ! dpkg -s "${p}" >/dev/null 2>&1; then
-			TOINSTALL="${TOINSTALL} ${p}"
-		fi
-	done
+  for p in devscripts equivs python3-dev
+  do
+    if ! dpkg -s "${p}" >/dev/null 2>&1; then
+      TOINSTALL="${TOINSTALL} ${p}"
+    fi
+  done
 
-	export DEBIAN_FRONTEND=noninteractive
+  if [[ -n "${TOINSTALL}" ]]; then
+    wait_for_apt_deb && sudo apt-get update
+    # shellcheck disable=SC2086
+    wait_for_apt_deb && sudo DEBIAN_FRONTEND="noninteractive" \
+      apt-get -qy install ${TOINSTALL}
+  fi
 
-	if [[ -n "${TOINSTALL}" ]]; then
-		wait_for_apt_deb && sudo apt-get update
-		# shellcheck disable=SC2086
-		wait_for_apt_deb && sudo apt-get -qy install ${TOINSTALL}
-	fi
-
-	sudo mk-build-deps debian/control
-	wait_for_apt_deb && sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
-	sudo rm -f keyman-buid-deps_*
+  sudo mk-build-deps debian/control
+  wait_for_apt_deb && sudo DEBIAN_FRONTEND="noninteractive" \
+    apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+  sudo rm -f keyman-build-deps_*
 }
