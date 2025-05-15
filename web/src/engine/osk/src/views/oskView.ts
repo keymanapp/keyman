@@ -20,7 +20,7 @@ import {
 } from 'keyman/engine/keyboard';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
-import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/js-processor';
+import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/keyboard';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';

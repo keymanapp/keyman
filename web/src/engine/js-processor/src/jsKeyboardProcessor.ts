@@ -17,7 +17,7 @@ import { type OutputTargetBase }  from "./outputTargetBase.js";
 import { RuleBehavior }  from "./ruleBehavior.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
-import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
+import { type MutableSystemStore, SystemStoreIDs } from "keyman/engine/keyboard";
 
 // #endregion
 
