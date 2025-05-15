@@ -1,6 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { JSKeyboard, Keyboard, KeyMapping, KeyEvent, Codes } from "keyman/engine/keyboard";
-import { type RuleBehavior } from 'keyman/engine/js-processor';
+import { JSKeyboard, Keyboard, KeyMapping, KeyEvent, Codes, type RuleBehavior } from "keyman/engine/keyboard";
 import { KeyEventSourceInterface } from 'keyman/engine/osk';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
