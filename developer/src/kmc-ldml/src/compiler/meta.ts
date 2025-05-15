@@ -28,11 +28,11 @@ export class MetaCompiler extends SectionCompiler {
     if(versionNumber !== undefined) {
       if(versionNumber.match(/^[=v]/i)) {
         // semver ignores a preceding '=' or 'v'
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }, this.keyboard3));
         return false;
       }
       if(!semver.parse(versionNumber, {loose: false})) {
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }, this.keyboard3));
         return false;
       }
     }
@@ -41,7 +41,7 @@ export class MetaCompiler extends SectionCompiler {
 
   private validateNormalization(normalization?: string) {
     if (normalization === 'disabled') {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NormalizationDisabled());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NormalizationDisabled(this.keyboard3.settings));
     }
     return true;
   }

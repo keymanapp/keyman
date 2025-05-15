@@ -41,7 +41,11 @@ const mx = CompilerMessageObjectSpec;
  */
 export class LdmlCompilerMessages {
   static HINT_NormalizationDisabled = SevHint | 0x0001;
-  static Hint_NormalizationDisabled = () => m(this.HINT_NormalizationDisabled, `normalization=disabled is not recommended.`);
+  static Hint_NormalizationDisabled = (x?: LDMLKeyboard.LKSettings) => mx(
+    this.HINT_NormalizationDisabled,
+    `normalization=disabled is not recommended.`,
+    x,
+  );
 
   static ERROR_InvalidLocale = SevError | 0x0002;
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
@@ -106,9 +110,10 @@ export class LdmlCompilerMessages {
   m(this.HINT_NoDisplayForMarker, `Key element with id "${def(o.id)}" has only marker output, but there is no matching display element by output or keyId. Keycap may be blank.`);
 
   static ERROR_InvalidVersion = SevError | 0x000D;
-  static Error_InvalidVersion = (o:{version: string}) => m(
+  static Error_InvalidVersion = (o: { version: string; }, x?: LDMLKeyboard.LKKeyboard) => mx(
     this.ERROR_InvalidVersion,
     `Version number '${def(o.version)}' must be a semantic version format string with 'major.minor.patch' components.`,
+    x,
     `The version number in the LDML keyboard file must be a [semantic
     version](https://semver.org) (semver) string. This string has a format of three
     integers representing major, minor, and patch versions, separated by periods. In
