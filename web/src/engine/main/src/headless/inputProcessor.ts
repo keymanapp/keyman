@@ -7,14 +7,22 @@ import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import { KM_Core } from 'keyman/engine/core-processor';
 
-import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent, type OutputTargetInterface, SystemStoreIDs } from "keyman/engine/keyboard";
-// TODO-web-core: remove usage of OutputTargetBase
 import {
   type Alternate,
+  Codes,
+  JSKeyboard,
+  KeyboardMinimalInterface,
+  type Keyboard,
+  type KeyEvent,
+  type OutputTargetInterface,
+  RuleBehavior,
+  SystemStoreIDs
+} from "keyman/engine/keyboard";
+// TODO-web-core: remove usage of OutputTargetBase
+import {
   isEmptyTransform,
   JSKeyboardProcessor,
   Mock,
-  RuleBehavior,
   type ProcessorInitOptions,
   OutputTargetBase
 } from 'keyman/engine/js-processor';
@@ -115,10 +123,10 @@ export class InputProcessor {
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
           // TODO-web-core
-          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(Mock.from(outputTarget as OutputTargetBase))) {
+          if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as Mock).isEqual(Mock.from(outputTarget))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
             // TODO-web-core
-            (outputTarget as OutputTargetBase).restoreTo(transcription.preInput);
+            (outputTarget as OutputTargetBase).restoreTo(transcription.preInput as Mock);
           }
           /*
             else:
@@ -238,8 +246,7 @@ export class InputProcessor {
 
       // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
       // by the actual keystroke occur.
-      // TODO-web-core
-      ruleBehavior.finalize(this.keyboardProcessor, outputTarget as OutputTargetBase, false);
+      this.keyboardProcessor.finalizeProcessorAction(ruleBehavior, outputTarget);
 
       // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
@@ -273,8 +280,7 @@ export class InputProcessor {
     // TODO-web-core
     const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget as OutputTargetBase);
     if (postRuleBehavior) {
-      // TODO-web-core
-      postRuleBehavior.finalize(this.keyboardProcessor, outputTarget as OutputTargetBase, true);
+      this.keyboardProcessor.finalizeProcessorAction(postRuleBehavior, outputTarget);
     }
 
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.

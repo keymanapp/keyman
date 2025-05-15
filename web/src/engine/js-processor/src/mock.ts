@@ -1,3 +1,4 @@
+import { OutputTargetInterface } from 'keyman/engine/keyboard';
 import { OutputTargetBase } from './outputTargetBase.js';
 import { KMWString } from '@keymanapp/web-utils';
 
@@ -25,9 +26,17 @@ export class Mock extends OutputTargetBase {
     this.selForward = this.selEnd >= this.selStart;
   }
 
+  static assertIsOutputTargetBase(outputTarget: OutputTargetInterface): asserts outputTarget is OutputTargetBase {
+    if (!(outputTarget instanceof OutputTargetBase)) {
+      throw new TypeError("outputTarget is not a OutputTargetBase");
+    }
+  }
+
   // Clones the state of an existing EditableElement, creating a Mock version of its state.
-  static from(outputTarget: OutputTargetBase, readonly?: boolean) {
+  static from(outputTarget: OutputTargetInterface, readonly?: boolean): Mock {
     let clone: Mock;
+
+    this.assertIsOutputTargetBase(outputTarget);
 
     if (outputTarget instanceof Mock) {
       // Avoids the need to run expensive kmwstring.ts `length()`
@@ -56,7 +65,7 @@ export class Mock extends OutputTargetBase {
     }
 
     // Also duplicate deadkey state!  (Needed for fat-finger ops.)
-    clone.setDeadkeys(outputTarget.deadkeys());
+    clone.setDeadkeys((outputTarget as OutputTargetBase).deadkeys());
 
     return clone;
   }
