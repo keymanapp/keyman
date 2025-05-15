@@ -4,6 +4,7 @@
 
 [Unit]
 Description=Keyman System Service
+Documentation=https://github.com/keymanapp/keyman/tree/master/linux/keyman-system-service
 
 [Service]
 Type=dbus
