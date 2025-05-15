@@ -28,7 +28,8 @@
 import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
-import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
+import { applyTransform, SearchKey, transformToSuggestion, Wordform2Key } from "./common.js";
+import { Node, Trie } from './trie.js';
 import { getLastPreCaretToken } from "./tokenization.js";
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import Capabilities = LexicalModelTypes.Capabilities;
@@ -305,7 +306,7 @@ export default class TrieModel implements LexicalModel {
   predict(transform: Transform, context: Context): Distribution<Suggestion> {
     // Special-case the empty buffer/transform: return the top suggestions.
     if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
-      return makeDistribution(this._trie.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
+      return makeDistribution(this.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
         transform: {
           insert: text,
           deleteLeft: 0
@@ -326,7 +327,7 @@ export default class TrieModel implements LexicalModel {
     let prefix = getLastPreCaretToken(this.breakWords, newContext);
 
     // Return suggestions from the trie.
-    return makeDistribution(this._trie.lookup(prefix).map(({text, p}) =>
+    return makeDistribution(this.lookup(prefix).map(({text, p}) =>
       transformToSuggestion({
         insert: text,
         // Delete whatever the prefix that the user wrote.
@@ -357,101 +358,13 @@ export default class TrieModel implements LexicalModel {
   public traverseFromRoot(): LexiconTraversal {
     return this._trie.traverseFromRoot();
   }
-};
 
-/////////////////////////////////////////////////////////////////////////////////
-// What remains in this file is the trie implementation proper. Note: to       //
-// reduce bundle size, any functions/methods related to creating the trie have //
-// been removed.                                                               //
-/////////////////////////////////////////////////////////////////////////////////
-
-/**
- * An **opaque** type for a string that is exclusively used as a search key in
- * the trie. There should be a function that converts arbitrary strings
- * (queries) and converts them into a standard search key for a given language
- * model.
- *
- * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
- */
-type SearchKey = string & { _: 'SearchKey'};
-
-/**
- * The priority queue will always pop the most probable item - be it a Traversal
- * state or a lexical entry reached via Traversal.
- */
-type TraversableWithProb = TextWithProbability | LexiconTraversal;
-
-/**
- * A function that converts a string (word form or query) into a search key
- * (secretly, this is also a string).
- */
-interface Wordform2Key {
-  (wordform: string): SearchKey;
-}
-
-// The following trie implementation has been (heavily) derived from trie-ing
-// by Conrad Irwin.
-// trie-ing is copyright (C) 2015–2017 Conrad Irwin.
-// Distributed under the terms of the MIT license:
-// https://github.com/ConradIrwin/trie-ing/blob/df55d7af7068d357829db9e0a7faa8a38add1d1d/LICENSE
-
-type Node = InternalNode | Leaf;
-/**
- * An internal node in the trie. Internal nodes NEVER contain entries; if an
- * internal node should contain an entry, then it has a dummy leaf node (see
- * below), that can be accessed by node.children["\uFDD0"].
- */
-interface InternalNode {
-  type: 'internal';
-  weight: number;
-  /** Maintains the keys of children in descending order of weight. */
-  values: string[]; // TODO: As an optimization, "values" can be a single string!
   /**
-   * Maps a single UTF-16 code unit to a child node in the trie. This child
-   * node may be a leaf or an internal node. The keys of this object are kept
-   * in sorted order in the .values array.
+   * Returns the top N suggestions from the trie.
+   * @param n How many suggestions, maximum, to return.
    */
-  children: { [codeunit: string]: Node };
-}
-/** Only leaf nodes actually contain entries (i.e., the words proper). */
-interface Leaf {
-  type: 'leaf';
-  weight: number;
-  entries: Entry[];
-}
-
-/**
- * An entry in the prefix trie (stored in leaf nodes exclusively!)
- */
-interface Entry {
-  /** The actual word form, stored in the trie. */
-  content: string;
-  /** A search key that usually simplifies the word form, for ease of search. */
-  key: SearchKey;
-  weight: number;
-}
-
-/**
- * Wrapper class for the trie and its nodes.
- */
-class Trie {
-  public readonly root: Node;
-  /** The total weight of the entire trie. */
-  readonly totalWeight: number;
-  /**
-   * Converts arbitrary strings to a search key. The trie is built up of
-   * search keys; not each entry's word form!
-   */
-  toKey: Wordform2Key;
-
-  constructor(root: Node, totalWeight: number, wordform2key: Wordform2Key) {
-    this.root = root;
-    this.toKey = wordform2key;
-    this.totalWeight = totalWeight;
-  }
-
-  public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this.root, '', this.totalWeight);
+  firstN(n: number): TextWithProbability[] {
+    return getSortedResults(this._trie.traverseFromRoot(), n);
   }
 
   /**
@@ -482,15 +395,19 @@ class Trie {
     // priority over anything from its descendants.
     return directEntries.concat(deduplicated);
   }
+};
 
-  /**
-   * Returns the top N suggestions from the trie.
-   * @param n How many suggestions, maximum, to return.
-   */
-  firstN(n: number): TextWithProbability[] {
-    return getSortedResults(this.traverseFromRoot(), n);
-  }
-}
+/////////////////////////////////////////////////////////////////////////////////
+// What remains in this file is the trie implementation proper. Note: to       //
+// reduce bundle size, any functions/methods related to creating the trie have //
+// been removed.                                                               //
+/////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The priority queue will always pop the most probable item - be it a Traversal
+ * state or a lexical entry reached via Traversal.
+ */
+type TraversableWithProb = TextWithProbability | LexiconTraversal;
 
 /**
  * Returns all entries matching the given prefix, in descending order of
