@@ -8,6 +8,13 @@ export class KMXKeyboard {
   constructor(private _keyboard: km_core_keyboard) {
   }
 
+  shutdown() {
+    if (this._keyboard) {
+      KM_Core.instance.keyboard_dispose(this._keyboard);
+      this._keyboard = null;
+    }
+  }
+
   get isMnemonic(): boolean {
     return false;
   }

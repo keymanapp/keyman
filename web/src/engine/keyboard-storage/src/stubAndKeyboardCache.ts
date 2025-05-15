@@ -1,4 +1,4 @@
-import { type Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
+import { type Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader, KMXKeyboard } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import KeyboardStub from "./keyboardStub.js";
@@ -50,6 +50,16 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   constructor(keyboardLoader?: KeyboardLoader) {
     super();
     this.keyboardLoader = keyboardLoader;
+  }
+
+  shutdown(): void {
+    for (const kbdId in this.keyboardTable) {
+      const kbd = this.keyboardTable[kbdId];
+      if (kbd instanceof KMXKeyboard) {
+        (kbd as KMXKeyboard).shutdown();
+      }
+      // TODO-web-core: do we have to do something if instanceof Promise?
+    }
   }
 
   getKeyboardForStub(stub: KeyboardStub): Keyboard {
