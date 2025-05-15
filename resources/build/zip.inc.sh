@@ -18,11 +18,10 @@ function zip_files() {
 
   # $1 for zip filename
   local ZIP_FILE="$1"
-  shift
 
   # $2 for filename containing files to exclude
-  EXCLUDE=$1
-  shift
+  EXCLUDE=$2
+  shift 2
   pwd
   if ! test -f ${EXCLUDE}; then
     builder_die "Filename of files to exclude '${EXCLUDE}' does not exist"
@@ -51,10 +50,7 @@ function zip_files() {
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
       case "${OSTYPE}" in
-        "cygwin")
-          SEVENZ="${SEVENZ_HOME}"/7z.exe
-          ;;
-        "msys")
+        "cygwin"|"msys")
           SEVENZ="${SEVENZ_HOME}"/7z.exe
           ;;
         *)
