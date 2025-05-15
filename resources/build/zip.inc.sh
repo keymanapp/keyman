@@ -31,7 +31,6 @@ function zip_files() {
       -x@*)
         # filename of files to exclude
         EXCLUDE="$1"
-        builder_echo_debug "EXCLUDE: ${EXCLUDE}"
         shift
         ;;
       -*)
