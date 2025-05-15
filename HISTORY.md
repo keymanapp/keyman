@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 19.0.38 alpha 2025-05-15
+
+* chore(android): Update FirstVoices launcher icon and red theme (#13907)
+* feat(developer): add more line number issues for KeysCompiler (#13915)
+* feat(developer):  add line number for MetaCompiler (#13916)
+* maint(linux): address comments from Debian package review (#13904)
+* maint(linux): add Questing to launchpad package builds (#13910)
+* maint(linux): fix logging in `deb-packaging.sh` (#13912)
+* maint(linux): remove temporary files created during dependency installation (#13913)
+* maint(common): move TC build configs for Linux to scripts (#13754)
+* fix(developer): remove ngrok binary at build time (#13847)
+* chore(linux): Update debian changelog (#13889)
+* refactor(web): rename `HardKeyboard` to `HardKeyboardBase` (#13929)
+* refactor(web): rename base `KeymanEngine` to `KeymanEngineBase` (#13942)
+
 ## 19.0.37 alpha 2025-05-14
 
 * maint(linux): remove generated file that got accidentally committed (#13902)
