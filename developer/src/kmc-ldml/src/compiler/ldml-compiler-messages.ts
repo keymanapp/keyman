@@ -1,5 +1,6 @@
-import { util } from "@keymanapp/common-types";
+import { KMXPlus, util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -53,11 +54,18 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
-  static Error_RowOnHardwareLayerHasTooManyKeys = (o:{row: number, hardware: string, modifiers: string}) =>  m(this.ERROR_RowOnHardwareLayerHasTooManyKeys, `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`);
+  static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x: LDMLKeyboard.LKRow) => mx(
+    this.ERROR_RowOnHardwareLayerHasTooManyKeys,
+    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`,
+    x,
+  );
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
-  static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
-    m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
+  static Error_KeyNotFoundInKeyBag = (o: { keyId: string, col: number, row: number, layer: string, form: string }, x: LDMLKeyboard.LKRow | KMXPlus.LayrRow) => mx(
+    this.ERROR_KeyNotFoundInKeyBag,
+    `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`,
+    x,
+  );
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
   static Hint_OneOrMoreRepeatedLocales = () =>
@@ -72,16 +80,26 @@ export class LdmlCompilerMessages {
   m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
 
   static ERROR_InvalidScanCode = SevError | 0x0009;
-  static Error_InvalidScanCode = (o:{form?: string, codes?: string[]}) =>
-  m(this.ERROR_InvalidScanCode, `Form '${def(o.form)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`);
+  static Error_InvalidScanCode = (o:{codes?: string[]}, x: LDMLKeyboard.LKForm) => mx(
+    this.ERROR_InvalidScanCode,
+    `Form '${def(x?.id)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`,
+    x,
+  );
 
   static WARN_CustomForm = SevWarn | 0x000A;
-  static Warn_CustomForm = (o:{id: string}) =>
-  m(this.WARN_CustomForm, `Custom <form id="${def(o.id)}"> element. Key layout may not be as expected.`);
+  static Warn_CustomForm = (o: LDMLKeyboard.LKForm) => mx(
+    this.WARN_CustomForm,
+    `Custom <form id="${def(o.id)}"> element. Key layout may not be as expected.`,
+    o,
+  );
 
   static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
-  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
-  m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`);
+  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x: LDMLKeyboard.LKKey) =>
+  mx(
+    this.ERROR_GestureKeyNotFoundInKeyBag,
+    `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`,
+    x,
+  );
 
   static HINT_NoDisplayForMarker = SevHint | 0x000C;
   static Hint_NoDisplayForMarker = (o: { id: string }) =>
@@ -138,8 +156,11 @@ export class LdmlCompilerMessages {
     `layers formId=${def(o.formId)}: Can only have one non-'touch' element`);
 
   static ERROR_InvalidHardware = SevError | 0x0013;
-  static Error_InvalidHardware = (o:{formId: string}) => m(this.ERROR_InvalidHardware,
-    `layers has invalid value formId=${def(o.formId)}`);
+  static Error_InvalidHardware = (o:LDMLKeyboard.LKLayers) => mx(
+    this.ERROR_InvalidHardware,
+    `layers has invalid value formId=${def(o.formId)}`,
+    o,
+  );
 
   private static layerIdOrEmpty(layer : string) {
     if (layer) {
@@ -150,12 +171,18 @@ export class LdmlCompilerMessages {
   }
 
   static ERROR_InvalidModifier = SevError | 0x0014;
-  static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,
-    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.layer));
+  static Error_InvalidModifier = (o:LDMLKeyboard.LKLayer) => mx(
+    this.ERROR_InvalidModifier,
+    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.id),
+    o,
+  );
 
   static ERROR_MissingFlicks = SevError | 0x0015;
-  static Error_MissingFlicks = (o:{flickId: string, id: string}) => m(this.ERROR_MissingFlicks,
-    `key id=${def(o.id)} refers to missing flickId=${def(o.flickId)}`);
+  static Error_MissingFlicks = (o: LDMLKeyboard.LKKey) => mx(
+    this.ERROR_MissingFlicks,
+    `key id=${def(o.id)} refers to missing flickId=${def(o.flickId)}`,
+    o,
+  );
 
   static ERROR_DuplicateVariable = SevError | 0x0016;
   static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
@@ -316,8 +343,14 @@ export class LdmlCompilerMessages {
   static offset(event: CompilerEvent, x?: any): CompilerEvent {
     if(x) {
       const metadata = KeymanXMLReader.getMetaData(x) || {};
-      event.offset = metadata?.startIndex;
-      event.filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      const offset = metadata?.startIndex;
+      if (offset) {
+        event.offset = offset;
+      }
+      const filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      if (filename) {
+        event.filename = filename;
+      }
     }
     return event;
   }

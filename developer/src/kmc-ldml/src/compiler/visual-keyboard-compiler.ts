@@ -117,7 +117,9 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
         if (!keydef || !kmap || text === null) {
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({ keyId: key.value, layer: layerId, row: y, col: x, form: hardware })
+            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({
+              keyId: key.value, layer: layerId, row: y, col: x, form: hardware
+            }, row)
           );
           result = false;
         } else {
