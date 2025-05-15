@@ -35,7 +35,7 @@ function determineBaseLayout(): string {
 export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
 export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
-export default class KeymanEngine<
+export class KeymanEngineBase<
   Configuration extends EngineConfiguration,
   ContextManager extends ContextManagerBase<any>,
   HardKeyboard extends HardKeyboardBase
@@ -117,7 +117,7 @@ export default class KeymanEngine<
     workerFactory: WorkerFactory,
     config: Configuration,
     contextManager: ContextManager,
-    processorConfigInitializer: (engine: KeymanEngine<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
+    processorConfigInitializer: (engine: KeymanEngineBase<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
   ) {
     this.config = config;
     this.contextManager = contextManager;
