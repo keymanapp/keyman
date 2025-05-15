@@ -97,7 +97,7 @@ if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
     . "$THIS_SCRIPT_PATH/localenv.sh"
 fi
 
-BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
+BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$KEYMAN_VERSION"
 
 ### START OF THE BUILD ###
 
@@ -151,16 +151,16 @@ updatePlist() {
             builder_die "File not found: $KM_PLIST"
         fi
         local YEAR=`date "+%Y"`
-        echo "Setting version and related fields to $VERSION_WITH_TAG in $KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $VERSION_ENVIRONMENT" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:Tier $TIER" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionTag $VERSION_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $VERSION_WITH_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $VERSION_GIT_TAG" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $VERSION_RELEASE" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
+        echo "Setting version and related fields to $KEYMAN_VERSION_WITH_TAG in $KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleVersion $KEYMAN_VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KEYMAN_VERSION" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:SentryEnvironment $KEYMAN_VERSION_ENVIRONMENT" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:Tier $KEYMAN_TIER" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionTag $KEYMAN_VERSION_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $KEYMAN_VERSION_WITH_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $KEYMAN_VERSION_GIT_TAG" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $KEYMAN_VERSION_RELEASE" "$KM_PLIST"
+        /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $KEYMAN_VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
     fi
 }
@@ -169,6 +169,9 @@ do_build_engine ( ) {
   ### Build Keyman Engine (kmx, ldml processor) ###
 
   execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme $ENGINE_NAME"
+}
+
+do_update_engine_metadata ( ) {
   execBuildCommand "$ENGINE_NAME dSYM file" "dsymutil \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Versions/A/$ENGINE_NAME\" -o \"$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework.dSYM\""
   updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
 }
@@ -181,6 +184,9 @@ do_build_app ( ) {
   builder_heading "Building Keyman.app"
 
   execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+}
+
+do_update_app_metadata ( ) {
   updatePlist "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Info.plist" "Keyman"
 
   if builder_is_debug_build; then
@@ -297,13 +303,21 @@ do_publish() {
 builder_run_action clean          do_clean
 builder_run_action configure      do_configure
 
-builder_run_action build:engine   do_build_engine
-builder_run_action build:app      do_build_app
-builder_run_action build:testapp  do_build_testapp
+# Note: `xcodebuild test` rewrites info.plist, so we need to patch the metadata
+# after testing for use in install/publish, hence the multiple build:engine /
+# build:app runs
 
+builder_run_action build:engine   do_build_engine
 builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS test -scheme $ENGINE_NAME"
+builder_run_action build:engine   do_update_engine_metadata
+
+builder_run_action build:app      do_build_app
 builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 builder_run_action test:help      check-markdown  "$KEYMAN_ROOT/mac/docs/help"
+builder_run_action build:app      do_update_app_metadata
+
+builder_run_action build:testapp  do_build_testapp
+
 
 builder_run_action install do_install
 

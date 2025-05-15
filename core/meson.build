@@ -6,7 +6,7 @@
 #
 
 project('keyman_core', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
+        version: files('../VERSION.md'),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++17',

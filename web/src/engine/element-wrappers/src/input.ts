@@ -1,4 +1,5 @@
 import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 interface EventMap  {
   /**
@@ -69,7 +70,7 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
   clearSelection(): void {
     // Processes our codepoint-based variants of selectionStart and selectionEnd.
     this.getCaret(); // updates processedSelectionStart if required
-    this.root.value = this.root.value._kmwSubstring(0, this.processedSelectionStart) + this.root.value._kmwSubstring(this.processedSelectionEnd); //I3319
+    this.root.value = KMWString.substr(this.root.value, 0, this.processedSelectionStart) + KMWString.substr(this.root.value, this.processedSelectionEnd); //I3319
 
     this.setCaret(this.processedSelectionStart);
   }
@@ -91,8 +92,8 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
   getCaret(): number {
     if(this.root.selectionStart != this._cachedSelectionStart) {
       this._cachedSelectionStart = this.root.selectionStart; // KMW-1
-      this.processedSelectionStart = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionStart); // I3319
-      this.processedSelectionEnd = this.root.value._kmwCodeUnitToCodePoint(this.root.selectionEnd);     // I3319
+      this.processedSelectionStart = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionStart); // I3319
+      this.processedSelectionEnd = KMWString.codeUnitToCodePoint(this.root.value, this.root.selectionEnd);     // I3319
     }
     return this.root.selectionDirection == 'forward' ? this.processedSelectionEnd : this.processedSelectionStart;
   }
@@ -106,8 +107,8 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
   }
 
   setSelection(start: number, end: number, direction: "forward" | "backward" | "none") {
-    let domStart = this.root.value._kmwCodePointToCodeUnit(start);
-    let domEnd = this.root.value._kmwCodePointToCodeUnit(end);
+    const domStart = KMWString.codePointToCodeUnit(this.root.value, start);
+    const domEnd = KMWString.codePointToCodeUnit(this.root.value, end);
     this.root.setSelectionRange(domStart, domEnd, direction);
 
     this.processedSelectionStart = start;
@@ -124,8 +125,8 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
     // We bypass this whenever operating in the embedded format.
     const element = this.getElement();
 
-    let selectionStart = element.selectionStart;
-    let selectionEnd = element.selectionEnd;
+    const selectionStart = element.selectionStart;
+    const selectionEnd = element.selectionEnd;
 
     this._activeForcedScroll = true;
 
@@ -152,26 +153,26 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
 
   getTextBeforeCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(0, this.processedSelectionStart);
+    return KMWString.substring(this.getText(), 0, this.processedSelectionStart);
   }
 
   getSelectedText(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionStart, this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionStart, this.processedSelectionEnd);
   }
 
   setTextBeforeCaret(text: string) {
     this.getCaret();
-    let selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
-    let direction = this.getSelectionDirection();
-    let newCaret = text._kmwLength();
-    this.root.value = text + this.getText()._kmwSubstring(this.processedSelectionStart);
+    const selectionLength = this.processedSelectionEnd - this.processedSelectionStart;
+    const direction = this.getSelectionDirection();
+    const newCaret = KMWString.length(text);
+    this.root.value = text + KMWString.substring(this.getText(), this.processedSelectionStart);
 
     this.setSelection(newCaret, newCaret + selectionLength, direction);
   }
 
   protected setTextAfterCaret(s: string) {
-    let direction = this.getSelectionDirection();
+    const direction = this.getSelectionDirection();
 
     this.root.value = this.getTextBeforeCaret() + s;
     this.setSelection(this.processedSelectionStart, this.processedSelectionEnd, direction);
@@ -179,7 +180,7 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
 
   getTextAfterCaret(): string {
     this.getCaret();
-    return this.getText()._kmwSubstring(this.processedSelectionEnd);
+    return KMWString.substring(this.getText(), this.processedSelectionEnd);
   }
 
   getText(): string {
@@ -188,15 +189,15 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
 
   deleteCharsBeforeCaret(dn: number) {
     if(dn > 0) {
-      let curText = this.getTextBeforeCaret();
-      let caret = this.processedSelectionStart;
+      const curText = this.getTextBeforeCaret();
+      const caret = this.processedSelectionStart;
 
       if(dn > caret) {
         dn = caret;
       }
 
       this.adjustDeadkeys(-dn);
-      this.setTextBeforeCaret(curText.kmwSubstring(0, caret - dn));
+      this.setTextBeforeCaret(KMWString.substring(curText, 0, caret - dn));
       this.setCaret(caret - dn);
     }
   }
@@ -206,13 +207,13 @@ export class Input extends OutputTargetElementWrapper<EventMap> {
       return;
     }
 
-    let caret = this.getCaret();
-    let front = this.getTextBeforeCaret();
-    let back = this.getText()._kmwSubstring(this.processedSelectionStart);
+    const caret = this.getCaret();
+    const front = this.getTextBeforeCaret();
+    const back = KMWString.substring(this.getText(), this.processedSelectionStart);
 
-    this.adjustDeadkeys(s._kmwLength());
+    this.adjustDeadkeys(KMWString.length(s));
     this.root.value = front + s + back;
-    this.setCaret(caret + s._kmwLength());
+    this.setCaret(caret + KMWString.length(s));
   }
 
   handleNewlineAtCaret(): void {

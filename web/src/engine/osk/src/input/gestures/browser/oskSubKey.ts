@@ -20,10 +20,10 @@ export default class OSKSubKey extends OSKKey {
   }
 
   construct(osk: VisualKeyboard, baseKey: KeyElement, width: number, topMargin: boolean): HTMLDivElement {
-    let spec = this.spec;
+    const spec = this.spec;
 
-    let kDiv=document.createElement('div');
-    let ks=kDiv.style;
+    const kDiv=document.createElement('div');
+    const ks=kDiv.style;
 
     kDiv.className='kmw-key-square-ex';
     if(topMargin) {
@@ -33,14 +33,14 @@ export default class OSKSubKey extends OSKKey {
     ks.width=width+'px';
     ks.height=baseKey.offsetHeight+'px';
 
-    let btnEle=document.createElement('div');
-    let btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
+    const btnEle=document.createElement('div');
+    const btn = this.btn = link(btnEle, new KeyData(this, spec['id']));
 
     this.setButtonClass();
     btn.id = this.getId();
 
     // Must set button size (in px) dynamically, not from CSS
-    let bs=btn.style;
+    const bs=btn.style;
     bs.height=ks.height;
     bs.lineHeight=baseKey.style.lineHeight;
     bs.width=ks.width;

@@ -4,6 +4,7 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
+import { KMWString } from '@keymanapp/web-utils';
 import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
@@ -51,7 +52,7 @@ const DOUBLED_BKSP_KEYBOARD_SCRIPT = function keyboard_core () {
   this.g_main=function(t,e) {
     var k=KeymanWeb;
     // Standard compiled keyboards do not directly use any methods on `t`.
-    if(e.Lcode == Codes.keyCodes.K_BKSP && t.getTextBeforeCaret().kmwLength() >= 2){
+    if(e.Lcode == Codes.keyCodes.K_BKSP && KMWString.length(t.getTextBeforeCaret()) >= 2){
       // If the context has at least two characters, delete two.
       k.KO(2, t, '')
       // Our rule matched, so signal that.
@@ -189,7 +190,7 @@ describe('Engine - specialized backspace handling', function() {
 
   it('empty context, positional keyboard, but text is selected', () => {
     let contextSource = new Mock('selected text', 0);
-    contextSource.setSelection(0, contextSource.getText().kmwLength());
+    contextSource.setSelection(0, KMWString.length(contextSource.getText()));
 
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,

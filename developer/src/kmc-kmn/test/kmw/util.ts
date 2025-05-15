@@ -5,7 +5,7 @@ export interface ETLResult {
 }
 
 export function extractTouchLayout(js: string): ETLResult|null  {
-  let m = /KVKL=(?<kvkl>.+?);[\r\n]/ds.exec(js);
+  const m = /KVKL=(?<kvkl>.+?);[\r\n]/ds.exec(js);
   if(!m) {
     return {
       js: js,
@@ -13,7 +13,7 @@ export function extractTouchLayout(js: string): ETLResult|null  {
     };
   }
 
-  let kvkl = (<any>m).indices.groups.kvkl;
+  const kvkl = (<any>m).indices.groups.kvkl;
 
   return {
     js: js.substring(0, kvkl[0]) + 'null' + js.substring(kvkl[1]),

@@ -1,9 +1,7 @@
-import { extendString } from "@keymanapp/web-utils";
+import { KMWString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
 import { OutputTarget } from 'keyman/engine/keyboard';
-
-extendString();
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
@@ -46,7 +44,7 @@ export class Transcription {
   private static tokenSeed: number = 0;
 
   constructor(keystroke: KeyEvent, transform: TextTransform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
-    let token = this.token = Transcription.tokenSeed++;
+    const token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;
     this.transform = transform;
@@ -94,7 +92,7 @@ export abstract class OutputTargetBase implements OutputTarget {
   }
 
   insertDeadkeyBeforeCaret(d: number) {
-    var dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
+    const dk: Deadkey = new Deadkey(this.getDeadkeyCaret(), d);
     this.deadkeys().add(dk);
   }
 
@@ -129,7 +127,7 @@ export abstract class OutputTargetBase implements OutputTarget {
     const fromLeft = original.getTextBeforeCaret();
 
     const leftDivergenceIndex = findCommonSubstringEndIndex(fromLeft, toLeft, false);
-    const deletedLeft = fromLeft.substring(leftDivergenceIndex)._kmwLength();
+    const deletedLeft = KMWString.length(fromLeft.substring(leftDivergenceIndex));
     // No need for our specialized variant here.
     const insertedText = toLeft.substring(leftDivergenceIndex);
 
@@ -140,13 +138,13 @@ export abstract class OutputTargetBase implements OutputTarget {
     // Right insertions aren't supported, but right deletions will matter in some scenarios.
     // In particular, once we allow right-deletion for pred-text suggestions applied with the
     // caret mid-word..
-    const deletedRight = fromRight.substring(0, rightDivergenceIndex + 1)._kmwLength();
+    const deletedRight = KMWString.length(fromRight.substring(0, rightDivergenceIndex + 1));
 
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
   buildTranscriptionFrom(original: OutputTargetBase, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
-    let transform = this.buildTransformFrom(original);
+    const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
 
@@ -179,7 +177,7 @@ export abstract class OutputTargetBase implements OutputTarget {
     this.clearSelection();
 
     if(transform.deleteRight) {
-      this.setTextAfterCaret(this.getTextAfterCaret()._kmwSubstr(transform.deleteRight));
+      this.setTextAfterCaret(KMWString.substr(this.getTextAfterCaret(), transform.deleteRight));
     }
 
     if(transform.deleteLeft) {
@@ -202,7 +200,7 @@ export abstract class OutputTargetBase implements OutputTarget {
    */
   protected setTextBeforeCaret(s: string): void {
     // This one's easy enough to provide a default implementation for.
-    this.deleteCharsBeforeCaret(this.getTextBeforeCaret()._kmwLength());
+    this.deleteCharsBeforeCaret(KMWString.length(this.getTextBeforeCaret()));
     this.insertTextBeforeCaret(s);
   }
 

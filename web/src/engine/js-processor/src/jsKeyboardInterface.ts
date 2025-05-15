@@ -5,7 +5,7 @@
 
 //#region Imports
 
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec, KMWString } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, type OutputTarget, VariableStoreDictionary } from "keyman/engine/keyboard";
 import { type OutputTargetBase }  from './outputTargetBase.js';
@@ -157,7 +157,7 @@ class CachedContextEx {
   }
 
   clone(): CachedContextEx {
-    let r = new CachedContextEx();
+    const r = new CachedContextEx();
     r._cache = this._cache;
     return r;
   }
@@ -231,7 +231,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   registerKeyboard(Pk: any): void {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
-    let keyboard = new JSKeyboard(Pk);
+    const keyboard = new JSKeyboard(Pk);
     this.loadedKeyboard = keyboard;
   }
 
@@ -250,12 +250,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
 
   context(n: number, ln: number, outputTarget: OutputTarget): string {
-    var v = this.cachedContext.get(n, ln);
+    const v = this.cachedContext.get(n, ln);
     if(v !== null) {
       return v;
     }
 
-    var r = this.KC_(n, ln, outputTarget);
+    const r = this.KC_(n, ln, outputTarget);
     this.cachedContext.set(n, ln, r);
     return r;
   }
@@ -279,11 +279,11 @@ export class JSKeyboardInterface extends KeyboardHarness {
     // If we have a selection, we have an empty context
     tempContext = outputTarget.isSelectionEmpty() ? outputTarget.getTextBeforeCaret() : "";
 
-    if(tempContext._kmwLength() < n) {
-      tempContext = Array(n-tempContext._kmwLength()+1).join("\uFFFE") + tempContext;
+    if(KMWString.length(tempContext) < n) {
+      tempContext = Array(n-KMWString.length(tempContext)+1).join("\uFFFE") + tempContext;
     }
 
-    return tempContext._kmwSubstr(-n)._kmwSubstr(0,ln);
+    return KMWString.substr(KMWString.substr(tempContext, -n), 0, ln);
   }
 
   /**
@@ -334,7 +334,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @return      {Array}                     Context array (of strings and numbers)
    */
   private _BuildExtendedContext(n: number, ln: number, outputTarget: OutputTargetBase): CachedExEntry {
-    var cache: CachedExEntry = this.cachedContextEx.get(n, ln);
+    let cache: CachedExEntry = this.cachedContextEx.get(n, ln);
     if(cache !== null) {
       return cache;
     } else {
@@ -343,15 +343,15 @@ export class JSKeyboardInterface extends KeyboardHarness {
       cache = this.cachedContextEx.get(n, n);
       if(cache === null) {
         // First, let's make sure we have a cloned, sorted copy of the deadkey array.
-        let unmatchedDeadkeys = outputTarget.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
+        const unmatchedDeadkeys = outputTarget.deadkeys().toSortedArray(); // Is reverse-order sorted for us already.
 
         // Time to build from scratch!
-        var index = 0;
+        let index = 0;
         cache = { valContext: [], deadContext: []};
         while(cache.valContext.length < n) {
           // As adapted from `deadkeyMatch`.
-          var sp = outputTarget.getDeadkeyCaret();
-          var deadPos = sp - index;
+          const sp = outputTarget.getDeadkeyCaret();
+          const deadPos = sp - index;
           if(unmatchedDeadkeys.length > 0 && unmatchedDeadkeys[0].p > deadPos) {
             // We have deadkeys at the right-hand side of the caret!  They don't belong in the context, so pop 'em off.
             unmatchedDeadkeys.splice(0, 1);
@@ -363,7 +363,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
             unmatchedDeadkeys.splice(0, 1);
           } else {
             // Take the character.  We get "\ufffe" if it doesn't exist.
-            var kc = this.context(++index, 1, outputTarget);
+            const kc = this.context(++index, 1, outputTarget);
             cache.valContext = ([kc] as (string|number)[]).concat(cache.valContext);
           }
         }
@@ -371,7 +371,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
       }
 
       // Now that we have the cache...
-      var subCache = cache;
+      const subCache = cache;
       subCache.valContext = subCache.valContext.slice(0, ln);
       this.cachedContextEx.set(n, ln, subCache);
 
@@ -392,32 +392,32 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
   fullContextMatch(n: number, outputTarget: OutputTargetBase, rule: ContextEntry[]): boolean {
     // Stage one:  build the context index map.
-    var fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
+    const fullContext = this._BuildExtendedContext(n, rule.length, outputTarget);
     this.ruleContextEx = this.cachedContextEx.clone();
-    var context = fullContext.valContext;
-    var deadContext = fullContext.deadContext;
+    const context = fullContext.valContext;
+    const deadContext = fullContext.deadContext;
 
-    var mismatch = false;
+    let mismatch = false;
 
     // This symbol internally indicates lack of context in a position.  (See KC_)
     const NUL_CONTEXT = "\uFFFE";
 
-    var assertNever = function(x: never): never {
+    const assertNever = function(x: never): never {
       // Could be accessed by improperly handwritten calls to `fullContextMatch`.
       throw new Error("Unexpected object in fullContextMatch specification: " + x);
     }
 
     // Stage two:  time to match against the rule specified.
-    for(var i=0; i < rule.length; i++) {
+    for(let i=0; i < rule.length; i++) {
       if(typeof rule[i] == 'string') {
-        var str = rule[i] as string;
+        const str = rule[i] as string;
         if(str !== context[i]) {
           mismatch = true;
           break;
         }
       } else {
         // TypeScript needs a cast to this intermediate type to do its discriminated union magic.
-        var r = rule[i] as ContextNonCharEntry;
+        const r = rule[i] as ContextNonCharEntry;
         switch(r.t) {
           case 'd':
             // We still need to set a flag here;
@@ -428,7 +428,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
             }
             break;
           case 'a':
-            var lookup: KeyboardStoreElement;
+            let lookup: KeyboardStoreElement;
 
             if(typeof context[i] == 'string') {
               lookup = context[i] as string;
@@ -436,7 +436,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
               lookup = {'t': 'd', 'd': context[i] as number};
             }
 
-            var result = this.any(i, lookup, r.a);
+            const result = this.any(i, lookup, r.a);
 
             if(!r.n) { // If it's a standard 'any'...
               if(!result) {
@@ -454,7 +454,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
             break;
           case 'i':
             // The context will never hold a 'beep.'
-            var ch = this._Index(r.i, r.o) as string | RuleDeadkey;
+            const ch = this._Index(r.i, r.o) as string | RuleDeadkey;
 
             if(ch !== undefined && (typeof(ch) == 'string' ? ch : ch.d) !== context[i]) {
               mismatch = true;
@@ -552,12 +552,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Test keystroke with modifiers against rule
    */
   keyMatch(e: KeyEvent, Lruleshift:number, Lrulekey:number): boolean {
-    var retVal = false; // I3318
-    var keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
+    let retVal = false; // I3318
+    let keyCode = (e.Lcode == 173 ? 189 : e.Lcode);  //I3555 (Firefox hyphen issue)
 
-    let bitmask = this.activeKeyboard.modifierBitmask;
-    var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
-    var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
+    const bitmask = this.activeKeyboard.modifierBitmask;
+    const modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
+    const stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
     const eventModifiers = JSKeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
 
@@ -598,7 +598,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Get object with extended key event information
    */
   keyInformation(e: KeyEvent): KeyInformation {
-    var ei = new KeyInformation();
+    const ei = new KeyInformation();
     ei['vk'] = e.LisVirtualKey;
     ei['code'] = e.Lcode;
     ei['modifiers'] = e.Lmodifiers;
@@ -633,7 +633,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
   _ExplodeStore(store: KeyboardStore): ComplexKeyboardStore {
     if(typeof(store) == 'string') {
-      let cachedStores = this.activeKeyboard.explodedStores;
+      const cachedStores = this.activeKeyboard.explodedStores;
 
       // Is the result cached?
       if(cachedStores[store]) {
@@ -641,9 +641,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
       }
 
       // Nope, so let's build its cache.
-      var result: ComplexKeyboardStore = [];
-      for(var i=0; i < store._kmwLength(); i++) {
-        result.push(store._kmwCharAt(i));
+      const result: ComplexKeyboardStore = [];
+      for(let i=0; i < KMWString.length(store); i++) {
+        result.push(KMWString.charAt(store, i));
       }
 
       // Cache the result for later!
@@ -669,8 +669,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
     }
 
     s = this._ExplodeStore(s);
-    var Lix = -1;
-    for(var i=0; i < s.length; i++) {
+    let Lix = -1;
+    for(let i=0; i < s.length; i++) {
       const entry = s[i];
       if(typeof(entry) == 'string') {
         if(s[i] == ch) {
@@ -720,12 +720,12 @@ export class JSKeyboardInterface extends KeyboardHarness {
   indexOutput(Pdn: number, Ps: KeyboardStore, Pn: number, outputTarget: OutputTarget): void {
     this.resetContextCache();
 
-    var assertNever = function(x: never): never {
+    const assertNever = function(x: never): never {
       // Could be accessed by improperly handwritten calls to `fullContextMatch`.
       throw new Error("Unexpected object in fullContextMatch specification: " + x);
     }
 
-    var indexChar = this._Index(Ps, Pn);
+    const indexChar = this._Index(Ps, Pn);
     if(indexChar !== "") {
       if(typeof indexChar == 'string' ) {
         this.output(Pdn, outputTarget, indexChar);  //I3319
@@ -755,15 +755,15 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * Description  Keyboard output
    */
   deleteContext(dn: number, outputTarget: OutputTarget): void {
-    var context: CachedExEntry;
+    let context: CachedExEntry;
 
     // We want to control exactly which deadkeys get removed.
     if(dn > 0) {
       context = this._BuildExtendedContext(dn, dn, (outputTarget as OutputTargetBase));
       let nulCount = 0;
 
-      for(var i=0; i < context.valContext.length; i++) {
-        var dk = context.deadContext[i];
+      for(let i=0; i < context.valContext.length; i++) {
+        const dk = context.deadContext[i];
 
         if(dk) {
           // Remove deadkey in context.
@@ -779,7 +779,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
       // Prevent attempts to delete nul sentinels, as they don't exist in the actual context.
       // (Addresses regression from KMW v 12.0 paired with Developer bug through same version)
-      let contextLength = context.valContext.length - nulCount;
+      const contextLength = context.valContext.length - nulCount;
       if(dn > contextLength) {
         dn = contextLength;
       }
@@ -873,8 +873,8 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @return      {boolean}                   True if the test succeeds
    */
   ifStore(systemId: number, strValue: string, outputTarget: OutputTarget): boolean {
-    var result=true;
-    let store = this.systemStores[systemId];
+    let result=true;
+    const store = this.systemStores[systemId];
     if(store) {
       result = store.matches(strValue);
     }
@@ -918,7 +918,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   loadStore(kbdName: string, storeName:string, dfltValue:string): string {
     this.resetContextCache();
     if(this.variableStoreSerializer) {
-      let cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
+      const cValue = this.variableStoreSerializer.loadStore(kbdName, storeName);
       return cValue[storeName] || dfltValue;
     } else {
       return dfltValue;
@@ -938,13 +938,13 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
   saveStore(storeName:string, optValue:string): boolean {
     this.resetContextCache();
-    var kbd=this.activeKeyboard;
+    const kbd=this.activeKeyboard;
     if(!kbd || typeof kbd.id == 'undefined' || kbd.id == '') {
       return false;
     }
 
     // And the lookup under that entry looks for the value under the store name, again.
-    let valueObj: VariableStore = {};
+    const valueObj: VariableStore = {};
     valueObj[storeName] = optValue;
 
     // Null-check in case of invocation during unit-test
@@ -1034,7 +1034,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.resetContextCache();
 
     // Capture the initial state of the OutputTarget before any rules are matched.
-    let preInput = Mock.from(outputTarget, true);
+    const preInput = Mock.from(outputTarget, true);
 
     // Capture the initial state of any variable stores
     const cachedVariableStores = this.activeKeyboard.variableStores;
@@ -1048,7 +1048,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
 
     // Calls the start-group of the active keyboard.
     this.activeTargetOutput = outputTarget;
-    var matched = callee(outputTarget, keystroke);
+    const matched = callee(outputTarget, keystroke);
     this.activeTargetOutput = null;
 
     // Finalize the rule's results.
@@ -1068,7 +1068,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     this.ruleBehavior.triggerKeyDefault = !matched;
 
     // Clear our result-tracking variable to prevent any possible pollution for future processing.
-    let behavior = this.ruleBehavior;
+    const behavior = this.ruleBehavior;
     this.ruleBehavior = null;
 
     return behavior;
@@ -1097,9 +1097,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
    */
   static __publishShorthandAPI() {
     // Keyboard callbacks
-    let prototype = this.prototype;
+    const prototype = this.prototype;
 
-    var exportKBCallback = function(miniName: string, longName: keyof JSKeyboardInterface) {
+    const exportKBCallback = function(miniName: string, longName: keyof JSKeyboardInterface) {
       if(prototype[longName]) {
         // @ts-ignore
         prototype[miniName] = prototype[longName];

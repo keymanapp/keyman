@@ -78,10 +78,10 @@ if(!keymanweb) {
        * Highlight the currently active keyboard in the list of keyboards
        **/
       private _ShowSelected() {
-        let kbd=keymanweb.getActiveKeyboard();
-        let lgc=keymanweb.getActiveLanguage();
-        let kList = this._KeymanWeb_KbdList.childNodes;
-        let _r = /^KMWSel_(.*)\$(.*)$/;
+        const kbd=keymanweb.getActiveKeyboard();
+        const lgc=keymanweb.getActiveLanguage();
+        const kList = this._KeymanWeb_KbdList.childNodes;
+        const _r = /^KMWSel_(.*)\$(.*)$/;
 
         for(let i=1; i<kList.length; i++) {
           (kList[i].childNodes[0] as HTMLElement).className = '';
@@ -89,7 +89,7 @@ if(!keymanweb) {
 
         let i: number;
         for(i=2; i<kList.length; i++) {
-          let _rv = _r.exec((kList[i].childNodes[0] as HTMLElement).id);
+          const _rv = _r.exec((kList[i].childNodes[0] as HTMLElement).id);
           if(_rv && (_rv[1] == kbd) && (_rv[2] == lgc)) {
             break;
           }
@@ -121,15 +121,16 @@ if(!keymanweb) {
           }
         }
 
-        let _r=/^KMWSel_(.*)\$(.*)$/;
-        let _rv=_r.exec(id),_lgc='',_name='';
+        const _r=/^KMWSel_(.*)\$(.*)$/;
+        const _rv=_r.exec(id);
+        let _lgc='',_name='';
         if(_rv !== null) {
           _name = _rv[1].split('$')[0]; //new code
           _lgc = id.split('$')[1];
           if(this._KMWSel != null) {
             this._KMWSel.className = '';
           }
-          let _k = document.getElementById(id);
+          const _k = document.getElementById(id);
           if(_k) {
             _k.className='selected';
           }
@@ -140,7 +141,7 @@ if(!keymanweb) {
         }
 
         keymanweb.focusLastActiveElement();
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
         if(osk && osk.isEnabled()) {
           osk.show(true);
         }
@@ -265,7 +266,7 @@ if(!keymanweb) {
        */
       private _ShowKeyboardButton(_name?: string) {
         let kbdName = keymanweb.getActiveKeyboard();
-        let kbdId = document.getElementById("KMW_Keyboard");
+        const kbdId = document.getElementById("KMW_Keyboard");
         if(arguments.length > 0) {
           kbdName = _name;
         }
@@ -274,14 +275,14 @@ if(!keymanweb) {
           if((kbdName == '') || keymanweb.isCJK()) {
             kbdId.className='kmw_disabled';
           } else {
-            let osk = keymanweb.osk;
+            const osk = keymanweb.osk;
             kbdId.className = osk && osk.isEnabled() ? 'kmw_show' : 'kmw_hide';
           }
         }
       }
 
       registerEvents() {
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
         if(!osk) {
           return;
         }
@@ -304,7 +305,7 @@ if(!keymanweb) {
         /* TODO: why is this still needed??? Does it actually do anything?? */
         osk.addEventListener('hide', function(obj) {
           if((arguments.length > 0) && obj.HiddenByUser) {
-            let _a = document.getElementById('KMW_Keyboard');
+            const _a = document.getElementById('KMW_Keyboard');
             if(_a) {
               _a.className = 'kmw_hide';
             }
@@ -320,7 +321,7 @@ if(!keymanweb) {
        **/
       readonly _ShowKeymanWebKeyboard = () => {
         const kbdId=document.getElementById("KMW_Keyboard");
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
 
         if((kbdId.className!='kmw_disabled') && osk && osk.show) {
           if(osk.isEnabled()) {
@@ -384,7 +385,7 @@ if(!keymanweb) {
         }
 
 
-        let imgPath=util.getOption('resources')+'ui/button/';
+        const imgPath=util.getOption('resources')+'ui/button/';
         if(_elem) {
           // Append another DIV to follow the main control with clear:both to prevent selection over entire width of window
           const dx=document.createElement('DIV')
@@ -417,9 +418,9 @@ if(!keymanweb) {
         // Thus, in essence:  if(true) { /* ... */ }
         // @ts-ignore
         if(!keymanweb['iOS']) {
-          var _li = util.createElement('li');
-          var _a = util.createElement('a');
-          var _img = util.createElement('img');
+          const _li = util.createElement('li');
+          const _a = util.createElement('a');
+          const _img = util.createElement('img');
           _img.src = imgPath+'kbdicon.gif';
           _a.appendChild(_img);
 
@@ -430,7 +431,7 @@ if(!keymanweb) {
           _sp1.appendChild(_txt1);
           _a.appendChild(_sp1);
 
-          var _sp2 = util.createElement('span');
+          const _sp2 = util.createElement('span');
           _sp2.id = 'KMW_KbdHiddenMsg';
           _sp2.appendChild(_txt2);
           _a.appendChild(_sp2);
@@ -443,9 +444,9 @@ if(!keymanweb) {
           this._KeymanWeb_KbdList.appendChild(_li);
         }
 
-        var _li1 = util.createElement('li');
+        const _li1 = util.createElement('li');
         _li1.id = 'KMW_ButtonUI_KbdList';
-        var _a1 = util.createElement('a');
+        const _a1 = util.createElement('a');
         _a1.appendChild(document.createTextNode('(System keyboard)'));
 
         _a1.onclick = this._SelectKeyboard;
@@ -460,7 +461,7 @@ if(!keymanweb) {
 
         document.getElementById('kmwico_li').appendChild(this._KeymanWeb_KbdList);
 
-        var _sfEl = document.getElementById("kmwico_li");
+        const _sfEl = document.getElementById("kmwico_li");
         util.attachDOMEvent(_sfEl,'mousedown',this._SelectorMouseDown);
         util.attachDOMEvent(_sfEl,'mouseover',this._SelectorMouseOver);
         util.attachDOMEvent(_sfEl,'mouseout',this._SelectorMouseOut);
@@ -494,7 +495,7 @@ if(!keymanweb) {
 
         const kbds=keymanweb.getKeyboards();
         if(kbds.length > 0) {
-          for(var i:number=0; i<kbds.length; i++) {
+          for(let i:number=0; i<kbds.length; i++) {
             this.registerKeyboard(
               kbds[i].InternalName,
               kbds[i].LanguageName,
@@ -524,7 +525,7 @@ if(!keymanweb) {
         let _t = Lkn.replace(/\s?keyboard/i,'');
 
         if(Lkl) {
-          var lg=Lkl.split(',')[0];
+          const lg=Lkl.split(',')[0];
           if(Lkn.search(lg) == -1) {
             _t = lg+' ('+_t+')';
           }

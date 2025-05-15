@@ -48,7 +48,7 @@ export class Elem extends Section {
    * If it is a string, will be interpreted per reorder element ruls.
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+    const s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
     if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
@@ -546,7 +546,7 @@ export class Keys extends Section {
   kmap: KeysKmap[] = [];
   constructor(strs: Strs) {
     super();
-    let nullFlicks = new KeysFlicks(strs.allocString(''));
+    const nullFlicks = new KeysFlicks(strs.allocString(''));
     this.flicks.push(nullFlicks); // C7043: null element string
   }
 };
