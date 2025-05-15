@@ -37,14 +37,14 @@ interface EventMap {
 }
 
 export class JSKeyboardProcessor extends EventEmitter<EventMap> {
-  public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
+  private static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us',
     defaultOutputRules: new DefaultRules()
   };
 
   // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
   // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
-  stateKeys = {
+  public stateKeys = {
     "K_CAPS":false,
     "K_NUMLOCK":false,
     "K_SCROLL":false
@@ -53,25 +53,25 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   // Tracks the most recent modifier state information in order to quickly detect changes
   // in keyboard state not otherwise captured by the hosting page in the browser.
   // Needed for AltGr simulation.
-  modStateFlags: number = 0;
+  public modStateFlags: number = 0;
 
-  keyboardInterface: JSKeyboardInterface;
+  public keyboardInterface: JSKeyboardInterface;
 
   /**
    * Indicates the device (platform) to be used for non-keystroke events,
    * such as those sent to `begin postkeystroke` and `begin newcontext`
    * entry points.
    */
-  contextDevice: DeviceSpec;
+  public contextDevice: DeviceSpec;
 
-  baseLayout: string;
+  public baseLayout: string;
 
-  defaultRules: DefaultRules;
+  public defaultRules: DefaultRules;
 
   // Callbacks for various feedback types
-  beepHandler?: BeepHandler;
-  warningLogger?: LogMessageHandler;
-  errorLogger?: LogMessageHandler;
+  public beepHandler?: BeepHandler;
+  public warningLogger?: LogMessageHandler;
+  public errorLogger?: LogMessageHandler;
 
   constructor(device: DeviceSpec, options?: ProcessorInitOptions) {
     super();
@@ -99,7 +99,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     this.resetContext();
   }
 
-  get layerStore(): MutableSystemStore {
+  public get layerStore(): MutableSystemStore {
     return this.keyboardInterface.systemStores[SystemStoreIDs.TSS_LAYER] as MutableSystemStore;
   }
 
@@ -128,7 +128,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
    * @return  {string}
    */
-  defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
+  private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
     let preInput = Mock.from(outputTarget, readonly);
     let ruleBehavior = new RuleBehavior();
 
@@ -198,19 +198,19 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     return ruleBehavior;
   }
 
-  processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
+  private processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
     return this.activeKeyboard ?
       this.keyboardInterface.processNewContextEvent(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
+  public processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
     return this.activeKeyboard ?
       this.keyboardInterface.processPostKeystroke(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): RuleBehavior {
+  public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): RuleBehavior {
     var matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
@@ -267,7 +267,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @return      {boolean}                 Always true
    * Description  Updates the current shift state within KMW, updating the OSK's visualization thereof.
    */
-  _UpdateVKShift(e: KeyEvent): boolean {
+  private _UpdateVKShift(e: KeyEvent): boolean {
     let keyShiftState=0;
 
     const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
@@ -343,7 +343,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
   }
 
-  getLayerId(modifier: number): string {
+  private getLayerId(modifier: number): string {
     return Layouts.getLayerId(modifier);
   }
 
@@ -354,7 +354,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    *  @param  {string}                    keyName     key identifier
    *  @return {boolean}                               return true if keyboard layer changed
    */
-  selectLayer(keyEvent: KeyEvent): boolean {
+  public selectLayer(keyEvent: KeyEvent): boolean {
     let keyName = keyEvent.kName;
     var nextLayer = keyEvent.kNextLayer;
     var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
@@ -437,7 +437,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    *
    * @param       {string}      id      layer id (e.g. ctrlshift)
    */
-  updateLayer(keyEvent: KeyEvent, id: string) {
+  private updateLayer(keyEvent: KeyEvent, id: string) {
     let activeLayer = this.layerId;
     var s = activeLayer;
 
@@ -539,7 +539,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
   // Returns true if the key event is a modifier press, allowing keyPress to return selectively
   // in those cases.
-  doModifierPress(Levent: KeyEvent, outputTarget: OutputTargetBase, isKeyDown: boolean): boolean {
+  public doModifierPress(Levent: KeyEvent, outputTarget: OutputTargetBase, isKeyDown: boolean): boolean {
     if(!this.activeKeyboard) {
       return false;
     }
@@ -573,7 +573,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
    *                                    all matched keyboard rules
    */
-  performNewContextEvent(outputTarget: OutputTargetBase): RuleBehavior {
+  private performNewContextEvent(outputTarget: OutputTargetBase): RuleBehavior {
     const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
 
     if(ruleBehavior) {
@@ -582,7 +582,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     return ruleBehavior;
   }
 
-  resetContext(target?: OutputTargetBase) {
+  public resetContext(target?: OutputTargetBase) {
     this.layerId = 'default';
 
     // Make sure all deadkeys for the context get cleared properly.
@@ -601,7 +601,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
   };
 
-  setNumericLayer(device: DeviceSpec) {
+  public setNumericLayer(device: DeviceSpec) {
     if (this.activeKeyboard) {
       let layout = this.activeKeyboard.layout(device.formFactor);
       if(layout.getLayer('numeric')) {
