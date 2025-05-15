@@ -10,7 +10,7 @@ import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import HardKeyboardBase from "./hardKeyboard.js";
+import { HardKeyboardBase } from "./hardKeyboardBase.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
