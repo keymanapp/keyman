@@ -27,7 +27,7 @@ export { default as DefaultRules } from "./defaultRules.js";
 export * from "./defaultRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
-export { OutputTarget } from "./outputTarget.js";
+export { OutputTargetInterface } from "./outputTargetInterface.js";
 export * from "./systemStores.js";
 
 export * from "@keymanapp/web-utils";
