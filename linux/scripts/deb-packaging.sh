@@ -46,19 +46,19 @@ dependencies_action() {
 }
 
 source_action() {
-  echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
+  builder_echo "${START_STEP}Make source package for keyman${COLOR_RESET}"
 
-  echo "${START_STEP}reconfigure${COLOR_RESET}"
+  builder_echo "${START_STEP}reconfigure${COLOR_RESET}"
   ./scripts/reconf.sh
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
-  echo "${START_STEP}Make origdist${COLOR_RESET}"
+  builder_echo "${START_STEP}Make origdist${COLOR_RESET}"
   ./scripts/dist.sh origdist
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
-  echo "${START_STEP}Make deb source${COLOR_RESET}"
+  builder_echo "${START_STEP}Make deb source${COLOR_RESET}"
   ./scripts/deb.sh
-  echo "${END_STEP}"
+  builder_echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
 }
