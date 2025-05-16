@@ -161,6 +161,10 @@ begin
       ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
       TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+  Params.InstallURL, 'cli.download');
     end;
+  end
+  else
+  begin
+      TKeymanSentryClient.Breadcrumb('info', 'DoDownloadUpdates Params.Status !=ucrsUpdateReady', 'cli.download');
   end;
   // If there is at least one keyboard package or version of keyman downloaded then
   // the result is true
@@ -189,7 +193,6 @@ begin
   else
   begin
     Result := False;
-    KL.Log('TDownloadUpdates.DownloadUpdates: LoadUpdateCacheData failed');
     TKeymanSentryClient.Breadcrumb('default', 'TDownloadUpdate: LoadUpdateCacheData failed.', 'cli.download');
   end;
 end;
