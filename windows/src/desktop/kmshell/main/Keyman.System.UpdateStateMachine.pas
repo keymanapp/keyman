@@ -783,6 +783,7 @@ begin
     // downloading process finish.
     if not FMutex.TakeOwnership then
     begin
+      TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
       Exit;
     end;
 
@@ -1135,27 +1136,23 @@ begin
   to ask for elevation. }
   if hasPackages then
   begin
-    KL.Log('InstallingState.EnterState hasPackages: True');
     LaunchInstallPackageProcess;
     Exit;
   end;
   // If no packages then install Keyman now
-  KL.Log('InstallingState.EnterState hasPackages: False');
   if hasKeymanInstall then
   begin
-    KL.Log('InstallingState.EnterState hasKeymanInstall: True');
     DoInstallKeyman;
     Exit;
   end;
   // unexpected: should have had either packages or a keyman file
-  KL.Log('InstallingState.EnterState unexpected should have package or install');
   bucStateContext.RemoveCachedFiles;
   ChangeState(IdleState);
 end;
 
 procedure InstallingState.ExitState;
 begin
-  KL.Log('InstallingState.ExitState');
+
 end;
 
 procedure InstallingState.HandleCheck;
@@ -1199,7 +1196,6 @@ begin
   if not kmcom.SystemInfo.IsAdministrator then
   begin
     if hasKeymanInstall then
-      KL.Log('InstallingState.HandleInstallPackages noAdmin hasKeymanInstall: True');
       DoInstallKeyman;
     Exit;
   end;
@@ -1211,7 +1207,6 @@ begin
 
   if hasKeymanInstall then
   begin
-    KL.Log('InstallingState.HandleInstallPackages Admin hasKeymanInstall: True');
     DoInstallKeyman;
   end;
 end;
