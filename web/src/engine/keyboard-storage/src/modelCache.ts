@@ -24,7 +24,7 @@ export default class ModelManager {
     this.registeredModels[model.id] = model;
 
     // Register the model for each targeted language code variant.
-    let mm = this;
+    const mm = this;
     model.languages.forEach(function(code: string) {
       // Prevent null / undefined codes; they're invalid.
       if(!code) {
@@ -50,7 +50,7 @@ export default class ModelManager {
     }
 
     // Ensure the model is deregistered for each targeted language code variant.
-    let mm = this;
+    const mm = this;
     model.languages.forEach(function(code: string) {
       if(mm.languageModelMap[code].id == modelId) {
         delete mm.languageModelMap[code];

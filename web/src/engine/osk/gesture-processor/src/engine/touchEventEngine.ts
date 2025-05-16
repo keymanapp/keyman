@@ -180,7 +180,7 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
           this.safeBoundMaskMap[touchId] = ZoneBoundaryChecker.inputStartSafeBoundProximityCheck(sample, this.config);
         } else {
           // This touchpoint shouldn't be considered; do not signal a touchstart for it.
-          let sourcePromise = capturedSourcePromises.get(touchId);
+          const sourcePromise = capturedSourcePromises.get(touchId);
           sourcePromise.resolve(null);
           continue;
         }
@@ -195,7 +195,7 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
           The resolved Promise may then be used to retrieve the correct source in the other event
           handlers' closures.
         */
-        let sourcePromise = capturedSourcePromises.get(touchId);
+        const sourcePromise = capturedSourcePromises.get(touchId);
         sourcePromise.resolve(touchpoint);
 
         /*
@@ -223,7 +223,7 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
       if(touchpoint) {
         // This 'lock' should only be released when the last simultaneously-registered touch is published via
         // gesture-recognizer event.
-        let eventSignalPromise = new ManagedPromise<void>();
+        const eventSignalPromise = new ManagedPromise<void>();
         this.inputStartSignalMap.set(touchpoint, eventSignalPromise);
 
         return eventSignalPromise.corePromise;

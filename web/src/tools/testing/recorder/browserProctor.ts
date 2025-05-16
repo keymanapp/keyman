@@ -8,7 +8,7 @@ import { type OutputTarget } from "keyman/engine/keyboard";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
-declare var keyman: KeymanEngine;
+declare let keyman: KeymanEngine;
 
 import {
   InputEventSpec,
@@ -53,7 +53,7 @@ export class BrowserProctor extends Proctor {
 
   // Performs browser-specific global test prep.
   async beforeAll() {
-    let ele = this.target;
+    const ele = this.target;
     keyman.setActiveElement(ele, true);
 
     // If the CSS isn't fully loaded, the element positions will not match their expected
@@ -82,7 +82,7 @@ export class BrowserProctor extends Proctor {
   // Execution of a test sequence depends on the testing environment; this handles
   // the browser-specific aspects.
   async simulateSequence(sequence: TestSequence<any>, outputTarget?: OutputTarget): Promise<string> {
-    let driver = new BrowserDriver(this.target);
+    const driver = new BrowserDriver(this.target);
 
     // For the version 10.0 spec
     if(sequence instanceof InputEventSpecSequence) {
@@ -90,14 +90,14 @@ export class BrowserProctor extends Proctor {
 
       // For the version 14.0+ spec
     } else if(sequence instanceof RecordedKeystrokeSequence) {
-      let inputSpecs: InputEventSpec[] = [];
+      const inputSpecs: InputEventSpec[] = [];
 
       for(let i=0; i < sequence.inputs.length; i++) {
         inputSpecs[i] = sequence.inputs[i].inputEventSpec;
       }
 
       // Converts the sequence back to version 10.0, since it's very well made for browser simulation.
-      let eventSpecSequence = new InputEventSpecSequence(inputSpecs, sequence.output, sequence.msg);
+      const eventSpecSequence = new InputEventSpecSequence(inputSpecs, sequence.output, sequence.msg);
       return driver.simulateSequence(eventSpecSequence);
     } else {
       throw new Error("Unexpected test-recording type");

@@ -97,7 +97,7 @@ export default class InlinedOSKView extends OSKView {
    * @return Array object with OSK window position
   **/
   getPos(): OSKPos {
-    var Lkbd=this._Box, p={
+    const Lkbd=this._Box, p={
       left: this._Visible ? Lkbd.offsetLeft : undefined,
       top:  this._Visible ? Lkbd.offsetTop  : undefined
     };

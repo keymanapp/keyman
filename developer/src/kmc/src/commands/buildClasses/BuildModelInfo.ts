@@ -52,13 +52,13 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    let kmpCompiler = new KmpCompiler();
+    const kmpCompiler = new KmpCompiler();
     if(!await kmpCompiler.init(callbacks, options)) {
       // Errors will have been emitted by KmpCompiler
       return false;
     }
 
-    let kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
+    const kmpJsonData = kmpCompiler.transformKpsToKmpObject(project.resolveInputFilePath(kps));
     if(!kmpJsonData) {
       // Errors will have been emitted by KmpCompiler
       return false;

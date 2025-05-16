@@ -16,7 +16,7 @@ import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
 import { RuleBehavior }  from "./ruleBehavior.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
-import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
@@ -129,12 +129,12 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @return  {string}
    */
   private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
-    let preInput = Mock.from(outputTarget, readonly);
-    let ruleBehavior = new RuleBehavior();
+    const preInput = Mock.from(outputTarget, readonly);
+    const ruleBehavior = new RuleBehavior();
 
     let matched = false;
-    var char = '';
-    var special: EmulationKeystrokes;
+    let char = '';
+    let special: EmulationKeystrokes;
     if(Lkc.isSynthetic || outputTarget.isSynthetic) {
       matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
                         // if no match occurs.
@@ -158,7 +158,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
             // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
           default:
             // In case we extend the allowed set, but forget to implement its handling case above.
-            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + (special as String).kmwCharCodeAt(0).toString(16) + ") went unhandled!";
+            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + KMWString.charCodeAt(special as string, 0).toString(16) + ") went unhandled!";
         }
       } else {
         // Back to the standard default, pending normal matching.
@@ -166,7 +166,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       }
     }
 
-    let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
+    const isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
       if((char = this.defaultRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
@@ -192,7 +192,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       return ruleBehavior;
     }
 
-    let transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
+    const transcription = outputTarget.buildTranscriptionFrom(preInput, Lkc, readonly);
     ruleBehavior.transcription = transcription;
 
     return ruleBehavior;
@@ -211,10 +211,10 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): RuleBehavior {
-    var matchBehavior: RuleBehavior;
+    let matchBehavior: RuleBehavior;
 
     // Before keyboard rules apply, check if the left-context is empty.
-    const nothingDeletable = outputTarget.getTextBeforeCaret().kmwLength() == 0 && outputTarget.isSelectionEmpty();
+    const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
 
     // Pass this key code and state to the keyboard program
     if(this.activeKeyboard && keyEvent.Lcode != 0) {
@@ -244,7 +244,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
       // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
       // Many keyboards rely upon these 'implied rules'.
-      let defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
+      const defaultBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
       if(defaultBehavior) {
         if(!matchBehavior) {
           matchBehavior = defaultBehavior;
@@ -355,9 +355,9 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    *  @return {boolean}                               return true if keyboard layer changed
    */
   public selectLayer(keyEvent: KeyEvent): boolean {
-    let keyName = keyEvent.kName;
-    var nextLayer = keyEvent.kNextLayer;
-    var isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
+    const keyName = keyEvent.kName;
+    let nextLayer = keyEvent.kNextLayer;
+    const isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
 
     // Layer must be identified by name, not number (27/08/2015)
     if(typeof nextLayer == 'number') {
@@ -438,20 +438,20 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @param       {string}      id      layer id (e.g. ctrlshift)
    */
   private updateLayer(keyEvent: KeyEvent, id: string) {
-    let activeLayer = this.layerId;
-    var s = activeLayer;
+    const activeLayer = this.layerId;
+    let s = activeLayer;
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
       return;
     }
 
-    var idx=id;
-    var i;
+    let idx=id;
+    let i;
 
     if(keyEvent.device.formFactor == DeviceSpec.FormFactor.Desktop) {
       // Need to test if target layer is a standard layer (based on the plain 'default')
-      var replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
+      const replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
 
       for(i=0; i < replacements.length; i++) {
         // Don't forget to remove the kebab-case hyphens!
@@ -471,7 +471,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       // if(idx == '') with accompanying if-else structural shift would be a far better test here.
       else {
         // Save our current modifier state.
-        var modifier=Codes.getModifierState(s);
+        let modifier=Codes.getModifierState(s);
 
         // Strip down to the base modifiable layer.
         for(i=0; i < replacements.length; i++) {
@@ -526,14 +526,14 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       s = id;
     }
 
-    let layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+    const layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
     if(layout.getLayer(s)) {
       this.layerId = s;
     } else {
       this.layerId = 'default';
     }
 
-    let baseModifierState = Codes.getModifierState(this.layerId);
+    const baseModifierState = Codes.getModifierState(this.layerId);
     this.modStateFlags = baseModifierState | keyEvent.Lstates;
   }
 
@@ -603,7 +603,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
 
   public setNumericLayer(device: DeviceSpec) {
     if (this.activeKeyboard) {
-      let layout = this.activeKeyboard.layout(device.formFactor);
+      const layout = this.activeKeyboard.layout(device.formFactor);
       if(layout.getLayer('numeric')) {
         this.layerId = 'numeric';
       }

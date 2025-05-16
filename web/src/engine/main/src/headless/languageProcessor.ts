@@ -34,7 +34,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
     // model may expect.
-    let capabilities: Capabilities = {
+    const capabilities: Capabilities = {
       maxLeftContextCodePoints: 64,
       // Since the apps don't yet support right-deletions.
       maxRightContextCodePoints: supportsRightDeletions ? 0 : 64
@@ -91,8 +91,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return Promise.resolve();
     }
 
-    let specType: 'file'|'raw' = model.path ? 'file' : 'raw';
-    let source = specType == 'file' ? model.path : model.code;
+    const specType: 'file'|'raw' = model.path ? 'file' : 'raw';
+    const source = specType == 'file' ? model.path : model.code;
 
     // We pre-emptively emit so that the banner's DOM elements may update synchronously.
     // Prevents an ugly "flash of unstyled content" layout issue during keyboard load
@@ -235,12 +235,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
       // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
       // replacing the suggestion transform with the original input text.
-      let preApply = Mock.from(original.preInput, false);
+      const preApply = Mock.from(original.preInput, false);
       preApply.apply(original.transform);
 
       // Builds the reversion option according to the loaded lexical model's known
       // syntactic properties.
-      let suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
+      const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
 
       // We must accept the Suggestion from its original context, which was before
       // `original.transform` was applied.
@@ -248,7 +248,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
       // Also, request new prediction set based on the resulting context.
       reversionPromise = reversionPromise.then((reversion) => {
-        let mappedReversion: Reversion = {
+        const mappedReversion: Reversion = {
           // By mapping back to the original Transcription that generated the Suggestion,
           // the input will be automatically rewound to the preInput state.
           transform: original.transform,
@@ -284,7 +284,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     //
     // Reversions use the additive inverse of the id token of the Transcription being
     // reverted to.
-    let original = this.getPredictionState(-reversion.transformId);
+    const original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return Promise.resolve([] as Suggestion[]);
@@ -293,7 +293,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
-    let final = Mock.from(original.preInput, false);
+    const final = Mock.from(original.preInput, false);
     final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -305,7 +305,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     (outputTarget as OutputTargetBase).apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    let promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -333,7 +333,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    let context = new ContextWindow(transcription.preInput, this.configuration, layerId);
+    const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
     if(resetContext) {
@@ -348,12 +348,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       }];
     }
 
-    let transform = transcription.transform;
-    var promise = this.currentPromise = this.lmEngine.predict(alternates, context);
+    const transform = transcription.transform;
+    const promise = this.currentPromise = this.lmEngine.predict(alternates, context);
 
     return promise.then((suggestions: Suggestion[]) => {
       if(promise == this.currentPromise) {
-        let result = new ReadySuggestions(suggestions, transform.id);
+        const result = new ReadySuggestions(suggestions, transform.id);
         this.emit("suggestionsready", result);
         this.currentPromise = null;
       }
@@ -404,7 +404,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return;
     }
 
-    let oldVal = this._mayPredict;
+    const oldVal = this._mayPredict;
     this._mayPredict = flag;
 
     if(oldVal != flag) {
@@ -415,7 +415,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       if(this.activeModel) {
         // If someone toggles predictions on and off without changing the model, it is possible
         // that the model is already configured!
-        let state: StateChangeEnum = flag ? 'active' : 'inactive';
+        const state: StateChangeEnum = flag ? 'active' : 'inactive';
 
         // We always signal the 'active' state here, even if 'configured', b/c of an
         // anti-banner-flicker optimization in the Android app.
@@ -460,7 +460,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // The object below is to facilitate a pass-by-reference on the boolean flag,
     // allowing the event's handler to signal if whitespace has been added via
     // auto-applied suggestion that should be blocked on the next keystroke.
-    let returnObj = {shouldSwallow: false};
+    const returnObj = {shouldSwallow: false};
     this.emit('tryaccept', source, returnObj);
 
     return returnObj.shouldSwallow ?? false;

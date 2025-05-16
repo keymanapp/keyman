@@ -284,9 +284,7 @@ export class ActiveKeyBase {
         }
         continue;
       } else {
-        // String.fromCharCode() is inadequate to handle the entire range of Unicode
-        // Someday after upgrading to ES2015, can use String.fromCodePoint()
-        result += String.kmwFromCharCode(codePointValue);
+        result += String.fromCodePoint(codePointValue);
       }
     }
     return result ? result : null;

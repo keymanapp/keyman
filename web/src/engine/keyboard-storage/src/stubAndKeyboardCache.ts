@@ -204,7 +204,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   getStub(keyboard: JSKeyboard, languageID?: string): KeyboardStub;
   getStub(arg0: string | JSKeyboard, arg1?: string): KeyboardStub {
     let keyboardID: string;
-    let languageID = arg1 || '---';
+    const languageID = arg1 || '---';
 
     if(arg0 instanceof JSKeyboard) {
       keyboardID = arg0.id;
@@ -238,7 +238,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
    *              If `false`, only forgets the metadata (stubs).
    */
   forgetKeyboard(keyboard: string | JSKeyboard, purge: boolean = false) {
-    let id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : prefixed(keyboard);
+    const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : prefixed(keyboard);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];
@@ -250,13 +250,13 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   getStubList(): KeyboardStub[] {
-    let arr: KeyboardStub[] = [];
+    const arr: KeyboardStub[] = [];
 
     const kbdIds = Object.keys(this.stubSetTable);
-    for(let kbdId of kbdIds) {
-      let row = this.stubSetTable[kbdId];
+    for(const kbdId of kbdIds) {
+      const row = this.stubSetTable[kbdId];
       const langIds = Object.keys(row);
-      for(let langId of langIds) {
+      for(const langId of langIds) {
         arr.push(row[langId]);
       }
     }

@@ -20,8 +20,7 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@./src/tools/testing/recorder test:integrated" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
-  ":integrated           Runs KMW's integration test suite" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)."
+  ":integrated           Runs KMW's integration test suite"
 
 builder_parse "$@"
 
@@ -29,7 +28,7 @@ builder_parse "$@"
 
 # Select the right CONFIG file.
 WTR_CONFIG=
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   WTR_CONFIG=.CI
 fi
 

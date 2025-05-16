@@ -39,7 +39,7 @@ export class BeepHandler {
     }
 
     // All code after this point is DOM-based, triggered by the beep.
-    let  Pelem: HTMLElement = outputTarget.getElement();
+    let Pelem: HTMLElement = outputTarget.getElement();
     if(outputTarget instanceof DesignIFrame) {
       Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
@@ -52,7 +52,7 @@ export class BeepHandler {
       return;
     }
 
-    for(var Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
+    for(let Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
                                                                 // I1511 - array prototype extended
       if(this._BeepObjects[Lbo].e == Pelem) {
         return;

@@ -29,7 +29,7 @@ export default class Version {
     }
 
     if(Array.isArray(text)) {
-      let components = text as number[];
+      const components = text as number[];
       if(components.length < 2) {
         throw new Error("Version string must have at least a major and minor component!");
       } else {
@@ -39,15 +39,15 @@ export default class Version {
     }
 
     // else, standard constructor path.
-    let parts = text.split('.');
-    let componentArray: number[] = [];
+    const parts = text.split('.');
+    const componentArray: number[] = [];
 
     if(parts.length < 2) {
       throw new Error("Version string must have at least a major and minor component!");
     }
 
     for(let i=0; i < parts.length; i++) {
-      let value = parseInt(parts[i], 10);
+      const value = parseInt(parts[i], 10);
       if(isNaN(value)) {
         throw new Error("Version string components must be numerical!");
       }
@@ -84,18 +84,18 @@ export default class Version {
 
   compareTo(other: Version): number {
     // If the version info depth differs, we need a flag to indicate which instance is shorter.
-    var isShorter: boolean = this.components.length < other.components.length;
-    var maxDepth: number = (this.components.length < other.components.length) ? this.components.length : other.components.length;
+    const isShorter: boolean = this.components.length < other.components.length;
+    const maxDepth: number = (this.components.length < other.components.length) ? this.components.length : other.components.length;
 
-    var i: number;
+    let i: number;
     for(i = 0; i < maxDepth; i++) {
-      let delta = this.components[i] - other.components[i];
+      const delta = this.components[i] - other.components[i];
       if(delta != 0) {
         return delta;
       }
     }
 
-    var longList = isShorter ? other.components : this.components;
+    const longList = isShorter ? other.components : this.components;
     do {
       if(longList[i] > 0) {
         return isShorter ? -1 : 1;
