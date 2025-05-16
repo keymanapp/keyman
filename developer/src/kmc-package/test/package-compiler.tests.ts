@@ -203,7 +203,7 @@ describe('KmpCompiler', function () {
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
 
-    let { kmpJsonData, fileData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+    const { kmpJsonData, fileData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
     assert.isNull(kmpJsonData);
     assert.isNull(fileData);
 

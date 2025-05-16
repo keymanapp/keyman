@@ -484,7 +484,7 @@ export class KmpCompiler implements KeymanCompiler {
 
     for(const value of data.files) {
       // Get the path of the file
-      let filename = value.name;
+      const filename = value.name;
       // We add this separately after zipping all other files
       if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
         continue;
