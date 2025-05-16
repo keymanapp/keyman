@@ -16,11 +16,11 @@ import {
   JSKeyboard,
   KeyboardProperties,
   ManagedPromise,
-  type MinimalCodesInterface
+  type MinimalCodesInterface,
+  type MutableSystemStore, type SystemStoreMutationHandler,
 } from 'keyman/engine/keyboard';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
-import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/js-processor';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';

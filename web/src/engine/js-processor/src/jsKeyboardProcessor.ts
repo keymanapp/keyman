@@ -10,14 +10,14 @@ import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
-  DefaultRules, EmulationKeystrokes
+  DefaultRules, EmulationKeystrokes,
+  type MutableSystemStore, SystemStoreIDs,
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
 import { RuleBehavior }  from "./ruleBehavior.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
-import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
 

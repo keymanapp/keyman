@@ -7,7 +7,7 @@ import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import { KM_Core } from 'keyman/engine/core-processor';
 
-import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent, type OutputTarget } from "keyman/engine/keyboard";
+import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent, type OutputTarget, SystemStoreIDs } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
 import {
   type Alternate,
@@ -16,7 +16,6 @@ import {
   Mock,
   RuleBehavior,
   type ProcessorInitOptions,
-  SystemStoreIDs,
   OutputTargetBase
 } from 'keyman/engine/js-processor';
 
