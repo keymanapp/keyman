@@ -31,7 +31,7 @@ runs:
         path: artifacts/keyman-srcpkg
 
     - name: Build
-      uses: sillsdev/gha-ubuntu-packaging@7b56f50d5d5537e9e9cafd3f6139ec6da69cfcda # v1.1
+      uses: sillsdev/gha-ubuntu-packaging@b619077451b27c16dc6fd699bc1daf8d5ce07659 # v1.2
       with:
         dist: "${{ inputs.dist }}"
         platform: "${{ inputs.arch }}"
