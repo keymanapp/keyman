@@ -1,7 +1,6 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
-import USVString = LexicalModelTypes.USVString;
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.
@@ -69,7 +68,7 @@ export class TrieTraversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: USVString): LexiconTraversal | undefined {
+  child(char: string): LexiconTraversal | undefined {
     /*
       Note: would otherwise return the current instance if `char == ''`.  If
       such a call is happening, it's probably indicative of an implementation
@@ -92,7 +91,7 @@ export class TrieTraversal implements LexiconTraversal {
   }
 
   // Handles one code unit at a time.
-  private _child(char: USVString): TrieTraversal | undefined {
+  private _child(char: string): TrieTraversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
@@ -118,7 +117,7 @@ export class TrieTraversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
+  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
     let root = this.root;
     const totalWeight = this.totalWeight;
 
