@@ -164,7 +164,7 @@ export class CumulativePathStats<Type = any> {
       throw 'Invalid argument:  stats missing necessary tracking variable.';
     }
 
-    for(let dim in result.rawLinearSums) {
+    for(const dim in result.rawLinearSums) {
       // TS refuses to infer beyond 'string' in a `let... in` construct; we can't
       // even assert it directly on `dim` via declaring it early!
       const d = dim as PathCoordAxis;
@@ -221,7 +221,7 @@ export class CumulativePathStats<Type = any> {
   }
 
   public replaceInitialSample(sample: InputSample<Type>): CumulativePathStats<Type> {
-    let result = new CumulativePathStats(this);
+    const result = new CumulativePathStats(this);
 
     return this._replaceInitialSample(result, sample);
   }

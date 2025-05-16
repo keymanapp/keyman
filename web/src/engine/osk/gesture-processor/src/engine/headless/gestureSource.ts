@@ -235,7 +235,7 @@ export class GestureSource<
   */
  /* c8 ignore start */
  toJSON(): SerializedGestureSource {
-   let jsonClone: SerializedGestureSource = {
+   const jsonClone: SerializedGestureSource = {
      identifier: this.identifier,
      isFromTouch: this.isFromTouch,
      path: this.path.toJSON(),

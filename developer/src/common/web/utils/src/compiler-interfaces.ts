@@ -5,7 +5,17 @@ import { CompilerCallbacks } from "./compiler-callbacks.js";
  */
 export interface CompilerEvent {
   filename?: string;
+  /** line where a message applies */
   line?: number;
+  /**
+   * column where a message applies.
+   */
+  column?: number;
+  /**
+   * offset where a message applies.
+   * If set, encompasses line and column.
+   */
+  offset?: number;
   code: number;
   message: string;
   /**

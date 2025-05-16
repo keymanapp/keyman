@@ -107,7 +107,7 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
       this.events[event] = [];
     }
 
-    for(var i=0; i<this.events[event].length; i++) {
+    for(let i=0; i<this.events[event].length; i++) {
       if(this.events[event][i] == func) {
         this.events[event].splice(i, 1);
         return true;
@@ -138,8 +138,9 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
 
     this.currentEvents.push(event);
 
-    for(var i=0; i<this.events[event].length; i++) {
-      var func=this.events[event][i] as EventListener<EventTypes, T>, result=false;
+    for(let i=0; i<this.events[event].length; i++) {
+      const func=this.events[event][i] as EventListener<EventTypes, T>;
+      let result=false;
       try {
         result=func(params as any);
       } catch(strExcept) {

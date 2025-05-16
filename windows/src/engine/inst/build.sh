@@ -14,7 +14,7 @@ builder_describe "Installation files for Keyman Engine for Windows" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /windows/release/${VERSION}/keymanengine-${VERSION}.msm
+  publish       /windows/release/${KEYMAN_VERSION}/keymanengine-${KEYMAN_VERSION}.msm
 
 builder_parse "$@"
 
@@ -23,8 +23,8 @@ builder_parse "$@"
 . "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
-if [[ -z ${TIER+x} ]]; then
-  TIER=alpha
+if [[ -z ${KEYMAN_TIER+x} ]]; then
+  KEYMAN_TIER=alpha
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ function do_publish() {
   #
   # Build the installation archive
   #
-  "$WIXCANDLE" -dVERSION=$VERSION_WIN -dRELEASE=$VERSION_RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
+  "$WIXCANDLE" -dKEYMAN_VERSION=$KEYMAN_VERSION_WIN -dRELEASE=$KEYMAN_VERSION_RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
 
   # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
   "$WIXLIGHT" -sw1072 -ext WixUtilExtension keymanengine.wixobj components.wixobj -o keymanengine.msm
@@ -50,8 +50,8 @@ function do_publish() {
 
 function copy-installer() {
   builder_heading copy-installer
-  mkdir -p "$KEYMAN_ROOT/windows/release/${VERSION}"
-  cp keymanengine.msm "$KEYMAN_ROOT/windows/release/${VERSION}/keymanengine-${VERSION}.msm"
+  mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
+  cp keymanengine.msm "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keymanengine-${KEYMAN_VERSION}.msm"
 }
 
 function verify-program-signatures() {
@@ -61,8 +61,8 @@ function verify-program-signatures() {
 }
 
 function test-releaseexists() {
-  if [[ -d "$KEYMAN_ROOT/windows/release/${VERSION}" ]]; then
-    builder_die "Release ${VERSION} already exists. Delete it or update VERSION.md and try again"
+  if [[ -d "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}" ]]; then
+    builder_die "Release ${KEYMAN_VERSION} already exists. Delete it or update VERSION.md and try again"
   fi
 }
 

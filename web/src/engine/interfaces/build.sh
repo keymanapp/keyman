@@ -19,8 +19,7 @@ builder_describe "Builds configuration subclasses used by the Keyman Engine for 
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  "test"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
