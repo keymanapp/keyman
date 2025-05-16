@@ -8,7 +8,7 @@ import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
-declare var keyman: KeymanEngine;
+declare let keyman: KeymanEngine;
 
 export type Mutable<Type> = {
   -readonly [Property in keyof Type]: Type[Property];
@@ -71,7 +71,7 @@ export class BrowserDriver {
 
   simulateHardwareEvent(eventSpec: PhysicalInputEventSpec) {
     // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-    let event: Mutable<Partial<KeyboardEvent>> = new Event(BrowserDriver.physicalEventType);
+    const event: Mutable<Partial<KeyboardEvent>> = new Event(BrowserDriver.physicalEventType);
     event['key'] = eventSpec.key;
     event['code'] = eventSpec.code;
     event['keyCode'] = eventSpec.keyCode;
@@ -99,8 +99,8 @@ export class BrowserDriver {
     }
 
     try {
-      let target = this.target;
-      let oskKeyElement = document.getElementById(eventSpec.keyID);
+      const target = this.target;
+      const oskKeyElement = document.getElementById(eventSpec.keyID);
       const boundingBox = oskKeyElement.getBoundingClientRect();
       const center = {
         clientX: boundingBox.left + boundingBox.width/2,
@@ -115,12 +115,10 @@ export class BrowserDriver {
 
       // To be safe, we replicate the MouseEvent similarly to the keystroke event.
       let downEvent: Event;
-      var upEvent: Event;
+      let upEvent: Event;
       if(keyman.config.hostDevice.touchable) {
-        let touchDownEvent: Mutable<Partial<TouchEvent>>;
-        let touchUpEvent: Mutable<Partial<TouchEvent>>;
-        touchDownEvent = new Event(BrowserDriver.oskDownTouchType);
-        touchUpEvent = new Event(BrowserDriver.oskUpTouchType);
+        const touchDownEvent: Mutable<Partial<TouchEvent>> = new Event(BrowserDriver.oskDownTouchType);
+        const touchUpEvent: Mutable<Partial<TouchEvent>> = new Event(BrowserDriver.oskUpTouchType);
         touchDownEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
         // The touch should NOT show up in event.touches when a touch ends.
         touchUpEvent['touches'] = asTouchList([]);
@@ -131,10 +129,8 @@ export class BrowserDriver {
         downEvent = touchDownEvent as Event;
         upEvent = touchUpEvent as Event;
       } else {
-        let mouseDownEvent: Mutable<Partial<MouseEvent>>;
-        let mouseUpEvent: Mutable<Partial<MouseEvent>>;
-        mouseDownEvent = new Event(BrowserDriver.oskDownMouseType);
-        mouseUpEvent = new Event(BrowserDriver.oskUpMouseType);
+        const mouseDownEvent: Mutable<Partial<MouseEvent>> = new Event(BrowserDriver.oskDownMouseType);
+        const mouseUpEvent: Mutable<Partial<MouseEvent>> = new Event(BrowserDriver.oskUpMouseType);
         mouseDownEvent.clientX = center.clientX;
         mouseDownEvent.clientY = center.clientY;
         mouseDownEvent['relatedTarget'] = target;
@@ -197,9 +193,9 @@ export class BrowserDriver {
   // Execution of a test sequence depends on the testing environment; integrated
   // testing requires browser-specific code.
   async simulateSequence(sequence: InputEventSpecSequence): Promise<string> {
-    let ele = this.target;
+    const ele = this.target;
 
-    for(var i=0; i < sequence.inputs.length; i++) {
+    for(let i=0; i < sequence.inputs.length; i++) {
       await this.simulateEvent(sequence.inputs[i]);
     }
 

@@ -59,6 +59,7 @@ uses
   OnlineUpdateCheckMessages,
   RegistryKeys,
   Upload_Settings,
+  UtilCheckOnline,
   utilkmshell;
 
 procedure ErrorLogMessage(ErrorLogMessage: string);
@@ -143,6 +144,7 @@ begin
     else
     begin
       Params.Packages[i].Install := False; // Download failed but install other files
+      TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+ Params.Packages[i].DownloadURL, 'cli.download');
     end;
   end;
 
@@ -157,6 +159,7 @@ begin
     else
     begin
       ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
+      TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+  Params.InstallURL, 'cli.download');
     end;
   end;
   // If there is at least one keyboard package or version of keyman downloaded then
@@ -172,6 +175,11 @@ var
   DownloadBackGroundSavePath : String;
   ucr: TUpdateCheckResponse;
 begin
+  if not IsOnline then
+  begin
+    TKeymanSentryClient.Breadcrumb('default', 'TDownloadUpdate: Not Online, cant execute download process.', 'cli.download');
+    Exit;
+  end;
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
   begin

@@ -6,6 +6,7 @@ import { KPJFileReader } from "../../src/types/kpj/kpj-file-reader.js";
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KPJFileWriter } from '../../src/types/kpj/kpj-file-writer.js';
 import { KeymanDeveloperProjectOptions } from '../../src/types/kpj/keyman-developer-project.js';
+import { SymbolUtils } from '../../src/symbol-utils.js';
 
 const callbacks = new TestCompilerCallbacks();
 
@@ -21,12 +22,12 @@ describe('kpj-file-writer', function () {
 
     const writer = new KPJFileWriter();
     const output = writer.write(project);
-    const outputKpj = reader.read(new TextEncoder().encode(output));
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    const outputKpj = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
 
     // The outputKpj may not contain all the fields from the inputKpj, only the
     // essential fields. Many of the fields in .kpj are deprecated, when they
     // relate to file content (e.g. parented files, file details)
-
     assert.deepEqual(outputKpj.KeymanDeveloperProject.Options, {
       "BuildPath": "$PROJECTPATH\\build",
       "CompilerWarningsAsErrors": "True",
@@ -61,7 +62,8 @@ describe('kpj-file-writer', function () {
 
     const writer = new KPJFileWriter();
     const output = writer.write(project);
-    const outputKpj = reader.read(new TextEncoder().encode(output));
+    // Remove XML metadata symbols to reduce clutter for testing purposes
+    const outputKpj = SymbolUtils.removeSymbols(reader.read(new TextEncoder().encode(output)));
 
     // The outputKpj may not contain all the fields from the inputKpj, only the
     // essential fields. Many of the fields in .kpj are deprecated, when they

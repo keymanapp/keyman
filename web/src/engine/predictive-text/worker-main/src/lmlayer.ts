@@ -28,7 +28,6 @@ import Distribution = LexicalModelTypes.Distribution;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 import PromiseStore from "./promise-store.js";
 import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
@@ -62,7 +61,7 @@ export default class LMLayer {
   /** Call this when the LMLayer has sent us the 'ready' message! */
   private _declareLMLayerReady: (conf: Configuration) => void;
   private _predictPromises: PromiseStore<Suggestion[]>;
-  private _wordbreakPromises: PromiseStore<USVString>;
+  private _wordbreakPromises: PromiseStore<string>;
   private _acceptPromises: PromiseStore<Reversion>;
   private _revertPromises: PromiseStore<Suggestion[]>;
   private _nextToken: number;
@@ -152,7 +151,7 @@ export default class LMLayer {
     });
   }
 
-  wordbreak(context: Context): Promise<USVString> {
+  wordbreak(context: Context): Promise<string> {
     let token = this._nextToken++;
     return new Promise((resolve, reject) => {
       this._wordbreakPromises.make(token, resolve, reject);

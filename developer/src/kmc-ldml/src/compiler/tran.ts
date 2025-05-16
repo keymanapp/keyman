@@ -100,10 +100,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   private compileTransforms(sections: DependencySections, transforms: LKTransforms): TranBase {
-    let result = this.newTran();
+    const result = this.newTran();
 
     if (transforms?.transformGroup) {
-      for (let transformGroup of transforms.transformGroup) {
+      for (const transformGroup of transforms.transformGroup) {
         const tg = this.compileTransformGroup(sections, transformGroup);
         if (!tg) return null; //error
         result.groups.push(tg);
@@ -138,7 +138,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
-    let result = new TranTransform();
+    const result = new TranTransform();
     // setup for serializing
     result._from = transform.from;
     result._to = transform.to;
@@ -289,7 +289,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   private compileReorder(sections: DependencySections, reorder: LKReorder): TranReorder {
-    let result = new TranReorder();
+    const result = new TranReorder();
     // for serializing
     result._before = reorder.before;
     result._from = reorder.from;
@@ -310,7 +310,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   public compile(sections: DependencySections): TranBase {
-    for(let t of this.keyboard3.transforms) {
+    for(const t of this.keyboard3.transforms) {
       if(t.type == this.type) {
         // compile only the transforms of the correct type
         return this.compileTransforms(sections, t);

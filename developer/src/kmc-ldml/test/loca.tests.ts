@@ -11,7 +11,7 @@ describe('loca', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal loca data', async function() {
-    let loca = await loadSectionFixture(LocaCompiler, 'sections/loca/minimal.xml', compilerTestCallbacks) as Loca;
+    const loca = await loadSectionFixture(LocaCompiler, 'sections/loca/minimal.xml', compilerTestCallbacks) as Loca;
     assert.isObject(loca);
 
     assert.equal(compilerTestCallbacks.messages.length, 0);
@@ -21,7 +21,7 @@ describe('loca', function () {
   });
 
   it('should compile multiple locales', async function() {
-    let loca = await loadSectionFixture(LocaCompiler, 'sections/loca/multiple.xml', compilerTestCallbacks) as Loca;
+    const loca = await loadSectionFixture(LocaCompiler, 'sections/loca/multiple.xml', compilerTestCallbacks) as Loca;
     assert.isObject(loca);
 
     // Note: multiple.xml includes fr-FR twice, with differing case, which should be canonicalized
@@ -41,7 +41,7 @@ describe('loca', function () {
   });
 
   it('should reject structurally invalid locales', async function() {
-    let loca = await loadSectionFixture(LocaCompiler, 'sections/loca/invalid-locale.xml', compilerTestCallbacks) as Loca;
+    const loca = await loadSectionFixture(LocaCompiler, 'sections/loca/invalid-locale.xml', compilerTestCallbacks) as Loca;
     assert.isNull(loca);
     assert.equal(compilerTestCallbacks.messages.length, 1);
     // We'll only test one invalid BCP 47 tag to verify that we are properly calling BCP 47 validation routines.

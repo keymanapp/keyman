@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 BASEDIR="$KEYMAN_ROOT/linux"
 echo "basedir is $BASEDIR"
 
-echo "Found tier ${TIER}, version ${VERSION}"
+echo "Found tier ${KEYMAN_TIER}, version ${KEYMAN_VERSION}"
 
 # We need to configure+build core before we can configure ibus-keyman
 cd ../core
@@ -32,14 +32,14 @@ quilt new version_py.diff
 quilt add "version.py"
 
 sed \
-    -e "s/_VERSION_/${VERSION}/g" \
-    -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \
-    -e "s/_VERSIONGITTAG_/${VERSION_GIT_TAG}/g" \
-    -e "s/_MAJORVERSION_/${VERSION_MAJOR}/g" \
-    -e "s/_RELEASEVERSION_/${VERSION_RELEASE}/g" \
-    -e "s/_TIER_/${TIER}/g" \
-    -e "s/_ENVIRONMENT_/${VERSION_ENVIRONMENT}/g" \
-    -e "s/_UPLOADSENTRY_/${UPLOAD_SENTRY}/g" \
+    -e "s/_KEYMAN_VERSION_/${KEYMAN_VERSION}/g" \
+    -e "s/_KEYMAN_VERSION_WITH_TAG_/${KEYMAN_VERSION_WITH_TAG}/g" \
+    -e "s/_KEYMAN_VERSION_GIT_TAG_/${KEYMAN_VERSION_GIT_TAG}/g" \
+    -e "s/_KEYMAN_VERSION_MAJOR_/${KEYMAN_VERSION_MAJOR}/g" \
+    -e "s/_KEYMAN_VERSION_RELEASE_/${KEYMAN_VERSION_RELEASE}/g" \
+    -e "s/_KEYMAN_TIER_/${KEYMAN_TIER}/g" \
+    -e "s/_KEYMAN_VERSION_ENVIRONMENT_/${KEYMAN_VERSION_ENVIRONMENT}/g" \
+    -e "s/_UPLOAD_SENTRY_/${UPLOAD_SENTRY}/g" \
     version.py.in > version.py
 quilt refresh
 quilt pop -a

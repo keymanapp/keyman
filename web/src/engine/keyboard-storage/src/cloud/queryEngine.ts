@@ -113,7 +113,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
 
     const query = URL + queryConfig + cmd;
 
-    let { promise, queryId } = this.requestEngine.request<KeyboardStub[] | LanguageAPIPropertySpec[]>(query);
+    const { promise, queryId } = this.requestEngine.request<KeyboardStub[] | LanguageAPIPropertySpec[]>(query);
     this.cloudResolutionPromises.set(queryId, promise);
 
     promise.finally(() => {
@@ -187,9 +187,9 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
     // Indicate if unable to register keyboard
     if(typeof(queryResult.error) == 'string') {
       // Currently unreachable (24 May 2021 - API returns a 404; returned 'script' does not call register)
-      var badName='';
+      let badName='';
       if(typeof(queryResult.options.keyboardid) == 'string') {
-        let keyboardId = queryResult.options.keyboardid;
+        const keyboardId = queryResult.options.keyboardid;
         badName = keyboardId.substring(0,1).toUpperCase() + keyboardId.substring(1);
       }
 
@@ -205,10 +205,10 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
     let stubs: KeyboardStub[] = [];
 
     if(options.context == 'keyboard') {
-      let i, kp=(queryResult as CloudKeyboardQueryResult).keyboard;
+    const kp=(queryResult as CloudKeyboardQueryResult).keyboard;
       // Process array of keyboard definitions
       if(Array.isArray(kp)) {
-        for(i=0; i<kp.length; i++) {
+        for(let i=0; i<kp.length; i++) {
           // Note:  if an invalid language code is specified, the elements here may be
           //        empty arrays.  Will not report an error if so.
           stubs = stubs.concat(CloudQueryEngine.registerLanguagesForKeyboard(kp[i],options,i));
@@ -273,7 +273,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
           }
 
           if(Array.isArray(kp[i].languages)) {
-            let langArray = kp[i].languages as LanguageAPIPropertySpec[];
+            const langArray = kp[i].languages as LanguageAPIPropertySpec[];
             for(let j=0; j < langArray.length; j++) {
               if(id == langArray[j].name.toLowerCase()) {
                 nDflt = i;
@@ -287,7 +287,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
       }
     } else { // Otherwise, process a single keyboard for the specified languages
       // Font path defined by cloud entry
-      let fontPath = options.fontBaseUri || '';
+      const fontPath = options.fontBaseUri || '';
 
       const allStubs = KeyboardStub.toStubs(kp, options.keyboardBaseUri, fontPath);
 

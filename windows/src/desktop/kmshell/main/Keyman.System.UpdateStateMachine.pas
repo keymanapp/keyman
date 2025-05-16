@@ -126,6 +126,7 @@ uses
   KLog,
   RegistryKeys,
   utilexecute,
+  UtilCheckOnline,
   utiluac;
 
 const
@@ -685,6 +686,12 @@ var
   FResult: Boolean;
   RootPath: string;
 begin
+  // check if online
+  if not IsOnline then
+  begin
+    TKeymanSentryClient.Breadcrumb('default', 'Not Online, cant execute download process.', 'update');
+    Exit;
+  end;
   // call separate process
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0),

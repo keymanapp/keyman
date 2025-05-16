@@ -81,9 +81,9 @@ export class LexicalModelCompiler implements KeymanCompiler {
    */
   async run(inputFilename: string, outputFilename?: string): Promise<LexicalModelCompilerResult> {
     try {
-      let modelSource = this.loadFromFilename(inputFilename);
-      let containingDirectory = callbacks.path.dirname(inputFilename);
-      let code = this.generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
+      const modelSource = this.loadFromFilename(inputFilename);
+      const containingDirectory = callbacks.path.dirname(inputFilename);
+      const code = this.generateLexicalModelCode('<unknown>', modelSource, containingDirectory);
       const result: LexicalModelCompilerResult = {
         artifacts: {
           js: {
@@ -129,11 +129,11 @@ export class LexicalModelCompiler implements KeymanCompiler {
     if(!data) {
       throw new ModelCompilerError(ModelCompilerMessages.Error_ModelFileNotFound({filename}));
     }
-    let sourceCode = new TextDecoder().decode(data);
+    const sourceCode = new TextDecoder().decode(data);
     // Compile the module to JavaScript code.
     // NOTE: transpile module does a very simple TS to JS compilation.
     // It DOES NOT check for types!
-    let compilationOutput = ts.transpile(sourceCode, {
+    const compilationOutput = ts.transpile(sourceCode, {
       // Our runtime only supports ES3 with Node/CommonJS modules on Android 5.0.
       // When we drop Android 5.0 support, we can update this to a `ScriptTarget`
       // matrix against target version of Keyman, here and in
@@ -142,11 +142,11 @@ export class LexicalModelCompiler implements KeymanCompiler {
       module: ts.ModuleKind.CommonJS,
     });
     // Turn the module into a function in which we can inject a global.
-    let moduleCode = '(function(exports){' + compilationOutput + '})';
+    const moduleCode = '(function(exports){' + compilationOutput + '})';
 
     // Run the module; its exports will be assigned to `moduleExports`.
-    let moduleExports: Partial<ES2015Module> = {};
-    let module = eval(moduleCode);
+    const moduleExports: Partial<ES2015Module> = {};
+    const module = eval(moduleCode);
     module(moduleExports);
 
     if (!moduleExports['__esModule'] || !moduleExports['default']) {
@@ -179,7 +179,7 @@ export class LexicalModelCompiler implements KeymanCompiler {
 
     switch(modelSource.format) {
       case "custom-1.0":
-        let sources: string[] = modelSource.sources.map(function(source) {
+        const sources: string[] = modelSource.sources.map(function(source) {
           return new TextDecoder().decode(callbacks.loadFile(callbacks.path.join(sourcePath, source)));
         });
         func += this.transpileSources(sources).join('\n');
@@ -191,9 +191,9 @@ export class LexicalModelCompiler implements KeymanCompiler {
         // Convert all relative path names to paths relative to the enclosing
         // directory. This way, we'll read the files relative to the model.ts
         // file, rather than the current working directory.
-        let filenames = modelSource.sources.map(filename => callbacks.path.join(sourcePath, filename));
+        const filenames = modelSource.sources.map(filename => callbacks.path.join(sourcePath, filename));
 
-        let definitions = new ModelDefinitions(modelSource);
+        const definitions = new ModelDefinitions(modelSource);
 
         func += definitions.compileDefinitions();
 
@@ -203,7 +203,7 @@ export class LexicalModelCompiler implements KeymanCompiler {
           createTrieDataStructure(filenames, definitions.searchTermToKey)
         }, {\n`;
 
-        let wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
+        const wordBreakerSourceCode = compileWordBreaker(normalizeWordBreakerSpec(modelSource.wordBreaker));
         func += `  wordBreaker: ${wordBreakerSourceCode},\n`;
 
         // START - the lexical mapping option block
@@ -275,7 +275,7 @@ function compileJoinDecorator(spec: WordBreakerSpec, existingWordBreakerCode: st
   // The decorator will run IMMEDIATELY when the model is loaded,
   // by the LMLayer returning the decorated word breaker to the
   // LMLayer model.
-  let joinerExpr: string = JSON.stringify(spec.joinWordsAt)
+  const joinerExpr: string = JSON.stringify(spec.joinWordsAt)
   return `(${decorateWithJoin.toString()}(${existingWordBreakerCode}, ${joinerExpr}))`;
 }
 

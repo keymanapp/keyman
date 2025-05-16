@@ -15,6 +15,7 @@ import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { KMWString } from "@keymanapp/web-utils";
 
 // From https://stackoverflow.com/a/69328045
 type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
@@ -237,7 +238,7 @@ export default class KeymanEngine<
     config.initialize(optionSpec);
 
     // Initialize supplementary plane string extensions
-    String.kmwEnableSupplementaryPlane(true);
+    KMWString.enableSupplementaryPlane(true);
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
@@ -289,7 +290,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('stubadded', (stub) => {
-      let eventRaiser = () => {
+      const eventRaiser = () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
           internalName: stub.KI,
@@ -314,7 +315,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('keyboardadded', (keyboard) => {
-      let eventRaiser = () => {
+      const eventRaiser = () => {
         // Execute any external (UI) code needed after loading keyboard
         this.legacyAPIEvents.callEvent('keyboardloaded', {
           keyboardName: keyboard.id

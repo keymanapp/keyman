@@ -2,10 +2,12 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: keyman
 Upstream-Contact: Keyman team <support@keyman.com>
 Source: https://github.com/keymanapp/keyman
+Comment: Debian's licensecheck tool uses the term `Expat` for the `MIT` license.
+         `Unicode-3.0` is identified `Unicode-DFS-2016`.
 
 Files: *
 Copyright: 2018-2025 SIL Global
-License: MIT
+License: Expat
 
 Files: linux/ibus-keyman/*
 Copyright: 2004-2025 SIL Global
@@ -16,7 +18,7 @@ Files: linux/ibus-keyman/src/keymanutil.c
        linux/ibus-keyman/src/kmpdetails.c
        linux/ibus-keyman/src/kmpdetails.h
 Copyright: 2009-2025 SIL Global
-License: GPL-2+ or MIT
+License: GPL-2+ or Expat
 
 Files: linux/ibus-keyman/src/keyman-service.c
        linux/ibus-keyman/src/keyman-service.h
@@ -42,9 +44,21 @@ Files: debian/com.keyman.config.appdata.xml
        debian/com.keyman.ibus_keyman.metainfo.xml
 Copyright: 2019 Daniel Glassey <wdg@debian.org>
            2022-2025 SIL Global
-License: MIT
+License: Expat
 
-License: MIT
+Files: resources/standards-data/ldml-keyboards/*
+Copyright: Copyright © 1991-2024 Unicode, Inc.
+License: Unicode-DFS-2016
+
+Files: resources/standards-data/unicode-character-database/*
+Copyright: Copyright © 1991-2023 Unicode, Inc.
+License: Unicode-DFS-2016
+
+Files: resources/standards-data/windows-lcid-to-bcp-47/*
+Copyright: Copyright © 1991-2017 Unicode, Inc.
+License: Unicode-DFS-2016
+
+License: Expat
  Permission is hereby granted, free of charge, to any person obtaining
  a copy of this software and associated documentation files (the
  "Software"), to deal in the Software without restriction, including
@@ -76,8 +90,7 @@ License: GPL-2+
  GNU General Public License for more details.
  .
  You should have received a copy of the GNU General Public License
- along with this package; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ along with this package. If not, see https://www.gnu.org/licenses/.
  .
  On Debian systems, the full text of the GNU General Public
  License version 2 can be found in the file
@@ -95,8 +108,7 @@ License: GPL-3+
  GNU General Public License for more details.
  .
  You should have received a copy of the GNU General Public License
- along with this package; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ along with this package. If not, see https://www.gnu.org/licenses/.
  .
  On Debian systems, the full text of the GNU General Public
  License version 3 can be found in the file
@@ -114,9 +126,37 @@ License: LGPL-2.1+
  details.
  .
  You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+ along with this library. If not, see https://www.gnu.org/licenses/.
  .
  On Debian systems, the full text of the GNU Lesser General Public
  License version 2.1 can be found in the file
  `/usr/share/common-licenses/LGPL-2.1'.
+
+License: Unicode-DFS-2016
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of data files and any associated documentation (the "Data Files") or
+ software and any associated documentation (the "Software") to deal in the
+ Data Files or Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, and/or sell
+ copies of the Data Files or Software, and to permit persons to whom the
+ Data Files or Software are furnished to do so, provided that either (a)
+ this copyright and permission notice appear with all copies of the Data
+ Files or Software, or (b) this copyright and permission notice appear in
+ associated Documentation.
+ .
+ THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+ KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+ THIRD PARTY RIGHTS.
+ .
+ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+ BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,
+ OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA
+ FILES OR SOFTWARE.
+ .
+ Except as contained in this notice, the name of a copyright holder shall
+ not be used in advertising or otherwise to promote the sale, use or other
+ dealings in these Data Files or Software without prior written
+ authorization of the copyright holder.

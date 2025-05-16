@@ -25,14 +25,14 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
 
   // Preserves a keyboard's ID, even if namespaced, via script tag tagging.
   preserveID(Pk: any /** a `Keyboard`'s `scriptObject` entry */) {
-    var trueID;
+    let trueID;
 
     // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
     if(document.currentScript) {
       trueID = document.currentScript.id;
     } else {
-      var scripts = document.getElementsByTagName('script');
-      var currentScript = scripts[scripts.length-1];
+      const scripts = document.getElementsByTagName('script');
+      const currentScript = scripts[scripts.length-1];
 
       trueID = currentScript.id;
     }

@@ -12,6 +12,24 @@ export class ParsedLengthStyle implements LengthStyle {
   public constructor(style: LengthStyle | string) {
     let parsed: LengthStyle = (typeof style == 'string') ? ParsedLengthStyle.parseLengthStyle(style) : style;
 
+    const fallback: LengthStyle = {
+      val: 1, // 100%
+      absolute: false
+    };
+
+    if(typeof style == 'number') {
+      // Addresses #13766 for compiled layouts with numbers in the touch-layout `fontsize` field
+
+      // Do not actually emit console warning; we handle those as "errors" in the mobile apps, and
+      // this is more an issue with the compiled keyboard.
+      parsed = fallback;
+    }
+
+    if(isNaN(parsed.val)) {
+      console.error("NaN appeared while trying to calculate style scaling effects");
+      parsed = fallback
+    }
+
     // While Object.assign would be nice (and previously, was used), it will break
     // on old but still supported versions of Android if their Chrome isn't updated.
     // Requires mobile Chrome 45+, but API 21 (5.0) launches with an older browser.
@@ -38,6 +56,11 @@ export class ParsedLengthStyle implements LengthStyle {
   }
 
   public scaledBy(scalar: number): ParsedLengthStyle {
+    if(isNaN(scalar)) {
+      console.error("NaN appeared while trying to calculate style scaling effects");
+      return this;
+    }
+
     return new ParsedLengthStyle({
       val: scalar * this.val,
       absolute: this.absolute
