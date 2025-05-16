@@ -151,8 +151,8 @@ export class InputProcessor {
    * @returns
    */
   private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTarget): RuleBehavior {
-    let formFactor = keyEvent.device.formFactor;
-    let fromOSK = keyEvent.isSynthetic;
+    const formFactor = keyEvent.device.formFactor;
+    const fromOSK = keyEvent.isSynthetic;
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
@@ -295,14 +295,14 @@ export class InputProcessor {
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.
     // Also, don't do fat-finger stuff if predictive text isn't enabled.
     if(this.languageProcessor.isActive && !ruleBehavior.triggersDefaultCommand) {
-      let keyDistribution = keyEvent.keyDistribution;
+      const keyDistribution = keyEvent.keyDistribution;
 
       // We don't need to track absolute indexing during alternate-generation;
       // only position-relative, so it's better to use a sliding window for context
       // when making alternates.  (Slightly worse for short text, matters greatly
       // for long text.)
-      let contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW, this.keyboardProcessor.layerId);
-      let windowedMock = contextWindow.toMock();
+      const contextWindow = new ContextWindow(preInputMock, ContextWindow.ENGINE_RULE_WINDOW, this.keyboardProcessor.layerId);
+      const windowedMock = contextWindow.toMock();
 
       // Note - we don't yet do fat-fingering with longpress keys.
       if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {
@@ -312,7 +312,7 @@ export class InputProcessor {
         // Consider use of https://developer.mozilla.org/en-US/docs/Web/API/Performance/now instead?
         // Would allow finer-tuned control.
         let TIMEOUT_THRESHOLD: number = Number.MAX_VALUE;
-        let _globalThis = globalObject();
+        const _globalThis = globalObject();
         let timer: () => number;
 
         // Available by default on `window` in browsers, but _not_ on `global` in Node,
@@ -336,7 +336,7 @@ export class InputProcessor {
         // Seek to match SearchSpace.EDIT_DISTANCE_COST_SCALE from the predictive-text engine.
         // Reasoning for the selected value may be seen there.  Short version - keystrokes
         // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
-        let KEYSTROKE_EPSILON = Math.exp(-5);
+        const KEYSTROKE_EPSILON = Math.exp(-5);
 
         // Sort the distribution into probability-descending order.
         keyDistribution.sort((a, b) => b.p - a.p);
@@ -344,7 +344,7 @@ export class InputProcessor {
         alternates = [];
 
         let totalMass = 0; // Tracks sum of non-error probabilities.
-        for(let pair of keyDistribution) {
+        for(const pair of keyDistribution) {
           if(pair.p < KEYSTROKE_EPSILON) {
             totalMass += pair.p;
             break;
@@ -357,7 +357,7 @@ export class InputProcessor {
             break;
           }
 
-          let mock = Mock.from(windowedMock, false);
+          const mock = Mock.from(windowedMock, false);
 
           const altKey = pair.keySpec;
           if(!altKey) {
@@ -365,15 +365,15 @@ export class InputProcessor {
             continue;
           }
 
-          let altEvent = this.keyboardProcessor.activeKeyboard.constructKeyEvent(altKey, keyEvent.device, this.keyboardProcessor.stateKeys);
-          let alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
+          const altEvent = this.keyboardProcessor.activeKeyboard.constructKeyEvent(altKey, keyEvent.device, this.keyboardProcessor.stateKeys);
+          const alternateBehavior = this.keyboardProcessor.processKeystroke(altEvent, mock);
 
           // If alternateBehavior.beep == true, ignore it.  It's a disallowed key sequence,
           // so we expect users to never intend their use.
           //
           // Also possible that this set of conditions fail for all evaluated alternates.
           if(alternateBehavior && !alternateBehavior.beep && pair.p > 0) {
-            let transform: LexicalModelTypes.Transform = alternateBehavior.transcription.transform;
+            const transform: LexicalModelTypes.Transform = alternateBehavior.transcription.transform;
 
             // Ensure that the alternate's token id matches that of the current keystroke, as we only
             // record the matched rule's context (since they match)

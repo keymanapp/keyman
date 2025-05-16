@@ -110,7 +110,7 @@ export function preprocessRecognizerConfig<HoveredItemType, StateToken = any>(
   config: GestureRecognizerConfiguration<HoveredItemType, StateToken>
 ): Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>> {
   // Allows configuration pre-processing during this method.
-  let processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>> = {...config} as
+  const processingConfig: Mutable<Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>> = {...config} as
     Nonoptional<GestureRecognizerConfiguration<HoveredItemType, StateToken>>;
 
   processingConfig.mouseEventRoot = processingConfig.mouseEventRoot ?? processingConfig.targetRoot;

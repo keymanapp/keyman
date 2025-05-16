@@ -30,19 +30,19 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model package source file.');
 }
 
-let outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
+const outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
 
 //
 // Run the compiler
 //
 
 const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
-let kmpCompiler = new KmpCompiler();
+const kmpCompiler = new KmpCompiler();
 if(!await kmpCompiler.init(callbacks, null)) {
   process.exit(1);
 }
 
-let result = await kmpCompiler.run(inputFilename, outputFilename);
+const result = await kmpCompiler.run(inputFilename, outputFilename);
 if(!result) {
   process.exit(1);
 }

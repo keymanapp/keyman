@@ -74,8 +74,8 @@ export class RuleBehavior {
       processor.beepHandler(outputTarget);
     }
 
-    for(let storeID in this.setStore) {
-      let sysStore = processor.keyboardInterface.systemStores[storeID];
+    for(const storeID in this.setStore) {
+      const sysStore = processor.keyboardInterface.systemStores[storeID];
       if(sysStore) {
         try {
           sysStore.set(this.setStore[storeID]);
@@ -92,13 +92,13 @@ export class RuleBehavior {
     processor.keyboardInterface.applyVariableStores(this.variableStores);
 
     if(processor.keyboardInterface.variableStoreSerializer) {
-      for(let storeID in this.saveStore) {
+      for(const storeID in this.saveStore) {
         processor.keyboardInterface.variableStoreSerializer.saveStore(processor.activeKeyboard.id, storeID, this.saveStore[storeID]);
       }
     }
 
     if(this.triggersDefaultCommand) {
-      let keyEvent = this.transcription.keystroke;
+      const keyEvent = this.transcription.keystroke;
       processor.defaultRules.applyCommand(keyEvent, outputTarget);
     }
 
@@ -121,15 +121,15 @@ export class RuleBehavior {
    * @param other
    */
   mergeInDefaults(other: RuleBehavior) {
-    let keystroke = this.transcription.keystroke;
-    let keyFromOther = other.transcription.keystroke;
+    const keystroke = this.transcription.keystroke;
+    const keyFromOther = other.transcription.keystroke;
     if(keystroke.Lcode != keyFromOther.Lcode || keystroke.Lmodifiers != keyFromOther.Lmodifiers) {
       throw "RuleBehavior default-merge not supported unless keystrokes are identical!";
     }
 
     this.triggersDefaultCommand = this.triggersDefaultCommand || other.triggersDefaultCommand;
 
-    let mergingMock = Mock.from(this.transcription.preInput, false);
+    const mergingMock = Mock.from(this.transcription.preInput, false);
     mergingMock.apply(this.transcription.transform);
     mergingMock.apply(other.transcription.transform);
 

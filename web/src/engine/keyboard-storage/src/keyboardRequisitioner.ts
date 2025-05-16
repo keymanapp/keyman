@@ -61,7 +61,7 @@ function convertToErrorStub(stub: {id: string, name: string}, err: Error | strin
 }
 
 function toQuerySpecs(id: string, langId: string, version?: string): CloudRequestEntry {
-  let obj = new CloudRequestEntry(id, langId);
+  const obj = new CloudRequestEntry(id, langId);
   if(version) {
     obj.version = version;
   }
@@ -115,16 +115,20 @@ export default class KeyboardRequisitioner {
     });
   }
 
+  shutdown(): void{
+    this.cache.shutdown();
+  }
+
   addKeyboardArray(x: (string|RawKeyboardMetadata)[]): Promise<(KeyboardStub | ErrorStub)[]> {
-    let completeStubs: KeyboardStub[] = [];
-    let incompleteStubs: KeyboardStub[] = [];
-    let stubs: KeyboardStub[] = [];
-    let identifiers: string[] = [];
-    let errorStubs: ErrorStub[] = [];
+    const completeStubs: KeyboardStub[] = [];
+    const incompleteStubs: KeyboardStub[] = [];
+    const stubs: KeyboardStub[] = [];
+    const identifiers: string[] = [];
+    const errorStubs: ErrorStub[] = [];
 
     // #region Parameter preprocessing: is incoming data already 'complete', or do we need to fetch the 'complete' version?
 
-    for(let entry of x) {
+    for(const entry of x) {
       if(typeof entry == 'string') {
         if(entry.length > 0) {
           identifiers.push(entry);
@@ -134,18 +138,18 @@ export default class KeyboardRequisitioner {
         if(entry['KI'] || entry['KL'] || entry['KLC'] || entry['KFont'] || entry['KOskFont']) {
           stubs.push(new KeyboardStub(entry as RawKeyboardStub));
         } else {
-          let apiSpecEntry = entry as KeyboardAPISpec;
+          const apiSpecEntry = entry as KeyboardAPISpec;
           if(typeof(apiSpecEntry.language) != "undefined") {
             console.warn("The 'language' property for keyboard stubs has been deprecated.  Please use the 'languages' property instead.");
           }
           apiSpecEntry.languages ||= apiSpecEntry.language;
 
           if(typeof apiSpecEntry.languages === 'undefined') {
-            let msg = 'To use keyboard \'' + apiSpecEntry.id + '\', you must specify languages.';
+            const msg = 'To use keyboard \'' + apiSpecEntry.id + '\', you must specify languages.';
             errorStubs.push(convertToErrorStub(apiSpecEntry, msg));
           } else if(Array.isArray(apiSpecEntry.languages)) {
-            let splitStubs = KeyboardStub.toStubs(apiSpecEntry, this.pathConfig.keyboards, this.pathConfig.fonts);
-            for(let stub of splitStubs) {
+            const splitStubs = KeyboardStub.toStubs(apiSpecEntry, this.pathConfig.keyboards, this.pathConfig.fonts);
+            for(const stub of splitStubs) {
               if(stub instanceof KeyboardStub) {
                 stubs.push(stub);
               } else {
@@ -161,9 +165,9 @@ export default class KeyboardRequisitioner {
     }
 
     // Next pass: determine which stubs are fully-formed and which are not.
-    for(let stub of stubs) {
+    for(const stub of stubs) {
       if(stub.KF) {
-        let err = stub.validateForCustomKeyboard();
+        const err = stub.validateForCustomKeyboard();
         if(err) {
           errorStubs.push(convertToErrorStub(stub, err));
         } else {
@@ -178,8 +182,8 @@ export default class KeyboardRequisitioner {
 
     // After that, request stubs that aren't fully-formed / are just requested by string.
     // Verify that we have at least a keyboard ID or a language code.
-    let cloudList: CloudRequestEntry[] = [];
-    for(let incomplete of incompleteStubs) {
+    const cloudList: CloudRequestEntry[] = [];
+    for(const incomplete of incompleteStubs) {
       if(!incomplete.KI && !incomplete.KLC) {
         errorStubs.push(convertToErrorStub(incomplete, "Cannot fetch keyboard information without a keyboard ID or language code."));
         continue;
@@ -194,7 +198,7 @@ export default class KeyboardRequisitioner {
     }
 
     // Double-check the incoming string-based queries, too!
-    for(let identifier of identifiers) {
+    for(const identifier of identifiers) {
       const pList=identifier.split('@');
       let lList=[''];
       if(pList[0].toLowerCase() == 'english') {
@@ -221,9 +225,9 @@ export default class KeyboardRequisitioner {
     completeStubs.forEach((stub) => this.cache.addStub(stub));
 
     // After that, note that we do merge non-fully-formed stubs with returned stubs that match?
-    let resultPromise = this.cloudQueryEngine.fetchCloudStubs(cloudList.map((spec) => spec.toString()));
+    const resultPromise = this.cloudQueryEngine.fetchCloudStubs(cloudList.map((spec) => spec.toString()));
     return resultPromise.then((queryResults) => {
-      for(let result of queryResults) {
+      for(const result of queryResults) {
         if(result instanceof KeyboardStub) {
           // Register the newly-complete stub.
           this.cache.addStub(result);
@@ -239,7 +243,7 @@ export default class KeyboardRequisitioner {
 
   async addLanguageKeyboards(languages: string[]): Promise<(ErrorStub | KeyboardStub)[]> {
     // Covers the 'add a keyboard by language name' angle.
-    let errorStubs: ErrorStub[] = [];
+    const errorStubs: ErrorStub[] = [];
     let fetchedLanguageList: LanguageAPIPropertySpec[] = [];
 
     try {
@@ -257,7 +261,7 @@ export default class KeyboardRequisitioner {
     let cmd = '';
     for(let i=0; i<languages.length; i++) {
       let lgName = languages[i].toLowerCase();
-      let addAll = (lgName.substr(-1,1) == '$');
+      const addAll = (lgName.substr(-1,1) == '$');
       if(addAll) {
         lgName = lgName.substr(0,lgName.length-1);
       }
@@ -281,7 +285,7 @@ export default class KeyboardRequisitioner {
       if (!languageFound) {
         // Construct response array of errors (failed-query keyboards)
         // that will be merged with stubs (successfully-queried keyboards)
-        let stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
+        const stub: ErrorStub = {language: {name: lgName}, error: new Error(this.alertLanguageUnavailable(lgName))};
         errorStubs.push(stub);
       }
     }
@@ -294,7 +298,7 @@ export default class KeyboardRequisitioner {
     return this.cloudQueryEngine.keymanCloudRequest('&keyboardid='+cmd, false).then(async (result) => {
       const results = await mergeAndResolveStubPromises(result, errorStubs);
 
-      for(let result of results) {
+      for(const result of results) {
         // If not an error stub...
         if(typeof (result as ErrorStub).error == 'undefined') {
           this.cache.addStub(result as KeyboardStub);
@@ -304,7 +308,7 @@ export default class KeyboardRequisitioner {
       return results;
     }, (err) => {
       console.error(err);
-      let stub: ErrorStub = {error: err};
+      const stub: ErrorStub = {error: err};
       errorStubs.push(stub);
       return rejectErrorStubs(errorStubs);
     });
@@ -326,7 +330,7 @@ export default class KeyboardRequisitioner {
    * @returns string of Error message
    */
   private alertLanguageUnavailable(languageName: string): string {
-    let msg = 'No keyboards are available for '+ languageName + '. '
+    const msg = 'No keyboards are available for '+ languageName + '. '
       +'Does it have another language name?';
 
     // TODO:  hooks for internal alerts!

@@ -1,4 +1,5 @@
 import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
+import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
   node: Node;
@@ -71,8 +72,8 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
   }
 
   hasSelection(): boolean {
-    let Lsel = this.doc.getSelection();
-    let outerSel = document.getSelection();
+    const Lsel = this.doc.getSelection();
+    const outerSel = document.getSelection();
 
     // If the outer doc's selection matches, we're active.
     if(outerSel.anchorNode == Lsel.anchorNode && outerSel.focusNode == Lsel.focusNode) {
@@ -86,7 +87,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
 
   clearSelection(): void {
     if(this.hasSelection()) {
-      let Lsel = this.doc.getSelection();
+      const Lsel = this.doc.getSelection();
 
       if(!Lsel.isCollapsed) {
         Lsel.deleteFromDocument();  // I2134, I2192
@@ -101,15 +102,15 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
                                   */  }
 
   getCarets(): SelectionRange {
-    let Lsel = this.doc.getSelection();
+    const Lsel = this.doc.getSelection();
     let code = Lsel.anchorNode.compareDocumentPosition(Lsel.focusNode);
 
     if(Lsel.isCollapsed) {
-      let caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
+      const caret = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
       return new SelectionRange(caret, caret);
     } else {
-      let anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
-      let focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
+      const anchor = new SelectionCaret(Lsel.anchorNode, Lsel.anchorOffset);
+      const focus = new SelectionCaret(Lsel.focusNode, Lsel.focusOffset);
 
       if(anchor.node == focus.node) {
         code = (focus.offset - anchor.offset > 0) ? 2 : 4;
@@ -125,7 +126,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
   }
 
   getDeadkeyCaret(): number {
-    return this.getTextBeforeCaret().kmwLength();
+    return KMWString.length(this.getTextBeforeCaret());
   }
 
   getTextBeforeCaret(): string {
@@ -133,7 +134,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return this.getText();
     }
 
-    let caret = this.getCarets().start;
+    const caret = this.getCarets().start;
 
     if(caret.node.nodeType != 3) {
       return ''; // Must be a text node to provide a context.
@@ -153,7 +154,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return '';
     }
 
-    let caret = this.getCarets().end;
+    const caret = this.getCarets().end;
 
     if(caret.node.nodeType != 3) {
       return ''; // Must be a text node to provide a context.
@@ -171,7 +172,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return;
     }
 
-    let start = this.getCarets().start;
+    const start = this.getCarets().start;
 
     // Bounds-check on the number of chars to delete.
     if(dn > start.offset) {
@@ -183,8 +184,8 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return; // No context to delete characters from.
     }
 
-    let range = this.doc.createRange();
-    let dnOffset = start.offset - start.node.nodeValue.substr(0, start.offset)._kmwSubstr(-dn).length;
+    const range = this.doc.createRange();
+    const dnOffset = start.offset - KMWString.substr(start.node.nodeValue.substr(0, start.offset), -dn).length;
 
     range.setStart(start.node, dnOffset);
     range.setEnd(start.node, start.offset);
@@ -200,9 +201,9 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return;
     }
 
-    let start = this.getCarets().start;
-    let delta = s._kmwLength();
-    let Lsel = this.doc.getSelection();
+    const start = this.getCarets().start;
+    const delta = KMWString.length(s);
+    const Lsel = this.doc.getSelection();
 
     if(delta == 0) {
       return;
@@ -215,17 +216,17 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
     // able to manage the caret properly.
     //
     // TODO:  double-check that it was only IE-motivated, re-implement with Selection.extend().
-    let finalCaret = this.root.ownerDocument.createRange();
+    const finalCaret = this.root.ownerDocument.createRange();
 
     if(start.node.nodeType == 3) {
-      let textStart = <Text> start.node;
+      const textStart = <Text> start.node;
       textStart.insertData(start.offset, s);
       finalCaret.setStart(textStart, start.offset + s.length);
     } else {
       // Create a new text node - empty control
-      var n = this.doc.createTextNode(s);
+      const n = this.doc.createTextNode(s);
 
-      let range = this.doc.createRange();
+      const range = this.doc.createRange();
       range.setStart(start.node, start.offset);
       range.collapse(true);
       range.insertNode(n);
@@ -264,8 +265,8 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       return;
     }
 
-    let caret = this.getCarets().end;
-    let delta = s._kmwLength();
+    const caret = this.getCarets().end;
+    const delta = KMWString.length(s);
 
     if(delta == 0) {
       return;
@@ -275,13 +276,13 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
     // will be handled after this method.
 
     if(caret.node.nodeType == 3) {
-      let textStart = <Text> caret.node;
+      const textStart = <Text> caret.node;
       textStart.replaceData(caret.offset, textStart.length, s);
     } else {
       // Create a new text node - empty control
-      var n = caret.node.ownerDocument.createTextNode(s);
+      const n = caret.node.ownerDocument.createTextNode(s);
 
-      let range = this.root.ownerDocument.createRange();
+      const range = this.root.ownerDocument.createRange();
       range.setStart(caret.node, caret.offset);
       range.collapse(true);
       range.insertNode(n);
@@ -295,7 +296,7 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
    */
   saveProperties() {
     // Formerly _CacheCommands.
-    var _CacheableCommands=[
+    const _CacheableCommands=[
       new StyleCommand('backcolor',1), new StyleCommand('fontname',1), new StyleCommand('fontsize',1),
       new StyleCommand('forecolor',1), new StyleCommand('bold',0), new StyleCommand('italic',0),
       new StyleCommand('strikethrough',0), new StyleCommand('subscript',0),
@@ -306,8 +307,8 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       _CacheableCommands.push(new StyleCommand('hilitecolor',1));
     }
 
-    for(var n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
-      let cmd = _CacheableCommands[n];
+    for(let n=0; n < _CacheableCommands.length; n++) { // I1511 - array prototype extended
+      const cmd = _CacheableCommands[n];
       //KeymanWeb._Debug('Command:'+_CacheableCommands[n][0]);
       if(cmd.stateType == 1) {
         cmd.cache = this.doc.queryCommandValue(cmd.cmd);
@@ -329,8 +330,8 @@ export class DesignIFrame extends OutputTargetElementWrapper<{}> {
       console.error("No command cache exists to restore!");
     }
 
-    for(var n=0; n < this.commandCache.length; n++) { // I1511 - array prototype extended
-      let cmd = this.commandCache[n];
+    for(let n=0; n < this.commandCache.length; n++) { // I1511 - array prototype extended
+      const cmd = this.commandCache[n];
 
       //KeymanWeb._Debug('ResetCacheCommand:'+_CacheableCommands[n][0]+'='+_CacheableCommands[n][2]);
       if(cmd.stateType == 1) {

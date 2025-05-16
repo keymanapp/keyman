@@ -37,7 +37,7 @@ builder_parse "$@"
 
 ####
 
-TIER=$(cat ../TIER.md)
+KEYMAN_TIER=$(cat ../TIER.md)
 BUILD_NUMBER=$(cat ../VERSION.md)
 
 function web_sentry_upload () {
@@ -50,7 +50,7 @@ function web_sentry_upload () {
 
   # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
   # the most common prefix instead.
-  sentry-cli releases files "${VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
+  sentry-cli releases files "${KEYMAN_VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
     --rewrite --ext js --ext map --ext ts
   echo "Upload successful."
 }
@@ -63,8 +63,7 @@ function build_action() {
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
   # one option:
-  # - --ci:       For app/browser, outputs 'release' config filesize profiling logs
-  ./build.sh configure clean build --ci
+  ./build.sh configure clean build
 
   # Upload the sentry-configuration engine used by the mobile apps to sentry
   # Also, clean 'em first.
@@ -79,19 +78,7 @@ function build_action() {
 }
 
 function test_action() {
-  # Testing step:  run ALL unit tests, including those of the submodules.
-
-  OPTIONS=
-  if ! builder_is_debug_build; then
-    OPTIONS=--ci
-  fi
-
-  # No --reporter option exists yet for the headless modules.
-
-  "${KEYMAN_ROOT}/web/src/engine/keyboard/build.sh" test ${OPTIONS}
-  "${KEYMAN_ROOT}/web/src/engine/osk/gesture-processor/build.sh" test ${OPTIONS}
-
-  ./build.sh test ${OPTIONS}
+  ./build.sh test
 }
 
 function post_test_action() {
@@ -132,7 +119,7 @@ function prepare_s_keyman_com_action() {
   # Second phase:  copy the artifacts over
 
   # The main build products are expected to reside at the root of this folder.
-  BASE_PUBLISH_FOLDER="${S_KEYMAN_COM}/kmw/engine/${VERSION}"
+  BASE_PUBLISH_FOLDER="${S_KEYMAN_COM}/kmw/engine/${KEYMAN_VERSION}"
   echo "FOLDER: ${BASE_PUBLISH_FOLDER}"
   mkdir -p "${BASE_PUBLISH_FOLDER}"
 
@@ -143,27 +130,27 @@ function prepare_s_keyman_com_action() {
   # Third phase: tweak the sourcemaps
   # We can use an alt-mode of Web's sourcemap-root tool for this.
   for sourcemap in "${BASE_PUBLISH_FOLDER}/"*.map; do
-    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --sourceRoot "https://s.keyman.com/kmw/engine/${VERSION}/src"
+    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --sourceRoot "https://s.keyman.com/kmw/engine/${KEYMAN_VERSION}/src"
   done
 
   # Construct the PR
-  echo "Committing and pushing KeymanWeb release ${VERSION} to s.keyman.com"
+  echo "Committing and pushing KeymanWeb release ${KEYMAN_VERSION} to s.keyman.com"
 
-  ci_add_files "${S_KEYMAN_COM}" "kmw/engine/${VERSION}"
+  ci_add_files "${S_KEYMAN_COM}" "kmw/engine/${KEYMAN_VERSION}"
   if ! ci_repo_has_cached_changes "${S_KEYMAN_COM}"; then
     builder_die "No release was added to s.keyman.com, something went wrong"
   fi
 
-  ci_open_pull_request "${S_KEYMAN_COM}" auto/keymanweb/release "auto: KeymanWeb release ${VERSION}"
+  ci_open_pull_request "${S_KEYMAN_COM}" auto/keymanweb/release "auto: KeymanWeb release ${KEYMAN_VERSION}"
 }
 
 # Note:  for now, this command is used to prepare the artifacts used by the download site, but
 #        NOT to actually UPLOAD them via rsync or to produce related .download_info files.
 function prepare_downloads_keyman_com_action() {
-  UPLOAD_PATH="${KEYMAN_ROOT}/web/build/upload/${VERSION}"
+  UPLOAD_PATH="${KEYMAN_ROOT}/web/build/upload/${KEYMAN_VERSION}"
 
   # --- First action artifact - the KMW zip file ---
-  ZIP="${UPLOAD_PATH}/keymanweb-${VERSION}.zip"
+  ZIP="${UPLOAD_PATH}/keymanweb-${KEYMAN_VERSION}.zip"
 
   mkdir -p "${UPLOAD_PATH}"
 

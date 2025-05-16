@@ -17,7 +17,7 @@ export default class DefaultBrowserRules extends DefaultRules {
   }
 
   isCommand(Lkc: KeyEvent): boolean {
-    let code = this.codeForEvent(Lkc);
+    const code = this.codeForEvent(Lkc);
 
     switch(code) {
       case Codes.keyCodes['K_TAB']:
@@ -33,7 +33,7 @@ export default class DefaultBrowserRules extends DefaultRules {
    * applyCommand - used when a RuleBehavior represents a non-text "command" within the Engine.
    */
   applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
-    let code = this.codeForEvent(Lkc);
+    const code = this.codeForEvent(Lkc);
 
     const moveToNext = (back: boolean) => {
       const contextManager = this.contextManager;

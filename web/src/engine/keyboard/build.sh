@@ -26,8 +26,7 @@ builder_describe \
   configure \
   clean \
   build \
-  test \
-  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
+  test
 
 builder_describe_outputs \
   configure     /node_modules \

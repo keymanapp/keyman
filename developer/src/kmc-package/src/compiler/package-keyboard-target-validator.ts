@@ -8,7 +8,7 @@ export class PackageKeyboardTargetValidator {
   constructor(private callbacks: CompilerCallbacks) {}
 
   public verifyAllTargets(kmp: KmpJsonFile.KmpJsonFile, metadata: KeyboardMetadataCollection): void {
-    for(let keyboard of Object.keys(metadata)) {
+    for(const keyboard of Object.keys(metadata)) {
       let hasJS = true;
 
       if(metadata[keyboard].data.targets) {

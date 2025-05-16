@@ -40,5 +40,5 @@ test_action() {
   fi
 }
 
-builder_run_action test test_action
-builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/linux/docs/help"
+builder_run_action  test        test_action
+builder_run_action  test:help   check-markdown  "${KEYMAN_ROOT}/linux/docs/help"

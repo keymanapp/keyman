@@ -44,7 +44,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   }
 
   async init(options: Required<WebviewInitOptionSpec>) {
-    let device = new DeviceSpec(
+    const device = new DeviceSpec(
       'native',
       options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone',
       this.config.hostDevice.OS,
@@ -125,7 +125,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
       key = child;
     }
 
-    var w=key.offsetWidth,
+    const w=key.offsetWidth,
         h=key.offsetHeight,
         // Since the full OSKManager '_Box' is displayed within the keyboards' WebViews,
         // these calculations should be performed with respect to that, rather than osk.vkbd.kbdDiv.

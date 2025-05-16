@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import * as Package from "keyman/engine/js-processor";
 import * as Package2 from "keyman/engine/keyboard";
+const KMWString = Package2.KMWString;
 
 // A few small tests to ensure that the ES Module bundle was successfully constructed and is usable.
 
@@ -29,15 +30,13 @@ describe('Bundled ES Module for js-processor', function() {
     });
 
     it('smp test', () => {
-      // Is installed as a _side effect_ from importing the module.
-      // We could disable that and require a call of `extendString()` instead.
-      String.kmwEnableSupplementaryPlane(true); // Declared & defined in web-utils.
+      KMWString.enableSupplementaryPlane(true); // Declared & defined in web-utils.
       try {
         let target = new Package.Mock(u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be), 2);  // ap | le
         target.insertTextBeforeCaret(u(0x1d5c9));
         assert.equal(target.getText(), u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be));
       } finally {
-        String.kmwEnableSupplementaryPlane(false);
+        KMWString.enableSupplementaryPlane(false);
       }
     });
   });

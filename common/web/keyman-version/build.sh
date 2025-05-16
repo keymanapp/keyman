@@ -33,16 +33,16 @@ function do_build() {
 // Note:  does not use the 'default' keyword so that the export name is
 // correct when converted to a CommonJS module with \`esbuild\`.
 export class KEYMAN_VERSION {
-  static readonly VERSION = \"$VERSION\";
-  static readonly VERSION_RELEASE =\"$VERSION_RELEASE\";
-  static readonly VERSION_MAJOR = \"$VERSION_MAJOR\";
-  static readonly VERSION_MINOR = \"$VERSION_MINOR\";
-  static readonly VERSION_PATCH = \"$VERSION_PATCH\";
-  static readonly TIER =\"$TIER\";
-  static readonly VERSION_TAG = \"$VERSION_TAG\";
-  static readonly VERSION_WITH_TAG = \"$VERSION_WITH_TAG\";
-  static readonly VERSION_ENVIRONMENT = \"$VERSION_ENVIRONMENT\";
-  static readonly VERSION_GIT_TAG = \"$VERSION_GIT_TAG\";
+  static readonly VERSION = \"$KEYMAN_VERSION\";
+  static readonly VERSION_RELEASE =\"$KEYMAN_VERSION_RELEASE\";
+  static readonly VERSION_MAJOR = \"$KEYMAN_VERSION_MAJOR\";
+  static readonly VERSION_MINOR = \"$KEYMAN_VERSION_MINOR\";
+  static readonly VERSION_PATCH = \"$KEYMAN_VERSION_PATCH\";
+  static readonly TIER =\"$KEYMAN_TIER\";
+  static readonly VERSION_TAG = \"$KEYMAN_VERSION_TAG\";
+  static readonly VERSION_WITH_TAG = \"$KEYMAN_VERSION_WITH_TAG\";
+  static readonly VERSION_ENVIRONMENT = \"$KEYMAN_VERSION_ENVIRONMENT\";
+  static readonly VERSION_GIT_TAG = \"$KEYMAN_VERSION_GIT_TAG\";
 }
 
 // Also provides it as a 'default' export.

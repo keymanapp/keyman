@@ -8,10 +8,10 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.9.2'
         // sentry-android-gradle-plugin 2.1.5+ requires AGP 7.0
         classpath 'io.sentry:sentry-android-gradle-plugin:4.6.0'
-        classpath 'name.remal:gradle-plugins:1.5.0'
+        classpath 'name.remal:gradle-plugins:1.9.2'
 
         // From jcenter() which was deprecated August 2024
         // https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/

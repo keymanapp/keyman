@@ -18,8 +18,7 @@ builder_describe "Builds the Keyman Engine for Web's sample page setups." \
   "configure           Does nothing for this project" \
   "clean" \
   "build" \
-  "test                Does nothing for this project" \
-  "--ci                Does nothing for this project"
+  "test                Does nothing for this project"
 
 # Possible TODO?s
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
@@ -40,6 +39,9 @@ SENTRY_MAP="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js.map"
 
 #### Build action definitions ####
 
+GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
+GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
+
 function do_copy() {
   mkdir -p "$KEYMAN_ROOT/$DEST"
 
@@ -49,12 +51,9 @@ function do_copy() {
   cp "$SENTRY_SRC"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js"
   cp "$SENTRY_MAP"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js.map"
 
-  GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
-  GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
-
   mkdir -p "$GESTURE_PROCESSOR_TARGET"
   cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
 }
 
-builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST"
+builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST" && rm -rf "$GESTURE_PROCESSOR_TARGET"
 builder_run_action build do_copy

@@ -78,7 +78,7 @@ export default class AnchoredOSKView extends OSKView {
 
   protected doResize() {
     if(this.vkbd) {
-      let targetOSKHeight = this.getDefaultKeyboardHeight();
+      const targetOSKHeight = this.getDefaultKeyboardHeight();
       this.setSize(this.getDefaultWidth(), targetOSKHeight + this.banner.height);
     }
   }
@@ -104,7 +104,7 @@ export default class AnchoredOSKView extends OSKView {
    *  @return   {number}    height in pixels
    **/
   getDefaultKeyboardHeight(): number {
-    let device = this.targetDevice;
+    const device = this.targetDevice;
 
     // KeymanTouch - get OSK height from device
     if(this.configuration.heightOverride) {
@@ -134,14 +134,13 @@ export default class AnchoredOSKView extends OSKView {
       baseHeight = Math.max(screen.height, screen.width);
 
       if(landscapeView()) {
-        let temp = baseWidth;
+        const temp = baseWidth;
         baseWidth = baseHeight;
         baseHeight = temp;
       }
     }
 
-    var oskHeightLandscapeView=Math.floor(Math.min(baseHeight, baseWidth)/2),
-        height=oskHeightLandscapeView;
+    let height=Math.floor(Math.min(baseHeight, baseWidth)/2);
 
     if(device.formFactor == 'phone') {
       /**
@@ -173,14 +172,14 @@ export default class AnchoredOSKView extends OSKView {
    *  @return   {number}    height in pixels
    **/
   getDefaultWidth(): number {
-    let device = this.targetDevice;
+    const device = this.targetDevice;
 
     // KeymanTouch - get OSK height from device
     if(this.configuration.widthOverride) {
       return this.configuration.widthOverride();
     }
 
-    var width: number;
+    let width: number;
 
     width = document?.documentElement?.clientWidth;
     if(typeof width == 'undefined') {
@@ -212,7 +211,7 @@ export default class AnchoredOSKView extends OSKView {
    * @return      {Object.<string,number>}     Array object with OSK window position
   **/
   getPos(): OSKPos {
-    var Lkbd=this._Box, p={
+    const Lkbd=this._Box, p={
       left: this._Visible ? Lkbd.offsetLeft : this.x,
       top: this._Visible ? Lkbd.offsetTop : this.y
     };
@@ -231,7 +230,7 @@ export default class AnchoredOSKView extends OSKView {
   }
 
   protected setDisplayPositioning() {
-    let Ls = this._Box.style;
+    const Ls = this._Box.style;
 
     // The following code will always be executed except for externally created OSK such as EuroLatin
     if(this.vkbd) {

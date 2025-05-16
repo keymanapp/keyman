@@ -1,6 +1,6 @@
 export { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from './engineConfiguration.js';
 export { ContextManagerBase, ContextManagerConfiguration } from './contextManagerBase.js';
-export { default as HardKeyboard, processForMnemonicsAndLegacy } from './hardKeyboard.js';
+export { HardKeyboard, processForMnemonicsAndLegacy } from './hardKeyboard.js';
 export { KeyboardInterfaceBase } from './keyboardInterfaceBase.js';
 export { KeymanEngineBase } from './keymanEngineBase.js';
 export { LegacyAPIEvents } from './legacyAPIEvents.js';

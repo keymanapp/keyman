@@ -76,7 +76,7 @@ export class ModelDefinitions {
 
       if(modelSource.applyCasing) {
         this.model.applyCasing = modelSource.applyCasing;
-        let _this = this;
+        const _this = this;
 
         // Since the defined casing function may expect to take our default implementation
         // as a parameter, we can define the full implementation via closure capture.
@@ -111,7 +111,7 @@ export class ModelDefinitions {
       this.applyCasing = this.defaults.applyCasing;
     }
 
-    let _this = this;
+    const _this = this;
     this.searchTermToKey = function(text: string) {
       return _this.model.searchTermToKey(text, _this.applyCasing);
     }

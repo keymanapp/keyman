@@ -118,7 +118,7 @@ if(!keymanweb) {
         let x = p.x;
         let y = p.y;
 
-        var ownerDoc = someElement.ownerDocument;
+        const ownerDoc = someElement.ownerDocument;
         if(ownerDoc.designMode == 'on' && ownerDoc.defaultView && ownerDoc.defaultView.frameElement) {
           w = ownerDoc.defaultView.frameElement.clientWidth;
           h = ownerDoc.defaultView.frameElement.clientHeight;
@@ -145,7 +145,7 @@ if(!keymanweb) {
       }
 
       registerEvents() {
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
 
         if(!osk) {
           return;
@@ -288,7 +288,7 @@ if(!keymanweb) {
           };
 
           private __updatestyle() {
-            var ss=this._elem.style;
+            const ss=this._elem.style;
             if(this._over) {
               ss.margin = '0px';
               if(this._selected) {
@@ -370,8 +370,8 @@ if(!keymanweb) {
           constructor(/* TODO: put wrapping method's params HERE instead upon class-extraction */) {
             this._selected = _selected;
 
-            let imgPath=util.getOption('resources') + 'ui/toggle/';
-            let _elemImg = util.createElement('img') as HTMLImageElement & Owned<Button>;
+            const imgPath=util.getOption('resources') + 'ui/toggle/';
+            const _elemImg = util.createElement('img') as HTMLImageElement & Owned<Button>;
             this._elem = util.createElement('div');
             this._elem['_owningObject'] = this;
             _elemImg.style.display = 'block';
@@ -475,7 +475,7 @@ if(!keymanweb) {
       }
 
       shutdown() {
-        var root = this.controller;
+        const root = this.controller;
 
         if(root) {
           root.parentNode.removeChild(root);
@@ -524,8 +524,8 @@ if(!keymanweb) {
           this.kbdButton.getElem().id = 'kmwico';
           this.kbdButton.getElem().style.width = '24px';
 
-          var Lki=_kbds[0].InternalName;
-          var Lklc=_kbds[0].LanguageCode;
+          const Lki=_kbds[0].InternalName;
+          const Lklc=_kbds[0].LanguageCode;
           this.controller.style.background = 'url('+imgPath+'kmwcontroller2.gif)';
           this.keyboards.push({_InternalName: Lki, _LanguageCode: Lklc, _Index: 0});
           this.kbdButton._onclick = this.switchSingleKbd;
@@ -542,7 +542,7 @@ if(!keymanweb) {
         }
 
         // Highlight the last active keyboard
-        var sk=keymanweb.getSavedKeyboard().split(':');
+        const sk=keymanweb.getSavedKeyboard().split(':');
         this.updateMenu(sk[0],sk[1]);
       }
 
@@ -701,8 +701,8 @@ if(!keymanweb) {
           this.keyboardMenu.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
         }
 
-        var _li = util.createElement('li');
-        var _a = util.createElement('a');
+        const _li = util.createElement('li');
+        const _a = util.createElement('a');
         _a.innerHTML='(System keyboard)';
         _a.href="#";
         _a.onclick = () => {
@@ -717,14 +717,14 @@ if(!keymanweb) {
 
         const _kbds=keymanweb.getKeyboards(), _added: Record<string, number> = {};
         this.keyboards = [];
-        for(var _kbd = 0; _kbd < _kbds.length; _kbd++) {
-          var _li1=util.createElement('li');
-          var _a1=util.createElement('a');
+        for(let _kbd = 0; _kbd < _kbds.length; _kbd++) {
+          const _li1=util.createElement('li');
+          const _a1=util.createElement('a');
           _a1.innerHTML=_kbds[_kbd].LanguageName + ' - ' + _kbds[_kbd].Name;
           if(!_added[_kbds[_kbd].InternalName]) _added[_kbds[_kbd].InternalName]=0;
           _added[_kbds[_kbd].InternalName]++;
 
-          var _n=_added[_kbds[_kbd].InternalName];
+          const _n=_added[_kbds[_kbd].InternalName];
           this.keyboards.push({_InternalName: _kbds[_kbd].InternalName, _LanguageCode:_kbds[_kbd].LanguageCode, _Index: _n});
 
           _a1.href="#";
