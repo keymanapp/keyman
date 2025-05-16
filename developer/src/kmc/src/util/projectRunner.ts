@@ -18,7 +18,7 @@ async function runProject(callbacks: CompilerCallbacks, filename: string, callba
 }
 
 export async function runOnFiles(callbacks: CompilerCallbacks, filenames: string[], callback: (filename:string)=>Promise<boolean>): Promise<boolean> {
-  for(let filename of filenames) {
+  for(const filename of filenames) {
     const result = isProject(filename) ?
       await runProject(callbacks, filename, callback) :
       await callback(filename);

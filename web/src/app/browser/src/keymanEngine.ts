@@ -158,8 +158,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * @returns A Promise that only resolves once the engine is fully initialized.
    */
   public async init(options: Required<BrowserInitOptionSpec>) {
-    let deviceDetector = new DeviceDetector();
-    let device = deviceDetector.detect();
+    const deviceDetector = new DeviceDetector();
+    const device = deviceDetector.detect();
 
     const totalOptions = {...BrowserInitOptionDefaults, ...options};
 
@@ -397,7 +397,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    */
   private _GetKeyboardDetail = function(Lstub: KeyboardStub, Lkbd: Keyboard) { // I2078 - Full keyboard detail
-    let Lr = {
+    const Lr = {
       Name: Lstub.KN,
       InternalName: Lstub.KI,
       LanguageName: Lstub.KL,  // I1300 - Add support for language names
@@ -433,7 +433,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
-      let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
+      const kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
       if(kbdDetail.KeyboardID){
         kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
@@ -682,7 +682,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     }
 
     PKbd = PKbd || this.core.activeKeyboard;
-    let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
+    const Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
     // help.keyman.com will set this function in place to specify the desired
     // dimensions for the documentation-keyboards, so we'll give it priority.  One of those
@@ -691,7 +691,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Note that the main intended use of that function is for embedded KMW on the mobile apps...
     // but they never call `BuildVisualKeyboard`, so it's all good.
     const getOskHeight = this['getOskHeight'];
-    let targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
+    const targetHeight = (typeof getOskHeight == 'function' ? getOskHeight() : null) || this.osk.computedHeight || 200;
 
     return VisualKeyboard.buildDocumentationKeyboard(
       PKbd,

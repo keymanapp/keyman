@@ -12,7 +12,7 @@ import { dirname } from 'node:path';
 export async function buildTestData(infile: string, _options: any, commander: any): Promise<void> {
   const options: CommandLineBuildBaseOptions = commander.optsWithGlobals();
 
-  let compilerOptions: kmcLdml.LdmlCompilerOptions = {
+  const compilerOptions: kmcLdml.LdmlCompilerOptions = {
     ...defaultCompilerOptions,
     ...options,
     saveDebug: false,
@@ -25,7 +25,7 @@ export async function buildTestData(infile: string, _options: any, commander: an
 
   const callbacks = new NodeCompilerCallbacks(options);
 
-  let testData = await loadTestData(infile, callbacks, compilerOptions);
+  const testData = await loadTestData(infile, callbacks, compilerOptions);
   if (!testData || callbacks.hasFailureMessage()) {
     await exitProcess(1);
   }

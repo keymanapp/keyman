@@ -44,9 +44,9 @@ export class LanguageMenu {
   }
 
   constructShim(): HTMLDivElement {
-    let languageMenu = this;
-    let shim = util._CreateElement('div');
-    let osk = this.keyman.osk;
+    const languageMenu = this;
+    const shim = util._CreateElement('div');
+    const osk = this.keyman.osk;
 
     shim.id='kmw-language-menu-background';
     shim.addEventListener('touchstart', (e) => {
@@ -55,8 +55,8 @@ export class LanguageMenu {
 
       // Display build only if touching menu, space *and* one other point on screen (build 369)
       if(e.touches.length > 2) {
-        var sX=e.touches[1].pageX,sY=e.touches[1].pageY;
-        let spaceBar = osk.vkbd.spaceBar;
+        const sX=e.touches[1].pageX,sY=e.touches[1].pageY;
+        const spaceBar = osk.vkbd.spaceBar;
         if(sX > spaceBar.offsetLeft && sX < spaceBar.offsetLeft+spaceBar.offsetWidth &&
            sY > spaceBar.offsetTop && sY < spaceBar.offsetTop+spaceBar.offsetHeight
         ) {
@@ -73,26 +73,26 @@ export class LanguageMenu {
    **/
   show() {
     const device = this.keyman.config.hostDevice;
-    let kbdList=this.keyman.keyboardRequisitioner.cache.getStubList();
-    let nKbds=kbdList.length;
+    const kbdList=this.keyman.keyboardRequisitioner.cache.getStubList();
+    const nKbds=kbdList.length;
     if(nKbds < 1) {
       return;
     }
 
     // Create the menu list container element
-    var menu=this.lgList=util._CreateElement('div');
+    const menu=this.lgList=util._CreateElement('div');
     this.lgList.id='kmw-language-menu';
 
     // Insert a transparent overlay to prevent anything else happening during keyboard selection,
     // but allow the menu to be closed if anywhere else on screen is touched
 
-    let languageMenu = this;
+    const languageMenu = this;
 
     document.body.appendChild(this.shim);
 
     // Add two nested DIVs to properly support iOS scrolling with momentum
     //  c.f. https://github.com/joelambert/ScrollFix/issues/2
-    var m2=util._CreateElement('div'),s2=m2.style,
+    const m2=util._CreateElement('div'),s2=m2.style,
         m3=util._CreateElement('div');
     m2.id='kmw-menu-scroll-container'; m3.id='kmw-menu-scroller';
 
@@ -105,7 +105,8 @@ export class LanguageMenu {
     menu.appendChild(m2);
 
     // Add menu index strip
-    let x,mx=util._CreateElement('div');
+    let x: HTMLParagraphElement;
+    const mx=util._CreateElement('div');
     mx.id='kmw-menu-index';
     for(let i=1; i<=26; i++) {
       x=util._CreateElement('p');
@@ -154,7 +155,7 @@ export class LanguageMenu {
 
     // Adjust width for pixel scaling on Android tablets
     if(device.OS == 'android' && device.formFactor == 'tablet' && 'devicePixelRatio' in window) {
-      var w=parseInt(util.getStyleValue(menu,'width'),10),
+      let w=parseInt(util.getStyleValue(menu,'width'),10),
       ms=menu.style;
       if(!isNaN(w)) {
         ms.width=ms.maxWidth=(2*w/window.devicePixelRatio)+'px';
@@ -175,17 +176,17 @@ export class LanguageMenu {
     this.adjust(0);
 
     // Adjust the index font size and line height
-    var dy=(<HTMLElement>mx.childNodes[1]).offsetTop-(<HTMLElement>mx.childNodes[0]).offsetTop,
-        lineHeight=Math.floor(menu.offsetHeight/26.0),
-        scale=Math.round(100.0*lineHeight/dy)/100.0,
-        factor=(scale > 0.6 ? 1 : 2);
+    const dy=(<HTMLElement>mx.childNodes[1]).offsetTop-(<HTMLElement>mx.childNodes[0]).offsetTop;
+    const lineHeight=Math.floor(menu.offsetHeight/26.0);
+    let scale=Math.round(100.0*lineHeight/dy)/100.0;
+    const factor=(scale > 0.6 ? 1 : 2);
 
     if(scale > 1.25) {
       scale=1.25;
     }
 
     for(let i=0;i<26;i++) {
-      var qs=(<HTMLElement>mx.childNodes[i]).style;
+      const qs=(<HTMLElement>mx.childNodes[i]).style;
       if(factor == 2 && (i%2) == 1) {
         qs.display='none';
       } else {
@@ -195,7 +196,7 @@ export class LanguageMenu {
     }
 
     // Increase width of outer menu DIV by index, else hide index
-    var menuWidth=m2.offsetWidth;
+    let menuWidth=m2.offsetWidth;
     if(m2.scrollHeight > m2.offsetHeight+3) {
       menuWidth = menuWidth+mx.offsetWidth;
     } else {
@@ -216,15 +217,16 @@ export class LanguageMenu {
    * @param   {number}  nKbds number of displayed keyboards to add to number of languages
    **/
   adjust(nKbds: number) {
-    let osk = this.keyman.osk;
-    let device = this.keyman.config.hostDevice;
+    const osk = this.keyman.osk;
+    const device = this.keyman.config.hostDevice;
 
-    var menu=this.lgList, m2=<HTMLElement>menu.firstChild, m3=<HTMLElement>m2.firstChild,
-      barWidth=0,s=menu.style,mx=<HTMLElement>menu.childNodes[1],
-      maxHeight=window.innerHeight-osk.vkbd.lgKey.offsetHeight-16,
+    const menu=this.lgList, m2=<HTMLElement>menu.firstChild, m3=<HTMLElement>m2.firstChild;
+    let barWidth=0;
+    let maxHeight=window.innerHeight-osk.vkbd.lgKey.offsetHeight-16;
+    const s=menu.style,mx=<HTMLElement>menu.childNodes[1],
       nItems=m3.childNodes.length+nKbds-1,      // Number of (visible) keyboard selectors
-      itemHeight=(<HTMLElement>m3.firstChild.firstChild).offsetHeight,
-      menuHeight=nItems*itemHeight;
+      itemHeight=(<HTMLElement>m3.firstChild.firstChild).offsetHeight;
+    let menuHeight=nItems*itemHeight;
 
     // Correct maxheight for viewport scaling (iPhone/iPod only) and internal position corrections
     if(device.OS == 'ios') {
@@ -263,17 +265,18 @@ export class LanguageMenu {
     e.stopPropagation();
     e.preventDefault();
 
-    let target = <HTMLElement> e.touches[0].target;
+    const target = <HTMLElement> e.touches[0].target;
 
     // Will return 'P', not 'p'.
     if(target.nodeName != 'P') {
       return;
     }
 
-    var i,t,initial=target.innerHTML.charCodeAt(0),nn=menu.childNodes;
+    let i: number;
+    const initial=target.innerHTML.charCodeAt(0), nn=menu.childNodes;
     try {
       for(i=0; i<nn.length-1; i++) {
-        t=(<HTMLElement>nn[i].firstChild).innerHTML.toUpperCase().charCodeAt(0);
+        const t=(<HTMLElement>nn[i].firstChild).innerHTML.toUpperCase().charCodeAt(0);
         if(t >= initial) {
           break;
         }
@@ -316,11 +319,11 @@ export class LanguageMenu {
    *    @return   {number}              index of currently active language
    **/
   addLanguages(menu: HTMLDivElement, kbdList: KeyboardStub[]): number {
-    var nStubs=kbdList.length;
-    let device = this.keyman.config.hostDevice;
+    const nStubs=kbdList.length;
+    const device = this.keyman.config.hostDevice;
 
     // Create and sort a list of languages
-    let langs: string[] = [];
+    const langs: string[] = [];
     for(let n=0; n<nStubs; n++) {
       const lg=kbdList[n]['KL'];
       if(langs.indexOf(lg) == -1) {
@@ -330,7 +333,7 @@ export class LanguageMenu {
     langs.sort();
 
     // Get current scale factor (reciprocal of viewport scale)
-    var scale=Math.round(100/util.getViewportScale(device.formFactor))/100;
+    const scale=Math.round(100/util.getViewportScale(device.formFactor))/100;
 
     let activeLanguageIndex=-1;
 
@@ -402,9 +405,9 @@ export class LanguageMenu {
     }
 
     // Add a non-selectable bottom bar so to allow scrolling to the last language
-    var padLast=util._CreateElement('div');
+    const padLast=util._CreateElement('div');
     padLast.id='kmw-menu-footer';
-    var cancelTouch=function(e: TouchEvent){
+    const cancelTouch=function(e: TouchEvent){
       if(e.cancelable) {
         e.preventDefault();
       }
@@ -498,9 +501,9 @@ export class LanguageMenu {
     // Touchmove drags the list and prevents release from selecting the language
     const touchMove=function(this: HTMLElement, e: TouchEvent) {
       e.stopImmediatePropagation();
-      var scroller=<HTMLElement>languageMenu.lgList.childNodes[0],
-          yMax=scroller.scrollHeight-scroller.offsetHeight,
-      y, dy;
+      const scroller=<HTMLElement>languageMenu.lgList.childNodes[0];
+      const yMax=scroller.scrollHeight-scroller.offsetHeight;
+      let y: number;
 
       // TS does not have a standard definition for TouchEvent.pageY.
       //@ts-ignore
@@ -513,7 +516,7 @@ export class LanguageMenu {
         return false;
       }
 
-      dy=y-languageMenu.y0;
+      const dy=y-languageMenu.y0;
 
       // Scroll up (show later listed languages)
       if(dy < 0) {
@@ -577,7 +580,7 @@ export class LanguageMenu {
    * Remove the language menu again
    **/
   hide() {
-    let osk = this.keyman.osk;
+    const osk = this.keyman.osk;
 
     if(this.lgList) {
       osk.vkbd.highlightKey(osk.vkbd.lgKey,false);
