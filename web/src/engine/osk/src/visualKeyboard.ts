@@ -1108,10 +1108,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * This function allows us to calculate the font size in those situations.
    */
   getKeyEmFontSize(): ParsedLengthStyle {
-    if (!this.fontSize) {
-      return new ParsedLengthStyle('0px');
-    }
-
     if (this.device.formFactor == 'desktop') {
       const keySquareScale = 0.8; // Set in kmwosk.css, is relative.
       return this.fontSize.scaledBy(keySquareScale);
@@ -1308,7 +1304,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       // All existing font-precalculations will need to be reset, as the font
       // was previously unavailable.
       this.layerGroup.resetPrecalcFontSizes();
-      this.refreshLayout()
+      // Can trigger when we're not actually layout-ready!
+      this.refreshLayout();
     });
   }
 
