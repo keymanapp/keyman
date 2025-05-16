@@ -18,7 +18,7 @@ export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: 
     return null;
   }
 
-  let result = await kmnCompiler.run(filename, null);
+  const result = await kmnCompiler.run(filename, null);
 
   if(!result) {
     // kmnCompiler will report any errors

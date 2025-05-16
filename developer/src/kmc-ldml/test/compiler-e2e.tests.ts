@@ -24,7 +24,7 @@ describe('compiler-tests', function() {
     const binaryFilename = makePathToFixture('basic.txt');
 
     // Compare output
-    let expected = await hextobin(binaryFilename, undefined, {silent:true});
+    const expected = await hextobin(binaryFilename, undefined, {silent:true});
 
     // now compare it to use with run()
     // Let's build basic.xml

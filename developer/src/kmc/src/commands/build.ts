@@ -103,7 +103,7 @@ async function buildFile(filenames: string[], _options: any, commander: any): Pr
     return await exitProcess(1);
   }
 
-  for(let filename of filenames) {
+  for(const filename of filenames) {
     if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
       // Once a file fails to build, we bail on subsequent builds
       return await exitProcess(1);
@@ -135,7 +135,7 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
       builder = new BuildProject();
     } else {
       // Otherwise, if it's one of our known file extensions, we build it
-      let extensions: string[] = [];
+      const extensions: string[] = [];
       builder = buildActivities.find(build => {
         extensions.push(build.sourceExtension);
         return filename.toLowerCase().endsWith(build.sourceExtension);

@@ -13,7 +13,7 @@ export default function wrapElement(e: HTMLElement): OutputTarget<any> {
   } else if(nestedInstanceOf(e, "HTMLTextAreaElement")) {
     return new TextArea(<HTMLTextAreaElement> e);
   } else if(nestedInstanceOf(e, "HTMLIFrameElement")) {
-    let iframe = <HTMLIFrameElement> e;
+    const iframe = <HTMLIFrameElement> e;
 
     if(iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.designMode == "on") {
       return new DesignIFrame(iframe);

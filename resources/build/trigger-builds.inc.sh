@@ -78,9 +78,9 @@ function triggerGitHubActionsBuild() {
 
   if [ "${action:-""}" == "commit" ]; then
     # This will only be true if we created and pushed a tag
-    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$VERSION_WITH_TAG")"
+    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$KEYMAN_VERSION_WITH_TAG")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
-    GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${KEYMAN_VERSION_WITH_TAG}"
   elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
     local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"

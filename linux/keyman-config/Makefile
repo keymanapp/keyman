@@ -24,8 +24,8 @@ dist: clean version
 	fi
 
 deb: dist
-	@VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
-	@echo VERSION is $(shell cat /tmp/keyman_version)
+	@KEYMAN_VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
+	@echo KEYMAN_VERSION is $(shell cat /tmp/keyman_version)
 	@mkdir -p make_deb
 	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
 		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
@@ -41,7 +41,7 @@ version_reconf:
 	cd .. && ./scripts/reconf.sh
 
 version: version_reconf
-	$(eval VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
+	$(eval KEYMAN_VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n
 
@@ -49,7 +49,7 @@ POFILES := $(shell find locale -name \*.po)
 MOFILES := $(POFILES:.po=/LC_MESSAGES/keyman-config.mo)
 
 update-template: version
-	xgettext --package-name "keyman" --package-version "$(VERSION)" \
+	xgettext --package-name "keyman" --package-version "$(KEYMAN_VERSION)" \
 		--msgid-bugs-address "<support@keyman.com>" --copyright-holder "SIL Global" \
 		--language=Python --directory=. --output-dir=locale --output=keyman-config.pot \
 		--add-comments=i18n: --sort-by-file --width=98 \

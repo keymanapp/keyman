@@ -6,12 +6,18 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
+/**
+ * Note that many of the constants defined here are also defined in the common header`kmx_file.h`
+ * Keyman for Mac only reads the kmx file to pass the contents to Keyman Core and for meta data.
+ * If the meta data can instead be returned by Keyman Core in the future, then the duplicate definitions
+ * found here can be removed.
+ */
+
 #ifndef KMBinaryFileFormat_h
 #define KMBinaryFileFormat_h
 
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
-//typedef wchar_t* PWSTR;
 
 struct COMP_KEYBOARD {
   DWORD dwIdentifier;     // 0000 Keyman compiled keyboard id
@@ -48,15 +54,6 @@ struct COMP_KEYBOARD {
 #define VERSION_170 0x00001100
 #define VERSION_MIN VERSION_50
 #define VERSION_MAX VERSION_170
-
-struct COMP_GROUP {
-  DWORD dpName;           // string (only debug)
-  DWORD dpKeyArray;       // [LPCOMP_KEY] address of first item in key array
-  DWORD dpMatch;          // extended string
-  DWORD dpNoMatch;        // extended string
-  DWORD cxKeyArray;       // in array entries
-  BOOL  fUsingKeys;       // group(xx) [using keys] <-- specified or not
-};
 
 struct COMP_STORE {
   DWORD dwSystemID;
@@ -124,78 +121,6 @@ struct COMP_STORE {
 #define TSS__KEYMAN_150_MAX             43
 
 #define TSS__MAX                        43
-
-// ShiftFlags
-#define LCTRLFLAG       0x0001      // Left Control flag
-#define RCTRLFLAG       0x0002      // Right Control flag
-#define LALTFLAG        0x0004      // Left Alt flag
-#define RALTFLAG        0x0008      // Right Alt flag
-#define K_SHIFTFLAG     0x0010      // Either shift flag
-#define K_CTRLFLAG      0x0020      // Either ctrl flag
-#define K_ALTFLAG       0x0040      // Either alt flag
-//#define K_METAFLAG  0x0080    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
-// Used internally (currently, only by KMW) to ensure Meta-key
-// shortcuts safely bypass rules
-// Meta key = Command key on macOS, Windows key on Windows
-#define CAPITALFLAG     0x0100      // Caps lock on
-#define NOTCAPITALFLAG  0x0200      // Caps lock NOT on
-#define NUMLOCKFLAG     0x0400      // Num lock on
-#define NOTNUMLOCKFLAG  0x0800      // Num lock NOT on
-#define SCROLLFLAG      0x1000      // Scroll lock on
-#define NOTSCROLLFLAG   0x2000      // Scroll lock NOT on
-#define ISVIRTUALKEY    0x4000      // It is a Virtual Key Sequence
-#define VIRTUALCHARKEY  0x8000      // Keyman 6.0: Virtual Key Cap Sequence
-#define K_MODIFIERFLAG  0x007F
-#define K_CAPITALMASK (CAPITALFLAG|NOTCAPITALFLAG)
-
-struct COMP_KEY {
-  WORD Key;  // Windows VK code or character value (VIRTUALCHARKEY, ISVIRTUALKEY)
-  DWORD Line;
-  DWORD ShiftFlags;
-  DWORD dpOutput;   // extended string
-  DWORD dpContext;  // extended string
-};
-
-#define UC_SENTINEL             0xFFFF
-#define UC_SENTINEL_EXTENDEDEND 0x10
-
-#define CODE_ANY                0x01
-#define CODE_INDEX              0x02
-#define CODE_CONTEXT            0x03
-#define CODE_NUL                0x04
-#define CODE_USE                0x05
-#define CODE_RETURN             0x06
-#define CODE_BEEP               0x07
-#define CODE_DEADKEY            0x08
-//  0x09 = bkspace.-- we don't need to keep this separate though with UC_SENTINEL
-#define CODE_EXTENDED           0x0A
-//#define CODE_EXTENDEDEND  0x0B  deprecated
-#define CODE_SWITCH             0x0C
-#define CODE_KEY                0x0D
-#define CODE_CLEARCONTEXT       0x0E
-#define CODE_CALL               0x0F
-// UC_SENTINEL_EXTENDEDEND  0x10
-#define CODE_CONTEXTEX          0x11
-#define CODE_NOTANY             0x12
-#define CODE_KEYMAN70_LASTCODE  0x12
-
-#define CODE_SETOPT             0x13
-#define CODE_IFOPT              0x14
-#define CODE_SAVEOPT            0x15
-#define CODE_RESETOPT           0x16
-#define CODE_KEYMAN80_LASTCODE  0x16
-
-/* Keyman 9.0 codes */
-#define CODE_IFSYSTEMSTORE      0x17
-#define CODE_SETSYSTEMSTORE     0x18
-#define CODE_LASTCODE           0x18
-
-/* Keyman4Mac codes */
-#define CODE_NULLCHAR           0x20
-
-
-#define NOT_EQUAL   0
-#define EQUAL       1
 
 /* KVK file format definitions */
 

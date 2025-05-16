@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 #
 
+# Needed for builder_is_ci_build check.
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+
 BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 # Compiles all build products corresponding to the specified target.
@@ -22,6 +25,8 @@ function compile() {
   if [ $# -lt 1 ]; then
     builder_die "Scripting error: insufficient argument count!"
   fi
+
+  eslint .
 
   local COMPILE_TARGET="$1"
   local SRC_DIR=${2:-"${KEYMAN_ROOT}/web/src"}
@@ -99,7 +104,7 @@ function test-headless() {
   fi
 
   TEST_OPTS=
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
   if [[ -n "$TEST_EXTENSIONS" ]]; then

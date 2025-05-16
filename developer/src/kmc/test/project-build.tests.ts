@@ -13,7 +13,7 @@ describe('BuildProject', function () {
     clearOptions();
     const builder = new BuildProject();
     const path = makePathToFixture('relative_paths', 'k_000___null_keyboard.kpj');
-    let result = await builder.build(path, null, callbacks, {
+    const result = await builder.build(path, null, callbacks, {
       shouldAddCompilerVersion: false,
       compilerWarningsAsErrors: true,
       saveDebug: false,

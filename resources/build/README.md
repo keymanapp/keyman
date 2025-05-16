@@ -12,13 +12,13 @@ including this file...
 
 ## Various tools
 
-### build-utils.sh
+### build-utils.sh, builder.inc.sh
 
-See [build-utils.md](build-utils.md)
+See [builder.md](../../docs/builder.md)
 
-### jq-win64
+### jq/jq-win64
 
-jq-win64.exe is used by various builds for json query.
+jq resp. jq-win64.exe is used by various builds for json query.
 
 Official source: <https://stedolan.github.io/jq/>.
 [License](jq-license.txt)

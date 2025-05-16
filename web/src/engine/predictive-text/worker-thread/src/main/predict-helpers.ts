@@ -1,4 +1,5 @@
 import * as models from '@keymanapp/models-templates';
+import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
@@ -231,11 +232,11 @@ export async function correctAndEnumerate(
       * Since we replace a word being corrected/predicted, we take length of the remaining
       * context's tail token in addition to however far was deleted to reach that state.
       */
-    deleteLeft = wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
+    deleteLeft = KMWString.length(wordbreak(postContext)) + inputTransform.deleteLeft;
   } else {
     // Suggestions are applied to the pre-input context, so get the token's original length.
     // We're on the same token, so just delete its text for the replacement op.
-    deleteLeft = wordbreak(context).kmwLength();
+    deleteLeft = KMWString.length(wordbreak(context));
   }
 
   // Is the token under construction newly-constructed / is there no pre-existing root?
@@ -586,7 +587,7 @@ export function processSimilarity(
 
   // Generate a full-word 'keep' replacement like other suggestions when one is not otherwise
   // produced; we want to replace the full token in the same manner used for other suggestions.
-  const basePrefixLength = truePrefix.kmwLength() - inputTransform.insert.kmwLength() + inputTransform.deleteLeft;
+  const basePrefixLength = KMWString.length(truePrefix) - KMWString.length(inputTransform.insert) + inputTransform.deleteLeft;
   const keepTransform = {
     insert: truePrefix,
     deleteLeft: basePrefixLength
