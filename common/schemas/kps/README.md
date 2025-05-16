@@ -2,6 +2,17 @@
 
 Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/kps/17.0/kps.xsd
 
+## 2025-04-25 19.0
+* Version 19.0 adds:
+  - Files/File/Source - a remote source for the file, or 'local'
+* Version 19.0 modifies:
+  - Files/File/Name - may be either a local file, relative to .kps (or absolute
+    path, not recommended) or a permanent URL on github.com
+* Version 19.0 deprecates (for later removal):
+  - Files/File/CopyLocation
+  - Files/File/Description
+  - Files/File/FileType
+
 ## 2025-04-02 18.0
 * Version 18.0 deprecates the following fields, and kmc-package does not use them (#13600):
   - Keyboards/Keyboard/Version
@@ -9,6 +20,7 @@ Master version: https://github.com/keymanapp/api.keyman.com/blob/master/schemas/
   - Keyboards/Keyboard/RTL
   - LexicalModels/LexicalModel/Name
   - LexicalModels/LexicalModel/RTL (Note: was never read or written by any Keyman tooling)
+See https://github.com/keymanapp/
 
 ## 2023-10-19 17.0
 * Version 17.0 adds:
