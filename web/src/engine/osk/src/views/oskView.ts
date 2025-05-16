@@ -522,7 +522,7 @@ export default abstract class OSKView
     // If the layer group specifies a fontsize value, we need
     // to apply that to the banner as well.
     let layerFontSizeRaw = this.vkbd?.layerGroup?.spec.fontsize;
-    if(layerFontSizeRaw == '') {
+    if(layerFontSizeRaw === '') {
       layerFontSizeRaw = "1em";
     }
     // Addresses issue with touch-layouts specifying a unitless fontsize; this
