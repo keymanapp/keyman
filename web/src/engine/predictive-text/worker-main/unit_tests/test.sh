@@ -21,7 +21,8 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   "configure" \
   "test+" \
   ":headless   Runs this module's headless user tests" \
-  ":browser    Runs this module's browser-based user tests"
+  ":browser    Runs this module's browser-based user tests" \
+  "--inspect   Runs browser-based tests in a locally-inspectable mode"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
@@ -46,17 +47,17 @@ fi
 
 if builder_start_action test:browser; then
   WTR_CONFIG=
-  WTR_DEBUG=
+  WTR_INSPECT=
 
   if builder_is_ci_build; then
     WTR_CONFIG=.CI
   fi
 
-  if builder_has_option --debug; then
-    WTR_DEBUG=" --manual"
+  if builder_has_option --inspect; then
+    WTR_INSPECT=" --manual"
   fi
 
-  web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
+  web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}
 
   builder_finish_action success test:browser
 fi
