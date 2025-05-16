@@ -20,11 +20,11 @@ export class PlatformSystemStore extends SystemStore {
   }
 
   matches(value: string) {
-    var i,constraint,constraints=value.split(' ');
-    let device = this.kbdInterface.activeDevice;
+    const constraints=value.split(' ');
+    const device = this.kbdInterface.activeDevice;
 
-    for(i=0; i<constraints.length; i++) {
-      constraint=constraints[i].toLowerCase();
+    for(let i=0; i<constraints.length; i++) {
+      let constraint=constraints[i].toLowerCase();
       switch(constraint) {
         case 'touch':
         case 'hardware':
