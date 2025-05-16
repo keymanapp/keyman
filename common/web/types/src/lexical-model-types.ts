@@ -5,18 +5,6 @@
 
 /****************************** Lexical Models ******************************/
 
-/**
- * A JavaScript string with the restriction that it must only
- * contain Unicode scalar values.
- *
- * This means that any lone high surrogate must be paired with
- * a low surrogate, if it exists. Lone surrogate code units are
- * forbidden.
- *
- * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString
- */
-export type USVString = string;
-
 export type CasingForm = 'lower' | 'initial' | 'upper';
 
 /**
@@ -74,7 +62,7 @@ export interface LexiconTraversal {
    * Note that there is no requirement for the ordering of the returned entries;
    * no sorting of any kind is required.
    */
-  children(): {char: USVString, p: number, traversal: () => LexiconTraversal}[];
+  children(): {char: string, p: number, traversal: () => LexiconTraversal}[];
 
   /**
    * Allows direct access to the traversal state that results when appending one
@@ -88,7 +76,7 @@ export interface LexiconTraversal {
    * That is, if a model "keys" `è` to `e`, there will be no `è` child.
    * @param char
    */
-  child(char: USVString): LexiconTraversal | undefined;
+  child(char: string): LexiconTraversal | undefined;
 
   /**
    * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
@@ -185,7 +173,7 @@ export interface LexicalModel {
    * @param text The original input text.
    * @returns The 'keyed' form of that text.
    */
-  toKey?(text: USVString): USVString;
+  toKey?(text: string): string;
 
   /**
    * Generates predictive suggestions corresponding to the state of context after the proposed
@@ -255,7 +243,7 @@ export interface LexicalModel {
    * @param context
    * @deprecated
    */
-  wordbreak?(context: Context): USVString;
+  wordbreak?(context: Context): string;
 
   /**
    * Lexical models _may_ provide a LexiconTraversal object usable to enhance
@@ -286,7 +274,7 @@ export interface Transform {
    *
    * Corresponds to `s` in com.keyman.KeyboardInterface.output.
    */
-  insert: USVString;
+  insert: string;
 
   /**
    * The number of code units to delete to the left of the cursor.
@@ -387,7 +375,7 @@ export interface Context {
    * buffer. If there is nothing to the left of the buffer, this is
    * an empty string.
    */
-  readonly left: USVString;
+  readonly left: string;
 
   /**
    * Up to maxRightContextCodeUnits code units of Unicode scalar value
@@ -397,7 +385,7 @@ export interface Context {
    *
    * This property may be missing entirely.
    */
-  readonly right?: USVString;
+  readonly right?: string;
 
   /**
    * Whether the insertion point is at the start of the buffer.

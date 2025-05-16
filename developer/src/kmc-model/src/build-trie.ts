@@ -28,10 +28,10 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
     throw new ModelCompilerError(ModelCompilerMessages.Error_SearchTermToKeyMustBeExplicitlySpecified());
   }
   // Make one big word list out of all of the filenames provided.
-  let wordlist: WordList = {};
+  const wordlist: WordList = {};
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
-  let trie = buildTrie(wordlist, searchTermToKey as SearchTermToKey);
+  const trie = buildTrie(wordlist, searchTermToKey as SearchTermToKey);
   return JSON.stringify(trie);
 }
 
@@ -92,15 +92,15 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
 
-  let wordsSeenInThisFile = new Set<string>();
+  const wordsSeenInThisFile = new Set<string>();
 
-  for (let [lineno, line] of source.lines()) {
+  for (const [lineno, srcLine] of source.lines()) {
     ModelCompilerMessageContext.line = lineno;
 
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
-    line = line.replace(/^\uFEFF/, '').trim();
+    const line = srcLine.replace(/^\uFEFF/, '').trim();
 
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
@@ -110,7 +110,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     let [wordform, countText] = line.split(TAB);
 
     // Clean the word form.
-    let original = wordform;
+    const original = wordform;
 
     wordform = wordform.normalize('NFC');
     if (original !== wordform) {
@@ -184,7 +184,7 @@ class WordListFromFilename {
  */
 function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
     let i = 1;
-    for (let line of lines) {
+    for (const line of lines) {
       yield [i, line];
       i++;
     }
@@ -216,7 +216,7 @@ export interface SearchTermToKey {
  * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
  */
 export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-  let collater = new TrieBuilder(keyFunction);
+  const collater = new TrieBuilder(keyFunction);
 
   buildFromWordList(collater, wordlist);
   return {
@@ -230,7 +230,7 @@ export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): obj
  * @param words a list of word and count pairs.
  */
 function buildFromWordList(trieCollator: TrieBuilder, words: WordList): TrieBuilder {
-  for (let [wordform, weight] of Object.entries(words)) {
+  for (const [wordform, weight] of Object.entries(words)) {
     trieCollator.addEntry(wordform, weight);
   }
   trieCollator.sort();

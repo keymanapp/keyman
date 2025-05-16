@@ -67,14 +67,6 @@ run_web() {
     "${builder_extra_params[@]}"
 }
 
-if [[ -z "${DISTRO_VERSION:-}" ]]; then
-  image_version=default
-  build_dir=default
-else
-  image_version="${DISTRO:-}-${DISTRO_VERSION}-java${KEYMAN_VERSION_JAVA}-node$(_print_expected_node_version)-emsdk${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
-  build_dir="${DISTRO:-}-${DISTRO_VERSION}"
-fi
-
 mkdir -p "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}"
 
 builder_run_action android  run_android

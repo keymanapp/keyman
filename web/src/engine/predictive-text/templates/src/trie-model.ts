@@ -25,8 +25,6 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-// Allows the kmwstring bindings to resolve.
-import { extendString } from "@keymanapp/web-utils";
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Configuration = LexicalModelTypes.Configuration;
@@ -36,8 +34,6 @@ import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 import { SearchKey, Wordform2Key } from "./common.js";
 import { Node, Trie } from './trie.js';
 import { TraversalModel } from './traversal-model.js';
-
-extendString();
 
 /**
  * @file trie-model.ts

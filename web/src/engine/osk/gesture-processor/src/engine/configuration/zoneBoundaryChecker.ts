@@ -62,7 +62,7 @@ export class ZoneBoundaryChecker {
       return true;
     }
 
-    let borderProximityBitmask = this.getCoordZoneBitmask(coord, config.safeBounds);
+    const borderProximityBitmask = this.getCoordZoneBitmask(coord, config.safeBounds);
 
     // If the active input sequence started close enough to a safe zone border, we
     // disable that part of the said border for any cancellation checks.

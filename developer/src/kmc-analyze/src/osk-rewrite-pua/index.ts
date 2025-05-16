@@ -40,7 +40,7 @@ export class AnalyzeOskRewritePua {
    * @returns       true if the file is successfully loaded and rewritten
    */
   public async analyze(file: string, mapping: Osk.StringResult[]): Promise<boolean> {
-    let map: Osk.PuaMap = Osk.parseMapping(mapping);
+    const map: Osk.PuaMap = Osk.parseMapping(mapping);
 
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard:
@@ -82,7 +82,7 @@ export class AnalyzeOskRewritePua {
   private async analyzeKmnKeyboard(filename: string, map: Osk.PuaMap): Promise<boolean> {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'keyboard source', name:filename}));
 
-    let osk = await getOskFromKmnFile(this.callbacks, filename);
+    const osk = await getOskFromKmnFile(this.callbacks, filename);
 
     if(osk.kvksFilename) {
       this._data[osk.kvksFilename] = this.analyzeVisualKeyboard(osk.kvksFilename, map);
@@ -110,7 +110,7 @@ export class AnalyzeOskRewritePua {
       this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
-    let invalidKeys: string[] = [];
+    const invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
     if(!vk) {
       this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e:null}));
@@ -134,7 +134,7 @@ export class AnalyzeOskRewritePua {
     const reader = new TouchLayoutFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
 
-    let dirty = Osk.remapTouchLayout(source, map);
+    const dirty = Osk.remapTouchLayout(source, map);
 
     if(!dirty) {
       return null;

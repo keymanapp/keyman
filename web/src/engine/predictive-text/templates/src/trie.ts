@@ -1,7 +1,6 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
-import USVString = LexicalModelTypes.USVString;
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.
@@ -110,7 +109,7 @@ export class TrieTraversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: USVString): LexiconTraversal | undefined {
+  child(char: string): LexiconTraversal | undefined {
     // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
       return this;
@@ -129,7 +128,7 @@ export class TrieTraversal implements LexiconTraversal {
   }
 
   // Handles one code unit at a time.
-  private _child(char: USVString): TrieTraversal | undefined {
+  private _child(char: string): TrieTraversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
@@ -159,7 +158,7 @@ export class TrieTraversal implements LexiconTraversal {
     }
   }
 
-  children(): {char: USVString, p: number, traversal: () => LexiconTraversal}[] {
+  children(): {char: string, p: number, traversal: () => LexiconTraversal}[] {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
@@ -167,7 +166,7 @@ export class TrieTraversal implements LexiconTraversal {
     // through `this.`.
     const totalWeight = this.totalWeight;
 
-    const results: {char: USVString, p: number, traversal: () => LexiconTraversal}[] = [];
+    const results: {char: string, p: number, traversal: () => LexiconTraversal}[] = [];
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
