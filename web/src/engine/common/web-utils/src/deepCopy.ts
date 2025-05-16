@@ -15,7 +15,7 @@ export default function deepCopy<T extends ({[key: string | number | symbol]: an
     // For arrays, skips over sparse entries.  Not that we use sparse arrays, but still.
     const keys = Object.keys(p);
 
-    for(let key of keys) {
+    for(const key of keys) {
       // @ts-ignore
       if(p[key] !== undefined) {
         // @ts-ignore

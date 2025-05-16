@@ -146,7 +146,7 @@ export default class DefaultRules {
       } else {
         Lch = Lkc.Lcode-64;
       }
-      let ch = String._kmwFromCharCode(Lch); //I3319
+      let ch = String.fromCodePoint(Lch);
       return ch;
     } else {
       return null;
@@ -178,9 +178,7 @@ export default class DefaultRules {
         // We'll attempt to add valid chars
         continue;
       } else {
-        // String.fromCharCode() is inadequate to handle the entire range of Unicode
-        // Someday after upgrading to ES2015, can use String.fromCodePoint()
-        result += String.kmwFromCharCode(codePointValue);
+        result += String.fromCodePoint(codePointValue);
       }
     }
     return result ? result : null;

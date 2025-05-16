@@ -96,7 +96,7 @@ describe('layr', function () {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
         LdmlCompilerMessages.Error_InvalidModifier({
-          layer: 'base',
+          id: 'base',
           modifiers: 'altR-shift'
         }),
       ],
@@ -132,7 +132,7 @@ describe('layr', function () {
     {
       subpath: 'sections/layr/error-bogus-modifiers.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ id: '', modifiers: 'caps bogus'}),
       ]
     },
     {

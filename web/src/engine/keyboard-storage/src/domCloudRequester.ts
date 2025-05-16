@@ -10,7 +10,7 @@ export default class DOMCloudRequester implements CloudRequesterInterface {
   }
 
   request<T>(query: string) {
-    let promise = new ManagedPromise<T>();
+    const promise = new ManagedPromise<T>();
 
     // Set callback timer
     const timeoutID = window.setTimeout(() => {

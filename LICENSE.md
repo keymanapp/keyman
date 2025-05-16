@@ -1,16 +1,14 @@
 # License
 
-Copyright (c) 2017-2024 SIL Global. All rights reserved.
+Copyright (c) 2017-2025 SIL Global. All rights reserved.
 
 Licensed under the MIT License.
-
-[Keyman for Linux](./linux) is licensed under the MIT License apart from [ibus-kmfl](./linux/ibus-kmfl) which is licensed under the GNU General Public License as published by the Free Software Foundation; either [version 2](./linux/ibus-kmfl/COPYING) of the License, or (at your option) any later version.
 
 ---
 
 The MIT License
 
-Copyright (c) 2017-2024 SIL Global
+Copyright (c) 2017-2025 SIL Global
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

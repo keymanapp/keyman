@@ -40,10 +40,10 @@ function build_index() {
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>Test Keyboards - $VERSION_WITH_TAG</title>
+    <title>Test Keyboards - $KEYMAN_VERSION_WITH_TAG</title>
   </head>
   <body>
-    <h1>Test Keyboards - $VERSION_WITH_TAG</h1>
+    <h1>Test Keyboards - $KEYMAN_VERSION_WITH_TAG</h1>
     <ul>
 EOF
 

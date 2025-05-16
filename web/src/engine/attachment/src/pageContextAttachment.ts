@@ -95,7 +95,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * be in order of definition within the document.
    */
   public get inputList(): readonly HTMLElement[] {
-    let embeddedInputs = this.embeddedPageContexts.map(
+    const embeddedInputs = this.embeddedPageContexts.map(
       // Gets the input list for any pages embedded via iframe
       (embeddedPage) => embeddedPage.inputList
     ).reduce(
@@ -201,7 +201,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       // The elements in the contained document get separately wrapped, so this doesn't need a proper wrapper.
       //
       // Its attachment process might need some work.
-      let eleInterface = wrapElement(x);
+      const eleInterface = wrapElement(x);
 
       // May should filter better for IFrames.
       if(!(eleInterface || nestedInstanceOf(x, "HTMLIFrameElement"))) {
@@ -288,7 +288,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       }
 
       // If not this one, perhaps a child?
-      for(let child of this.embeddedPageContexts) {
+      for(const child of this.embeddedPageContexts) {
         if(child.isAttached(x)) {
           return true;
         }
@@ -378,13 +378,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
         this.enableInputModeObserver();
       }
 
-      let cnIndex = Pelem.className.indexOf('keymanweb-font');
+      const cnIndex = Pelem.className.indexOf('keymanweb-font');
       if(cnIndex >= 0) { // See note about the alias below.
         Pelem.className = Pelem.className.replace('keymanweb-font', '').trim();
       }
 
       // Remove the element from our internal input tracking.
-      var index = this.inputList.indexOf(Pelem);
+      const index = this.inputList.indexOf(Pelem);
       if(index > -1) {
         this._inputList.splice(index, 1);
       }
@@ -504,7 +504,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
           // If already attached, do not attempt to attach again.
           if(this.embeddedPageContexts.filter((context) => context.document == Lelem).length == 0) {
             // Lelem is the IFrame's internal document; set 'er up!
-            let embeddedPageAttachment = new PageContextAttachment(Lelem, {
+            const embeddedPageAttachment = new PageContextAttachment(Lelem, {
               ...this.options,
               owner: Pelem
             });
@@ -533,7 +533,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     const detachFromDesignIframe = () => {
       this.clearElementAttachment(Pelem);
 
-      let index = this._inputList.indexOf(Pelem);
+      const index = this._inputList.indexOf(Pelem);
       if(index != -1) {
         this._inputList.splice(index, 1);
       }
@@ -586,7 +586,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Description  Attaches KMW to control (or IFrame)
    */
   attachToControl(Pelem: HTMLElement) {
-    var touchable = this.device.touchable;
+    const touchable = this.device.touchable;
 
     // Exception for IFrame elements, in case of async loading issues.  (Fixes fun iframe loading bug with Chrome.)
     if(this.isAttached(Pelem) && !(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
@@ -693,7 +693,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       console.warn("KeymanWeb is not attached to element " + Pelem);
     }
 
-    var cn = Pelem.className;
+    const cn = Pelem.className;
     if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
       Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
     }
@@ -715,8 +715,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       console.warn("KeymanWeb is not attached to element " + Pelem);
     }
 
-    var cn = Pelem.className;
-    var tagIndex = cn.indexOf('kmw-disabled');
+    const cn = Pelem.className;
+    const tagIndex = cn.indexOf('kmw-disabled');
     if(tagIndex >= 0) { // if already explicitly disabled...
       Pelem.className = cn.replace('kmw-disabled', '').trim();
     }
@@ -729,9 +729,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   // except any tagged with class 'kmw-disabled'
   // TODO: email and url types should perhaps use default keyboard only
   listInputs() {
-    let eList: SortableInput[]=[];
-    let t1=document.getElementsByTagName('input');
-    let t2=document.getElementsByTagName('textarea');
+    const eList: SortableInput[]=[];
+    const t1=document.getElementsByTagName('input');
+    const t2=document.getElementsByTagName('textarea');
 
     for(let i=0; i<t1.length; i++) {
       if (Input.isSupportedType(t1[i].type) && t1[i].className.indexOf('kmw-disabled') < 0) {
@@ -754,7 +754,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     });
 
     // Create a new list of sorted elements
-    let tList: HTMLElement[] = [];
+    const tList: HTMLElement[] = [];
     for(let i=0; i<eList.length; i++) {
       tList.push(eList[i].ip);
     }
@@ -773,7 +773,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * @param      {number|boolean}  bBack     Direction to move (0 or 1)
    */
   findNeighboringInput(activeBase: HTMLElement, bBack: number|boolean) {
-    var i,t=this.sortedInputs;
+    let i: number;
+    const t=this.sortedInputs;
 
     if(t.length == 0) {
       return null;
@@ -814,7 +815,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
     // Document.ownerDocument === null, so we better check that it's not null before proceeding.
     if(Pelem.ownerDocument && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLElement) {
-      let dv = Pelem.ownerDocument.defaultView;
+      const dv = Pelem.ownerDocument.defaultView;
 
       if(Pelem instanceof dv.HTMLInputElement || Pelem instanceof dv.HTMLTextAreaElement) {
         possibleInputs.push(Pelem);
@@ -832,7 +833,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
        * @return      {Array<Element>}  array of elements of specified type
        * Description  Local function to get list of editable controls
        */
-      var LiTmp = function(_colon: string): HTMLElement[] {
+      const LiTmp = function(_colon: string): HTMLElement[] {
         return arrayFromNodeList(Pelem.getElementsByTagName(_colon));
       };
 
@@ -859,9 +860,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Description  Used to automatically attach KMW to editable controls, regardless of control path.
    */
   private _SetupDocument(Pelem: HTMLElement) { // I1961
-    let possibleInputs = this._GetDocumentEditables(Pelem);
+    const possibleInputs = this._GetDocumentEditables(Pelem);
 
-    for(var Li = 0; Li < possibleInputs.length; Li++) {
+    for(let Li = 0; Li < possibleInputs.length; Li++) {
       // It knows how to handle pre-loaded iframes appropriately.
       this.attachToControl(possibleInputs[Li]);
     }
@@ -875,9 +876,9 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *              Mostly used to clear out all controls of a detached IFrame.
    */
   private _ClearDocument(Pelem: HTMLElement) { // I1961
-    let possibleInputs = this._GetDocumentEditables(Pelem);
+    const possibleInputs = this._GetDocumentEditables(Pelem);
 
-    for(var Li = 0; Li < possibleInputs.length; Li++) {
+    for(let Li = 0; Li < possibleInputs.length; Li++) {
       // It knows how to handle pre-loaded iframes appropriately.
       this.detachFromControl(possibleInputs[Li]);
     }
@@ -885,12 +886,12 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
 
   _EnablementMutationObserverCore = (mutations: MutationRecord[]) => {
-    for(var i=0; i < mutations.length; i++) {
-      var mutation = mutations[i];
+    for(let i=0; i < mutations.length; i++) {
+      const mutation = mutations[i];
 
       // ( ? : ) needed as a null check.
-      var disabledBefore = mutation.oldValue ? mutation.oldValue.indexOf('kmw-disabled') >= 0 : false;
-      var disabledAfter = (mutation.target as HTMLElement).className.indexOf('kmw-disabled') >= 0;
+      const disabledBefore = mutation.oldValue ? mutation.oldValue.indexOf('kmw-disabled') >= 0 : false;
+      const disabledAfter = (mutation.target as HTMLElement).className.indexOf('kmw-disabled') >= 0;
 
       if(disabledBefore && !disabledAfter) {
         this._EnableControl(mutation.target as HTMLElement);
@@ -900,12 +901,12 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
       // 'readonly' triggers on whether or not the attribute exists, not its value.
       if(!disabledAfter && mutation.attributeName == "readonly") {
-        var readonlyBefore = mutation.oldValue ? mutation.oldValue != null : false;
-        var elem = mutation.target;
+        const readonlyBefore = mutation.oldValue ? mutation.oldValue != null : false;
+        const elem = mutation.target;
 
         if(elem instanceof elem.ownerDocument.defaultView.HTMLInputElement
             || elem instanceof elem.ownerDocument.defaultView.HTMLTextAreaElement) {
-          var readonlyAfter = elem.readOnly;
+          const readonlyAfter = elem.readOnly;
 
           if(readonlyBefore && !readonlyAfter) {
             this._EnableControl(mutation.target as HTMLElement);
@@ -918,28 +919,28 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   };
 
   _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
-    var inputElementAdditions: HTMLElement[] = [];
-    var inputElementRemovals: HTMLElement[] = [];
+    let inputElementAdditions: HTMLElement[] = [];
+    let inputElementRemovals: HTMLElement[] = [];
 
-    for(var i=0; i < mutations.length; i++) {
-      let mutation = mutations[i];
+    for(let i=0; i < mutations.length; i++) {
+      const mutation = mutations[i];
 
-      for(var j=0; j < mutation.addedNodes.length; j++) {
+      for(let j=0; j < mutation.addedNodes.length; j++) {
         inputElementAdditions = inputElementAdditions.concat(this._GetDocumentEditables(mutation.addedNodes[j] as HTMLElement));
       }
 
-      for(j = 0; j < mutation.removedNodes.length; j++) {
+      for(let j = 0; j < mutation.removedNodes.length; j++) {
         inputElementRemovals = inputElementRemovals.concat(this._GetDocumentEditables(mutation.removedNodes[j] as HTMLElement));
       }
     }
 
-    for(var k = 0; k < inputElementAdditions.length; k++) {
+    for(let k = 0; k < inputElementAdditions.length; k++) {
       if(this.isKMWInput(inputElementAdditions[k])) { // Apply standard element filtering!
         this._MutationAdditionObserved(inputElementAdditions[k]);
       }
     }
 
-    for(k = 0; k < inputElementRemovals.length; k++) {
+    for(let k = 0; k < inputElementRemovals.length; k++) {
       let matched = false;
       const elem = inputElementRemovals[k];
 
@@ -1041,7 +1042,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   // To be called by the object responsible for webpage-integration.
   initMutationObservers(document: Document, manualAttach: boolean) {
     if(typeof MutationObserver == 'function') {
-      var observationTarget = document.querySelector('body'), observationConfig: MutationObserverInit;
+      const observationTarget = document.querySelector('body');
+      let observationConfig: MutationObserverInit;
       if(!manualAttach) { //I1961
         observationConfig = { childList: true, subtree: true};
         this.attachmentObserver = new MutationObserver(this._AutoAttachObserverCore);
@@ -1080,9 +1082,10 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *  @return   {string}
    */
   getBaseFont() {
-    var ipInput = document.getElementsByTagName<'input'>('input'),
-        ipTextArea=document.getElementsByTagName<'textarea'>('textarea'),
-        n=0,fs,fsDefault='Arial,sans-serif';
+    const ipInput    = document.getElementsByTagName('input');
+    const ipTextArea = document.getElementsByTagName('textarea');
+    let n=0, fs: string;
+    const fsDefault='Arial,sans-serif';
 
     // Find the first input element (if it exists)
     if(ipInput.length == 0 && ipTextArea.length == 0) {
@@ -1092,8 +1095,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     } else if(ipInput.length == 0 && ipTextArea.length > 0) {
       n=2;
     } else {
-      var firstInput = ipInput[0];
-      var firstTextArea = ipTextArea[0];
+      const firstInput = ipInput[0];
+      const firstTextArea = ipTextArea[0];
 
       if(firstInput.offsetTop < firstTextArea.offsetTop) {
         n=1;
@@ -1133,7 +1136,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *
    **/
   buildAttachmentFontStyle(keyboardFontDescriptor: InternalKeyboardFont): string {
-    let kfd = keyboardFontDescriptor;
+    const kfd = keyboardFontDescriptor;
 
     // Get name of font to be applied
     let fontName = this.baseFont;
@@ -1146,7 +1149,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
     // Set font family chain for mapped elements and remove any double quotes
     // font-family:  maintains the base font as a fallback.
-    var rx = new RegExp('\\s?' + fontName + ',?'), fontFamily = this.appliedFont.replace(/\u0022/g, '');
+    const rx = new RegExp('\\s?' + fontName + ',?');
+    let fontFamily = this.appliedFont.replace(/\u0022/g, '');
 
     // Remove base font name from chain if present
     fontFamily = fontFamily.replace(rx, '');
@@ -1163,7 +1167,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     fontFamily = '"' + fontFamily.replace(/\,\s?/g, '","') + '"';
 
     // Add to the stylesheet, quoted, and with !important to override any explicit style
-    let s = '.keymanweb-font{\nfont-family:' + fontFamily + ' !important;\n}\n';
+    const s = '.keymanweb-font{\nfont-family:' + fontFamily + ' !important;\n}\n';
 
     // Store the current font chain (with quote-delimited font names)
     this.appliedFont = fontFamily;
@@ -1210,7 +1214,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
         } catch (e) {}
       });
 
-      for(let input of this.inputList) {
+      for(const input of this.inputList) {
         try {
           this.detachFromControl(input);
         } catch(e) {

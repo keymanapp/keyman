@@ -88,7 +88,7 @@ if(!keymanweb) {
        */
       readonly toggleOSK = () => {
         keymanweb.activatingUI(true);
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
         if(osk && osk.show) {
           if(osk.isEnabled()) {
             osk.hide();
@@ -133,7 +133,7 @@ if(!keymanweb) {
         this.outerDiv.innerHTML = "<a href='http://keyman.com/web/' target='KeymanWebHelp'>"
           + "<img src='"+imgPath+"kmicon.gif' border='0' style='padding: 0px 2px 0 1px; margin:0px;' title='KeymanWeb' alt='KeymanWeb' /></a>"; /* I2081 */
 
-        var s=this.outerDiv.style;
+        let s=this.outerDiv.style;
         s.backgroundColor='white'; s.border='solid 1px black'; s.position='absolute'; s.height='18px';
         s.font='bold 8pt sans-serif'; s.display='none'; s.textAlign='left';s.overflow='hidden';
 
@@ -150,7 +150,7 @@ if(!keymanweb) {
         // Set initial OSK button style (off by default)
         this.oskButtonState(false);
 
-        var Lhdiv = util.createElement('div');
+        const Lhdiv = util.createElement('div');
         this.oskButton = Lhdiv;
         Lhdiv.onclick = this.toggleOSK;
         Lhdiv.appendChild(this.kbdIcon);
@@ -177,7 +177,8 @@ if(!keymanweb) {
         this.innerDiv.appendChild(this.KeyboardSelector);  //this may need to be moved up....
 
         // Check required interface alignment and default keyboard
-        var opt=util.getOption('ui'), dfltKeyboard='(System keyboard)';
+        const opt=util.getOption('ui');
+        let dfltKeyboard='(System keyboard)';
         if(opt && typeof(opt) == 'object') {
           if(typeof(opt['position']) == 'string' && opt['position'] == 'right') {
             this.floatRight = true;
@@ -186,7 +187,7 @@ if(!keymanweb) {
           }
         }
 
-        var Lopt = util.createElement('option');
+        let Lopt = util.createElement('option');
         Lopt.value = '-';
         Lopt.innerHTML = dfltKeyboard;
         this.KeyboardSelector.appendChild(Lopt);
@@ -209,7 +210,7 @@ if(!keymanweb) {
        * UI removal - resource cleanup
        */
       shutdown() {
-        var root = this.outerDiv;
+        const root = this.outerDiv;
         if(root) {
           root.parentNode.removeChild(root);
         }
@@ -238,14 +239,14 @@ if(!keymanweb) {
           }
 
           // Loop over installed keyboards and add to selection list
-          var Lkbds=keymanweb.getKeyboards();
+          const Lkbds=keymanweb.getKeyboards();
 
           for(let Ln=0; Ln<Lkbds.length; Ln++) {
             let Lopt = util.createElement('option');
             Lopt.value = Lkbds[Ln].InternalName+':'+Lkbds[Ln].LanguageCode;
             Lopt.innerHTML = Lkbds[Ln].Name.replace(/\s?keyboard/i,'');
             if(Lkbds[Ln].LanguageName) {
-              var lg=Lkbds[Ln].LanguageName;
+              let lg=Lkbds[Ln].LanguageName;
               // Only show the main language name if variants indicated (this is tentative)
               // e.g. Chinese rather than Chinese, Mandarin, which is in the keyboard name
               lg = lg.split(',')[0];
@@ -284,14 +285,14 @@ if(!keymanweb) {
        *              is listed more than once for different language codes
        */
       readonly updateMenu = (kbd: string, lg: string) => {
-        var i=0;
+        let i=0;
 
         // This can be called during startup before fully initialized - ignore if so
         if(!this.initialized) {
           return;
         }
 
-        var match = kbd;
+        let match = kbd;
         if(lg != '') {
           match += ':' + lg;
         }
@@ -321,7 +322,7 @@ if(!keymanweb) {
        * Description  Update kbd icon border style to indicate whether OSK is enabled for display or not
        **/
       readonly oskButtonState = (oskEnabled: boolean) => {
-        var s = this.kbdIcon.style;
+        const s = this.kbdIcon.style;
         s.width='24px';
         s.height='13px';
         s.top='1px';
@@ -383,7 +384,7 @@ if(!keymanweb) {
           this.addButtonOSK();
         });
 
-        let osk = keymanweb.osk;
+        const osk = keymanweb.osk;
         if(!osk) {
           return;
         }
@@ -453,8 +454,8 @@ if(!keymanweb) {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {
-          var i=this.KeyboardSelector.selectedIndex;
-          var t=this.KeyboardSelector.options[i].value.split(':');
+          const i=this.KeyboardSelector.selectedIndex;
+          const t=this.KeyboardSelector.options[i].value.split(':');
           keymanweb.setActiveKeyboard(t[0],t[1]);
         } else {
           keymanweb.setActiveKeyboard('');
@@ -489,7 +490,7 @@ if(!keymanweb) {
       readonly ShowInterface = (Px?: number, Py?: number) => {
         if(!this.initialized) return;
 
-        var Ls = this.outerDiv.style;
+        const Ls = this.outerDiv.style;
 
         if(Px  &&  Py) {
           Ls.left = Px + 'px';
@@ -531,7 +532,7 @@ if(!keymanweb) {
             this.outerDiv.style.width = this.KeyboardSelector.offsetWidth+30+'px';
           } else {
             this.oskButton.style.display = 'block';
-            let osk = keymanweb.osk;
+            const osk = keymanweb.osk;
             if(osk) {
               this.oskButtonState(osk.isEnabled());
             } else {
@@ -551,7 +552,7 @@ if(!keymanweb) {
        */
       readonly _Resize = (e: Event) => {
         if(this.outerDiv.style.display =='block') {
-          var elem = keymanweb.getLastActiveElement();
+          const elem = keymanweb.getLastActiveElement();
           if(this.floatRight) {  // I1296
             this.ShowInterface(util.getAbsoluteX(elem) + elem.offsetWidth + 1, util.getAbsoluteY(elem) + 1);
           } else {

@@ -1,6 +1,5 @@
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
-import USVString = LexicalModelTypes.USVString;
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
 import { decompressNode, inflateChild } from "./trie-compression.js";
 
@@ -115,7 +114,7 @@ export class TrieTraversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: USVString): LexiconTraversal | undefined {
+  child(char: string): LexiconTraversal | undefined {
     // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
       return this;
@@ -134,7 +133,7 @@ export class TrieTraversal implements LexiconTraversal {
   }
 
   // Handles one code unit at a time.
-  private _child(char: USVString): TrieTraversal | undefined {
+  private _child(char: string): TrieTraversal | undefined {
     const root = this.root;
     const nextPrefix = this.prefix + char;
 
@@ -164,7 +163,7 @@ export class TrieTraversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
+  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
     const root = this.root;
 
     // Sorts _just_ the current level, and only if needed.

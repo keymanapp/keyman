@@ -1,5 +1,5 @@
 project('ibus-keyman', 'c', 'cpp',
-        version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
+        version: files('../../VERSION.md'),
         license: 'GPL-2+',
         meson_version: '>=1.0')
 
@@ -18,7 +18,7 @@ conf = configuration_data()
 ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')
 gtk =            dependency('gtk+-3.0',             version: '>= 2.4')
 json_glib =      dependency('json-glib-1.0',        version: '>= 1.0')
-icu =            dependency('icu-i18n')
+icu =            [dependency('icu-i18n'), dependency('icu-uc')]
 
 systemd  =       dependency('libsystemd', 'libelogind', required: false)
 if systemd.found()
@@ -42,11 +42,6 @@ if get_option('keyman_deb_pkg_build')
 endif
 
 env = find_program('env')
-
-# Check if we have patched ibus (https://github.com/ibus/ibus/pull/2440)
-if c_compiler.has_header_symbol('ibus.h', 'IBUS_CAP_PREFILTER', dependencies: [ibus], required: false)
-  conf.set('IBUS_HAS_PREFILTER', 1)
-endif
 
 conf.set('HAVE_CONFIG_H', 1)
 configure_file(output : 'config.h',
