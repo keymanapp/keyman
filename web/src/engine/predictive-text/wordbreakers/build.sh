@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
 
@@ -19,8 +20,7 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci"
+  "test"
 
 builder_describe_outputs \
   configure          src/main/default/data.inc.ts \
@@ -48,7 +48,7 @@ function do_build() {
 function do_test() {
   local FLAGS=
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     FLAGS="-reporter mocha-teamcity-reporter"
   fi
 

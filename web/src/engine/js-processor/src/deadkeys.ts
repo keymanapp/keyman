@@ -14,7 +14,7 @@ export class Deadkey {
   }
 
   match(p: number, d: number): boolean {
-    var result:boolean = (this.p == p && this.d == d);
+    const result:boolean = (this.p == p && this.d == d);
 
     return result;
   }
@@ -32,7 +32,7 @@ export class Deadkey {
   }
 
   clone(): Deadkey {
-    let dk = new Deadkey(this.p, this.d);
+    const dk = new Deadkey(this.p, this.d);
     dk.o = this.o;
 
     return dk;
@@ -65,8 +65,8 @@ export class DeadkeyTracker {
   }
 
   clone(): DeadkeyTracker {
-    let dkt = new DeadkeyTracker();
-    let dks = this.toSortedArray();
+    const dkt = new DeadkeyTracker();
+    const dks = this.toSortedArray();
 
     // Make sure to clone the deadkeys themselves - the Deadkey object is mutable.
     dkt.dks = [];
@@ -91,9 +91,9 @@ export class DeadkeyTracker {
       return false; // I3318
     }
 
-    var sp=caretPos;
+    const sp=caretPos;
     n = sp - n;
-    for(var i = 0; i < this.dks.length; i++) {
+    for(let i = 0; i < this.dks.length; i++) {
       // Don't re-match an already-matched deadkey.  It's possible to have two identical
       // entries, and they should be kept separately.
       if(this.dks[i].match(n, d) && !this.dks[i].matched) {
@@ -114,7 +114,7 @@ export class DeadkeyTracker {
   }
 
   remove(dk: Deadkey) {
-    var index = this.dks.indexOf(dk);
+    const index = this.dks.indexOf(dk);
     this.dks.splice(index, 1);
   }
 
@@ -123,13 +123,13 @@ export class DeadkeyTracker {
   }
 
   resetMatched() {
-    for(let dk of this.dks) {
+    for(const dk of this.dks) {
       dk.reset();
     }
   }
 
   deleteMatched(): void {
-    for(var Li = 0; Li < this.dks.length; Li++) {
+    for(let Li = 0; Li < this.dks.length; Li++) {
       if(this.dks[Li].matched) {
         this.dks.splice(Li--, 1); // Don't forget to decrement!
       }
@@ -148,7 +148,7 @@ export class DeadkeyTracker {
       return;
     }
 
-    for(let dk of this.dks) {
+    for(const dk of this.dks) {
       if(dk.p > Lstart) {
         dk.p += Ldelta;
       }
@@ -163,7 +163,7 @@ export class DeadkeyTracker {
     const otherDks = other.dks;
     const matchedDks: Deadkey[] = [];
 
-    for(let dk of this.dks) {
+    for(const dk of this.dks) {
       const match = otherDks.find((otherDk) => dk.equal(otherDk));
       if(!match) {
         return false;

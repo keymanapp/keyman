@@ -39,7 +39,7 @@ export class ListItem extends Array<ListIndex> implements OrderedStringList {
       return a;
     }
     for (const str of source) {
-        let index = new ListIndex(sections.strs.allocString(str, opts, sections));
+        const index = new ListIndex(sections.strs.allocString(str, opts, sections));
         a.push(index);
     }
     return a;

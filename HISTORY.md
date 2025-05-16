@@ -1,5 +1,107 @@
 # Keyman Version History
 
+## 19.0.37 alpha 2025-05-14
+
+* maint(linux): remove generated file that got accidentally committed (#13902)
+* maint(linux): remove check for patched ibus from `meson.build` (#13909)
+* maint(common): report builder errors to stderr (#13882)
+
+## 19.0.36 alpha 2025-05-13
+
+* feat(developer): line numbers for XML parsing and kmc-ldml (#13375)
+* maint(android): Update to Java 21 and Gradle dependencies (#13858)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#13890)
+* fix(linux): fallback to `VERSION` if `KEYMAN_VERSION` isn't set during package build (#13891)
+* maint(common): move and document `builder_is_ci_*` functions (#13892)
+* maint(android): use new variable name `KEYMAN_TIER` (#13898)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13876)
+
+## 19.0.35 alpha 2025-05-12
+
+* maint(common): add two more functions to detect if running on CI (#13869)
+* maint(common): use unique names for Keyman version variables (#13854)
+* maint(common): use new `builder_is_running_on_*` functions (#13875)
+* maint(common): remove obsolete code from docker-images `run.sh` (#13879)
+* chore(mac): remove obsolete key processing code (#13848)
+
+## 19.0.34 alpha 2025-05-08
+
+* docs(common): update `builder_echo` documentation for TC blocks (#13855)
+* fix(windows): add breadcrumb to download failures (#13826)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13860)
+* maint(common): remove obsolete code from docker-images `build.sh` (#13861)
+* maint(common): output start/end messages if not running on TC (#13868)
+
+## 19.0.33 alpha 2025-05-07
+
+* maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
+* docs(web): add a Web engine keystroke lifecycle internal doc (#13759)
+* maint(common): use function to detect if running on TC (#13844)
+* docs(common): document new `builder_is_running_on_teamcity` function (#13852)
+
+## 19.0.32 alpha 2025-05-06
+
+* change(web): replace USVString with string in predictive-text engine (#13785)
+* chore(web): replace --ci flag with builder_is_ci_build (#13819)
+* maint(web): simplify worker-main test.sh (#13820)
+* change(web): lint kmwstring web-utility (#13800)
+* fix(web): fix extraction of gesture-engine fixture used in DOM-based unit tests (#13805)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13774)
+* fix(web): fix var declaration affected by linter strictness + length-style fix (#13839)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13840)
+* chore(common): override check when running on TC (#13779)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13842)
+* maint(common): add support for TC blocks (#13810)
+
+## 19.0.31 alpha 2025-05-05
+
+* fix(mac): add version metadata after building tests (#13818)
+* maint(common): remove `eslint:recommended` configuration for .ts (#13825)
+* maint(common): Update write_download_info() to be cross-platform (#13813)
+* change(ios): limit reports about devices without predefined scaling entries (#13806)
+* change(web): lint engine/common/web-utils (#13797)
+* chore(web): replace kmwFromCharCode with its ES6 equivalent (#13716)
+* chore(web): add unit tests for SMP-aware string-handling helper methods (#13719)
+* refactor(web): refactor string-helper library to eliminate its module side-effect (#13726)
+
+## 19.0.30 alpha 2025-05-02
+
+* chore(android): Use `builder_is_ci_build` rather than `--ci` flag (#13772)
+* docs: add `--deps` flags and move builder.md into /docs (#13815)
+* chore(web): improve clean actions (#13804)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13773)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13807)
+* maint(core): batch build kmx in tests for performance (#13795)
+* maint(common): cleanup meson versioning (#13796)
+* maint(common): test imported resource versions (#13803)
+
+## 19.0.29 alpha 2025-04-30
+
+* change(web): enable linting for Keyman Engine for Web modules (#13787)
+* fix(web): reconnect unit tests for low-level web utility classes/methods (#13714)
+* fix(android): Change Alert Dialog instead of Toast if package missing languages (#13786)
+* maint(common): remove platform advocates from CODEOWNERS (#13801)
+* chore(common): allow to run tests in virtual environment (#13793)
+* chore: increase linter strictness (#13788)
+
+## 19.0.28 alpha 2025-04-29
+
+* chore(common): Update dependencies in crowdin GitHub action (#13775)
+* chore: additional tweaks to scopes/labels (#13765)
+* chore(common): rename `chore` GH label to `maint` (#13780)
+* change(linux): add link to issue (#13778)
+
+## 19.0.27 alpha 2025-04-28
+
+* chore: update labels for v19 (#13744)
+
+## 19.0.26 alpha 2025-04-24
+
+* chore: merge beta version 18.0.235 history to master (#13735)
+* chore(linux): Update debian changelog (#13738)
+* chore: comment out CODEOWNERS (#13739)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13740)
+
 ## 19.0.25 alpha 2025-04-22
 
 * chore: merge beta to master (pre-release prep) (#13730)
@@ -112,6 +214,23 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.236 stable 2025-05-12
+
+* chore(linux): Update debian changelog (#13737)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13741)
+* fix(android): Use Alert Dialog if keyboard pkg missing languages (#13802)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13808)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13817)
+* change(ios): limit reports about devices without predefined scaling entries (#13828)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13841)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13838)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13843)
+* fix(mac): add version metadata after building tests (#13853)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13863)
+* fix(developer): remove ngrok binary at build time (#13873)
+* maint(common): apply new codeowners from master (#13874)
+* chore(mac,windows): Update Crowdin strings for Italian (#13872)
 
 ## 18.0.234 beta 2025-04-22
 

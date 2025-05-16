@@ -137,8 +137,16 @@ write_download_info() {
 
   FILE_EXTENSION="${BASE_FILE##*.}"
 
-  FILE_SIZE=$(/usr/bin/stat -f"%z" "${BASE_PATH}/${BASE_FILE}")
-  MD5_HASH=$(md5 -q "${BASE_PATH}/${BASE_FILE}")
+  # stat flags to get filesize in bytes
+  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
+    # /usr/bin/stat on mac is BSD
+    STAT_FLAGS="-f%z"
+  else
+    # GNU (coreutils)
+    STAT_FLAGS="-c%s"
+  fi
+  FILE_SIZE=$(stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
+  MD5_HASH=$(md5sum "${BASE_PATH}/${BASE_FILE}" | cut -d" " -f 1 -) # hash is the first element returned
 
   if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
     builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
@@ -162,19 +170,19 @@ write_download_info() {
 set_version ( ) {
   PRODUCT_PATH=$1
 
-  if [ $VERSION ]; then
+  if [ $KEYMAN_VERSION ]; then
     if [ $2 ]; then  # $2 = product name.
-      echo "Setting version numbers in $2 to $VERSION."
+      echo "Setting version numbers in $2 to $KEYMAN_VERSION."
     fi
-    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $VERSION" "$PRODUCT_PATH/Info.plist"
-    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $VERSION" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $KEYMAN_VERSION" "$PRODUCT_PATH/Info.plist"
+    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KEYMAN_VERSION" "$PRODUCT_PATH/Info.plist"
   fi
 }
 
 
 # Uses npm to set the current package version (package.json).
 #
-# This sets the version according to the current VERSION_WITH_TAG.
+# This sets the version according to the current KEYMAN_VERSION_WITH_TAG.
 #
 # Usage:
 #
@@ -186,7 +194,7 @@ set_npm_version () {
   # release of Keyman Developer -- these two versions should be in sync. Because this
   # is a large repo with multiple projects and build systems, it's better for us that
   # individual build systems don't take too much ownership of git tagging. :)
-  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
+  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$KEYMAN_VERSION_WITH_TAG"
 }
 
 #
@@ -257,7 +265,7 @@ verify_npm_setup() {
   # If we are on CI environment, automatically select a node version with nvm
   # Also, a developer can set KEYMAN_USE_NVM variable to get this behaviour
   # automatically too (see /docs/build/node.md)
-  if [[ "$VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_NVM+x}" ]]; then
+  if [[ "$KEYMAN_VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_NVM+x}" ]]; then
     _select_node_version_with_nvm
   fi
 
@@ -329,7 +337,7 @@ check-markdown() {
 builder_do_typescript_tests() {
   local MOCHA_FLAGS=
 
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+  if builder_is_running_on_teamcity; then
     # we're running in TeamCity
     MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
   fi

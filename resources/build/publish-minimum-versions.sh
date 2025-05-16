@@ -12,6 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/minimum-versions.tests.inc.sh"
 
 builder_describe "Build and test minimum-versions" \
   clean build test
@@ -30,7 +31,17 @@ generate_table() {
   # echo "${strarr[@]}"
 
   for n in ${!strarr[@]}; do
-    echo "| ${strarr[n]} | ${!strarr[n]} |"
+    case "${strarr[n]}" in
+    KEYMAN_VERSION | KEYMAN_VERSION_MAJOR | KEYMAN_VERSION_MINOR | \
+    KEYMAN_VERSION_PATCH | KEYMAN_VERSION_RELEASE | KEYMAN_VERSION_WIN | \
+    KEYMAN_VERSION_TAG | KEYMAN_VERSION_WITH_TAG | \
+    KEYMAN_VERSION_ENVIRONMENT | KEYMAN_VERSION_GIT_TAG)
+      # ignore the variables that contain the Keyman version
+      ;;
+    *)
+      echo "| ${strarr[n]} | ${!strarr[n]} |"
+      ;;
+    esac
   done
 
   echo ""
@@ -53,16 +64,10 @@ do_test() {
     builder_die "minimum-versions.md is not up to date. Please run 'publish-minimum-versions.sh build'"
   )
 
-  rm  "$new_table"
+  rm "$new_table"
 
-  # TODO: this should have a test for each of the known machine-extractable versions.
-
-  # language-subtag-registry
-
-  local NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY="$(head ../standards-data/language-subtag-registry/language-subtag-registry -n 1 | cut -d" " -f 2 -)"
-  if [[ "$NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY" != "$KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY" ]]; then
-    builder_die "language-subtag-registry is version '$NEW_KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY' but minimum-version.inc.sh has version '$KEYMAN_VERSION_LANGUAGE_SUBTAG_REGISTRY'"
-  fi
+  # From minimum-versions.tests.inc.sh
+  minver_test_all
 }
 
 builder_run_action clean rm -f "$KEYMAN_ROOT/docs/minimum-versions.md"

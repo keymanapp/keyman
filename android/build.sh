@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
 
@@ -36,7 +37,7 @@ builder_describe \
   build \
   test \
   "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
-  --ci+ \
+  "--ci+                                    Deprecated build option. Remove in 20.0" \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
