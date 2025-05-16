@@ -206,6 +206,29 @@ export function describeCodepoint(ch : number) : string {
   return `${s} (U+${Number(ch).toString(16).toUpperCase()})`;
 }
 
+/**
+ * @brief  function to convert a numeric character reference to a unicode codepoint e.g. &#x63 -> U+0063;  &#1111553 -> U+10F601
+ * @param  instr the value that will converted
+ * @return a unicode codepoint if instr is a numeric character reference
+ *         instr if instr is not a numeric character reference
+ */
+export function convertToUnicodeCodePoint(instr: string): string {
+
+  if (instr.substring(0, 3) === "&#x") {
+    const num_length = instr.length - instr.indexOf("x") - 1;
+    const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
+    return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
+  }
+
+  // if not hex: convert to hex
+  if ((instr.substring(0, 2) === "&#")) {
+    const num_length = instr.length - instr.indexOf("#") - 1;
+    const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
+    return "U+" + Number(num_str.slice(-num_length)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
+  }
+  else
+    return instr;
+}
 
 export enum BadStringType {
   pua = 'PUA',
