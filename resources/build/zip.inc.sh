@@ -47,6 +47,7 @@ function zip_files() {
   done
 
   COMPRESS_CMD=zip
+  SEVENZ_CMD=
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
@@ -61,11 +62,12 @@ function zip_files() {
 
       # 7z command
       COMPRESS_CMD="${SEVENZ}"
+      SEVENZ_CMD="a"
     fi
   fi
 
   # Create archive
-  builder_echo_debug "${COMPRESS_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}"
-  "${COMPRESS_CMD}" ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}
+  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}"
+  "${COMPRESS_CMD}" ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}
 
 }
