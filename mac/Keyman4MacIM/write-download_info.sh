@@ -39,7 +39,7 @@ popd  > /dev/null
 DEST_DIR="$KEYMAN_MACIM_BASE_PATH/output/upload"
 ADD_VERSION_TO_DEST_DIR=true
 
-KM_BLD_COUNTER="$((${VERSION##*.}))"
+KM_BLD_COUNTER="$((${KEYMAN_VERSION##*.}))"
 
 # Parse args
 shopt -s nocasematch
@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 if $ADD_VERSION_TO_DEST_DIR ; then
-    DEST_DIR="$DEST_DIR/$VERSION"
+    DEST_DIR="$DEST_DIR/$KEYMAN_VERSION"
 fi
 if [[ ! -e $DEST_DIR ]]; then
 	mkdir -p $DEST_DIR
@@ -75,7 +75,7 @@ elif [[ ! -d $DEST_DIR ]]; then
 	builder_die "Destination dir exists but is not a directory: $2"
 fi
 
-DMG_FILENAME="keyman-$VERSION.dmg"
+DMG_FILENAME="keyman-$KEYMAN_VERSION.dmg"
 DMG_FILEPATH="$DEST_DIR/$DMG_FILENAME"
 DOWNLOAD_INFO_FILEPATH="${DMG_FILEPATH}.download_info"
 if [[ ! -f "$DMG_FILEPATH" ]]; then
@@ -90,10 +90,10 @@ fi
 
 echo { > "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"name\": \"Keyman4MacIM\"," >> "$DOWNLOAD_INFO_FILEPATH"
-echo "  \"version\": \"${VERSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
+echo "  \"version\": \"${KEYMAN_VERSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"date\": \"$(date "+%Y-%m-%d")\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"platform\": \"mac\"," >> "$DOWNLOAD_INFO_FILEPATH"
-echo "  \"stability\": \"${TIER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
+echo "  \"stability\": \"${KEYMAN_TIER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"file\": \"${DMG_FILENAME}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"md5\": \"${DMG_MD5}\"," >> "$DOWNLOAD_INFO_FILEPATH"
 echo "  \"type\": \"dmg\"," >> "$DOWNLOAD_INFO_FILEPATH"

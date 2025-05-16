@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
 
@@ -22,8 +23,7 @@ builder_describe "Build KMSample1 app for Android." \
   "configure" \
   "build" \
   "test" \
-  ":app                   KMSample1" \
-  "--ci                   Don't start the Gradle daemon. Use for CI"
+  ":app                   KMSample1" 
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -46,7 +46,7 @@ builder_describe_outputs \
 
 # Parse args
 
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   SAMPLE_FLAGS="$SAMPLE_FLAGS -no-daemon"
 fi
 

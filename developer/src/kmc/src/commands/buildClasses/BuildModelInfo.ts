@@ -52,7 +52,7 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    let kmpCompiler = new KmpCompiler();
+    const kmpCompiler = new KmpCompiler();
     if(!await kmpCompiler.init(callbacks, options)) {
       // Errors will have been emitted by KmpCompiler
       return false;

@@ -217,7 +217,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
   }
 
   private copyWasmResult(wasm_result: any): KmnCompilerResult {
-    let result: KmnCompilerResult = {
+    const result: KmnCompilerResult = {
       // We cannot Object.assign or {...} on a wasm-defined object, so...
       artifacts: {},
       extra: {
@@ -229,10 +229,10 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       },
       displayMap: null
     };
-    for(let store of wasm_result.extra.stores) {
+    for(const store of wasm_result.extra.stores) {
       result.extra.stores.push({storeType: store.storeType, name: store.name, line: store.line});
     }
-    for(let group of wasm_result.extra.groups) {
+    for(const group of wasm_result.extra.groups) {
       result.extra.groups.push({isReadOnly: group.isReadOnly, name: group.name});
     }
 
@@ -314,7 +314,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       }
     });
 
-    let wasm_options = new Module.CompilerOptions();
+    const wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
     try {
       wasm_options.saveDebug = options.saveDebug;
@@ -454,9 +454,9 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
         this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
         return null;
       }
-      let invalidVkeys: string[] = [];
+      const invalidVkeys: string[] = [];
       vk = reader.transform(kvks, invalidVkeys);
-      for(let invalidVkey of invalidVkeys) {
+      for(const invalidVkey of invalidVkeys) {
         this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
       }
     }
@@ -470,7 +470,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       Osk.remapVisualKeyboard(vk, displayMap);
     }
 
-    let writer = new KvkFileWriter();
+    const writer = new KvkFileWriter();
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
         basename + KeymanFileTypes.Binary.VisualKeyboard),

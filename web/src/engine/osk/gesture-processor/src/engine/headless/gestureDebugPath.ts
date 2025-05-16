@@ -63,7 +63,7 @@ export class GestureDebugPath<Type, StateToken = any> extends GesturePath<Type, 
     instance._isComplete = true;
     instance._wasCancelled = jsonObj.wasCancelled;
 
-    let stats = instance.samples.reduce((stats: CumulativePathStats<Type>, sample) => stats.extend(sample), new CumulativePathStats<Type>());
+    const stats = instance.samples.reduce((stats: CumulativePathStats<Type>, sample) => stats.extend(sample), new CumulativePathStats<Type>());
     instance._stats = stats;
 
     return instance;
@@ -107,7 +107,7 @@ export class GestureDebugPath<Type, StateToken = any> extends GesturePath<Type, 
    * `JSON.stringify`.
    */
   toJSON() {
-    let jsonClone: SerializedGesturePath<Type, StateToken> = {
+    const jsonClone: SerializedGesturePath<Type, StateToken> = {
       // Replicate array and its entries, but with certain fields of each entry missing.
       // No .clientX, no .clientY.
       coords: [].concat(this.samples.map((obj) => ({
@@ -121,7 +121,7 @@ export class GestureDebugPath<Type, StateToken = any> extends GesturePath<Type, 
     }
 
     // Removes components of each sample that we don't want serialized.
-    for(let sample of jsonClone.coords) {
+    for(const sample of jsonClone.coords) {
       delete sample.clientX;
       delete sample.clientY;
 

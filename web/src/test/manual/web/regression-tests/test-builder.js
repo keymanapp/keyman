@@ -61,7 +61,7 @@ const cfg = require('karma').config;
 // Note: if karma.conf.js is invalid, then this will die with exit code 1
 // without logging the error. The easiest way to see the error is to
 // run `node_modules/bin/karma start karma.conf.js`
-const karmaConfig = cfg.parseConfig(path.resolve('./karma.conf.js'), process.env.TEAMCITY_PROJECT_NAME ? {'reporters': ['teamcity']} : {});
+const karmaConfig = cfg.parseConfig(path.resolve('./karma.conf.js'), process.env.TEAMCITY_GIT_PATH ? {'reporters': ['teamcity']} : {});
 
 let server = new Server(karmaConfig, function(exitCode) {
   console.log('Karma has exited with ' + exitCode)

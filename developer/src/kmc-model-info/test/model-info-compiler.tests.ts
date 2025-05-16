@@ -42,7 +42,7 @@ describe('model-info-compiler', function () {
     assert.isNotNull(result);
 
     const actual = JSON.parse(new TextDecoder().decode(result.artifacts.model_info.data));
-    let expected = JSON.parse(fs.readFileSync(buildModelInfoFilename, 'utf-8'));
+    const expected = JSON.parse(fs.readFileSync(buildModelInfoFilename, 'utf-8'));
 
     // `lastModifiedDate` is dependent on time of run (not worth mocking)
     delete actual['lastModifiedDate'];

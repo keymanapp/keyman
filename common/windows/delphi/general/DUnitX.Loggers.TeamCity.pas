@@ -14,7 +14,7 @@ var
   KeymanRoot: string;
   ReportPath: string;
 begin
-  if GetEnvironmentVariable('TEAMCITY_VERSION') <> '' then
+  if GetEnvironmentVariable('TEAMCITY_GIT_PATH') <> '' then
   begin
     KeymanRoot := ExcludeTrailingPathDelimiter(GetEnvironmentVariable('KEYMAN_ROOT'));
     ReportPath := ExtractRelativePath(KeymanRoot, ExtractFilePath(ParamStr(0)) + 'dunitx-results.xml');

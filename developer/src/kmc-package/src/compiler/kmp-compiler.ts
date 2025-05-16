@@ -400,7 +400,7 @@ export class KmpCompiler implements KeymanCompiler {
         }));
 
         // Remove default values
-        for(let item of kmp.startMenu.items) {
+        for(const item of kmp.startMenu.items) {
           if(item.icon == '') delete item.icon;
           if(item.location == 'psmelStartMenu') delete item.location;
           if(item.arguments == '') delete item.arguments;
@@ -418,7 +418,7 @@ export class KmpCompiler implements KeymanCompiler {
     // Helper functions
 
   private kpsInfoToKmpInfo(kpsInfo: KpsFile.KpsFileInfo): KmpJsonFile.KmpJsonFileInfo {
-    let kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
+    const kmpInfo: KmpJsonFile.KmpJsonFileInfo = {};
 
     const keys: [(keyof KpsFile.KpsFileInfo), (keyof KmpJsonFile.KmpJsonFileInfo), boolean][] = [
       ['Author','author',false],
@@ -429,7 +429,7 @@ export class KmpCompiler implements KeymanCompiler {
       ['Description','description',true],
     ];
 
-    for (let [src,dst,isMarkdown] of keys) {
+    for (const [src,dst,isMarkdown] of keys) {
       if (kpsInfo[src]?._ && (kpsInfo[src]._.trim() || kpsInfo[src].$?.URL)) {
         kmpInfo[dst] = {
           description: (kpsInfo[src]._ ?? '').trim()
@@ -484,7 +484,7 @@ export class KmpCompiler implements KeymanCompiler {
 
     for(const value of data.files) {
       // Get the path of the file
-      let filename = value.name;
+      const filename = value.name;
       // We add this separately after zipping all other files
       if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
         continue;

@@ -8,8 +8,8 @@ function checkPrerequisites() {
     fi
 
     # Check the tier
-    if [[ -z "${TIER:=}" ]]; then
-        echo "TIER.md or \${TIER} must be set to (alpha, beta, stable) to use this script"
+    if [[ -z "${KEYMAN_TIER:=}" ]]; then
+        echo "TIER.md or \${KEYMAN_TIER} must be set to (alpha, beta, stable) to use this script"
         exit 1
     fi
 
@@ -32,7 +32,7 @@ function downloadSource() {
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier) and remove comment
-    sed -e "s/\$tier\|alpha\|beta\|stable/${TIER}/g" -e "s/^# .*$//" "$BASEDIR"/scripts/watch.in > debian/watch
+    sed -e "s/\$tier\|alpha\|beta\|stable/${KEYMAN_TIER}/g" -e "s/^# .*$//" "$BASEDIR"/scripts/watch.in > debian/watch
 
     version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
     dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
@@ -45,7 +45,7 @@ function downloadSource() {
     mv "${proj}"*.asc "${BASEDIR}/${packageDir}"
     rm "${proj}"*.debian.tar.xz
     cd "${BASEDIR}/${packageDir}" || exit
-    wget -N "https://downloads.keyman.com/linux/${TIER}/${dirversion}/SHA256SUMS"
+    wget -N "https://downloads.keyman.com/linux/${KEYMAN_TIER}/${dirversion}/SHA256SUMS"
     sha256sum -c --ignore-missing SHA256SUMS |grep "${proj}"
 }
 
@@ -59,24 +59,24 @@ function wait_for_apt_deb {
 
 function checkAndInstallRequirements()
 {
-	local TOINSTALL=""
+  local TOINSTALL=""
 
-	for p in devscripts equivs python3-dev
-	do
-		if ! dpkg -s "${p}" >/dev/null 2>&1; then
-			TOINSTALL="${TOINSTALL} ${p}"
-		fi
-	done
+  for p in devscripts equivs python3-dev
+  do
+    if ! dpkg -s "${p}" >/dev/null 2>&1; then
+      TOINSTALL="${TOINSTALL} ${p}"
+    fi
+  done
 
-	export DEBIAN_FRONTEND=noninteractive
+  if [[ -n "${TOINSTALL}" ]]; then
+    wait_for_apt_deb && sudo apt-get update
+    # shellcheck disable=SC2086
+    wait_for_apt_deb && sudo DEBIAN_FRONTEND="noninteractive" \
+      apt-get -qy install ${TOINSTALL}
+  fi
 
-	if [[ -n "${TOINSTALL}" ]]; then
-		wait_for_apt_deb && sudo apt-get update
-		# shellcheck disable=SC2086
-		wait_for_apt_deb && sudo apt-get -qy install ${TOINSTALL}
-	fi
-
-	sudo mk-build-deps debian/control
-	wait_for_apt_deb && sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
-	sudo rm -f keyman-buid-deps_*
+  sudo mk-build-deps debian/control
+  wait_for_apt_deb && sudo DEBIAN_FRONTEND="noninteractive" \
+    apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+  sudo rm -f keyman-build-deps_*
 }

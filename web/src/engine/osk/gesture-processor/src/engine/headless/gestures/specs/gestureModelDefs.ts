@@ -37,7 +37,7 @@ export function getGestureModel<Type, StateToken>(defs: GestureModelDefs<Type, S
 }
 
 export function getGestureModelSet<Type, StateToken>(defs: GestureModelDefs<Type, StateToken>, id: string): gestures.specs.GestureModel<Type, StateToken>[] {
-  let idSet = defs.sets[id];
+  const idSet = defs.sets[id];
   if(!idSet) {
     throw new Error(`Could not find a defined gesture-set with id '${id}'`);
   }

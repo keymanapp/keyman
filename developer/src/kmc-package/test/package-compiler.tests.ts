@@ -41,7 +41,7 @@ describe('KmpCompiler', function () {
     }
   });
 
-  for (let modelID of MODELS) {
+  for (const modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
       makePathToFixture(modelID, 'source', `${modelID}.model.kps`) : makePathToFixture(modelID, `${modelID}.model.kps`);
     const jsPath = modelID.includes('withfolders') ?
@@ -119,7 +119,7 @@ describe('KmpCompiler', function () {
 
     const zip = JSZip();
 
-    let jszip = await zip.loadAsync(kmpData);
+    const jszip = await zip.loadAsync(kmpData);
     assert.isNotNull(jszip.file('kmp.json')); // kmp.json should be present
     // kmp file should contain the following files
     const expectedFiles = [
@@ -135,7 +135,7 @@ describe('KmpCompiler', function () {
       expectedFiles.sort(),
       'khmer_angkor.kmp file should have exactly the expected files');
 
-    let finalKmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
+    const finalKmpJsonData = JSON.parse(await jszip.file('kmp.json').async('string'));
     assert.deepEqual(finalKmpJsonData, kmpJsonFixture);
   });
 
@@ -147,12 +147,12 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
     const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
 
-    let { kmpJsonData: kmpJsonActual } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+    const { kmpJsonData: kmpJsonActual } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
     if(kmpJsonActual == null) {
       callbacks.printMessages();
       assert.isNotNull(kmpJsonActual);
     }
-    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
     assert.isNotNull(kmpJsonFixture);
 
     // Blank out system.keymanDeveloperVersion which will vary
@@ -171,13 +171,12 @@ describe('KmpCompiler', function () {
   it(`should support .kps 17.0 metadata correctly`, async function () {
     const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
-
-    let { kmpJsonData: kmpJsonActual } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+    const { kmpJsonData: kmpJsonActual } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
     if(kmpJsonActual == null) {
       callbacks.printMessages();
       assert.isNotNull(kmpJsonActual);
     }
-    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    const kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
     assert.isNotNull(kmpJsonFixture);
 
     // Blank out system.keymanDeveloperVersion which will vary
@@ -204,7 +203,7 @@ describe('KmpCompiler', function () {
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
 
-    let { kmpJsonData, fileData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+    const { kmpJsonData, fileData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
     assert.isNull(kmpJsonData);
     assert.isNull(fileData);
 
