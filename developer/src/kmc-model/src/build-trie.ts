@@ -216,7 +216,7 @@ export interface SearchTermToKey {
  * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
  */
 export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-  let collater = new TrieBuilder(keyFunction);
+  const collater = new TrieBuilder(keyFunction);
 
   buildFromWordList(collater, wordlist);
   return {
@@ -230,7 +230,7 @@ export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): obj
  * @param words a list of word and count pairs.
  */
 function buildFromWordList(trieCollator: TrieBuilder, words: WordList): TrieBuilder {
-  for (let [wordform, weight] of Object.entries(words)) {
+  for (const [wordform, weight] of Object.entries(words)) {
     trieCollator.addEntry(wordform, weight);
   }
   trieCollator.sort();
