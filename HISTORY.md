@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.39 alpha 2025-05-16
+
+* chore(mac,windows): Update Crowdin strings for Italian (#13871)
+* refactor(web): rename generic type variables (#13930)
+* maint(linux): properly fallback to `VERSION` in deb-packaging (#13961)
+* maint(linux): update gha-ubuntu-packaging dependency (#13964)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13962)
+* maint(linux): don't include `dockerbuild` log files (#13965)
+* maint(linux): update GHA dependencies for Linux package builds (#13966)
+
 ## 19.0.38 alpha 2025-05-15
 
 * chore(android): Update FirstVoices launcher icon and red theme (#13907)
