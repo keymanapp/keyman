@@ -228,7 +228,7 @@ export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): Tri
  * @param words a list of word and count pairs.
  */
 function buildFromWordList(trieCollator: TrieBuilder, words: WordList): TrieBuilder {
-  for (let [wordform, weight] of Object.entries(words)) {
+  for (const [wordform, weight] of Object.entries(words)) {
     trieCollator.addEntry(wordform, weight);
   }
   trieCollator.sort();
