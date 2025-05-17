@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withColumn } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withOffset } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -9,6 +9,7 @@ import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
@@ -311,7 +312,7 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
+        LdmlCompilerMessages.Error_InvalidModifier({id:'base',modifiers:'altR-shift'}),
       ]
     },
     {
@@ -330,7 +331,11 @@ describe('keys.kmap', function () {
       // warning on custom form
       subpath: 'sections/layr/warn-custom-us-form.xml',
       warnings: [
-        LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
+        // most tests will want to leave retainOffsetInMessages: false  to
+        // not require maintaining the offset here, which will break if
+        // the XML changes.
+        // However, it's worthwhile having at least one test that verifies in this way.
+        LdmlCompilerMessages.Warn_CustomForm(withOffset(367, {id: "us"}) as LDMLKeyboard.LKForm),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -355,6 +360,9 @@ describe('keys.kmap', function () {
           },
         ]);
       },
+      // Note: Most tests will NOT want to set this.
+      // We set this here to test the test mechanism.
+      retainOffsetInMessages: true,
     },
     {
       // warning on a custom unknown form - but no error!
@@ -392,7 +400,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: 'us' }),
       ],
     },
     {
@@ -401,7 +409,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: "zzz" }),
       ],
     },
     {
@@ -442,7 +450,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withColumn(276)));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withOffset(276)));
   });
 
   it('should reject layouts with too many hardware keys', async function() {
@@ -450,7 +458,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifiers: 'none'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: 1, hardware: 'us', modifiers: 'none' }, withOffset(785) as LDMLKeyboard.LKRow));
   });
 
   it('should reject layouts with undefined keys', async function() {
@@ -458,7 +466,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}, withOffset(271) as LDMLKeyboard.LKRow));
   });
   it('should reject layouts with invalid keys', async function() {
     const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
@@ -466,7 +474,7 @@ describe('keys.kmap', function () {
     assert.equal(compilerTestCallbacks.messages.length, 1);
     assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(
       {keyId: 'Q'},
-      withColumn(188)
+      withOffset(188)
     ));
   });
   it('should accept layouts with gap/switch keys', async function() {

@@ -19,8 +19,7 @@ builder_describe \
   ":core" \
   ":linux" \
   ":web" \
-  "--distro=DISTRO                  The distribution to use for the base image "\
-  "                                 (debian or ubuntu, default: ubuntu)" \
+  "--distro=DISTRO                  The distribution to use for the base image (debian or ubuntu, default: ubuntu)" \
   "--distro-version=DISTRO_VERSION  The Ubuntu/Debian version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
   "build                            Build docker images" \

@@ -1,5 +1,46 @@
 # Keyman Version History
 
+## 19.0.39 alpha 2025-05-16
+
+* chore(mac,windows): Update Crowdin strings for Italian (#13871)
+* refactor(web): rename generic type variables (#13930)
+* maint(linux): properly fallback to `VERSION` in deb-packaging (#13961)
+* maint(linux): update gha-ubuntu-packaging dependency (#13964)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13962)
+* maint(linux): don't include `dockerbuild` log files (#13965)
+* maint(linux): update GHA dependencies for Linux package builds (#13966)
+
+## 19.0.38 alpha 2025-05-15
+
+* chore(android): Update FirstVoices launcher icon and red theme (#13907)
+* feat(developer): add more line number issues for KeysCompiler (#13915)
+* feat(developer):  add line number for MetaCompiler (#13916)
+* maint(linux): address comments from Debian package review (#13904)
+* maint(linux): add Questing to launchpad package builds (#13910)
+* maint(linux): fix logging in `deb-packaging.sh` (#13912)
+* maint(linux): remove temporary files created during dependency installation (#13913)
+* maint(common): move TC build configs for Linux to scripts (#13754)
+* fix(developer): remove ngrok binary at build time (#13847)
+* chore(linux): Update debian changelog (#13889)
+* refactor(web): rename `HardKeyboard` to `HardKeyboardBase` (#13929)
+* refactor(web): rename base `KeymanEngine` to `KeymanEngineBase` (#13942)
+
+## 19.0.37 alpha 2025-05-14
+
+* maint(linux): remove generated file that got accidentally committed (#13902)
+* maint(linux): remove check for patched ibus from `meson.build` (#13909)
+* maint(common): report builder errors to stderr (#13882)
+
+## 19.0.36 alpha 2025-05-13
+
+* feat(developer): line numbers for XML parsing and kmc-ldml (#13375)
+* maint(android): Update to Java 21 and Gradle dependencies (#13858)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#13890)
+* fix(linux): fallback to `VERSION` if `KEYMAN_VERSION` isn't set during package build (#13891)
+* maint(common): move and document `builder_is_ci_*` functions (#13892)
+* maint(android): use new variable name `KEYMAN_TIER` (#13898)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13876)
+
 ## 19.0.35 alpha 2025-05-12
 
 * maint(common): add two more functions to detect if running on CI (#13869)

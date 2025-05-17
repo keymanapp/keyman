@@ -928,6 +928,50 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_is_ci_build` function
+
+Returns `true` (aka 0) if the current build is running in CI, as a pull
+request test, as a mainline branch test, or as a release build.
+
+### Usage
+
+```bash
+if builder_is_ci_build; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_ci_release_build` function
+
+Returns `true` (aka 0) if the current build is running as a release build in CI
+
+### Usage
+
+```bash
+if builder_is_ci_release_build; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
+## `builder_is_ci_test_build` function
+
+Returns `true` (aka 0) if the current build is running in CI, as a pull
+request test, or as a mainline branch test.
+
+### Usage
+
+```bash
+if builder_is_ci_test_build; then
+  ...
+fi
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_parse` function
 
 Initializes a build.sh script, parses command line. Will abort the script if

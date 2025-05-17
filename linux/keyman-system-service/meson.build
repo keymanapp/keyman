@@ -1,6 +1,6 @@
 project('keyman-system-service', 'c', 'cpp',
         version: files('../../VERSION.md'),
-        license: 'GPL-2+',
+        license: 'MIT',
         meson_version: '>=1.0')
 
 conf = configuration_data()

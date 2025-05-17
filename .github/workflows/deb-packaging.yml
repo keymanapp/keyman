@@ -41,7 +41,7 @@ jobs:
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
@@ -87,7 +87,7 @@ jobs:
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
         . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
-        echo "KEYMAN_VERSION=$KEYMAN_VERSION" >> $GITHUB_OUTPUT
+        echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
       id: prerelease_tag
@@ -112,7 +112,7 @@ jobs:
         echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store source package
-      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: keyman-srcpkg
         path: |
@@ -131,7 +131,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -157,7 +157,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -178,7 +178,7 @@ jobs:
 
     steps:
     # - name: Download Artifacts
-    #   uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
     #   with:
     #     path: artifacts
     #     merge-multiple: true
@@ -247,7 +247,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Download Artifacts
-      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         name: keyman-signedpkgs
 
@@ -303,15 +303,16 @@ jobs:
         echo "::endgroup::"
 
   prepare_api_verification:
-    name: Verify API for libkeymancore.so
+    name: Prepare API verification
     needs: [sourcepackage, binary_packages_released]
     runs-on: ubuntu-latest
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       with:
         path: artifacts
+        pattern: keyman-*
         merge-multiple: true
 
     - name: Save environment
@@ -326,7 +327,7 @@ jobs:
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
 
     - name: Cache artifacts
-      uses: actions/cache/save@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       with:
         path: |
           artifacts
