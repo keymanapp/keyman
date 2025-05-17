@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.40 alpha 2025-05-17
+
+* maint(common): Add zip.inc.sh for cross-platform zipping (#13812)
+
 ## 19.0.39 alpha 2025-05-16
 
 * chore(mac,windows): Update Crowdin strings for Italian (#13871)
