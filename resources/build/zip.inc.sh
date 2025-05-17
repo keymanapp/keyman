@@ -23,16 +23,10 @@ function zip_files() {
   shift
 
   # Parse rest of parameters
-  EXCLUDE=
   FLAGS=()
   INCLUDE=()
   while [[ $# -gt 0 ]] ; do
     case "$1" in
-      -x@*)
-        # filename of files to exclude
-        EXCLUDE="$1"
-        shift
-        ;;
       -*)
         # zip/7z flags
         FLAGS+=($1)
@@ -60,14 +54,14 @@ function zip_files() {
           ;;
       esac
 
-      # 7z command
+      # 7z command to add files
       COMPRESS_CMD="${SEVENZ}"
       SEVENZ_CMD="a"
     fi
   fi
 
   # Create archive
-  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}"
-  "${COMPRESS_CMD}" ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]} ${EXCLUDE}
+  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
+  "${COMPRESS_CMD}" ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}
 
 }
