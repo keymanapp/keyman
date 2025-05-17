@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
+
 # This script runs from its parent's folder
 cd "$(dirname "$THIS_SCRIPT")/.."
 
@@ -71,13 +73,13 @@ echo "engine dest: $KMEI_DST"
 
 echo "Zipping ${FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
 cd "${KMEI_FRAMEWORK_BASE}"
-zip -qrX "${KMEI_DST}" ${FRAMEWORK}
+zip_files "${KMEI_DST}" "../../../../exclude.in" "-qrX" "${FRAMEWORK}"
 cd "$WORK_DIR"
 
 echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
 cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
 cd "${UPLOAD_DIR}"
-zip -qr "${KMEI_DST_NAME}" "samples"
+zip_files "${KMEI_DST_NAME}" "../../exclude.in" "-qr" "samples"
 rm -rf "samples"
 cd "$WORK_DIR"
 
@@ -97,7 +99,7 @@ KEYMANAPP_SIM_APP_DST="keyman-ios-simulator-${BUILD_NUMBER}.app.zip"
 
 echo "Zipping Keyman simulator artifact ${KEYMANAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
 cd "${KEYMANAPP_SIM_FOLDER}"
-zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}" "Keyman.app"
+zip_files "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}" "../../../../exclude.in" "-qrX" "Keyman.app"
 echo "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}"
 cd "$WORK_DIR"
 
@@ -118,7 +120,7 @@ if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
 
   echo "Zipping FirstVoices simulator artifact ${FIRSTVOICESAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
   cd "${FIRSTVOICESAPP_SIM_FOLDER}"
-  zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_APP_DST}" "FirstVoices.app"
+  zip_files "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_APP_DST}" "../../../../../../../ios/exclude.in" "-qrX" "FirstVoices.app"
   cd "$WORK_DIR"
 fi
 
