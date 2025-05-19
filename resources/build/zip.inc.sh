@@ -38,14 +38,12 @@ function zip_files() {
         # Compression level where -1 indicates fastest compression speed
         ZIP_FLAGS+=($1)
         SEVENZ_FLAGS+=("-mx1")
-        echo "SEVENZ_FLAGS: ${SEVENZ_FLAGS[@]}"
         shift
         ;;
       -9)
         # Compression level where -9 indicates the slowest compression speed
         ZIP_FLAGS+=($1)
         SEVENZ_FLAGS+=("-mx9")
-        echo "SEVENZ_FLAGS: ${SEVENZ_FLAGS[@]}"
         shift
         ;;
       -*)
