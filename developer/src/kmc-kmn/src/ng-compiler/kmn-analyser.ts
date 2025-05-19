@@ -182,14 +182,14 @@ export class RangeEndRule extends SingleChildRule {
 export class VirtualKeyRule extends SingleChildRule {
   public constructor() {
     super();
-    const leftSquare: Rule          = new TokenRule(TokenTypes.LEFT_SQ);
-    const optWhitespace: Rule       = new OptionalWhiteSpaceRule();
-    const spacedShiftCode: Rule     = new SpacedShiftCodeRule();
-    const manySpacedShiftCode: Rule = new ManyRule(spacedShiftCode);
-    const keyCode: Rule             = new TokenRule(TokenTypes.KEY_CODE, true);
-    const rightSquare: Rule          = new TokenRule(TokenTypes.RIGHT_SQ);
+    const leftSquare: Rule         = new TokenRule(TokenTypes.LEFT_SQ);
+    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const spacedModifier: Rule     = new SpacedModifierRule();
+    const manySpacedModifier: Rule = new ManyRule(spacedModifier);
+    const keyCode: Rule            = new TokenRule(TokenTypes.KEY_CODE, true);
+    const rightSquare: Rule        = new TokenRule(TokenTypes.RIGHT_SQ);
     this.rule = new SequenceRule([
-      leftSquare, optWhitespace, manySpacedShiftCode, keyCode, optWhitespace, rightSquare
+      leftSquare, optWhitespace, manySpacedModifier, keyCode, optWhitespace, rightSquare
     ]);
   }
 
@@ -207,33 +207,33 @@ export class VirtualKeyRule extends SingleChildRule {
   }
 }
 
-export class SpacedShiftCodeRule extends SingleChildRule {
+export class SpacedModifierRule extends SingleChildRule {
   public constructor() {
     super();
-    const shiftCode: Rule  = new ShiftCodeRule();
+    const modifier: Rule   = new ModifierRule();
     const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
-    this.rule = new SequenceRule([shiftCode, whitespace]);
+    this.rule = new SequenceRule([modifier, whitespace]);
   }
 }
 
-export class ShiftCodeRule extends SingleChildRule {
+export class ModifierRule extends SingleChildRule {
   public constructor() {
     super();
-    const shift: Rule     = new TokenRule(TokenTypes.SHIFT, true);
-    const caps: Rule      = new TokenRule(TokenTypes.CAPS, true);
-    const shiftCode: Rule = new TokenRule(TokenTypes.SHIFT_CODE, true);
-    this.rule = new AlternateRule([shift, caps, shiftCode]);
+    const shift: Rule    = new TokenRule(TokenTypes.SHIFT, true);
+    const caps: Rule     = new TokenRule(TokenTypes.CAPS, true);
+    const modifier: Rule = new TokenRule(TokenTypes.MODIFIER, true);
+    this.rule = new AlternateRule([shift, caps, modifier]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      let shiftCodeNode = tmp.getSoleChildOfType(NodeTypes.SHIFT_CODE);
-      if (shiftCodeNode === null) {
-        shiftCodeNode = new ASTNode(NodeTypes.SHIFT_CODE, tmp.getSoleChild().token);
+      let modifierNode = tmp.getSoleChildOfType(NodeTypes.MODIFIER);
+      if (modifierNode === null) {
+        modifierNode = new ASTNode(NodeTypes.MODIFIER, tmp.getSoleChild().token);
       }
-      node.addChild(shiftCodeNode);
+      node.addChild(modifierNode);
     }
     return parseSuccess;
   }

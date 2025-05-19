@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ShiftCodeRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -445,7 +445,7 @@ describe("KMN Analyser Tests", () => {
       const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
-      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.SHIFT_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
     });
     it("can parse correctly (two shiftcode virtual key)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[SHIFT CTRL K_K]');
@@ -454,10 +454,10 @@ describe("KMN Analyser Tests", () => {
       const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
       assert.isNotNull(virtualKeyNode);
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
-      const shiftCodes = virtualKeyNode.getChildrenOfType(NodeTypes.SHIFT_CODE);
-      assert.equal(shiftCodes.length, 2);
-      assert.equal(shiftCodes[0].token.text, 'SHIFT');
-      assert.equal(shiftCodes[1].token.text, 'CTRL');
+      const modifiers = virtualKeyNode.getChildrenOfType(NodeTypes.MODIFIER);
+      assert.equal(modifiers.length, 2);
+      assert.equal(modifiers[0].token.text, 'SHIFT');
+      assert.equal(modifiers[1].token.text, 'CTRL');
     });
     it("can parse correctly (simple virtual key, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('[ K_K]');
@@ -484,11 +484,11 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
     });
   });
-  describe("ShiftCodeRule Tests", () => {
-    it("can construct a ShiftCodeRule", () => {
+  describe("ModifierRule Tests", () => {
+    it("can construct a ModifierRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const shiftCode: Rule = new ShiftCodeRule();
-      assert.isNotNull(shiftCode);
+      const modifier: Rule = new ModifierRule();
+      assert.isNotNull(modifier);
     });
     it("can parse correctly", () => {
       [
@@ -503,10 +503,10 @@ describe("KMN Analyser Tests", () => {
         'ncaps',
       ].forEach((code) => {
         Rule.tokenBuffer = stringToTokenBuffer(`${code} `);
-        const shiftCode: Rule = new ShiftCodeRule();
+        const modifier: Rule = new ModifierRule();
         root = new ASTNode(NodeTypes.TMP);
-        assert.isTrue(shiftCode.parse(root));
-        assert.equal(root.getSoleChildOfType(NodeTypes.SHIFT_CODE).getText(), code);
+        assert.isTrue(modifier.parse(root));
+        assert.equal(root.getSoleChildOfType(NodeTypes.MODIFIER).getText(), code);
       });
     });
   });
