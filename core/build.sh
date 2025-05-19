@@ -12,14 +12,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
-cleanup_visual_studio_path
-
-MESON_LOW_VERSION=false
-
-if [[ `meson --version` < 0.54 ]]; then
-  MESON_LOW_VERSION=true
-fi
-
 #
 # Restrict available targets to those that can be built on the current system
 #
@@ -119,6 +111,12 @@ if builder_has_action configure; then
   # Import our standard compiler defines
   source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
   standard_meson_build
+fi
+
+# Setup Windows environment for VC++
+if [[ $BUILDER_OS == win ]]; then
+  source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+  configure_windows_build_environment
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built
