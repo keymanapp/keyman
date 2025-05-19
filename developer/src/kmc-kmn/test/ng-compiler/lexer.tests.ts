@@ -298,14 +298,14 @@ describe("Lexer Tests", () => {
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenTypes.STRING, '"store"');
     });
-    it("can recognise a SHIFT_CODE token", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'CTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'LCTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'RCTRL');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'ALT');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'LALT');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'RALT');
-      recogniseTokenFollowedBySpace(TokenTypes.SHIFT_CODE, 'NCAPS');
+    it("can recognise a MODIFIER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'CTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'LCTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'RCTRL');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'ALT');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'LALT');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'RALT');
+      recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'NCAPS');
     });
     it("can recognise a KEY_CODE token", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'K_K');
