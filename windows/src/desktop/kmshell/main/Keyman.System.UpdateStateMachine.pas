@@ -1030,7 +1030,7 @@ begin
   found := False;
   for FileName in FileNames do
   begin
-    if ucrFileName = ExtractFileName(FileName) then
+    if SameText(ucrFileName, ExtractFileName(FileName)) then
     begin
       found := True;
       break;
