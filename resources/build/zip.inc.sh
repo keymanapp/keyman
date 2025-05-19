@@ -34,6 +34,13 @@ function zip_files() {
         SEVENZ_FLAGS+=($1)
         shift
         ;;
+      -q)
+        # quiet mode  -> disable progress indicator, set output log level 0
+        ZIP_FLAGS+=($1)
+        SEVENZ_FLAGS+=("-bd")
+        SEVENZ_FLAGS+=("-bb0")
+        shift
+        ;;
       -1)
         # Compression level where -1 indicates fastest compression speed
         ZIP_FLAGS+=($1)
@@ -60,7 +67,6 @@ function zip_files() {
   done
 
   local COMPRESS_CMD=zip
-  SEVENZ_CMD=
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
