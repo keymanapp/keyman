@@ -23,13 +23,34 @@ function zip_files() {
   shift
 
   # Parse rest of parameters
-  FLAGS=()
-  INCLUDE=()
+  local ZIP_FLAGS=()
+  local SEVENZ_FLAGS=('a') # 7z requires a command
+  local INCLUDE=()
   while [[ $# -gt 0 ]] ; do
     case "$1" in
+      -r)
+        # Common flags to zip and 7z
+        ZIP_FLAGS+=($1)
+        SEVENZ_FLAGS+=($1)
+        shift
+        ;;
+      -1)
+        # Compression level where -1 indicates fastest compression speed
+        ZIP_FLAGS+=($1)
+        SEVENZ_FLAGS+=("-mx1")
+        echo "SEVENZ_FLAGS: ${SEVENZ_FLAGS[@]}"
+        shift
+        ;;
+      -9)
+        # Compression level where -9 indicates the slowest compression speed
+        ZIP_FLAGS+=($1)
+        SEVENZ_FLAGS+=("-mx9")
+        echo "SEVENZ_FLAGS: ${SEVENZ_FLAGS[@]}"
+        shift
+        ;;
       -*)
-        # zip/7z flags
-        FLAGS+=($1)
+        # Rest of zip flags.
+        ZIP_FLAGS+=($1)
         shift
         ;;
       *)
@@ -40,7 +61,7 @@ function zip_files() {
     esac
   done
 
-  COMPRESS_CMD=zip
+  local COMPRESS_CMD=zip
   SEVENZ_CMD=
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
@@ -53,15 +74,18 @@ function zip_files() {
           SEVENZ=7z
           ;;
       esac
-
-      # 7z command to add files
-      COMPRESS_CMD="${SEVENZ}"
-      SEVENZ_CMD="a"
     fi
+
+    # 7z command to add files so clear zip flags
+    COMPRESS_CMD="${SEVENZ}"
+    ZIP_FLAGS=()
+  else
+    # Using zip so clear 7z flags
+    SEVENZ_FLAGS=()
   fi
 
   # Create archive
-  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
-  "${COMPRESS_CMD}" ${SEVENZ_CMD} ${FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}
+  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
+  "${COMPRESS_CMD}" ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}
 
 }
