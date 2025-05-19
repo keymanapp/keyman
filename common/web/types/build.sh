@@ -32,6 +32,7 @@ function compile_schemas() {
   local schemas=(
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboard3.schema.json"
     "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/46/ldml-keyboardtest3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/keylayout/keylayout.schema.json"
     "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"

@@ -1,0 +1,327 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "keyboard": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "additionalProperties": false,
+          "properties": {
+            "action": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "when": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "#text": {
+                                "type": "string"
+                              },
+                              "next": {
+                                "maximum": 127,
+                                "minimum": -128,
+                                "type": "integer"
+                              },
+                              "output": {
+                                "type": "string"
+                              },
+                              "state": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "when": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "#text": {
+                          "type": "string"
+                        },
+                        "next": {
+                          "maximum": 127,
+                          "minimum": -128,
+                          "type": "integer"
+                        },
+                        "output": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "group": {
+          "maximum": 127,
+          "minimum": -128,
+          "type": "integer"
+        },
+        "id": {
+          "maximum": 32767,
+          "minimum": -32768,
+          "type": "integer"
+        },
+        "keyMapSet": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "keyMap": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "index": {
+                    "maximum": 127,
+                    "minimum": -128,
+                    "type": "integer"
+                  },
+                  "key": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "#text": {
+                          "type": "string"
+                        },
+                        "action": {
+                          "type": "string"
+                        },
+                        "code": {
+                          "maximum": 127,
+                          "minimum": -128,
+                          "type": "integer"
+                        },
+                        "output": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "layouts": {
+          "additionalProperties": false,
+          "properties": {
+            "layout": {
+              "additionalProperties": false,
+              "properties": {
+                "#text": {
+                  "type": "string"
+                },
+                "first": {
+                  "maximum": 127,
+                  "minimum": -128,
+                  "type": "integer"
+                },
+                "last": {
+                  "maximum": 127,
+                  "minimum": -128,
+                  "type": "integer"
+                },
+                "layout": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "#text": {
+                      "type": "string"
+                    },
+                    "first": {
+                      "maximum": 127,
+                      "minimum": -128,
+                      "type": "integer"
+                    },
+                    "last": {
+                      "maximum": 127,
+                      "minimum": -128,
+                      "type": "integer"
+                    },
+                    "mapSet": {
+                      "maximum": 32767,
+                      "minimum": -32768,
+                      "type": "integer"
+                    },
+                    "modifiers": {
+                      "maximum": 127,
+                      "minimum": -128,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "mapSet": {
+                  "maximum": 32767,
+                  "minimum": -32768,
+                  "type": "integer"
+                },
+                "modifiers": {
+                  "maximum": 127,
+                  "minimum": -128,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "layout"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "layout"
+          ],
+          "type": "object"
+        },
+        "maxout": {
+          "maximum": 127,
+          "minimum": -128,
+          "type": "integer"
+        },
+        "modifierMap": {
+          "additionalProperties": false,
+          "properties": {
+            "defaultIndex": {
+              "maximum": 127,
+              "minimum": -128,
+              "type": "integer"
+            },
+            "id": {
+              "maximum": 127,
+              "minimum": -128,
+              "type": "integer"
+            },
+            "keyMapSelect": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "mapIndex": {
+                    "maximum": 127,
+                    "minimum": -128,
+                    "type": "integer"
+                  },
+                  "modifier": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "#text": {
+                          "type": "string"
+                        },
+                        "keys": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "terminators": {
+          "additionalProperties": false,
+          "properties": {
+            "when": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "#text": {
+                    "type": "string"
+                  },
+                  "output": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "maximum": 127,
+                    "minimum": -128,
+                    "type": "integer"
+                  },
+                  "when": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "#text": {
+                          "type": "string"
+                        },
+                        "output": {
+                          "type": "string"
+                        },
+                        "state": {
+                          "maximum": 127,
+                          "minimum": -128,
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "layouts",
+        "modifierMap",
+        "keyMapSet",
+        "actions",
+        "terminators"
+      ]
+    },
+    "xs:annotation": {
+      "xs:documentation": "Data generated April 15 2025\r\n\r\n\tGenerated by S. Schmitt"
+    }
+  },
+  "required": [
+    "keyboard"
+  ],
+  "title": "C:/Projects/keyman/keyman/resources/standards-data/keylayout/dtd/keylayout.xsd",
+  "type": "object"
+}
