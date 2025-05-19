@@ -11,9 +11,9 @@ text: textRange|simpleText|outsStatement
 simpleText: STRING|virtualKey|U_CHAR
 textRange: simpleText rangeEnd+
 rangeEnd: WHITESPACE? RANGE WHITESPACE? simpleText
-virtualKey: LEFT_SQ WHITESPACE? spacedShiftCode* KEY_CODE WHITESPACE? RIGHT_SQ
-spacedShiftCode: modifier WHITESPACE
-modifier: SHIFT|CAPS|SHIFT_CODE
+virtualKey: LEFT_SQ WHITESPACE? spacedModifier* KEY_CODE WHITESPACE? RIGHT_SQ
+spacedModifier: modifier WHITESPACE
+modifier: SHIFT|CAPS|MODIFIER
 outsStatement: OUTS bracketedStoreName
 ruleBlock: beginBlock|groupBlock|usingKeysProductionBlock|readOnlyProductionBlock|
   contextProductionBlock
