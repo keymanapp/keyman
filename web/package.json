@@ -12,6 +12,11 @@
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
+    "./engine/core-adapter": {
+      "es6-bundling": "./src/engine/core-adapter/src/index.ts",
+      "types": "./build/engine/core-adapter/obj/index.d.ts",
+      "import": "./build/engine/core-adapter/obj/index.js"
+    },
     "./engine/core-processor": {
       "es6-bundling": "./src/engine/core-processor/src/index.ts",
       "types": "./build/engine/core-processor/obj/index.d.ts",

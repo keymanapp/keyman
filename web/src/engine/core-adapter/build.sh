@@ -6,14 +6,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-SUBPROJECT_NAME=engine/core-processor
+SUBPROJECT_NAME=engine/core-adapter
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 
 # ################################ Main script ################################
 
-builder_describe "Keyman Core Keyboard Processor" \
+builder_describe "Keyman Core WASM integration" \
   "@/core:wasm" \
   "@/web/src/engine/common/web-utils" \
   "clean" \
@@ -23,7 +23,7 @@ builder_describe "Keyman Core Keyboard Processor" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 builder_describe_outputs \
-  configure    "/node_modules" \
+  configure    "/web/src/engine/core-adapter/src/import/core/keymancore.d.ts" \
   build        "/web/build/${SUBPROJECT_NAME}/lib/index.mjs"
 
 builder_parse "$@"
