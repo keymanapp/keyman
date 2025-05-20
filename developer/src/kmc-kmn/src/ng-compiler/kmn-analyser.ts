@@ -9,7 +9,7 @@
 import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, StringSystemStoreNameRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -955,14 +955,14 @@ export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRu
 export class IfSystemStoreNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-    const baselayout: Rule            = new TokenRule(TokenTypes.BASELAYOUT, true);
-    const layer: Rule                 = new TokenRule(TokenTypes.LAYER, true);
-    const newLayer: Rule              = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldLayer: Rule              = new TokenRule(TokenTypes.OLDLAYER, true);
-    const platform: Rule              = new TokenRule(TokenTypes.PLATFORM, true);
+    const systemStoreName: Rule = new SystemStoreNameRule();
+    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
+    const newLayer: Rule        = new TokenRule(TokenTypes.NEWLAYER, true);
+    const oldLayer: Rule        = new TokenRule(TokenTypes.OLDLAYER, true);
+    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
     this.rule = new AlternateRule([
-      stringSystemStoreName,
+      systemStoreName,
       baselayout,
       layer,
       newLayer,

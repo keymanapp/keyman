@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -91,11 +91,11 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
   });
-  describe("StringSystemStoreNameRule Tests", () => {
-    it("can construct a StringSystemStoreNameRule", () => {
+  describe("SystemStoreNameRule Tests", () => {
+    it("can construct a SystemStoreNameRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-      assert.isNotNull(stringSystemStoreName);
+      const systemStoreName: Rule = new SystemStoreNameRule();
+      assert.isNotNull(systemStoreName);
     });
     it("can parse correctly", () => {
       [
@@ -126,9 +126,9 @@ describe("KMN Store Analyser Tests", () => {
         {code: 'shiftfreescaps',   nodeType: NodeTypes.SHIFTFREESCAPS},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(testCase.code);
-        const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+        const systemStoreName: Rule = new SystemStoreNameRule();
         root = new ASTNode(NodeTypes.TMP);
-        assert.isTrue(stringSystemStoreName.parse(root));
+        assert.isTrue(systemStoreName.parse(root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });
     });

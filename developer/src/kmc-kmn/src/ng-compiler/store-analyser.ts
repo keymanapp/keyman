@@ -18,10 +18,10 @@ import { ASTNode, NodeTypes } from "./tree-construction.js";
 export class SystemStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringSystemStore: Rule   = new SystemStoreRule();
+    const systemStore: Rule         = new SystemStoreRule();
     const prePadText: Rule          = new PrePadTextRule();
     const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
-    this.rule = new SequenceRule([stringSystemStore, oneOrManyPaddedText]);
+    this.rule = new SequenceRule([systemStore, oneOrManyPaddedText]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -59,20 +59,20 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
 export class SystemStoreRule extends AbstractSystemStoreRule {
   public constructor() {
     super();
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+    const systemStoreName: Rule = new SystemStoreNameRule();
     this.rule = new SequenceRule([
       this.store,
       this.leftBracket,
       this.optWhitespace,
       this.ampersand,
-      stringSystemStoreName,
+      systemStoreName,
       this.optWhitespace,
       this.rightBracket,
     ]);
   }
 }
 
-export class StringSystemStoreNameRule extends AlternateTokenRule {
+export class SystemStoreNameRule extends AlternateTokenRule {
   public constructor() {
     super([
       TokenTypes.BITMAP,
