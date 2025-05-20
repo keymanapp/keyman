@@ -18,7 +18,7 @@ import { ASTNode, NodeTypes } from "./tree-construction.js";
 export class SystemStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringSystemStore: Rule   = new StringSystemStoreRule();
+    const stringSystemStore: Rule   = new SystemStoreRule();
     const prePadText: Rule          = new PrePadTextRule();
     const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
     this.rule = new SequenceRule([stringSystemStore, oneOrManyPaddedText]);
@@ -56,7 +56,7 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
   }
 }
 
-export class StringSystemStoreRule extends AbstractSystemStoreRule {
+export class SystemStoreRule extends AbstractSystemStoreRule {
   public constructor() {
     super();
     const stringSystemStoreName: Rule = new StringSystemStoreNameRule();

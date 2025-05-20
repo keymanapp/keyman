@@ -15,7 +15,7 @@ import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
-import { StringSystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { SystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -60,34 +60,34 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
   });
-  describe("StringSystemStoreRule Tests", () => {
-    it("can construct a StringSystemStoreRule", () => {
+  describe("SystemStoreRule Tests", () => {
+    it("can construct a SystemStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const stringSystemStore: Rule = new StringSystemStoreRule();
-      assert.isNotNull(stringSystemStore);
+      const systemStore: Rule = new SystemStoreRule();
+      assert.isNotNull(systemStore);
     });
     it("can parse correctly (bitmap)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)');
-      const stringSystemStore: Rule = new StringSystemStoreRule();
-      assert.isTrue(stringSystemStore.parse(root));
+      const systemStore: Rule = new SystemStoreRule();
+      assert.isTrue(systemStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace after left bracket)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store( &bitmap)');
-      const stringSystemStore: Rule = new StringSystemStoreRule();
-      assert.isTrue(stringSystemStore.parse(root));
+      const systemStore: Rule = new SystemStoreRule();
+      assert.isTrue(systemStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace before right bracket)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap )');
-      const stringSystemStore: Rule = new StringSystemStoreRule();
-      assert.isTrue(stringSystemStore.parse(root));
+      const systemStore: Rule = new SystemStoreRule();
+      assert.isTrue(systemStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
     it("can parse correctly (bitmap, whitespace after left and before right brackets)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store( &bitmap )');
-      const stringSystemStore: Rule = new StringSystemStoreRule();
-      assert.isTrue(stringSystemStore.parse(root));
+      const systemStore: Rule = new SystemStoreRule();
+      assert.isTrue(systemStore.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
   });
