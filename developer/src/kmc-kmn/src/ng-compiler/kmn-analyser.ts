@@ -883,14 +883,9 @@ export class IfLikeStatementRule extends SingleChildRule {
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const ifStoreStoreStatement: Rule        = new IfStoreStoreStatementRule();
     const ifStoreStringStatement: Rule       = new IfStoreStringStatementRule();
-    const ifSystemStoreStoreStatement: Rule  = new IfSystemStoreStoreStatementRule();
     const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
-    this.rule = new AlternateRule([
-      ifStoreStoreStatement, ifStoreStringStatement,
-      ifSystemStoreStoreStatement, ifSystemStoreStringStatement,
-    ]);
+    this.rule = new AlternateRule([ifStoreStringStatement, ifSystemStoreStringStatement]);
   }
 }
 
@@ -925,18 +920,6 @@ export class AbstractIfStoreStatementRule extends SingleChildRule {
   }
 }
 
-export class IfStoreStoreStatementRule extends AbstractIfStoreStatementRule {
-  public constructor() {
-    super();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, variableStoreName,
-      this.whitespace, this.comparison, this.whitespace, variableStoreName,
-      this.optWhitespace, this.rightBracket,
-    ]);
-  }
-}
-
 export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
@@ -946,20 +929,6 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
       this.ifRule, this.leftBracket, this.optWhitespace, variableStoreName,
       this.whitespace, this.comparison, this.whitespace, stringRule,
       this.optWhitespace, this.rightBracket,
-    ]);
-  }
-}
-
-export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRule {
-  public constructor() {
-    super();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
-    const systemStoreName: Rule   = new SystemStoreNameRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, amphasand,
-      systemStoreName, this.whitespace, this.comparison, this.whitespace,
-      variableStoreName, this.optWhitespace, this.rightBracket,
     ]);
   }
 }

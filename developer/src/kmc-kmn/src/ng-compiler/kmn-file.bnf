@@ -54,14 +54,9 @@ postPadIfLikeBlock: ifLikeBlock padding
 ifLikeBlock: ifLikeStatement prePadIfLikeStatement*
 prePadIfLikeStatement: padding IfLikeStatement
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
-ifStatement: ifStoreStoreStatement|ifStoreStringStatement|ifSystemStoreStoreStatement
-  ifSystemStoreStringStatement
-ifStoreStoreStatement: IF LEFT_BR WHITESPACE? variableStoreName WHITESPACE
-  comparison WHITESPACE variableStoreName WHITESPACE? RIGHT_BR
+ifStatement: ifStoreStringStatement|ifSystemStoreStringStatement
 ifStoreStringStatement: IF LEFT_BR WHITESPACE? variableStoreName WHITESPACE
   comparison WHITESPACE STRING WHITESPACE? RIGHT_BR
-ifSystemStoreStoreStatement: IF LEFT_BR WHITESPACE? AMPERSAND systemStoreName
-  WHITESPACE comparison WHITESPACE variableStoreName WHITESPACE? RIGHT_BR
 ifSystemStoreStringStatement: IF LEFT_BR WHITESPACE? AMPERSAND systemStoreName
   WHITESPACE comparison WHITESPACE STRING WHITESPACE? RIGHT_BR
 ifSystemStoreName: PLATFORM|LAYER|BASELAYOUT|NEWLAYER|OLDLAYER
