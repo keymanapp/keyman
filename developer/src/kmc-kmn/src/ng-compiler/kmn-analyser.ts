@@ -9,7 +9,7 @@
 import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -86,8 +86,6 @@ export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
     const systemStoreAssign: Rule    = new SystemStoreAssignRule();
-    const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-    const hotkeyStoreAssign: Rule    = new HotkeyStoreAssignRule();
     const capsAlwaysOff: Rule        = new CapsAlwaysOffRule();
     const capsOnOnly: Rule           = new CapsOnOnlyRule();
     const shiftFreesCaps: Rule       = new ShiftFreesCapsRule();
@@ -95,8 +93,6 @@ export class ContentRule extends SingleChildRule {
     const ruleBlock: Rule            = new RuleBlockRule();
     this.rule = new AlternateRule([
       systemStoreAssign,
-      casedkeysStoreAssign,
-      hotkeyStoreAssign,
       capsAlwaysOff,
       capsOnOnly,
       shiftFreesCaps,

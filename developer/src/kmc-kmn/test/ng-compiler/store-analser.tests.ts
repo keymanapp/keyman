@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -58,6 +58,54 @@ describe("KMN Store Analyser Tests", () => {
       assert.isTrue(systemStoreAssign.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (casedkeys single virtual key)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+    });
+    it("can parse correctly (casedkeys two virtual keys)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A] [K_B]');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const children = casedkeysNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[1].getSoleChild().getText(), 'K_B');
+    });
+    it("can parse correctly (casedkeys virtual key range)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]..[K_C]');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
+      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+    });
+    it("can parse correctly (casedkeys character range)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) "a".."c"');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
+      assert.isNotNull(casedkeysNode);
+      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
+      const children  = rangeNode.getChildrenOfType(NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].getText(), '"c"');
+    });
+    it("can parse correctly (hotkey)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
+      assert.isNotNull(hotkeyNode);
+      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
     });
   });
   describe("SystemStoreRule Tests", () => {
@@ -131,94 +179,6 @@ describe("KMN Store Analyser Tests", () => {
         assert.isTrue(systemStoreName.parse(root));
         assert.isNotNull(root.getSoleChildOfType(testCase.nodeType));
       });
-    });
-  });
-  describe("CasedkeysStoreAssignRule Tests", () => {
-    it("can construct a CasedkeysStoreAssignRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-      assert.isNotNull(casedkeysStoreAssign);
-    });
-    it("can parse correctly (single virtual key)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]');
-      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-      assert.isTrue(casedkeysStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
-      assert.isNotNull(casedkeysNode);
-      assert.isNotNull(casedkeysNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
-    });
-    it("can parse correctly (two virtual keys)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A] [K_B]');
-      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-      assert.isTrue(casedkeysStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
-      assert.isNotNull(casedkeysNode);
-      const children = casedkeysNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].getSoleChild().getText(), 'K_B');
-    });
-    it("can parse correctly (virtual key range)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]..[K_C]');
-      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-      assert.isTrue(casedkeysStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
-      assert.isNotNull(casedkeysNode);
-      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
-      const children  = rangeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
-    });
-    it("can parse correctly (character range)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys) "a".."c"');
-      const casedkeysStoreAssign: Rule = new CasedkeysStoreAssignRule();
-      assert.isTrue(casedkeysStoreAssign.parse(root));
-      const casedkeysNode = root.getSoleChildOfType(NodeTypes.CASEDKEYS)
-      assert.isNotNull(casedkeysNode);
-      const rangeNode = casedkeysNode.getSoleChildOfType(NodeTypes.RANGE);
-      const children  = rangeNode.getChildrenOfType(NodeTypes.STRING);
-      assert.equal(children[0].getText(), '"a"');
-      assert.equal(children[1].getText(), '"c"');
-    });
-  });
-  describe("CasedkeysStoreRule Tests", () => {
-    it("can construct a CasedkeysStoreRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const casedkeysStore: Rule = new CasedkeysStoreRule();
-      assert.isNotNull(casedkeysStore);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&casedkeys)');
-      const casedkeysStore: Rule = new CasedkeysStoreRule();
-      assert.isTrue(casedkeysStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CASEDKEYS));
-    });
-  });
-  describe("HotkeyStoreAssignRule Tests", () => {
-    it("can construct a HotkeyStoreAssignRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const hotkeyStoreAssign: Rule  = new HotkeyStoreAssignRule();
-      assert.isNotNull(hotkeyStoreAssign);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
-      const hotkeyStoreAssign: Rule = new HotkeyStoreAssignRule();
-      assert.isTrue(hotkeyStoreAssign.parse(root));
-      const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
-      assert.isNotNull(hotkeyNode);
-      assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
-    });
-  });
-  describe("HotkeyStoreRule Tests", () => {
-    it("can construct a HotkeyStoreRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const hotkeyStore: Rule = new HotkeyStoreRule();
-      assert.isNotNull(hotkeyStore);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&hotkey)');
-      const hotkeyStore: Rule = new HotkeyStoreRule();
-      assert.isTrue(hotkeyStore.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY));
     });
   });
   describe("VariableStoreAssignRule Tests", () => {
