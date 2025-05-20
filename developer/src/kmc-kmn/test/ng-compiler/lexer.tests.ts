@@ -337,6 +337,16 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a COMMENT token (immediately followed by LF)", () => {
+      const comment: String = 'c';
+      recogniseTokens(
+        'c\n',
+        [
+          new Token(TokenTypes.COMMENT, comment),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 2, `c\n`),
+        ]
+      );
+    });
     it("can recognise a WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.WHITESPACE, ' ');
     });
