@@ -2,7 +2,7 @@ import { JSKeyboardProcessor } from "./jsKeyboardProcessor.js";
 import { VariableStoreDictionary } from "keyman/engine/keyboard";
 import { OutputTargetBase, type Transcription } from './outputTargetBase.js';
 import { Mock } from "./mock.js";
-import { type VariableStore } from "./systemStores.js";
+import { type VariableStore } from "./stores.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**

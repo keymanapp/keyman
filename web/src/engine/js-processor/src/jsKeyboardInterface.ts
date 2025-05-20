@@ -12,7 +12,9 @@ import { type OutputTargetBase }  from './outputTargetBase.js';
 import { type Deadkey } from './deadkeys.js';
 import { Mock } from "./mock.js";
 import { RuleBehavior }  from "./ruleBehavior.js";
-import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, SystemStoreIDs, SystemStore, MutableSystemStore, PlatformSystemStore, VariableStore, VariableStoreSerializer } from "./systemStores.js";
+import { SystemStoreIDs, SystemStore, MutableSystemStore } from "keyman/engine/keyboard";
+import { PlatformSystemStore } from './platformSystemStore.js';
+import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, VariableStore, VariableStoreSerializer } from "./stores.js";
 
 //#endregion
 
