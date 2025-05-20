@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.43 alpha 2025-05-20
+
+* chore(ios): FirstVoices certificate update (#13991)
+* fix(linux): configurable path in `.service` file when using basu (#13980)
+
 ## 19.0.42 alpha 2025-05-20
 
 * maint(linux): add `--no-werror` option to not report warnings as errors (#13988)
