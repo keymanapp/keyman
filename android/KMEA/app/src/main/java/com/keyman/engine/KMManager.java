@@ -486,6 +486,8 @@ public final class KMManager {
 
   public static void initialize(final Context context, KeyboardType keyboardType) {
     appContext = context.getApplicationContext();
+    // To facilitate tagging events with current keyboard, language, model.
+    KMLog.setEngineContext(appContext);
 
     if (!didCopyAssets || isTestMode()) {
       // Copy and install assets

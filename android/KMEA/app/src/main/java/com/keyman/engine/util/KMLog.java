@@ -4,21 +4,70 @@
 
 package com.keyman.engine.util;
 
+import static com.keyman.engine.KMManager.KMKey_LexicalModelID;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.BuildConfig;
 import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.LexicalModel;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
+
+import java.util.Map;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
 public final class KMLog {
+  // Needed to facilitate looking up the current keyboard & model.
+  @SuppressLint("StaticFieldLeak")
+  private static Context engineContext;
+
   private static final String TAG = "KMLog";
+
+  private static final String KEYBOARD_TAG = "keyboardId";
+  private static final String MODEL_TAG = "modelId";
+  private static final String LANGCODE_TAG = "languageCode";
+
+  private static boolean isLogging = false;
+
+  public static void setEngineContext(Context context) {
+    engineContext = context;
+  }
+
+  private static void tagDebugInfo() {
+    String kbdId = "";
+    String lngCode = "";
+    String modelId = "";
+    // Do not risk raising a new error while tagging info for another error.
+    try {
+      if (engineContext != null) {
+        Keyboard kbd = KMManager.getCurrentKeyboardInfo(null);
+        if (kbd != null) {
+          kbdId = kbd.getKeyboardID();
+          lngCode = kbd.getLanguageCode();
+          Map<String, String> modelMap = KMManager.getAssociatedLexicalModel(kbd.getLanguageID());
+          if (modelMap != null) {
+            modelId = modelMap.get(KMKey_LexicalModelID);
+            if (modelId == null) {
+              modelId = "";
+            }
+          }
+        }
+      }
+    } catch (Exception ignored) {
+    }
+    Sentry.setExtra(KEYBOARD_TAG, kbdId);
+    Sentry.setExtra(LANGCODE_TAG, lngCode);
+    Sentry.setExtra(MODEL_TAG, modelId);
+  }
 
   /**
    * Utility to log info and send to Sentry
@@ -26,13 +75,19 @@ public final class KMLog {
    * @param msg String of the info message
    */
   public static void LogInfo(String tag, String msg) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (msg != null && !msg.isEmpty()) {
       Log.i(tag, msg);
 
       if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+        tagDebugInfo();
         Sentry.captureMessage(msg, SentryLevel.INFO);
       }
     }
+    isLogging = false;
   }
 
   /**
@@ -46,9 +101,15 @@ public final class KMLog {
       return;
     }
 
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
+
     Log.i(tag, msg);
 
     if (!DependencyUtil.libraryExists(LibraryType.SENTRY) || !Sentry.isEnabled()) {
+      isLogging = false;
       return;
     }
 
@@ -74,7 +135,9 @@ public final class KMLog {
         crumb.setData("stacktrace", trace);
       }
     }
+    tagDebugInfo();
     Sentry.addBreadcrumb(crumb);
+    isLogging = false;
   }
 
   /**
@@ -83,6 +146,10 @@ public final class KMLog {
    * @param msg String of the error message
    */
   public static void LogError(String tag, String msg) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
 
@@ -91,9 +158,11 @@ public final class KMLog {
       }
 
       if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+        tagDebugInfo();
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
+    isLogging = false;
   }
 
   /**
@@ -103,6 +172,10 @@ public final class KMLog {
    * @param e Throwable exception
    */
   public static void LogException(String tag, String msg, Throwable e) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     String errorMsg = "";
     if (msg != null && !msg.isEmpty()) {
       errorMsg = msg + "\n" + e;
@@ -116,9 +189,11 @@ public final class KMLog {
     }
 
     if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      tagDebugInfo();
       Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
+    isLogging = false;
   }
 
   /**
@@ -131,7 +206,12 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (obj != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      tagDebugInfo();
       String objStr = null;
       try {
         objStr = obj.toString();
@@ -141,6 +221,8 @@ public final class KMLog {
       }
       // Report the original exception
       LogException(tag, msg, e);
+      Sentry.removeExtra(objName);
     }
+    isLogging = false;
   }
 }
