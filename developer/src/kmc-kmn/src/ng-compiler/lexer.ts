@@ -8,7 +8,7 @@
 
 export enum TokenTypes {
   ALWAYS             = "ALWAYS",
-  AMPHASAND          = "AMPHASAND",
+  AMPERSAND          = "AMPERSAND",
   ANSI               = "ANSI",
   ANY                = "ANY",
   BASELAYOUT         = "BASELAYOUT",
@@ -195,7 +195,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.RIGHT_BR,           new RegExp("^\\)")),
     new ScanRecogniser(TokenTypes.LEFT_SQ,            new RegExp("^\\[")),
     new ScanRecogniser(TokenTypes.RIGHT_SQ,           new RegExp("^\\]")),
-    new ScanRecogniser(TokenTypes.AMPHASAND,          new RegExp("^&")),
+    new ScanRecogniser(TokenTypes.AMPERSAND,          new RegExp("^&")),
     new ScanRecogniser(TokenTypes.CHEVRON,            new RegExp("^>")),
     new ScanRecogniser(TokenTypes.PLUS,               new RegExp("^\\+")),
     new ScanRecogniser(TokenTypes.COMMA,              new RegExp("^,")),

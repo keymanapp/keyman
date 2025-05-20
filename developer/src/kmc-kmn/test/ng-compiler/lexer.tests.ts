@@ -249,8 +249,8 @@ describe("Lexer Tests", () => {
     it("can recognise a RIGHT_SQ token", () => {
       recogniseToken(TokenTypes.RIGHT_SQ, ']');
     });
-    it("can recognise a AMPHASAND token", () => {
-      recogniseToken(TokenTypes.AMPHASAND, '&');
+    it("can recognise a AMPERSAND token", () => {
+      recogniseToken(TokenTypes.AMPERSAND, '&');
     });
     it("can recognise a CHEVRON token", () => {
       recogniseToken(TokenTypes.CHEVRON, '>');
@@ -675,7 +675,7 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.IF, 'if'),
           new Token(TokenTypes.LEFT_BR, '(', 1, 3),
-          new Token(TokenTypes.AMPHASAND, '&', 1, 4),
+          new Token(TokenTypes.AMPERSAND, '&', 1, 4),
           new Token(TokenTypes.NEWLAYER, 'newLayer', 1, 5),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 13),
           new Token(TokenTypes.EQUAL, '=', 1, 14),
@@ -685,7 +685,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.WHITESPACE, ' ', 1, 19),
           new Token(TokenTypes.IF, 'if', 1, 20),
           new Token(TokenTypes.LEFT_BR, '(', 1, 22),
-          new Token(TokenTypes.AMPHASAND, '&', 1, 23),
+          new Token(TokenTypes.AMPERSAND, '&', 1, 23),
           new Token(TokenTypes.LAYER, 'layer', 1, 24),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 29),
           new Token(TokenTypes.EQUAL, '=', 1, 30),
@@ -873,7 +873,7 @@ function recogniseStoreWithString(type: TokenTypes, text: String) {
     [
       new Token(TokenTypes.STORE, 'store'),
       new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-      new Token(TokenTypes.AMPHASAND, '&', 1, 7),
+      new Token(TokenTypes.AMPERSAND, '&', 1, 7),
       new Token(type, value, 1, 8),
       new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
       new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
