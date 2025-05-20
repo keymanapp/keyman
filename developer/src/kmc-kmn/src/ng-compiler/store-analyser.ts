@@ -53,7 +53,7 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
     this.store = new TokenRule(TokenTypes.STORE);
     this.leftBracket = new TokenRule(TokenTypes.LEFT_BR);
     this.optWhitespace = new OptionalWhiteSpaceRule();
-    this.amphasand = new TokenRule(TokenTypes.AMPHASAND);
+    this.amphasand = new TokenRule(TokenTypes.AMPERSAND);
     this.rightBracket = new TokenRule(TokenTypes.RIGHT_BR);
   }
 }
@@ -325,7 +325,7 @@ export class SetLayerRule extends SingleChildRule {
     const set: Rule               = new TokenRule(TokenTypes.SET, true);
     const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
     const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPHASAND);
+    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
     const layer: Rule             = new TokenRule(TokenTypes.LAYER, true);
     const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
     const equal: Rule             = new TokenRule(TokenTypes.EQUAL);

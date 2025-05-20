@@ -953,7 +953,7 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
 export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPHASAND);
+    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
     const systemStoreName: Rule   = new SystemStoreNameRule();
     const variableStoreName: Rule = new VariableStoreNameRule();
     this.rule = new SequenceRule([
@@ -967,7 +967,7 @@ export class IfSystemStoreStoreStatementRule extends AbstractIfStoreStatementRul
 export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPHASAND);
+    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
     const systemStoreName: Rule   = new SystemStoreNameRule();
     const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
