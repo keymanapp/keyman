@@ -39,35 +39,23 @@ export class SystemStoreAssignRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractSystemStoreRule extends SingleChildRule {
-  protected store: Rule;
-  protected leftBracket: Rule;
-  protected optWhitespace: Rule;
-  protected ampersand: Rule;
-  protected rightBracket: Rule;
-
-  public constructor() {
-    super();
-    this.store = new TokenRule(TokenTypes.STORE);
-    this.leftBracket = new TokenRule(TokenTypes.LEFT_BR);
-    this.optWhitespace = new OptionalWhiteSpaceRule();
-    this.ampersand = new TokenRule(TokenTypes.AMPERSAND);
-    this.rightBracket = new TokenRule(TokenTypes.RIGHT_BR);
-  }
-}
-
-export class SystemStoreRule extends AbstractSystemStoreRule {
+export class SystemStoreRule extends SingleChildRule {
   public constructor() {
     super();
     const systemStoreName: Rule = new SystemStoreNameRule();
+    const store                 = new TokenRule(TokenTypes.STORE);
+    const leftBracket           = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace         = new OptionalWhiteSpaceRule();
+    const ampersand             = new TokenRule(TokenTypes.AMPERSAND);
+    const rightBracket          = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      this.store,
-      this.leftBracket,
-      this.optWhitespace,
-      this.ampersand,
+      store,
+      leftBracket,
+      optWhitespace,
+      ampersand,
       systemStoreName,
-      this.optWhitespace,
-      this.rightBracket,
+      optWhitespace,
+      rightBracket,
     ]);
   }
 }
