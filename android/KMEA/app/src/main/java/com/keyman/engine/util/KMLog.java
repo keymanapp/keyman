@@ -29,6 +29,10 @@ public final class KMLog {
   private static final String MODEL_TAG = "modelId";
   private static final String LANGCODE_TAG = "languageCode";
 
+  // Some of the methods used to generate debug logging information can, themselves,
+  // trigger errors that can also trigger the same logging.  We must not get
+  // caught in an infinite loop / stack-overflow; this field helps us avoid states
+  // that would otherwise cause error-looping, etc.
   private static boolean isLogging = false;
 
   private static void tagDebugInfo() {
@@ -52,7 +56,9 @@ public final class KMLog {
           }
         }
       }
-    } catch (Exception ignored) {
+    } catch (Exception ex) {
+      String msg = ex.getMessage() == null ? "" : ex.getMessage();
+      Sentry.setExtra("debugLoggingError", msg);
     }
     Sentry.setExtra(KEYBOARD_TAG, kbdId);
     Sentry.setExtra(KEYBOARD_COUNT_TAG, "" + kbdCount);
@@ -212,6 +218,8 @@ public final class KMLog {
       }
       // Report the original exception
       LogException(tag, msg, e);
+      // And remove the exception-specific tagged data, lest it also be
+      // tracked on subsequent errors not associated with the current call.
       Sentry.removeExtra(objName);
     }
     isLogging = false;
