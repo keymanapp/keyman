@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3";
 
 import {
   DeviceSpec, KeyboardProperties, ManagedPromise, OutputTargetInterface,
-  RuleBehavior, physicalKeyDeviceAlias, SpacebarText
+  ProcessorAction, physicalKeyDeviceAlias, SpacebarText
 } from "keyman/engine/keyboard";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
 import { DeviceDetector } from "./headless/deviceDetector.js";
@@ -112,7 +112,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
    * @param ruleBehavior  The full effects of keystroke + postkeystroke rules from a processed keystroke.
    * @param outputTarget  The engine's current source for context
    */
-  onRuleFinalization(ruleBehavior: RuleBehavior, outputTarget: OutputTargetInterface) {};
+  onRuleFinalization(ruleBehavior: ProcessorAction, outputTarget: OutputTargetInterface) {};
 }
 
 export interface InitOptionSpec extends PathOptionSpec {

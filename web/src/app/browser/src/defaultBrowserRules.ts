@@ -30,7 +30,7 @@ export default class DefaultBrowserRules extends DefaultRules {
   }
 
   /**
-   * applyCommand - used when a RuleBehavior represents a non-text "command" within the Engine.
+   * applyCommand - used when a ProcessorAction represents a non-text "command" within the Engine.
    */
   applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetInterface): void {
     const code = this.codeForEvent(Lkc);
