@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -316,6 +316,36 @@ describe("KMN Analyser Tests", () => {
       const text: Rule = new TextRule();
       assert.isTrue(text.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.OUTS));
+    });
+  });
+  describe("PlainTextRule Tests", () => {
+    it("can construct a PlainTextRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const plainText: Rule = new PlainTextRule();
+      assert.isNotNull(plainText);
+    });
+    it("can parse correctly (text range)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('"a".."c"');
+      const plainText: Rule = new PlainTextRule();
+      assert.isTrue(plainText.parse(root));
+      const rangeNode = root.getSoleChildOfType(NodeTypes.RANGE);
+      assert.isNotNull(rangeNode);
+      const children = rangeNode.getChildren();
+      assert.equal(children[0].nodeType, NodeTypes.STRING);
+      assert.equal(children[0].getText(), '"a"');
+      assert.equal(children[1].nodeType, NodeTypes.STRING);
+      assert.equal(children[1].getText(), '"c"');
+    });
+    it("can parse correctly (simple text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('"a"');
+      const plainText: Rule = new PlainTextRule();
+      assert.isTrue(plainText.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (outs statement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
+      const plainText: Rule = new PlainTextRule();
+      assert.isFalse(plainText.parse(root));
     });
   });
   describe("SimpleTextRule Tests", () => {

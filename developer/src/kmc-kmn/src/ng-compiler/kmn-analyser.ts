@@ -127,12 +127,18 @@ export class PrePadTextRule extends SingleChildRule {
 export class TextRule extends SingleChildRule {
   public constructor() {
     super();
+    const plainText: Rule     = new PlainTextRule();
+    const outsStatement: Rule = new OutsStatementRule();
+    this.rule = new AlternateRule([plainText, outsStatement]);
+  }
+}
+
+export class PlainTextRule extends SingleChildRule {
+  public constructor() {
+    super();
     const textRange: Rule     = new TextRangeRule();
     const simpleText: Rule    = new SimpleTextRule();
-    const outsStatement: Rule = new OutsStatementRule();
-    this.rule = new AlternateRule([
-      textRange, simpleText, outsStatement,
-    ]);
+    this.rule = new AlternateRule([textRange, simpleText]);
   }
 }
 

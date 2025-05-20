@@ -7,7 +7,8 @@ continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE WHITESPACE?
 content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
   capsAlwaysOff|capsOnOnly|shiftFreesCaps|variableStoreAssign|ruleBlock
 prePadText: padding text
-text: textRange|simpleText|outsStatement
+text: plainText|outsStatement
+plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR
 textRange: simpleText rangeEnd+
 rangeEnd: WHITESPACE? RANGE WHITESPACE? simpleText
