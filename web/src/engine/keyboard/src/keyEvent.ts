@@ -64,7 +64,7 @@ export interface KeyEventSpec {
  * This class is defined within its own file so that it can be loaded by code outside of KMW without
  * having to actually load the entirety of KMW.
  */
-export default class KeyEvent implements KeyEventSpec {
+export class KeyEvent implements KeyEventSpec {
   Lcode: number;
   Lstates: number;
   LmodifierChange?: boolean;
