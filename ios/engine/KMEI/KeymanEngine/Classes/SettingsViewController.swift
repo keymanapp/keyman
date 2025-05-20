@@ -111,13 +111,13 @@ open class SettingsViewController: UITableViewController {
       "reuseid" : "installfile"
       ])
 
-    #if DEBUG && !NO_SENTRY
+//    #if DEBUG && !NO_SENTRY
             itemsArray.append([
       "title": "Force a crash",
       "subtitle": "Test Sentry error-reporting integration",
       "reuseid" : "forcederror"
       ])
-    #endif
+//    #endif
 
     _ = view
   }
