@@ -95,8 +95,8 @@ export class SystemStoreNameRule extends AlternateTokenRule {
 export class VariableStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const variableStore: Rule = new VariableStoreRule();
-    const prePadText: Rule = new PrePadTextRule();
+    const variableStore: Rule       = new VariableStoreRule();
+    const prePadText: Rule          = new PrePadTextRule();
     const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
     this.rule = new SequenceRule([variableStore, oneOrManyPaddedText]);
   }
@@ -119,7 +119,7 @@ export class VariableStoreAssignRule extends SingleChildRule {
 export class VariableStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const store: Rule = new TokenRule(TokenTypes.STORE, true);
+    const store: Rule              = new TokenRule(TokenTypes.STORE, true);
     const bracketedStoreName: Rule = new BracketedStoreNameRule();
     this.rule = new SequenceRule([store, bracketedStoreName]);
   }
@@ -128,7 +128,7 @@ export class VariableStoreRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const storeNode = tmp.getSoleChildOfType(NodeTypes.STORE);
+      const storeNode     = tmp.getSoleChildOfType(NodeTypes.STORE);
       const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
       storeNode.addChild(storeNameNode);
       node.addChild(storeNode);
@@ -140,10 +140,10 @@ export class VariableStoreRule extends SingleChildRule {
 export class BracketedStoreNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const leftBracket: Rule = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
     const variableStoreName: Rule = new VariableStoreNameRule();
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       leftBracket, optWhitespace, variableStoreName, optWhitespace, rightBracket,
     ]);
@@ -156,7 +156,7 @@ export class VariableStoreNameRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const parameters: Token[] = [];
+    const parameters: Token[]   = [];
     const parseSuccess: boolean = parameterSequence(parameters, 1);
     if (parseSuccess) {
       node.addToken(NodeTypes.STORENAME, parameters[0]);
@@ -215,15 +215,15 @@ export class SetStoreRule extends SingleChildRule {
 export class SetLayerRule extends SingleChildRule {
   public constructor() {
     super();
-    const set: Rule               = new TokenRule(TokenTypes.SET, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const ampersand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
-    const layer: Rule             = new TokenRule(TokenTypes.LAYER, true);
-    const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
-    const equal: Rule             = new TokenRule(TokenTypes.EQUAL);
-    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule      = new TokenRule(TokenTypes.RIGHT_BR);
+    const set: Rule           = new TokenRule(TokenTypes.SET, true);
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const ampersand: Rule     = new TokenRule(TokenTypes.AMPERSAND);
+    const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE);
+    const equal: Rule         = new TokenRule(TokenTypes.EQUAL);
+    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
 
     this.rule = new SequenceRule([
       set,
@@ -312,11 +312,11 @@ export class CapsAlwaysOffRule extends CapsLockStatementRule {
 export class CapsOnOnlyRule extends CapsLockStatementRule {
   public constructor() {
     super();
-    this.tokenType     = TokenTypes.CAPSONONLY;
-    this.nodeType      = NodeTypes.CAPSONONLY;
-    const caps: Rule   = new TokenRule(TokenTypes.CAPS);
-    const on: Rule     = new TokenRule(TokenTypes.ON);
-    const only: Rule   = new TokenRule(TokenTypes.ONLY);
+    this.tokenType   = TokenTypes.CAPSONONLY;
+    this.nodeType    = NodeTypes.CAPSONONLY;
+    const caps: Rule = new TokenRule(TokenTypes.CAPS);
+    const on: Rule   = new TokenRule(TokenTypes.ON);
+    const only: Rule = new TokenRule(TokenTypes.ONLY);
     this.rule = new SequenceRule([
       caps, this.whitespace, on, this.whitespace, only,
     ]);
