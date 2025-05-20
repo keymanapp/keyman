@@ -16,9 +16,14 @@ import os.log
  */
 public class SentryManager {
   private static var _started: Bool = false
+  private static var engineHasInitialized: Bool = false
 
   public static var hasStarted: Bool {
     return _started
+  }
+  
+  public static func setEngineInitialized() {
+    engineHasInitialized = true
   }
 
   public static func start(sendingEnabled: Bool = true) {
@@ -89,6 +94,31 @@ public class SentryManager {
       return SentryManager.enabled
     #endif
   }
+  
+  private static func setDebugInfo() {
+    // We cannot directly use Manager.shared while it's initializing,
+    // and there are logging lines during that process that can lead here!
+    guard engineHasInitialized else {
+      return
+    }
+    
+    let kbd = Manager.shared.currentKeyboard
+    let modelId = Manager.shared.currentLexicalModelID?.id ?? ""
+    let kbdId = kbd?.id ?? ""
+    let langCode = kbd?.lgCode ?? ""
+    let kbdCnt = "\(Storage.active.userDefaults.userKeyboards?.count ?? 0)"
+    
+    let engineState: [String: String] = [
+      "installedKeyboardCount": kbdCnt,
+      "keyboardId" : kbdId,
+      "languageCode" : langCode,
+      "modelId" : modelId,
+    ]
+
+    SentrySDK.configureScope { scope in
+      scope.setContext(value: engineState, key: "engineState")
+    }
+  }
 
   /**
    * Captures a Sentry event  and safely bypass the Sentry component if not activated by the app.
@@ -96,6 +126,7 @@ public class SentryManager {
   public static func capture(_ event: Sentry.Event) {
     // Guarded in case a library consumer decides against initializing Sentry.
     if _started {
+      setDebugInfo()
       SentrySDK.capture(event: event)
     }
   }
@@ -131,6 +162,7 @@ public class SentryManager {
   public static func breadcrumb(crumb: Sentry.Breadcrumb) {
     // Guarded in case a library consumer decides against initializing Sentry.
     if _started {
+      setDebugInfo()
       SentrySDK.addBreadcrumb(crumb)
     }
   }
@@ -151,6 +183,7 @@ public class SentryManager {
 
   public static func forceError() {
     SentrySDK.addBreadcrumb(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
-    SentrySDK.crash()
+    capture("Deliberate testing error", sentryLevel: .error)
+//    SentrySDK.crash()
   }
 }
