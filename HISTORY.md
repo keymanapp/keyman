@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.42 alpha 2025-05-20
+
+* maint(linux): add `--no-werror` option to not report warnings as errors (#13988)
+
 ## 19.0.41 alpha 2025-05-19
 
 * fix(web): inspectable test-script mode should not be auto-enabled in local-env tests (#13895)
