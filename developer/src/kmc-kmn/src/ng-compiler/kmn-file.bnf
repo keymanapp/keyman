@@ -4,7 +4,7 @@ contentLine: WHITESPACE? content WHITESPACE? COMMENT? NEWLINE
 blankLine: WHITESPACE? COMMENT? NEWLINE
 padding: continuationNewline|WHITESPACE
 continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE WHITESPACE?
-content: stringSystemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
+content: systemStoreAssign|casedkeysStoreAssign|hotkeyStoreAssign|
   capsAlwaysOff|capsOnOnly|shiftFreesCaps|variableStoreAssign|ruleBlock
 prePadText: padding text
 text: plainText|outsStatement
@@ -83,7 +83,7 @@ offset: PARAMETER
 contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR
 
 # System and Variable Store Rules
-stringSystemStoreAssign: stringSystemStore padding STRING
+systemStoreAssign: stringSystemStore prePadText+
 stringSystemStore: STORE LEFT_BR WHITESPACE? AMPERSAND stringSystemStoreName WHITESPACE? RIGHT_BR
 stringSystemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|

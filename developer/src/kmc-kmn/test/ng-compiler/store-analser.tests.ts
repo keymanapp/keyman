@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { PermittedKeywordRule, SetLayerRule, SetStoreRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { StringSystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -23,23 +23,23 @@ describe("KMN Store Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
   });
-  describe("StringSystemStoreAssignRule Tests", () => {
-    it("can construct a StringSystemStoreAssignRule", () => {
+  describe("SystemStoreAssignRule Tests", () => {
+    it("can construct a SystemStoreAssignRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
-      assert.isNotNull(stringSystemStoreAssign);
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isNotNull(systemStoreAssign);
     });
     it("can parse bitmap store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
-      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
-      assert.isTrue(stringSystemStoreAssign.parse(root));
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse bitmap store correctly (with continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)\\\n"filename"');
-      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
-      assert.isTrue(stringSystemStoreAssign.parse(root));
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
       const bitmapNode = root.getSoleChildOfType(NodeTypes.BITMAP);
       assert.isNotNull(bitmapNode);
       assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.STRING));
@@ -47,15 +47,15 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse copyright store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
-      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
-      assert.isTrue(stringSystemStoreAssign.parse(root));
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });
     it("can parse includecodes store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&includecodes) "filename"');
-      const stringSystemStoreAssign: Rule = new StringSystemStoreAssignRule();
-      assert.isTrue(stringSystemStoreAssign.parse(root));
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INCLUDECODES));
       assert.isNotNull(root.getSoleChild().getSoleChildOfType(NodeTypes.STRING));
     });

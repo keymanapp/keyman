@@ -15,26 +15,24 @@ import { OneOrManyRule, parameterSequence } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 
-export class StringSystemStoreAssignRule extends SingleChildRule {
+export class SystemStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringSystemStore: Rule = new StringSystemStoreRule();
-    const padding: Rule = new PaddingRule();
-    const stringRule: Rule = new TokenRule(TokenTypes.STRING, true);
-    this.rule = new SequenceRule([
-      stringSystemStore, padding, stringRule,
-    ]);
+    const stringSystemStore: Rule   = new StringSystemStoreRule();
+    const prePadText: Rule          = new PrePadTextRule();
+    const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
+    this.rule = new SequenceRule([stringSystemStore, oneOrManyPaddedText]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const stringNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STRING);
-      const lineNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.LINE);
-      const storeNode: ASTNode = tmp.getSoleChild();
-      storeNode.addChild(stringNode);
-      storeNode.addChild(lineNode);
+      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
+      const children: ASTNode[]  = tmp.getChildren();
+      const storeNode: ASTNode   = children.splice(0, 1)[0];
+      storeNode.addChildren(children);
+      storeNode.addChildren(lineNodes);
       node.addChild(storeNode);
     }
     return parseSuccess;

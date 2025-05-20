@@ -237,7 +237,7 @@ describe("KMN Analyser Tests", () => {
       const content: Rule = new ContentRule();
       assert.isNotNull(content);
     });
-    it("can parse correctly (string system store assign)", () => {
+    it("can parse correctly (system store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
