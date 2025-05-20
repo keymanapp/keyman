@@ -50,7 +50,7 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename: string = ""): Promise<ConverterToKmnArtifacts> {
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnArtifacts> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -60,19 +60,21 @@ export class KeylayoutToKmnConverter {
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: object = KeylayoutReader.read(inputFilename);
     if (!jsonO) {
-      throw new Error('Error while processing read()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
+      return null;
     }
 
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
     if (!outArray) {
-      throw new Error('Error while processing convert()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
+      return null;
     }
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
     const out_text_ok: boolean = kmnFileWriter.write(outArray);
-
     if (!out_text_ok) {
-      throw new Error('Error while processing write()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+      return null;
     }
     return null;
   }
@@ -451,13 +453,12 @@ export class KeylayoutToKmnConverter {
         }
 
         if (isFirstUsedHere_dk) {
-          const ruleArray: string[] = [];
           object_array[i].unique_deadkey = unique_dkB_count;
-          ruleArray.push(object_array[i].modifier_deadkey);
-          ruleArray.push(object_array[i].deadkey);
-          ruleArray.push(String(unique_dkB_count));
+          list_of_unique_Text2_rules.push([
+            object_array[i].modifier_deadkey,
+            object_array[i].deadkey,
+            String(unique_dkB_count)]);
           unique_dkB_count++;
-          list_of_unique_Text2_rules.push(ruleArray);
         }
       }
     }
@@ -493,13 +494,13 @@ export class KeylayoutToKmnConverter {
         }
 
         if (isFirstUsedHere_prev_dk) {
-          const ruleArray: string[] = [];
           object_array[i].unique_deadkey = unique_dkB_count;
-          ruleArray.push(object_array[i].modifier_prev_deadkey);
-          ruleArray.push(object_array[i].prev_deadkey);
-          ruleArray.push(String(unique_dkB_count));
+          list_of_unique_Text2_rules.push([
+            object_array[i].modifier_prev_deadkey,
+            object_array[i].prev_deadkey,
+            String(unique_dkB_count)
+          ]);
           unique_dkB_count++;
-          list_of_unique_Text2_rules.push(ruleArray);
         }
       }
     }
@@ -801,17 +802,15 @@ export class KeylayoutToKmnConverter {
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          const returnarray: string[] = [];
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
             data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])));
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index']);
-            returnarray.push(search[k][2]);
-          }
-          if (returnarray.length > 0) {
-            returnarray2D.push(returnarray);
+            returnarray2D.push([
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              search[k][2]
+            ]);
           }
         }
       }
@@ -830,14 +829,12 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-        const returnarray: string[] = [];
         if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
-          returnarray.push(data.keyboard.actions.action[i]['@_id']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_state']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_output']);
-        }
-        if (returnarray.length > 0) {
-          returnarray2D.push(returnarray);
+          returnarray2D.push([
+            data.keyboard.actions.action[i]['@_id'],
+            data.keyboard.actions.action[i].when[j]['@_state'],
+            data.keyboard.actions.action[i].when[j]['@_output']
+          ]);
         }
       }
     }
@@ -857,23 +854,19 @@ export class KeylayoutToKmnConverter {
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
         const behaviour: number = Number(search[i][3]);
-
         for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
-          const returnarray1D: string[] = [];
-          // KeyName
-          returnarray1D.push(String(search[i][1]));
-          // actionId
-          returnarray1D.push(String(search[i][2]));
-          // behaviour
-          returnarray1D.push(String(search[i][3]));
-          // modifier
-          returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)));
-          // output
-          returnarray1D.push(String(search[i][4]));
-
-          if (returnarray1D.length > 0) {
-            returnarray.push(returnarray1D);
-          }
+          returnarray.push([
+            // KeyName
+            String(search[i][1]),
+            // actionId
+            String(search[i][2]),
+            // behaviour
+            String(search[i][3]),
+            // modifier
+            String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
+            // output
+            String(search[i][4])
+          ]);
         }
       }
     }
@@ -912,21 +905,16 @@ export class KeylayoutToKmnConverter {
       for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
-            const returnarray: string[] = [];
             const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
             const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
             const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
-
-            returnarray.push(search);
-            returnarray.push(outchar);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(behaviour);
-            returnarray.push(keyName);
-            returnarray.push(modifierkmn);
-
-            if (returnarray.length > 0) {
-              returnarray2D.push(returnarray);
-            }
+            returnarray2D.push([
+              search,
+              outchar,
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              behaviour,
+              keyName,
+              modifierkmn]);
           }
         }
       }
@@ -956,13 +944,8 @@ export class KeylayoutToKmnConverter {
     const mapIndexArray_2D: number[][] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-        const mapIndexArrayperKey: number[] = [];
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-          mapIndexArrayperKey.push(i);
-        }
-        if (mapIndexArrayperKey.length > 0) {
-          mapIndexArray_2D.push(mapIndexArrayperKey);
+          mapIndexArray_2D.push([data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], i]);
         }
       }
     }

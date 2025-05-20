@@ -30,4 +30,20 @@ export class ConverterMessages {
   static Error_FileNotFound = (o: { inputFilename: string; }) => m(
     this.ERROR_FileNotFound, `Input filename '${def(o.inputFilename)}
     ' does not exist or could not be loaded.`);
+
+  static ERROR_UnableToRead = SevError | 0x0004;
+  static Error_UnableToRead = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToRead, `Input file '${def(o.inputFilename)}
+    ' could not be read.`);
+
+  static ERROR_UnableToConvert = SevError | 0x0005;
+  static Error_UnableToConvert = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToConvert, `Input file '${def(o.inputFilename)}
+    ' could not be converted.`);
+
+  static ERROR_UnableToWrite = SevError | 0x0006;
+  static Error_UnableToWrite = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToWrite, `Output file for '${def(o.inputFilename)}
+    ' could not be written.`);
+
 }
