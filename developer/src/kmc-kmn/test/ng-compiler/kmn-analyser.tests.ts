@@ -1414,23 +1414,23 @@ describe("KMN Analyser Tests", () => {
       const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
       assert.isNotNull(ifSystemStoreName);
     });
-    it("can parse correctly (platform)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform');
+    it("can parse correctly (string system store name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('bitmap');
       const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
       assert.isTrue(ifSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
-    });
-    it("can parse correctly (layer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer');
-      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
-      assert.isTrue(ifSystemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
     it("can parse correctly (baselayout)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('baselayout');
       const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
       assert.isTrue(ifSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BASELAYOUT));
+    });
+    it("can parse correctly (layer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
     });
     it("can parse correctly (newLayer)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('newLayer');
@@ -1443,6 +1443,12 @@ describe("KMN Analyser Tests", () => {
       const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
       assert.isTrue(ifSystemStoreName.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.OLDLAYER));
+    });
+    it("can parse correctly (platform)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform');
+      const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
+      assert.isTrue(ifSystemStoreName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM));
     });
   });
   describe("ComparisonRule Tests", () => {

@@ -11,7 +11,7 @@
 import { PaddingRule, OptionalWhiteSpaceRule, PrePadTextRule, VirtualKeyRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
-import { OneOrManyRule, parameterSequence, AlternateRule } from "./recursive-descent.js";
+import { OneOrManyRule, parameterSequence } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 
@@ -45,7 +45,7 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
   protected store: Rule;
   protected leftBracket: Rule;
   protected optWhitespace: Rule;
-  protected amphasand: Rule;
+  protected ampersand: Rule;
   protected rightBracket: Rule;
 
   public constructor() {
@@ -53,7 +53,7 @@ abstract class AbstractSystemStoreRule extends SingleChildRule {
     this.store = new TokenRule(TokenTypes.STORE);
     this.leftBracket = new TokenRule(TokenTypes.LEFT_BR);
     this.optWhitespace = new OptionalWhiteSpaceRule();
-    this.amphasand = new TokenRule(TokenTypes.AMPERSAND);
+    this.ampersand = new TokenRule(TokenTypes.AMPERSAND);
     this.rightBracket = new TokenRule(TokenTypes.RIGHT_BR);
   }
 }
@@ -66,7 +66,7 @@ export class StringSystemStoreRule extends AbstractSystemStoreRule {
       this.store,
       this.leftBracket,
       this.optWhitespace,
-      this.amphasand,
+      this.ampersand,
       stringSystemStoreName,
       this.optWhitespace,
       this.rightBracket,
@@ -78,9 +78,11 @@ export class StringSystemStoreNameRule extends AlternateTokenRule {
   public constructor() {
     super([
       TokenTypes.BITMAP,
+      TokenTypes.CASEDKEYS,
       TokenTypes.COPYRIGHT,
       TokenTypes.DISPLAYMAP,
       TokenTypes.ETHNOLOGUECODE,
+      TokenTypes.HOTKEY,
       TokenTypes.INCLUDECODES,
       TokenTypes.KEYBOARDVERSION,
       TokenTypes.KMW_EMBEDCSS,
@@ -136,7 +138,7 @@ export class CasedkeysStoreRule extends AbstractSystemStoreRule {
       this.store,
       this.leftBracket,
       this.optWhitespace,
-      this.amphasand,
+      this.ampersand,
       casedkeys,
       this.optWhitespace,
       this.rightBracket,
@@ -176,7 +178,7 @@ export class HotkeyStoreRule extends AbstractSystemStoreRule {
       this.store,
       this.leftBracket,
       this.optWhitespace,
-      this.amphasand,
+      this.ampersand,
       hotkey,
       this.optWhitespace,
       this.rightBracket,
@@ -257,21 +259,6 @@ export class VariableStoreNameRule extends SingleChildRule {
   };
 }
 
-export class SystemStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
-    const casedkeys: Rule = new TokenRule(TokenTypes.CASEDKEYS, true);
-    const hotkey: Rule = new TokenRule(TokenTypes.HOTKEY, true);
-    const layer: Rule = new TokenRule(TokenTypes.LAYER, true);
-    const newLayer: Rule = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldLayer: Rule = new TokenRule(TokenTypes.OLDLAYER, true);
-    this.rule = new AlternateRule([
-      stringSystemStoreName, casedkeys, hotkey, layer, newLayer, oldLayer,
-    ]);
-  }
-}
-
 export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
     super([
@@ -325,7 +312,7 @@ export class SetLayerRule extends SingleChildRule {
     const set: Rule               = new TokenRule(TokenTypes.SET, true);
     const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
     const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
+    const ampersand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
     const layer: Rule             = new TokenRule(TokenTypes.LAYER, true);
     const whitespace: Rule        = new TokenRule(TokenTypes.WHITESPACE);
     const equal: Rule             = new TokenRule(TokenTypes.EQUAL);
@@ -336,7 +323,7 @@ export class SetLayerRule extends SingleChildRule {
       set,
       leftBracket,
       optWhitespace,
-      amphasand,
+      ampersand,
       layer,
       whitespace,
       equal,

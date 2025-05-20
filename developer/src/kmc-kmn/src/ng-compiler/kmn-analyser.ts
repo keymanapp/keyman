@@ -9,9 +9,8 @@
 import { Token, TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AlternateTokenRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule } from "./store-analyser.js";
-import { StringSystemStoreAssignRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, HotkeyStoreAssignRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, StringSystemStoreNameRule } from "./store-analyser.js";
+import { StringSystemStoreAssignRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -942,26 +941,34 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
 export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const amphasand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
-    const systemStoreName: Rule   = new SystemStoreNameRule();
+    const ampersand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
+    const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
     const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, amphasand,
-      systemStoreName, this.whitespace, this.comparison, this.whitespace,
+      this.ifRule, this.leftBracket, this.optWhitespace, ampersand,
+      ifSystemStoreName, this.whitespace, this.comparison, this.whitespace,
       stringRule, this.optWhitespace, this.rightBracket,
     ]);
   }
 }
 
-export class IfSystemStoreNameRule extends AlternateTokenRule {
+export class IfSystemStoreNameRule extends SingleChildRule {
   public constructor() {
-    super([
-      TokenTypes.PLATFORM,
-      TokenTypes.LAYER,
-      TokenTypes.BASELAYOUT,
-      TokenTypes.NEWLAYER,
-      TokenTypes.OLDLAYER,
-    ], true);
+    super();
+    const stringSystemStoreName: Rule = new StringSystemStoreNameRule();
+    const baselayout: Rule            = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const layer: Rule                 = new TokenRule(TokenTypes.LAYER, true);
+    const newLayer: Rule              = new TokenRule(TokenTypes.NEWLAYER, true);
+    const oldLayer: Rule              = new TokenRule(TokenTypes.OLDLAYER, true);
+    const platform: Rule              = new TokenRule(TokenTypes.PLATFORM, true);
+    this.rule = new AlternateRule([
+      stringSystemStoreName,
+      baselayout,
+      layer,
+      newLayer,
+      oldLayer,
+      platform,
+    ]);
   }
 }
 

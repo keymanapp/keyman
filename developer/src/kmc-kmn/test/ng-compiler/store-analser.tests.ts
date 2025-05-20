@@ -15,7 +15,7 @@ import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, CasedkeysStoreAssignRule, CasedkeysStoreRule, HotkeyStoreAssignRule, HotkeyStoreRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerRule, SetStoreRule, StringSystemStoreAssignRule, StringSystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
-import { StringSystemStoreRule, SystemStoreNameRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { StringSystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -100,9 +100,11 @@ describe("KMN Store Analyser Tests", () => {
     it("can parse correctly", () => {
       [
         {code: 'bitmap',           nodeType: NodeTypes.BITMAP},
+        {code: 'casedkeys',        nodeType: NodeTypes.CASEDKEYS},
         {code: 'copyright',        nodeType: NodeTypes.COPYRIGHT},
         {code: 'displaymap',       nodeType: NodeTypes.DISPLAYMAP},
         {code: 'ethnologuecode',   nodeType: NodeTypes.ETHNOLOGUECODE},
+        {code: 'hotkey',           nodeType: NodeTypes.HOTKEY},
         {code: 'includecodes',     nodeType: NodeTypes.INCLUDECODES},
         {code: 'keyboardversion',  nodeType: NodeTypes.KEYBOARDVERSION},
         {code: 'kmw_embedcss',     nodeType: NodeTypes.KMW_EMBEDCSS},
@@ -377,49 +379,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
       assert.isNotNull(storeNameNode);
       assert.equal(storeNameNode.getText(), 'digit');
-    });
-  });
-  describe("SystemStoreNameRule Tests", () => {
-    it("can construct a SystemStoreNameRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isNotNull(systemStoreName);
-    });
-    it("can parse correctly (bitmap)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('bitmap');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
-    });
-    it("can parse correctly (casedkeys)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('casedkeys');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.CASEDKEYS));
-    });
-    it("can parse correctly (hotkey)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('hotkey');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY));
-    });
-    it("can parse correctly (layer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
-    });
-    it("can parse correctly (newLayer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('newLayer');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWLAYER));
-    });
-    it("can parse correctly (oldLayer)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('oldLayer');
-      const systemStoreName: Rule = new SystemStoreNameRule();
-      assert.isTrue(systemStoreName.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.OLDLAYER));
     });
   });
   describe("PermittedKeywordRule Tests", () => {
