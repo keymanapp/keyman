@@ -206,7 +206,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.STRING,             new RegExp("^('.*?'|\".*?\")")),
     new ScanRecogniser(TokenTypes.MODIFIER,           new RegExp("^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\\S\\r\\n])", "i")),
     new ScanRecogniser(TokenTypes.KEY_CODE,           new RegExp("^(((K_|T_|U_)[^\\]\\s]+)|[A-E]\\d\\d)(?=[^\\S\\r\\n]*\\])", "i")),
-    new ScanRecogniser(TokenTypes.COMMENT,            new RegExp("^c[^\\S\\r\\n][^\\r\\n]*", "i")),
+    new ScanRecogniser(TokenTypes.COMMENT,            new RegExp("^c(([^\\S\\r\\n][^\\r\\n]*)|(?=(\\r\\n|\\n|\\r)))", "i")),
     new ScanRecogniser(TokenTypes.WHITESPACE,         new RegExp("^[^\\S\\r\\n]+")),
     new ScanRecogniser(TokenTypes.CONTINUATION,       new RegExp("^\\\\(?=([^\\S\\r\\n]*(\\r\\n|\\n|\\r)))")),
     new ScanRecogniser(TokenTypes.NEWLINE,            new RegExp("^(\\r\\n|\\n|\\r)")),
