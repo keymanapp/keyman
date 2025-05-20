@@ -592,10 +592,12 @@ end;
 
 procedure TState.HandleFirstRun;
 begin
-  // If Handle First run hits base implementation
-  // something is wrong.
-  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-    'Handle first run called in state:"' + Self.ClassName + '"');
+  // A Keyman install file can be downloaded and installed directly therefore
+  // the state machine could be in a "unexpected" state such as UpdateAvailable.
+  // It will still be good to record the breadcrumb of the state incase there is a error
+  // during the first run.
+  TKeymanSentryClient.Breadcrumb('info',
+    'TState.HandleFirstRun first run called in state:"' + Self.ClassName + '"', 'update');
   bucStateContext.RemoveCachedFiles;
   ChangeState(IdleState);
 end;
