@@ -2,7 +2,7 @@ import { Codes, DeviceSpec, KeyEvent, KeyMapping, JSKeyboard } from 'keyman/engi
 import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
-import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
+import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
@@ -203,7 +203,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   return processedEvent;
 }
 
-export default class HardwareEventKeyboard extends HardKeyboard {
+export default class HardwareEventKeyboard extends HardKeyboardBase {
   private readonly hardDevice: DeviceSpec;
 
   // Needed properties & methods:

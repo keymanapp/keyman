@@ -1,7 +1,7 @@
 import { KMWString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
-import { OutputTarget } from 'keyman/engine/keyboard';
+import { OutputTargetInterface } from 'keyman/engine/keyboard';
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
@@ -64,7 +64,7 @@ export class Transcription {
 
 export type Alternate = LexicalModelTypes.ProbabilityMass<LexicalModelTypes.Transform>;
 
-export abstract class OutputTargetBase implements OutputTarget {
+export abstract class OutputTargetBase implements OutputTargetInterface {
   private _dks: DeadkeyTracker;
 
   constructor() {

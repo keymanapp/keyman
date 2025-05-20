@@ -125,7 +125,8 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * where and when appropriate.
    *
    * @param   {object}  Lkc           The pre-analyzed KeyEvent object
-   * @param   {boolean} outputTarget  The OutputTarget receiving the KeyEvent
+   * @param   {OutputTargetInterface} outputTarget  The OutputTarget receiving the KeyEvent
+   * @param   {boolean}  readonly      True if the target is read-only
    * @return  {string}
    */
   private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
