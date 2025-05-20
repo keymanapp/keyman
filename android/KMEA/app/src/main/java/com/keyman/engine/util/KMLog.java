@@ -6,8 +6,6 @@ package com.keyman.engine.util;
 
 import static com.keyman.engine.KMManager.KMKey_LexicalModelID;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,8 +13,6 @@ import com.keyman.engine.BaseActivity;
 import com.keyman.engine.BuildConfig;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Keyboard;
-import com.keyman.engine.data.LexicalModel;
-import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 
 import java.util.Map;
@@ -26,45 +22,40 @@ import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
 public final class KMLog {
-  // Needed to facilitate looking up the current keyboard & model.
-  @SuppressLint("StaticFieldLeak")
-  private static Context engineContext;
-
   private static final String TAG = "KMLog";
 
   private static final String KEYBOARD_TAG = "keyboardId";
+  private static final String KEYBOARD_COUNT_TAG = "installedKeyboardCount";
   private static final String MODEL_TAG = "modelId";
   private static final String LANGCODE_TAG = "languageCode";
 
   private static boolean isLogging = false;
 
-  public static void setEngineContext(Context context) {
-    engineContext = context;
-  }
-
   private static void tagDebugInfo() {
     String kbdId = "";
     String lngCode = "";
     String modelId = "";
+    int kbdCount = 0;
     // Do not risk raising a new error while tagging info for another error.
     try {
-      if (engineContext != null) {
-        Keyboard kbd = KMManager.getCurrentKeyboardInfo(null);
-        if (kbd != null) {
-          kbdId = kbd.getKeyboardID();
-          lngCode = kbd.getLanguageCode();
-          Map<String, String> modelMap = KMManager.getAssociatedLexicalModel(kbd.getLanguageID());
-          if (modelMap != null) {
-            modelId = modelMap.get(KMKey_LexicalModelID);
-            if (modelId == null) {
-              modelId = "";
-            }
+      // Both take a context parameter... but don't actually need or use it!
+      Keyboard kbd = KMManager.getCurrentKeyboardInfo(null);
+      kbdCount = KMManager.getKeyboardsList(null).size();
+      if (kbd != null) {
+        kbdId = kbd.getKeyboardID();
+        lngCode = kbd.getLanguageCode();
+        Map<String, String> modelMap = KMManager.getAssociatedLexicalModel(kbd.getLanguageID());
+        if (modelMap != null) {
+          modelId = modelMap.get(KMKey_LexicalModelID);
+          if (modelId == null) {
+            modelId = "";
           }
         }
       }
     } catch (Exception ignored) {
     }
     Sentry.setExtra(KEYBOARD_TAG, kbdId);
+    Sentry.setExtra(KEYBOARD_COUNT_TAG, "" + kbdCount);
     Sentry.setExtra(LANGCODE_TAG, lngCode);
     Sentry.setExtra(MODEL_TAG, modelId);
   }
