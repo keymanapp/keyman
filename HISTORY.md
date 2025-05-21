@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 19.0.46 alpha 2025-05-21
+
+* docs(common): update README with number of languages and keyboards (#14023)
+
+## 19.0.45 alpha 2025-05-21
+
+* maint(linux): use correct syntax to define local variables in script (#14021)
+* maint(developer): update multer to v2.0.0 (#14012)
+
+## 19.0.44 alpha 2025-05-21
+
+* feat(android): log active keyboard, model IDs with reported errors (#13983)
+* fix(windows): rename Enter and Exit methods TState (#13920)
+* maint: update macOS environment setup, related documentation (#13979)
+* chore(deps): bump multer from 1.4.5-lts.1 to 2.0.0 (#13982)
+* feat(ios): log active keyboard, model IDs with reported errors (#13987)
+* maint(linux): add quilt to release build configuration (#13986)
+* chore(ios): update FirstVoices AppIcon (#13976)
+* docs(developer): add security note to Upload documentation (#14015)
+* fix(android): Check network access before trying to download keyboard (#13978)
+
 ## 19.0.43 alpha 2025-05-20
 
 * chore(ios): FirstVoices certificate update (#13991)
