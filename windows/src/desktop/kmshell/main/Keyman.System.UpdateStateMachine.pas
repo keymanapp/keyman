@@ -38,8 +38,8 @@ type
 
   public
     constructor Create(Context: TUpdateStateMachine);
-    procedure Enter; virtual; abstract;
-    procedure Exit; virtual; abstract;
+    procedure EnterState; virtual; abstract;
+    procedure ExitState; virtual; abstract;
     procedure HandleCheck; virtual; abstract;
     function  HandleKmShell: Integer; virtual; abstract;
     procedure HandleDownload; virtual; abstract;
@@ -152,8 +152,8 @@ type
   // Derived classes for each state
   IdleState = class(TState)
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -166,8 +166,8 @@ type
   private
     procedure StartDownloadProcess;
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -178,8 +178,8 @@ type
   DownloadingState = class(TState)
   private
     function DownloadUpdatesBackground: Boolean;
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -189,8 +189,8 @@ type
 
   WaitingRestartState = class(TState)
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -224,8 +224,8 @@ type
     procedure LaunchInstallPackageProcess;
 
   public
-    procedure Enter; override;
-    procedure Exit; override;
+    procedure EnterState; override;
+    procedure ExitState; override;
     procedure HandleCheck; override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
@@ -446,14 +446,14 @@ procedure TUpdateStateMachine.SetState(const Value: TStateClass);
 begin
   if Assigned(CurrentState) then
   begin
-    CurrentState.Exit;
+    CurrentState.ExitState;
   end;
 
   SetStateOnly(ConvertStateToEnum(Value));
 
   if Assigned(CurrentState) then
   begin
-    CurrentState.Enter;
+    CurrentState.EnterState;
   end
   else
   begin
@@ -601,13 +601,13 @@ end;
 
 { IdleState }
 
-procedure IdleState.Enter;
+procedure IdleState.EnterState;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usIdle);
 end;
 
-procedure IdleState.Exit;
+procedure IdleState.ExitState;
 begin
 
 end;
@@ -697,7 +697,7 @@ begin
   end;
 end;
 
-procedure UpdateAvailableState.Enter;
+procedure UpdateAvailableState.EnterState;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usUpdateAvailable);
@@ -707,7 +707,7 @@ begin
   end;
 end;
 
-procedure UpdateAvailableState.Exit;
+procedure UpdateAvailableState.ExitState;
 begin
   // Exit UpdateAvailableState
 end;
@@ -760,7 +760,7 @@ end;
 
 { DownloadingState }
 
-procedure DownloadingState.Enter;
+procedure DownloadingState.EnterState;
 var
   DownloadResult: Boolean;
   RetryCount: Integer;
@@ -776,6 +776,7 @@ begin
     // downloading process finish.
     if not FMutex.TakeOwnership then
     begin
+      TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
       Exit;
     end;
 
@@ -816,7 +817,7 @@ begin
 
 end;
 
-procedure DownloadingState.Exit;
+procedure DownloadingState.ExitState;
 begin
   // Exit DownloadingState
 end;
@@ -895,13 +896,13 @@ end;
 
 { WaitingRestartState }
 
-procedure WaitingRestartState.Enter;
+procedure WaitingRestartState.EnterState;
 begin
   // Enter WaitingRestartState
   bucStateContext.SetRegistryState(usWaitingRestart);
 end;
 
-procedure WaitingRestartState.Exit;
+procedure WaitingRestartState.ExitState;
 begin
   // Exit DownloadingState
 end;
@@ -1010,19 +1011,20 @@ function InstallingState.DoInstallKeyman: Boolean;
 var
   FResult: Boolean;
   SavePath: String;
-  fileExt: String;
   FileName: String;
   FileNames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  ucrFileName: String;
   found: Boolean;
 begin
-
+  TUpdateCheckStorage.LoadUpdateCacheData(ucr);
+  ucrFileName := ucr.FileName;
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   GetFileNamesInDirectory(SavePath, FileNames);
   found := False;
   for FileName in FileNames do
   begin
-    fileExt := LowerCase(ExtractFileExt(FileName));
-    if fileExt = '.exe' then
+    if SameText(ucrFileName, ExtractFileName(FileName)) then
     begin
       found := True;
       break;
@@ -1104,7 +1106,7 @@ begin
   Result := True;
 end;
 
-procedure InstallingState.Enter;
+procedure InstallingState.EnterState;
 var
   ucr: TUpdateCheckResponse;
   hasPackages, hasKeymanInstall: Boolean;
@@ -1141,7 +1143,7 @@ begin
   ChangeState(IdleState);
 end;
 
-procedure InstallingState.Exit;
+procedure InstallingState.ExitState;
 begin
 
 end;
@@ -1197,7 +1199,9 @@ begin
   end;
 
   if hasKeymanInstall then
+  begin
     DoInstallKeyman;
+  end;
 end;
 
 procedure InstallingState.HandleFirstRun;
