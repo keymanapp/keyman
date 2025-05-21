@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:element name="keyboard">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="layouts">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="layout">
+                <xs:complexType>
+                  <xs:attribute name="first" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="last" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="mapSet" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="modifiers" type="xs:unsignedByte" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="modifierMap">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="keyMapSelect">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="modifier">
+                      <xs:complexType>
+                        <xs:attribute name="keys" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="mapIndex" type="xs:unsignedByte" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:unsignedByte" use="required" />
+            <xs:attribute name="defaultIndex" type="xs:unsignedByte" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="keyMapSet">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="keyMap">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="key">
+                      <xs:complexType>
+                        <xs:attribute name="code" type="xs:unsignedByte" use="required" />
+                        <xs:attribute name="action" type="xs:string" use="optional" />
+                        <xs:attribute name="output" type="xs:string" use="optional" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="index" type="xs:unsignedByte" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="actions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="action">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" name="when">
+                      <xs:complexType>
+                        <xs:attribute name="state" type="xs:string" use="required" />
+                        <xs:attribute name="output" type="xs:string" use="optional" />
+                        <xs:attribute name="next" type="xs:unsignedByte" use="optional" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="terminators">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="when">
+                <xs:complexType>
+                  <xs:attribute name="state" type="xs:unsignedByte" use="required" />
+                  <xs:attribute name="output" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="group" type="xs:unsignedByte" use="required" />
+      <xs:attribute name="id" type="xs:short" use="required" />
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="maxout" type="xs:unsignedByte" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
