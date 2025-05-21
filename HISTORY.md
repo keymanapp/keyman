@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.45 alpha 2025-05-21
+
+* maint(linux): use correct syntax to define local variables in script (#14021)
+* maint(developer): update multer to v2.0.0 (#14012)
+
 ## 19.0.44 alpha 2025-05-21
 
 * feat(android): log active keyboard, model IDs with reported errors (#13983)
