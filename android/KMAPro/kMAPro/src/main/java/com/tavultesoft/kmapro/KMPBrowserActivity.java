@@ -114,7 +114,14 @@ public class KMPBrowserActivity extends BaseActivity {
           Intent intent = new Intent(context, MainActivity.class);
           intent.setData(downloadURI);
           KMLog.LogBreadcrumb(TAG, "Successful keyboard search now triggering package install", true);
-          startActivity(intent);
+
+          // Verify network access before trying to download
+          if (KMManager.hasConnection(context)) {
+            startActivity(intent);
+          } else {
+            Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+            return true;
+          }
 
           // Finish activity
           finish();
