@@ -8,7 +8,7 @@ Description=Keyman System Service
 [Service]
 Type=dbus
 BusName=com.keyman.SystemService1
-ExecStart=/usr/libexec/keyman-system-service
+ExecStart=@LIBEXECDIR@/keyman-system-service
 Restart=on-failure
 
 # Filesystem lockdown
