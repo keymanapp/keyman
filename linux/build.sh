@@ -26,7 +26,8 @@ builder_describe \
   "--no-integration+         don't run integration tests" \
   "--coverage+               capture test coverage" \
   "--report+                 create coverage report" \
-  "--open                    open the coverage reports in the browser"
+  "--open                    open the coverage reports in the browser" \
+  "--no-werror+              don't report warnings as errors"
 
 builder_parse "$@"
 

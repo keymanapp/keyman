@@ -21,7 +21,8 @@ builder_describe \
   "@../keyman-system-service:service" \
   "--no-integration          don't run integration tests" \
   "--report                  create coverage report" \
-  "--coverage                capture test coverage"
+  "--coverage                capture test coverage" \
+  "--no-werror               don't report warnings as errors"
 
 builder_parse "$@"
 
@@ -45,6 +46,11 @@ else
   MESON_COVERAGE=
 fi
 
+MESON_ARGS=--werror
+if builder_has_option --no-werror; then
+  MESON_ARGS=
+fi
+
 # Import our standard compiler defines; this is copied from
 # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
 # allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
@@ -56,7 +62,7 @@ fi
 
 configure_action() {
   # shellcheck disable=SC2086,SC2154
-  meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
+  meson setup ${MESON_COVERAGE} ${MESON_ARGS} --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"
 }
 
 test_action() {
