@@ -25,7 +25,6 @@ import {
   JSKeyboardProcessor,
   Mock,
   type ProcessorInitOptions,
-  OutputTargetBase
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -136,8 +135,7 @@ export class InputProcessor {
           // TODO-web-core
           if(!isEmptyTransform(transcription.transform) || !(transcription.preInput as Mock).isEqual(Mock.from(outputTarget))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
-            // TODO-web-core
-            (outputTarget as OutputTargetBase).restoreTo(transcription.preInput as Mock);
+            outputTarget.restoreTo(transcription.preInput as Mock);
           }
           /*
             else:
@@ -186,7 +184,7 @@ export class InputProcessor {
     // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
     // of state management.  `doModifierPress` must always run.
     // TODO-web-core
-    if (this.keyboardProcessor.doModifierPress(keyEvent, outputTarget as OutputTargetBase, !fromOSK)) {
+    if (this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
       if(!fromOSK) {
@@ -214,14 +212,14 @@ export class InputProcessor {
     // Create a "mock" backup of the current outputTarget in its pre-input state.
     // Current, long-existing assumption - it's DOM-backed.
     // TODO-web-core
-    const preInputMock = Mock.from(outputTarget as OutputTargetBase, true);
+    const preInputMock = Mock.from(outputTarget, true);
 
     const startingLayerId = this.keyboardProcessor.layerId;
 
     // We presently need the true keystroke to run on the FULL context.  That index is still
     // needed for some indexing operations when comparing two different output targets.
     // TODO-web-core
-    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget as OutputTargetBase);
+    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -268,8 +266,7 @@ export class InputProcessor {
     } else {
       // We need a dummy ProcessorAction for keys which have no output (e.g. Shift)
       ruleBehavior = new ProcessorAction();
-      // TODO-web-core
-      ruleBehavior.transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
+      ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       ruleBehavior.triggersDefaultCommand = true;
     }
 
@@ -289,7 +286,7 @@ export class InputProcessor {
     this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
     // TODO-web-core
-    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget as OutputTargetBase);
+    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget);
     if (postRuleBehavior) {
       this.keyboardProcessor.finalizeProcessorAction(postRuleBehavior, outputTarget);
     }
@@ -415,7 +412,7 @@ export class InputProcessor {
   public resetContext(outputTarget?: OutputTargetInterface) {
     // Also handles new-context events, which may modify the layer
     // TODO-web-core
-    this.keyboardProcessor.resetContext(outputTarget as OutputTargetBase);
+    this.keyboardProcessor.resetContext(outputTarget);
     // With the layer now set, we trigger new predictions.
     this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
   }

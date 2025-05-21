@@ -1,4 +1,11 @@
-import { KM_Core, km_core_keyboard } from 'keyman/engine/core-processor';
+import { DeviceSpec } from '@keymanapp/web-utils';
+import {
+  KM_Core, km_core_keyboard, KM_CORE_KMX_ENV,
+  KM_CORE_OPTION_SCOPE, km_core_state, KM_CORE_STATUS
+} from 'keyman/engine/core-adapter';
+import { ActiveKey, ActiveSubKey } from './activeLayout.js';
+import { StateKeyMap } from './stateKeyMap.js';
+import { KeyEvent } from '../keyEvent.js';
 
 /**
  * Acts as a wrapper class for KMX(+) Keyman keyboards

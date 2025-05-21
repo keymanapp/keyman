@@ -89,17 +89,20 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
       console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
       return null;
     }
+    const processorAction = new ProcessorAction();
     const core_actions = KM_Core.instance.state_get_actions(activeKeyboard.state);
-    /*
-      process_backspace_action(engine, actions->code_points_to_delete);
-      process_output_action(engine, actions->output);
-      process_persist_action(engine, actions->persist_options);
-      process_alert_action(actions->do_alert);
-      gboolean result = process_emit_keystroke_action(engine, actions->emit_keystroke);
-      process_capslock_action(actions->new_caps_lock_state);
-      finish_process_actions(engine);
-    */
-    return null;
+
+    outputTarget.deleteCharsBeforeCaret(core_actions.code_points_to_delete);
+    outputTarget.insertTextBeforeCaret(core_actions.output);
+    processorAction.beep = core_actions.do_alert;
+    processorAction.triggerKeyDefault = core_actions.emit_keystroke;
+
+    // TODO-web-core: Implement options
+    // process_persist_action(engine, actions->persist_options);
+    // TODO-web-core: do we have to do anything with the new_caps_lock_state?
+    // process_capslock_action(actions->new_caps_lock_state);
+
+    return processorAction;
   }
 
   /**
