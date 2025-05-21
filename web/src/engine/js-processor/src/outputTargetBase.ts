@@ -1,7 +1,7 @@
 import { KMWString } from "@keymanapp/web-utils";
+import { Alternate, OutputTargetInterface, TextTransform, Transcription } from 'keyman/engine/keyboard';
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
-import { OutputTargetInterface } from 'keyman/engine/keyboard';
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
@@ -16,53 +16,6 @@ export function isEmptyTransform(transform: LexicalModelTypes.Transform) {
   }
   return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
 }
-
-export class TextTransform implements LexicalModelTypes.Transform {
-  readonly insert: string;
-  readonly deleteLeft: number;
-  readonly deleteRight: number;
-  readonly erasedSelection: boolean;
-  id: number;
-
-  constructor(insert: string, deleteLeft: number, deleteRight: number, erasedSelection: boolean) {
-    this.insert = insert;
-    this.deleteLeft = deleteLeft;
-    this.deleteRight = deleteRight;
-    this.erasedSelection = erasedSelection;
-  }
-
-  public static readonly nil = new TextTransform('', 0, 0, false);
-}
-
-export class Transcription {
-  readonly token: number;
-  readonly keystroke: KeyEvent;
-  readonly transform: TextTransform;
-  alternates: Alternate[]; // constructed after the rest of the transcription.
-  readonly preInput: Mock;
-
-  private static tokenSeed: number = 0;
-
-  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
-    const token = this.token = Transcription.tokenSeed++;
-
-    this.keystroke = keystroke;
-    this.transform = transform;
-    this.alternates = alternates;
-    this.preInput = preInput;
-
-    this.transform.id = this.token;
-
-    // Assign the ID to each alternate, as well.
-    if(alternates) {
-      alternates.forEach(function(alt) {
-        alt.sample.id = token;
-      });
-    }
-  }
-}
-
-export type Alternate = LexicalModelTypes.ProbabilityMass<LexicalModelTypes.Transform>;
 
 export abstract class OutputTargetBase implements OutputTargetInterface {
   private _dks: DeadkeyTracker;
@@ -122,7 +75,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTargetBase): TextTransform {
+  buildTransformFrom(original: OutputTargetInterface): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -143,7 +96,7 @@ export abstract class OutputTargetBase implements OutputTargetInterface {
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
-  buildTranscriptionFrom(original: OutputTargetBase, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
+  buildTranscriptionFrom(original: OutputTargetInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
     const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.

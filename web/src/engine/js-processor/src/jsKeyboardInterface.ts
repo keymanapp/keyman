@@ -7,14 +7,27 @@
 
 import { type DeviceSpec, KMWString } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, type OutputTargetInterface, VariableStoreDictionary } from "keyman/engine/keyboard";
+import {
+  Codes,
+  JSKeyboard,
+  KeyboardHarness,
+  KeyboardKeymanGlobal,
+  KeyMapping,
+  MutableSystemStore,
+  SystemStore,
+  SystemStoreIDs,
+  type KeyEvent,
+  type OutputTargetInterface,
+  RuleBehavior,
+  VariableStore,
+  VariableStoreDictionary,
+  VariableStoreSerializer,
+} from "keyman/engine/keyboard";
 import { type OutputTargetBase }  from './outputTargetBase.js';
 import { type Deadkey } from './deadkeys.js';
 import { Mock } from "./mock.js";
-import { RuleBehavior }  from "./ruleBehavior.js";
-import { SystemStoreIDs, SystemStore, MutableSystemStore } from "keyman/engine/keyboard";
 import { PlatformSystemStore } from './platformSystemStore.js';
-import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, VariableStore, VariableStoreSerializer } from "./stores.js";
+import { ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement } from "./stores.js";
 
 //#endregion
 

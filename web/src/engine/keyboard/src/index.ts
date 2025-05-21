@@ -18,8 +18,11 @@ export {
   MetadataObj as RawKeyboardMetadata,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";
+export { RuleBehavior } from "./keyboards/ruleBehavior.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
 export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
+export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
+export { Transcription } from "./keyboards/transcription.js";
 
 export { default as Codes } from "./codes.js";
 export * from "./codes.js";
@@ -28,7 +31,8 @@ export * from "./defaultRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
 export { OutputTargetInterface } from "./outputTargetInterface.js";
-export * from "./systemStores.js";
+export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
+export { type VariableStore, VariableStoreSerializer } from "./variableStore.js";
 
 export * from "@keymanapp/web-utils";
 

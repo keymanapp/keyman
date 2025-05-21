@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  *
- * Definitions for basic stores and variable stores (see kmn reference)
+ * Definitions for basic stores (see kmn reference)
  */
 
 import { StoreNonCharEntry } from './jsKeyboardInterface.js';
@@ -18,9 +18,3 @@ export type ComplexKeyboardStore = KeyboardStoreElement[];
 
 export type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
 
-export type VariableStore = { [name: string]: string };
-
-export interface VariableStoreSerializer {
-  loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
-}
