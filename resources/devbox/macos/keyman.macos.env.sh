@@ -20,8 +20,8 @@ if [ -z "$HOMEBREW_PREFIX" ]; then
 fi
 
 export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
-export PATH="$HOMEBREW_PREFIX/opt/java11/bin:$PATH"
-export JAVA_HOME="$HOMEBREW_PREFIX/opt/java11"
+export PATH="$HOMEBREW_PREFIX/opt/openjdk@21/bin:$PATH"
+export JAVA_HOME="$HOMEBREW_PREFIX/opt/openjdk@21"
 
 # Python 2.7
 eval "$(pyenv init --path)"
