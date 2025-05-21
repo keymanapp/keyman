@@ -15,7 +15,7 @@ import {
   type Keyboard,
   type KeyEvent,
   type OutputTargetInterface,
-  RuleBehavior,
+  ProcessorAction,
   SystemStoreIDs
 } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
@@ -101,10 +101,10 @@ export class InputProcessor {
    *
    * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
    * @param       {Object}      outputTarget  The OutputTarget receiving the KeyEvent
-   * @returns     {Object}                    A RuleBehavior object describing the cumulative effects of
+   * @returns     {Object}                    A ProcessorAction object describing the cumulative effects of
    *                                          all matched keyboard rules.
    */
-  processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): RuleBehavior {
+  processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): ProcessorAction {
     const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
     const trueActiveKeyboard = this.activeKeyboard;
 
@@ -138,7 +138,7 @@ export class InputProcessor {
         } else {
           console.warn('The base context for the multitap could not be found!\n\n' + this.contextCache.buildLog());
           // would be lovely to report a desire for gesture debug output
-          // maybe add something to RuleBehavior?
+          // maybe add something to ProcessorAction?
         }
       }
 
@@ -158,7 +158,7 @@ export class InputProcessor {
    * @param outputTarget
    * @returns
    */
-  private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): RuleBehavior {
+  private _processKeyEvent(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
     const fromOSK = keyEvent.isSynthetic;
 
@@ -168,7 +168,7 @@ export class InputProcessor {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
       if(this.keyboardProcessor.selectLayer(keyEvent)) {
-        return new RuleBehavior();
+        return new ProcessorAction();
       }
     }
 
@@ -179,7 +179,7 @@ export class InputProcessor {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
       if(!fromOSK) {
-        return new RuleBehavior();
+        return new ProcessorAction();
       }
     }
 
@@ -191,10 +191,10 @@ export class InputProcessor {
 
       // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
       if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-        return new RuleBehavior();
+        return new ProcessorAction();
         // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
       } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
-        return new RuleBehavior();
+        return new ProcessorAction();
       }
     }
 
@@ -255,8 +255,8 @@ export class InputProcessor {
         ruleBehavior.transcription.alternates = alternates;
       }
     } else {
-      // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
-      ruleBehavior = new RuleBehavior();
+      // We need a dummy ProcessorAction for keys which have no output (e.g. Shift)
+      ruleBehavior = new ProcessorAction();
       // TODO-web-core
       ruleBehavior.transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
       ruleBehavior.triggersDefaultCommand = true;
@@ -295,7 +295,7 @@ export class InputProcessor {
     return keepRuleBehavior ? ruleBehavior : null;
   }
 
-  private buildAlternates(ruleBehavior: RuleBehavior, keyEvent: KeyEvent, preInputMock: Mock): Alternate[] {
+  private buildAlternates(ruleBehavior: ProcessorAction, keyEvent: KeyEvent, preInputMock: Mock): Alternate[] {
     let alternates: Alternate[];
 
     // If we're performing a 'default command', it's not a standard 'typing' event - don't do fat-finger stuff.

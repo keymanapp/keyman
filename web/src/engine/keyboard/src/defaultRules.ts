@@ -77,7 +77,7 @@ export default class DefaultRules {
   }
 
   /**
-   * Used when a RuleBehavior represents a non-text "command" within the Engine.  This will generally
+   * Used when a ProcessorAction represents a non-text "command" within the Engine.  This will generally
    * trigger events that require context reset - often by moving the caret or by moving what OutputTarget
    * the caret is in.  However, we let those events perform the actual context reset.
    *

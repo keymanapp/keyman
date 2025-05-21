@@ -18,7 +18,7 @@ import {
   SystemStoreIDs,
   type KeyEvent,
   type OutputTargetInterface,
-  RuleBehavior,
+  ProcessorAction,
   VariableStore,
   VariableStoreDictionary,
   VariableStoreSerializer,
@@ -188,7 +188,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
   ruleContextEx: CachedContextEx;
 
   activeTargetOutput: OutputTargetInterface;
-  ruleBehavior: RuleBehavior;
+  ruleBehavior: ProcessorAction;
 
   systemStores: {[storeID: number]: SystemStore};
 
@@ -994,9 +994,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}        outputTarget   The target receiving input
    * @param       {Object}        keystroke      The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin newContext` group
-   * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin NewContext`
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin NewContext`
    */
-  processNewContextEvent(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
+  processNewContextEvent(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
@@ -1009,9 +1009,9 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}        outputTarget   The target receiving input
    * @param       {Object}        keystroke      The input keystroke with relevant properties to be mapped by the keyboard.
    * Description  Calls the keyboard's `begin postKeystroke` group
-   * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin PostKeystroke`
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin PostKeystroke`
    */
-  processPostKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
+  processPostKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
@@ -1024,16 +1024,16 @@ export class JSKeyboardInterface extends KeyboardHarness {
    * @param       {Object}        outputTarget   The target receiving input
    * @param       {Object}        keystroke   The input keystroke (with its properties) to be mapped by the keyboard.
    * Description  Encapsulates calls to keyboard input processing.
-   * @returns     {RuleBehavior}  Record of commands and state changes that result from executing `begin Unicode`
+   * @returns     {ProcessorAction}  Record of commands and state changes that result from executing `begin Unicode`
    */
-  processKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): RuleBehavior {
+  processKeystroke(outputTarget: OutputTargetBase, keystroke: KeyEvent): ProcessorAction {
     if(!this.activeKeyboard) {
       throw "No active keyboard for keystroke processing!";
     }
     return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke, false);
   }
 
-  private process(callee: (outputTarget: OutputTargetBase, keystroke: KeyEvent) => boolean, outputTarget: OutputTargetBase, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
+  private process(callee: (outputTarget: OutputTargetBase, keystroke: KeyEvent) => boolean, outputTarget: OutputTargetBase, keystroke: KeyEvent, readonly: boolean): ProcessorAction {
     // Clear internal state tracking data from prior keystrokes.
     if(!outputTarget) {
       throw "No target specified for keyboard output!";
@@ -1055,7 +1055,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     const cachedVariableStores = this.activeKeyboard.variableStores;
 
     // Establishes the results object, allowing corresponding commands to set values here as appropriate.
-    this.ruleBehavior = new RuleBehavior();
+    this.ruleBehavior = new ProcessorAction();
 
     // Ensure the settings are in place so that KIFS/ifState activates and deactivates
     // the appropriate rule(s) for the modeled device.
@@ -1069,7 +1069,7 @@ export class JSKeyboardInterface extends KeyboardHarness {
     // Finalize the rule's results.
     this.ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(preInput, keystroke, readonly);
 
-    // We always backup the changes to variable stores to the RuleBehavior, to
+    // We always backup the changes to variable stores to the ProcessorAction, to
     // be applied during finalization, then restore them to the cached initial
     // values to avoid side-effects with predictive text mocks.
     this.ruleBehavior.variableStores = this.activeKeyboard.variableStores;

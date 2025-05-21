@@ -9,7 +9,7 @@ import { SystemStoreDictionary } from '../systemStore.js';
 /**
  * Represents the commands and state changes that result from a matched keyboard rule.
  */
-export class RuleBehavior {
+export class ProcessorAction {
   /**
    * The before-and-after Transform from matching a keyboard rule.  May be `null`
    * if no keyboard rules were matched for the keystroke.

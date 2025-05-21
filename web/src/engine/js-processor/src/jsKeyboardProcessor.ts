@@ -11,7 +11,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  OutputTargetInterface, RuleBehavior, SystemStoreIDs
+  OutputTargetInterface, ProcessorAction, SystemStoreIDs
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
@@ -120,7 +120,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   /**
-   * Get the default RuleBehavior for the specified key, attempting to mimic standard browser defaults
+   * Get the default ProcessorAction for the specified key, attempting to mimic standard browser defaults
    * where and when appropriate.
    *
    * @param   {object}  Lkc           The pre-analyzed KeyEvent object
@@ -128,9 +128,9 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * @param   {boolean}  readonly      True if the target is read-only
    * @return  {string}
    */
-  private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): RuleBehavior {
+  private defaultRuleBehavior(Lkc: KeyEvent, outputTarget: OutputTargetBase, readonly: boolean): ProcessorAction {
     const preInput = Mock.from(outputTarget, readonly);
-    const ruleBehavior = new RuleBehavior();
+    const ruleBehavior = new ProcessorAction();
 
     let matched = false;
     let char = '';
@@ -182,7 +182,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
           this.keyboardInterface.output(0, outputTarget, char);
         }
       } else {
-        // No match, no default RuleBehavior.
+        // No match, no default ProcessorAction.
         return null;
       }
     }
@@ -198,20 +198,20 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     return ruleBehavior;
   }
 
-  private processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
+  private processNewContextEvent(device: DeviceSpec, outputTarget: OutputTargetBase): ProcessorAction {
     return this.activeKeyboard ?
       this.keyboardInterface.processNewContextEvent(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  public processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): RuleBehavior {
+  public processPostKeystroke(device: DeviceSpec, outputTarget: OutputTargetBase): ProcessorAction {
     return this.activeKeyboard ?
       this.keyboardInterface.processPostKeystroke(outputTarget, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
       null;
   }
 
-  public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): RuleBehavior {
-    let matchBehavior: RuleBehavior;
+  public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetBase): ProcessorAction {
+    let matchBehavior: ProcessorAction;
 
     // Before keyboard rules apply, check if the left-context is empty.
     const nothingDeletable = KMWString.length(outputTarget.getTextBeforeCaret()) == 0 && outputTarget.isSelectionEmpty();
@@ -570,10 +570,10 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * e.g. by focus change, selection change, keyboard change, etc.
    *
    * @param    {Object}   outputTarget  The OutputTarget that has focus
-   * @returns  {Object}                 A RuleBehavior object describing the cumulative effects of
+   * @returns  {Object}                 A ProcessorAction object describing the cumulative effects of
    *                                    all matched keyboard rules
    */
-  private performNewContextEvent(outputTarget: OutputTargetBase): RuleBehavior {
+  private performNewContextEvent(outputTarget: OutputTargetBase): ProcessorAction {
     const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
 
     if (ruleBehavior) {
@@ -610,9 +610,9 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
     }
   };
 
-  public finalizeProcessorAction(data: RuleBehavior, outputTarget: OutputTargetInterface): void {
+  public finalizeProcessorAction(data: ProcessorAction, outputTarget: OutputTargetInterface): void {
     if (!data.transcription) {
-      throw "Cannot finalize a RuleBehavior with no transcription.";
+      throw "Cannot finalize a ProcessorAction with no transcription.";
     }
 
     if (this.beepHandler && data.beep) {
@@ -655,7 +655,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   /**
-   * Merges default-related behaviors from another RuleBehavior into this one.  Assumes that the current instance
+   * Merges default-related behaviors from another ProcessorAction into this one.  Assumes that the current instance
    * "came first" chronologically.  Both RuleBehaviors must be sourced from the same keystroke.
    *
    * Intended use:  merging rule-based behavior with default key behavior during scenarios like those described
@@ -665,11 +665,11 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
    * WILL break for unintended uses.
    * @param other
    */
-  private mergeInOtherProcessorAction(first: RuleBehavior, other: RuleBehavior): void {
+  private mergeInOtherProcessorAction(first: ProcessorAction, other: ProcessorAction): void {
     const keystroke = first.transcription.keystroke;
     const keyFromOther = other.transcription.keystroke;
     if (keystroke.Lcode != keyFromOther.Lcode || keystroke.Lmodifiers != keyFromOther.Lmodifiers) {
-      throw "RuleBehavior default-merge not supported unless keystrokes are identical!";
+      throw "ProcessorAction default-merge not supported unless keystrokes are identical!";
     }
 
     first.triggersDefaultCommand = first.triggersDefaultCommand || other.triggersDefaultCommand;

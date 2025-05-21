@@ -1,4 +1,4 @@
-import { DeviceSpec, DefaultRules, RuleBehavior } from 'keyman/engine/keyboard';
+import { DeviceSpec, DefaultRules, ProcessorAction } from 'keyman/engine/keyboard';
 import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -17,7 +17,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   constructor(workerFactory: WorkerFactory, sourceUri: string) {
     const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    config.onRuleFinalization = (ruleBehavior: RuleBehavior) => {
+    config.onRuleFinalization = (ruleBehavior: ProcessorAction) => {
       (this.context as ContextHost).updateHost(ruleBehavior.transcription);
     }
 
