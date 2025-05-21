@@ -237,6 +237,21 @@ describe("Lexer Tests", () => {
     it("can recognise a KEYS token", () => {
       recogniseToken(TokenTypes.KEYS, 'keys');
     });
+    it("can recognise a KEMANONLY token", () => {
+      recogniseToken(TokenTypes.KEYMANONLY, 'keymanonly');
+    });
+    it("can recognise a KEYMANWEB token", () => {
+      recogniseToken(TokenTypes.KEYMANWEB, 'keymanweb');
+    });
+    it("can recognise a KEYMAN token", () => {
+      recogniseToken(TokenTypes.KEYMAN, 'keyman');
+    });
+    it("can recognise a WEAVER token", () => {
+      recogniseToken(TokenTypes.WEAVER, 'weaver');
+    });
+    it("can recognise a KMFL token", () => {
+      recogniseToken(TokenTypes.KMFL, 'kmfl');
+    });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenTypes.LEFT_BR, '(');
     });
@@ -269,6 +284,12 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a RANGE token", () => {
       recogniseToken(TokenTypes.RANGE, '..');
+    });
+    it("can recognise a DOLLAR token", () => {
+      recogniseToken(TokenTypes.DOLLAR, '$');
+    });
+    it("can recognise a COLON token", () => {
+      recogniseToken(TokenTypes.COLON, ':');
     });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenTypes.U_CHAR, 'U+1');
