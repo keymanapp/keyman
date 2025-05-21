@@ -41,17 +41,16 @@ function zip_files() {
         SEVENZ_FLAGS+=("-bb0")
         shift
         ;;
-      -1)
-        # Compression level where -1 indicates fastest compression speed
+      -[0123456789])
+        # Compression level where 
+        # -0 indicates no compression
+        # -1 indicates low compression (fastest)
+        # -9 indicates ultra compression (slowest)
         ZIP_FLAGS+=($1)
-        SEVENZ_FLAGS+=("-mx1")
-        shift
-        ;;
-      -9)
-        # Compression level where -9 indicates the slowest compression speed
-        ZIP_FLAGS+=($1)
-        SEVENZ_FLAGS+=("-mx9")
-        shift
+        if [[ $1 =~ -([0-9]) ]] then
+          SEVENZ_FLAGS+=("-mx${BASH_REMATCH[1]}")
+        fi  
+        shift;
         ;;
       -*)
         # Rest of zip flags.
