@@ -83,9 +83,9 @@ function _sign_source_tarball() {
 function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
-  local DATE, UPLOAD_BASE, UPLOAD_FOLDER, UPLOAD_DIR
-  local ARTIFACTS, NAMES
-  local TAR_GZ, HASH, SIZE, DOWNLOAD_INFO
+  local DATE UPLOAD_BASE UPLOAD_FOLDER UPLOAD_DIR
+  local ARTIFACTS NAMES
+  local TAR_GZ HASH SIZE DOWNLOAD_INFO
 
   DATE=$(date +%F)
 
