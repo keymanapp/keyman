@@ -21,7 +21,7 @@
     "semver": "^7.5.4",
     "ws": "^8.17.1",
     "xmlbuilder": "~11.0.0"
-},
+  },
   "optionalDependencies": {
     "node-hide-console-window": "^2.2.0"
   },
@@ -30,7 +30,7 @@
     "@keymanapp/resources-gosh": "*",
     "@types/express": "^4.17.13",
     "@types/mocha": "^9.1.0",
-    "@types/multer": "^1.4.7",
+    "@types/multer": "^1.4.12",
     "@types/node": "^20.4.1",
     "@types/ws": "^8.2.2",
     "copyfiles": "^2.4.1",
