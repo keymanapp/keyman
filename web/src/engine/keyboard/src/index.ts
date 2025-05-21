@@ -6,7 +6,7 @@ export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { Keyboard, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
-export { KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
+export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {
   CloudKeyboardFont,
   internalizeFont,

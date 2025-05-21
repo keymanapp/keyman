@@ -6,7 +6,7 @@ import { KM_Core, km_core_keyboard } from 'keyman/engine/core-processor';
 export class KMXKeyboard {
   private _state: km_core_state;
 
-  constructor(private _keyboard: km_core_keyboard) {
+  public constructor(private _keyboard: km_core_keyboard) {
     const environment_opts =
       [
         {
@@ -34,7 +34,7 @@ export class KMXKeyboard {
     }
   }
 
-  shutdown() {
+  public shutdown() {
     if (this._state) {
       this._state.delete();
       this._state = null;
@@ -45,29 +45,49 @@ export class KMXKeyboard {
     }
   }
 
-  get isMnemonic(): boolean {
+  public constructKeyEvent(key: ActiveKey | ActiveSubKey, device: DeviceSpec, stateKeys: StateKeyMap): KeyEvent {
+    // TODO-web-core: Implement this method
+    return null;
+  }
+
+  public get isMnemonic(): boolean {
     return false;
   }
 
-  get version(): string {
+  public get version(): string {
     const attrs = KM_Core.instance.keyboard_get_attrs(this._keyboard);
     const version = attrs.object.version_string;
     attrs.delete();
     return version;
   }
 
-  get id(): string {
+  public get id(): string {
     const attrs = KM_Core.instance.keyboard_get_attrs(this._keyboard);
     const id = attrs.object.id;
     attrs.delete();
     return id;
   }
 
-  get keyboard(): km_core_keyboard {
+  public get keyboard(): km_core_keyboard {
     return this._keyboard;
   }
 
-  get state(): km_core_state {
+  public get state(): km_core_state {
     return this._state;
   }
+
+  public get isChiral(): boolean {
+    // TODO-web-core: Implement this method
+    return false;
+  }
+
+  /**
+   * Signifies whether or not a layout or OSK should include AltGr / Right-alt emulation for this  keyboard.
+   * @return  {boolean}
+   */
+  public get emulatesAltGr(): boolean {
+    // TODO-web-core: Implement this method
+    return false;
+  }
+
 }

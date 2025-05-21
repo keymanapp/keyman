@@ -16,7 +16,8 @@ import {
   type KeyEvent,
   type OutputTargetInterface,
   ProcessorAction,
-  SystemStoreIDs
+  SystemStoreIDs,
+  KeyboardProcessor
 } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
 import {
@@ -44,6 +45,7 @@ export class InputProcessor {
   private contextDevice: DeviceSpec;
   private jsKbdProcessor: JSKeyboardProcessor;
   private coreKbdProcessor: CoreKeyboardProcessor;
+  private activeKbdProcessor: KeyboardProcessor;
   private lngProcessor: LanguageProcessor;
 
 
@@ -60,6 +62,7 @@ export class InputProcessor {
 
     this.contextDevice = device;
     this.jsKbdProcessor = new JSKeyboardProcessor(device, options);
+    this.activeKbdProcessor = this.jsKbdProcessor;
     this.coreKbdProcessor = new CoreKeyboardProcessor();
     this.lngProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
@@ -72,8 +75,8 @@ export class InputProcessor {
     return this.lngProcessor;
   }
 
-  public get keyboardProcessor(): JSKeyboardProcessor {
-    return this.jsKbdProcessor;
+  public get keyboardProcessor(): KeyboardProcessor {
+    return this.activeKbdProcessor;
   }
 
   public get keyboardInterface(): KeyboardMinimalInterface {
@@ -86,6 +89,12 @@ export class InputProcessor {
 
   public set activeKeyboard(keyboard: Keyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
+
+    if (keyboard instanceof JSKeyboard) {
+      this.activeKbdProcessor = this.jsKbdProcessor;
+    } else {
+      this.activeKbdProcessor = this.coreKbdProcessor;
+    }
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
     // on a keyboard change.
