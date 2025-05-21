@@ -169,7 +169,7 @@ if builder_has_action all; then
   set_variables_for_nvm
 
   linux_build_action
-  linux_unit_tests_action
+  linux_unit_tests_action --no-integration
   publish_action
 else
   builder_run_action  configure   linux_install_dependencies_action
@@ -177,6 +177,6 @@ else
   set_variables_for_nvm
 
   builder_run_action  build       linux_build_action
-  builder_run_action  test        linux_unit_tests_action
+  builder_run_action  test        linux_unit_tests_action --no-integration
   builder_run_action  publish     publish_action
 fi

@@ -9,7 +9,7 @@ Documentation=https://github.com/keymanapp/keyman/tree/master/linux/keyman-syste
 [Service]
 Type=dbus
 BusName=com.keyman.SystemService1
-ExecStart=/usr/libexec/keyman-system-service
+ExecStart=@LIBEXECDIR@/keyman-system-service
 Restart=on-failure
 
 # Filesystem lockdown
