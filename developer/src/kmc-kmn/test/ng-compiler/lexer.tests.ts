@@ -237,6 +237,21 @@ describe("Lexer Tests", () => {
     it("can recognise a KEYS token", () => {
       recogniseToken(TokenTypes.KEYS, 'keys');
     });
+    it("can recognise a KEMANONLY token", () => {
+      recogniseToken(TokenTypes.KEYMANONLY, 'keymanonly');
+    });
+    it("can recognise a KEYMANWEB token", () => {
+      recogniseToken(TokenTypes.KEYMANWEB, 'keymanweb');
+    });
+    it("can recognise a KEYMAN token", () => {
+      recogniseToken(TokenTypes.KEYMAN, 'keyman');
+    });
+    it("can recognise a WEAVER token", () => {
+      recogniseToken(TokenTypes.WEAVER, 'weaver');
+    });
+    it("can recognise a KMFL token", () => {
+      recogniseToken(TokenTypes.KMFL, 'kmfl');
+    });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenTypes.LEFT_BR, '(');
     });
@@ -269,6 +284,12 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a RANGE token", () => {
       recogniseToken(TokenTypes.RANGE, '..');
+    });
+    it("can recognise a DOLLAR token", () => {
+      recogniseToken(TokenTypes.DOLLAR, '$');
+    });
+    it("can recognise a COLON token", () => {
+      recogniseToken(TokenTypes.COLON, ':');
     });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenTypes.U_CHAR, 'U+1');
@@ -539,6 +560,40 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.PARAMETER, 'anyA'),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
+        ]
+      );
+    });
+    it("can recognise an IDENTIFIER token", () => {
+      recogniseToken(TokenTypes.IDENTIFIER, 'abc');
+    });
+    it("can recognise an IDENTIFIER token (followed by space)", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.IDENTIFIER, 'abc');
+    });
+    it("can recognise an IDENTIFIER token (in named constant)", () => {
+      recogniseTokens(
+        '$abc',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.IDENTIFIER, 'abc', 1, 2),
+        ]
+      );
+    });
+    it("can recognise an IDENTIFIER token (khmer, in named constant)", () => {
+      recogniseTokens(
+        '$ពុំណំឡ',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.IDENTIFIER, 'ពុំណំឡ', 1, 2),
+        ]
+      );
+    });
+    it("can recognise an IDENTIFIER token (in named constant followed by space)", () => {
+      recogniseTokens(
+        '$abc ',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.IDENTIFIER, 'abc', 1, 2),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
         ]
       );
     });
@@ -827,6 +882,67 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+000D', 1, 30),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 36),
           new Token(TokenTypes.U_CHAR, 'U+000A', 1, 37),
+        ]
+      );
+    });
+    it("can recognise compile targets (keyman)", () => {
+      recogniseTokens(
+        '$keyman:',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.KEYMAN, 'keyman', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 8),
+        ]
+      );
+    });
+    it("can recognise compile targets (keyman, followed by space)", () => {
+      recogniseTokens(
+        '$keyman: ',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.KEYMAN, 'keyman', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 8),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 9),
+        ]
+      );
+    });
+    it("can recognise compile targets (keymanonly)", () => {
+      recogniseTokens(
+        '$keymanonly:',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.KEYMANONLY, 'keymanonly', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 12),
+        ]
+      );
+    });
+    it("can recognise compile targets (keymanweb)", () => {
+      recogniseTokens(
+        '$keymanweb:',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.KEYMANWEB, 'keymanweb', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 11),
+        ]
+      );
+    });
+    it("can recognise compile targets (weaver)", () => {
+      recogniseTokens(
+        '$weaver:',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.WEAVER, 'weaver', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 8),
+        ]
+      );
+    });
+    it("can recognise compile targets (kmfl)", () => {
+      recogniseTokens(
+        '$kmfl:',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.KMFL, 'kmfl', 1, 2),
+          new Token(TokenTypes.COLON, ':', 1, 6),
         ]
       );
     });
