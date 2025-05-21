@@ -723,11 +723,13 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the presense following package related switches means we should
-        // skip running the update state machine HandleKmShell event
-        SkipBUpdate := (FMode in [fmInstallTip,
-        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
-        fmUpgradeMnemonicLayout]);
+        // the presence of the following package related switches means we 
+        // should skip running the update state machine HandleKmShell event
+        SkipBUpdate := (FMode in [
+          fmInstallTip, fmInstallTipsForPackages, 
+          fmRegisterTip, fmUpgradeKeyboards,
+          fmUpgradeMnemonicLayout
+        ]);
 
         SendToBUpdateSM := ShouldSendToBUpdateSM(FSilent, BUpdateSM, FMode);
 
