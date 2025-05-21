@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 19.0.43 alpha 2025-05-20
+
+* chore(ios): FirstVoices certificate update (#13991)
+* fix(linux): configurable path in `.service` file when using basu (#13980)
+
+## 19.0.42 alpha 2025-05-20
+
+* maint(linux): add `--no-werror` option to not report warnings as errors (#13988)
+
+## 19.0.41 alpha 2025-05-19
+
+* fix(web): inspectable test-script mode should not be auto-enabled in local-env tests (#13895)
+* maint(common): evaluate and apply npm audit fix (without forced changes) (#13897)
+* maint: update mocha (#13899)
+* maint: update @actions/github + @octokit references (#13900)
+* maint(common): update fast-json-patch to ^3.1.1 (#13901)
+* change(web): cancel flicks when both returning to and releasing at original tap location (#13683)
+* fix(web): empty layout fontSize property should default to 1em (#13959)
+* maint(linux): fix release build to run all tests except integration tests (#13968)
+
 ## 19.0.40 alpha 2025-05-17
 
 * maint(common): Add zip.inc.sh for cross-platform zipping (#13812)
