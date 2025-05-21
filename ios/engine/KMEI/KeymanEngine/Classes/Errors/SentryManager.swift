@@ -16,12 +16,17 @@ import os.log
  */
 public class SentryManager {
   private static var _started: Bool = false
+  
+  // Set once Manager.shared is fully initialized and safe to reference.
   private static var engineHasInitialized: Bool = false
 
   public static var hasStarted: Bool {
     return _started
   }
   
+  /**
+   This method should be called once Manager.shared is fully initialized and safe to reference - a precondition needed to enable engine-state logging, such as current keyboard, etc when errors occur.
+   */
   public static func setEngineInitialized() {
     engineHasInitialized = true
   }
@@ -183,7 +188,6 @@ public class SentryManager {
 
   public static func forceError() {
     SentrySDK.addBreadcrumb(Sentry.Breadcrumb(level: .info, category: "Deliberate testing error"))
-    capture("Deliberate testing error", sentryLevel: .error)
-//    SentrySDK.crash()
+    SentrySDK.crash()
   }
 }
