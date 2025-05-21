@@ -38,15 +38,13 @@ export function _GetEventKeyCode(e: KeyboardEvent) {
 // Keeping this as a separate function affords us the opportunity to unit-test the method more simply.
 
 /**
- * Function     _GetKeyEventProperties
- * Scope        Private
- * @param       {Event}       e         Event object
- * @return      {Object.<string,*>}     KMW keyboard event object:
- * Description  Get object with target element, key code, shift state, virtual key state
- *                Lcode=keyCode
- *                Lmodifiers=shiftState
- *                LisVirtualKeyCode e.g. ctrl/alt key
- *                LisVirtualKey     e.g. Virtual key or non-keypress event
+ * Function     preprocessKeyboardEvent
+ * @param       {Event}         e              Event object
+ * @param       {KeyboardState} keyboardState  Keyboard state object
+ * @param       {DeviceSpec}    device         Device object
+ * @return      {KeyEvent}                     KMW keyboard event object:
+ *
+ * Description  Returns the preprocessed KeyEvent object.
  */
 export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: KeyboardState, device: DeviceSpec): KeyEvent {
   if(e.cancelBubble === true) {
