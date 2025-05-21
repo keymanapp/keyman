@@ -3,8 +3,7 @@
  */
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { Transcription } from './transcription.js';
-import { VariableStore } from '../variableStore.js';
-import { VariableStoreDictionary } from './jsKeyboard.js';
+import { VariableStore, VariableStoreDictionary } from '../variableStore.js';
 import { SystemStoreDictionary } from '../systemStore.js';
 
 /**

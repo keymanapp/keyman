@@ -4,6 +4,10 @@
  * Definitions for variable stores (see kmn reference)
  */
 
+export interface VariableStoreDictionary {
+  [name: string]: string;
+};
+
 export type VariableStore = { [name: string]: string; };
 
 export interface VariableStoreSerializer {
