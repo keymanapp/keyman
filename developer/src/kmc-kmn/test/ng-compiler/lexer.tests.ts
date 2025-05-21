@@ -563,6 +563,21 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise an IDENTIFIER token", () => {
+      recogniseToken(TokenTypes.IDENTIFIER, 'abc');
+    });
+    it("can recognise an IDENTIFIER token (followed by space)", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.IDENTIFIER, 'abc');
+    });
+    it("can recognise an IDENTIFIER token (in named constant)", () => {
+      recogniseTokens(
+        '$abc',
+        [
+          new Token(TokenTypes.DOLLAR, '$'),
+          new Token(TokenTypes.IDENTIFIER, 'abc', 1, 2),
+        ]
+      );
+    });
     it("can recognise a bitmap store", () => {
       recogniseStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
     });

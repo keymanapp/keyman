@@ -100,6 +100,7 @@ export enum TokenTypes {
   WEAVER             = "WEAVER",
   WHITESPACE         = "WHITESPACE",
   WINDOWSLANGUAGES   = "WINDOWSLANGUAGES",
+  IDENTIFIER = "IDENTIFIER",
 };
 
 export class ScanRecogniser {
@@ -225,6 +226,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.CONTINUATION,       /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/),
     new ScanRecogniser(TokenTypes.NEWLINE,            /^(\r\n|\n|\r)/),
     new ScanRecogniser(TokenTypes.PARAMETER,          /^[^,\)\s]+(?=([^\S\r\n]*,?[^\S\r\n]*[^,\)\s]+)*[^\S\r\n]*\))/),
+    new ScanRecogniser(TokenTypes.IDENTIFIER,         /^\S+/),
   ];
 
   static {
