@@ -3,11 +3,11 @@
  */
 
 import { EventEmitter } from 'eventemitter3';
-import { KM_Core } from 'keyman/engine/core-adapter';
+import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
 import {
   BeepHandler,
   DeviceSpec, EventMap, Keyboard, KeyboardMinimalInterface, KeyboardProcessor,
-  KeyEvent, MutableSystemStore, OutputTargetInterface, ProcessorAction,
+  KeyEvent, KMXKeyboard, MutableSystemStore, OutputTargetInterface, ProcessorAction,
   StateKeyMap
 } from "keyman/engine/keyboard";
 
@@ -83,7 +83,22 @@ export class CoreKeyboardProcessor extends EventEmitter<EventMap> implements Key
   }
 
   public processKeystroke(keyEvent: KeyEvent, outputTarget: OutputTargetInterface): ProcessorAction {
-    // TODO-web-core: Implement this method
+    const activeKeyboard = this.activeKeyboard as KMXKeyboard;
+    const status = KM_Core.instance.process_event(activeKeyboard.state, keyEvent.Lcode, keyEvent.Lmodifiers, 1, 0); // TODO-web-core: properly set keyDown and flags
+    if (status != KM_CORE_STATUS.OK) {
+      console.error('KeymanWeb: km_core_process_event failed with status: ' + status);
+      return null;
+    }
+    const core_actions = KM_Core.instance.state_get_actions(activeKeyboard.state);
+    /*
+      process_backspace_action(engine, actions->code_points_to_delete);
+      process_output_action(engine, actions->output);
+      process_persist_action(engine, actions->persist_options);
+      process_alert_action(actions->do_alert);
+      gboolean result = process_emit_keystroke_action(engine, actions->emit_keystroke);
+      process_capslock_action(actions->new_caps_lock_state);
+      finish_process_actions(engine);
+    */
     return null;
   }
 
