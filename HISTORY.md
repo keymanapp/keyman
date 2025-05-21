@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.46 alpha 2025-05-21
+
+* docs(common): update README with number of languages and keyboards (#14023)
+
 ## 19.0.45 alpha 2025-05-21
 
 * maint(linux): use correct syntax to define local variables in script (#14021)
