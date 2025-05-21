@@ -23,12 +23,9 @@
                           "items": {
                             "additionalProperties": false,
                             "properties": {
-                              "#text": {
-                                "type": "string"
-                              },
                               "next": {
-                                "maximum": 127,
-                                "minimum": -128,
+                                "maximum": 255,
+                                "minimum": 0,
                                 "type": "integer"
                               },
                               "output": {
@@ -38,13 +35,22 @@
                                 "type": "string"
                               }
                             },
+                            "required": [
+                              "state"
+                            ],
                             "type": "object"
                           },
+                          "minItems": 1,
                           "type": "array"
                         }
                       },
+                      "required": [
+                        "when",
+                        "id"
+                      ],
                       "type": "object"
                     },
+                    "minItems": 1,
                     "type": "array"
                   },
                   "id": {
@@ -54,12 +60,9 @@
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#text": {
-                          "type": "string"
-                        },
                         "next": {
-                          "maximum": 127,
-                          "minimum": -128,
+                          "maximum": 255,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "output": {
@@ -69,21 +72,34 @@
                           "type": "string"
                         }
                       },
+                      "required": [
+                        "state"
+                      ],
                       "type": "object"
                     },
+                    "minItems": 1,
                     "type": "array"
                   }
                 },
+                "required": [
+                  "when",
+                  "id",
+                  "action"
+                ],
                 "type": "object"
               },
+              "minItems": 1,
               "type": "array"
             }
           },
+          "required": [
+            "action"
+          ],
           "type": "object"
         },
         "group": {
-          "maximum": 127,
-          "minimum": -128,
+          "maximum": 255,
+          "minimum": 0,
           "type": "integer"
         },
         "id": {
@@ -102,39 +118,49 @@
                 "additionalProperties": false,
                 "properties": {
                   "index": {
-                    "maximum": 127,
-                    "minimum": -128,
+                    "maximum": 255,
+                    "minimum": 0,
                     "type": "integer"
                   },
                   "key": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#text": {
-                          "type": "string"
-                        },
                         "action": {
                           "type": "string"
                         },
                         "code": {
-                          "maximum": 127,
-                          "minimum": -128,
+                          "maximum": 255,
+                          "minimum": 0,
                           "type": "integer"
                         },
                         "output": {
                           "type": "string"
                         }
                       },
+                      "required": [
+                        "code"
+                      ],
                       "type": "object"
                     },
+                    "minItems": 1,
                     "type": "array"
                   }
                 },
+                "required": [
+                  "key",
+                  "index"
+                ],
                 "type": "object"
               },
+              "minItems": 1,
               "type": "array"
             }
           },
+          "required": [
+            "keyMap",
+            "id"
+          ],
           "type": "object"
         },
         "layouts": {
@@ -143,60 +169,64 @@
             "layout": {
               "additionalProperties": false,
               "properties": {
-                "#text": {
-                  "type": "string"
-                },
                 "first": {
-                  "maximum": 127,
-                  "minimum": -128,
+                  "maximum": 255,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "last": {
-                  "maximum": 127,
-                  "minimum": -128,
+                  "maximum": 255,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "layout": {
                   "additionalProperties": false,
                   "properties": {
-                    "#text": {
-                      "type": "string"
-                    },
                     "first": {
-                      "maximum": 127,
-                      "minimum": -128,
+                      "maximum": 255,
+                      "minimum": 0,
                       "type": "integer"
                     },
                     "last": {
-                      "maximum": 127,
-                      "minimum": -128,
+                      "maximum": 255,
+                      "minimum": 0,
                       "type": "integer"
                     },
                     "mapSet": {
-                      "maximum": 32767,
-                      "minimum": -32768,
+                      "maximum": 255,
+                      "minimum": 0,
                       "type": "integer"
                     },
                     "modifiers": {
-                      "maximum": 127,
-                      "minimum": -128,
+                      "maximum": 255,
+                      "minimum": 0,
                       "type": "integer"
                     }
                   },
+                  "required": [
+                    "first",
+                    "last",
+                    "mapSet",
+                    "modifiers"
+                  ],
                   "type": "object"
                 },
                 "mapSet": {
-                  "maximum": 32767,
-                  "minimum": -32768,
+                  "maximum": 255,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "modifiers": {
-                  "maximum": 127,
-                  "minimum": -128,
+                  "maximum": 255,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
               "required": [
+                "first",
+                "last",
+                "mapSet",
+                "modifiers",
                 "layout"
               ],
               "type": "object"
@@ -208,21 +238,21 @@
           "type": "object"
         },
         "maxout": {
-          "maximum": 127,
-          "minimum": -128,
+          "maximum": 255,
+          "minimum": 0,
           "type": "integer"
         },
         "modifierMap": {
           "additionalProperties": false,
           "properties": {
             "defaultIndex": {
-              "maximum": 127,
-              "minimum": -128,
+              "maximum": 255,
+              "minimum": 0,
               "type": "integer"
             },
             "id": {
-              "maximum": 127,
-              "minimum": -128,
+              "maximum": 255,
+              "minimum": 0,
               "type": "integer"
             },
             "keyMapSelect": {
@@ -230,31 +260,42 @@
                 "additionalProperties": false,
                 "properties": {
                   "mapIndex": {
-                    "maximum": 127,
-                    "minimum": -128,
+                    "maximum": 255,
+                    "minimum": 0,
                     "type": "integer"
                   },
                   "modifier": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#text": {
-                          "type": "string"
-                        },
                         "keys": {
                           "type": "string"
                         }
                       },
+                      "required": [
+                        "keys"
+                      ],
                       "type": "object"
                     },
+                    "minItems": 1,
                     "type": "array"
                   }
                 },
+                "required": [
+                  "modifier",
+                  "mapIndex"
+                ],
                 "type": "object"
               },
+              "minItems": 1,
               "type": "array"
             }
           },
+          "required": [
+            "keyMapSelect",
+            "id",
+            "defaultIndex"
+          ],
           "type": "object"
         },
         "name": {
@@ -267,43 +308,51 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "#text": {
-                    "type": "string"
-                  },
                   "output": {
                     "type": "string"
                   },
                   "state": {
-                    "maximum": 127,
-                    "minimum": -128,
+                    "maximum": 255,
+                    "minimum": 0,
                     "type": "integer"
                   },
                   "when": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#text": {
-                          "type": "string"
-                        },
                         "output": {
                           "type": "string"
                         },
                         "state": {
-                          "maximum": 127,
-                          "minimum": -128,
+                          "maximum": 255,
+                          "minimum": 0,
                           "type": "integer"
                         }
                       },
+                      "required": [
+                        "state",
+                        "output"
+                      ],
                       "type": "object"
                     },
+                    "minItems": 1,
                     "type": "array"
                   }
                 },
+                "required": [
+                  "state",
+                  "output",
+                  "when"
+                ],
                 "type": "object"
               },
+              "minItems": 1,
               "type": "array"
             }
           },
+          "required": [
+            "when"
+          ],
           "type": "object"
         }
       },
@@ -312,11 +361,12 @@
         "modifierMap",
         "keyMapSet",
         "actions",
-        "terminators"
+        "terminators",
+        "group",
+        "id",
+        "name",
+        "maxout"
       ]
-    },
-    "xs:annotation": {
-      "xs:documentation": "Data generated April 15 2025\r\n\r\n\tGenerated by S. Schmitt"
     }
   },
   "required": [
