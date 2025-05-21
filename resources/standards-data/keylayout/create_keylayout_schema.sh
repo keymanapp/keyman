@@ -31,11 +31,13 @@ for xsd in dtd/*.xsd;
 do
     base=$(basename "${xsd}" .xsd | tr A-Z a-z )
     json=${base}.schema.json
-    builder_echo debug "${xsd} -> ${json}"    
-    
+    builder_echo debug "${xsd} -> ${json}"
     echo THIS_SCRIPT_PATH/XSD: ${THIS_SCRIPT_PATH}/"${xsd}"
-
     (cd .. ; npx -p  jgexml xsd2json ${THIS_SCRIPT_PATH}/"${xsd}"  ${THIS_SCRIPT_PATH}/"${json}") || exit
+
+    #builder_echo debug 'fixup-schema.js' "${json}"
+    #node ../fixup-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
+
     mv "${json}" tmp.json
     ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; builder_die "failed to transform final schema ${json}")
     rm tmp.json

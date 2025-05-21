@@ -74,7 +74,8 @@ export class KeylayoutFileReader {
     const options = {
       ignoreAttributes: false,
       trimValues: false,           // preserve spaces
-      attributeNamePrefix: '@_'    // to access the attribute
+      attributeNamePrefix: '@_',   // to access the attribute
+      ignoreDeclaration:true
     };
 
     try {
