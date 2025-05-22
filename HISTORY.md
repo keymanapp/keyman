@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.47 alpha 2025-05-22
+
+* fix(windows): only breadcrumb unexpected state on first run (#13984)
+* maint: change builder_completion script to a .inc.sh (#14007)
+* fix(windows): skip sending handle kmshell events to upgrade state machine  for keyboard install modes (#13989)
+* fix(windows): fix sentry error message reporting (#14027)
+
 ## 19.0.46 alpha 2025-05-21
 
 * docs(common): update README with number of languages and keyboards (#14023)
