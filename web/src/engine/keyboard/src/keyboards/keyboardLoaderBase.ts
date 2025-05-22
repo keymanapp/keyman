@@ -41,10 +41,16 @@ export abstract class KeyboardLoaderBase {
     return this.loadKeyboardInternal(stub.filename, new StubBasedErrorBuilder(stub));
   }
 
+  private isKMXKeyboard(byteArray: Uint8Array): boolean {
+    // Check if the first 4 bytes are 'KXTS' (0x4b, 0x58, 0x54, 0x53)
+    return byteArray.length >= 4 && byteArray[0] === 0x4b &&
+      byteArray[1] === 0x58 && byteArray[2] === 0x54 && byteArray[3] === 0x53;
+  }
+
   private async loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
     const byteArray = await this.loadKeyboardBlob(uri, errorBuilder);
 
-    if (byteArray.slice(0, 4) == Uint8Array.from([0x4b, 0x58, 0x54, 0x53])) { // 'KXTS'
+    if (this.isKMXKeyboard(byteArray)) {
       // KMX or LDML (KMX+) keyboard
       const result = KM_Core.instance.keyboard_load_from_blob(uri, byteArray);
       if (result.status == KM_CORE_STATUS.OK) {
