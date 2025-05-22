@@ -4,14 +4,18 @@
 
 package com.keyman.engine.util;
 
+import static com.keyman.engine.KMManager.KMKey_LexicalModelID;
+
 import android.util.Log;
 import android.widget.Toast;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.BuildConfig;
 import com.keyman.engine.KMManager;
-import com.keyman.engine.util.DependencyUtil;
+import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
+
+import java.util.Map;
 
 import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
@@ -20,19 +24,67 @@ import io.sentry.SentryLevel;
 public final class KMLog {
   private static final String TAG = "KMLog";
 
+  private static final String KEYBOARD_TAG = "keyboardId";
+  private static final String KEYBOARD_COUNT_TAG = "installedKeyboardCount";
+  private static final String MODEL_TAG = "modelId";
+  private static final String LANGCODE_TAG = "languageCode";
+
+  // Some of the methods used to generate debug logging information can, themselves,
+  // trigger errors that can also trigger the same logging.  We must not get
+  // caught in an infinite loop / stack-overflow; this field helps us avoid states
+  // that would otherwise cause error-looping, etc.
+  private static boolean isLogging = false;
+
+  private static void tagDebugInfo() {
+    String kbdId = "";
+    String lngCode = "";
+    String modelId = "";
+    int kbdCount = 0;
+    // Do not risk raising a new error while tagging info for another error.
+    try {
+      // Both take a context parameter... but don't actually need or use it!
+      Keyboard kbd = KMManager.getCurrentKeyboardInfo(null);
+      kbdCount = KMManager.getKeyboardsList(null).size();
+      if (kbd != null) {
+        kbdId = kbd.getKeyboardID();
+        lngCode = kbd.getLanguageCode();
+        Map<String, String> modelMap = KMManager.getAssociatedLexicalModel(kbd.getLanguageID());
+        if (modelMap != null) {
+          modelId = modelMap.get(KMKey_LexicalModelID);
+          if (modelId == null) {
+            modelId = "";
+          }
+        }
+      }
+    } catch (Exception ex) {
+      String msg = ex.getMessage() == null ? "" : ex.getMessage();
+      Sentry.setExtra("debugLoggingError", msg);
+    }
+    Sentry.setExtra(KEYBOARD_TAG, kbdId);
+    Sentry.setExtra(KEYBOARD_COUNT_TAG, "" + kbdCount);
+    Sentry.setExtra(LANGCODE_TAG, lngCode);
+    Sentry.setExtra(MODEL_TAG, modelId);
+  }
+
   /**
    * Utility to log info and send to Sentry
    * @param tag String of the caller
    * @param msg String of the info message
    */
   public static void LogInfo(String tag, String msg) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (msg != null && !msg.isEmpty()) {
       Log.i(tag, msg);
 
       if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+        tagDebugInfo();
         Sentry.captureMessage(msg, SentryLevel.INFO);
       }
     }
+    isLogging = false;
   }
 
   /**
@@ -46,9 +98,15 @@ public final class KMLog {
       return;
     }
 
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
+
     Log.i(tag, msg);
 
     if (!DependencyUtil.libraryExists(LibraryType.SENTRY) || !Sentry.isEnabled()) {
+      isLogging = false;
       return;
     }
 
@@ -74,7 +132,9 @@ public final class KMLog {
         crumb.setData("stacktrace", trace);
       }
     }
+    tagDebugInfo();
     Sentry.addBreadcrumb(crumb);
+    isLogging = false;
   }
 
   /**
@@ -83,6 +143,10 @@ public final class KMLog {
    * @param msg String of the error message
    */
   public static void LogError(String tag, String msg) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (msg != null && !msg.isEmpty()) {
       Log.e(tag, msg);
 
@@ -91,9 +155,11 @@ public final class KMLog {
       }
 
       if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+        tagDebugInfo();
         Sentry.captureMessage(msg, SentryLevel.ERROR);
       }
     }
+    isLogging = false;
   }
 
   /**
@@ -103,6 +169,10 @@ public final class KMLog {
    * @param e Throwable exception
    */
   public static void LogException(String tag, String msg, Throwable e) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     String errorMsg = "";
     if (msg != null && !msg.isEmpty()) {
       errorMsg = msg + "\n" + e;
@@ -116,9 +186,11 @@ public final class KMLog {
     }
 
     if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      tagDebugInfo();
       Sentry.addBreadcrumb(errorMsg);
       Sentry.captureException(e);
     }
+    isLogging = false;
   }
 
   /**
@@ -131,7 +203,12 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
+    if(isLogging) {
+      return;
+    }
+    isLogging = true;
     if (obj != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      tagDebugInfo();
       String objStr = null;
       try {
         objStr = obj.toString();
@@ -141,6 +218,10 @@ public final class KMLog {
       }
       // Report the original exception
       LogException(tag, msg, e);
+      // And remove the exception-specific tagged data, lest it also be
+      // tracked on subsequent errors not associated with the current call.
+      Sentry.removeExtra(objName);
     }
+    isLogging = false;
   }
 }
