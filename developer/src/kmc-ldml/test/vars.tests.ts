@@ -112,13 +112,14 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/dup0.xml',
       errors: [
-        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'y'})
       ],
     },
     {
       subpath: 'sections/vars/dup1.xml',
       errors: [
-        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'upper'}),
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'y'}),
       ],
     },
     {

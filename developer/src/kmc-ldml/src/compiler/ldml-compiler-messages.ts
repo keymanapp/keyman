@@ -195,8 +195,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_DuplicateVariable = SevError | 0x0016;
-  static Error_DuplicateVariable = (o:{ids: string}) => m(this.ERROR_DuplicateVariable,
-      `duplicate variables: id=${def(o.ids)}`);
+  static Error_DuplicateVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DuplicateVariable, x,
+    `duplicate variable: id=${def(o.id)}`,
+  );
 
   // Not hit due to XML parsing
   static ERROR_InvalidTransformsType = SevError | 0x0018;
@@ -216,8 +218,10 @@ export class LdmlCompilerMessages {
   m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
 
   static ERROR_MissingStringVariable = SevError | 0x001C;
-  static Error_MissingStringVariable = (o:{id: string}) =>
-  m(this.ERROR_MissingStringVariable, `Reference to undefined string variable: \${${def(o.id)}}`);
+  static Error_MissingStringVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_MissingStringVariable, x,
+    `Reference to undefined string variable: \${${def(o.id)}}`,
+  );
 
   static ERROR_MissingSetVariable = SevError | 0x001D;
   static Error_MissingSetVariable = (o:{id: string}) =>
@@ -228,12 +232,16 @@ export class LdmlCompilerMessages {
   m(this.ERROR_MissingUnicodeSetVariable, `Reference to undefined UnicodeSet variable: \$[${def(o.id)}]`);
 
   static ERROR_NeedSpacesBetweenSetVariables = SevError | 0x001F;
-  static Error_NeedSpacesBetweenSetVariables = (o:{item: string}) =>
-  m(this.ERROR_NeedSpacesBetweenSetVariables, `Need spaces between set variables: ${def(o.item)}`);
+  static Error_NeedSpacesBetweenSetVariables = (o:{item: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_NeedSpacesBetweenSetVariables, x,
+    `Need spaces between set variables: ${def(o.item)}`,
+  );
 
   static ERROR_CantReferenceSetFromUnicodeSet = SevError | 0x0020;
-  static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}) =>
-  m(this.ERROR_CantReferenceSetFromUnicodeSet, `Illegal use of set variable from within UnicodeSet: \$[${def(o.id)}]`);
+  static Error_CantReferenceSetFromUnicodeSet = (o:{id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_CantReferenceSetFromUnicodeSet, x,
+    `Illegal use of set variable from within UnicodeSet: \$[${def(o.id)}]`
+  );
 
   static ERROR_MissingMarkers = SevError | 0x0021;
   static Error_MissingMarkers = (o: { ids: string[] }) =>

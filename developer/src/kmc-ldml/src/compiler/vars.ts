@@ -53,8 +53,8 @@ export class VarsCompiler extends SectionCompiler {
     const variables = this.keyboard3?.variables;
 
     // Check for duplicate ids
-    const allIds = new Set();
-    const dups = new Set();
+    const allIds = new Map<string,LDMLKeyboard.Variable>();
+    const dups = new Set<string>();
 
     const allStrings = new Set();
     const allSets = new Set();
@@ -63,28 +63,30 @@ export class VarsCompiler extends SectionCompiler {
     /**
      * add an ID to check for duplicates
      * @param id id
+     * @param x context
      */
-    function addId(id: string): void {
+    function addId(id: string, x: LDMLKeyboard.Variable): void {
       if (allIds.has(id)) {
         dups.add(id);
       } else {
-        allIds.add(id);
+        allIds.set(id, x);
       }
     }
 
     if (variables) {
       // Strings
-      for (const { id, value } of variables.string) {
+      for (const e of variables.string) {
+        const { id, value } = e;
         if(!this.validateIdentifier(id)) {
           valid = false;
           continue;
         }
-        addId(id);
+        addId(id, e);
         const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
         for(const ref of stringrefs) {
           if(!allStrings.has(ref)) {
             valid = false;
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({id: ref}));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({id: ref}, e));
             allStrings.add(ref); // avoids multiple reports of same missing variable
           }
         }
@@ -93,12 +95,13 @@ export class VarsCompiler extends SectionCompiler {
         st.addMarkers(SubstitutionUse.variable, value);
       }
       // Sets
-      for (const { id, value } of variables.set) {
+      for (const e of variables.set) {
+        const { id, value } = e;
         if(!this.validateIdentifier(id)) {
           valid = false;
           continue;
         }
-        addId(id);
+        addId(id, e);
         allSets.add(id);
         // check for illegal references, here.
         const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
@@ -111,7 +114,7 @@ export class VarsCompiler extends SectionCompiler {
           if (setrefs.length > 1) {
             // this is the form $[seta]$[setb]
             valid = false;
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }, e));
           } else {
             st.set.add(SubstitutionUse.variable, setrefs); // the reference to a 'map'
           }
@@ -119,12 +122,13 @@ export class VarsCompiler extends SectionCompiler {
         }
       }
       // UnicodeSets
-      for (const { id, value } of variables.uset) {
+      for (const e of variables.uset) {
+        const { id, value } = e;
         if(!this.validateIdentifier(id)) {
           valid = false;
           continue;
         }
-        addId(id);
+        addId(id, e);
         allUnicodeSets.add(id);
         const stringrefs = LdmlKeyboardTypes.VariableParser.allStringReferences(value);
         st.string.add(SubstitutionUse.variable, stringrefs);
@@ -134,7 +138,7 @@ export class VarsCompiler extends SectionCompiler {
             valid = false;
             if (allSets.has(id2)) {
               // $[set] in a UnicodeSet must be another UnicodeSet.
-              this.callbacks.reportMessage(LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
+              this.callbacks.reportMessage(LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }, e));
             } else {
               st.uset.add(SubstitutionUse.variable, [id2]);
             }
@@ -144,9 +148,11 @@ export class VarsCompiler extends SectionCompiler {
     }
     // one report if any dups
     if (dups.size > 0) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateVariable({
-        ids: Array.from(dups.values()).sort().join(', ')
-      }));
+      for (const id of dups.values()) {
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateVariable({
+          id
+        }, allIds.get(id)));
+      }
       valid = false;
     }
 
