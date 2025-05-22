@@ -689,7 +689,6 @@ end;
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
 var
   BUpdateSM : TUpdateStateMachine;
-  frmStartInstall: TfrmStartInstall;
   SendToBUpdateSM: Boolean;
   SkipBUpdate : Boolean;
 begin
