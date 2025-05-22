@@ -55,37 +55,34 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   public validate(): boolean {
     const reportMessage = this.callbacks.reportMessage.bind(this.callbacks);
-
+    const ALLOWED_TYPES = ["simple", "backspace"];
     let valid = true;
     const transforms = this?.keyboard3?.transforms;
-    if (transforms) {
-      const types : string[] = transforms.map(({type}) => type);
+    if (transforms && this.id == "tran") {
+      // Only run this part in the main "tran" compiler.
+      // we use this map to get back to a context object for the error message
+      const typeToObject = new Map<string, LKTransforms>();
+      transforms.forEach(t => typeToObject.set(t.type, t));
+      const types = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
-        types => reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ types })),
-        new Set(['simple', 'backspace']),
-        types => reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ types })))) {
+        types => types.forEach(type =>
+          reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ type }, typeToObject.get(type)))),
+        new Set(ALLOWED_TYPES),
+        types => types.forEach(type =>
+          reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ type }, typeToObject.get(type)))))) {
         valid = false;
       }
 
-      // check for mixed groups
-      let mixed = false;
-      let empty = false;
-      transforms.forEach(({transformGroup}) => transformGroup.forEach((transformGroup) => {
+      transforms.forEach(({ type, transformGroup }) => transformGroup.forEach((transformGroup) => {
+        if (this.type != type) return; // only validate bskp in bksp, tran in tran, etc.
         if (transformGroup.reorder?.length && transformGroup.transform?.length) {
-          mixed = true;
-        }
-        if (!transformGroup.reorder?.length && !transformGroup.transform?.length) {
-          empty = true;
+          valid = false;
+          reportMessage(LdmlCompilerMessages.Error_MixedTransformGroup(transformGroup));
+        } else if (!transformGroup.reorder?.length && !transformGroup.transform?.length) {
+          valid = false;
+          reportMessage(LdmlCompilerMessages.Error_EmptyTransformGroup(transformGroup));
         }
       }));
-      if (mixed) {
-        valid = false;
-        reportMessage(LdmlCompilerMessages.Error_MixedTransformGroup()); // report this once
-      }
-      if (empty) {
-        valid = false;
-        reportMessage(LdmlCompilerMessages.Error_EmptyTransformGroup()); // report this once
-      }
 
       // TODO-LDML: linting here should check for identical from, but this involves a double-parse which is ugly
       // TODO-LDML: unicodesets means that either we fully parse them and verify conflicting rules or the linting is imperfect
@@ -96,7 +93,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   /* c8 ignore next 4 */
   /** allocate a new TranBase subclass */
   protected newTran(): TranBase {
-    throw Error(`Internal Error: newTran() not implemented`);
+    throw Error(`Internal Error: TranBase.newTran() not implemented (should not be called)`);
   }
 
   private compileTransforms(sections: DependencySections, transforms: LKTransforms): TranBase {
@@ -149,7 +146,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
 
     if (cookedFrom === '') {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }, transform));
       return null;
     }
 
@@ -181,7 +178,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
 
     // check for denormalized ranges
-    cookedFrom = this.checkRanges(cookedFrom); // check before normalizing
+    cookedFrom = this.checkRanges(cookedFrom, transform); // check before normalizing
 
     if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
@@ -202,7 +199,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
       return null;
     }
-    
+
     // run the parser here next, on the original to
     try {
       transform_to_parse(transform.to || '');
@@ -210,7 +207,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
       return null;
     }
-  
+
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,
@@ -337,7 +334,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param cookedFrom the original string
    * @returns the original string, or null if an error was reported
    */
-  private checkEscapes(cookedFrom: string): string | null {
+  private checkEscapes(cookedFrom: string, transform?: LKTransform): string | null {
     if (!cookedFrom) return cookedFrom;
 
     // should not follow marker prefix, nor marker prefix with range
@@ -346,7 +343,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
       const s = util.unescapeOne(sub);
       if (s !== '\uffff' && s !== '\u0008') { // markers
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }, transform));
         return null; // exit on the first error
       }
     }
@@ -359,7 +356,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param cookedFrom input regex string
    * @returns updated 'from' string
    */
-  private checkRanges(cookedFrom: string): string {
+  private checkRanges(cookedFrom: string, transform?: LKTransform): string {
     if (!cookedFrom) return cookedFrom;
 
     // extract all of the potential ranges - but don't match any-markers!
@@ -408,13 +405,17 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let needCooking = false;
     const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
     if (explicitSet) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CharClassExplicitDenorm({
+        lowestCh: explicitSet.values().next().value
+      }, transform));
       needCooking = true;
     } else {
       // don't analyze the implicit set of THIS range, if explicit is already problematic
       const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
       if (implicitSet) {
-        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_CharClassImplicitDenorm({
+          lowestCh: implicitSet.values().next().value
+        }, transform));
         needCooking = true;
       }
     }
@@ -471,5 +472,9 @@ export class BkspCompiler extends TransformCompiler<'backspace', Bksp /*, BkspIt
   }
   public get id() {
     return constants.section.bksp;
+  }
+  /**  */
+  public validate(): boolean {
+      return true;
   }
 };
