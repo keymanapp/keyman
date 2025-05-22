@@ -443,7 +443,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       kbd = this.core.activeKeyboard;
     }
 
-    // TODO-web-core: implement for KMX keyboards if needed
+    // We only support isCJK on legacy .js keyboards; see #7928
     return kbd && kbd instanceof JSKeyboard && kbd.isCJK;
   }
 
