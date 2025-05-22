@@ -55,8 +55,6 @@ type
   private
     FForce: Boolean;
     FAutomaticUpdate: Boolean;
-    FErrorMessage: string;
-    FShowErrors: Boolean;
 
     CurrentState: TState;
     // State object for performance (could lazy create?)
@@ -101,7 +99,6 @@ type
     function ReadyToInstall: Boolean;
     function IsInstallingState: Boolean;
 
-    property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState: TUpdateState;
 
   end;
@@ -240,7 +237,6 @@ type
 constructor TUpdateStateMachine.Create(AForce: Boolean);
 begin
   inherited Create;
-  FShowErrors := True;
 
   FForce := AForce;
   FAutomaticUpdate := GetAutomaticUpdates;
@@ -259,16 +255,10 @@ destructor TUpdateStateMachine.Destroy;
 var
   lpState: TUpdateState;
 begin
-  if (FErrorMessage <> '') and FShowErrors then
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      '"+FErrorMessage+"');
-
   for lpState := Low(TUpdateState) to High(TUpdateState) do
   begin
     FreeAndNil(FStateInstance[lpState]);
   end;
-
-  // TODO: #10210 TODO: epic-windows-update remove debugging comments throughout this Unit.
 
   inherited Destroy;
 end;
