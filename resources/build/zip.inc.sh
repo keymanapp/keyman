@@ -8,13 +8,14 @@
 #
 # TODO: refactor with /resources/build/win/zip.inc.sh
 
-# zip/7z to create an archive with the following parameters (in order)
+# Add files to create a zip/7z archive with the following parameters (in order)
 # [zip filename]
-# [list of flags to pass to zip command. Flags start with a single-dash
+# [list of flags to pass to zip command] Flags start with a single-dash
 #   -x@filename for a file containing list of files to exclude from the archive
-#   -* all other flags]
+#   -* all other flags
+#   Flags passed in are treated as zip parameters, and internally converterted to 7z flags as applicable
 # [list of files to include in zip]
-function zip_files() {
+function add_zip_files() {
 
   # Parse parameters
 
@@ -29,11 +30,13 @@ function zip_files() {
   while [[ $# -gt 0 ]] ; do
     case "$1" in
       -r)
-        # Common flags to zip and 7z
+        # recursive paths - Identical flag to zip and 7z
         ZIP_FLAGS+=($1)
         SEVENZ_FLAGS+=($1)
         shift
         ;;
+
+      # Zip flags that have a corresponding 7z flag
       -q)
         # quiet mode  -> disable progress indicator, set output log level 0
         ZIP_FLAGS+=($1)
@@ -52,11 +55,13 @@ function zip_files() {
         fi  
         shift;
         ;;
+
       -*)
-        # Rest of zip flags.
+        # Remaining zip flags that don't apply to 7z
         ZIP_FLAGS+=($1)
         shift
         ;;
+
       *)
         # files to include in the archive
         INCLUDE+=($1)
@@ -88,7 +93,7 @@ function zip_files() {
   fi
 
   # Create archive
-  builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
+  # builder_echo_debug "${COMPRESS_CMD} ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}"
   "${COMPRESS_CMD}" ${SEVENZ_FLAGS[@]} ${ZIP_FLAGS[@]} ${ZIP_FILE} ${INCLUDE[@]}
 
 }
