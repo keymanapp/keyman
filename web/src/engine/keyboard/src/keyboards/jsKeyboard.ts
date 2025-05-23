@@ -13,7 +13,7 @@ import LayoutSpec = KeymanWebKeyboard.LayoutSpec;
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
-import StateKeyMap from "./stateKeyMap.js";
+import { StateKeyMap } from "./stateKeyMap.js";
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.
