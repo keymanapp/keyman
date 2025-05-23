@@ -39,6 +39,7 @@ do
     #node fixup-keylayout-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
 
     mv "${json}" tmp.json
+    # reformat with prettier(JQ)
     ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; builder_die "failed to transform final schema ${json}")
     rm tmp.json
 done

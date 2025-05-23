@@ -14,13 +14,16 @@ const { argv } = require('process');
 
 // Read stuff
 const input = readFileSync(argv[2] || 0, "utf-8");
+// uses C:\Projects\keyman\keyman\developer\src\common\web\utils\src\xml-utils.ts -> parse()
 const data = JSON.parse(input);
 
+// SAB don`t need this
 const aaa= data.properties.keyboard.properties.id
 const b= data['$id']
 const c= data['id']
 
 // Fix stuff
+// SAB don`t need this
 if (!data['$id'] && data['id']) {
     data['$id'] = data['id'];
     delete data['id'];
@@ -114,6 +117,8 @@ if (data.title.endsWith('keylayout.xsd')) {
     if (data?.properties?.keyboard) {
         data.properties.keyboard.type = 'object';
 
+
+        // SAB don`t need this
         // add the xmlns property as allowed
         if (!data.properties.keyboard3?.properties?.xmlns) {
           data.properties.keyboard3.properties.xmlns = { type: 'string' };
@@ -121,7 +126,7 @@ if (data.title.endsWith('keylayout.xsd')) {
     }
 
 
-
+    // SAB calls the func for different tags
     arrayToSingle(data?.properties?.keyboard3?.properties?.vkeys);
     singleToArray(data?.definitions?.keys?.properties?.key);
     singleToArray(data?.definitions?.keys?.properties?.flicks);
@@ -155,6 +160,7 @@ if (data.title.endsWith('ldmlKeyboardTest3.xsd')) {
   if (data?.properties?.keyboardTest3) {
       data.properties.keyboardTest3.type = 'object';
 
+      // SAB don`t need this
       // support this proactively
       if (!data.properties.keyboardTest3?.properties?.xmlns) {
         data.properties.keyboardTest3.properties.xmlns = { type: 'string' };
