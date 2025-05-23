@@ -1,4 +1,4 @@
-import Codes from "../codes.js";
+import { Codes } from "../codes.js";
 import { Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import { KeyEvent } from "../keyEvent.js";

@@ -1,4 +1,4 @@
-import Codes from "../codes.js";
+import { Codes } from "../codes.js";
 import { KeyEvent, KeyEventSpec } from "../keyEvent.js";
 import KeyMapping from "../keyMapping.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";

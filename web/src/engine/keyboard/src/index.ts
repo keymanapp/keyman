@@ -24,8 +24,7 @@ export { StateKeyMap } from "./keyboards/stateKeyMap.js";
 export { type Alternate, TextTransform } from "./keyboards/textTransform.js";
 export { Transcription } from "./keyboards/transcription.js";
 
-export { default as Codes } from "./codes.js";
-export * from "./codes.js";
+export { Codes } from "./codes.js";
 export { default as DefaultRules } from "./defaultRules.js";
 export * from "./defaultRules.js";
 export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";

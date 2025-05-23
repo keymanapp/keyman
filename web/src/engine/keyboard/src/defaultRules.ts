@@ -5,7 +5,7 @@
  */
 
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import Codes from './codes.js';
+import { Codes } from './codes.js';
 import { type KeyEvent } from './keyEvent.js';
 import { type OutputTargetInterface }  from './outputTargetInterface.js';
 
