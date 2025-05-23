@@ -58,3 +58,28 @@ linux_unit_tests_action() {
   builder_echo end unit_tests success "Finished running unit tests"
 }
 
+web_build_action() {
+  builder_echo start web_build "Building web"
+  "${KEYMAN_ROOT}/web/ci.sh" build
+  builder_echo end web_build success "Finished building web"
+}
+
+web_test_action() {
+  builder_echo start web_test "Running tests for native KeymanWeb"
+  if is_ubuntu; then
+    linux_start_xvfb
+    trap "linux_stop_xvfb" ERR
+  fi
+
+  "${KEYMAN_ROOT}/web/ci.sh" test
+
+  if is_ubuntu; then
+    linux_stop_xvfb
+    trap ERR
+  fi
+
+  "${KEYMAN_ROOT}/web/build.sh" coverage
+
+  builder_echo end web_test success "Finished running tests for native KeymanWeb"
+}
+
