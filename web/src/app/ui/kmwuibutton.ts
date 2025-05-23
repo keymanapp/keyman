@@ -28,7 +28,7 @@ if(!keymanweb) {
 
   /**
    * Do not enclose in an anonymous function, as the compiler may create
-   * global scope variables to replace true, false, null, whcih can then collide
+   * global scope variables to replace true, false, null, which can then collide
    * with other variables.
    * Instead, use the --output-wrapper command during optimization, which will
    * add the anonymous function to enclose all code, including those optimized
@@ -106,7 +106,7 @@ if(!keymanweb) {
        * @param       {Event}  _id   keyboard selection event
        * @return      {boolean}
        */
-      readonly _SelectKeyboard = (_id: Event) => {
+      private readonly _SelectKeyboard = async (_id: Event): Promise<boolean> => {
         let id: string = '';
         if(typeof(_id) == 'object') {
           let t: HTMLElement = null;
@@ -135,7 +135,7 @@ if(!keymanweb) {
             _k.className='selected';
           }
           this._KMWSel = _k;
-          keymanweb.setActiveKeyboard(_name,_lgc);
+          await keymanweb.setActiveKeyboard(_name,_lgc);
         } else {
           _name=null;
         }
@@ -252,7 +252,7 @@ if(!keymanweb) {
        *
        * @param       {Event}    e     event
        */
-      readonly _SelectorMouseOut = (e: MouseEvent) => {
+      private readonly _SelectorMouseOut = (e: MouseEvent) => {
         if(keymanweb.activatingUI) {
           keymanweb.activatingUI(0);
         }

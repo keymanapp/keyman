@@ -450,15 +450,15 @@ if(!keymanweb) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      readonly SelectKeyboardChange = (e: Event) => {
+      private readonly SelectKeyboardChange = async (e: Event) => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {
           const i=this.KeyboardSelector.selectedIndex;
           const t=this.KeyboardSelector.options[i].value.split(':');
-          keymanweb.setActiveKeyboard(t[0],t[1]);
+          await keymanweb.setActiveKeyboard(t[0],t[1]);
         } else {
-          keymanweb.setActiveKeyboard('');
+          await keymanweb.setActiveKeyboard('');
         }
 
         //if(osk['show']) osk['show'](osk['isEnabled']()); handled by keyboard change event???
