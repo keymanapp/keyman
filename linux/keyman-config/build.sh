@@ -62,14 +62,14 @@ build_action() {
   builder_echo "Create version.py"
   pushd keyman_config
   sed \
-      -e "s/_KEYMAN_VERSION_/${KEYMAN_VERSION}/g" \
-      -e "s/_KEYMAN_VERSION_WITH_TAG_/${KEYMAN_VERSION_WITH_TAG}/g" \
-      -e "s/_KEYMAN_VERSION_GIT_TAG_/${KEYMAN_VERSION_GIT_TAG}/g" \
-      -e "s/_KEYMAN_VERSION_MAJOR_/${KEYMAN_VERSION_MAJOR}/g" \
-      -e "s/_KEYMAN_VERSION_RELEASE_/${KEYMAN_VERSION_RELEASE}/g" \
-      -e "s/_KEYMAN_TIER_/${KEYMAN_TIER}/g" \
-      -e "s/_KEYMAN_VERSION_ENVIRONMENT_/${KEYMAN_VERSION_ENVIRONMENT}/g" \
-      -e "s/_UPLOAD_SENTRY_/${UPLOAD_SENTRY}/g" \
+      -e "s/__KEYMAN_VERSION__/${KEYMAN_VERSION}/g" \
+      -e "s/__KEYMAN_VERSION_WITH_TAG__/${KEYMAN_VERSION_WITH_TAG}/g" \
+      -e "s/__KEYMAN_VERSION_GIT_TAG__/${KEYMAN_VERSION_GIT_TAG}/g" \
+      -e "s/__KEYMAN_VERSION_MAJOR__/${KEYMAN_VERSION_MAJOR}/g" \
+      -e "s/__KEYMAN_VERSION_RELEASE__/${KEYMAN_VERSION_RELEASE}/g" \
+      -e "s/__KEYMAN_TIER__/${KEYMAN_TIER}/g" \
+      -e "s/__KEYMAN_VERSION_ENVIRONMENT__/${KEYMAN_VERSION_ENVIRONMENT}/g" \
+      -e "s/__UPLOAD_SENTRY__/${UPLOAD_SENTRY}/g" \
       version.py.in > version.py
   popd
   pushd buildtools
