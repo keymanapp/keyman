@@ -820,7 +820,7 @@ if(!keymanweb) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
+      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
         keymanweb.activatingUI(true);
 
         if(this.selectedLanguage) {
@@ -943,7 +943,7 @@ if(!keymanweb) {
        * @return      {boolean}
        * Description  Update the UI when all keyboards disabled by user
        **/
-      readonly offButtonClickEvent = async (event: Event) => {
+      private readonly offButtonClickEvent = async (event: Event) => {
         if(this.toolbarNode.className != 'kmw_controls_disabled') {
           this.hideKeyboardsForLanguage(null);
           if(this.selectedLanguage) {

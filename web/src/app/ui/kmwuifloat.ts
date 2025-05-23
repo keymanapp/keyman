@@ -450,7 +450,7 @@ if(!keymanweb) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      readonly SelectKeyboardChange = async (e: Event) => {
+      private readonly SelectKeyboardChange = async (e: Event) => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {

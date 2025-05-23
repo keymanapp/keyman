@@ -558,7 +558,7 @@ if(!keymanweb) {
        * @param       {number}  _kbd
        * Description  Select a keyboard from the drop down menu
        **/
-      async selectKbd(_kbd: number): Promise<boolean> {
+      private async selectKbd(_kbd: number): Promise<boolean> {
         let _name,_lgCode;
         if(_kbd < 0) {
           _name = '';
