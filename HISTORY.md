@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.48 alpha 2025-05-23
+
+* maint(web): upgrade Sentry to 8.55.0 (#14030)
+
 ## 19.0.47 alpha 2025-05-22
 
 * fix(windows): only breadcrumb unexpected state on first run (#13984)
