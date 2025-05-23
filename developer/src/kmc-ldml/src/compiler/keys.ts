@@ -73,7 +73,7 @@ export class KeysCompiler extends SectionCompiler {
     this.keyboard3.forms?.form?.forEach((form) => {
       if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
         // If it's not an implied import, give a warning.
-        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm(form));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm({ id: form.id }, form));
       }
     });
 
@@ -100,7 +100,7 @@ export class KeysCompiler extends SectionCompiler {
         if (!flickHash.has(flickId)) {
           valid = false;
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_MissingFlicks(key)
+            LdmlCompilerMessages.Error_MissingFlicks({ id: key.id, flickId: key.flickId }, key)
           );
         }
       }
@@ -157,16 +157,16 @@ export class KeysCompiler extends SectionCompiler {
     const form = this.getForm(formId);
     if (!form) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidHardware(layers)
+        LdmlCompilerMessages.Error_InvalidHardware({formId}, layers)
       );
       return null;
     }
     const keymap = KeysCompiler.getKeymapFromScancodes(form, badScans);
     if (!keymap) {
     } else if (badScans.size !== 0) {
-      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
+      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort().join(' ');
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidScanCode({ codes }, form)
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes, id: form.id }, form)
       );
       return null;
     }
@@ -461,7 +461,7 @@ export class KeysCompiler extends SectionCompiler {
     const { modifiers } = layer;
     if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier(layer)
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer)
       );
       valid = false;
     }

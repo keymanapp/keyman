@@ -1,6 +1,5 @@
-import { KMXPlus, util } from "@keymanapp/common-types";
+import { util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
-import { LDMLKeyboard } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -19,18 +18,36 @@ const SevErrorTransform = SevError | 0xF00;
 type ObjectWithMetadata = any;
 
 /**
- * Convenience function for constructing CompilerEvents with line numbers
+ * Convenience function for constructing CompilerEvents with line numbers.
+ * Use it as below: (abbreviated as mx())
+ *
+ * ```js
+ *  // Note: Indentation makes "InvalidScanCode" line up thrice
+ *  static ERROR_InvalidScanCode = SevError | 0x0009;
+ *  // Note:
+ *  //   1. All parameters are passed in 'o', the context object is only used for context even if
+ *  //      it contains redundant info.
+ *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
+ *  //      with `${def(o.property)}` as the max complexity of interpolation.
+ *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
+ *    this.ERROR_InvalidScanCode, x,
+ *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
+ *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
+ *  `…additional markdown detail…`
+ *  );
+ * ```
+ *
  * @param code     Unique numeric value of the event
  * @param message  A short description of the error presented to the user
- * @param x        Object to be used as a source for line number information
+ * @param context  Object to be used as a source for line number information
  * @param detail   Detailed Markdown-formatted description of the error
  *                 including references to documentation, remediation options.
  * @see CompilerMessageSpec
  * @returns
  */
-function CompilerMessageObjectSpec(code: number, message: string, x: ObjectWithMetadata, detail?: string): CompilerEvent {
-  let evt = m(code, message, detail);        // raw message
-  evt = LdmlCompilerMessages.offset(evt, x); // with offset
+function CompilerMessageObjectSpec(code: number, context: ObjectWithMetadata, message: string, detail?: string): CompilerEvent {
+  let evt = m(code, message, detail); // constructs raw message
+  evt = LdmlCompilerMessages.offset(evt, context); // updates with offset from context
   return evt;
 };
 
@@ -41,34 +58,30 @@ const mx = CompilerMessageObjectSpec;
  */
 export class LdmlCompilerMessages {
   static HINT_NormalizationDisabled = SevHint | 0x0001;
-  static Hint_NormalizationDisabled = (x?: LDMLKeyboard.LKSettings) => mx(
-    this.HINT_NormalizationDisabled,
+  static Hint_NormalizationDisabled = (x?: ObjectWithMetadata) => mx(
+    this.HINT_NormalizationDisabled, x,
     `normalization=disabled is not recommended.`,
-    x,
   );
 
   static ERROR_InvalidLocale = SevError | 0x0002;
   static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
-  static Error_HardwareLayerHasTooManyRows = (x: any) => mx(
-    this.ERROR_HardwareLayerHasTooManyRows,
+  static Error_HardwareLayerHasTooManyRows = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_HardwareLayerHasTooManyRows, x,
     `'hardware' layer has too many rows`,
-    x,
   );
 
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
-  static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x: LDMLKeyboard.LKRow) => mx(
-    this.ERROR_RowOnHardwareLayerHasTooManyKeys,
+  static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_RowOnHardwareLayerHasTooManyKeys, x,
     `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`,
-    x,
   );
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
-  static Error_KeyNotFoundInKeyBag = (o: { keyId: string, col: number, row: number, layer: string, form: string }, x: LDMLKeyboard.LKRow | KMXPlus.LayrRow) => mx(
-    this.ERROR_KeyNotFoundInKeyBag,
+  static Error_KeyNotFoundInKeyBag = (o: { keyId: string, col: number, row: number, layer: string, form: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_KeyNotFoundInKeyBag, x,
     `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`,
-    x,
   );
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
@@ -84,25 +97,22 @@ export class LdmlCompilerMessages {
   m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
 
   static ERROR_InvalidScanCode = SevError | 0x0009;
-  static Error_InvalidScanCode = (o:{codes?: string[]}, x: LDMLKeyboard.LKForm) => mx(
-    this.ERROR_InvalidScanCode,
-    `Form '${def(x?.id)}' has invalid/unknown scancodes '${def(o.codes?.join(' '))}'`,
-    x,
+  static Error_InvalidScanCode = (o: { codes: string, id: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidScanCode, x,
+    `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
   );
 
   static WARN_CustomForm = SevWarn | 0x000A;
-  static Warn_CustomForm = (o: LDMLKeyboard.LKForm) => mx(
-    this.WARN_CustomForm,
+  static Warn_CustomForm = (o: { id: string }, x?: ObjectWithMetadata) => mx(
+    this.WARN_CustomForm, x,
     `Custom <form id="${def(o.id)}"> element. Key layout may not be as expected.`,
-    o,
   );
 
   static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
-  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x: LDMLKeyboard.LKKey) =>
+  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x?: ObjectWithMetadata) =>
   mx(
-    this.ERROR_GestureKeyNotFoundInKeyBag,
+    this.ERROR_GestureKeyNotFoundInKeyBag, x,
     `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`,
-    x,
   );
 
   static HINT_NoDisplayForMarker = SevHint | 0x000C;
@@ -110,10 +120,9 @@ export class LdmlCompilerMessages {
   m(this.HINT_NoDisplayForMarker, `Key element with id "${def(o.id)}" has only marker output, but there is no matching display element by output or keyId. Keycap may be blank.`);
 
   static ERROR_InvalidVersion = SevError | 0x000D;
-  static Error_InvalidVersion = (o: { version: string; }, x?: LDMLKeyboard.LKKeyboard) => mx(
-    this.ERROR_InvalidVersion,
+  static Error_InvalidVersion = (o: { version: string; }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidVersion, x,
     `Version number '${def(o.version)}' must be a semantic version format string with 'major.minor.patch' components.`,
-    x,
     `The version number in the LDML keyboard file must be a [semantic
     version](https://semver.org) (semver) string. This string has a format of three
     integers representing major, minor, and patch versions, separated by periods. In
@@ -150,10 +159,9 @@ export class LdmlCompilerMessages {
     m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
-  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x: ObjectWithMetadata) => mx(
-    this.ERROR_KeyMissingToGapOrSwitch,
+  static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_KeyMissingToGapOrSwitch, x,
     `key id='${def(o.keyId)}' must have either output=, gap=, or layerId=.`,
-    x,
   );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
@@ -161,10 +169,9 @@ export class LdmlCompilerMessages {
     `layers formId=${def(o.formId)}: Can only have one non-'touch' element`);
 
   static ERROR_InvalidHardware = SevError | 0x0013;
-  static Error_InvalidHardware = (o:LDMLKeyboard.LKLayers) => mx(
-    this.ERROR_InvalidHardware,
+  static Error_InvalidHardware = (o: { formId: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidHardware, x,
     `layers has invalid value formId=${def(o.formId)}`,
-    o,
   );
 
   private static layerIdOrEmpty(layer : string) {
@@ -176,17 +183,15 @@ export class LdmlCompilerMessages {
   }
 
   static ERROR_InvalidModifier = SevError | 0x0014;
-  static Error_InvalidModifier = (o:LDMLKeyboard.LKLayer) => mx(
-    this.ERROR_InvalidModifier,
+  static Error_InvalidModifier = (o:{modifiers: string, id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidModifier, x,
     `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.id),
-    o,
   );
 
   static ERROR_MissingFlicks = SevError | 0x0015;
-  static Error_MissingFlicks = (o: LDMLKeyboard.LKKey) => mx(
-    this.ERROR_MissingFlicks,
+  static Error_MissingFlicks = (o: {id: string, flickId: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_MissingFlicks, x,
     `key id=${def(o.id)} refers to missing flickId=${def(o.flickId)}`,
-    o,
   );
 
   static ERROR_DuplicateVariable = SevError | 0x0016;

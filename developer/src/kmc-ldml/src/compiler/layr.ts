@@ -40,7 +40,7 @@ export class LayrCompiler extends SectionCompiler {
         const { modifiers } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier(layer));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer));
           valid = false;
         }
       });
