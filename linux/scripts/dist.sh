@@ -84,6 +84,7 @@ dpkg-source \
   --tar-ignore=keyman/linux/keyman-config/keyman_config/version.py \
   --tar-ignore=keyman/linux/keyman-config/buildtools/build-langtags.py \
   --tar-ignore=keyman/linux/keyman-system-service/build \
+  --tar-ignore=keyman/linux/resources \
   --tar-ignore=keyman/mac \
   --tar-ignore=keyman/oem \
   --tar-ignore=keyman/resources/devbox \
@@ -91,7 +92,6 @@ dpkg-source \
   --tar-ignore=keyman/resources/environment.sh \
   --tar-ignore=keyman/resources/git-hooks \
   --tar-ignore=keyman/resources/scopes \
-  --tar-ignore=keyman/resources/teamcity \
   --tar-ignore=keyman/resources/build/*.lua \
   --tar-ignore=keyman/resources/build/jq* \
   --tar-ignore=keyman/results \

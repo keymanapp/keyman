@@ -6,13 +6,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
+. "${KEYMAN_ROOT}/linux/resources/teamcity/includes/tc-actions.inc.sh"
+. "${KEYMAN_ROOT}/linux/resources/teamcity/includes/tc-linux.inc.sh"
 
 ################################ Main script ################################
 
