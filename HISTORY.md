@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.49 alpha 2025-05-25
+
+* feat(developer): revamp line numbers per design doc (#14016)
+* docs(developer): add compiler message internal documentation (#14025)
+* feat(developer): add line numbers to vars compiler (#14036)
+
 ## 19.0.48 alpha 2025-05-23
 
 * maint(web): upgrade Sentry to 8.55.0 (#14030)
