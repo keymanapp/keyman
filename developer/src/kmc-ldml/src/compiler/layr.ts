@@ -20,14 +20,26 @@ export class LayrCompiler extends SectionCompiler {
     let valid = true;
     let totalLayerCount = 0;
     let hardwareLayers = 0;
-    // let touchLayers = 0;
+    let touchLayers = 0;
+    const deviceWidths = new Set<number>();
     this.keyboard3.layers?.forEach((layers) => {
       const { formId } = layers;
       if (formId === 'touch') {
-        // touchLayers++;
-        // multiple touch layers are OK
+        touchLayers++;
         totalLayerCount += layers.layer?.length;
-        // TODO-LDML: check that widths are distinct
+        const { minDeviceWidth } = layers;
+        if (!minDeviceWidth ||
+          minDeviceWidth < constants.layr_min_minDeviceWidth ||
+          minDeviceWidth > constants.layr_max_minDeviceWidth ||
+          Number.isNaN(Number(minDeviceWidth))) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLayerWidth({minDeviceWidth}, layers));
+        } else if (deviceWidths.has(minDeviceWidth)) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateLayerWidth({minDeviceWidth}, layers));
+        } else {
+          deviceWidths.add(minDeviceWidth);
+        }
       } else {
         // hardware
         hardwareLayers++;

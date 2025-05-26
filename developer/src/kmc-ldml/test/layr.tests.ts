@@ -167,5 +167,18 @@ describe('layr', function () {
         }
       },
     },
+    {
+      subpath: 'sections/layr/error-dup-width.xml',
+      errors: [
+        LdmlCompilerMessages.Error_DuplicateLayerWidth({ minDeviceWidth: 120}),
+      ]
+    },
+    ...[0, 1024, 1500, `x` as unknown as number].map(minDeviceWidth => ({
+      subpath: `sections/layr/error-bad-width-${minDeviceWidth}.xml`,
+      errors: [
+        //
+        LdmlCompilerMessages.Error_InvalidLayerWidth({ minDeviceWidth }),
+      ]
+    })),
   ]);
 });

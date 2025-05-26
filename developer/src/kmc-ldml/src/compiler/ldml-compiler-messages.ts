@@ -299,7 +299,21 @@ export class LdmlCompilerMessages {
   static Warn_StringDenorm = (o: { s: string }) =>
   m(this.WARN_StringDenorm, `File contains string "${def(o.s)}" that is neither NFC nor NFD.`);
 
-  // Available: 0x02C-0x2F
+  static ERROR_DuplicateLayerWidth = SevError | 0x002C;
+  static Error_DuplicateLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DuplicateLayerWidth, x,
+    `Two or more layers have minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Touch layers must have distinct widths.`
+  );
+
+  static ERROR_InvalidLayerWidth = SevError | 0x002D;
+  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidLayerWidth, x,
+    `Invalid Layers minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
+  );
+
+  // Available: 0x02E-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }, x?: ObjectWithMetadata) => mx(
