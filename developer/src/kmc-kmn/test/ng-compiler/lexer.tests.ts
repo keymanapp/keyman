@@ -24,92 +24,98 @@ describe("Lexer Tests", () => {
     });
   });
   describe("Lexer", () => {
+    it("can recognise a BASELAYOUT token", () => {
+      recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
+    });
     it("can recognise a BITMAP token", () => {
       recogniseToken(TokenTypes.BITMAP, '&bitmap');
     });
     it("can recognise a CASEDKEYS token", () => {
-      recogniseToken(TokenTypes.CASEDKEYS, 'casedkeys');
+      recogniseToken(TokenTypes.CASEDKEYS, '&casedkeys');
     });
     it("can recognise a COPYRIGHT token", () => {
-      recogniseToken(TokenTypes.COPYRIGHT, 'copyright');
+      recogniseToken(TokenTypes.COPYRIGHT, '&copyright');
     });
     it("can recognise a DISPLAYMAP token", () => {
-      recogniseToken(TokenTypes.DISPLAYMAP, 'displaymap');
+      recogniseToken(TokenTypes.DISPLAYMAP, '&displaymap');
     });
     it("can recognise a ETHNOLOGUECODE token", () => {
-      recogniseToken(TokenTypes.ETHNOLOGUECODE, 'ethnologuecode');
+      recogniseToken(TokenTypes.ETHNOLOGUECODE, '&ethnologuecode');
     });
     it("can recognise a HOTKEY token", () => {
-      recogniseToken(TokenTypes.HOTKEY, 'hotkey');
+      recogniseToken(TokenTypes.HOTKEY, '&hotkey');
     });
     it("can recognise a INCLUDECODES token", () => {
-      recogniseToken(TokenTypes.INCLUDECODES, 'includecodes');
+      recogniseToken(TokenTypes.INCLUDECODES, '&includecodes');
     });
     it("can recognise a KEYBOARDVERSION token", () => {
-      recogniseToken(TokenTypes.KEYBOARDVERSION, 'keyboardversion');
+      recogniseToken(TokenTypes.KEYBOARDVERSION, '&keyboardversion');
     });
     it("can recognise a KMW_EMBEDCSS token", () => {
-      recogniseToken(TokenTypes.KMW_EMBEDCSS, 'kmw_embedcss');
+      recogniseToken(TokenTypes.KMW_EMBEDCSS, '&kmw_embedcss');
     });
     it("can recognise a KMW_EMBEDJS token", () => {
-      recogniseToken(TokenTypes.KMW_EMBEDJS, 'kmw_embedjs');
+      recogniseToken(TokenTypes.KMW_EMBEDJS, '&kmw_embedjs');
     });
     it("can recognise a KMW_HELPFILE token", () => {
-      recogniseToken(TokenTypes.KMW_HELPFILE, 'kmw_helpfile');
+      recogniseToken(TokenTypes.KMW_HELPFILE, '&kmw_helpfile');
     });
     it("can recognise a KMW_HELPTEXT token", () => {
-      recogniseToken(TokenTypes.KMW_HELPTEXT, 'kmw_helptext');
+      recogniseToken(TokenTypes.KMW_HELPTEXT, '&kmw_helptext');
     });
     it("can recognise a KMW_RTL token", () => {
-      recogniseToken(TokenTypes.KMW_RTL, 'kmw_rtl');
+      recogniseToken(TokenTypes.KMW_RTL, '&kmw_rtl');
     });
     it("can recognise a LANGUAGE token", () => {
-      recogniseToken(TokenTypes.LANGUAGE, 'language');
+      recogniseToken(TokenTypes.LANGUAGE, '&language');
     });
     it("can recognise a LAYER token", () => {
-      recogniseToken(TokenTypes.LAYER, 'layer');
+      recogniseToken(TokenTypes.LAYER, '&layer');
     });
     it("can recognise a LAYOUTFILE token", () => {
-      recogniseToken(TokenTypes.LAYOUTFILE, 'layoutfile');
+      recogniseToken(TokenTypes.LAYOUTFILE, '&layoutfile');
     });
     it("can recognise a MESSAGE token", () => {
-      recogniseToken(TokenTypes.MESSAGE, 'message');
+      recogniseToken(TokenTypes.MESSAGE, '&message');
     });
     it("can recognise a MNEMONICLAYOUT token", () => {
-      recogniseToken(TokenTypes.MNEMONICLAYOUT, 'mnemoniclayout');
+      recogniseToken(TokenTypes.MNEMONICLAYOUT, '&mnemoniclayout');
     });
     it("can recognise a NAME token", () => {
-      recogniseToken(TokenTypes.NAME, 'name');
+      recogniseToken(TokenTypes.NAME, '&name');
     });
     it("can recognise a NEWLAYER token", () => {
-      recogniseToken(TokenTypes.NEWLAYER, 'newlayer');
+      recogniseToken(TokenTypes.NEWLAYER, '&newlayer');
     });
     it("can recognise a OLDCHARPOSMATCHING token", () => {
-      recogniseToken(TokenTypes.OLDCHARPOSMATCHING, 'oldcharposmatching');
+      recogniseToken(TokenTypes.OLDCHARPOSMATCHING, '&oldcharposmatching');
     });
     it("can recognise a OLDLAYER token", () => {
-      recogniseToken(TokenTypes.OLDLAYER, 'oldlayer');
+      recogniseToken(TokenTypes.OLDLAYER, '&oldlayer');
+    });
+    it("can recognise a PLATFORM token", () => {
+      recogniseToken(TokenTypes.PLATFORM, '&platform');
     });
     it("can recognise a TARGETS token", () => {
-      recogniseToken(TokenTypes.TARGETS, 'targets');
+      recogniseToken(TokenTypes.TARGETS, '&targets');
     });
     it("can recognise a VERSION token", () => {
-      recogniseToken(TokenTypes.VERSION, 'version');
+      recogniseToken(TokenTypes.VERSION, '&version');
     });
     it("can recognise a VISUALKEYBOARD token", () => {
-      recogniseToken(TokenTypes.VISUALKEYBOARD, 'visualkeyboard');
+      recogniseToken(TokenTypes.VISUALKEYBOARD, '&visualkeyboard');
     });
     it("can recognise a WINDOWSLANGUAGES token", () => {
-      recogniseToken(TokenTypes.WINDOWSLANGUAGES, 'windowslanguages');
+      recogniseToken(TokenTypes.WINDOWSLANGUAGES, '&windowslanguages');
     });
     it("can recognise a CAPSALWAYSOFF token", () => {
-      recogniseToken(TokenTypes.CAPSALWAYSOFF, 'capsalwaysoff');
+      recogniseToken(TokenTypes.CAPSALWAYSOFF, '&capsalwaysoff');
     });
     it("can recognise a CAPSONONLY token", () => {
-      recogniseToken(TokenTypes.CAPSONONLY, 'capsononly');
+      recogniseToken(TokenTypes.CAPSONONLY, '&capsononly');
     });
     it("can recognise a SHIFTFREECAPS token", () => {
-      recogniseToken(TokenTypes.SHIFTFREESCAPS, 'shiftfreescaps');
+      recogniseToken(TokenTypes.SHIFTFREESCAPS, '&shiftfreescaps');
     });
     it("can recognise a CAPS token", () => {
       recogniseToken(TokenTypes.CAPS, 'caps');
@@ -132,6 +138,15 @@ describe("Lexer Tests", () => {
     it("can recognise a FREES token", () => {
       recogniseToken(TokenTypes.FREES, 'frees');
     });
+    it("can recognise a BASELAYOUT_SHORTCUT token", () => {
+      recogniseToken(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
+    });
+    it("can recognise a LAYER_SHORTCUT token", () => {
+      recogniseToken(TokenTypes.LAYER_SHORTCUT, 'layer');
+    });
+    it("can recognise a PLATFORM_SHORTCUT token", () => {
+      recogniseToken(TokenTypes.PLATFORM_SHORTCUT, 'platform');
+    });
     it("can recognise an ANY token", () => {
       recogniseToken(TokenTypes.ANY, 'any');
     });
@@ -143,9 +158,6 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.COMMA, ',', 1, 4),
         ]
       );
-    });
-    it("can recognise a BASELAYOUT token", () => {
-      recogniseToken(TokenTypes.BASELAYOUT, 'baselayout');
     });
     it("can recognise a BEEP token", () => {
       recogniseToken(TokenTypes.BEEP, 'beep');
@@ -188,9 +200,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a OUTS token", () => {
       recogniseToken(TokenTypes.OUTS, 'outs');
-    });
-    it("can recognise a PLATFORM token", () => {
-      recogniseToken(TokenTypes.PLATFORM, 'platform');
     });
     it("can recognise a RESET token", () => {
       recogniseToken(TokenTypes.RESET, 'reset');
@@ -237,7 +246,7 @@ describe("Lexer Tests", () => {
     it("can recognise a KEYS token", () => {
       recogniseToken(TokenTypes.KEYS, 'keys');
     });
-    it("can recognise a KEMANONLY token", () => {
+    it("can recognise a KEYMANONLY token", () => {
       recogniseToken(TokenTypes.KEYMANONLY, 'keymanonly');
     });
     it("can recognise a KEYMANWEB token", () => {
@@ -263,9 +272,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a RIGHT_SQ token", () => {
       recogniseToken(TokenTypes.RIGHT_SQ, ']');
-    });
-    it("can recognise a AMPERSAND token", () => {
-      recogniseToken(TokenTypes.AMPERSAND, '&');
     });
     it("can recognise a CHEVRON token", () => {
       recogniseToken(TokenTypes.CHEVRON, '>');
@@ -601,34 +607,34 @@ describe("Lexer Tests", () => {
       recogniseSystemStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
     });
     it("can recognise a copyright store", () => {
-      recogniseStoreWithString(TokenTypes.COPYRIGHT, '© SIL Global');
+      recogniseSystemStoreWithString(TokenTypes.COPYRIGHT, '© SIL Global');
     });
     it("can recognise a displaymap store", () => {
-      recogniseStoreWithString(TokenTypes.DISPLAYMAP, '../../../shared/fonts/kbd/kbdkhmr/KbdKhmr.json');
+      recogniseSystemStoreWithString(TokenTypes.DISPLAYMAP, '../../../shared/fonts/kbd/kbdkhmr/KbdKhmr.json');
     });
     it("can recognise a keyboardversion store", () => {
-      recogniseStoreWithString(TokenTypes.KEYBOARDVERSION, '2.0');
+      recogniseSystemStoreWithString(TokenTypes.KEYBOARDVERSION, '2.0');
     });
     it("can recognise a layoutfile store", () => {
-      recogniseStoreWithString(TokenTypes.LAYOUTFILE, 'khmer_angkor.keyman-touch-layout');
+      recogniseSystemStoreWithString(TokenTypes.LAYOUTFILE, 'khmer_angkor.keyman-touch-layout');
     });
     it("can recognise a name store", () => {
-      recogniseStoreWithString(TokenTypes.NAME, "Khmer Angkor");
+      recogniseSystemStoreWithString(TokenTypes.NAME, "Khmer Angkor");
     });
     it("can recognise a message store", () => {
-      recogniseStoreWithString(TokenTypes.MESSAGE, "More than just a Khmer Unicode keyboard.");
+      recogniseSystemStoreWithString(TokenTypes.MESSAGE, "More than just a Khmer Unicode keyboard.");
     });
     it("can recognise a targets store", () => {
-      recogniseStoreWithString(TokenTypes.TARGETS, 'any');
+      recogniseSystemStoreWithString(TokenTypes.TARGETS, 'any');
     });
     it("can recognise a version store", () => {
-      recogniseStoreWithString(TokenTypes.VERSION, 'khmer_angkor.kvks');
+      recogniseSystemStoreWithString(TokenTypes.VERSION, 'khmer_angkor.kvks');
     });
     it("can recognise a visualkeyboard store", () => {
-      recogniseStoreWithString(TokenTypes.VISUALKEYBOARD, '10.0');
+      recogniseSystemStoreWithString(TokenTypes.VISUALKEYBOARD, '10.0');
     });
     it("can recognise a capsalwaysoff store", () => {
-      recogniseStoreWithString(TokenTypes.CAPSALWAYSOFF, "1");
+      recogniseSystemStoreWithString(TokenTypes.CAPSALWAYSOFF, "1");
     });
     it("can recognise a 'caps always off' statement", () => {
       recogniseTokens(
@@ -643,7 +649,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a capsononly store", () => {
-      recogniseStoreWithString(TokenTypes.CAPSONONLY, "1");
+      recogniseSystemStoreWithString(TokenTypes.CAPSONONLY, "1");
     });
     it("can recognise a 'caps on only' statement", () => {
       recogniseTokens(
@@ -658,7 +664,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a shiftfreescaps store", () => {
-      recogniseStoreWithString(TokenTypes.SHIFTFREESCAPS, "1");
+      recogniseSystemStoreWithString(TokenTypes.SHIFTFREESCAPS, "1");
     });
     it("can recognise a 'shift frees caps' statement", () => {
       recogniseTokens(
@@ -740,8 +746,7 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.IF, 'if'),
           new Token(TokenTypes.LEFT_BR, '(', 1, 3),
-          new Token(TokenTypes.AMPERSAND, '&', 1, 4),
-          new Token(TokenTypes.NEWLAYER, 'newLayer', 1, 5),
+          new Token(TokenTypes.NEWLAYER, '&newLayer', 1, 4),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 13),
           new Token(TokenTypes.EQUAL, '=', 1, 14),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 15),
@@ -750,8 +755,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.WHITESPACE, ' ', 1, 19),
           new Token(TokenTypes.IF, 'if', 1, 20),
           new Token(TokenTypes.LEFT_BR, '(', 1, 22),
-          new Token(TokenTypes.AMPERSAND, '&', 1, 23),
-          new Token(TokenTypes.LAYER, 'layer', 1, 24),
+          new Token(TokenTypes.LAYER, '&layer', 1, 23),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 29),
           new Token(TokenTypes.EQUAL, '=', 1, 30),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 31),
@@ -767,7 +771,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.WHITESPACE, ' ', 1, 62),
           new Token(TokenTypes.CONTEXT, 'context', 1, 63),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 70),
-          new Token(TokenTypes.LAYER, 'layer', 1, 71),
+          new Token(TokenTypes.LAYER_SHORTCUT, 'layer', 1, 71),
           new Token(TokenTypes.LEFT_BR, '(', 1, 76),
           new Token(TokenTypes.STRING, '\'default\'', 1, 77),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 86),
@@ -797,7 +801,7 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.WHITESPACE, ' ', 1, 8),
           new Token(TokenTypes.CHEVRON, '>', 1, 9),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 10),
-          new Token(TokenTypes.LAYER, 'layer', 1, 11),
+          new Token(TokenTypes.LAYER_SHORTCUT, 'layer', 1, 11),
           new Token(TokenTypes.LEFT_BR, '(', 1, 16),
           new Token(TokenTypes.STRING, '\'default\'', 1, 17),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 26),
@@ -808,7 +812,7 @@ describe("Lexer Tests", () => {
       recogniseTokens(
         'platform(\'touch\') > use(detectStartOfSentence)',
         [
-          new Token(TokenTypes.PLATFORM, 'platform'),
+          new Token(TokenTypes.PLATFORM_SHORTCUT, 'platform'),
           new Token(TokenTypes.LEFT_BR, '(', 1, 9),
           new Token(TokenTypes.STRING, '\'touch\'', 1, 10),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 17),
@@ -988,22 +992,6 @@ function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String): vo
     [
       new Token(type, text),
       new Token(TokenTypes.RIGHT_SQ, ']', 1, 1+text.length),
-    ]
-  );
-}
-
-function recogniseStoreWithString(type: TokenTypes, text: String) {
-  const value = TokenTypes[type].toLowerCase();
-  recogniseTokens(
-    `store(&${value}) '${text}'`,
-    [
-      new Token(TokenTypes.STORE, 'store'),
-      new Token(TokenTypes.LEFT_BR, '(', 1, 6),
-      new Token(TokenTypes.AMPERSAND, '&', 1, 7),
-      new Token(type, value, 1, 8),
-      new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
-      new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
-      new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
     ]
   );
 }
