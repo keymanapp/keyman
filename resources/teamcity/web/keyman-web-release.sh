@@ -1,0 +1,93 @@
+#!/bin/bash
+# Copyright (C) 2025 SIL International. All rights reserved.
+# Distributed under the MIT License. See LICENSE.md file in the project
+# root for full license information.
+#
+# TC build script to build release of KeymanWeb.
+
+# shellcheck disable=SC2164
+# shellcheck disable=SC1091
+
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
+
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+
+################################ Main script ################################
+
+builder_describe \
+  "Run tests for native KeymanWeb" \
+  "all            run all actions" \
+  "build          build Web + embedded" \
+  "publish        publish release"
+
+builder_parse "$@"
+
+cd "${KEYMAN_ROOT}/web"
+
+function build_web_action() {
+  builder_echo start web_build "Building KeymanWeb"
+
+  node ../resources/gosh/gosh.js ./ci.sh build
+
+  builder_echo end web_build success "Finished building KeymanWeb"
+}
+
+function _push_release_to_skeymancom() {
+  # Push release to s.keyman.com/kmw/engine (do this before updating
+  # downloads.keyman.com so we can ensure files are available)
+  builder_echo start publish "Publishing release to skeyman.com"
+
+  cd ../../s.keyman.com
+  git pull https://github.com/keymanapp/s.keyman.com.git master
+  cd ../keyman/web
+  node ../resources/gosh/gosh.js ./ci.sh prepare:s.keyman.com --s.keyman.com ../../s.keyman.com
+
+  builder_echo end publish success "Finished publishing release to skeyman.com"
+}
+
+function _zip_and_upload_artifacts() {
+  if ! is_windows; then
+    # requires Powershell
+    return 0
+  fi
+
+  builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
+
+  powershell -NonInteractive -ExecutionPolicy Bypass -File zip-and-upload-artifacts.ps1
+
+  builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
+}
+
+function _upload_help() {
+  builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
+
+  node ../gosh/gosh.js ./help-keyman-com.sh web
+
+  builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
+}
+
+function publish_web_action() {
+  builder_echo start publish "Publishing KeymanWeb release"
+
+  # Push release to s.keyman.com/kmw/engine (do this before updating
+  # downloads.keyman.com so we can ensure files are available)
+  _push_release_to_skeymancom
+
+  _zip_and_upload_artifacts
+  _upload_help
+
+  builder_echo end publish success "Finished publishing KeymanWeb release"
+}
+
+if builder_has_action all; then
+  build_web_action
+  publish_web_action
+else
+  builder_run_action  build       build_web_action
+  builder_run_action  publish     publish_web_action
+fi
