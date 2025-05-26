@@ -291,9 +291,9 @@ describe("Lexer Tests", () => {
     it("can recognise a RANGE token", () => {
       recogniseToken(TokenTypes.RANGE, '..');
     });
-    it("can recognise a DOLLAR token", () => {
-      recogniseToken(TokenTypes.DOLLAR, '$');
-    });
+    // it("can recognise a DOLLAR token", () => {
+    //   recogniseToken(TokenTypes.DOLLAR, '$');
+    // });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenTypes.U_CHAR, 'U+1');
       recogniseToken(TokenTypes.U_CHAR, 'U+A');
@@ -483,6 +483,15 @@ describe("Lexer Tests", () => {
     it("can recognise a NEWLINE token (CRLF)", () => {
       recogniseToken(TokenTypes.NEWLINE, '\r\n');
     });
+    it("can recognise a NAMED_CONSTANT token", () => {
+      recogniseToken(TokenTypes.NAMED_CONSTANT, '$abc');
+    });
+    it("can recognise a NAMED_CONSTANT token (followed by space)", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.NAMED_CONSTANT, '$abc');
+    });
+    it("can recognise a NAMED_CONSTANT token (khmer)", () => {
+      recogniseToken(TokenTypes.NAMED_CONSTANT, '$សួស្តី');
+    });
     it("can recognise a PARAMETER token", () => {
       recogniseTokens(
         'main)',
@@ -563,40 +572,6 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.PARAMETER, 'anyA'),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 5),
-        ]
-      );
-    });
-    it("can recognise an IDENTIFIER token", () => {
-      recogniseToken(TokenTypes.IDENTIFIER, 'abc');
-    });
-    it("can recognise an IDENTIFIER token (followed by space)", () => {
-      recogniseTokenFollowedBySpace(TokenTypes.IDENTIFIER, 'abc');
-    });
-    it("can recognise an IDENTIFIER token (in named constant)", () => {
-      recogniseTokens(
-        '$abc',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.IDENTIFIER, 'abc', 1, 2),
-        ]
-      );
-    });
-    it("can recognise an IDENTIFIER token (khmer, in named constant)", () => {
-      recogniseTokens(
-        '$ពុំណំឡ',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.IDENTIFIER, 'ពុំណំឡ', 1, 2),
-        ]
-      );
-    });
-    it("can recognise an IDENTIFIER token (in named constant followed by space)", () => {
-      recogniseTokens(
-        '$abc ',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.IDENTIFIER, 'abc', 1, 2),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 5),
         ]
       );
     });
