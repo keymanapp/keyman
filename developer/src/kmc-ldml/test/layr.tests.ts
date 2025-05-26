@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
-import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
+import { compilerTestCallbacks, testCompilationCases, withOffset } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -108,7 +108,14 @@ describe('layr', function () {
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(258))],
+      retainOffsetInMessages: true,
+    },
+    {
+      // missing layer element
+      subpath: 'sections/layr/invalid-missing-layer2.xml',
       errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      retainOffsetInMessages: true,
     },
     {
       // keep in sync with similar test in test-keys.ts

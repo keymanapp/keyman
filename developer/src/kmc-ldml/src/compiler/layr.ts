@@ -33,7 +33,7 @@ export class LayrCompiler extends SectionCompiler {
         hardwareLayers++;
         if (hardwareLayers > 1) {
           valid = false;
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}, layers));
         }
       }
       layers.layer.forEach((layer) => {
@@ -48,7 +48,7 @@ export class LayrCompiler extends SectionCompiler {
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere
       valid = false;
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(this.keyboard3?.layers[0]));
     }
     return valid;
   }

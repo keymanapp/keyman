@@ -126,8 +126,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
-  static Error_MustBeAtLeastOneLayerElement = () =>
-  m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
+  static Error_MustBeAtLeastOneLayerElement = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_MustBeAtLeastOneLayerElement, x,
+    `The source file must contain at least one layer element.`,
+  );
 
   static HINT_NoDisplayForSwitch = SevHint | 0x000F;
   static Hint_NoDisplayForSwitch = (o: { id: string }) =>
@@ -159,8 +161,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
-  static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,
-    `layers formId=${def(o.formId)}: Can only have one non-'touch' element`);
+  static Error_ExcessHardware = (o:{formId: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_ExcessHardware, x,
+    `layers formId=${def(o.formId)}: Can only have one non-'touch' element`,
+  );
 
   static ERROR_InvalidHardware = SevError | 0x0013;
   static Error_InvalidHardware = (o: { formId: string }, x?: ObjectWithMetadata) => mx(
