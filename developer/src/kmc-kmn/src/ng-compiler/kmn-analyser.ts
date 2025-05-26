@@ -937,13 +937,12 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
 export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const ampersand: Rule         = new TokenRule(TokenTypes.AMPERSAND);
     const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
     const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, ampersand,
-      ifSystemStoreName, this.whitespace, this.comparison, this.whitespace,
-      stringRule, this.optWhitespace, this.rightBracket,
+      this.ifRule, this.leftBracket, this.optWhitespace, ifSystemStoreName,
+      this.whitespace, this.comparison, this.whitespace, stringRule,
+      this.optWhitespace, this.rightBracket,
     ]);
   }
 }
@@ -980,7 +979,7 @@ export class ComparisonRule extends SingleChildRule {
 export class LayerStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
+    const layer: Rule           = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
     const bracketedString: Rule = new BracketedStringRule();
     this.rule = new SequenceRule([layer, bracketedString]);
   }
@@ -989,7 +988,7 @@ export class LayerStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const layerNode  = tmp.getSoleChildOfType(NodeTypes.LAYER);
+      const layerNode  = tmp.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
       const stringNode = tmp.getSoleChildOfType(NodeTypes.STRING);
       layerNode.addChild(stringNode);
       node.addChild(layerNode);
@@ -1001,7 +1000,7 @@ export class LayerStatementRule extends SingleChildRule {
 export class PlatformStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
+    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
     const bracketedString: Rule = new BracketedStringRule();
     this.rule = new SequenceRule([platform, bracketedString]);
   }
@@ -1010,7 +1009,7 @@ export class PlatformStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const platformNode = tmp.getSoleChildOfType(NodeTypes.PLATFORM);
+      const platformNode = tmp.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT);
       const stringNode   = tmp.getSoleChildOfType(NodeTypes.STRING);
       platformNode.addChild(stringNode);
       node.addChild(platformNode);
@@ -1022,7 +1021,7 @@ export class PlatformStatementRule extends SingleChildRule {
 export class BaselayoutStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
+    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
     const bracketedString: Rule = new BracketedStringRule();
     this.rule = new SequenceRule([baselayout, bracketedString]);
   }
@@ -1031,7 +1030,7 @@ export class BaselayoutStatementRule extends SingleChildRule {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT);
+      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT_SHORTCUT);
       const stringNode     = tmp.getSoleChildOfType(NodeTypes.STRING);
       baselayoutNode.addChild(stringNode);
       node.addChild(baselayoutNode);

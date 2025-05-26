@@ -173,7 +173,7 @@ describe("KMN Store Analyser Tests", () => {
         {code: 'capsononly',       nodeType: NodeTypes.CAPSONONLY},
         {code: 'shiftfreescaps',   nodeType: NodeTypes.SHIFTFREESCAPS},
       ].forEach((testCase) => {
-        Rule.tokenBuffer = stringToTokenBuffer(testCase.code);
+        Rule.tokenBuffer = stringToTokenBuffer(`&${testCase.code}`);
         const systemStoreName: Rule = new SystemStoreNameRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(systemStoreName.parse(root));

@@ -46,13 +46,11 @@ export class SystemStoreRule extends SingleChildRule {
     const store                 = new TokenRule(TokenTypes.STORE);
     const leftBracket           = new TokenRule(TokenTypes.LEFT_BR);
     const optWhitespace         = new OptionalWhiteSpaceRule();
-    const ampersand             = new TokenRule(TokenTypes.AMPERSAND);
     const rightBracket          = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       store,
       leftBracket,
       optWhitespace,
-      ampersand,
       systemStoreName,
       optWhitespace,
       rightBracket,
@@ -218,7 +216,6 @@ export class SetLayerRule extends SingleChildRule {
     const set: Rule           = new TokenRule(TokenTypes.SET, true);
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
     const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const ampersand: Rule     = new TokenRule(TokenTypes.AMPERSAND);
     const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
     const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE);
     const equal: Rule         = new TokenRule(TokenTypes.EQUAL);
@@ -229,7 +226,6 @@ export class SetLayerRule extends SingleChildRule {
       set,
       leftBracket,
       optWhitespace,
-      ampersand,
       layer,
       whitespace,
       equal,
