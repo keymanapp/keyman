@@ -246,20 +246,20 @@ describe("Lexer Tests", () => {
     it("can recognise a KEYS token", () => {
       recogniseToken(TokenTypes.KEYS, 'keys');
     });
+    it("can recognise a KEYMAN token", () => {
+      recogniseToken(TokenTypes.KEYMAN, '$keyman:');
+    });
     it("can recognise a KEYMANONLY token", () => {
-      recogniseToken(TokenTypes.KEYMANONLY, 'keymanonly');
+      recogniseToken(TokenTypes.KEYMANONLY, '$keymanonly:');
     });
     it("can recognise a KEYMANWEB token", () => {
-      recogniseToken(TokenTypes.KEYMANWEB, 'keymanweb');
-    });
-    it("can recognise a KEYMAN token", () => {
-      recogniseToken(TokenTypes.KEYMAN, 'keyman');
-    });
-    it("can recognise a WEAVER token", () => {
-      recogniseToken(TokenTypes.WEAVER, 'weaver');
+      recogniseToken(TokenTypes.KEYMANWEB, '$keymanweb:');
     });
     it("can recognise a KMFL token", () => {
-      recogniseToken(TokenTypes.KMFL, 'kmfl');
+      recogniseToken(TokenTypes.KMFL, '$kmfl:');
+    });
+    it("can recognise a WEAVER token", () => {
+      recogniseToken(TokenTypes.WEAVER, '$weaver:');
     });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenTypes.LEFT_BR, '(');
@@ -293,9 +293,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a DOLLAR token", () => {
       recogniseToken(TokenTypes.DOLLAR, '$');
-    });
-    it("can recognise a COLON token", () => {
-      recogniseToken(TokenTypes.COLON, ':');
     });
     it("can recognise a U_CHAR token", () => {
       recogniseToken(TokenTypes.U_CHAR, 'U+1');
@@ -889,66 +886,8 @@ describe("Lexer Tests", () => {
         ]
       );
     });
-    it("can recognise compile targets (keyman)", () => {
-      recogniseTokens(
-        '$keyman:',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.KEYMAN, 'keyman', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 8),
-        ]
-      );
-    });
     it("can recognise compile targets (keyman, followed by space)", () => {
-      recogniseTokens(
-        '$keyman: ',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.KEYMAN, 'keyman', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 8),
-          new Token(TokenTypes.WHITESPACE, ' ', 1, 9),
-        ]
-      );
-    });
-    it("can recognise compile targets (keymanonly)", () => {
-      recogniseTokens(
-        '$keymanonly:',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.KEYMANONLY, 'keymanonly', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 12),
-        ]
-      );
-    });
-    it("can recognise compile targets (keymanweb)", () => {
-      recogniseTokens(
-        '$keymanweb:',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.KEYMANWEB, 'keymanweb', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 11),
-        ]
-      );
-    });
-    it("can recognise compile targets (weaver)", () => {
-      recogniseTokens(
-        '$weaver:',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.WEAVER, 'weaver', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 8),
-        ]
-      );
-    });
-    it("can recognise compile targets (kmfl)", () => {
-      recogniseTokens(
-        '$kmfl:',
-        [
-          new Token(TokenTypes.DOLLAR, '$'),
-          new Token(TokenTypes.KMFL, 'kmfl', 1, 2),
-          new Token(TokenTypes.COLON, ':', 1, 6),
-        ]
-      );
+      recogniseTokenFollowedBySpace(TokenTypes.KEYMAN, '$keyman:');
     });
     it("can handle no newline at end of file", () => {
       const lexer    = new Lexer('beep');
