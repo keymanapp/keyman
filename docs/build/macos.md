@@ -76,7 +76,7 @@ set_keyman_standard_build_path() {
 autoload -Uz compinit && compinit
 autoload bashcompinit
 bashcompinit
-source "${KEYMAN_ROOT}/resources/builder_completion.sh"
+source "${KEYMAN_ROOT}/resources/builder_completion.inc.sh"
 
 # environment variable initialization
 source "${KEYMAN_ROOT}/resources/devbox/macos/keyman.macos.env.sh"
