@@ -25,7 +25,7 @@ describe("Lexer Tests", () => {
   });
   describe("Lexer", () => {
     it("can recognise a BITMAP token", () => {
-      recogniseToken(TokenTypes.BITMAP, 'bitmap');
+      recogniseToken(TokenTypes.BITMAP, '&bitmap');
     });
     it("can recognise a CASEDKEYS token", () => {
       recogniseToken(TokenTypes.CASEDKEYS, 'casedkeys');
@@ -598,7 +598,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a bitmap store", () => {
-      recogniseStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
+      recogniseSystemStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
     });
     it("can recognise a copyright store", () => {
       recogniseStoreWithString(TokenTypes.COPYRIGHT, '© SIL Global');
@@ -1001,6 +1001,21 @@ function recogniseStoreWithString(type: TokenTypes, text: String) {
       new Token(TokenTypes.LEFT_BR, '(', 1, 6),
       new Token(TokenTypes.AMPERSAND, '&', 1, 7),
       new Token(type, value, 1, 8),
+      new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
+      new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
+      new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
+    ]
+  );
+}
+
+function recogniseSystemStoreWithString(type: TokenTypes, text: String) {
+  const value = TokenTypes[type].toLowerCase();
+  recogniseTokens(
+    `store(&${value}) '${text}'`,
+    [
+      new Token(TokenTypes.STORE, 'store'),
+      new Token(TokenTypes.LEFT_BR, '(', 1, 6),
+      new Token(type, `&${value}`, 1, 7),
       new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
       new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
       new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
