@@ -135,18 +135,30 @@ export class KmnFileWriter {
           data += '\n';
         }
 
+        // use of Unicode Character vs Unicode Codepoint;
+        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        let version_output_character;
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);//new
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + " Use of a control character ";
+        if ((Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+
+          version_output_character = output_Unicode_CodePoint;
+
+          if (output_Unicode_CodePoint.length > 1) {
+            if (warn_text[2] == "") {
+              warn_text[2] = warn_text[2] + "c WARNING: use of a control character " /*+ output_Unicode_CodePoint*/;
+            }
+            else {
+              warn_text[2] = warn_text[2] + " Use of a control character "/* + output_Unicode_CodePoint*/;
+            }
+          }
+        } else {
+          version_output_character = output_Unicode_Character;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -164,7 +176,7 @@ export class KmnFileWriter {
               + "+ ["
               + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
               + `]  > \'`
-              + output_character_unicode
+              + version_output_character
               + '\'\n';
           }
         }
@@ -176,18 +188,30 @@ export class KmnFileWriter {
 
       if (unique_data_Rules[k].rule_type === "C2") {
 
+        // use of Unicode Character vs Unicode Codepoint;
+        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        let version_output_character;
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);//new
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+
+          version_output_character = output_Unicode_CodePoint;
+          if (output_Unicode_Character.length > 1) {
+            if (warn_text[2] == "") {
+              warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+            }
+            else {
+              warn_text[2] = warn_text[2] + "; Use of a control character ";
+            }
+          }
+
+        } else {
+          version_output_character = output_Unicode_Character;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -223,7 +247,7 @@ export class KmnFileWriter {
                 + unique_data_Rules[k].modifier_key).trim()
               + " "
               + unique_data_Rules[k].key + "]  >  \'"
-              + output_character_unicode
+              + version_output_character
               + "\'\n";
           }
           data += "\n";
@@ -236,18 +260,30 @@ export class KmnFileWriter {
     for (let k = 0; k < unique_data_Rules.length; k++) {
       if (unique_data_Rules[k].rule_type === "C3") {
 
-        const warn_text = this.reviewRules(unique_data_Rules, k);
+        // use of Unicode Character vs Unicode Codepoint;
+        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        let version_output_character;
 
+        const warn_text = this.reviewRules(unique_data_Rules, k);
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_character_unicode = util.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
 
         // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-        if ((output_character_unicode.length > 1)
-          && (Number("0x" + output_character_unicode.substring(2, output_character_unicode.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
-          if (warn_text[2] == "")
-            warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
-          else
-            warn_text[2] = warn_text[2] + "; Use of a control character ";
+        if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+
+          version_output_character = output_Unicode_CodePoint;
+
+          if (output_Unicode_Character.length > 1) {
+            if (warn_text[2] == "") {
+              warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+            }
+            else {
+              warn_text[2] = warn_text[2] + "; Use of a control character ";
+            }
+          }
+        } else {
+          version_output_character = output_Unicode_Character;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -255,8 +291,8 @@ export class KmnFileWriter {
         // (even if there are other warnings for the same rule) since that rule had been written before
         if ((warn_text[0].indexOf("duplicate") < 0)) {
 
-
           let warningTextToWrite = "";
+
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warn_text[0].length > 0)) {
             warningTextToWrite = warn_text[0];
           }
@@ -305,7 +341,7 @@ export class KmnFileWriter {
               + " "
               + unique_data_Rules[k].key
               + "]  >  \'"
-              + output_character_unicode
+              + version_output_character
               + "\'\n";
           }
         }

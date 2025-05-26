@@ -12,6 +12,7 @@ import { assert } from 'chai';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { ConverterMessages } from '../src/converter-messages.js';
 import * as NodeAssert from 'node:assert';
 
 describe('KeylayoutToKmnConverter', function () {
@@ -20,25 +21,47 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
+  // todo remove
+  describe('RunOneFile', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    sut.run(inputFilename);
+    assert.isTrue(true);
+  });
+
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     it('run() should throw on null input file name and null output file name', async function () {
       // note, could use 'chai as promised' library to make this more fluent:
-      await NodeAssert.rejects(async () => sut.run(null, null));
+      const result = sut.run(null, null);
+      assert.isNotNull(result);
+      assert.equal(compilerTestCallbacks.messages.length, 1);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
     it('run() should throw on null input file name and empty output file name', async function () {
-      await NodeAssert.rejects(async () => sut.run(null, ''));
+      const result = sut.run(null, '');
+      assert.isNotNull(result);
+      assert.equal(compilerTestCallbacks.messages.length, 1);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
+
     it('run() should throw on null input file name and unknown output file name', async function () {
-      await NodeAssert.rejects(async () => sut.run(null, 'X'));
+      const result = sut.run(null, 'X');
+      assert.isNotNull(result);
+      assert.equal(compilerTestCallbacks.messages.length, 1);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Unavailable.keylayout');
-      await NodeAssert.rejects(async () => sut.run(inputFilename, null));
+      const result = sut.run(inputFilename, null);
+      assert.isNotNull(result);
+      assert.equal(compilerTestCallbacks.messages.length, 2);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
+      assert.deepEqual(compilerTestCallbacks.messages[1], ConverterMessages.Error_UnableToRead({ inputFilename: inputFilename }));
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
@@ -60,7 +83,11 @@ describe('KeylayoutToKmnConverter', function () {
     it('run() should throw on incorrect input file extention and output file extention', async function () {
       const inputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/Test_command.A');
       const outputFilename = makePathToFixture('../' + KeylayoutToKmnConverter.DATA_SUBFOLDER + '/data/OutputXName.B');
-      await NodeAssert.rejects(async () => sut.run(inputFilename, outputFilename));
+      const result = sut.run(inputFilename, outputFilename);
+      assert.isNotNull(result);
+      assert.equal(compilerTestCallbacks.messages.length, 2);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
+      assert.deepEqual(compilerTestCallbacks.messages[1], ConverterMessages.Error_UnableToRead({ inputFilename: inputFilename }));
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {

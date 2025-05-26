@@ -176,4 +176,34 @@ describe('KmnFileWriter', function () {
       });
     });
   });
+
+  describe('convertToUnicodeCharacter ', function () {
+    [
+      ["&#x61;", 'a'],
+      ["&#x1234;", 'ሴ'],
+      ["&#x1F60E;", '😎'],
+      ["&#x1000000;", undefined],
+      ["&#97;", 'a'],
+      ["&#4660;", 'ሴ'],
+      ["&#128518;", '😆'],
+      ["&#1000000;", undefined],
+      ["U+0061;", 'a'],
+      ["U+1234;", 'ሴ'],
+      ["U+1F60E", '😎'],
+      ["U+1000000;", undefined],
+      ["&commat;", undefined],
+      ["a", 'a'],
+      ["ሴ", 'ሴ'],
+      ['😎', '😎'],
+      ["ab", undefined],
+      ["", ''],
+      [undefined, undefined],
+      [null, undefined]
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = util.convertToUnicodeCharacter(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    });
+  });
 });
