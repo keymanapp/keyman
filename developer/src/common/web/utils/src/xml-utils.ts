@@ -11,6 +11,7 @@ import { XMLParser, XMLBuilder, XmlBuilderOptions, X2jOptions } from 'fast-xml-p
 export type KeymanXMLType =
   'keyboard3'           // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
+  | 'keylayout'           // keylayout
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
@@ -56,6 +57,19 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     ignoreAttributes: false, // We'd like attributes, please
     ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
+  },
+  'keylayout': {
+    attributeNamePrefix: '@_', // avoid @_
+    htmlEntities: true,
+    ignoreAttributes: false, // We'd like attributes, please
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+      // since trimValues: false, we need to zap any element values that would be trimmed.
+      // currently, the LDML spec doesn't have any element values, but this
+      // future-proofs us a little in that element values are allowed, just trimmed.
+      // if we do need elements in the future, we'd check the preserve-space attribute here.
+      return tagValue?.trim();
+    },
+    trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'kps': {
     ...PARSER_COMMON_OPTIONS,
@@ -175,6 +189,45 @@ export class KeymanXMLReader {
     }
   }
 
+
+  /**
+   * Requires attribute prefix @_ (double underscore)
+   * For attributes, just remove @_ and continue.
+   * For objects, replace any empty string "" with an empty object {} */
+  private static fixupEmptyStringToEmptyObject_keylayout(data: any) : any {
+    console.log("in fixupEmptyStringToEmptyObject_keylayout ",);
+
+    if (typeof data === 'object') {
+      // For arrays of objects, we map "" to {}
+      // "" means an empty object
+      if (Array.isArray(data)) {
+        return data.map(v => {
+          if (v === '') {
+            return {};
+          } else {
+            return KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v);
+          }
+        });
+      }
+      // otherwise: remove @_ for attributes, remap objects
+      const e: any = [];
+      Object.entries(data).forEach(([k, v]) => {
+        if (k.startsWith('@_')) {
+          e.push([k.substring(3), KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
+        } else {
+          if (v === '') {
+            e.push([k, {}]);
+          } else {
+            e.push([k, KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
+          }
+        }
+      });
+      return Object.fromEntries(e);
+    } else {
+      return data;
+    }
+  }
+
   /**
    * Replace:
    * ```json
@@ -235,10 +288,14 @@ export class KeymanXMLReader {
   }
 
   public parse(data: string): any {
+    console.log(" PARSER_OPTIONS[this.type].attributeNamePrefix",PARSER_OPTIONS[this.type].attributeNamePrefix);
+
     const parser = this.parser();
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {
       result = KeymanXMLReader.fixupDollarAttributes(result);
+    } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@_') {
+      result = KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(result);
     } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@__') {
       result = KeymanXMLReader.fixupEmptyStringToEmptyObject(result);
     } else if (PARSER_OPTIONS[this.type].preserveOrder) {

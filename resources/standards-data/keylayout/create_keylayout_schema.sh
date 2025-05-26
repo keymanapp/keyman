@@ -36,7 +36,7 @@ do
 
     #builder_echo debug 'fixup-schema.js' "${json}"
     # old ldml:  node ../fixup-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
-    #node fixup-keylayout-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
+    node fixup-keylayout-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
 
     mv "${json}" tmp.json
     # reformat with prettier(JQ)
