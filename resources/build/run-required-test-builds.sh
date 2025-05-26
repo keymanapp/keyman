@@ -166,8 +166,8 @@ while IFS= read -r line; do
       # Which platform are we watching?
       eval watch='$'watch_$platform
       # Add common patterns to the watch list
-      watch="^($platform|(oem/[^/]+/$platform)|resources|$watch)"
-      if [[ "$line" =~ $watch ]]; then
+      watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity)|teamcity/(${platform}|includes))|$watch)"
+      if echo "${line}" | grep --quiet --perl-regexp "${watch}"; then
         build_platforms+=($platform)
       fi
     fi
