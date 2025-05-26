@@ -134,7 +134,7 @@ export class Lexer {
   }
 
   private static scanRecognisers = [
-    new ScanRecogniser(TokenTypes.BITMAP,             /^bitmap(?![a-z])/i),
+    new ScanRecogniser(TokenTypes.BITMAP,             /^&bitmap(?![a-z])/i),
     new ScanRecogniser(TokenTypes.CASEDKEYS,          /^casedkeys(?![a-z])/i),
     new ScanRecogniser(TokenTypes.COPYRIGHT,          /^copyright(?![a-z])/i),
     new ScanRecogniser(TokenTypes.DISPLAYMAP,         /^displaymap(?![a-z])/i),
