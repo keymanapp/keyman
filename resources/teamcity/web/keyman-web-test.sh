@@ -52,7 +52,12 @@ function install_playwright_dependencies() {
   fi
 
   # shellcheck disable=SC2086
-  check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 libvpx9 libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 gstreamer1.0-libav
+  check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 \
+    libvpx9 libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 \
+    libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 \
+    gstreamer1.0-libav libnss3 libnspr4 libatk1.0-0t64 libatk-bridge2.0-0t64 \
+    libcups2t64 libatspi2.0-0t64 libxcomposite1 libxdamage1 libxrandr2 \
+    libxcursor1 libgtk-3-0t64 libgles2
 }
 
 function check_build_size_action() {
