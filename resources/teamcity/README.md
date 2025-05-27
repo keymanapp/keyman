@@ -22,11 +22,14 @@ Inside of the container, run
 ```bash
 apt update && apt install sudo
 export DOCKER_RUNNING=1
+echo "ubuntu ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+su ubuntu
 ```
 
 and then run the build, e.g.
 
 ```bash
+cd /Develop
 resources/teamcity/keyman-linux-test.sh configure,build,test
 ```
 
