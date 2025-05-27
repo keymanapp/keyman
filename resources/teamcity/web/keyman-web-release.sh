@@ -58,7 +58,9 @@ function _zip_and_upload_artifacts() {
 
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
+  cd "${KEYMAN_ROOT}/resources/teamcity/web"
   powershell -NonInteractive -ExecutionPolicy Bypass -File zip-and-upload-artifacts.ps1
+  cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
@@ -66,7 +68,9 @@ function _zip_and_upload_artifacts() {
 function _upload_help() {
   builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
 
+  cd "${KEYMAN_ROOT}/resources/build"
   node ../gosh/gosh.js ./help-keyman-com.sh web
+  cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
 }
