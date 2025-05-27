@@ -66,10 +66,13 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       const types = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
         types => types.forEach(type =>
-          reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ type }, typeToObject.get(type)))),
+          reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ type }, typeToObject.get(type)))
+        ),
         new Set(ALLOWED_TYPES),
         types => types.forEach(type =>
-          reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ type }, typeToObject.get(type)))))) {
+          reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ type }, typeToObject.get(type)))
+        )
+      )) {
         valid = false;
       }
 
