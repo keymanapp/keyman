@@ -15,27 +15,23 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe \
   "Run tests for native KeymanWeb" \
   "all            run all actions" \
+  "configure      install dependencies" \
   "build          build Web + embedded" \
   "publish        publish release"
 
 builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/web"
-
-function build_web_action() {
-  builder_echo start web_build "Building KeymanWeb"
-
-  node ../resources/gosh/gosh.js ./ci.sh build
-
-  builder_echo end web_build success "Finished building KeymanWeb"
-}
 
 function _push_release_to_skeymancom() {
   # Push release to s.keyman.com/kmw/engine (do this before updating
@@ -44,8 +40,8 @@ function _push_release_to_skeymancom() {
 
   cd ../../s.keyman.com
   git pull https://github.com/keymanapp/s.keyman.com.git master
-  cd ../keyman/web
-  node ../resources/gosh/gosh.js ./ci.sh prepare:s.keyman.com --s.keyman.com ../../s.keyman.com
+  cd "${KEYMAN_ROOT}/web"
+  "${KEYMAN_ROOT}/web/ci.sh" prepare:s.keyman.com --s.keyman.com ../../s.keyman.com
 
   builder_echo end publish success "Finished publishing release to skeyman.com"
 }
@@ -58,7 +54,9 @@ function _zip_and_upload_artifacts() {
 
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
+  cd "${KEYMAN_ROOT}/resources/teamcity/web"
   powershell -NonInteractive -ExecutionPolicy Bypass -File zip-and-upload-artifacts.ps1
+  cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
@@ -66,7 +64,7 @@ function _zip_and_upload_artifacts() {
 function _upload_help() {
   builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
 
-  node ../gosh/gosh.js ./help-keyman-com.sh web
+  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
 
   builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
 }
@@ -85,9 +83,17 @@ function publish_web_action() {
 }
 
 if builder_has_action all; then
-  build_web_action
+  web_install_dependencies_action
+
+  set_variables_for_nvm
+
+  web_build_action
   publish_web_action
 else
-  builder_run_action  build       build_web_action
+  builder_run_action  configure   web_install_dependencies_action
+
+  set_variables_for_nvm
+
+  builder_run_action  build       web_build_action
   builder_run_action  publish     publish_web_action
 fi
