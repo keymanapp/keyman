@@ -27,3 +27,39 @@ is_macos() {
     return 1
   fi
 }
+
+install_nvm() {
+  if is_ubuntu; then
+    linux_install_nvm
+  elif is_macos; then
+    macos_install_packages nvm
+  fi
+}
+
+# Set the environment variables required to use node/nvm and set the
+# `KEYMAN_USE_NVM` variable so that the build can automatically install
+# the required node version.
+set_variables_for_nvm() {
+  # nvm.sh uses some variables that might not be initialized, so we
+  # disable the "unbound variable" check temporarily
+  set -u
+  export NVM_DIR="${HOME}/.nvm"
+  # shellcheck disable=SC1091
+  . "${NVM_DIR}/nvm.sh"
+  set +u
+  export KEYMAN_USE_NVM=1
+  PATH=${HOME}/.keyman/node:${PATH}
+}
+
+install_emscripten() {
+  if is_ubuntu; then
+    linux_install_emscripten
+  elif is_macos; then
+    macos_install_packages emscripten
+  fi
+}
+
+set_variables_for_emscripten() {
+  export EMSCRIPTEN_BASE="${EMSCRIPTEN_BASE:-${HOME}/emsdk/upstream/emscripten}"
+  export KEYMAN_USE_EMSDK=1
+}

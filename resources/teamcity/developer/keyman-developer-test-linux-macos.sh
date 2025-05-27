@@ -3,7 +3,7 @@
 # Distributed under the MIT License. See LICENSE.md file in the project
 # root for full license information.
 #
-# TC build script for Keyman Developer on macOS
+# TC build script for Keyman Developer on Linux and macOS
 
 # shellcheck disable=SC2164
 # shellcheck disable=SC1091
@@ -14,11 +14,18 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-macos.inc.sh"
+
 ################################ Main script ################################
 
 builder_describe \
-  "Build Keyman Developer on macOS" \
+  "Build Keyman Developer on Linux and macOS" \
   "all            run all actions" \
+  "configure      install dependencies" \
   "build          build"
 
 builder_parse "$@"
@@ -28,13 +35,23 @@ cd "${KEYMAN_ROOT}/developer/src"
 function build_developer_action() {
   builder_echo start "build developer" "Building Keyman Developer"
 
-  ./build.sh configure build test
+  "${KEYMAN_ROOT}/developer/src/build.sh" configure build test
 
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }
 
 if builder_has_action all; then
+  developer_install_dependencies_action
+
+  set_variables_for_nvm
+  set_variables_for_emscripten
+
   build_developer_action
 else
+  builder_run_action  configure   developer_install_dependencies_action
+
+  set_variables_for_nvm
+  set_variables_for_emscripten
+
   builder_run_action build build_developer_action
 fi

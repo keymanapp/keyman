@@ -23,13 +23,14 @@ is_package_installed() {
 # Check if the specified packages are installed and install them if not.
 # Parameters:
 #   $* - List of package names to check and install (e.g., "lcov jq")
-check_and_install_packages() {
-  local PACKAGES=$*
-  local TOINSTALL=""
-
+linux_check_and_install_packages() {
   if ! is_ubuntu; then
     return 0
   fi
+
+  builder_echo start "check and install packages" "Checking and installing packages"
+  local PACKAGES=$*
+  local TOINSTALL=""
 
   for p in ${PACKAGES}
   do
@@ -43,21 +44,7 @@ check_and_install_packages() {
     # shellcheck disable=SC2086
     sudo DEBIAN_FRONTEND="noninteractive" apt-get install -qy ${TOINSTALL}
   fi
-}
-
-# Set the environment variables required to use node/nvm and set the
-# `KEYMAN_USE_NVM` variable so that the build can automatically install
-# the required node version.
-set_variables_for_nvm() {
-  # nvm.sh uses some variables that might not be initialized, so we
-  # disable the "unbound variable" check temporarily
-  set -u
-  export NVM_DIR="${HOME}/.nvm"
-  # shellcheck disable=SC1091
-  . "${NVM_DIR}/nvm.sh"
-  set +u
-  export KEYMAN_USE_NVM=1
-  PATH=${HOME}/.keyman/node:${PATH}
+  builder_echo end "check and install packages" success "Finished checking and installing packages"
 }
 
 # Install nvm if it is not already installed and install the latest LTS
@@ -78,11 +65,34 @@ linux_install_nvm() {
   builder_echo end install_nvm success "Finished checking and installing nvm"
 }
 
+linux_install_emscripten() {
+  builder_echo start "install emscripten" "Checking and installing emscripten"
+  if { [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -f "${EMSCRIPTEN_BASE}/emcc" ]] } ||
+    [[ -f "${HOME}/emsdk/upstream/emscripten/emcc" ]]; then
+    builder_echo "Emscripten is already installed at ${EMSCRIPTEN_BAS:-${HOME}/emsdk/upstream/emscripten}"
+  else
+    # shellcheck disable=SC2154
+    . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+
+    builder_echo "Installing emscripten version ${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    export EMSDK_KEEP_DOWNLOADS=1
+    # shellcheck disable=SC2164
+    cd "${HOME}"
+    git clone https://github.com/emscripten-core/emsdk.git
+    # shellcheck disable=SC2164
+    cd emsdk
+    ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+  fi
+  set_variables_for_emscripten
+  builder_echo end "install emscripten" success "Finished checking and installing emscripten"
+}
+
 # Install additional dependencies required for running integration tests.
 linux_install_dependencies_for_tests() {
   builder_echo start install_dependencies_for_tests "Installing dependencies for tests"
 
-  check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
+  linux_check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
 
   builder_echo end install_dependencies_for_tests success "Finished installing dependencies for tests"
 }

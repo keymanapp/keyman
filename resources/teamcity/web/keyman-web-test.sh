@@ -37,7 +37,7 @@ function install_dependencies_action() {
   builder_echo start "install dependencies" "Install dependencies"
 
   # shellcheck disable=SC2086
-  check_and_install_packages devscripts jq
+  linux_check_and_install_packages devscripts jq
 
   # TODO: we can we do something similar for Windows and macOS?
   linux_install_nvm
@@ -52,7 +52,7 @@ function install_playwright_dependencies() {
   fi
 
   # shellcheck disable=SC2086
-  check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 libvpx9 libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 gstreamer1.0-libav
+  linux_check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 libvpx9 libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 gstreamer1.0-libav
 }
 
 function check_build_size_action() {
