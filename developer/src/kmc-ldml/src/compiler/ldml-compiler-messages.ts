@@ -208,12 +208,16 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_MixedTransformGroup = SevError | 0x001A;
-  static Error_MixedTransformGroup = (x?: ObjectWithMetadata) =>
-  m(this.ERROR_MixedTransformGroup, `transformGroup cannot contain both reorder and transform elements`);
+  static Error_MixedTransformGroup = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_MixedTransformGroup, x,
+    `transformGroup cannot contain both reorder and transform elements`,
+  );
 
   static ERROR_EmptyTransformGroup = SevError | 0x001B;
-  static Error_EmptyTransformGroup = (x?: ObjectWithMetadata) =>
-  m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
+  static Error_EmptyTransformGroup = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_EmptyTransformGroup, x,
+    `transformGroup must have either reorder or transform elements`,
+  );
 
   static ERROR_MissingStringVariable = SevError | 0x001C;
   static Error_MissingStringVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
@@ -266,7 +270,7 @@ export class LdmlCompilerMessages {
   static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
   static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
     this.HINT_CharClassImplicitDenorm, x,
-  `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+    `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
   );
 
   static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;

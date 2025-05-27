@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.50 alpha 2025-05-26
+
+* chore(web): mark async methods in UI components (#14034)
+
 ## 19.0.49 alpha 2025-05-25
 
 * feat(developer): revamp line numbers per design doc (#14016)
