@@ -228,7 +228,7 @@ describe("TokenBuffer Tests", () => {
         assert.deepEqual(output.toString(), buffer.toString());
       });
     });
-   it("can provide round trip text for repository keyboards", () => {
+   it("can provide round trip text for repository keyboards (0-99)", () => {
       [
         'experimental/a/alephwithbeth/source/alephwithbeth',
         'experimental/a/amuzgo_guerrero/source/amuzgo_guerrero',
@@ -294,7 +294,6 @@ describe("TokenBuffer Tests", () => {
         'experimental/w/wancho/source/wancho',
         'experimental/w/wenchow/source/wenchow',
         'experimental/w/winchus/source/winchus',
-        'legacy/a/amazigh_lat',
         'legacy/gff/gff_awn_7/archive/gff-awn-7',
         'legacy/gff/gff_bcq_7/archive/gff-bcq-7',
         'legacy/gff/gff_byn_7/archive/gff-byn-7',
@@ -331,6 +330,17 @@ describe("TokenBuffer Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
+          ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (100-199)", () => {
+      [
         'release/b/batak/source/batak',
         'release/b/baybayin/source/baybayin',
         'release/b/behdini_arab/source/behdini_arab',
@@ -431,6 +441,17 @@ describe("TokenBuffer Tests", () => {
         'release/basic/basic_kbdinpun/source/basic_kbdinpun',
         'release/basic/basic_kbdintam/source/basic_kbdintam',
         'release/basic/basic_kbdintel/source/basic_kbdintel',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (200-299)", () => {
+      [
         'release/basic/basic_kbdinuk2/source/basic_kbdinuk2',
         'release/basic/basic_kbdir/source/basic_kbdir',
         'release/basic/basic_kbdit/source/basic_kbdit',
@@ -531,6 +552,17 @@ describe("TokenBuffer Tests", () => {
         'release/basic/basic_kbdyak/source/basic_kbdyak',
         'release/basic/basic_kbdyba/source/basic_kbdyba',
         'release/basic/basic_kbdycc/source/basic_kbdycc',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (300-399)", () => {
+      [
         'release/basic/basic_kbdycl/source/basic_kbdycl',
         'release/bj/bj_cree_east/source/bj_cree_east',
         'release/bj/bj_cree_east_james_bay/source/bj_cree_east_james_bay',
@@ -631,6 +663,17 @@ describe("TokenBuffer Tests", () => {
         'release/fv/fv_hlgaagilda_xaayda_kil/source/fv_hlgaagilda_xaayda_kil',
         'release/fv/fv_hulquminum/source/fv_hulquminum',
         'release/fv/fv_hulquminum_combine/source/fv_hulquminum_combine',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (400-499)", () => {
+      [
         'release/fv/fv_ilnu_innu_aimun/source/fv_ilnu_innu_aimun',
         'release/fv/fv_inuvialuktun/source/fv_inuvialuktun',
         'release/fv/fv_isga_iabi/source/fv_isga_iabi',
@@ -731,6 +774,17 @@ describe("TokenBuffer Tests", () => {
         'release/gff/gff_awngi_xamtanga/source/gff_awngi_xamtanga',
         'release/gff/gff_blin/source/gff_blin',
         'release/gff/gff_ethiopic/source/gff_ethiopic',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it.skip("can provide round trip text for repository keyboards (500-599)", () => {
+      [
         'release/gff/gff_ethiopic_7/source/gff_ethiopic_7',
         'release/gff/gff_geez/source/gff_geez',
         'release/gff/gff_gurage/extras/gff-xst-7',
@@ -831,6 +885,17 @@ describe("TokenBuffer Tests", () => {
         'release/m/medefaidrin/source/medefaidrin',
         'release/m/meroitic_cursive/source/meroitic_cursive',
         'release/m/meroitic_hieroglyphs/source/meroitic_hieroglyphs',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (600-699)", () => {
+      [
         'release/m/me_en/source/me_en',
         'release/m/mitterhofer/source/mitterhofer',
         'release/m/modi_inscript/source/modi_inscript',
@@ -931,6 +996,17 @@ describe("TokenBuffer Tests", () => {
         'release/rac/rac_dogri/source/rac_dogri',
         'release/rac/rac_gawar_bati/source/rac_gawar_bati',
         'release/rac/rac_gawri/source/rac_gawri',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (700-799)", () => {
+      [
         'release/rac/rac_hazaragi/source/rac_hazaragi',
         'release/rac/rac_hindko/source/rac_hindko',
         'release/rac/rac_indus_kohistani/source/rac_indus_kohistani',
@@ -1031,6 +1107,17 @@ describe("TokenBuffer Tests", () => {
         'release/sil/sil_kayah_latn/source/sil_kayah_latn',
         'release/sil/sil_kayah_mymr/source/sil_kayah_mymr',
         'release/sil/sil_kcho/source/sil_kcho',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it("can provide round trip text for repository keyboards (800-899)", () => {
+      [
         'release/sil/sil_khamti/source/sil_khamti',
         'release/sil/sil_khmer/source/sil_khmer',
         'release/sil/sil_khowar/source/sil_khowar',
@@ -1131,6 +1218,17 @@ describe("TokenBuffer Tests", () => {
         'release/t/tohono_oodham/source/tohono_oodham',
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
+      ].forEach((name) => {
+        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
+        const output: String = tokenBuffer.toText();
+        assert.deepEqual(output.toString(), buffer.toString());
+      });
+    });
+    it.skip("can provide round trip text for repository keyboards (900-end)", () => {
+      [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',
         'release/t/txo_toto/source/txo_toto',
         'release/u/udi_keyboard/source/udi_keyboard',
@@ -1163,7 +1261,7 @@ describe("TokenBuffer Tests", () => {
         'release/y/yo/source/yo',
         'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
         'release/z/zanabazar_square/source/zanabazar_square',
-      ].slice(1,4).forEach((name) => {
+      ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();
