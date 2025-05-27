@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.51 alpha 2025-05-27
+
+* maint: add stable-19.0 triggers (#14043)
+* maint: add empty 'scripts' tag to package.json to silence warning (#14044)
+* fix(linux): fix version variable references in kmconfig (#14032)
+
 ## 19.0.50 alpha 2025-05-26
 
 * chore(web): mark async methods in UI components (#14034)
