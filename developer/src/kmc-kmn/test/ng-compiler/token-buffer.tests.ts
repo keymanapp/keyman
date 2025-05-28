@@ -10,7 +10,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -25,6 +25,7 @@ const LIST: Token[] = [
 ];
 
 describe("TokenBuffer Tests", () => {
+
   describe("TokenBuffer constructor", () => {
     it("can construct a TokenBuffer with list", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
@@ -799,7 +800,7 @@ describe("TokenBuffer Tests", () => {
         'release/gff/gff_tigrinya_eritrea/source/gff_tigrinya_eritrea',
         'release/gff/gff_tigrinya_ethiopia/source/gff_tigrinya_ethiopia',
         'release/h/hainam/source/hainam',
-        //'release/h/hakka/source/hakka',
+        'release/h/hakka/source/hakka',
         'release/h/hanifi_rohingya/source/hanifi_rohingya',
         'release/h/hanunoo/source/hanunoo',
         'release/h/haroi/source/haroi',
@@ -893,7 +894,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(5000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
       [
         'release/m/me_en/source/me_en',
@@ -1240,10 +1241,10 @@ describe("TokenBuffer Tests", () => {
         'release/u/urdu_phonetic_crulp/source/urdu_phonetic_crulp',
         'release/v/venetia_et_histria/source/venetia_et_histria',
         'release/v/vietnamese_telex/extras/vn_kmn_compiler/keyboard/vn_telex/raw/header',
-        //'release/v/vietnamese_telex/source/vietnamese_telex',
+        'release/v/vietnamese_telex/source/vietnamese_telex',
         'release/v/vietnamese_telex_legacy/extras/vn_kmn_compiler/vn_telex/raw/header',
         'release/v/vietnamese_telex_legacy/extras/vn_kmn_compiler/vn_telex_legacy/raw/header',
-        //'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
+        'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
         'release/v/vietnamese_vni/extras/vn_kmn_compiler/keyboard/vn_vni/raw/header',
         'release/v/vietnamese_vni/source/vietnamese_vni',
         'release/v/vithkuqi/source/vithkuqi',
@@ -1262,7 +1263,6 @@ describe("TokenBuffer Tests", () => {
         'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
         'release/z/zanabazar_square/source/zanabazar_square',
       ].forEach((name) => {
-        writeFileSync('debug.txt', `${name}.kmn\n`, {flag: 'a+'})
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();
@@ -1270,6 +1270,6 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(10000);
   });
 });
