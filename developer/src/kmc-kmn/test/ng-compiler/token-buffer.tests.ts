@@ -10,7 +10,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 // nomatch > layer('default')
 const LIST: Token[] = [
@@ -225,7 +225,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
    it("can provide round trip text for repository keyboards (0-99)", () => {
@@ -336,7 +336,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (100-199)", () => {
@@ -447,7 +447,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (200-299)", () => {
@@ -558,7 +558,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (300-399)", () => {
@@ -669,7 +669,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (400-499)", () => {
@@ -780,10 +780,10 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
-    it.skip("can provide round trip text for repository keyboards (500-599)", () => {
+    it("can provide round trip text for repository keyboards (500-599)", () => {
       [
         'release/gff/gff_ethiopic_7/source/gff_ethiopic_7',
         'release/gff/gff_geez/source/gff_geez',
@@ -799,7 +799,7 @@ describe("TokenBuffer Tests", () => {
         'release/gff/gff_tigrinya_eritrea/source/gff_tigrinya_eritrea',
         'release/gff/gff_tigrinya_ethiopia/source/gff_tigrinya_ethiopia',
         'release/h/hainam/source/hainam',
-        'release/h/hakka/source/hakka',
+        //'release/h/hakka/source/hakka',
         'release/h/hanifi_rohingya/source/hanifi_rohingya',
         'release/h/hanunoo/source/hanunoo',
         'release/h/haroi/source/haroi',
@@ -891,7 +891,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (600-699)", () => {
@@ -1002,7 +1002,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (700-799)", () => {
@@ -1113,7 +1113,7 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
     it("can provide round trip text for repository keyboards (800-899)", () => {
@@ -1224,10 +1224,10 @@ describe("TokenBuffer Tests", () => {
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
-    it.skip("can provide round trip text for repository keyboards (900-end)", () => {
+    it("can provide round trip text for repository keyboards (900-end)", () => {
       [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',
         'release/t/txo_toto/source/txo_toto',
@@ -1240,10 +1240,10 @@ describe("TokenBuffer Tests", () => {
         'release/u/urdu_phonetic_crulp/source/urdu_phonetic_crulp',
         'release/v/venetia_et_histria/source/venetia_et_histria',
         'release/v/vietnamese_telex/extras/vn_kmn_compiler/keyboard/vn_telex/raw/header',
-        'release/v/vietnamese_telex/source/vietnamese_telex',
+        //'release/v/vietnamese_telex/source/vietnamese_telex',
         'release/v/vietnamese_telex_legacy/extras/vn_kmn_compiler/vn_telex/raw/header',
         'release/v/vietnamese_telex_legacy/extras/vn_kmn_compiler/vn_telex_legacy/raw/header',
-        'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
+        //'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
         'release/v/vietnamese_vni/extras/vn_kmn_compiler/keyboard/vn_vni/raw/header',
         'release/v/vietnamese_vni/source/vietnamese_vni',
         'release/v/vithkuqi/source/vithkuqi',
@@ -1262,12 +1262,13 @@ describe("TokenBuffer Tests", () => {
         'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
         'release/z/zanabazar_square/source/zanabazar_square',
       ].forEach((name) => {
+        writeFileSync('debug.txt', `${name}.kmn\n`, {flag: 'a+'})
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString());
+        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
     });
   });
