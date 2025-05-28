@@ -20,20 +20,32 @@ export class LayrCompiler extends SectionCompiler {
     let valid = true;
     let totalLayerCount = 0;
     let hardwareLayers = 0;
-    // let touchLayers = 0;
+    let touchLayers = 0;
+    const deviceWidths = new Set<number>();
     this.keyboard3.layers?.forEach((layers) => {
       const { formId } = layers;
       if (formId === 'touch') {
-        // touchLayers++;
-        // multiple touch layers are OK
+        touchLayers++;
         totalLayerCount += layers.layer?.length;
-        // TODO-LDML: check that widths are distinct
+        const { minDeviceWidth } = layers;
+        if (!minDeviceWidth ||
+          minDeviceWidth < constants.layr_min_minDeviceWidth ||
+          minDeviceWidth > constants.layr_max_minDeviceWidth ||
+          Number.isNaN(Number(minDeviceWidth))) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLayerWidth({minDeviceWidth}, layers));
+        } else if (deviceWidths.has(minDeviceWidth)) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateLayerWidth({minDeviceWidth}, layers));
+        } else {
+          deviceWidths.add(minDeviceWidth);
+        }
       } else {
         // hardware
         hardwareLayers++;
         if (hardwareLayers > 1) {
           valid = false;
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}, layers));
         }
       }
       layers.layer.forEach((layer) => {
@@ -48,7 +60,7 @@ export class LayrCompiler extends SectionCompiler {
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere
       valid = false;
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(this.keyboard3?.layers[0]));
     }
     return valid;
   }

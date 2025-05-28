@@ -126,8 +126,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
-  static Error_MustBeAtLeastOneLayerElement = () =>
-  m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
+  static Error_MustBeAtLeastOneLayerElement = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_MustBeAtLeastOneLayerElement, x,
+    `The source file must contain at least one layer element.`,
+  );
 
   static HINT_NoDisplayForSwitch = SevHint | 0x000F;
   static Hint_NoDisplayForSwitch = (o: { id: string }) =>
@@ -159,8 +161,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_ExcessHardware = SevError | 0x0012;
-  static Error_ExcessHardware = (o:{formId: string}) => m(this.ERROR_ExcessHardware,
-    `layers formId=${def(o.formId)}: Can only have one non-'touch' element`);
+  static Error_ExcessHardware = (o:{formId: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_ExcessHardware, x,
+    `layers formId=${def(o.formId)}: Can only have one non-'touch' element`,
+  );
 
   static ERROR_InvalidHardware = SevError | 0x0013;
   static Error_InvalidHardware = (o: { formId: string }, x?: ObjectWithMetadata) => mx(
@@ -299,7 +303,21 @@ export class LdmlCompilerMessages {
   static Warn_StringDenorm = (o: { s: string }) =>
   m(this.WARN_StringDenorm, `File contains string "${def(o.s)}" that is neither NFC nor NFD.`);
 
-  // Available: 0x02C-0x2F
+  static ERROR_DuplicateLayerWidth = SevError | 0x002C;
+  static Error_DuplicateLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DuplicateLayerWidth, x,
+    `Two or more layers have minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Touch layers must have distinct widths.`
+  );
+
+  static ERROR_InvalidLayerWidth = SevError | 0x002D;
+  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidLayerWidth, x,
+    `Invalid Layers minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
+  );
+
+  // Available: 0x02E-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }, x?: ObjectWithMetadata) => mx(
