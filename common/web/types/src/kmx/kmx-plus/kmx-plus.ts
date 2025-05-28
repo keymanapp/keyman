@@ -135,6 +135,18 @@ export class StrsItem {
   isEqual(a: StrsItem): boolean {
     return a.value === this.value && a.char === this.char;
   }
+
+  private _context : any = null;
+
+  /** add any context from the options to this strsitem */
+  setContext(opts?: StrsOptions) {
+    // At present, there's only a single piece of context available
+    this._context = this._context || opts?.x;
+  }
+
+  get context() : any {
+    return this._context;
+  }
 };
 
 /**
@@ -161,6 +173,8 @@ export interface StrsOptions {
   nfd?: boolean;
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
+  /** optional context */
+  x?: any;
 };
 
 export class Strs extends Section {
@@ -192,6 +206,8 @@ export class Strs extends Section {
       result = new StrsItem(s);
       this.strings.push(result);
     }
+    // give an option to set the context
+    result.setContext(opts);
     return result;
   }
 
