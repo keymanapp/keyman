@@ -19,11 +19,16 @@ android/app/: android/KMAPro/**
 android/engine/: android/KMEA/**
 android/samples/: android/Samples/**
 
-common/: common/**
+common/:
+  - common/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/common/**
 common/web/: common/web/**
 
 core/:
   - core/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/core/**
 
 developer/:
   - developer/**

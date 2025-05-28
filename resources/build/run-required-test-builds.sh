@@ -167,6 +167,7 @@ while IFS= read -r line; do
       eval watch='$'watch_$platform
       # Add common patterns to the watch list
       watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity)|teamcity/(${platform}|includes))|$watch)"
+      # Since bash doesn't support negative look-aheads we use grep to test
       if echo "${line}" | grep --quiet --perl-regexp "${watch}"; then
         build_platforms+=($platform)
       fi
