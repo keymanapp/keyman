@@ -56,7 +56,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_InvalidLocale = SevError | 0x0002;
-  static Error_InvalidLocale = (o:{tag: string}) => m(this.ERROR_InvalidLocale, `Invalid BCP 47 locale form '${def(o.tag)}'`);
+  static Error_InvalidLocale = (o:{tag: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidLocale, x,
+    `Invalid BCP 47 locale form '${def(o.tag)}'`,
+  );
 
   static ERROR_HardwareLayerHasTooManyRows = SevError | 0x0003;
   static Error_HardwareLayerHasTooManyRows = (x?: ObjectWithMetadata) => mx(
@@ -77,16 +80,20 @@ export class LdmlCompilerMessages {
   );
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
-  static Hint_OneOrMoreRepeatedLocales = () =>
-  m(this.HINT_OneOrMoreRepeatedLocales, `After minimization, one or more locales is repeated and has been removed`);
+  static Hint_OneOrMoreRepeatedLocales = (x?: ObjectWithMetadata) => mx(
+    this.HINT_OneOrMoreRepeatedLocales, x,
+    `After minimization, one or more locales is repeated and has been removed`,
+  );
 
   static ERROR_InvalidFile = SevError | 0x0007;
   static Error_InvalidFile = (o:{errorText: string}) =>
   m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
 
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
-  static Hint_LocaleIsNotMinimalAndClean = (o:{sourceLocale: string, locale: string}) =>
-  m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
+  static Hint_LocaleIsNotMinimalAndClean = (o:{sourceLocale: string, locale: string}, x?: ObjectWithMetadata) => mx(
+    this.HINT_LocaleIsNotMinimalAndClean, x,
+    `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`,
+  );
 
   static ERROR_InvalidScanCode = SevError | 0x0009;
   static Error_InvalidScanCode = (o: { codes: string, id: string }, x?: ObjectWithMetadata) => mx(
