@@ -147,8 +147,10 @@ export class LdmlCompilerMessages {
   }
 
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
-  static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}) =>
-    m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
+  static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DisplayIsRepeated, x,
+    `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`,
+  );
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}, x?: ObjectWithMetadata) => mx(
@@ -248,8 +250,10 @@ export class LdmlCompilerMessages {
   m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${def(o.ids?.join(','))}`);
 
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
-  static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}) =>
-  m(this.ERROR_DisplayNeedsToOrId, `display ${LdmlCompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`);
+  static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DisplayNeedsToOrId, x,
+    `display ${LdmlCompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`,
+  );
 
   static HINT_PUACharacters = SevHint | 0x0023;
   static Hint_PUACharacters = (o: { count: number, lowestCh: number }) =>
