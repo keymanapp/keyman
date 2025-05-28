@@ -348,6 +348,15 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a HANGUL token", () => {
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_A');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GA');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGA');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAE');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEG');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEGG');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGYAEGG');
+    });
     it("can recognise a COMMENT token", () => {
       recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });

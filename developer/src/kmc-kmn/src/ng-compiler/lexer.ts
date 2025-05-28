@@ -102,6 +102,7 @@ export enum TokenTypes {
   WEAVER              = "WEAVER",
   WHITESPACE          = "WHITESPACE",
   WINDOWSLANGUAGES    = "WINDOWSLANGUAGES",
+  HANGUL = "HANGUL",
 };
 
 export class ScanRecogniser {
@@ -222,6 +223,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.STRING,              /^('.*?'|\".*?\")/),
     new ScanRecogniser(TokenTypes.MODIFIER,            /^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\S\r\n])/i),
     new ScanRecogniser(TokenTypes.KEY_CODE,            /^(((K_|T_|U_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/i),
+    new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i),
     new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i),
     new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/),
     new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/),
