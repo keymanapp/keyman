@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.52 alpha 2025-05-28
+
+* feat(developer): line numbers for tran compiler (#14037)
+* feat(developer): add line numbers to disp compiler (#14048)
+* feat(developer): line numbers for layr compiler (#14050)
+* feat(developer): line numbers for LocaCompiler (#14054)
+* fix(common): properly use newly installed node version (#14057)
+* maint(common): update build coordinator and labels for `resources/teamcity` changes (#14047)
+
 ## 19.0.51 alpha 2025-05-27
 
 * maint: add stable-19.0 triggers (#14043)
