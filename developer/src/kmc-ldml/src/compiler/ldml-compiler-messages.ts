@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader, ObjectWithMetadata } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -8,14 +8,6 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
-
-/**
- * Any object with metadata, for line number errs.
- * Could be for example an LKKeys or KMXPlus.KeysKeys object.
- * Defined as 'any' here to reduce noise on the client side.
- * @see {@link KeymanXMLReader.getMetaData()}
- */
-type ObjectWithMetadata = any;
 
 /**
  * Convenience function for constructing CompilerEvents with line numbers.
@@ -202,20 +194,28 @@ export class LdmlCompilerMessages {
 
   // Not hit due to XML parsing
   static ERROR_InvalidTransformsType = SevError | 0x0018;
-  static Error_InvalidTransformsType = (o:{types: string[]}) =>
-  m(this.ERROR_InvalidTransformsType, `Invalid transforms types: '${def(o.types?.join(','))}'`);
+  static Error_InvalidTransformsType = (o:{type: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidTransformsType, x,
+    `Invalid transforms type: '${def(o.type)}'`,
+  );
 
   static ERROR_DuplicateTransformsType = SevError | 0x0019;
-  static Error_DuplicateTransformsType = (o:{types: string[]}) =>
-  m(this.ERROR_DuplicateTransformsType, `Duplicate transforms types: '${def(o.types?.join(','))}'`);
+  static Error_DuplicateTransformsType = (o:{type: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_DuplicateTransformsType, x,
+    `Duplicate transforms type: '${def(o.type)}'`,
+  );
 
   static ERROR_MixedTransformGroup = SevError | 0x001A;
-  static Error_MixedTransformGroup = () =>
-  m(this.ERROR_MixedTransformGroup, `transformGroup cannot contain both reorder and transform elements`);
+  static Error_MixedTransformGroup = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_MixedTransformGroup, x,
+    `transformGroup cannot contain both reorder and transform elements`,
+  );
 
   static ERROR_EmptyTransformGroup = SevError | 0x001B;
-  static Error_EmptyTransformGroup = () =>
-  m(this.ERROR_EmptyTransformGroup, `transformGroup must have either reorder or transform elements`);
+  static Error_EmptyTransformGroup = (x?: ObjectWithMetadata) => mx(
+    this.ERROR_EmptyTransformGroup, x,
+    `transformGroup must have either reorder or transform elements`,
+  );
 
   static ERROR_MissingStringVariable = SevError | 0x001C;
   static Error_MissingStringVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
@@ -264,12 +264,16 @@ export class LdmlCompilerMessages {
   m(this.ERROR_IllegalCharacters, `File contains ${def(o.count)} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
 
   static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
-  static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }) =>
-  m(this.HINT_CharClassImplicitDenorm, `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
+    this.HINT_CharClassImplicitDenorm, x,
+    `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+  );
 
   static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
-  static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }) =>
-  m(this.WARN_CharClassExplicitDenorm, `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`);
+  static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
+    this.WARN_CharClassExplicitDenorm, x,
+    `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+  );
 
   static ERROR_UnparseableReorderSet = SevError | 0x0028;
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
@@ -294,8 +298,10 @@ export class LdmlCompilerMessages {
   // Available: 0x02C-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
-  static Error_InvalidQuadEscape = (o: { cp: number }) =>
-  m(this.ERROR_InvalidQuadEscape, `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`);
+  static Error_InvalidQuadEscape = (o: { cp: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidQuadEscape, x,
+    `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`,
+  );
 
   //
   // Transform syntax errors begin at ...F00 (SevErrorTransform)
@@ -319,8 +325,8 @@ export class LdmlCompilerMessages {
   `);
 
   static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
-  static Error_TransformFromMatchesNothing = (o: { from: string }) => m(
-    this.ERROR_TransformFromMatchesNothing,
+  static Error_TransformFromMatchesNothing = (o: { from: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_TransformFromMatchesNothing, x,
     `Invalid transfom from="${def(o.from)}": Matches an empty string.`
   );
 
