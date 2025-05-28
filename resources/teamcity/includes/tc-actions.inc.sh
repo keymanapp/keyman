@@ -9,9 +9,10 @@ linux_clean_action() {
 
 # Install required dependencies for building Keyman on Linux.
 linux_install_dependencies_action() {
-  builder_heading "Installing dependencies"
+  builder_echo start "install dependencies" "Installing dependencies"
   . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
   checkAndInstallRequirements
+  builder_echo end "install dependencies" success "Finished installing dependencies"
 }
 
 # Install additional dependencies required for determining test coverage.
