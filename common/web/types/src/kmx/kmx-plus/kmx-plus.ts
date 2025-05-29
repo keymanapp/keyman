@@ -136,7 +136,7 @@ export class StrsItem {
     return a.value === this.value && a.char === this.char;
   }
 
-  private _context : any = null;
+  private _context: any = undefined;
 
   /** add any context from the options to this strsitem */
   setContext(opts?: StrsOptions) {
