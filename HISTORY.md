@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.53 alpha 2025-05-29
+
+* fix(developer): ensure that kmc doesn't skip validate phase of kmc-ldml (#14068)
+
 ## 19.0.52 alpha 2025-05-28
 
 * feat(developer): line numbers for tran compiler (#14037)
