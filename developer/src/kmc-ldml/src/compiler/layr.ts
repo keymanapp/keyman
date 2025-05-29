@@ -69,13 +69,13 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard3.layers.map((layers) => {
-      const hardware = sections.strs.allocString(layers.formId);
+      const hardware = sections.strs.allocString(layers.formId, {x:layers});
       // Already validated in validate
       const layerEntries = [];
       for (const layer of layers.layer) {
         const rows = layer.row.map((row) => {
           const erow: LayrRow = {
-            keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id)),
+            keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id, { x: row })),
           };
           // include linenumber info for row
           return SectionCompiler.copySymbols(erow, row);
@@ -84,7 +84,7 @@ export class LayrCompiler extends SectionCompiler {
         // push a layer entry for each modifier set
         for (const mod of mods) {
           layerEntries.push({
-            id: sections.strs.allocString(layer.id),
+            id: sections.strs.allocString(layer.id, {x:layer}),
             mod,
             rows,
           });
