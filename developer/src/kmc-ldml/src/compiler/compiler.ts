@@ -131,7 +131,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     if (!source) {
       return null;
     }
-    let kmx = await this.compile(source);
+    const kmx = await this.compile(source, true);
     if (!kmx) {
       return null;
     }
@@ -344,6 +344,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Transforms in-memory LDML keyboard xml file to an intermediate
    * representation of a .kmx file.
    * @param   source - in-memory representation of LDML keyboard xml file
+   * @param   postValidate - pass true if sections should run a 'validate' phase at the very end.
+   *                         Set this to true if you aren't calling validate() separately.
    * @returns          KMXPlusFile intermediate file
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
