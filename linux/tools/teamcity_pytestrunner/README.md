@@ -1,6 +1,6 @@
-# Teamcity Test Runner
+# Teamcity Python Test Runner
 
-This implements an improved version of JetBrains' unittest runner for
+This implements an improved version of JetBrains' python unittest runner for
 Teamcity. It makes the output of the tests indented and collapsible under
 the test block by specifying a parent flow.
 
