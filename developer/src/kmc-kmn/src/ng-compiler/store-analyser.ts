@@ -10,8 +10,8 @@
 
 import { OptionalWhiteSpaceRule, PrePadTextRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
-import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
-import { OneOrManyRule, parameterSequence } from "./recursive-descent.js";
+import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule } from "./recursive-descent.js";
+import { OneOrManyRule  } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 
@@ -149,18 +149,22 @@ export class BracketedStoreNameRule extends SingleChildRule {
 }
 
 export class VariableStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-  }
-
-  public parse(node: ASTNode): boolean {
-    const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(parameters, 1);
-    if (parseSuccess) {
-      node.addToken(NodeTypes.STORENAME, parameters[0]);
+    public constructor() {
+      super();
+      const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
+      const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
+      this.rule = new AlternateRule([parameter, octal]);
     }
-    return parseSuccess;
-  };
+
+    public parse(node: ASTNode): boolean {
+      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const parseSuccess: boolean = this.rule.parse(tmp);
+      if (parseSuccess) {
+        const child = tmp.getSoleChild();
+        node.addToken(NodeTypes.STORENAME, child.token);
+      }
+      return parseSuccess;
+    };
 }
 
 export class PermittedKeywordRule extends AlternateTokenRule {

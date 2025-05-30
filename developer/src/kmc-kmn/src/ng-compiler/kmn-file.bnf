@@ -26,7 +26,7 @@ spacedChevron: WHITESPACE CHEVRON WHITESPACE
 useStatement: USE bracketedGroupName
 bracketedGroupName: LEFT_BR WHITESPACE? groupNameOrKeyword WHITESPACE? RIGHT_BR
 groupNameOrKeyword: groupName|permittedKeyword
-groupName: PARAMETER
+groupName: PARAMETER|OCTAL
 groupBlock: groupStatement spacedGroupQualifier?
 groupStatement: GROUP bracketedGroupName
 spacedGroupQualifier: WHITESPACE groupQualifier
@@ -79,7 +79,7 @@ saveStatement: SAVE bracketedStoreName
 deadKeyStatement: DEADKEY bracketedStoreName
 indexStatement: INDEX LEFT_BR WHITESPACE? variableStoreName spacedComma offset WHITESPACE? RIGHT_BR
 spacedComma: WHITESPACE? COMMA WHITESPACE?
-offset: PARAMETER
+offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR
 
 # System and Variable Store Rules
@@ -92,7 +92,7 @@ systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
 variableStoreAssign: variableStore prePadText+
 variableStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR WHITESPACE? variableStoreName WHITESPACE? RIGHT_BR
-variableStoreName: PARAMETER
+variableStoreName: PARAMETER|OCTAL
 permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 setStore: SET LEFT_BR WHITESPACE? variableStoreName WHITESPACE EQUAL
   WHITESPACE STRING WHITESPACE? RIGHT_BR

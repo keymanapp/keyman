@@ -6,9 +6,9 @@
  * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
  */
 
-import { Token, TokenTypes } from "./lexer.js";
+import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
-import { SingleChildRule, parameterSequence, OneOrManyRule, ManyRule } from "./recursive-descent.js";
+import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
@@ -470,18 +470,22 @@ export class GroupNameOrKeywordRule extends SingleChildRule {
 }
 
 export class GroupNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-  }
-
-  public parse(node: ASTNode): boolean {
-    const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(parameters, 1);
-    if (parseSuccess) {
-      node.addToken(NodeTypes.GROUPNAME, parameters[0]);
+    public constructor() {
+      super();
+      const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
+      const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
+      this.rule = new AlternateRule([parameter, octal]);
     }
-    return parseSuccess;
-  };
+
+    public parse(node: ASTNode): boolean {
+      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const parseSuccess: boolean = this.rule.parse(tmp);
+      if (parseSuccess) {
+        const child = tmp.getSoleChild();
+        node.addToken(NodeTypes.GROUPNAME, child.token);
+      }
+      return parseSuccess;
+    };
 }
 
 export class OptionalSpacedGroupQualifierRule extends SingleChildRule {
@@ -1227,13 +1231,17 @@ export class SpacedCommaRule extends SingleChildRule {
 export class OffsetRule extends SingleChildRule {
   public constructor() {
     super();
+    const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
+    const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
+    this.rule = new AlternateRule([octal, parameter]);
   }
 
   public parse(node: ASTNode): boolean {
-    const parameters: Token[]   = [];
-    const parseSuccess: boolean = parameterSequence(parameters, 1);
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      node.addToken(NodeTypes.OFFSET, parameters[0]);
+      const child = tmp.getSoleChild();
+      node.addToken(NodeTypes.OFFSET, child.token);
     }
     return parseSuccess;
   };
