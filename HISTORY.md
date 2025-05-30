@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 18.0.237 stable 2025-05-30
+
+* maint(android): Update FirstVoices launcher icon and red theme (#13917)
+* fix(web): empty layout fontSize property should default to 1em (#13960)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13963)
+* chore(linux): Update debian changelog (#13888)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13957)
+* feat(android): log active keyboard, model IDs with reported errors (#14003)
+* chore(ios): FirstVoices certificate update (#14005)
+* feat(ios): log active keyboard, model IDs with reported errors (#14006)
+* fix(linux): configurable path in `.service` file when using basu (#13999)
+* maint(linux): add `--no-werror` option to not report warnings as errors (#14000)
+* fix(windows): use json file name against cache folder and ename Enter and Exit methods for TState Object (#14010)
+* chore(ios): update FirstVoices AppIcon (#14011)
+* maint: change builder_completion script to a .inc.sh (#14008)
+* fix(windows): only breadcrumb unexpected state on first run (#14026)
+* fix(windows): skip sending handle kmshell events to upgrade state machine for keyboard install modes (#14028)
+* fix(windows): fix sentry error message reporting (#14029)
+
 ## 18.0.236 stable 2025-05-12
 
 * chore(linux): Update debian changelog (#13737)
