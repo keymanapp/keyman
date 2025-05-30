@@ -31,7 +31,7 @@ if [[ -n "${TEAMCITY_GIT_PATH}" ]]; then
       # shellcheck disable=SC2086
       pip3 install --user ${PIP_ARGS:-} teamcity-messages
   fi
-  test_module=teamcity_testrunner.unittestpy
+  test_module=teamcity_pytestrunner.unittestpy
   echo "##teamcity[testStarted name='|[keyman-config|] Running unit tests']"
   echo "##teamcity[flowStarted flowId='unit_tests']"
 else
