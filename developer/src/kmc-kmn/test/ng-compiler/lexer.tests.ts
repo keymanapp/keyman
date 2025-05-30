@@ -348,6 +348,31 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a DECIMAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd999');
+    });
+    it("can recognise a HEXDECIMAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xa99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xA99');
+    });
+    it("can recognise an OCTAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '77');
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '777');
+    });
+    it("can recognise a HANGUL token", () => {
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_A');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GA');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGA');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAE');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEG');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGAEGG');
+      recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_GGYAEGG');
+    });
     it("can recognise a COMMENT token", () => {
       recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
@@ -533,26 +558,26 @@ describe("Lexer Tests", () => {
         ]
       );
     });
-    it("can recognise two PARAMETER tokens in brackets (comma separated)", () => {
+    it("can recognise PARAMETER/OCTAL tokens in brackets (comma separated)", () => {
       recogniseTokens(
         '(main,2)',
         [
           new Token(TokenTypes.LEFT_BR, '('),
           new Token(TokenTypes.PARAMETER, 'main', 1, 2),
           new Token(TokenTypes.COMMA, ',', 1, 6),
-          new Token(TokenTypes.PARAMETER, '2', 1, 7),
+          new Token(TokenTypes.OCTAL, '2', 1, 7),
           new Token(TokenTypes.RIGHT_BR, ')', 1, 8),
         ]
       );
     });
-    it("can recognise two PARAMETER tokens in brackets (space separated)", () => {
+    it("can recognise PARAMETER/OCTAL tokens in brackets (space separated)", () => {
       recogniseTokens(
         '(main 2)',
         [
           new Token(TokenTypes.LEFT_BR, '('),
           new Token(TokenTypes.PARAMETER, 'main', 1, 2),
           new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
-          new Token(TokenTypes.PARAMETER, '2', 1, 7),
+          new Token(TokenTypes.OCTAL, '2', 1, 7),
           new Token(TokenTypes.RIGHT_BR,   ')', 1, 8),
         ]
       );
