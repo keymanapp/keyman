@@ -181,28 +181,30 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark= block= action= do_output=true
+  local color=white message= mark= block= action= do_output=true test=
   local echo_target=echo
 
   if [[ $# -gt 1 ]]; then
     if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
       color="$1"
       shift
-    elif [[ $1 == "start" ]]; then
+    elif [[ $1 == "start" ]] || [[ $1 == "startTest" ]]; then
       # builder_echo start block message
-      action="$1"
+      test="$1"
       block="$2"
       shift 2
+      action="start"
       color="heading"
       if ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
-    elif [[ $1 == "end" ]]; then
+    elif [[ $1 == "end" ]] || [[ $1 == "endTest" ]]; then
       # builder_echo end block status message
-      action="$1"
+      test="$1"
       block="$2"
       color="$3"
       shift 3
+      action="end"
       if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
@@ -211,7 +213,11 @@ builder_echo() {
   message="$*"
 
   if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
-    $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    if [[ "${test}" == "startTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteStarted name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    else
+      $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    fi
   fi
 
   if ${do_output}; then
@@ -241,7 +247,11 @@ builder_echo() {
   fi
 
   if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
-    $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    if [[ "${test}" == "endTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteFinished name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    else
+      $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    fi
   fi
 }
 
