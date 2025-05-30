@@ -305,8 +305,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     if (reorder.before && this.checkEscapes(reorder.before) === null) {
       return null; // error'ed
     }
-    result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
-    result.before = sections.elem.allocElementString(sections, reorder.before);
+    result.elements = sections.elem.allocElementString(sections, {x:reorder}, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
+    result.before = sections.elem.allocElementString(sections, {x:reorder}, reorder.before);
     if (!result.elements || !result.before) {
       return null; // already error'ed
     } else {

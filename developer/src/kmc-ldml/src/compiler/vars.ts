@@ -261,7 +261,14 @@ export class VarsCompiler extends SectionCompiler {
 
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== LdmlKeyboardTypes.MarkerParser.ANY_MARKER_ID).sort();
-    result.markers = sections.list.allocList(allMarkers, {}, sections);
+    result.markers = sections.list.allocList(allMarkers, {
+      // x: - we don't have an easy way to get context at this point
+      // however, this is the string with the marker *id*. So, from the StrsCompiler
+      // point of view, the value of this context would be if the marker ID had, say,
+      // invalid Unicode in it for ERROR_IllegalCharacters - but, that wouldn't be a
+      // valid Marker ID either.
+      // So, it's OK to not pass context with this particular list.
+    }, sections);
 
     // sets need to be added late, because they can refer to markers
     variables?.set?.forEach((e) =>
