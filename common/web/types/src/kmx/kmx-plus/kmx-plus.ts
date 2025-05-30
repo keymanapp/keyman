@@ -216,7 +216,7 @@ export class Strs extends Section {
     s = s ?? '';
     // type check everything else
     if (typeof s !== 'string') {
-      throw new Error('alloc_string: s must be a string, undefined, or null.');
+      throw new Error(`Internal Error: processString: s must be a string, undefined, or null, not ${typeof s} ${s}`);
     }
     // substitute variables
     if (opts?.stringVariables) {

@@ -37,7 +37,7 @@ export class KeysCompiler extends SectionCompiler {
     for (const keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // key not found is handled elsewhere.
-      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
+      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output, key);
     }
     return true;
   }
