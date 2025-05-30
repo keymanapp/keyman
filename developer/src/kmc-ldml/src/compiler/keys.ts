@@ -37,7 +37,7 @@ export class KeysCompiler extends SectionCompiler {
     for (const keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // key not found is handled elsewhere.
-      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
+      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output, key);
     }
     return true;
   }
@@ -333,7 +333,7 @@ export class KeysCompiler extends SectionCompiler {
         const keyIdStr = sections.strs.allocString(keyId, { x: flickSegment });
         const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
-          { },
+          { x: flickSegment },
           sections);
         flicks.flicks.push({
           directions: directionsList,
@@ -372,7 +372,7 @@ export class KeysCompiler extends SectionCompiler {
       }
       const id = sections.strs.allocString(key.id, { x: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(
-        longPressKeyIds, {},
+        longPressKeyIds, { x: key },
         sections);
 
       const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
@@ -381,7 +381,7 @@ export class KeysCompiler extends SectionCompiler {
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
         multiTapKeyIds,
-        {},
+        { x: key },
         sections);
       const keySwitch = sections.strs.allocString(layerId, { x: key }); // 'switch' is a reserved word
 
