@@ -90,7 +90,7 @@ export class SystemStoreNameRule extends AlternateTokenRule {
   }
 }
 
-export class VariableStoreAssignRule extends SingleChildRule {
+export class NormalStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
     const variableStore: Rule       = new VariableStoreRule();

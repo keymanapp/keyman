@@ -15,7 +15,7 @@ import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
 import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
-import { SystemStoreRule, VariableStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
+import { SystemStoreRule, NormalStoreAssignRule, VariableStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
 
@@ -181,40 +181,40 @@ describe("KMN Store Analyser Tests", () => {
       });
     });
   });
-  describe("VariableStoreAssignRule Tests", () => {
-    it("can construct a VariableStoreAssignRule", () => {
+  describe("NormalStoreAssignRule Tests", () => {
+    it("can construct a NormalStoreAssignRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isNotNull(variableStoreAssign);
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isNotNull(normalStoreAssign);
     });
     it("can parse correctly (single u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
     it("can parse correctly (single outs)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(ShiftOutAll)  outs(ShiftOutSingle)');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.OUTS));
     });
     it("can parse correctly (two u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 U+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
     });
     it("can parse correctly (two u_char with continuation)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
@@ -222,8 +222,8 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (two u_char with continuation, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\nU+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
@@ -231,8 +231,8 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (two u_char with continuation, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\n U+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
@@ -240,8 +240,8 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (two u_char with continuation, spaces before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\n U+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
@@ -249,8 +249,8 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (two u_char with continuation, spaces before, after and between)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\ \n U+1781');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
@@ -258,8 +258,8 @@ describe("KMN Store Analyser Tests", () => {
     });
     it("can parse correctly (mixed text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) " " U+1781 [K_K] outs(ShiftOutSingle)');
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STRING));
@@ -277,8 +277,8 @@ describe("KMN Store Analyser Tests", () => {
       const line7 = '                       [RALT K_K] [RALT K_B]';
       const str = `${line1}${line2}${line3}${line4}${line5}${line6}${line7}`;
       Rule.tokenBuffer = stringToTokenBuffer(str);
-      const variableStoreAssign: Rule = new VariableStoreAssignRule();
-      assert.isTrue(variableStoreAssign.parse(root));
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       const virtualKeyNodes = storeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);

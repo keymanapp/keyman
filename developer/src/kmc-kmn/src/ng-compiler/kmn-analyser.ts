@@ -10,7 +10,7 @@ import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
-import { SystemStoreAssignRule, VariableStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
+import { SystemStoreAssignRule, NormalStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -85,18 +85,18 @@ export class ContinuationNewlineRule extends SingleChildRule {
 export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStoreAssign: Rule    = new SystemStoreAssignRule();
-    const capsAlwaysOff: Rule        = new CapsAlwaysOffRule();
-    const capsOnOnly: Rule           = new CapsOnOnlyRule();
-    const shiftFreesCaps: Rule       = new ShiftFreesCapsRule();
-    const variableStoreAssign: Rule  = new VariableStoreAssignRule();
-    const ruleBlock: Rule            = new RuleBlockRule();
+    const systemStoreAssign: Rule  = new SystemStoreAssignRule();
+    const capsAlwaysOff: Rule      = new CapsAlwaysOffRule();
+    const capsOnOnly: Rule         = new CapsOnOnlyRule();
+    const shiftFreesCaps: Rule     = new ShiftFreesCapsRule();
+    const normalStoreAssign: Rule  = new NormalStoreAssignRule();
+    const ruleBlock: Rule          = new RuleBlockRule();
     this.rule = new AlternateRule([
       systemStoreAssign,
       capsAlwaysOff,
       capsOnOnly,
       shiftFreesCaps,
-      variableStoreAssign,
+      normalStoreAssign,
       ruleBlock,
     ]);
   }
