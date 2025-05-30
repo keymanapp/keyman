@@ -103,7 +103,7 @@ destructor TRemoteUpdateCheck.Destroy;
 begin
   if (FErrorMessage <> '') and FShowErrors then
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      '"+FErrorMessage+"');
+      'TRemoteUpdateCheck.Destroy: FErrorMessage = ' + FErrorMessage);
 
   KL.Log('TRemoteUpdateCheck.Destroy: FErrorMessage = ' + FErrorMessage);
   KL.Log('TRemoteUpdateCheck.Destroy: FRemoteResult = ' +

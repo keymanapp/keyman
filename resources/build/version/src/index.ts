@@ -1,5 +1,6 @@
 import { info as logInfo } from '@actions/core';
-import { GitHub } from '@actions/github';
+import { getOctokit } from '@actions/github';
+type GitHub = ReturnType<typeof getOctokit>;
 
 import { sendCommentToPullRequestAndRelatedIssues, fixupHistory } from './fixupHistory.js';
 import { incrementVersion } from './incrementVersion.js';
@@ -59,7 +60,7 @@ const argv = await yargs(hideBin(process.argv))
 
 const main = async (): Promise<void> => {
 
-  const octokit: GitHub = new GitHub(argv.token);
+  const octokit: GitHub = getOctokit(argv.token);
 
   // Pretend we have a single change. If we chain commands (as in normal usage),
   // then we use the real history change count to determine if we continue.

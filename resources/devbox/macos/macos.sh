@@ -148,7 +148,7 @@ BREW_ALL="bash jq python3 meson ninja coreutils pyenv"
 BREW_WEB="node emscripten"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
-BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
+BREW_ANDROID="openjdk@21 android-commandlinetools android-studio ant gradle maven"
 
 # Turn on verbosity
 set -x
@@ -169,16 +169,21 @@ pyenv global 2.7.18
 source "$THIS_DIR/keyman.macos.env.sh"
 
 $REQUIRE_ANDROID && (
-    mkdir -p .android && touch ~/.android/repositories.cfg
+    mkdir -p ~/.android && touch ~/.android/repositories.cfg
+    SDK_ROOT=~/.android
 
+    # installed via android-commandlinetools
     which sdkmanager || (
         echo "Please run Android Studio to install the Android SDK tools."
         read -p "Press ENTER to continue after installation"
         PATH="$HOME/Library/Android/sdk/tools/bin:$PATH"
     )
-    sdkmanager "system-images;android-30;google_apis_playstore;x86_64"
-    sdkmanager --update
-    sdkmanager --licenses
+
+    # android-commandlinetools default sdk_root location is elsewhere, as
+    # documented by https://formulae.brew.sh/cask/android-commandlinetools
+    sdkmanager --sdk_root=$SDK_ROOT "system-images;android-30;google_apis_playstore;x86_64"
+    sdkmanager --sdk_root=$SDK_ROOT --update
+    sdkmanager --sdk_root=$SDK_ROOT --licenses
 )
 
 # For now, we won't run this step automatically

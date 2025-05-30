@@ -129,7 +129,7 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/fail-duplicate-type.xml',
       errors: [
-        LdmlCompilerMessages.Error_DuplicateTransformsType({types: ['simple']})
+        LdmlCompilerMessages.Error_DuplicateTransformsType({type: 'simple'})
       ]
     },
     {

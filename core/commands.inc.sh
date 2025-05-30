@@ -55,7 +55,7 @@ do_configure() {
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" $MESON_CROSS_FILE --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" $MESON_CROSS_FILE ${MESON_ARGS} --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
     popd > /dev/null
   fi
 

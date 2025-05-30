@@ -1,107 +1,114 @@
 {
   "images" : [
     {
-      "idiom" : "iphone",
+      "filename" : "icon-20@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "idiom" : "iphone",
+      "filename" : "icon-20@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
-      "filename" : "FV Keyboards_iOS_Settings_58x58-1.png",
-      "idiom" : "iphone",
+      "filename" : "icon-29@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
-      "filename" : "FV Keyboards_iOS_Settings_87x87.png",
-      "idiom" : "iphone",
+      "filename" : "icon-29@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
-      "filename" : "FV Keyboards_iPhone_x2_80x80.png",
-      "idiom" : "iphone",
+      "filename" : "icon-38@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "scale" : "2x",
+      "size" : "38x38"
+    },
+    {
+      "filename" : "icon-38@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "scale" : "3x",
+      "size" : "38x38"
+    },
+    {
+      "filename" : "icon-40@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "FV Keyboards_iPhone_120x120-1.png",
-      "idiom" : "iphone",
+      "filename" : "icon-40@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
-      "filename" : "FV Keyboards_iPhone_120x120.png",
-      "idiom" : "iphone",
+      "filename" : "icon-60@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
-      "filename" : "FV Keyboards_iPhone_Retina_180x180.png",
-      "idiom" : "iphone",
+      "filename" : "icon-60@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
-      "idiom" : "ipad",
-      "scale" : "1x",
-      "size" : "20x20"
-    },
-    {
-      "idiom" : "ipad",
+      "filename" : "icon-64@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
-      "size" : "20x20"
+      "size" : "64x64"
     },
     {
-      "filename" : "FV Keyboards_iOS_Settings_29x29.png",
-      "idiom" : "ipad",
-      "scale" : "1x",
-      "size" : "29x29"
+      "filename" : "icon-64@3x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
+      "scale" : "3x",
+      "size" : "64x64"
     },
     {
-      "filename" : "FV Keyboards_iOS_Settings_58x58.png",
-      "idiom" : "ipad",
+      "filename" : "icon-68@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
-      "size" : "29x29"
+      "size" : "68x68"
     },
     {
-      "filename" : "FV Keyboards_iPhone_x1_40x40.png",
-      "idiom" : "ipad",
-      "scale" : "1x",
-      "size" : "40x40"
-    },
-    {
-      "filename" : "FV Keyboards_iPhone_x2_80x80-1.png",
-      "idiom" : "ipad",
-      "scale" : "2x",
-      "size" : "40x40"
-    },
-    {
-      "filename" : "FV Keyboards_iPad_76x76-1.png",
-      "idiom" : "ipad",
-      "scale" : "1x",
-      "size" : "76x76"
-    },
-    {
-      "filename" : "FV Keyboards_iPad_152x152.png",
-      "idiom" : "ipad",
+      "filename" : "icon-76@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "FV Keyboards_iPadPro_167x167.png",
-      "idiom" : "ipad",
+      "filename" : "icon-83_5@2x.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "FV Keyboards_Appstore_1024x1024.png",
-      "idiom" : "ios-marketing",
-      "scale" : "1x",
+      "filename" : "ios-marketing.png",
+      "idiom" : "universal",
+      "platform" : "ios",
       "size" : "1024x1024"
     }
   ],

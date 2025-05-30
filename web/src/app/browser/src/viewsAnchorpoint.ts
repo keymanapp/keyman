@@ -5,7 +5,7 @@ import {
   FloatingOSKViewConfiguration,
   InlinedOSKView
 } from "keyman/engine/osk";
-import KeymanEngine from "./keymanEngine.js";
+import { KeymanEngine } from "./keymanEngine.js";
 
 function buildBaseOskConfiguration(engine: KeymanEngine) {
   return {

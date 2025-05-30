@@ -689,7 +689,6 @@ end;
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean) : Boolean;
 var
   BUpdateSM : TUpdateStateMachine;
-  frmStartInstall: TfrmStartInstall;
   SendToBUpdateSM: Boolean;
   SkipBUpdate : Boolean;
 begin
@@ -723,11 +722,13 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the following package related switches are valid in the installing
-        // state.
-        SkipBUpdate := (BUpdateSM.IsInstallingState and (FMode in [fmInstallTip,
-        fmInstallTipsForPackages, fmRegisterTip, fmUpgradeKeyboards,
-        fmUpgradeMnemonicLayout]));
+        // the presence of the following package related switches means we 
+        // should skip running the update state machine HandleKmShell event
+        SkipBUpdate := (FMode in [
+          fmInstallTip, fmInstallTipsForPackages, 
+          fmRegisterTip, fmUpgradeKeyboards,
+          fmUpgradeMnemonicLayout
+        ]);
 
         SendToBUpdateSM := ShouldSendToBUpdateSM(FSilent, BUpdateSM, FMode);
 

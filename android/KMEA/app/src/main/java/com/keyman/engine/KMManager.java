@@ -362,8 +362,7 @@ public final class KMManager {
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSSentry = "sentry.min.js";
-  protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
+  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
@@ -982,7 +981,6 @@ public final class KMManager {
 
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
-      copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);

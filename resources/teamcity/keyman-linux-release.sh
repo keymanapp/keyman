@@ -35,6 +35,17 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/linux"
 
+function _install_additional_dependencies() {
+  builder_echo start additional_dependencies "Installing additional dependencies"
+
+  # Additionally we need quilt to be able to create the source package.
+  # Since this is not needed to build the binary package, it is not
+  # (and should not be) included in `build-depends` in `debian/control`.
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install quilt
+
+  builder_echo end additional_dependencies success "Finished installing additional dependencies"
+}
+
 function _cleanup_before_creating_source_package() {
   # Cleanup before creating the source package.
   builder_echo start cleanup "Cleanup before creating the source package"
@@ -72,9 +83,9 @@ function _sign_source_tarball() {
 function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
-  local DATE, UPLOAD_BASE, UPLOAD_FOLDER, UPLOAD_DIR
-  local ARTIFACTS, NAMES
-  local TAR_GZ, HASH, SIZE, DOWNLOAD_INFO
+  local DATE UPLOAD_BASE UPLOAD_FOLDER UPLOAD_DIR
+  local ARTIFACTS NAMES
+  local TAR_GZ HASH SIZE DOWNLOAD_INFO
 
   DATE=$(date +%F)
 
@@ -165,18 +176,20 @@ function publish_action() {
 
 if builder_has_action all; then
   linux_install_dependencies_action
+  _install_additional_dependencies
 
   set_variables_for_nvm
 
   linux_build_action
-  linux_unit_tests_action
+  linux_unit_tests_action --no-integration
   publish_action
 else
   builder_run_action  configure   linux_install_dependencies_action
+  builder_run_action  configure   _install_additional_dependencies
 
   set_variables_for_nvm
 
   builder_run_action  build       linux_build_action
-  builder_run_action  test        linux_unit_tests_action
+  builder_run_action  test        linux_unit_tests_action --no-integration
   builder_run_action  publish     publish_action
 fi

@@ -37,7 +37,7 @@ function make_source_tarball_action() {
 
 if builder_has_action all; then
   linux_install_dependencies_action
-  linux_additional_dependencies_action
+  linux_additional_test_dependencies_action
 
   set_variables_for_nvm
 
@@ -46,7 +46,7 @@ if builder_has_action all; then
   make_source_tarball_action
 else
   builder_run_action  configure   linux_install_dependencies_action
-  builder_run_action  configure   linux_additional_dependencies_action
+  builder_run_action  configure   linux_additional_test_dependencies_action
 
   set_variables_for_nvm
 

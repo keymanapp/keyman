@@ -29,7 +29,7 @@ builder_describe "Builds Keyman Engine for Android." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  ":engine          Builds Engine" 
+  ":engine          Builds Engine"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -82,8 +82,6 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
-
-  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
   cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"

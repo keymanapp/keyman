@@ -134,6 +134,7 @@ begin
   Result := False;
   FSuccessfulDownloadCount := 0;
   // Keyboard Packages
+
   for i := 0 to High(Params.Packages) do
   begin
     Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
@@ -147,7 +148,6 @@ begin
       TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+ Params.Packages[i].DownloadURL, 'cli.download');
     end;
   end;
-
   // Keyman Installer
   //
   if Params.Status = ucrsUpdateReady then
@@ -161,6 +161,10 @@ begin
       ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
       TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+  Params.InstallURL, 'cli.download');
     end;
+  end
+  else
+  begin
+      TKeymanSentryClient.Breadcrumb('info', 'DoDownloadUpdates Params.Status !=ucrsUpdateReady', 'cli.download');
   end;
   // If there is at least one keyboard package or version of keyman downloaded then
   // the result is true
@@ -178,7 +182,7 @@ begin
   if not IsOnline then
   begin
     TKeymanSentryClient.Breadcrumb('default', 'TDownloadUpdate: Not Online, cant execute download process.', 'cli.download');
-    Exit;
+    Exit(False);
   end;
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
@@ -187,7 +191,10 @@ begin
     KL.Log('DownloadUpdates.DownloadUpdates: DownloadResult = '+IntToStr(Ord(Result)));
   end
   else
+  begin
     Result := False;
+    TKeymanSentryClient.Breadcrumb('default', 'TDownloadUpdate: LoadUpdateCacheData failed.', 'cli.download');
+  end;
 end;
 
 end.

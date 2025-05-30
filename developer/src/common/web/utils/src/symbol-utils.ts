@@ -6,6 +6,14 @@
  * Utilities for manipulating Symbol properties
  */
 
+
+/**
+ * Any object with metadata, for example for line number errs.
+ * Defined as 'any' here to reduce noise on the client side.
+ * @see {@link KeymanXMLReader.getMetaData()}
+ */
+export type ObjectWithMetadata = any;
+
 export class SymbolUtils {
   /**
    * Copy symbols shallowly from 'from' onto 'onto'
@@ -13,8 +21,8 @@ export class SymbolUtils {
    * @param from source for symbols
    * @returns the onto object
    */
-  public static copySymbols<T>(onto: T, from: any): T {
-    const o = onto as any;
+  public static copySymbols<T>(onto: T, from: ObjectWithMetadata): T {
+    const o = onto as ObjectWithMetadata;
     for (const sym of Object.getOwnPropertySymbols(from)) {
       o[sym] = from[sym];
     }

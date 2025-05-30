@@ -4,6 +4,7 @@
   "type": "module",
   "main": "build/index.js",
   "license": "MIT",
+  "scripts": {},
   "devDependencies": {
     "marked": "^14.1.2",
     "chalk": "^2.4.2"

@@ -31,14 +31,14 @@ cd "${KEYMAN_ROOT}/linux"
 if builder_has_action all; then
   linux_clean_action
   linux_install_dependencies_action
-  linux_additional_dependencies_action
+  linux_additional_test_dependencies_action
   set_variables_for_nvm
   linux_build_action
   linux_unit_tests_action
 else
   builder_run_action  clean       linux_clean_action
   builder_run_action  configure   linux_install_dependencies_action
-  builder_run_action  configure   linux_additional_dependencies_action
+  builder_run_action  configure   linux_additional_test_dependencies_action
 
   set_variables_for_nvm
 

@@ -1,5 +1,5 @@
 #ifndef __ORDEREDOUTPUTDEVICE_H__
-#define __ORDEROUTPUTDEVICE_H__
+#define __ORDEREDOUTPUTDEVICE_H__
 
 #include <libevdev/libevdev-uinput.h>
 
@@ -23,4 +23,4 @@ protected:
 
 OrderedOutputDevice* CreateOrderedOutputDevice();
 
-#endif // __ORDEROUTPUTDEVICE_H__
+#endif // __ORDEREDOUTPUTDEVICE_H__

@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
-    "@sentry/browser": "^5.27.4"
+    "@sentry/browser": "^8.55.0"
   }
 }

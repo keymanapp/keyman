@@ -1,15 +1,5 @@
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
-
-// Unfortunately, we can't bundle Sentry via direct import - something in the process breaks
-// esbuild due to needing to transform to ES5.
-import { default as SentryType } from '@sentry/browser';
-
-// But this will get us sufficient typing to work with as long as we also link (or prepend)
-// a pre-bundled Sentry build artifact.
-let Sentry: {
-  init: typeof SentryType.init;
-  // @ts-ignore
-} = window['Sentry'];
+import * as Sentry from '@sentry/browser';
 
 /**
  * Controls whether or not the generated Sentry event is logged to the console (true)

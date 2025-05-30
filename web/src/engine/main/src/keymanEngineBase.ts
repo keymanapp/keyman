@@ -10,7 +10,7 @@ import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import HardKeyboardBase from "./hardKeyboard.js";
+import { HardKeyboardBase } from "./hardKeyboardBase.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
@@ -35,20 +35,20 @@ function determineBaseLayout(): string {
 export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
 export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
-export default class KeymanEngine<
-  Configuration extends EngineConfiguration,
-  ContextManager extends ContextManagerBase<any>,
-  HardKeyboard extends HardKeyboardBase
+export class KeymanEngineBase<
+  ConfigurationT extends EngineConfiguration,
+  ContextManagerT extends ContextManagerBase<any>,
+  HardKeyboardT extends HardKeyboardBase
 > implements KeyboardKeymanGlobal {
-  readonly config: Configuration;
-  contextManager: ContextManager;
-  interface: KeyboardInterface<ContextManager>;
+  readonly config: ConfigurationT;
+  contextManager: ContextManagerT;
+  interface: KeyboardInterface<ContextManagerT>;
   readonly core: InputProcessor;
   keyboardRequisitioner: KeyboardRequisitioner;
   modelCache: ModelCache;
 
   protected legacyAPIEvents = new LegacyEventEmitter<LegacyAPIEvents>();
-  private _hardKeyboard: HardKeyboard;
+  private _hardKeyboard: HardKeyboardT;
   private _osk: OSKView;
 
   protected keyEventRefocus?: () => void;
@@ -115,16 +115,16 @@ export default class KeymanEngine<
    */
   constructor(
     workerFactory: WorkerFactory,
-    config: Configuration,
-    contextManager: ContextManager,
-    processorConfigInitializer: (engine: KeymanEngine<Configuration, ContextManager, HardKeyboard>) => ProcessorConfiguration
+    config: ConfigurationT,
+    contextManager: ContextManagerT,
+    processorConfigInitializer: (engine: KeymanEngineBase<ConfigurationT, ContextManagerT, HardKeyboardT>) => ProcessorConfiguration
   ) {
     this.config = config;
     this.contextManager = contextManager;
 
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
-    this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManager>;
+    this.interface = processorConfiguration.keyboardInterface as KeyboardInterface<ContextManagerT>;
     this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
@@ -354,11 +354,11 @@ export default class KeymanEngine<
     return KEYMAN_VERSION.VERSION_RELEASE;
   }
 
-  public get hardKeyboard(): HardKeyboard {
+  public get hardKeyboard(): HardKeyboardT {
     return this._hardKeyboard;
   }
 
-  protected set hardKeyboard(keyboard: HardKeyboard) {
+  protected set hardKeyboard(keyboard: HardKeyboardT) {
     if(this._hardKeyboard) {
       this._hardKeyboard.off('keyevent', this.keyEventListener);
     }

@@ -15,7 +15,7 @@ linux_install_dependencies_action() {
 }
 
 # Install additional dependencies required for determining test coverage.
-linux_additional_dependencies_action() {
+linux_additional_test_dependencies_action() {
   builder_echo start additional_dependencies "Installing additional dependencies"
   local TOINSTALL="lcov libdatetime-perl gcovr python3-venv jq"
 

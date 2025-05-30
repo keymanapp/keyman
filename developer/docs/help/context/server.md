@@ -240,6 +240,10 @@ controlled from the **Device** menu.
   This will be most useful when running Server on macOS or Linux, where
   integration with the Keyman Developer IDE is not available.
 
+  Note that for security reasons, upload is only available when accessing
+  Keyman Developer Server on a localhost URL (127.0.0.1, ::1, or
+  ::ffff:127.0.0.1).
+
   You can also drag and drop these same files onto the page.
 
 **Help...**

@@ -31,7 +31,8 @@ builder_describe \
   "@/web/src/tools/es-bundling" \
   "@../wordbreakers" \
   "@../templates" \
-  configure clean build test
+  configure clean build test \
+  "--inspect  Runs browser-based tests in a locally-inspectable mode"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -92,20 +93,20 @@ function do_build() {
 function do_test() {
   local MOCHA_FLAGS=
   local WTR_CONFIG=
-  local WTR_DEBUG=
+  local WTR_INSPECT=
 
   if builder_is_ci_build; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.CI
   fi
 
-  if builder_has_option --debug; then
-    WTR_DEBUG=" --manual"
+  if builder_has_option --inspect; then
+    WTR_INSPECT=" --manual"
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/tests/mocha/cases/
 
-  web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
+  web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}
 }
 
 builder_run_action configure  do_configure
