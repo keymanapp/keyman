@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.54 alpha 2025-05-30
+
+* maint(linux): move TC build scripts to `resources/teamcity/linux` (#14061)
+
 ## 19.0.53 alpha 2025-05-29
 
 * fix(developer): ensure that kmc doesn't skip validate phase of kmc-ldml (#14068)
