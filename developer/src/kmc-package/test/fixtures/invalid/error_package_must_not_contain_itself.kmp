@@ -1,0 +1,2 @@
+NOTE: not a .kmp file. This file must exist in order for the test to pass, as
+the package compiler retrieves content files before doing validation tests.
