@@ -10,7 +10,7 @@ import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, PermittedKeywordRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
-import { SystemStoreAssignRule, NormalStoreAssignRule, VariableStoreNameRule } from "./store-analyser.js";
+import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
@@ -928,10 +928,10 @@ export class AbstractIfStoreStatementRule extends SingleChildRule {
 export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    const normalStoreName: Rule = new NormalStoreNameRule();
+    const stringRule: Rule      = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, variableStoreName,
+      this.ifRule, this.leftBracket, this.optWhitespace, normalStoreName,
       this.whitespace, this.comparison, this.whitespace, stringRule,
       this.optWhitespace, this.rightBracket,
     ]);
@@ -1188,18 +1188,18 @@ export class DeadKeyStatementRule extends AbstractBracketedStoreNameStatementRul
 export class IndexStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const index: Rule             = new TokenRule(TokenTypes.INDEX, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const variableStoreName: Rule = new VariableStoreNameRule();
-    const spacedComma: Rule       = new SpacedCommaRule();
-    const offset: Rule            = new OffsetRule();
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
+    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
+    const optWhitespace: Rule   = new OptionalWhiteSpaceRule();
+    const normalStoreName: Rule = new NormalStoreNameRule();
+    const spacedComma: Rule     = new SpacedCommaRule();
+    const offset: Rule          = new OffsetRule();
+    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       index,
       leftBracket,
       optWhitespace,
-      variableStoreName,
+      normalStoreName,
       spacedComma,
       offset,
       optWhitespace,
