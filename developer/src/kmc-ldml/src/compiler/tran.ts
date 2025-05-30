@@ -1,6 +1,6 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes, util } from '@keymanapp/common-types';
-import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, LDMLKeyboard, ObjectWithMetadata } from "@keymanapp/developer-utils";
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -204,7 +204,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
         transform_from_parse(transform.from);
       }
     } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }, transform));
       return null;
     }
 
@@ -212,7 +212,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     try {
       transform_to_parse(transform.to || '');
     } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }, transform));
       return null;
     }
 
@@ -237,9 +237,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * We have already checked that it's not a mapTo,
    * so there should not be any illegal substitutions.
    */
-  private isValidTo(to: string) : boolean {
+  private isValidTo(to: string, x?: ObjectWithMetadata) : boolean {
     if (/(?<!\\)(?:\\\\)*\$\[/.test(to)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }, x));
       return false;
     }
     return true;
@@ -251,18 +251,18 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param from the original from - for error reporting
    * @returns true if OK
    */
-  private isValidRegex(cookedFrom: string, from: string) : boolean {
+  private isValidRegex(cookedFrom: string, from: string, x?: ObjectWithMetadata) : boolean {
     // check for any unescaped dollar sign here
     if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }, x));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\*/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }, x));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\+/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }, x));
       return false;
     }
     // Verify that the regex is syntactically valid
@@ -272,14 +272,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
       // does it match an empty string?
       if (rg.test('')) {
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }, x));
         return false;
       }
     } catch (e) {
       // We're exposing the internal regex error message here.
       // In the future, CLDR plans to expose the EBNF for the transform,
       // at which point we would have more precise validation prior to getting to this point.
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }, x));
       return false;
     }
     return true;
