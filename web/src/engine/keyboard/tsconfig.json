@@ -7,6 +7,9 @@
     "tsBuildInfoFile": "../../../build/engine/keyboard/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src/"
   },
+  "references": [
+    { "path": "../core-processor"},
+  ],
   "include": [ "./src/**/*.ts"],
   "exclude": ["./src/keyboards/loaders/**/*.ts"]
 }

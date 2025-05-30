@@ -1,14 +1,14 @@
-import KeyboardProcessor from "./keyboardProcessor.js";
+import { JSKeyboardProcessor } from "./jsKeyboardProcessor.js";
 import { VariableStoreDictionary } from "keyman/engine/keyboard";
-import OutputTarget, { type Transcription } from './outputTarget.js';
+import { OutputTargetBase, type Transcription } from './outputTargetBase.js';
 import { Mock } from "./mock.js";
-import { type VariableStore } from "./systemStores.js";
+import { type VariableStore } from "./stores.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**
  * Represents the commands and state changes that result from a matched keyboard rule.
  */
-export default class RuleBehavior {
+export class RuleBehavior {
   /**
    * The before-and-after Transform from matching a keyboard rule.  May be `null`
    * if no keyboard rules were matched for the keystroke.
@@ -65,7 +65,7 @@ export default class RuleBehavior {
    */
   triggerKeyDefault?: boolean;
 
-  finalize(processor: KeyboardProcessor, outputTarget: OutputTarget, readonly: boolean) {
+  finalize(processor: JSKeyboardProcessor, outputTarget: OutputTargetBase, readonly: boolean) {
     if(!this.transcription) {
       throw "Cannot finalize a RuleBehavior with no transcription.";
     }

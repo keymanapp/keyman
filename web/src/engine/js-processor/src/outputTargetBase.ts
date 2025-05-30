@@ -1,7 +1,7 @@
 import { KMWString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
-import { OutputTarget as OutputTargetInterface } from 'keyman/engine/keyboard';
+import { OutputTarget } from 'keyman/engine/keyboard';
 
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
@@ -64,7 +64,7 @@ export class Transcription {
 
 export type Alternate = LexicalModelTypes.ProbabilityMass<LexicalModelTypes.Transform>;
 
-export default abstract class OutputTarget implements OutputTargetInterface {
+export abstract class OutputTargetBase implements OutputTarget {
   private _dks: DeadkeyTracker;
 
   constructor() {
@@ -122,7 +122,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTarget): TextTransform {
+  buildTransformFrom(original: OutputTargetBase): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -143,7 +143,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
     return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
-  buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
+  buildTranscriptionFrom(original: OutputTargetBase, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
     const transform = this.buildTransformFrom(original);
 
     // If we ever decide to re-add deadkey tracking, this is the place for it.
@@ -155,7 +155,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
    * Restores the `OutputTarget` to the indicated state.  Designed for use with `Transcription.preInput`.
    * @param original An `OutputTarget` (usually a `Mock`).
    */
-  restoreTo(original: OutputTarget) {
+  restoreTo(original: OutputTargetBase) {
     this.clearSelection();
     // We currently do not restore selected text; the mechanism isn't supported at present for
     // all output target types - especially in regard to re-selecting the text if restored.
