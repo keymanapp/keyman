@@ -5,7 +5,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
@@ -22,7 +22,7 @@ builder_describe \
   "configure      install dependencies" \
   "build          make a release build" \
   "test           run unit tests" \
-  "publish        make a source tarball" \
+  "publish        make a source tarball and publish to downloads and launchpad" \
   "--gpgkey=GPGKEYGRIP      GPG key for signing" \
   "--gpgpw=GPGKEYPW         GPG key passphrase" \
   "--rsync-path=RSYNC_PATH  rsync path on remote server" \
