@@ -2,20 +2,21 @@
 
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
-import type { ModelSpec }  from "keyman/engine/interfaces";
+import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
-import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
+import { KM_Core } from 'keyman/engine/core-processor';
+
+import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent, type OutputTarget, SystemStoreIDs } from "keyman/engine/keyboard";
+// TODO-web-core: remove usage of OutputTargetBase
 import {
   type Alternate,
   isEmptyTransform,
-  KeyboardInterface,
-  KeyboardProcessor,
+  JSKeyboardProcessor,
   Mock,
-  type OutputTarget,
   RuleBehavior,
   type ProcessorInitOptions,
-  SystemStoreIDs
+  OutputTargetBase
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -33,8 +34,9 @@ export class InputProcessor {
    * entry points.
    */
   private contextDevice: DeviceSpec;
-  private kbdProcessor: KeyboardProcessor;
+  private kbdProcessor: JSKeyboardProcessor;
   private lngProcessor: LanguageProcessor;
+
 
   private readonly contextCache = new TranscriptionCache();
 
@@ -48,19 +50,23 @@ export class InputProcessor {
     }
 
     this.contextDevice = device;
-    this.kbdProcessor = new KeyboardProcessor(device, options);
+    this.kbdProcessor = new JSKeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
+  }
+
+  public async init(paths: PathConfiguration): Promise<void> {
+    await KM_Core.createCoreProcessor(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
     return this.lngProcessor;
   }
 
-  public get keyboardProcessor(): KeyboardProcessor {
+  public get keyboardProcessor(): JSKeyboardProcessor {
     return this.kbdProcessor;
   }
 
-  public get keyboardInterface(): KeyboardInterface {
+  public get keyboardInterface(): KeyboardMinimalInterface {
     return this.keyboardProcessor.keyboardInterface;
   }
 
@@ -108,9 +114,11 @@ export class InputProcessor {
           // Has there been a context change at any point during the multitap?  If so, we need
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
-          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(Mock.from(outputTarget))) {
+          // TODO-web-core
+          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(Mock.from(outputTarget as OutputTargetBase))) {
             // Restores full context, including deadkeys in their exact pre-keystroke state.
-            outputTarget.restoreTo(transcription.preInput);
+            // TODO-web-core
+            (outputTarget as OutputTargetBase).restoreTo(transcription.preInput);
           }
           /*
             else:
@@ -148,7 +156,7 @@ export class InputProcessor {
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
+    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || (this.activeKeyboard instanceof JSKeyboard && this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && fromOSK) {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
       if(this.keyboardProcessor.selectLayer(keyEvent)) {
@@ -158,7 +166,8 @@ export class InputProcessor {
 
     // Will handle keystroke-based non-layer change modifier & state keys, mapping them through the physical keyboard's version
     // of state management.  `doModifierPress` must always run.
-    if(this.keyboardProcessor.doModifierPress(keyEvent, outputTarget, !fromOSK)) {
+    // TODO-web-core
+    if (this.keyboardProcessor.doModifierPress(keyEvent, outputTarget as OutputTargetBase, !fromOSK)) {
       // If run on a desktop platform, we know that modifier & state key presses may not
       // produce output, so we may make an immediate return safely.
       if(!fromOSK) {
@@ -185,13 +194,15 @@ export class InputProcessor {
 
     // Create a "mock" backup of the current outputTarget in its pre-input state.
     // Current, long-existing assumption - it's DOM-backed.
-    const preInputMock = Mock.from(outputTarget, true);
+    // TODO-web-core
+    const preInputMock = Mock.from(outputTarget as OutputTargetBase, true);
 
     const startingLayerId = this.keyboardProcessor.layerId;
 
     // We presently need the true keystroke to run on the FULL context.  That index is still
     // needed for some indexing operations when comparing two different output targets.
-    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget);
+    // TODO-web-core
+    let ruleBehavior = this.keyboardProcessor.processKeystroke(keyEvent, outputTarget as OutputTargetBase);
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -227,7 +238,8 @@ export class InputProcessor {
 
       // Now that we've done all the keystroke processing needed, ensure any extra effects triggered
       // by the actual keystroke occur.
-      ruleBehavior.finalize(this.keyboardProcessor, outputTarget, false);
+      // TODO-web-core
+      ruleBehavior.finalize(this.keyboardProcessor, outputTarget as OutputTargetBase, false);
 
       // -- All keystroke (and 'alternate') processing is now complete.  Time to finalize everything! --
 
@@ -238,7 +250,8 @@ export class InputProcessor {
     } else {
       // We need a dummy RuleBehavior for keys which have no output (e.g. Shift)
       ruleBehavior = new RuleBehavior();
-      ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
+      // TODO-web-core
+      ruleBehavior.transcription = (outputTarget as OutputTargetBase).buildTranscriptionFrom(outputTarget as OutputTargetBase, null, false);
       ruleBehavior.triggersDefaultCommand = true;
     }
 
@@ -257,9 +270,11 @@ export class InputProcessor {
     this.keyboardProcessor.newLayerStore.set(hasLayerChanged ? this.keyboardProcessor.layerId : '');
     this.keyboardProcessor.oldLayerStore.set(hasLayerChanged ? startingLayerId : '');
 
-    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget);
-    if(postRuleBehavior) {
-      postRuleBehavior.finalize(this.keyboardProcessor, outputTarget, true);
+    // TODO-web-core
+    const postRuleBehavior = this.keyboardProcessor.processPostKeystroke(this.contextDevice, outputTarget as OutputTargetBase);
+    if (postRuleBehavior) {
+      // TODO-web-core
+      postRuleBehavior.finalize(this.keyboardProcessor, outputTarget as OutputTargetBase, true);
     }
 
     // Yes, even for ruleBehavior.triggersDefaultCommand.  Those tend to change the context.
@@ -382,7 +397,8 @@ export class InputProcessor {
 
   public resetContext(outputTarget?: OutputTarget) {
     // Also handles new-context events, which may modify the layer
-    this.keyboardProcessor.resetContext(outputTarget);
+    // TODO-web-core
+    this.keyboardProcessor.resetContext(outputTarget as OutputTargetBase);
     // With the layer now set, we trigger new predictions.
     this.languageProcessor.invalidateContext(outputTarget, this.keyboardProcessor.layerId);
   }

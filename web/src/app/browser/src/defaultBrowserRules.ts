@@ -2,9 +2,9 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
   DefaultRules,
-  type KeyEvent
+  type KeyEvent,
+  type OutputTarget
 } from 'keyman/engine/keyboard';
-import { type OutputTarget } from 'keyman/engine/js-processor';
 
 import ContextManager from './contextManager.js';
 
