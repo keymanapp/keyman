@@ -1,5 +1,5 @@
 import { KeymanWebKeyboard } from '@keymanapp/common-types';
-import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
+import { KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
@@ -29,7 +29,7 @@ import { BeepHandler } from './beepHandler.js';
 import KeyboardInterface from './keyboardInterface.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 
-export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
+export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
   private pageIntegration: PageIntegrationHandlers;
 

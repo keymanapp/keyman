@@ -3,7 +3,7 @@ import { DeviceSpec } from "keyman/engine/keyboard";
 import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 
 import { GlobeHint } from './osk/globeHint.js';
-import type KeymanEngine from "./keymanEngine.js";
+import { type KeymanEngine }  from "./keymanEngine.js";
 
 export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
   osk.on('globekey', (key, on) => {
