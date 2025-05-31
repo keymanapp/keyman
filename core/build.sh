@@ -69,7 +69,8 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--test,-t=opt_tests             test[s] to run (space separated)"
+  "--test,-t=opt_tests             test[s] to run (space separated)" \
+  "--no-werror                     don't report warnings as errors"
 
 builder_parse "$@"
 
@@ -114,6 +115,11 @@ builder_describe_outputs \
   build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
+
+MESON_ARGS=--werror
+if builder_has_option --no-werror; then
+  MESON_ARGS=
+fi
 
 if builder_has_action configure; then
   # Import our standard compiler defines

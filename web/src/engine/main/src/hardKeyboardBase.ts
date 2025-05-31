@@ -11,7 +11,7 @@ interface EventMap {
   'keyevent': (event: KeyEvent, callback?: (result: RuleBehavior, error?: Error) => void) => void
 }
 
-export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
+export class HardKeyboardBase extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
 
 export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboard, baseLayout: string): KeyEvent {
   // Mnemonic handling.
