@@ -18,6 +18,7 @@ import { verifyValidAndUnique } from "../util/util.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 import { transform_from_parse, transform_to_parse } from "../util/abnf/abnf.js";
+import { StrsOptions } from "../../../../../common/web/types/src/kmx/kmx-plus/kmx-plus.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
@@ -138,6 +139,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
+    // we have lots of strings to allocate, that will all have these options
+    const stropts : StrsOptions = { x: transform };
     const result = new TranTransform();
     // setup for serializing
     result._from = transform.from;
@@ -157,11 +160,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
-      result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
-      result.mapTo = sections.strs.allocString(mapTo[1]); // var name
+      result.mapFrom = sections.strs.allocString(mapFrom[1], stropts); // var name
+      result.mapTo = sections.strs.allocString(mapTo[1], stropts); // var name
     } else {
-      result.mapFrom = sections.strs.allocString('');
-      result.mapTo = sections.strs.allocString('');
+      result.mapFrom = sections.strs.allocString('', stropts);
+      result.mapTo = sections.strs.allocString('', stropts);
 
       // validate 'to' here
       if (!this.isValidTo(transform.to || '')) {
@@ -214,6 +217,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,
+      x: transform,
     }, sections);
     // 'to' is handled via allocString
     result.to = sections.strs.allocString(transform.to, {
@@ -221,6 +225,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       markers: true,
       unescape: true,
       nfd: true,
+      x: transform,
     }, sections);
     return result;
   }

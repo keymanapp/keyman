@@ -71,7 +71,7 @@ export class LocaCompiler extends SectionCompiler {
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
     const canonicalLocales = (Intl as any).getCanonicalLocales(locales) as string[];
-    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale));
+    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale, {x: this.contextForLocale(locale)}));
 
     if(result.locales.length < locales.length) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales(this.keyboard3?.locales));
