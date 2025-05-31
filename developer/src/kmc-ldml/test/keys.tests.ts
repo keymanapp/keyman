@@ -335,7 +335,7 @@ describe('keys.kmap', function () {
         // not require maintaining the offset here, which will break if
         // the XML changes.
         // However, it's worthwhile having at least one test that verifies in this way.
-        LdmlCompilerMessages.Warn_CustomForm(withOffset(367, {id: "us"}) as LDMLKeyboard.LKForm),
+        LdmlCompilerMessages.Warn_CustomForm({id: "us"}, withOffset(367)),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -400,7 +400,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: 'us' }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: 'ff', id: 'us' }),
       ],
     },
     {
@@ -409,7 +409,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ codes: ['ff'] }, { id: "zzz" }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: 'ff', id: "zzz" }),
       ],
     },
     {

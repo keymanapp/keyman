@@ -45,7 +45,6 @@ if builder_start_action build; then
   # We shouldn't rely on a prior Android build for these files!  We can retrieve them separately.
   cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "host/keyman-sentry.js"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "host/es6-shim.min.js"
-  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "host/sentry.min.js"
 
   # Test keyboards
 
