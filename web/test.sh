@@ -20,7 +20,8 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "@./src/tools/testing/recorder test:integrated" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
-  ":integrated           Runs KMW's integration test suite"
+  ":integrated           Runs KMW's integration test suite" \
+  "--inspect             Runs browser-based unit tests in an inspectable mode"
 
 builder_parse "$@"
 
@@ -33,15 +34,15 @@ if builder_is_ci_build; then
 fi
 
 # Prepare the flags for the karma command.
-WTR_DEBUG=
-if builder_is_debug_build; then
-  WTR_DEBUG="--manual"
+WTR_INSPECT=
+if builder_has_option --inspect; then
+  WTR_INSPECT="--manual"
 fi
 
 # End common configs.
 
 cd "${KEYMAN_ROOT}"
 
-builder_run_action test:dom web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+builder_run_action test:dom web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
 
-builder_run_action test:integrated web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+builder_run_action test:integrated web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}

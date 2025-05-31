@@ -106,7 +106,7 @@ if(!keymanweb) {
        * @param       {Event}  _id   keyboard selection event
        * @return      {boolean}
        */
-      readonly _SelectKeyboard = async (_id: Event): Promise<boolean> => {
+      private readonly _SelectKeyboard = async (_id: Event): Promise<boolean> => {
         let id: string = '';
         if(typeof(_id) == 'object') {
           let t: HTMLElement = null;
@@ -252,7 +252,7 @@ if(!keymanweb) {
        *
        * @param       {Event}    e     event
        */
-      readonly _SelectorMouseOut = (e: MouseEvent) => {
+      private readonly _SelectorMouseOut = (e: MouseEvent) => {
         if(keymanweb.activatingUI) {
           keymanweb.activatingUI(0);
         }
