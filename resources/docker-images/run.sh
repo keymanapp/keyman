@@ -16,6 +16,7 @@ builder_describe \
   "Run build.sh script inside of a docker image. Pass the build script and parameters after --." \
   "android" \
   "core" \
+  "developer" \
   "linux" \
   "web" \
   "--distro=DISTRO                  The distribution (debian or ubuntu, default: ubuntu)" \
@@ -48,6 +49,13 @@ run_core() {
     "${builder_extra_params[@]}"
 }
 
+run_developer() {
+  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+    -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
+    "keymanapp/keyman-developer-ci:${image_version}" \
+    "${builder_extra_params[@]}"
+}
+
 run_linux() {
   mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}"
   mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}"
@@ -69,7 +77,8 @@ run_web() {
 
 mkdir -p "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}"
 
-builder_run_action android  run_android
-builder_run_action core     run_core
-builder_run_action linux    run_linux
-builder_run_action web      run_web
+builder_run_action android    run_android
+builder_run_action core       run_core
+builder_run_action developer  run_developer
+builder_run_action linux      run_linux
+builder_run_action web        run_web
