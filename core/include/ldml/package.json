@@ -13,6 +13,7 @@
   "license": "MIT",
   "type": "module",
   "main": "build/keyman_core_ldml.js",
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
