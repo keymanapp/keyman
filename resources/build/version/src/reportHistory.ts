@@ -1,6 +1,7 @@
 import { warning as logWarning, info as logInfo } from '@actions/core';
 
-import { GitHub } from '@actions/github';
+import { getOctokit } from '@actions/github';
+type GitHub = ReturnType<typeof getOctokit>;
 
 import { findLastHistoryPR, getAssociatedPR} from './graphql/queries.js';
 import { spawnChild } from './util/spawnAwait.js';

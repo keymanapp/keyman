@@ -22,7 +22,6 @@
     "karma-requirejs": "^1.1.0",
     "karma-teamcity-reporter": "^1.1.0",
     "minimist": "^1.2.6",
-    "mocha": "^8.4.0",
     "requirejs": "^2.3.6",
     "rimraf": "^2.6.3"
   }
