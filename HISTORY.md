@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.55 alpha 2025-05-31
+
+* maint(linux): `sudo` not required for removing temporary files (#14086)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14089)
+
 ## 19.0.54 alpha 2025-05-30
 
 * maint(linux): move TC build scripts to `resources/teamcity/linux` (#14061)
