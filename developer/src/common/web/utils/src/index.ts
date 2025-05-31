@@ -48,7 +48,7 @@ export {
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
   CompilerErrorSeverity,  CompilerCallbackOptions,
-  CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
+  CompilerError, CompilerMessageSpec, CompilerMessageObjectSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
   compilerErrorFormatCode, CompilerMessageDef,
   compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
   ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
