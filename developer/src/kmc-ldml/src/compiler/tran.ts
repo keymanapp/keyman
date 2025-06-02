@@ -350,10 +350,15 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     // should not follow marker prefix, nor marker prefix with range
     const anyQuad = /(?<!\\uffff\\u0008(?:\[[0-9a-fA-F\\u-]*)?)\\u([0-9a-fA-F]{4})/g;
 
-    for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
+    for (const [matched, sub] of cookedFrom.matchAll(anyQuad)) {
       const s = util.unescapeOne(sub);
       if (s !== '\uffff' && s !== '\u0008') { // markers
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }, transform));
+        const codepoint: number = s.codePointAt(0);
+        const cp: string = matched; // the original match from the file
+        const recommended: string = `\\u{${codepoint.toString(16)}}`;
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({
+          cp, recommended
+        }, transform));
         return null; // exit on the first error
       }
     }

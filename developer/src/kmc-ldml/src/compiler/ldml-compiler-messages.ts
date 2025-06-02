@@ -1,4 +1,3 @@
-import { util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageObjectSpec as mx, CompilerMessageSpec as m, CompilerMessageDef as def, ObjectWithMetadata } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -220,33 +219,33 @@ export class LdmlCompilerMessages {
   );
 
   static HINT_PUACharacters = SevHint | 0x0023;
-  static Hint_PUACharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Hint_PUACharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.HINT_PUACharacters, x,
-    `File contains ${def(o.count)} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+    `File contains ${def(o.count)} PUA character(s), including ${def(o.lowestCh)}`,
   );
 
   static WARN_UnassignedCharacters = SevWarn | 0x0024;
-  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.WARN_UnassignedCharacters, x,
-    `File contains ${def(o.count)} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+    `File contains ${def(o.count)} unassigned character(s), including ${def(o.lowestCh)}`,
   );
 
   static ERROR_IllegalCharacters = SevError | 0x0025;
-  static Error_IllegalCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Error_IllegalCharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_IllegalCharacters, x,
-    `File contains ${def(o.count)} illegal character(s), including ${ util.describeCodepoint(o.lowestCh) }`,
+    `File contains ${def(o.count)} illegal character(s), including ${def(o.lowestCh) }`,
   );
 
   static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
   static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
     this.HINT_CharClassImplicitDenorm, x,
-    `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+    `File has character classes which span non-NFD character(s), including ${def(o.lowestCh)}. These will not match any text.`,
   );
 
   static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
   static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
     this.WARN_CharClassExplicitDenorm, x,
-    `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+    `File has character classes which include non-NFD characters(s), including ${def(o.lowestCh)}. These will not match any text.`,
   );
 
   // Available: 0x0028
@@ -286,9 +285,10 @@ export class LdmlCompilerMessages {
   // Available: 0x02E-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
-  static Error_InvalidQuadEscape = (o: { cp: number }, x?: ObjectWithMetadata) => mx(
+  static Error_InvalidQuadEscape = (o: { cp: string, recommended: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidQuadEscape, x,
-    `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`,
+    `Invalid escape "${def(o.cp)}"`,
+    `**Hint**: Use "${def(o.recommended)}"`,
   );
 
   //

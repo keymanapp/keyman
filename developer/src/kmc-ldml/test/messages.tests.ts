@@ -68,6 +68,6 @@ describe('LdmlCompilerMessages', function () {
         }
       }
     }
-    expect(complexInterpolation).to.equal([], 'Complex interpolation found, please only use the ${def(o... form')
+    expect(complexInterpolation).to.deep.equal([], 'Complex interpolation found, please only use the ${def(o... form')
   });
 });
