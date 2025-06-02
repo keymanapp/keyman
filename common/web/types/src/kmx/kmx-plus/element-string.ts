@@ -81,9 +81,9 @@ export class ElementString extends Array<ElemElement> {
           // error. So we can just exit here.
           return null; // UnicodeSet error
         }
-        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
+        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges, options?.x);
         if (!uset) {
-          return null; // UnicodeSet error already thrown
+          return null; // UnicodeSet error already added to callback
         }
         elem.uset = sections.uset.allocUset(uset, sections, options?.x);
         elem.value = sections.strs.allocString('', {...options, singleOk: true}); // no string
