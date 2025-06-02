@@ -990,8 +990,8 @@ begin
         TKeymanSentryClient.Breadcrumb('error',
           'Executing kmshell process to install keyboard packages failed"' +
            IntToStr(Ord(executeResult)) + '"', 'update');
-        KL.Log('InstallingState.DoInstallKeyman failed executing kmshell ' +
-          'or the update was not found in the cache');
+        KL.Log('InstallingState.LaunchInstallPackageProcess failed executing kmshell ' +
+          'process to install keyboard packages: "' + IntToStr(Ord(executeResult)) + '"');
         ChangeState(IdleState);
       end;
     end
