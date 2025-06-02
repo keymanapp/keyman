@@ -484,7 +484,7 @@ export class KeysCompiler extends SectionCompiler {
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
             hardware: layers.formId,
-            modifiers,
+            modifiers: modifiers || 'none',
           }, row)
         );
         valid = false;

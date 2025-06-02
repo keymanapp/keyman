@@ -34,7 +34,7 @@ export class LdmlCompilerMessages {
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
   static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_RowOnHardwareLayerHasTooManyKeys, x,
-    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`,
+    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${def(o.modifiers)} has too many keys`,
   );
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
@@ -272,14 +272,14 @@ export class LdmlCompilerMessages {
   static ERROR_DuplicateLayerWidth = SevError | 0x002C;
   static Error_DuplicateLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
     this.ERROR_DuplicateLayerWidth, x,
-    `Two or more layers have minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Two or more layers have minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Touch layers must have distinct widths.`
   );
 
   static ERROR_InvalidLayerWidth = SevError | 0x002D;
   static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidLayerWidth, x,
-    `Invalid Layers minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Invalid Layers minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
   );
 
