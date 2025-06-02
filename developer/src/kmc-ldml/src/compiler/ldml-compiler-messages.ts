@@ -270,11 +270,7 @@ export class LdmlCompilerMessages {
     `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
   );
 
-  static ERROR_UnparseableReorderSet = SevError | 0x0028;
-  static Error_UnparseableReorderSet = (o: { from: string, set: string }, x?: ObjectWithMetadata) => mx(
-    this.ERROR_UnparseableReorderSet, x,
-    `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`,
-  );
+  // Available: 0x0028
 
   static ERROR_InvalidVariableIdentifier = SevError | 0x0029;
   static Error_InvalidVariableIdentifier = (o: { id: string }, x?: ObjectWithMetadata) => mx(
