@@ -56,7 +56,7 @@ function add_zip_files() {
         # -1 indicates low compression (fastest)
         # -9 indicates ultra compression (slowest)
         ZIP_FLAGS+=($1)
-        if [[ $1 =~ -([0-9]) ]] then
+        if [[ $1 =~ -([0-9]) ]]; then
           SEVENZ_FLAGS+=("-mx${BASH_REMATCH[1]}")
         fi  
         shift;
