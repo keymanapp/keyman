@@ -68,16 +68,12 @@ PREPRELEASE=false
 UPDATE_VERSION_IN_PLIST=true
 DO_CODESIGN=true
 CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
-
-QUIET=true
+QUIET=false
 
 if builder_verbose; then
   BUILD_OPTIONS=""
-  QUIET_FLAG=
-  QUIET=false
 else
   BUILD_OPTIONS="-quiet"
-  QUIET_FLAG="-quiet"
 fi
 
 BUILD_ACTIONS="build"
@@ -289,7 +285,7 @@ do_publish() {
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
 
-  "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
+  "$KM4MIM_BASE_PATH/make-km-dmg.sh"
 
   # Create download info
   "$KM4MIM_BASE_PATH/write-download_info.sh"
