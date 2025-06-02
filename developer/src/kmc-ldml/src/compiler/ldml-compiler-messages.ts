@@ -110,23 +110,10 @@ export class LdmlCompilerMessages {
     `Key element with id "${def(o.id)}" is a layer switch key, but there is no matching display element by keyId. Keycap may be blank.`,
   );
 
-  /** annotate the to= or id= entry */
-  private static outputOrKeyId(o:{output?: string, keyId?: string}) {
-    if (o.output && o.keyId) {
-      return `output='${o.output}' keyId='${o.keyId}'`;
-    } else if(o.keyId) {
-      return `keyId='${o.keyId}'`;
-    } else if (o.output) {
-      return `output='${o.output}'`;
-    } else {
-      return '';
-    }
-  }
-
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
-  static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+  static Error_DisplayIsRepeated = (o:{display?: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_DisplayIsRepeated, x,
-    `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`,
+    `display display='${def(o.display)}' refers to the same keyId or output as another entry.`,
   );
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
@@ -235,9 +222,9 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
-  static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+  static Error_DisplayNeedsToOrId = (o:{display?: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_DisplayNeedsToOrId, x,
-    `display ${LdmlCompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`,
+    `display display='${def(o.display)}' needs output= or keyId=, but not both`,
   );
 
   static HINT_PUACharacters = SevHint | 0x0023;

@@ -35,18 +35,18 @@ export class DispCompiler extends SectionCompiler {
       for (const display of this.keyboard3.displays?.display) {
         const { output, keyId } = display;
         if ((output && keyId) || (!output && !keyId)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }, display));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ display: display.display }, display));
           return false;
         } else if (output) {
           if (tos.has(output)) {
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ output }, display));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ display: display.display }, display));
             return false;
           } else {
             tos.add(output);
           }
         } else if (keyId) {
           if (ids.has(keyId)) {
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ keyId }, display));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ display: display.display }, display));
             return false;
           } else {
             ids.add(keyId);
