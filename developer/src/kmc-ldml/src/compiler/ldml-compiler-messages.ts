@@ -134,18 +134,10 @@ export class LdmlCompilerMessages {
     `layers has invalid value formId=${def(o.formId)}`,
   );
 
-  private static layerIdOrEmpty(layer : string) {
-    if (layer) {
-      return ` on layer id=${def(layer)}`;
-    } else {
-      return '';
-    }
-  }
-
   static ERROR_InvalidModifier = SevError | 0x0014;
-  static Error_InvalidModifier = (o:{modifiers: string, id: string}, x?: ObjectWithMetadata) => mx(
+  static Error_InvalidModifier = (o:{modifiers: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidModifier, x,
-    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.id),
+    `layer has invalid modifiers='${def(o.modifiers)}'`,
   );
 
   static ERROR_MissingFlicks = SevError | 0x0015;

@@ -463,7 +463,7 @@ export class KeysCompiler extends SectionCompiler {
     const { modifiers } = layer;
     if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer)
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer)
       );
       valid = false;
     }
