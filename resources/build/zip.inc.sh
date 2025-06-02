@@ -35,6 +35,12 @@ function add_zip_files() {
         SEVENZ_FLAGS+=($1)
         shift
         ;;
+      -x@*)
+        # Filename for a file containing list of files to exclude from the archive - Identical flag to zip and 7z
+        ZIP_FLAGS+=($1)
+        SEVENZ_FLAGS+=($1)
+        shift
+        ;;
 
       # Zip flags that have a corresponding 7z flag
       -q)

@@ -84,22 +84,30 @@ if builder_start_action archive; then
   mkdir -p "${UPLOAD_PATH}"
 
   # Create Keyman Engine for Android archive
-  # zip/7z flags to: (disable progress), output log level 0
-  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar" ./
-  if [ "$BUILDER_OS" == "win" ]; then
-    # win uses 7zip flags
-    ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
-    zip_files "${ZIP_FILE[@]}" "-bd" "-bb0" "-x@exclude.in" "keyman-engine.aar" "Samples/" # need a?
-  else
-    ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
-    zip_files "${ZIP_FILE}" "-r" "-q" "-x@exclude.in" "keyman-engine.aar" "Samples/"
-  fi
+  ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
+  ZIP_FLAGS=("-q" "-r") # quiet, recursive
 
-  # Copy release APKs
+  builder_echo "Copying Keyman Engine for Android into ${UPLOAD_PATH}..."
+  cd "${UPLOAD_PATH}"
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar" ./
+  add_zip_files "${ZIP_FILE}" "${ZIP_FLAGS[@]}" "keyman-engine.aar"
+  rm -f "keyman-engine.aar"
+
+  builder_echo "Copying Keyman Engine for Android Sample projects into ${UPLOAD_PATH}..."
+  cp -rf "${KEYMAN_ROOT}/android/Samples" ./
+  add_zip_files "${ZIP_FILE}" "-x@../../zip-excludes" "${ZIP_FLAGS[@]}" "Samples"
+  rm -rf "Samples"
+
+  # Copy release APK
   cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" \
     "${UPLOAD_PATH}/${KEYMAN_APK}"
-  cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" \
-    "${UPLOAD_PATH}/${FIRSTVOICES_APK}"
+
+  # FirstVoices app
+
+  if [ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]; then
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" \
+      "${UPLOAD_PATH}/${FIRSTVOICES_APK}"
+  fi
 
   #
   # Write download info files
