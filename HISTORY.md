@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 19.0.55 alpha 2025-05-31
+
+* maint(linux): `sudo` not required for removing temporary files (#14086)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14089)
+
+## 19.0.54 alpha 2025-05-30
+
+* maint(linux): move TC build scripts to `resources/teamcity/linux` (#14061)
+
+## 19.0.53 alpha 2025-05-29
+
+* fix(developer): ensure that kmc doesn't skip validate phase of kmc-ldml (#14068)
+
 ## 19.0.52 alpha 2025-05-28
 
 * feat(developer): line numbers for tran compiler (#14037)
@@ -320,6 +333,25 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.237 stable 2025-05-30
+
+* maint(android): Update FirstVoices launcher icon and red theme (#13917)
+* fix(web): empty layout fontSize property should default to 1em (#13960)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13963)
+* chore(linux): Update debian changelog (#13888)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13957)
+* feat(android): log active keyboard, model IDs with reported errors (#14003)
+* chore(ios): FirstVoices certificate update (#14005)
+* feat(ios): log active keyboard, model IDs with reported errors (#14006)
+* fix(linux): configurable path in `.service` file when using basu (#13999)
+* maint(linux): add `--no-werror` option to not report warnings as errors (#14000)
+* fix(windows): use json file name against cache folder and ename Enter and Exit methods for TState Object (#14010)
+* chore(ios): update FirstVoices AppIcon (#14011)
+* maint: change builder_completion script to a .inc.sh (#14008)
+* fix(windows): only breadcrumb unexpected state on first run (#14026)
+* fix(windows): skip sending handle kmshell events to upgrade state machine for keyboard install modes (#14028)
+* fix(windows): fix sentry error message reporting (#14029)
 
 ## 18.0.236 stable 2025-05-12
 

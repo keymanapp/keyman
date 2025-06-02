@@ -27,7 +27,7 @@ export DOCKER_RUNNING=1
 and then run the build, e.g.
 
 ```bash
-resources/teamcity/keyman-linux-test.sh configure,build,test
+resources/teamcity/linux/keyman-linux-test.sh configure,build,test
 ```
 
 NOTE: by default this will run the build as `root` in the container,
