@@ -245,6 +245,10 @@ export class KeymanSentryManager {
   public set enabled(value: boolean) {
     this._enabled = value;
   }
+
+  public setExtraData(key: string, value: any): void {
+    Sentry.setExtra(key, value);
+  }
 }
 
 // Publish to the window.
