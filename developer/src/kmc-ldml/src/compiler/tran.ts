@@ -151,7 +151,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
     // We run this first because it's more helpful than the ABNF.
-    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+    cookedFrom = this.checkEscapes(cookedFrom, transform); // check for \uXXXX escapes before normalizing
 
     if (cookedFrom === '') {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }, transform));
@@ -301,10 +301,10 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     result._before = reorder.before;
     result._from = reorder.from;
     result._order = reorder.order;
-    if (reorder.from && this.checkEscapes(reorder.from) === null) {
+    if (reorder.from && this.checkEscapes(reorder.from, reorder) === null) {
       return null; // error'ed
     }
-    if (reorder.before && this.checkEscapes(reorder.before) === null) {
+    if (reorder.before && this.checkEscapes(reorder.before, reorder) === null) {
       return null; // error'ed
     }
     result.elements = sections.elem.allocElementString(sections, {x:reorder}, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
@@ -344,7 +344,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param cookedFrom the original string
    * @returns the original string, or null if an error was reported
    */
-  private checkEscapes(cookedFrom: string, transform?: LKTransform): string | null {
+  private checkEscapes(cookedFrom: string, transform?: ObjectWithMetadata): string | null {
     if (!cookedFrom) return cookedFrom;
 
     // should not follow marker prefix, nor marker prefix with range
