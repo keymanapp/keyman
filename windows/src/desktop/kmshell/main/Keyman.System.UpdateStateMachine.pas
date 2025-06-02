@@ -759,11 +759,32 @@ end;
 
 { DownloadingState }
 
+// Check that cache.json file exists and packages or keyman versions available to download
+function IsUpdateMetaDataValid(ucr :TUpdateCheckResponse) : Boolean;
+var
+  hasPackages, hasKeymanInstallReady: Boolean;
+begin
+
+  hasPackages := False;
+  hasKeymanInstallReady := False;
+  if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
+  begin
+    // check again has packages or keyman update
+    hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
+    hasKeymanInstallReady := (ucr.Status = ucrsUpdateReady) and TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+  end;
+
+  Result := (hasPackages Or hasKeymanInstallReady);
+
+end;
+
 procedure DownloadingState.EnterState;
 var
   DownloadResult: Boolean;
   RetryCount: Integer;
   FMutex: TKeymanMutex;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstallReady: Boolean;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
@@ -779,11 +800,15 @@ begin
       Exit;
     end;
 
-    RetryCount := 0;
-    repeat
-      DownloadResult := DownloadUpdatesBackground;
-      Inc(RetryCount);
-    until DownloadResult or (RetryCount >= 3);
+    if not IsUpdateMetaDataValid(ucr) then
+    begin
+      // Return to Idle state and check for Updates state
+      bucStateContext.RemoveCachedFiles;
+      ChangeState(IdleState);
+      bucStateContext.CurrentState.HandleCheck;
+    end;
+
+    DownloadResult := DownloadUpdatesBackground;
     FMutex.ReleaseOwnership;
   finally
     FreeAndNil(FMutex);
@@ -791,10 +816,10 @@ begin
 
   if (not DownloadResult) then
   begin
-    // Failed three times in this process; return to the
+    // Failed download; return to the
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-    'Error Updates not downloaded after 3 attempts');
+    'Error Updates not downloaded');
     bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
