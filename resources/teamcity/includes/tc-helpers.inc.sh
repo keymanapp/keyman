@@ -29,11 +29,11 @@ is_macos() {
 }
 
 install_nvm() {
-  if is_ubuntu; then
-    linux_install_nvm
-  elif is_macos; then
-    macos_install_packages nvm
+  if ! is_ubuntu; then
+    # on Windows and macOS build agents are configured manually
+    return 0
   fi
+  linux_install_nvm
 }
 
 # Set the environment variables required to use node/nvm and set the
@@ -52,11 +52,11 @@ set_variables_for_nvm() {
 }
 
 install_emscripten() {
-  if is_ubuntu; then
-    linux_install_emscripten
-  elif is_macos; then
-    macos_install_packages emscripten
+  if ! is_ubuntu; then
+    # on Windows and macOS build agents are configured manually
+    return 0
   fi
+  linux_install_emscripten
 }
 
 set_variables_for_emscripten() {

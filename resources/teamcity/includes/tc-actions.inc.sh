@@ -82,18 +82,3 @@ web_test_action() {
 
   builder_echo end web_test success "Finished running tests for native KeymanWeb"
 }
-
-developer_install_dependencies_action() {
-  builder_echo start "install dependencies" "Installing dependencies"
-
-  if is_ubuntu; then
-    linux_check_and_install_packages devscripts jq meson
-  elif is_macos; then
-    macos_install_packages bash jq python3 meson ninja coreutils pyenv
-  fi
-
-  install_nvm
-  install_emscripten
-
-  builder_echo end "install dependencies" success "Finished installing dependencies"
-}
