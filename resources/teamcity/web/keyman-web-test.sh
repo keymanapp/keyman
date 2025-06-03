@@ -16,7 +16,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 
@@ -40,7 +40,7 @@ function check_build_size_action() {
 }
 
 if builder_has_action all; then
-  web_install_dependencies_action
+  web_install_dependencies_on_linux_action
 
   set_variables_for_nvm
 
@@ -48,7 +48,7 @@ if builder_has_action all; then
   web_test_action
   check_build_size_action
 else
-  builder_run_action  configure   web_install_dependencies_action
+  builder_run_action  configure   web_install_dependencies_on_linux_action
 
   set_variables_for_nvm
 
