@@ -80,13 +80,12 @@ if builder_start_action archive; then
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
   KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
   FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
+  ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
+  ZIP_FLAGS=("-q" "-r") # quiet, recursive
 
   mkdir -p "${UPLOAD_PATH}"
 
   # Create Keyman Engine for Android archive
-  ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
-  ZIP_FLAGS=("-q" "-r") # quiet, recursive
-
   builder_echo "Copying Keyman Engine for Android into ${UPLOAD_PATH}..."
   cd "${UPLOAD_PATH}"
   cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar" ./
@@ -99,14 +98,12 @@ if builder_start_action archive; then
   rm -rf "Samples"
 
   # Copy release APK
-  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" \
-    "${UPLOAD_PATH}/${KEYMAN_APK}"
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" ./
 
   # FirstVoices app
 
   if [ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]; then
-    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" \
-      "${UPLOAD_PATH}/${FIRSTVOICES_APK}"
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" ./
   fi
 
   #
