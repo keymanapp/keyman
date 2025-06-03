@@ -103,7 +103,7 @@ function _publish_api_documentation() {
   # Upload new Keyman Developer API documentation to help.keyman.com
   builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
 
-  "${KEYMAN_ROOT}/resouyrces/build/help-keyman-com.sh" developer
+  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
 
   builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
 }
