@@ -59,12 +59,15 @@ linux_unit_tests_action() {
 }
 
 web_install_dependencies_action() {
+  if ! is_ubuntu; then
+    return 0
+  fi
+
   builder_echo start "install dependencies" "Install dependencies"
 
   # shellcheck disable=SC2086
   check_and_install_packages devscripts jq
 
-  # TODO: we can we do something similar for Windows and macOS?
   linux_install_nvm
   _install_playwright_dependencies
 

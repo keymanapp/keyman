@@ -38,14 +38,14 @@ cd "${KEYMAN_ROOT}/web"
 function _push_release_to_skeymancom() {
   # Push release to s.keyman.com/kmw/engine (do this before updating
   # downloads.keyman.com so we can ensure files are available)
-  builder_echo start publish "Publishing release to skeyman.com"
+  builder_echo start publish "Publishing release to s.keyman.com"
 
   cd "${S_KEYMAN_COM_PATH:=${KEYMAN_ROOT}/../s.keyman.com}"
   git pull https://github.com/keymanapp/s.keyman.com.git master
   cd "${KEYMAN_ROOT}/web"
   "${KEYMAN_ROOT}/web/ci.sh" prepare:s.keyman.com --s.keyman.com "${S_KEYMAN_COM_PATH}"
 
-  builder_echo end publish success "Finished publishing release to skeyman.com"
+  builder_echo end publish success "Finished publishing release to s.keyman.com"
 }
 
 function _zip_and_upload_artifacts() {
@@ -76,6 +76,12 @@ function _upload_help() {
 
 function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
+
+  # TODO: refactor to allow to run on Linux/macOS as well
+  if ! is_windows; then
+    builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
+    return 1
+  fi
 
   # Push release to s.keyman.com/kmw/engine (do this before updating
   # downloads.keyman.com so we can ensure files are available)
