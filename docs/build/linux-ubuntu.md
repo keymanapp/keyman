@@ -16,7 +16,7 @@ On Linux, you can build the following projects:
 The following projects **cannot** be built on Linux:
 
 - Keyman for Windows
-- Keyman Developer (other than node modules)
+- Keyman Developer (Windows components - IDE, setup, Server - has Windows components currently)
 - Keyman for macOS
 - Keyman for iOS
 
