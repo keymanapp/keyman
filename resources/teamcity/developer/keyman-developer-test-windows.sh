@@ -54,6 +54,11 @@ function publish_sentry_action() {
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 
+if ! is_windows; then
+  builder_echo error "This script is intended to be run on Windows only."
+  exit 1
+fi
+
 if builder_has_action all; then
   build_developer_action
   publish_sentry_action
