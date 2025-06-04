@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 
 developer_install_dependencies_on_linux_action() {
-  builder_echo start "install dependencies" "Installing dependencies"
-
-  if is_ubuntu; then
-    linux_check_and_install_packages devscripts jq meson
-  elif is_macos; then
-    macos_install_packages bash jq python3 meson ninja coreutils pyenv
+  if ! is_ubuntu; then
+    return 0
   fi
 
+  builder_echo start "install dependencies" "Installing dependencies"
+
+  linux_check_and_install_packages devscripts jq meson
   install_nvm
   install_emscripten
 
