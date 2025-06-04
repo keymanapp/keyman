@@ -1,5 +1,5 @@
 #!/bin/bash
-PYTHONPATH=.:${PYTHONPATH}
+export PYTHONPATH=.:${PYTHONPATH}
 
 XDG_CONFIG_HOME=$(mktemp --directory)
 export XDG_CONFIG_HOME
@@ -13,6 +13,8 @@ if [[ "$1" == "--coverage" ]]; then
 fi
 
 if [[ -n "${TEAMCITY_GIT_PATH}" ]]; then
+  PYTHONPATH=$(dirname "$0")/../tools:${PYTHONPATH}
+
   if ! pip3 list --format=columns | grep -q teamcity-messages; then
       if [[ -n "${TEAMCITY_PLATFORM}" ]] || [[ -n "${DOCKER_RUNNING}" ]]; then
         # Ubuntu 24.04+ prevents mixing pip and system packages and wants us
@@ -29,7 +31,9 @@ if [[ -n "${TEAMCITY_GIT_PATH}" ]]; then
       # shellcheck disable=SC2086
       pip3 install --user ${PIP_ARGS:-} teamcity-messages
   fi
-  test_module=teamcity.unittestpy
+  test_module=teamcity_pytestrunner.unittestpy
+  echo "##teamcity[testStarted name='|[keyman-config|] Running unit tests']"
+  echo "##teamcity[flowStarted flowId='unit_tests']"
 else
   test_module=unittest
   extra_opts=-v
@@ -38,4 +42,8 @@ fi
 # shellcheck disable=SC2086
 python3 ${coverage:-} -m "${test_module:-}" discover ${extra_opts:-} -s tests/ -p "*_tests.py"
 
+if [[ -n "${TEAMCITY_GIT_PATH}" ]]; then
+  echo "##teamcity[flowFinished flowId='unit_tests']"
+  echo "##teamcity[testFinished name='|[keyman-config|] Finished running unit tests']"
+fi
 rm -rf "${XDG_CONFIG_HOME}"

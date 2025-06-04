@@ -9,9 +9,10 @@ linux_clean_action() {
 
 # Install required dependencies for building Keyman on Linux.
 linux_install_dependencies_action() {
-  builder_heading "Installing dependencies"
+  builder_echo start "install dependencies" "Installing dependencies"
   . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
   checkAndInstallRequirements
+  builder_echo end "install dependencies" success "Finished installing dependencies"
 }
 
 # Install additional dependencies required for determining test coverage.
@@ -46,7 +47,8 @@ linux_build_action() {
 
 # Run unit tests for Keyman for Linux.
 linux_unit_tests_action() {
-  builder_echo start unit_tests "Running unit tests"
+  builder_echo startTest unit_tests "Running unit tests"
+
   rm -f /tmp/ibus-engine-keyman.log
   rm -f /tmp/ibus-daemon.log
   # symlink might point to wrong location, so delete it - will be re-created during tests
@@ -55,5 +57,5 @@ linux_unit_tests_action() {
   export NO_AT_BRIDGE=1
   # shellcheck disable=SC2068
   "${KEYMAN_ROOT}/linux/build.sh" test $@
-  builder_echo end unit_tests success "Finished running unit tests"
+  builder_echo endTest unit_tests success "Finished running unit tests"
 }

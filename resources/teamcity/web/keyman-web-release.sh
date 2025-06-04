@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2025 SIL International. All rights reserved.
-# Distributed under the MIT License. See LICENSE.md file in the project
-# root for full license information.
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # TC build script to build release of KeymanWeb.
 
@@ -28,8 +26,8 @@ builder_describe \
   "configure      install dependencies" \
   "build          build Web + embedded" \
   "publish        publish release" \
-  "--s.keyman.com=S_KEYMAN_COM_PATH        path to s.keyman.com repository" \
-  "--help.keyman.com=HELP_KEYMAN_COM_PATH  path to help.keyman.com repository"
+  "--s.keyman.com=S_KEYMAN_COM        path to s.keyman.com repository" \
+  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
 
 builder_parse "$@"
 
@@ -40,10 +38,10 @@ function _push_release_to_skeymancom() {
   # downloads.keyman.com so we can ensure files are available)
   builder_echo start publish "Publishing release to s.keyman.com"
 
-  cd "${S_KEYMAN_COM_PATH:=${KEYMAN_ROOT}/../s.keyman.com}"
+  cd "${S_KEYMAN_COM:=${KEYMAN_ROOT}/../s.keyman.com}"
   git pull https://github.com/keymanapp/s.keyman.com.git master
   cd "${KEYMAN_ROOT}/web"
-  "${KEYMAN_ROOT}/web/ci.sh" prepare:s.keyman.com --s.keyman.com "${S_KEYMAN_COM_PATH}"
+  "${KEYMAN_ROOT}/web/ci.sh" prepare:s.keyman.com --s.keyman.com "${S_KEYMAN_COM}"
 
   builder_echo end publish success "Finished publishing release to s.keyman.com"
 }
@@ -66,7 +64,7 @@ function _zip_and_upload_artifacts() {
 function _upload_help() {
   builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
 
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM_PATH:-${KEYMAN_ROOT}/../help.keyman.com}"
+  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
   cd "${KEYMAN_ROOT}/resources/build"
   "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
   cd "${KEYMAN_ROOT}/web"
