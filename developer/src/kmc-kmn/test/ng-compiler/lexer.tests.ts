@@ -13,8 +13,8 @@ import { Lexer, ScanRecogniser, Token, TokenTypes } from '../../src/ng-compiler/
 describe("Lexer Tests", () => {
   describe("ScanRecogniser", () => {
     it("can construct a ScanRecogniser", () => {
-      const sr = new ScanRecogniser(TokenTypes.STORE, new RegExp("^store"));
-      assert.deepEqual(sr.toString(), '[STORE,/^store/]');
+      const sr = new ScanRecogniser(TokenTypes.STORE, /^store/, true);
+      assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
     });
   });
   describe("Token", () => {
@@ -891,7 +891,7 @@ describe("Lexer Tests", () => {
     });
     it("can handle no newline at end of file", () => {
       const lexer    = new Lexer('beep');
-      const actual   = lexer.parse(true);
+      const actual   = lexer.parse(true, true);
       const expected = [
         new Token(TokenTypes.BEEP, 'beep'),
         new Token(TokenTypes.EOF, '', 1, 1, 'beep'),
@@ -903,7 +903,7 @@ describe("Lexer Tests", () => {
 
 function recogniseToken(type: TokenTypes, text: String): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(false);
+  const actual   = lexer.parse(false, true);
   const line     = (type === TokenTypes.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
@@ -911,7 +911,7 @@ function recogniseToken(type: TokenTypes, text: String): void {
 
 function recogniseTokens(text: String, expected: Token[]): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(false);
+  const actual   = lexer.parse(false, true);
   assert.deepEqual(actual, expected);
 }
 

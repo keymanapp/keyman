@@ -111,14 +111,16 @@ export enum TokenTypes {
 export class ScanRecogniser {
   tokenType: TokenTypes;
   regExp: RegExp;
+  emit: boolean;
 
-  public constructor(tokenType: TokenTypes, regExp: RegExp) {
+  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
     this.tokenType = tokenType;
     this.regExp    = regExp;
+    this.emit      = emit;
   }
 
   public toString(): String {
-    return `[${this.tokenType},${this.regExp}]`;
+    return `[${this.tokenType},${this.regExp},${this.emit}]`;
   }
 }
 
@@ -139,103 +141,103 @@ export class Lexer {
   }
 
   private static scanRecognisers = [
-    new ScanRecogniser(TokenTypes.BASELAYOUT,          /^&baselayout(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.BITMAP,              /^&bitmap(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CASEDKEYS,           /^&casedkeys(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.COPYRIGHT,           /^&copyright(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.DISPLAYMAP,          /^&displaymap(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ETHNOLOGUECODE,      /^&ethnologuecode(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.HOTKEY,              /^&hotkey(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.INCLUDECODES,        /^&includecodes(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KEYBOARDVERSION,     /^&keyboardversion(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KMW_EMBEDCSS,        /^&kmw_embedcss(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KMW_EMBEDJS,         /^&kmw_embedjs(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KMW_HELPFILE,        /^&kmw_helpfile(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KMW_HELPTEXT,        /^&kmw_helptext(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KMW_RTL,             /^&kmw_rtl(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.LANGUAGE,            /^&language(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.LAYER,               /^&layer(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.LAYOUTFILE,          /^&layoutfile(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.MESSAGE,             /^&message(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.MNEMONICLAYOUT,      /^&mnemoniclayout(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NAME,                /^&name(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NEWLAYER,            /^&newlayer(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.OLDCHARPOSMATCHING,  /^&oldcharposmatching(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.OLDLAYER,            /^&oldlayer(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.PLATFORM,            /^&platform(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.TARGETS,             /^&targets(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.VERSION,             /^&version(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.VISUALKEYBOARD,      /^&visualkeyboard(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.WINDOWSLANGUAGES,    /^&windowslanguages(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CAPSALWAYSOFF,       /^&capsalwaysoff(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CAPSONONLY,          /^&capsononly(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.SHIFTFREESCAPS,      /^&shiftfreescaps(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CAPS,                /^caps(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ALWAYS,              /^always(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.OFF,                 /^off(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ON,                  /^on(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ONLY,                /^only(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.SHIFT,               /^shift(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.FREES,               /^frees(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.BASELAYOUT_SHORTCUT, /^baselayout(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.LAYER_SHORTCUT,      /^layer(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.PLATFORM_SHORTCUT,   /^platform(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ANY,                 /^any(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.BEEP,                /^beep(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.BEGIN,               /^begin(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CALL,                /^call(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.CONTEXT,             /^context(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.DEADKEY,             /^(deadkey|dk)(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.GROUP,               /^group(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.IF,                  /^if(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.INDEX,               /^index(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.MATCH,               /^match(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NOMATCH,             /^nomatch(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NOTANY,              /^notany(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NUL,                 /^nul(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.OUTS,                /^outs(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.RESET,               /^reset(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.RETURN,              /^return(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.SAVE,                /^save(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.SET,                 /^set(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.STORE,               /^store(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.USE,                 /^use(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.UNICODE,             /^unicode(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.NEWCONTEXT,          /^newcontext(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.POSTKEYSTROKE,       /^postkeystroke(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.ANSI,                /^ansi(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.READONLY,            /^readonly(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.USING,               /^using(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KEYS,                /^keys(?![a-z])/i),
-    new ScanRecogniser(TokenTypes.KEYMAN,              /^\$keyman:/i),
-    new ScanRecogniser(TokenTypes.KEYMANONLY,          /^\$keymanonly:/i),
-    new ScanRecogniser(TokenTypes.KEYMANWEB,           /^\$keymanweb:/i),
-    new ScanRecogniser(TokenTypes.KMFL,                /^\$kmfl:/i),
-    new ScanRecogniser(TokenTypes.WEAVER,              /^\$weaver:/i),
-    new ScanRecogniser(TokenTypes.LEFT_BR,             /^\(/),
-    new ScanRecogniser(TokenTypes.RIGHT_BR,            /^\)/),
-    new ScanRecogniser(TokenTypes.LEFT_SQ,             /^\[/),
-    new ScanRecogniser(TokenTypes.RIGHT_SQ,            /^\]/),
-    new ScanRecogniser(TokenTypes.CHEVRON,             /^>/),
-    new ScanRecogniser(TokenTypes.PLUS,                /^\+/),
-    new ScanRecogniser(TokenTypes.COMMA,               /^,/),
-    new ScanRecogniser(TokenTypes.NOT_EQUAL,           /^!=/),
-    new ScanRecogniser(TokenTypes.EQUAL,               /^=/),
-    new ScanRecogniser(TokenTypes.RANGE,               /^\.\./),
-    new ScanRecogniser(TokenTypes.U_CHAR,              /^U\+[0-9A-F]{1,6}/i),
-    new ScanRecogniser(TokenTypes.STRING,              /^('.*?'|\".*?\")/),
-    new ScanRecogniser(TokenTypes.MODIFIER,            /^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\S\r\n])/i),
-    new ScanRecogniser(TokenTypes.KEY_CODE,            /^(((K_|T_|U_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/),
-    new ScanRecogniser(TokenTypes.DECIMAL,             /^d\d+/),
-    new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+/),
-    new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+/),
-    new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i),
-    new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i),
-    new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/),
-    new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/),
-    new ScanRecogniser(TokenTypes.NEWLINE,             /^(\r\n|\n|\r)/),
-    new ScanRecogniser(TokenTypes.NAMED_CONSTANT,      /^\$\S+/),
-    new ScanRecogniser(TokenTypes.PARAMETER,           /^[^,\)\s]+/),
+    new ScanRecogniser(TokenTypes.BASELAYOUT,          /^&baselayout(?![a-z])/i,                                true),
+    new ScanRecogniser(TokenTypes.BITMAP,              /^&bitmap(?![a-z])/i,                                    true),
+    new ScanRecogniser(TokenTypes.CASEDKEYS,           /^&casedkeys(?![a-z])/i,                                 true),
+    new ScanRecogniser(TokenTypes.COPYRIGHT,           /^&copyright(?![a-z])/i,                                 true),
+    new ScanRecogniser(TokenTypes.DISPLAYMAP,          /^&displaymap(?![a-z])/i,                                true),
+    new ScanRecogniser(TokenTypes.ETHNOLOGUECODE,      /^&ethnologuecode(?![a-z])/i,                            true),
+    new ScanRecogniser(TokenTypes.HOTKEY,              /^&hotkey(?![a-z])/i,                                    true),
+    new ScanRecogniser(TokenTypes.INCLUDECODES,        /^&includecodes(?![a-z])/i,                              true),
+    new ScanRecogniser(TokenTypes.KEYBOARDVERSION,     /^&keyboardversion(?![a-z])/i,                           true),
+    new ScanRecogniser(TokenTypes.KMW_EMBEDCSS,        /^&kmw_embedcss(?![a-z])/i,                              true),
+    new ScanRecogniser(TokenTypes.KMW_EMBEDJS,         /^&kmw_embedjs(?![a-z])/i,                               true),
+    new ScanRecogniser(TokenTypes.KMW_HELPFILE,        /^&kmw_helpfile(?![a-z])/i,                              true),
+    new ScanRecogniser(TokenTypes.KMW_HELPTEXT,        /^&kmw_helptext(?![a-z])/i,                              true),
+    new ScanRecogniser(TokenTypes.KMW_RTL,             /^&kmw_rtl(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.LANGUAGE,            /^&language(?![a-z])/i,                                  true),
+    new ScanRecogniser(TokenTypes.LAYER,               /^&layer(?![a-z])/i,                                     true),
+    new ScanRecogniser(TokenTypes.LAYOUTFILE,          /^&layoutfile(?![a-z])/i,                                true),
+    new ScanRecogniser(TokenTypes.MESSAGE,             /^&message(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.MNEMONICLAYOUT,      /^&mnemoniclayout(?![a-z])/i,                            true),
+    new ScanRecogniser(TokenTypes.NAME,                /^&name(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.NEWLAYER,            /^&newlayer(?![a-z])/i,                                  true),
+    new ScanRecogniser(TokenTypes.OLDCHARPOSMATCHING,  /^&oldcharposmatching(?![a-z])/i,                        true),
+    new ScanRecogniser(TokenTypes.OLDLAYER,            /^&oldlayer(?![a-z])/i,                                  true),
+    new ScanRecogniser(TokenTypes.PLATFORM,            /^&platform(?![a-z])/i,                                  true),
+    new ScanRecogniser(TokenTypes.TARGETS,             /^&targets(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.VERSION,             /^&version(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.VISUALKEYBOARD,      /^&visualkeyboard(?![a-z])/i,                            true),
+    new ScanRecogniser(TokenTypes.WINDOWSLANGUAGES,    /^&windowslanguages(?![a-z])/i,                          true),
+    new ScanRecogniser(TokenTypes.CAPSALWAYSOFF,       /^&capsalwaysoff(?![a-z])/i,                             true),
+    new ScanRecogniser(TokenTypes.CAPSONONLY,          /^&capsononly(?![a-z])/i,                                true),
+    new ScanRecogniser(TokenTypes.SHIFTFREESCAPS,      /^&shiftfreescaps(?![a-z])/i,                            true),
+    new ScanRecogniser(TokenTypes.CAPS,                /^caps(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.ALWAYS,              /^always(?![a-z])/i,                                     true),
+    new ScanRecogniser(TokenTypes.OFF,                 /^off(?![a-z])/i,                                        true),
+    new ScanRecogniser(TokenTypes.ON,                  /^on(?![a-z])/i,                                         true),
+    new ScanRecogniser(TokenTypes.ONLY,                /^only(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.SHIFT,               /^shift(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.FREES,               /^frees(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.BASELAYOUT_SHORTCUT, /^baselayout(?![a-z])/i,                                 true),
+    new ScanRecogniser(TokenTypes.LAYER_SHORTCUT,      /^layer(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.PLATFORM_SHORTCUT,   /^platform(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.ANY,                 /^any(?![a-z])/i,                                        true),
+    new ScanRecogniser(TokenTypes.BEEP,                /^beep(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.BEGIN,               /^begin(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.CALL,                /^call(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.CONTEXT,             /^context(?![a-z])/i,                                    true),
+    new ScanRecogniser(TokenTypes.DEADKEY,             /^(deadkey|dk)(?![a-z])/i,                               true),
+    new ScanRecogniser(TokenTypes.GROUP,               /^group(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.IF,                  /^if(?![a-z])/i,                                         true),
+    new ScanRecogniser(TokenTypes.INDEX,               /^index(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.MATCH,               /^match(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.NOMATCH,             /^nomatch(?![a-z])/i,                                    true),
+    new ScanRecogniser(TokenTypes.NOTANY,              /^notany(?![a-z])/i,                                     true),
+    new ScanRecogniser(TokenTypes.NUL,                 /^nul(?![a-z])/i,                                        true),
+    new ScanRecogniser(TokenTypes.OUTS,                /^outs(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.RESET,               /^reset(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.RETURN,              /^return(?![a-z])/i,                                     true),
+    new ScanRecogniser(TokenTypes.SAVE,                /^save(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.SET,                 /^set(?![a-z])/i,                                        true),
+    new ScanRecogniser(TokenTypes.STORE,               /^store(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.USE,                 /^use(?![a-z])/i,                                        true),
+    new ScanRecogniser(TokenTypes.UNICODE,             /^unicode(?![a-z])/i,                                    true),
+    new ScanRecogniser(TokenTypes.NEWCONTEXT,          /^newcontext(?![a-z])/i,                                 true),
+    new ScanRecogniser(TokenTypes.POSTKEYSTROKE,       /^postkeystroke(?![a-z])/i,                              true),
+    new ScanRecogniser(TokenTypes.ANSI,                /^ansi(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.READONLY,            /^readonly(?![a-z])/i,                                   true),
+    new ScanRecogniser(TokenTypes.USING,               /^using(?![a-z])/i,                                      true),
+    new ScanRecogniser(TokenTypes.KEYS,                /^keys(?![a-z])/i,                                       true),
+    new ScanRecogniser(TokenTypes.KEYMAN,              /^\$keyman:/i,                                           true),
+    new ScanRecogniser(TokenTypes.KEYMANONLY,          /^\$keymanonly:/i,                                       true),
+    new ScanRecogniser(TokenTypes.KEYMANWEB,           /^\$keymanweb:/i,                                        true),
+    new ScanRecogniser(TokenTypes.KMFL,                /^\$kmfl:/i,                                             true),
+    new ScanRecogniser(TokenTypes.WEAVER,              /^\$weaver:/i,                                           true),
+    new ScanRecogniser(TokenTypes.LEFT_BR,             /^\(/,                                                   true),
+    new ScanRecogniser(TokenTypes.RIGHT_BR,            /^\)/,                                                   true),
+    new ScanRecogniser(TokenTypes.LEFT_SQ,             /^\[/,                                                   true),
+    new ScanRecogniser(TokenTypes.RIGHT_SQ,            /^\]/,                                                   true),
+    new ScanRecogniser(TokenTypes.CHEVRON,             /^>/,                                                    true),
+    new ScanRecogniser(TokenTypes.PLUS,                /^\+/,                                                   true),
+    new ScanRecogniser(TokenTypes.COMMA,               /^,/,                                                    true),
+    new ScanRecogniser(TokenTypes.NOT_EQUAL,           /^!=/,                                                   true),
+    new ScanRecogniser(TokenTypes.EQUAL,               /^=/,                                                    true),
+    new ScanRecogniser(TokenTypes.RANGE,               /^\.\./,                                                 true),
+    new ScanRecogniser(TokenTypes.U_CHAR,              /^U\+[0-9A-F]{1,6}/i,                                    true),
+    new ScanRecogniser(TokenTypes.STRING,              /^('.*?'|\".*?\")/,                                      true),
+    new ScanRecogniser(TokenTypes.MODIFIER,            /^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\S\r\n])/i, true),
+    new ScanRecogniser(TokenTypes.KEY_CODE,            /^(((K_|T_|U_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/,     true),
+    new ScanRecogniser(TokenTypes.DECIMAL,             /^d\d+/,                                                 true),
+    new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+/,                                         true),
+    new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+/,                                               true),
+    new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i,                        true),
+    new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i,             true),
+    new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/,                                           false),
+    new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/,                       true),
+    new ScanRecogniser(TokenTypes.NEWLINE,             /^(\r\n|\n|\r)/,                                         true),
+    new ScanRecogniser(TokenTypes.NAMED_CONSTANT,      /^\$\S+/,                                                true),
+    new ScanRecogniser(TokenTypes.PARAMETER,           /^[^,\)\s]+/,                                            true),
   ];
 
   static {
@@ -245,12 +247,12 @@ export class Lexer {
     }
   }
 
-  public parse(addEOF: boolean=true): Token[]  {
-    while (this.matchToken(addEOF));
+  public parse(addEOF: boolean=true, emitAll: boolean=false): Token[]  {
+    while (this.matchToken(addEOF, emitAll));
     return this.tokenList;
   }
 
-  private matchToken(addEOF: boolean) {
+  private matchToken(addEOF: boolean, emitAll: boolean) {
     let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
@@ -263,14 +265,16 @@ export class Lexer {
       match      = recogniser.regExp.exec(this.buffer.toString());
 
       if (match) {
-        this.line   = this.line.concat(match[0].toString());
+        this.line = this.line.concat(match[0].toString());
         let line: String = null;
         if (recogniser.tokenType === TokenTypes.NEWLINE) {
           line      = this.line;
           this.line = '';
         }
         const token = new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line);
-        this.tokenList.push(token);
+        if (emitAll || recogniser.emit) {
+          this.tokenList.push(token);
+        }
         tokenMatch  = true;
         this.buffer = this.buffer.substring(match[0].length);
         if (recogniser.tokenType === TokenTypes.NEWLINE) {
