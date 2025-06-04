@@ -1,3 +1,4 @@
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # This script should be the identical for nightly/beta/stable for a given platform
 #

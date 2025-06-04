@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
 developer_install_dependencies_on_linux_action() {
   if ! is_ubuntu; then
