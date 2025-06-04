@@ -33,7 +33,8 @@ export class LineRule extends SingleChildRule {
 export class ContentLineRule extends SingleChildRule {
   public constructor() {
     super();
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const content: Rule       = new ContentRule();
     const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
     const optComment: Rule    = new OptionalRule(commentRule);
@@ -47,7 +48,8 @@ export class ContentLineRule extends SingleChildRule {
 export class BlankLineRule extends SingleChildRule {
   public constructor() {
     super();
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
     const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
@@ -67,7 +69,8 @@ export class PaddingRule extends SingleChildRule {
 export class ContinuationNewlineRule extends SingleChildRule {
   public constructor() {
     super();
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const continuation: Rule  = new TokenRule(TokenTypes.CONTINUATION);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule(
@@ -93,14 +96,6 @@ export class ContentRule extends SingleChildRule {
       normalStoreAssign,
       ruleBlock,
     ]);
-  }
-}
-
-export class OptionalWhiteSpaceRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
-    this.rule = new OptionalRule(whitespace);
   }
 }
 
@@ -165,7 +160,8 @@ export class TextRangeRule extends SingleChildRule {
 export class RangeEndRule extends SingleChildRule {
   public constructor() {
     super();
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const range: Rule         = new TokenRule(TokenTypes.RANGE);
     const simpleText: Rule    = new SimpleTextRule();
     this.rule = new SequenceRule([
@@ -178,7 +174,8 @@ export class VirtualKeyRule extends SingleChildRule {
   public constructor() {
     super();
     const leftSquare: Rule         = new TokenRule(TokenTypes.LEFT_SQ);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const whitespace: Rule         = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule      = new OptionalRule(whitespace);
     const spacedModifier: Rule     = new SpacedModifierRule();
     const manySpacedModifier: Rule = new ManyRule(spacedModifier);
     const keyCode: Rule            = new TokenRule(TokenTypes.KEY_CODE, true);
@@ -309,7 +306,8 @@ export class BeginStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const begin: Rule                = new TokenRule(TokenTypes.BEGIN, true);
-    const optSpacedEntryPoint: Rule  = new OptionalSpacedEntryPointRule();
+    const spacedEntryPointRule: Rule = new SpacedEntryPointRule();
+    const optSpacedEntryPoint: Rule  = new OptionalRule(spacedEntryPointRule);
     this.rule = new SequenceRule([begin, optSpacedEntryPoint]);
   }
 
@@ -348,14 +346,6 @@ export class EntryPointRule extends SingleChildRule {
   }
 }
 
-export class OptionalSpacedEntryPointRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const spacedEntryPointRule: Rule = new SpacedEntryPointRule();
-    this.rule = new OptionalRule(spacedEntryPointRule);
-  }
-}
-
 export class SpacedChevronRule extends SingleChildRule {
   public constructor() {
     super();
@@ -390,7 +380,8 @@ export class BracketedGroupNameRule extends SingleChildRule {
   public constructor() {
     super();
     const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule      = new OptionalWhiteSpaceRule();
+    const whitespace: Rule         = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule      = new OptionalRule(whitespace);
     const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
     const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
@@ -402,8 +393,9 @@ export class BracketedGroupNameRule extends SingleChildRule {
 export class GroupBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const groupStatement: Rule          = new GroupStatementRule();
-    const optSpacedGroupQualifier: Rule = new OptionalSpacedGroupQualifierRule();
+    const groupStatement: Rule           = new GroupStatementRule();
+    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule();
+    const optSpacedGroupQualifier: Rule  = new OptionalRule(spacedGroupQualifierRule);
     this.rule = new SequenceRule([groupStatement, optSpacedGroupQualifier]);
   }
 
@@ -480,14 +472,6 @@ export class GroupNameRule extends SingleChildRule {
       }
       return parseSuccess;
     };
-}
-
-export class OptionalSpacedGroupQualifierRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule();
-    this.rule = new OptionalRule(spacedGroupQualifierRule);
-  }
 }
 
 export class SpacedGroupQualifierRule extends SingleChildRule {
@@ -646,9 +630,12 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
 export class UsingKeysInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPostPadNul: Rule          = new OptionalPostPadNulRule();
-    const optPostPadIfLikeBlock: Rule  = new OptionalPostPadIfLikeBlockRule();
-    const optPostPadInputContext: Rule = new OptionalPostPadInputContextRule();
+    const postPadNul: Rule             = new PostPadNulRule();
+    const optPostPadNul: Rule          = new OptionalRule(postPadNul);
+    const postPadIfLikeBlock: Rule     = new PostPadIfLikeBlockRule();
+    const optPostPadIfLikeBlock: Rule  = new OptionalRule(postPadIfLikeBlock);
+    const postPadInputContext: Rule    = new PostPadInputContextRule();
+    const optPostPadInputContext: Rule = new OptionalRule(postPadInputContext);
     const plus: Rule                   = new TokenRule(TokenTypes.PLUS);
     const padding: Rule                = new PaddingRule();
     const keystoke: Rule               = new KeystrokeRule();
@@ -666,8 +653,10 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
 export class ReadOnlyInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
-    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
+    const postPadNul: Rule            = new PostPadNulRule();
+    const optPostPadNul: Rule         = new OptionalRule(postPadNul);
+    const postPadIfLikeBlock: Rule    = new PostPadIfLikeBlockRule();
+    const optPostPadIfLikeBlock: Rule = new OptionalRule(postPadIfLikeBlock);
     const keystoke: Rule              = new KeystrokeRule();
     this.rule = new SequenceRule([
       optPostPadNul, optPostPadIfLikeBlock, keystoke,
@@ -678,8 +667,10 @@ export class ReadOnlyInputBlockRule extends SingleChildRule {
 export class ContextInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPostPadNul: Rule         = new OptionalPostPadNulRule();
-    const optPostPadIfLikeBlock: Rule = new OptionalPostPadIfLikeBlockRule();
+    const postPadNul: Rule            = new PostPadNulRule();
+    const optPostPadNul: Rule         = new OptionalRule(postPadNul);
+    const postPadIfLikeBlock: Rule    = new PostPadIfLikeBlockRule();
+    const optPostPadIfLikeBlock: Rule = new OptionalRule(postPadIfLikeBlock);
     const inputContext: Rule          = new InputContextRule();
     this.rule = new SequenceRule([
       optPostPadNul, optPostPadIfLikeBlock, inputContext,
@@ -691,16 +682,9 @@ export class NulInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const nulRule: Rule              = new TokenRule(TokenTypes.NUL, true);
-    const optPrePadIfLikeBlock: Rule = new OptionalPrePadIfLikeBlockRule();
+    const prePadIfLikeBlock: Rule    = new PrePadIfLikeBlockRule();
+    const optPrePadIfLikeBlock: Rule = new OptionalRule(prePadIfLikeBlock);
     this.rule = new SequenceRule([nulRule, optPrePadIfLikeBlock]);
-  }
-}
-
-export class OptionalPostPadNulRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const postPadNul: Rule = new PostPadNulRule();
-    this.rule = new OptionalRule(postPadNul);
   }
 }
 
@@ -710,22 +694,6 @@ export class PostPadNulRule extends SingleChildRule {
     const nulRule: Rule = new TokenRule(TokenTypes.NUL, true);
     const padding: Rule = new PaddingRule();
     this.rule = new SequenceRule([nulRule, padding]);
-  }
-}
-
-export class OptionalPrePadIfLikeBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const prePadIfLikeBlock: Rule = new PrePadIfLikeBlockRule();
-    this.rule = new OptionalRule(prePadIfLikeBlock);
-  }
-}
-
-export class OptionalPostPadIfLikeBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const postPadIfLikeBlock: Rule = new PostPadIfLikeBlockRule();
-    this.rule = new OptionalRule(postPadIfLikeBlock);
   }
 }
 
@@ -744,14 +712,6 @@ export class PostPadIfLikeBlockRule extends SingleChildRule {
     const ifLikeBlock: Rule = new IfLikeBlockRule();
     const padding: Rule     = new PaddingRule();
     this.rule = new SequenceRule([ifLikeBlock, padding]);
-  }
-}
-
-export class OptionalPostPadInputContextRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const postPadInputContext: Rule = new PostPadInputContextRule();
-    this.rule = new OptionalRule(postPadInputContext);
   }
 }
 
@@ -900,8 +860,8 @@ export class AbstractIfStoreStatementRule extends SingleChildRule {
     super();
     this.ifRule        = new TokenRule(TokenTypes.IF, true);
     this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
-    this.optWhitespace = new OptionalWhiteSpaceRule();
     this.whitespace    = new TokenRule(TokenTypes.WHITESPACE);
+    this.optWhitespace = new OptionalRule(this.whitespace);
     this.comparison    = new ComparisonRule();
     this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
   }
@@ -1041,7 +1001,8 @@ export class BracketedStringRule extends SingleChildRule {
   public constructor() {
     super();
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const string: Rule        = new TokenRule(TokenTypes.STRING, true);
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
@@ -1078,17 +1039,10 @@ export class RhsBlockRule extends SingleChildRule {
 export class ContextOutputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const optPostPadContext: Rule = new OptionalPostPadContextRule();
-    const outputBlock: Rule       = new OutputBlockRule();
-    this.rule = new SequenceRule([optPostPadContext, outputBlock]);
-  }
-}
-
-export class OptionalPostPadContextRule extends SingleChildRule {
-  public constructor() {
-    super();
     const postPadContextRule: Rule = new PostPadContextRule();
-    this.rule = new OptionalRule(postPadContextRule);
+    const optPostPadContext: Rule  = new OptionalRule(postPadContextRule)
+    const outputBlock: Rule        = new OutputBlockRule();
+    this.rule = new SequenceRule([optPostPadContext, outputBlock]);
   }
 }
 
@@ -1184,7 +1138,8 @@ export class IndexStatementRule extends SingleChildRule {
     super();
     const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule   = new OptionalWhiteSpaceRule();
+    const whitespace: Rule      = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule   = new OptionalRule(whitespace);
     const normalStoreName: Rule = new NormalStoreNameRule();
     const spacedComma: Rule     = new SpacedCommaRule();
     const offset: Rule          = new OffsetRule();
@@ -1216,7 +1171,8 @@ export class IndexStatementRule extends SingleChildRule {
 export class SpacedCommaRule extends SingleChildRule {
   public constructor() {
     super();
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
     const comma: Rule         = new TokenRule(TokenTypes.COMMA);
     this.rule = new SequenceRule([optWhitespace, comma, optWhitespace]);
   }
@@ -1244,10 +1200,11 @@ export class OffsetRule extends SingleChildRule {
 export class ContextStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const index: Rule             = new TokenRule(TokenTypes.CONTEXT, true);
-    const leftBracket: Rule       = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule     = new OptionalWhiteSpaceRule();
-    const offset: Rule            = new OffsetRule();
+    const index: Rule         = new TokenRule(TokenTypes.CONTEXT, true);
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule = new OptionalRule(whitespace);
+    const offset: Rule        = new OffsetRule();
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       index,

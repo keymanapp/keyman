@@ -8,9 +8,9 @@
  * System and Variable Store Rules
  */
 
-import { OptionalWhiteSpaceRule, PrePadTextRule } from "./kmn-analyser.js";
+import { PrePadTextRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
-import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule } from "./recursive-descent.js";
+import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, OptionalRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -45,7 +45,8 @@ export class SystemStoreRule extends SingleChildRule {
     const systemStoreName: Rule = new SystemStoreNameRule();
     const store                 = new TokenRule(TokenTypes.STORE);
     const leftBracket           = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace         = new OptionalWhiteSpaceRule();
+    const whitespace: Rule      = new TokenRule(TokenTypes.WHITESPACE)
+    const optWhitespace: Rule   = new OptionalRule(whitespace);
     const rightBracket          = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       store,
@@ -139,7 +140,8 @@ export class BracketedStoreNameRule extends SingleChildRule {
   public constructor() {
     super();
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule   = new OptionalWhiteSpaceRule();
+    const whitespace: Rule      = new TokenRule(TokenTypes.WHITESPACE);
+    const optWhitespace: Rule   = new OptionalRule(whitespace);
     const normalStoreName: Rule = new NormalStoreNameRule();
     const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
@@ -181,9 +183,9 @@ export class SetStoreRule extends SingleChildRule {
     super();
     const set: Rule             = new TokenRule(TokenTypes.SET, true);
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule   = new OptionalWhiteSpaceRule();
-    const normalStoreName: Rule = new NormalStoreNameRule();
     const whitespace: Rule      = new TokenRule(TokenTypes.WHITESPACE);
+    const optWhitespace: Rule   = new OptionalRule(whitespace);
+    const normalStoreName: Rule = new NormalStoreNameRule();
     const equal: Rule           = new TokenRule(TokenTypes.EQUAL);
     const stringRule: Rule      = new TokenRule(TokenTypes.STRING, true);
     const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
@@ -219,9 +221,9 @@ export class SetLayerRule extends SingleChildRule {
     super();
     const set: Rule           = new TokenRule(TokenTypes.SET, true);
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
     const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE);
+    const optWhitespace: Rule = new OptionalRule(whitespace);
+    const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
     const equal: Rule         = new TokenRule(TokenTypes.EQUAL);
     const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
