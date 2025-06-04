@@ -27,22 +27,24 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st: Substitutions): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
-        transformGroup.transform?.forEach(({ to, from }) => {
-          st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
-          st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
+        transformGroup.transform?.forEach((transform) => {
+          const { to, from } = transform;
+          st.addSetAndStringSubtitution(SubstitutionUse.consume, from, transform);
+          st.addSetAndStringSubtitution(SubstitutionUse.emit, to, transform);
           const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(from);
           const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
           if (mapFrom) {
             // add the 'from' as a match
-            st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
+            st.set.add(SubstitutionUse.consume, [mapFrom[1]], transform);
           }
           if (mapTo) {
             // add the 'from' as a match
-            st.set.add(SubstitutionUse.emit, [mapTo[1]]);
+            st.set.add(SubstitutionUse.emit, [mapTo[1]], transform);
           }
         });
-        transformGroup.reorder?.forEach(({ before }) => {
-          st.addStringSubstitution(SubstitutionUse.consume, before);
+        transformGroup.reorder?.forEach((reorder) => {
+          const { before } = reorder;
+          st.addStringSubstitution(SubstitutionUse.consume, before, reorder);
         });
       }));
     return true;
@@ -305,8 +307,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     if (reorder.before && this.checkEscapes(reorder.before) === null) {
       return null; // error'ed
     }
-    result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
-    result.before = sections.elem.allocElementString(sections, reorder.before);
+    result.elements = sections.elem.allocElementString(sections, {x:reorder}, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
+    result.before = sections.elem.allocElementString(sections, {x:reorder}, reorder.before);
     if (!result.elements || !result.before) {
       return null; // already error'ed
     } else {

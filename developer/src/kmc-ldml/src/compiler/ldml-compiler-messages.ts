@@ -108,15 +108,16 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_GestureKeyNotFoundInKeyBag = SevError | 0x000B;
-  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x?: ObjectWithMetadata) =>
-  mx(
+  static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_GestureKeyNotFoundInKeyBag, x,
     `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`,
   );
 
   static HINT_NoDisplayForMarker = SevHint | 0x000C;
-  static Hint_NoDisplayForMarker = (o: { id: string }) =>
-  m(this.HINT_NoDisplayForMarker, `Key element with id "${def(o.id)}" has only marker output, but there is no matching display element by output or keyId. Keycap may be blank.`);
+  static Hint_NoDisplayForMarker = (o: { id: string }, x?: ObjectWithMetadata) => mx(
+    this.HINT_NoDisplayForMarker, x,
+    `Key element with id "${def(o.id)}" has only marker output, but there is no matching display element by output or keyId. Keycap may be blank.`,
+  );
 
   static ERROR_InvalidVersion = SevError | 0x000D;
   static Error_InvalidVersion = (o: { version: string; }, x?: ObjectWithMetadata) => mx(
@@ -139,8 +140,10 @@ export class LdmlCompilerMessages {
   );
 
   static HINT_NoDisplayForSwitch = SevHint | 0x000F;
-  static Hint_NoDisplayForSwitch = (o: { id: string }) =>
-  m(this.HINT_NoDisplayForSwitch, `Key element with id "${def(o.id)}" is a layer switch key, but there is no matching display element by keyId. Keycap may be blank.`);
+  static Hint_NoDisplayForSwitch = (o: { id: string }, x?: ObjectWithMetadata) => mx(
+    this.HINT_NoDisplayForSwitch, x,
+    `Key element with id "${def(o.id)}" is a layer switch key, but there is no matching display element by keyId. Keycap may be blank.`,
+  );
 
   /** annotate the to= or id= entry */
   private static outputOrKeyId(o:{output?: string, keyId?: string}) {
@@ -237,12 +240,16 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_MissingSetVariable = SevError | 0x001D;
-  static Error_MissingSetVariable = (o:{id: string}) =>
-  m(this.ERROR_MissingSetVariable, `Reference to undefined set variable: \$[${def(o.id)}]`);
+  static Error_MissingSetVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_MissingSetVariable, x,
+    `Reference to undefined set variable: \$[${def(o.id)}]`,
+  );
 
   static ERROR_MissingUnicodeSetVariable = SevError | 0x001E;
-  static Error_MissingUnicodeSetVariable = (o:{id: string}) =>
-  m(this.ERROR_MissingUnicodeSetVariable, `Reference to undefined UnicodeSet variable: \$[${def(o.id)}]`);
+  static Error_MissingUnicodeSetVariable = (o:{id: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_MissingUnicodeSetVariable, x,
+    `Reference to undefined UnicodeSet variable: \$[${def(o.id)}]`,
+  );
 
   static ERROR_NeedSpacesBetweenSetVariables = SevError | 0x001F;
   static Error_NeedSpacesBetweenSetVariables = (o:{item: string}, x?: ObjectWithMetadata) => mx(
@@ -257,8 +264,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_MissingMarkers = SevError | 0x0021;
-  static Error_MissingMarkers = (o: { ids: string[] }) =>
-  m(this.ERROR_MissingMarkers, `Markers used for matching but not defined: ${def(o.ids?.join(','))}`);
+  static Error_MissingMarkers = (o: { ids: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_MissingMarkers, x,
+    `Markers used for matching but not defined: ${def(o.ids)}`
+  );
 
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
   static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
@@ -301,14 +310,14 @@ export class LdmlCompilerMessages {
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
   static ERROR_InvalidVariableIdentifier = SevError | 0x0029;
-  static Error_InvalidVariableIdentifier = (o: { id: string }) => m(
-    this.ERROR_InvalidVariableIdentifier,
+  static Error_InvalidVariableIdentifier = (o: { id: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidVariableIdentifier, x,
     `Invalid variable identifier "${def(o.id)}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
   );
 
   static ERROR_InvalidMarkerIdentifier = SevError | 0x002A;
-  static Error_InvalidMarkerIdentifier = (o: { id: string }) => m(
-    this.ERROR_InvalidMarkerIdentifier,
+  static Error_InvalidMarkerIdentifier = (o: { id: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_InvalidMarkerIdentifier, x,
     `Invalid marker identifier "\m{${def(o.id)}}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
   );
 

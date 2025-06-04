@@ -12,9 +12,10 @@ import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
   static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions): boolean {
-    keyboard.displays?.display?.forEach(({ display, output }) => {
-      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output);
-      st.addStringSubstitution(SubstitutionUse.emit, display);
+    keyboard.displays?.display?.forEach((e) => {
+      const { display, output } = e;
+      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output, e);
+      st.addStringSubstitution(SubstitutionUse.emit, display, e);
     });
     // no marker references in 'id'
     return true;
