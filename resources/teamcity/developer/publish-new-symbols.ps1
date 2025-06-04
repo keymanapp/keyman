@@ -6,6 +6,10 @@
 $ErrorActionPreference = "Stop"
 
 $RSYNC_HOME = $env:RSYNC_HOME
+$RSYNC_PATH = $env:RSYNC_PATH
+$RSYNC_USER = $env:RSYNC_USER
+$RSYNC_HOST = $env:RSYNC_HOST
+$RSYNC_ROOT = $env:RSYNC_ROOT
 $USERPROFILE = $env:USERPROFILE
 
 # Rename 000Admin to 000admin
@@ -23,10 +27,10 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  '--rsync-path="sudo -u vu2009 rsync"',    # path on remote server
+  '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
   ".",                                      # upload the whole symbols folder
-  "%downloads_rsync_user%@%downloads_rsync_host%:%downloads_rsync_root%/windows/symbols/" # target server + path
+  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/" # target server + path
 )
 
 & $RSYNC_HOME\rsync.exe $rsync_args

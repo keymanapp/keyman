@@ -21,7 +21,12 @@ builder_describe \
   "Build Keyman Developer on Windows" \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
-  "publish        publish release of Keyman Developer"
+  "publish        publish release of Keyman Developer" \
+  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
+  "--rsync-user=RSYNC_USER            rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
 
 builder_parse "$@"
 
@@ -86,6 +91,7 @@ function _publish_api_documentation() {
   # Upload new Keyman Developer API documentation to help.keyman.com
   builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
 
+  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
   "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
 
   builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
