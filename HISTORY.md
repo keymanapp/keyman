@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.57 alpha 2025-06-03
+
+* fix(windows): change from error to breadcrumb and log (#14069)
+* maint(mac): make make-km-dmg.sh less quiet (#14105)
+
+## 19.0.56 alpha 2025-06-02
+
+* maint(ios): Use zip.inc.sh to prep release artifacts (#13919)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14094)
+* chore(linux): add Python TC test runner (#14062)
+
 ## 19.0.55 alpha 2025-05-31
 
 * maint(linux): `sudo` not required for removing temporary files (#14086)
