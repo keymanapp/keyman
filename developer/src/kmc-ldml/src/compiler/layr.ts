@@ -20,27 +20,39 @@ export class LayrCompiler extends SectionCompiler {
     let valid = true;
     let totalLayerCount = 0;
     let hardwareLayers = 0;
-    // let touchLayers = 0;
+    let touchLayers = 0;
+    const deviceWidths = new Set<number>();
     this.keyboard3.layers?.forEach((layers) => {
       const { formId } = layers;
       if (formId === 'touch') {
-        // touchLayers++;
-        // multiple touch layers are OK
+        touchLayers++;
         totalLayerCount += layers.layer?.length;
-        // TODO-LDML: check that widths are distinct
+        const { minDeviceWidth } = layers;
+        if (!minDeviceWidth ||
+          minDeviceWidth < constants.layr_min_minDeviceWidth ||
+          minDeviceWidth > constants.layr_max_minDeviceWidth ||
+          Number.isNaN(Number(minDeviceWidth))) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLayerWidth({minDeviceWidth}, layers));
+        } else if (deviceWidths.has(minDeviceWidth)) {
+          valid = false;
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateLayerWidth({minDeviceWidth}, layers));
+        } else {
+          deviceWidths.add(minDeviceWidth);
+        }
       } else {
         // hardware
         hardwareLayers++;
         if (hardwareLayers > 1) {
           valid = false;
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}, layers));
         }
       }
       layers.layer.forEach((layer) => {
         const { modifiers } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer));
           valid = false;
         }
       });
@@ -48,7 +60,7 @@ export class LayrCompiler extends SectionCompiler {
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere
       valid = false;
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(this.keyboard3?.layers[0]));
     }
     return valid;
   }
@@ -57,13 +69,13 @@ export class LayrCompiler extends SectionCompiler {
     const sect = new Layr();
 
     sect.lists = this.keyboard3.layers.map((layers) => {
-      const hardware = sections.strs.allocString(layers.formId);
+      const hardware = sections.strs.allocString(layers.formId, {x:layers});
       // Already validated in validate
       const layerEntries = [];
       for (const layer of layers.layer) {
         const rows = layer.row.map((row) => {
           const erow: LayrRow = {
-            keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id)),
+            keys: row.keys.trim().split(/[ \t]+/).map((id) => sections.strs.allocString(id, { x: row })),
           };
           // include linenumber info for row
           return SectionCompiler.copySymbols(erow, row);
@@ -72,7 +84,7 @@ export class LayrCompiler extends SectionCompiler {
         // push a layer entry for each modifier set
         for (const mod of mods) {
           layerEntries.push({
-            id: sections.strs.allocString(layer.id),
+            id: sections.strs.allocString(layer.id, {x:layer}),
             mod,
             rows,
           });

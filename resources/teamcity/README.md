@@ -30,5 +30,5 @@ and then run the build, e.g.
 
 ```bash
 cd /Develop
-resources/teamcity/keyman-linux-test.sh configure,build,test
+resources/teamcity/linux/keyman-linux-test.sh configure,build,test
 ```

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
 # Returns 0 if the OS version is greater than or equal to the specified version.
 # Parameter:
