@@ -51,4 +51,23 @@ describe('LdmlCompilerMessages', function () {
     expect(lines).to.not.be.equal(0, `None of ${total} messages had offset reporting.`);
     expect(Array.from(noLines.values())).to.deep.equal([], `${noLines.size}/${total} ${Number((noLines.size/total)*100).toFixed(0)}% of message(s) did not have detectable offset (line number) reporting`);
   });
+  it('Should only have simple ${def(o...)} interpolation', () => {
+      const m = LdmlCompilerMessages as Record<string,any>;
+    const keys = Object.keys(LdmlCompilerMessages);
+    const complexInterpolation : string[] = [];
+    for(const key of keys) {
+      // exclude this one, does not need line numbers
+      if (key == 'Error_InvalidFile') continue;
+      if (typeof m[key] == 'function') {
+        const f = m[key] as Function;
+        const s = f.toString();
+        // scan for interpolation
+        // Interpolation.. A non-escaped ${ that's NOT followed by `def(o.` triggers this error.
+        if (/.*`.*(?<!\\)(?:\\\\)*\$\{(?!def\(o\.)/.test(s)) {
+          complexInterpolation.push(key);
+        }
+      }
+    }
+    expect(complexInterpolation).to.deep.equal([], 'Complex interpolation found, please only use the ${def(o... form')
+  });
 });

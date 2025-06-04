@@ -7,6 +7,7 @@ import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
 import { writeFileSync } from 'node:fs';
 import { LdmlCompilerMessages } from '../src/main.js';
+import { util } from '@keymanapp/common-types';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -56,8 +57,8 @@ describe('compiler-tests', function() {
     assert.sameDeepMembers( scrubContextFromMessages(compilerTestCallbacks.messages), [
       // copied from strs.tests.ts
       // validation messages
-      LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: 0xFDD0 }),
-      LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+      LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: util.describeCodepoint(0xFDD0) }),
+      LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: util.describeCodepoint(0xE010) }),
     ]);
   });
 

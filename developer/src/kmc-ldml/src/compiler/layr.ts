@@ -52,7 +52,7 @@ export class LayrCompiler extends SectionCompiler {
         const { modifiers } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer));
           valid = false;
         }
       });

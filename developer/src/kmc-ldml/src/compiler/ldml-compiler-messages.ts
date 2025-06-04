@@ -1,4 +1,3 @@
-import { util } from "@keymanapp/common-types";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageObjectSpec as mx, CompilerMessageSpec as m, CompilerMessageDef as def, ObjectWithMetadata } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -34,7 +33,7 @@ export class LdmlCompilerMessages {
   static ERROR_RowOnHardwareLayerHasTooManyKeys = SevError | 0x0004;
   static Error_RowOnHardwareLayerHasTooManyKeys = (o: { row: number, hardware: string, modifiers: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_RowOnHardwareLayerHasTooManyKeys, x,
-    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${o.modifiers || 'none'} has too many keys`,
+    `Row #${def(o.row)} on 'hardware' ${def(o.hardware)} layer for modifier ${def(o.modifiers)} has too many keys`,
   );
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
@@ -110,23 +109,10 @@ export class LdmlCompilerMessages {
     `Key element with id "${def(o.id)}" is a layer switch key, but there is no matching display element by keyId. Keycap may be blank.`,
   );
 
-  /** annotate the to= or id= entry */
-  private static outputOrKeyId(o:{output?: string, keyId?: string}) {
-    if (o.output && o.keyId) {
-      return `output='${o.output}' keyId='${o.keyId}'`;
-    } else if(o.keyId) {
-      return `keyId='${o.keyId}'`;
-    } else if (o.output) {
-      return `output='${o.output}'`;
-    } else {
-      return '';
-    }
-  }
-
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
-  static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+  static Error_DisplayIsRepeated = (o:{display?: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_DisplayIsRepeated, x,
-    `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`,
+    `display display='${def(o.display)}' refers to the same keyId or output as another entry.`,
   );
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
@@ -147,18 +133,10 @@ export class LdmlCompilerMessages {
     `layers has invalid value formId=${def(o.formId)}`,
   );
 
-  private static layerIdOrEmpty(layer : string) {
-    if (layer) {
-      return ` on layer id=${def(layer)}`;
-    } else {
-      return '';
-    }
-  }
-
   static ERROR_InvalidModifier = SevError | 0x0014;
-  static Error_InvalidModifier = (o:{modifiers: string, id: string}, x?: ObjectWithMetadata) => mx(
+  static Error_InvalidModifier = (o:{modifiers: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidModifier, x,
-    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.id),
+    `layer has invalid modifiers='${def(o.modifiers)}'`,
   );
 
   static ERROR_MissingFlicks = SevError | 0x0015;
@@ -235,39 +213,39 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
-  static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}, x?: ObjectWithMetadata) => mx(
+  static Error_DisplayNeedsToOrId = (o:{display?: string}, x?: ObjectWithMetadata) => mx(
     this.ERROR_DisplayNeedsToOrId, x,
-    `display ${LdmlCompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`,
+    `display display='${def(o.display)}' needs output= or keyId=, but not both`,
   );
 
   static HINT_PUACharacters = SevHint | 0x0023;
-  static Hint_PUACharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Hint_PUACharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.HINT_PUACharacters, x,
-    `File contains ${def(o.count)} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+    `File contains ${def(o.count)} PUA character(s), including ${def(o.lowestCh)}`,
   );
 
   static WARN_UnassignedCharacters = SevWarn | 0x0024;
-  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.WARN_UnassignedCharacters, x,
-    `File contains ${def(o.count)} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+    `File contains ${def(o.count)} unassigned character(s), including ${def(o.lowestCh)}`,
   );
 
   static ERROR_IllegalCharacters = SevError | 0x0025;
-  static Error_IllegalCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+  static Error_IllegalCharacters = (o: { count: number, lowestCh: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_IllegalCharacters, x,
-    `File contains ${def(o.count)} illegal character(s), including ${ util.describeCodepoint(o.lowestCh) }`,
+    `File contains ${def(o.count)} illegal character(s), including ${def(o.lowestCh) }`,
   );
 
   static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
   static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
     this.HINT_CharClassImplicitDenorm, x,
-    `File has character classes which span non-NFD character(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+    `File has character classes which span non-NFD character(s), including ${def(o.lowestCh)}. These will not match any text.`,
   );
 
   static WARN_CharClassExplicitDenorm = SevWarn | 0x0027;
   static Warn_CharClassExplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
     this.WARN_CharClassExplicitDenorm, x,
-    `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
+    `File has character classes which include non-NFD characters(s), including ${def(o.lowestCh)}. These will not match any text.`,
   );
 
   // Available: 0x0028
@@ -293,23 +271,24 @@ export class LdmlCompilerMessages {
   static ERROR_DuplicateLayerWidth = SevError | 0x002C;
   static Error_DuplicateLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
     this.ERROR_DuplicateLayerWidth, x,
-    `Two or more layers have minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Two or more layers have minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Touch layers must have distinct widths.`
   );
 
   static ERROR_InvalidLayerWidth = SevError | 0x002D;
   static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidLayerWidth, x,
-    `Invalid Layers minDeviceWidth=${def(o?.minDeviceWidth)}`,
+    `Invalid Layers minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
   );
 
   // Available: 0x02E-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
-  static Error_InvalidQuadEscape = (o: { cp: number }, x?: ObjectWithMetadata) => mx(
+  static Error_InvalidQuadEscape = (o: { cp: string, recommended: string }, x?: ObjectWithMetadata) => mx(
     this.ERROR_InvalidQuadEscape, x,
-    `Invalid escape "\\u${util.hexQuad(o?.cp || 0)}". Hint: Use "\\u{${def(o?.cp?.toString(16))}}"`,
+    `Invalid escape "${def(o.cp)}"`,
+    `**Hint**: Use "${def(o.recommended)}"`,
   );
 
   //
