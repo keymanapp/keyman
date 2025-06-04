@@ -12,6 +12,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+
 ################################ Main script ################################
 
 builder_describe \

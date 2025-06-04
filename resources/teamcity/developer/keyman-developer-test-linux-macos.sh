@@ -17,7 +17,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-macos.inc.sh"
 
 ################################ Main script ################################
 
