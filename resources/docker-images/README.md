@@ -22,11 +22,11 @@ resources/docker-images/build.sh
 ```
 
 By default this will create 64-bit images for building
-Keyman Core, Keyman for Android, Keyman for Linux and
-Keyman for Web. These images are based on the Ubuntu 24.04
-with Node 20 and Emscripten 3.1.58 (for the exact versions,
-see [`minimum-versions.inc.sh`](../build/minimum-versions.inc.sh))
-and are named e.g. `keyman-core-ci:default`.
+Keyman Core, Keyman for Android, Keyman for Linux, Keyman for Web
+and (cross-platform parts of) Keyman Developer. These images are based
+on Ubuntu 24.04 with Node 20 and Emscripten 3.1.58 (for the exact versions,
+see [`minimum-versions.inc.sh`](../build/minimum-versions.inc.sh)).
+The images are named e.g. `keymanapp/keyman-core-ci:default`.
 
 The versions can be changed, e.g.
 
@@ -34,7 +34,8 @@ The versions can be changed, e.g.
 resources/docker-images/build.sh --distro-version jammy --node 20
 ```
 
-This will create an image named e.g. `keyman-core-ci:jammy-node20`.
+This will create an image named e.g.
+`keymanapp/keyman-core-ci:ubuntu-jammy-java21-node20.16.0-emsdk3.1.58`.
 
 Once the image is built, it may be used to build parts of Keyman.
 
