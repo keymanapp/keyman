@@ -16,6 +16,9 @@ export * as KpsFile from './types/kps/kps-file.js';
 export { KpsFileReader } from './types/kps/kps-file-reader.js';
 export { KpsFileWriter } from './types/kps/kps-file-writer.js';
 
+export * as RegressionTestSourceFile from './types/regression-test/regression-test-file.js';
+export { RegressionTestSourceFileReader } from './types/regression-test/regression-test-file-reader.js';
+
 export { default as KvksFileReader } from './types/kvks/kvks-file-reader.js';
 export { default as KvksFileWriter } from './types/kvks/kvks-file-writer.js';
 export * as KvksFile from './types/kvks/kvks-file.js';
