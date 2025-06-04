@@ -35,7 +35,8 @@ export class ContentLineRule extends SingleChildRule {
     super();
     const optWhitespace: Rule = new OptionalWhiteSpaceRule();
     const content: Rule       = new ContentRule();
-    const optComment: Rule    = new OptionalCommentRule();
+    const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
+    const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule([
       optWhitespace, content, optWhitespace, optComment, newline
@@ -47,17 +48,10 @@ export class BlankLineRule extends SingleChildRule {
   public constructor() {
     super();
     const optWhitespace: Rule = new OptionalWhiteSpaceRule();
-    const optComment: Rule    = new OptionalCommentRule();
+    const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
+    const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule([optWhitespace, optComment, newline]);
-  }
-}
-
-export class OptionalCommentRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const commentRule: Rule = new TokenRule(TokenTypes.COMMENT);
-    this.rule = new OptionalRule(commentRule);
   }
 }
 
