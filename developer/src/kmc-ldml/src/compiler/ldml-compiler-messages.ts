@@ -1,5 +1,5 @@
 import { util } from "@keymanapp/common-types";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, XML_FILENAME_SYMBOL, CompilerEvent, KeymanXMLReader, ObjectWithMetadata } from '@keymanapp/developer-utils';
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageObjectSpec as mx, CompilerMessageSpec as m, CompilerMessageDef as def, ObjectWithMetadata } from '@keymanapp/developer-utils';
 // const SevInfo = CompilerErrorSeverity.Info | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
@@ -8,42 +8,6 @@ const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboa
 
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
-
-/**
- * Convenience function for constructing CompilerEvents with line numbers.
- * Use it as below: (abbreviated as mx())
- *
- * ```js
- *  // Note: Indentation makes "InvalidScanCode" line up thrice
- *  static ERROR_InvalidScanCode = SevError | 0x0009;
- *  // Note:
- *  //   1. All parameters are passed in 'o', the context object is only used for context even if
- *  //      it contains redundant info.
- *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
- *  //      with `${def(o.property)}` as the max complexity of interpolation.
- *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
- *    this.ERROR_InvalidScanCode, x,
- *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
- *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
- *  `…additional markdown detail…`
- *  );
- * ```
- *
- * @param code     Unique numeric value of the event
- * @param message  A short description of the error presented to the user
- * @param context  Object to be used as a source for line number information
- * @param detail   Detailed Markdown-formatted description of the error
- *                 including references to documentation, remediation options.
- * @see CompilerMessageSpec
- * @returns
- */
-function CompilerMessageObjectSpec(code: number, context: ObjectWithMetadata, message: string, detail?: string): CompilerEvent {
-  let evt = m(code, message, detail); // constructs raw message
-  evt = LdmlCompilerMessages.offset(evt, context); // updates with offset from context
-  return evt;
-};
-
-const mx = CompilerMessageObjectSpec;
 
 /**
  * @internal
@@ -306,11 +270,7 @@ export class LdmlCompilerMessages {
     `File has character classes which include non-NFD characters(s), including ${util.describeCodepoint(o.lowestCh)}. These will not match any text.`,
   );
 
-  static ERROR_UnparseableReorderSet = SevError | 0x0028;
-  static Error_UnparseableReorderSet = (o: { from: string, set: string }, x?: ObjectWithMetadata) => mx(
-    this.ERROR_UnparseableReorderSet, x,
-    `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`,
-  );
+  // Available: 0x0028
 
   static ERROR_InvalidVariableIdentifier = SevError | 0x0029;
   static Error_InvalidVariableIdentifier = (o: { id: string }, x?: ObjectWithMetadata) => mx(
@@ -408,25 +368,4 @@ export class LdmlCompilerMessages {
     this.ERROR_UnparseableTransformTo, x,
     `Invalid transform to="${def(o.to)}": "${def(o.message)}"`,
   );
-
-  /**
-   * Get an offset from o and set e's offset field
-   * @param event a compiler event, such as from functions in this class
-   * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
-   * @returns modified event object
-   */
-  static offset(event: CompilerEvent, x?: any): CompilerEvent {
-    if(x) {
-      const metadata = KeymanXMLReader.getMetaData(x) || {};
-      const offset = metadata?.startIndex;
-      if (offset) {
-        event.offset = offset;
-      }
-      const filename = event.filename || metadata[XML_FILENAME_SYMBOL];
-      if (filename) {
-        event.filename = filename;
-      }
-    }
-    return event;
-  }
 }
