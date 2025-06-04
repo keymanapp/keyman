@@ -15,18 +15,20 @@ describe('LdmlCompilerMessages', function () {
     /** all fns */
     let total = 0;
     /** does not take line numbers */
-    let noLines = 0;
+    const noLines = new Set<string>();
     /** takes line numbers */
     let lines = 0;
     const fakeOffsetNumber = 1234;
     const fakeOffsetObject = withOffset(fakeOffsetNumber);
     for(const key of keys) {
-      if(typeof m[key] == 'function') {
+      // exclude this one, does not need line numbers
+      if (key == 'Error_InvalidFile') continue;
+      if (typeof m[key] == 'function') {
         total++;
         const f = m[key] as Function;
         // console.log(`${f.name}: ${f.length}`);
         if (f.length === 0) { // Error_foo()
-          noLines++;
+          noLines.add(key);
           continue;
         }
         // now try to call it
@@ -42,16 +44,11 @@ describe('LdmlCompilerMessages', function () {
           expect(resp.offset).to.equal(fakeOffsetNumber, `Offset number round trip for error ${f.name} did not work, check the message function`);
         } else {
           // did not get a column number back
-          noLines++;
+          noLines.add(key);
         }
       }
     }
     expect(lines).to.not.be.equal(0, `None of ${total} messages had offset reporting.`);
-    if (noLines > 0) {
-      // Once this goes to zero, make it an error if it goes up!
-      // Oh, and while you're here, once this is zero, uncomment the code in testCompilationCases
-      // that asserts that all messages are actually generated with an offset.
-      console.warn(`TODO-LDML (#10622) ${noLines}/${total} ${Number((noLines/total)*1000).toFixed(0)}‰ of message(s) did not have detectable offset (line number) reporting.`);
-    }
+    expect(Array.from(noLines.values())).to.deep.equal([], `${noLines.size}/${total} ${Number((noLines.size/total)*100).toFixed(0)}% of message(s) did not have detectable offset (line number) reporting`);
   });
 });

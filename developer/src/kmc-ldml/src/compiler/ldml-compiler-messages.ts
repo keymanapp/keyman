@@ -85,6 +85,7 @@ export class LdmlCompilerMessages {
     `After minimization, one or more locales is repeated and has been removed`,
   );
 
+  // This is the only allowed use of m() vs mx() in this file, all the others take context.
   static ERROR_InvalidFile = SevError | 0x0007;
   static Error_InvalidFile = (o:{errorText: string}) =>
   m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
@@ -306,8 +307,10 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_UnparseableReorderSet = SevError | 0x0028;
-  static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
-  m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
+  static Error_UnparseableReorderSet = (o: { from: string, set: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_UnparseableReorderSet, x,
+    `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`,
+  );
 
   static ERROR_InvalidVariableIdentifier = SevError | 0x0029;
   static Error_InvalidVariableIdentifier = (o: { id: string }, x?: ObjectWithMetadata) => mx(
@@ -354,16 +357,18 @@ export class LdmlCompilerMessages {
 
   // This is a bit of a catch-all and represents messages bubbling up from the underlying regex engine
   static ERROR_UnparseableTransformFrom   = SevErrorTransform | 0x00;
-  static Error_UnparseableTransformFrom   = (o: { from: string, message: string }) =>
-  m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
+  static Error_UnparseableTransformFrom   = (o: { from: string, message: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_UnparseableTransformFrom, x,
+    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`,
+  );
 
   //------------------------------------------------------------------------------|
   // max length of detail message lines (checked by verifyCompilerMessagesObject) |
   //------------------------------------------------------------------------------|
 
   static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
-  static Error_IllegalTransformDollarsign = (o: { from: string }) => m(
-    this.ERROR_IllegalTransformDollarsign,
+  static Error_IllegalTransformDollarsign = (o: { from: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_IllegalTransformDollarsign, x,
     `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`, `
     **Hint**: Use \`\\$\` to match a literal dollar-sign. If this precedes a
     variable name, the variable name may not be valid (A-Z, a-z, 0-9, _, 32
@@ -377,30 +382,30 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_IllegalTransformPlus = SevErrorTransform | 0x03;
-  static Error_IllegalTransformPlus = (o: { from: string }) => m(
-    this.ERROR_IllegalTransformPlus,
+  static Error_IllegalTransformPlus = (o: { from: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_IllegalTransformPlus, x,
     `Invalid transform from="${def(o.from)}": Unescaped plus (+) is not valid transform syntax.`, `
     **Hint**: Use \`\\+\` to match a literal plus.
   `);
 
   static ERROR_IllegalTransformAsterisk = SevErrorTransform | 0x04;
-  static Error_IllegalTransformAsterisk = (o: { from: string }) =>m(
-    this.ERROR_IllegalTransformAsterisk,
+  static Error_IllegalTransformAsterisk = (o: { from: string }, x?: ObjectWithMetadata) =>mx(
+    this.ERROR_IllegalTransformAsterisk, x,
     `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`, `
     **Hint**: Use \`\\*\` to match a literal asterisk.
   `);
 
   static ERROR_IllegalTransformToUset = SevErrorTransform | 0x05;
-  static Error_IllegalTransformToUset = (o: { to: string }) => m(
-    this.ERROR_IllegalTransformToUset,
+  static Error_IllegalTransformToUset = (o: { to: string }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_IllegalTransformToUset, x,
     `Invalid transform to="${def(o.to)}": Set variable (\\$[…]) cannot be used in 'to=' unless part of a map.`, `
     **Hint**: If a map was meant, must use the form
     \`<transform from="($[fromSet])" to="$[1:toSet]"/>\`.
   `);
 
   static ERROR_UnparseableTransformTo = SevErrorTransform | 0x06;
-  static Error_UnparseableTransformTo = (o: {to: string, message: string}) => m(
-    this.ERROR_UnparseableTransformTo,
+  static Error_UnparseableTransformTo = (o: {to: string, message: string}, x?: ObjectWithMetadata) => mx(
+    this.ERROR_UnparseableTransformTo, x,
     `Invalid transform to="${def(o.to)}": "${def(o.message)}"`,
   );
 
