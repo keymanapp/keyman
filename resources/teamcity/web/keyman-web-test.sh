@@ -1,7 +1,5 @@
-#!/bin/bash
-# Copyright (C) 2025 SIL International. All rights reserved.
-# Distributed under the MIT License. See LICENSE.md file in the project
-# root for full license information.
+#!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # TC build script for Keyman Web/Test
 
