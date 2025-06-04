@@ -267,16 +267,22 @@ export class LdmlCompilerMessages {
   );
 
   static HINT_PUACharacters = SevHint | 0x0023;
-  static Hint_PUACharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.HINT_PUACharacters, `File contains ${def(o.count)} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static Hint_PUACharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+    this.HINT_PUACharacters, x,
+    `File contains ${def(o.count)} PUA character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+  );
 
   static WARN_UnassignedCharacters = SevWarn | 0x0024;
-  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.WARN_UnassignedCharacters, `File contains ${def(o.count)} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static Warn_UnassignedCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+    this.WARN_UnassignedCharacters, x,
+    `File contains ${def(o.count)} unassigned character(s), including ${util.describeCodepoint(o.lowestCh)}`,
+  );
 
   static ERROR_IllegalCharacters = SevError | 0x0025;
-  static Error_IllegalCharacters = (o: { count: number, lowestCh: number }) =>
-  m(this.ERROR_IllegalCharacters, `File contains ${def(o.count)} illegal character(s), including ${util.describeCodepoint(o.lowestCh)}`);
+  static Error_IllegalCharacters = (o: { count: number, lowestCh: number }, x?: ObjectWithMetadata) => mx(
+    this.ERROR_IllegalCharacters, x,
+    `File contains ${def(o.count)} illegal character(s), including ${ util.describeCodepoint(o.lowestCh) }`,
+  );
 
   static HINT_CharClassImplicitDenorm = SevHint | 0x0026;
   static Hint_CharClassImplicitDenorm = (o: { lowestCh: number }, x?: ObjectWithMetadata) => mx(
@@ -307,8 +313,10 @@ export class LdmlCompilerMessages {
   );
 
   static WARN_StringDenorm = SevWarn | 0x002B;
-  static Warn_StringDenorm = (o: { s: string }) =>
-  m(this.WARN_StringDenorm, `File contains string "${def(o.s)}" that is neither NFC nor NFD.`);
+  static Warn_StringDenorm = (o: { s: string }, x?: ObjectWithMetadata) => mx(
+    this.WARN_StringDenorm, x,
+    `File contains string "${def(o.s)}" that is neither NFC nor NFD.`,
+  );
 
   static ERROR_DuplicateLayerWidth = SevError | 0x002C;
   static Error_DuplicateLayerWidth = (o: { minDeviceWidth: number }, x?: ObjectWithMetadata) => mx(

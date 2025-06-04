@@ -324,12 +324,13 @@ export class KeysCompiler extends SectionCompiler {
 
       // allocate the in-memory <flick id=…>
       const flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(flickId)
+        sections.strs.allocString(flickId, { x: flick })
       );
 
       // add data from each segment
-      for (const { keyId, directions } of flick.flickSegment) {
-        const keyIdStr = sections.strs.allocString(keyId);
+      for (const flickSegment of flick.flickSegment) {
+        const { keyId, directions } = flickSegment;
+        const keyIdStr = sections.strs.allocString(keyId, { x: flickSegment });
         const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
           { },
@@ -369,20 +370,20 @@ export class KeysCompiler extends SectionCompiler {
       if (!!gap) {
         flags |= constants.keys_key_flags_gap;
       }
-      const id = sections.strs.allocString(key.id);
+      const id = sections.strs.allocString(key.id, { x: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(
         longPressKeyIds, {},
         sections);
 
       const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
-        {},
+        { x: key },
         sections);
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
         multiTapKeyIds,
         {},
         sections);
-      const keySwitch = sections.strs.allocString(layerId); // 'switch' is a reserved word
+      const keySwitch = sections.strs.allocString(layerId, { x: key }); // 'switch' is a reserved word
 
       const toRaw = output;
 
@@ -395,6 +396,7 @@ export class KeysCompiler extends SectionCompiler {
           unescape: true,
           singleOk: true,
           nfd: true,
+          x: key,
         },
         sections);
       if (!to.isOneChar) {

@@ -143,6 +143,7 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
   assert.isNotNull(source, 'k.load should not have returned null');
 
   const valid = await k.validate(source);
+  zapMessageMetadata();
   if (validateMessages) {
     assert.sameDeepMembers(compilerTestCallbacks.messages, validateMessages, "validation messages mismatch");
     assert.notEqual(valid, expectFailValidate, 'validation failure');
@@ -154,6 +155,7 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
   if (!valid) return null; // get out, if the above asserts didn't get us out.
 
   const kmx = await k.compile(source);
+  zapMessageMetadata();
   if (compileMessages) {
     assert.sameDeepMembers(compilerTestCallbacks.messages, compileMessages, "compiler messages mismatch");
   } else {
@@ -170,6 +172,16 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
 
 export function checkMessages() {
   assert.isEmpty(compilerTestCallbacks.messages, compilerEventFormat(compilerTestCallbacks.messages));
+}
+
+/** These tests aren't prepared for line number information in messages. Remove it so that comparisons pass. */
+function zapMessageMetadata() {
+  for(const i in compilerTestCallbacks.messages) {
+    delete compilerTestCallbacks.messages[i].column;
+    delete compilerTestCallbacks.messages[i].filename;
+    delete compilerTestCallbacks.messages[i].line;
+    delete compilerTestCallbacks.messages[i].offset;
+  }
 }
 
 /**
@@ -260,6 +272,26 @@ export interface CompilationCase {
 }
 
 /**
+ * Scrub 'context' from messages. to simplify unit tests
+ * @param messages input array of messages
+ * @returns copy of messages
+ */
+export function scrubContextFromMessages(messages: CompilerEvent[]): CompilerEvent[] {
+  return messages.map(m => {
+    const scrubbed = Object.assign({}, m);
+    // Turn this on once all messages have offsets, see messages.tests.ts
+    // if (!scrubbed.offset) {
+    //   throw Error(`Error, no offset detected in message ${CompilerError.formatEvent(m)}`);
+    // }
+    delete scrubbed.offset;
+    delete scrubbed.line;
+    delete scrubbed.filename;
+    delete scrubbed.column;
+    return scrubbed;
+  });
+}
+
+/**
  * Run a bunch of cases
  * @param cases cases to run
  * @param compiler argument to loadSectionFixture()
@@ -283,15 +315,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       let messagesToCheck = callbacks.messages;
       // scrub offsets from messages to reduce churn in the test casws
       if (!testcase.retainOffsetInMessages && callbacks.messages) {
-        messagesToCheck = callbacks.messages.map(m => {
-          const scrubbed = Object.assign({}, m);
-          // Turn this on once all messages have offsets, see messages.tests.ts
-          // if (!scrubbed.offset) {
-          //   throw Error(`Error, no offset detected in message ${CompilerError.formatEvent(m)}`);
-          // }
-          delete scrubbed.offset;
-          return scrubbed;
-        });
+        messagesToCheck = scrubContextFromMessages(callbacks.messages);
       }
       const testcaseErrors = matchCompilerEventsOrBoolean(messagesToCheck, testcase.errors);
       const testcaseWarnings = matchCompilerEvents(messagesToCheck, testcase.warnings);
