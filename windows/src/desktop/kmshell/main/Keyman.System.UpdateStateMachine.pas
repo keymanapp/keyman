@@ -618,8 +618,8 @@ begin
     CheckForUpdates.Free;
   end;
 
-  { Response OK and Update is available }
-  if Result = wucSuccess then
+  { Response wucSuccess and Update is available }
+  if (Result = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate) then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -759,32 +759,10 @@ end;
 
 { DownloadingState }
 
-// Check that cache.json file exists and packages or keyman versions available to download
-function IsUpdateMetaDataValid(ucr :TUpdateCheckResponse) : Boolean;
-var
-  hasPackages, hasKeymanInstallReady: Boolean;
-begin
-
-  hasPackages := False;
-  hasKeymanInstallReady := False;
-  if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
-  begin
-    // check again has packages or keyman update
-    hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-    hasKeymanInstallReady := (ucr.Status = ucrsUpdateReady) and TUpdateCheckStorage.HasKeymanInstallFile(ucr);
-  end;
-
-  Result := (hasPackages Or hasKeymanInstallReady);
-
-end;
-
 procedure DownloadingState.EnterState;
 var
   DownloadResult: Boolean;
-  RetryCount: Integer;
   FMutex: TKeymanMutex;
-  ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstallReady: Boolean;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
@@ -799,13 +777,12 @@ begin
       TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
       Exit;
     end;
-
-    if not IsUpdateMetaDataValid(ucr) then
+    // verify there is an update available
+    if not TUpdateCheckStorage.CheckMetaDataForUpdate then
     begin
-      // Return to Idle state and check for Updates state
+      // Return to Idle state
       bucStateContext.RemoveCachedFiles;
       ChangeState(IdleState);
-      bucStateContext.CurrentState.HandleCheck;
     end;
 
     DownloadResult := DownloadUpdatesBackground;
@@ -951,9 +928,6 @@ begin
 end;
 
 function WaitingRestartState.HandleKmShell;
-var
-  ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall: Boolean;
 begin
   // Still can't go if keyman has run
   if HasKeymanRun then
@@ -962,14 +936,7 @@ begin
   end
   else
   begin
-    hasPackages := False;
-    hasKeymanInstall := False;
-    if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
-    begin
-      hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-      hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
-    end;
-    if not (hasPackages Or hasKeymanInstall) then
+    if not (TUpdateCheckStorage.CheckMetaDataForUpdate) then
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
@@ -1143,7 +1110,7 @@ begin
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   end;
   { Notes: The reason packages (keyboards) is installed first is
   because we are trying to reduce the number of times the user has
@@ -1207,7 +1174,7 @@ var
   hasKeymanInstall : Boolean;
 begin
   TUpdateCheckStorage.LoadUpdateCacheData(ucr);
-  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
