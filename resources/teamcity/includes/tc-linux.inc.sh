@@ -68,9 +68,9 @@ linux_install_nvm() {
 
 linux_install_emscripten() {
   builder_echo start "install emscripten" "Checking and installing emscripten"
-  if { [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -f "${EMSCRIPTEN_BASE}/emcc" ]] } ||
+  if { [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -f "${EMSCRIPTEN_BASE}/emcc" ]] ; } ||
     [[ -f "${HOME}/emsdk/upstream/emscripten/emcc" ]]; then
-    builder_echo "Emscripten is already installed at ${EMSCRIPTEN_BAS:-${HOME}/emsdk/upstream/emscripten}"
+    builder_echo "Emscripten is already installed at ${EMSCRIPTEN_BASE:-${HOME}/emsdk/upstream/emscripten}"
   else
     # shellcheck disable=SC2154
     . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
