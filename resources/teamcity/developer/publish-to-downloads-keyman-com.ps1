@@ -1,3 +1,5 @@
+# Keyman is copyright (C) SIL Global. MIT License.
+
 $ErrorActionPreference = "Stop"
 
 $tier = Get-Content ..\TIER.md
