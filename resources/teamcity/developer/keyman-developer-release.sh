@@ -54,11 +54,6 @@ function _publish_sentry() {
 
 function _download_symbol_server_index() {
   # Download symbol server index from symbol server
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "download symbol server index" "Downloading symbol server index"
 
   # shellcheck disable=SC2154
@@ -69,11 +64,6 @@ function _download_symbol_server_index() {
 
 function _publish_new_symbols() {
   # Publish new symbols to symbol server
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
 
   # shellcheck disable=SC2154
@@ -84,11 +74,6 @@ function _publish_new_symbols() {
 
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
   # shellcheck disable=SC2154
@@ -112,6 +97,12 @@ function build_developer_action() {
 }
 
 function publish_action() {
+  if ! is_windows; then
+    # requires Powershell, so currently only supported on Windows
+    builder_echo error "This script is intended to be run on Windows only."
+    return 1
+  fi
+
   _publish_sentry
   _download_symbol_server_index
   _publish_new_symbols
