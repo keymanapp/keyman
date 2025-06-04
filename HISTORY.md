@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.58 alpha 2025-06-04
+
+* feat(developer): update strs compiler to collect context (#14064)
+* feat(developer): line numbers for UsetCompiler, others (#14090)
+* feat(developer): remaining line numbers for tran/bksp compilers (#14097)
+* feat(developer): ldml: update errors for unparseable reorder (#14098)
+* chore(developer): ldml: messages cleanup (#14100)
+* maint(android): Create "archive" builder step to prep release artifacts (#14093)
+* maint(web): move TC configuration for Web to script (#14049)
+
 ## 19.0.57 alpha 2025-06-03
 
 * fix(windows): change from error to breadcrumb and log (#14069)
