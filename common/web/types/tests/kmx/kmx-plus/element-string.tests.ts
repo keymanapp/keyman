@@ -91,12 +91,12 @@ describe('Test of ElementString file', () => {
     });
     describe('Test of fromStrings()', () => {
       it('returns an empty ElementString if source is null', () => {
-        const es = ElementString.fromStrings({}, null);
+        const es = ElementString.fromStrings({}, {}, null);
         assert.deepEqual(es, new ElementString());
       });
       it('can create an ElementString from a string array', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
-        const actual = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const actual = ElementString.fromStrings(sections, {}, ["𐌰", "𐌱", "𐌲"]);
         const expected = [
           initElemElement(GOTHIC_A),
           initElemElement(GOTHIC_B),
@@ -106,7 +106,7 @@ describe('Test of ElementString file', () => {
       });
       it('can create an ElementString from a string', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
-        const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
+        const actual = ElementString.fromStrings(sections, {}, "𐌰𐌱𐌲");
         const expected = [
           initElemElement(GOTHIC_A),
           initElemElement(GOTHIC_B),
@@ -118,6 +118,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           "1 2 3",
         );
@@ -132,6 +133,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           "1",
         );
@@ -146,6 +148,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           "1 2",
         );
@@ -160,6 +163,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           "1 A 3",
         );
@@ -174,6 +178,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           "1 2 3",
@@ -189,6 +194,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           "1",
@@ -204,6 +210,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           "1 2",
@@ -219,6 +226,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           "1 A 3",
@@ -234,6 +242,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -250,6 +259,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -266,6 +276,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -282,6 +293,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -299,6 +311,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -316,6 +329,7 @@ describe('Test of ElementString file', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         const actual = ElementString.fromStrings(
           sections,
+          {},
           "𐌰𐌱𐌲",
           null,
           null,
@@ -333,7 +347,7 @@ describe('Test of ElementString file', () => {
         ElementParser.segment = stubElementParserSegment_Uset;
         sections.strs.allocString = stubStrsAllocString_Str;
         sections.uset.allocUset = stubUsetAllocUset;
-        const actual = ElementString.fromStrings(sections, "[𐌰-𐍊]");
+        const actual = ElementString.fromStrings(sections, {}, "[𐌰-𐍊]");
         const expected = [
           initElemElement(
             new StrsItem(''),
@@ -348,17 +362,17 @@ describe('Test of ElementString file', () => {
       it('returns null for an invalid unicode set size', () => {
         ElementParser.segment = stubElementParserSegment_Uset;
         sections.usetparser.sizeUnicodeSet = (pattern: string) : number => -1;
-        assert.isNull(ElementString.fromStrings(sections, "[𐌰-𐍊]"));
+        assert.isNull(ElementString.fromStrings(sections, {}, "[𐌰-𐍊]"));
       });
       it('returns null if it cannot parse the unicode set', () => {
         ElementParser.segment = stubElementParserSegment_Uset;
         sections.usetparser.parseUnicodeSet = (pattern: string, rangeCount: number) : UnicodeSet | null => null;
-        assert.isNull(ElementString.fromStrings(sections, "[𐌰-𐍊]"));
+        assert.isNull(ElementString.fromStrings(sections, {}, "[𐌰-𐍊]"));
       });
       it('can handle quad strings', () => {
         sections.strs.allocString = stubStrsAllocString_Char;
         ElementParser.segment = stubElementParserSegment_Escaped;
-        const actual   = ElementString.fromStrings(sections, "\\ud800\\udf30");
+        const actual   = ElementString.fromStrings(sections, {}, "\\ud800\\udf30");
         const expected = [
           initElemElement(HI_GOTHIC_A),
           initElemElement(LO_GOTHIC_A),
@@ -367,7 +381,7 @@ describe('Test of ElementString file', () => {
       });
       it('can handle ElemElement of string type', () => {
         sections.strs.allocString = stubStrsAllocString_Str;
-        const actual   = ElementString.fromStrings(sections, ["𐌰𐌱𐌲",]);
+        const actual   = ElementString.fromStrings(sections, {}, ["𐌰𐌱𐌲",]);
         const expected = [
           initElemElement(
             new StrsItem("𐌰𐌱𐌲"),
