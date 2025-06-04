@@ -345,6 +345,13 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.238 stable 2025-06-04
+
+* fix(developer): ldml: make sure .run() calls compile() for validation (#14071)
+* maint(linux): fix typo of temporary dependency package (#14085)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14096)
+* maint(mac): make make-km-dmg.sh less quiet (#14106)
+
 ## 18.0.237 stable 2025-05-30
 
 * maint(android): Update FirstVoices launcher icon and red theme (#13917)
