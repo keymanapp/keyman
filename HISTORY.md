@@ -1,5 +1,115 @@
 # Keyman Version History
 
+## 19.0.53 alpha 2025-05-29
+
+* fix(developer): ensure that kmc doesn't skip validate phase of kmc-ldml (#14068)
+
+## 19.0.52 alpha 2025-05-28
+
+* feat(developer): line numbers for tran compiler (#14037)
+* feat(developer): add line numbers to disp compiler (#14048)
+* feat(developer): line numbers for layr compiler (#14050)
+* feat(developer): line numbers for LocaCompiler (#14054)
+* fix(common): properly use newly installed node version (#14057)
+* maint(common): update build coordinator and labels for `resources/teamcity` changes (#14047)
+
+## 19.0.51 alpha 2025-05-27
+
+* maint: add stable-19.0 triggers (#14043)
+* maint: add empty 'scripts' tag to package.json to silence warning (#14044)
+* fix(linux): fix version variable references in kmconfig (#14032)
+
+## 19.0.50 alpha 2025-05-26
+
+* chore(web): mark async methods in UI components (#14034)
+
+## 19.0.49 alpha 2025-05-25
+
+* feat(developer): revamp line numbers per design doc (#14016)
+* docs(developer): add compiler message internal documentation (#14025)
+* feat(developer): add line numbers to vars compiler (#14036)
+
+## 19.0.48 alpha 2025-05-23
+
+* maint(web): upgrade Sentry to 8.55.0 (#14030)
+
+## 19.0.47 alpha 2025-05-22
+
+* fix(windows): only breadcrumb unexpected state on first run (#13984)
+* maint: change builder_completion script to a .inc.sh (#14007)
+* fix(windows): skip sending handle kmshell events to upgrade state machine  for keyboard install modes (#13989)
+* fix(windows): fix sentry error message reporting (#14027)
+
+## 19.0.46 alpha 2025-05-21
+
+* docs(common): update README with number of languages and keyboards (#14023)
+
+## 19.0.45 alpha 2025-05-21
+
+* maint(linux): use correct syntax to define local variables in script (#14021)
+* maint(developer): update multer to v2.0.0 (#14012)
+
+## 19.0.44 alpha 2025-05-21
+
+* feat(android): log active keyboard, model IDs with reported errors (#13983)
+* fix(windows): rename Enter and Exit methods TState (#13920)
+* maint: update macOS environment setup, related documentation (#13979)
+* chore(deps): bump multer from 1.4.5-lts.1 to 2.0.0 (#13982)
+* feat(ios): log active keyboard, model IDs with reported errors (#13987)
+* maint(linux): add quilt to release build configuration (#13986)
+* chore(ios): update FirstVoices AppIcon (#13976)
+* docs(developer): add security note to Upload documentation (#14015)
+* fix(android): Check network access before trying to download keyboard (#13978)
+
+## 19.0.43 alpha 2025-05-20
+
+* chore(ios): FirstVoices certificate update (#13991)
+* fix(linux): configurable path in `.service` file when using basu (#13980)
+
+## 19.0.42 alpha 2025-05-20
+
+* maint(linux): add `--no-werror` option to not report warnings as errors (#13988)
+
+## 19.0.41 alpha 2025-05-19
+
+* fix(web): inspectable test-script mode should not be auto-enabled in local-env tests (#13895)
+* maint(common): evaluate and apply npm audit fix (without forced changes) (#13897)
+* maint: update mocha (#13899)
+* maint: update @actions/github + @octokit references (#13900)
+* maint(common): update fast-json-patch to ^3.1.1 (#13901)
+* change(web): cancel flicks when both returning to and releasing at original tap location (#13683)
+* fix(web): empty layout fontSize property should default to 1em (#13959)
+* maint(linux): fix release build to run all tests except integration tests (#13968)
+
+## 19.0.40 alpha 2025-05-17
+
+* maint(common): Add zip.inc.sh for cross-platform zipping (#13812)
+
+## 19.0.39 alpha 2025-05-16
+
+* chore(mac,windows): Update Crowdin strings for Italian (#13871)
+* refactor(web): rename generic type variables (#13930)
+* maint(linux): properly fallback to `VERSION` in deb-packaging (#13961)
+* maint(linux): update gha-ubuntu-packaging dependency (#13964)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13962)
+* maint(linux): don't include `dockerbuild` log files (#13965)
+* maint(linux): update GHA dependencies for Linux package builds (#13966)
+
+## 19.0.38 alpha 2025-05-15
+
+* chore(android): Update FirstVoices launcher icon and red theme (#13907)
+* feat(developer): add more line number issues for KeysCompiler (#13915)
+* feat(developer):  add line number for MetaCompiler (#13916)
+* maint(linux): address comments from Debian package review (#13904)
+* maint(linux): add Questing to launchpad package builds (#13910)
+* maint(linux): fix logging in `deb-packaging.sh` (#13912)
+* maint(linux): remove temporary files created during dependency installation (#13913)
+* maint(common): move TC build configs for Linux to scripts (#13754)
+* fix(developer): remove ngrok binary at build time (#13847)
+* chore(linux): Update debian changelog (#13889)
+* refactor(web): rename `HardKeyboard` to `HardKeyboardBase` (#13929)
+* refactor(web): rename base `KeymanEngine` to `KeymanEngineBase` (#13942)
+
 ## 19.0.37 alpha 2025-05-14
 
 * maint(linux): remove generated file that got accidentally committed (#13902)
