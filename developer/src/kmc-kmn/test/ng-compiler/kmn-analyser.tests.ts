@@ -8,10 +8,10 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Rule } from '../../src/ng-compiler/recursive-descent.js';
-import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
+import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule, ContinuationNewlineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -19,7 +19,7 @@ import { IfLikeBlockRule, IfLikeStatementRule, IfStatementRule, IfStoreStringSta
 import { IfSystemStoreNameRule, IfSystemStoreStringStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule, OutputBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { OutputStatementRule, OutsStatementRule, PaddingRule, PlatformStatementRule, ReadOnlyInputBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ReadOnlyLhsBlockRule, ReadOnlyProductionBlockRule, RhsBlockRule, SimpleTextRule, SpacedCommaRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ReadOnlyLhsBlockRule, ReadOnlyProductionBlockRule, RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, UseStatementRule, UsingKeysInputBlockRule, UsingKeysLhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { UsingKeysProductionBlockRule, UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
@@ -144,6 +144,21 @@ describe("KMN Analyser Tests", () => {
       assert.equal(uCharNodes.length, 35);
       const lineNodes = storeNode.getChildrenOfType(NodeTypes.LINE);
       assert.equal(lineNodes.length, 6);
+    });
+    it("can parse correctly (ruleBlock)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F\n');
+      const contentLine: Rule = new ContentLineRule();
+      assert.isTrue(contentLine.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
   describe("BlankLineRule Tests", () => {
@@ -555,6 +570,28 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
+  describe("RuleBlockRule Tests", () => {
+    it("can construct a RuleBlockRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const ruleBlock: Rule = new RuleBlockRule();
+      assert.isNotNull(ruleBlock);
+    });
+    it("can parse correctly (usingKeysProductionBlock)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
+      const productionBlock: Rule = new RuleBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+  });
   describe("BeginBlockRule Tests", () => {
     it("can construct an BeginBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -807,6 +844,21 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       const uCharNodes = rhsNode.getChildrenOfType(NodeTypes.U_CHAR);
       assert.equal(uCharNodes.length, 2);
+    });
+    it("can parse correctly (u_char, plus, virtual key, context, u_char)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
+      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
   describe("ReadOnlyProductionBlockRule Tests", () => {
@@ -1843,31 +1895,31 @@ describe("KMN Analyser Tests", () => {
       assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
     });
   });
-  describe("SpacedCommaRule Tests", () => {
-    it("can construct a SpacedCommaRule", () => {
+  describe("CommaRule Tests", () => {
+    it("can construct a CommaRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const spacedComma: Rule = new SpacedCommaRule();
-      assert.isNotNull(spacedComma);
+      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      assert.isNotNull(comma);
     });
     it("can parse correctly (comma)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(',');
-      const spacedComma: Rule = new SpacedCommaRule();
-      assert.isTrue(spacedComma.parse(root));
+      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' ,');
-      const spacedComma: Rule = new SpacedCommaRule();
-      assert.isTrue(spacedComma.parse(root));
+      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(', ');
-      const spacedComma: Rule = new SpacedCommaRule();
-      assert.isTrue(spacedComma.parse(root));
+      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      assert.isTrue(comma.parse(root));
     });
     it("can parse correctly (comma, space before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' , ');
-      const spacedComma: Rule = new SpacedCommaRule();
-      assert.isTrue(spacedComma.parse(root));
+      const comma: Rule = new TokenRule(TokenTypes.COMMA);
+      assert.isTrue(comma.parse(root));
     });
   });
   describe("ContextStatementRule Tests", () => {

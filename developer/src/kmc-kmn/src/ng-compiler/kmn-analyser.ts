@@ -33,14 +33,12 @@ export class LineRule extends SingleChildRule {
 export class ContentLineRule extends SingleChildRule {
   public constructor() {
     super();
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const content: Rule       = new ContentRule();
     const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
     const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
     this.rule = new SequenceRule([
-      optWhitespace, content, optWhitespace, optComment, newline
+      content, optComment, newline
     ]);
   }
 }
@@ -48,34 +46,27 @@ export class ContentLineRule extends SingleChildRule {
 export class BlankLineRule extends SingleChildRule {
   public constructor() {
     super();
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
     const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule([optWhitespace, optComment, newline]);
+    this.rule = new SequenceRule([optComment, newline]);
   }
 }
 
 export class PaddingRule extends SingleChildRule {
   public constructor() {
     super();
-    const whitespace          = new TokenRule(TokenTypes.WHITESPACE);
     const continuationNewline = new ContinuationNewlineRule();
-    this.rule = new AlternateRule([continuationNewline, whitespace]);
+    this.rule = new OptionalRule(continuationNewline);
   }
 }
 
 export class ContinuationNewlineRule extends SingleChildRule {
   public constructor() {
     super();
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const continuation: Rule  = new TokenRule(TokenTypes.CONTINUATION);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule(
-      [optWhitespace, continuation, optWhitespace, newline, optWhitespace]
-    );
+    this.rule = new SequenceRule([continuation, newline]);
   }
 }
 
@@ -160,28 +151,22 @@ export class TextRangeRule extends SingleChildRule {
 export class RangeEndRule extends SingleChildRule {
   public constructor() {
     super();
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const range: Rule         = new TokenRule(TokenTypes.RANGE);
     const simpleText: Rule    = new SimpleTextRule();
-    this.rule = new SequenceRule([
-      optWhitespace, range, optWhitespace, simpleText
-    ]);
+    this.rule = new SequenceRule([range, simpleText]);
   }
 }
 
 export class VirtualKeyRule extends SingleChildRule {
   public constructor() {
     super();
-    const leftSquare: Rule         = new TokenRule(TokenTypes.LEFT_SQ);
-    const whitespace: Rule         = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule      = new OptionalRule(whitespace);
-    const spacedModifier: Rule     = new SpacedModifierRule();
-    const manySpacedModifier: Rule = new ManyRule(spacedModifier);
-    const keyCode: Rule            = new TokenRule(TokenTypes.KEY_CODE, true);
-    const rightSquare: Rule        = new TokenRule(TokenTypes.RIGHT_SQ);
+    const leftSquare: Rule   = new TokenRule(TokenTypes.LEFT_SQ);
+    const modifier: Rule     = new ModifierRule();
+    const manyModifier: Rule = new ManyRule(modifier);
+    const keyCode: Rule      = new TokenRule(TokenTypes.KEY_CODE, true);
+    const rightSquare: Rule  = new TokenRule(TokenTypes.RIGHT_SQ);
     this.rule = new SequenceRule([
-      leftSquare, optWhitespace, manySpacedModifier, keyCode, optWhitespace, rightSquare
+      leftSquare, manyModifier, keyCode, rightSquare
     ]);
   }
 
@@ -196,15 +181,6 @@ export class VirtualKeyRule extends SingleChildRule {
       node.addChildren(lineNodes);
     }
     return parseSuccess;
-  }
-}
-
-export class SpacedModifierRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const modifier: Rule   = new ModifierRule();
-    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
-    this.rule = new SequenceRule([modifier, whitespace]);
   }
 }
 
@@ -284,9 +260,9 @@ export class BeginBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const beginStatement: Rule = new BeginStatementRule();
-    const spacedChevron: Rule  = new SpacedChevronRule();
+    const chevron: Rule        = new TokenRule(TokenTypes.CHEVRON);
     const useStatement: Rule   = new UseStatementRule();
-    this.rule = new SequenceRule([beginStatement, spacedChevron, useStatement]);
+    this.rule = new SequenceRule([beginStatement, chevron, useStatement]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -305,10 +281,10 @@ export class BeginBlockRule extends SingleChildRule {
 export class BeginStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const begin: Rule                = new TokenRule(TokenTypes.BEGIN, true);
-    const spacedEntryPointRule: Rule = new SpacedEntryPointRule();
-    const optSpacedEntryPoint: Rule  = new OptionalRule(spacedEntryPointRule);
-    this.rule = new SequenceRule([begin, optSpacedEntryPoint]);
+    const begin: Rule          = new TokenRule(TokenTypes.BEGIN, true);
+    const entryPointRule: Rule = new EntryPointRule();
+    const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
+    this.rule = new SequenceRule([begin, optEntryPoint]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -324,15 +300,6 @@ export class BeginStatementRule extends SingleChildRule {
   }
 }
 
-export class SpacedEntryPointRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
-    const entryPoint: Rule = new EntryPointRule();
-    this.rule = new SequenceRule([whitespace, entryPoint]);
-  }
-}
-
 export class EntryPointRule extends SingleChildRule {
   public constructor() {
     super();
@@ -340,18 +307,7 @@ export class EntryPointRule extends SingleChildRule {
     const newcontext: Rule    = new TokenRule(TokenTypes.NEWCONTEXT, true);
     const postkeystroke: Rule = new TokenRule(TokenTypes.POSTKEYSTROKE, true);
     const ansi: Rule          = new TokenRule(TokenTypes.ANSI, true);
-    this.rule = new AlternateRule([
-      unicode, newcontext, postkeystroke, ansi,
-    ]);
-  }
-}
-
-export class SpacedChevronRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
-    const chevron: Rule    = new TokenRule(TokenTypes.CHEVRON);
-    this.rule = new SequenceRule([whitespace, chevron, whitespace]);
+    this.rule = new AlternateRule([unicode, newcontext, postkeystroke, ansi]);
   }
 }
 
@@ -380,12 +336,10 @@ export class BracketedGroupNameRule extends SingleChildRule {
   public constructor() {
     super();
     const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
-    const whitespace: Rule         = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule      = new OptionalRule(whitespace);
     const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
     const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      leftBracket, optWhitespace, groupNameOrKeyword, optWhitespace, rightBracket,
+      leftBracket, groupNameOrKeyword, rightBracket,
     ]);
   }
 }
@@ -393,10 +347,10 @@ export class BracketedGroupNameRule extends SingleChildRule {
 export class GroupBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const groupStatement: Rule           = new GroupStatementRule();
-    const spacedGroupQualifierRule: Rule = new SpacedGroupQualifierRule();
-    const optSpacedGroupQualifier: Rule  = new OptionalRule(spacedGroupQualifierRule);
-    this.rule = new SequenceRule([groupStatement, optSpacedGroupQualifier]);
+    const groupStatement: Rule     = new GroupStatementRule();
+    const groupQualifierRule: Rule = new GroupQualifierRule();
+    const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
+    this.rule = new SequenceRule([groupStatement, optGroupQualifier]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -474,15 +428,6 @@ export class GroupNameRule extends SingleChildRule {
     };
 }
 
-export class SpacedGroupQualifierRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const whitespace: Rule     = new TokenRule(TokenTypes.WHITESPACE);
-    const groupQualifier: Rule = new GroupQualifierRule();
-    this.rule = new SequenceRule([whitespace, groupQualifier]);
-  }
-}
-
 export class GroupQualifierRule extends SingleChildRule {
   public constructor() {
     super();
@@ -496,11 +441,8 @@ export class UsingKeysRule extends SingleChildRule {
   public constructor() {
     super();
     const using: Rule      = new TokenRule(TokenTypes.USING);
-    const whitespace: Rule = new TokenRule(TokenTypes.WHITESPACE);
     const keys: Rule       = new TokenRule(TokenTypes.KEYS);
-    this.rule = new SequenceRule([
-      using, whitespace, keys,
-    ]);
+    this.rule = new SequenceRule([using, keys]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -514,15 +456,15 @@ export class UsingKeysRule extends SingleChildRule {
 }
 
 abstract class AbstractProductionBlockRule extends SingleChildRule {
-  protected spacedChevron: Rule;
+  protected chevron: Rule;
   protected rhsBlock: Rule;
   protected lhsNodeType: NodeTypes;
   protected productionNodeType: NodeTypes;
 
   public constructor() {
     super();
-    this.spacedChevron = new SpacedChevronRule();
-    this.rhsBlock      = new RhsBlockRule();
+    this.chevron  = new TokenRule(TokenTypes.CHEVRON);
+    this.rhsBlock = new RhsBlockRule();
   }
 
   public parse(node: ASTNode): boolean {
@@ -550,7 +492,7 @@ export class UsingKeysProductionBlockRule extends AbstractProductionBlockRule {
     this.lhsNodeType        = NodeTypes.LHS_USING_KEYS;
     this.productionNodeType = NodeTypes.PRODUCTION_USING_KEYS;
     const usingKeysLhsBlock = new UsingKeysLhsBlockRule();
-    this.rule = new SequenceRule([usingKeysLhsBlock, this.spacedChevron, this.rhsBlock]);
+    this.rule = new SequenceRule([usingKeysLhsBlock, this.chevron, this.rhsBlock]);
   }
 }
 
@@ -560,7 +502,7 @@ export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
     this.lhsNodeType        = NodeTypes.LHS_READONLY;
     this.productionNodeType = NodeTypes.PRODUCTION_READONLY;
     const readOnlyLhsBlock  = new ReadOnlyLhsBlockRule();
-    this.rule = new SequenceRule([readOnlyLhsBlock, this.spacedChevron, this.rhsBlock]);
+    this.rule = new SequenceRule([readOnlyLhsBlock, this.chevron, this.rhsBlock]);
   }
 }
 
@@ -570,7 +512,7 @@ export class ContextProductionBlockRule extends AbstractProductionBlockRule {
     this.lhsNodeType        = NodeTypes.LHS_CONTEXT;
     this.productionNodeType = NodeTypes.PRODUCTION_CONTEXT;
     const contextLhsBlock   = new ContextLhsBlockRule();
-    this.rule = new SequenceRule([contextLhsBlock, this.spacedChevron, this.rhsBlock]);
+    this.rule = new SequenceRule([contextLhsBlock, this.chevron, this.rhsBlock]);
   }
 }
 
@@ -851,8 +793,6 @@ export class IfStatementRule extends SingleChildRule {
 export class AbstractIfStoreStatementRule extends SingleChildRule {
   protected ifRule: Rule;
   protected leftBracket: Rule;
-  protected optWhitespace: Rule
-  protected whitespace: Rule;
   protected comparison: Rule;
   protected rightBracket: Rule;
 
@@ -860,8 +800,6 @@ export class AbstractIfStoreStatementRule extends SingleChildRule {
     super();
     this.ifRule        = new TokenRule(TokenTypes.IF, true);
     this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
-    this.whitespace    = new TokenRule(TokenTypes.WHITESPACE);
-    this.optWhitespace = new OptionalRule(this.whitespace);
     this.comparison    = new ComparisonRule();
     this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
   }
@@ -885,9 +823,8 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
     const normalStoreName: Rule = new NormalStoreNameRule();
     const stringRule: Rule      = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, normalStoreName,
-      this.whitespace, this.comparison, this.whitespace, stringRule,
-      this.optWhitespace, this.rightBracket,
+      this.ifRule, this.leftBracket, normalStoreName,
+      this.comparison, stringRule, this.rightBracket,
     ]);
   }
 }
@@ -898,9 +835,8 @@ export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRu
     const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
     const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, this.optWhitespace, ifSystemStoreName,
-      this.whitespace, this.comparison, this.whitespace, stringRule,
-      this.optWhitespace, this.rightBracket,
+      this.ifRule, this.leftBracket, ifSystemStoreName,
+      this.comparison, stringRule, this.rightBracket,
     ]);
   }
 }
@@ -1001,24 +937,23 @@ export class BracketedStringRule extends SingleChildRule {
   public constructor() {
     super();
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const string: Rule        = new TokenRule(TokenTypes.STRING, true);
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      leftBracket, optWhitespace, string, optWhitespace, rightBracket,
-    ]);
+    this.rule = new SequenceRule([leftBracket, string, rightBracket]);
   }
 }
 
 export class RhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
+    const outputBlock: Rule        = new OutputBlockRule();
     const contextOutputBlock: Rule = new ContextOutputBlockRule();
     const context: Rule            = new TokenRule(TokenTypes.CONTEXT, true);
     const returnRule: Rule         = new TokenRule(TokenTypes.RETURN, true);
     const nul: Rule                = new TokenRule(TokenTypes.NUL, true);
-    this.rule = new AlternateRule([contextOutputBlock, context, returnRule, nul]);
+    this.rule = new AlternateRule([
+      outputBlock, contextOutputBlock, context, returnRule, nul
+    ]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -1138,20 +1073,16 @@ export class IndexStatementRule extends SingleChildRule {
     super();
     const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
-    const whitespace: Rule      = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule   = new OptionalRule(whitespace);
     const normalStoreName: Rule = new NormalStoreNameRule();
-    const spacedComma: Rule     = new SpacedCommaRule();
+    const comma: Rule           = new TokenRule(TokenTypes.COMMA);
     const offset: Rule          = new OffsetRule();
     const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       index,
       leftBracket,
-      optWhitespace,
       normalStoreName,
-      spacedComma,
+      comma,
       offset,
-      optWhitespace,
       rightBracket,
     ]);
   }
@@ -1165,16 +1096,6 @@ export class IndexStatementRule extends SingleChildRule {
       node.addChild(indexNode);
     }
     return parseSuccess;
-  }
-}
-
-export class SpacedCommaRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
-    const comma: Rule         = new TokenRule(TokenTypes.COMMA);
-    this.rule = new SequenceRule([optWhitespace, comma, optWhitespace]);
   }
 }
 
@@ -1202,16 +1123,12 @@ export class ContextStatementRule extends SingleChildRule {
     super();
     const index: Rule         = new TokenRule(TokenTypes.CONTEXT, true);
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const whitespace: Rule    = new TokenRule(TokenTypes.WHITESPACE)
-    const optWhitespace: Rule = new OptionalRule(whitespace);
     const offset: Rule        = new OffsetRule();
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
       index,
       leftBracket,
-      optWhitespace,
       offset,
-      optWhitespace,
       rightBracket,
     ]);
   }

@@ -1,9 +1,9 @@
 kmnTree: line*
 line: contentLine|blankLine
-contentLine: WHITESPACE? content WHITESPACE? COMMENT? NEWLINE
-blankLine: WHITESPACE? COMMENT? NEWLINE
-padding: continuationNewline|WHITESPACE
-continuationNewline: WHITESPACE? CONTINUATION WHITESPACE? NEWLINE WHITESPACE?
+contentLine: content COMMENT? NEWLINE
+blankLine: COMMENT? NEWLINE
+padding: continuationNewline?
+continuationNewline: CONTINUATION NEWLINE
 content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
   normalStoreAssign|ruleBlock
 prePadText: padding text
@@ -11,30 +11,26 @@ text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR
 textRange: simpleText rangeEnd+
-rangeEnd: WHITESPACE? RANGE WHITESPACE? simpleText
-virtualKey: LEFT_SQ WHITESPACE? spacedModifier* KEY_CODE WHITESPACE? RIGHT_SQ
-spacedModifier: modifier WHITESPACE
+rangeEnd: RANGE simpleText
+virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 outsStatement: OUTS bracketedStoreName
 ruleBlock: beginBlock|groupBlock|usingKeysProductionBlock|readOnlyProductionBlock|
   contextProductionBlock
-beginBlock: beginStatement spacedChevron useStatement
-beginStatement: BEGIN spacedEntryPoint?
-spacedEntryPoint: WHITESPACE entryPoint
+beginBlock: beginStatement CHEVRON useStatement
+beginStatement: BEGIN entryPoint?
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
-spacedChevron: WHITESPACE CHEVRON WHITESPACE
 useStatement: USE bracketedGroupName
-bracketedGroupName: LEFT_BR WHITESPACE? groupNameOrKeyword WHITESPACE? RIGHT_BR
+bracketedGroupName: LEFT_BR groupNameOrKeyword RIGHT_BR
 groupNameOrKeyword: groupName|permittedKeyword
 groupName: PARAMETER|OCTAL
-groupBlock: groupStatement spacedGroupQualifier?
+groupBlock: groupStatement groupQualifier?
 groupStatement: GROUP bracketedGroupName
-spacedGroupQualifier: WHITESPACE groupQualifier
 groupQualifier: usingKeys|READONLY
-usingKeys: USING WHITESPACE KEYS
-usingKeysProductionBlock: usingKeysLhsBlock spacedChevron rhsBlock
-readOnlyProductionBlock: readOnlyLhsBlock spacedChevron rhsBlock
-contextProductionBlock: contextLhsBlock spacedChevron rhsBlock
+usingKeys: USING KEYS
+usingKeysProductionBlock: usingKeysLhsBlock CHEVRON rhsBlock
+readOnlyProductionBlock: readOnlyLhsBlock CHEVRON rhsBlock
+contextProductionBlock: contextLhsBlock CHEVRON rhsBlock
 usingKeysLhsBlock: usingKeysInputBlock
 readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
 contextLhsBlock: contextInputBlock|nulInputBlock
@@ -56,17 +52,17 @@ ifLikeBlock: ifLikeStatement prePadIfLikeStatement*
 prePadIfLikeStatement: padding IfLikeStatement
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStringStatement|ifSystemStoreStringStatement
-ifStoreStringStatement: IF LEFT_BR WHITESPACE? normalStoreName WHITESPACE
-  comparison WHITESPACE STRING WHITESPACE? RIGHT_BR
-ifSystemStoreStringStatement: IF LEFT_BR WHITESPACE? ifSystemStoreName
-  WHITESPACE comparison WHITESPACE STRING WHITESPACE? RIGHT_BR
+ifStoreStringStatement: IF LEFT_BR normalStoreName
+  comparison STRING RIGHT_BR
+ifSystemStoreStringStatement: IF LEFT_BR ifSystemStoreName
+  comparison STRING RIGHT_BR
 ifSystemStoreName: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
 comparison:EQUAL|NOT_EQUAL
 layerStatement: LAYER_SHORTCUT bracketedString
 platformStatement: PLATFORM_SHORTCUT bracketedString
 baselayoutStatement: BASELAYOUT_SHORTCUT bracketedString
-bracketedString: LEFT_BR WHITESPACE? STRING WHITESPACE? RIGHT_BR
-rhsBlock: contextOutputBlock|CONTEXT|RETURN|NUL
+bracketedString: LEFT_BR STRING RIGHT_BR
+rhsBlock: outputBlock|contextOutputBlock|CONTEXT|RETURN|NUL
 contextOutputBlock: postPadContext? outputBlock
 postPadContext: CONTEXT padding
 outputBlock: outputStatement prePadOutputStatement*
@@ -77,28 +73,25 @@ outputStatement: useStatement|callStatement|setStore|saveStatement|
 callStatement: CALL bracketedStoreName
 saveStatement: SAVE bracketedStoreName
 deadKeyStatement: DEADKEY bracketedStoreName
-indexStatement: INDEX LEFT_BR WHITESPACE? normalStoreName spacedComma offset WHITESPACE? RIGHT_BR
-spacedComma: WHITESPACE? COMMA WHITESPACE?
+indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
 offset: OCTAL|PARAMETER
-contextStatement: CONTEXT LEFT_BR WHITESPACE? offset WHITESPACE? RIGHT_BR
+contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 
 # System and Variable Store Rules
 systemStoreAssign: systemStore prePadText+
-systemStore: STORE LEFT_BR WHITESPACE? systemStoreName WHITESPACE? RIGHT_BR
+systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
 systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|
   KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|TARGETS|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
 normalStoreAssign: normalStore prePadText+
 normalStore: STORE bracketedStoreName
-bracketedStoreName: LEFT_BR WHITESPACE? normalStoreName WHITESPACE? RIGHT_BR
+bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
 permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
-setStore: SET LEFT_BR WHITESPACE? normalStoreName WHITESPACE EQUAL
-  WHITESPACE STRING WHITESPACE? RIGHT_BR
-setLayer: SET LEFT_BR WHITESPACE? LAYER WHITESPACE EQUAL
-  WHITESPACE STRING WHITESPACE? RIGHT_BR
+setStore: SET LEFT_BR normalStoreName EQUAL STRING RIGHT_BR
+setLayer: SET LEFT_BR LAYER EQUAL STRING RIGHT_BR
 resetStore: RESET bracketedStoreName
-capsAlwaysOff: CAPS WHITESPACE ALWAYS WHITESPACE OFF
-capsOnOnly: CAPS WHITESPACE ON WHITESPACE ONLY
-shiftFreesCaps: SHIFT WHITESPACE FREES WHITESPACE CAPS
+capsAlwaysOff: CAPS ALWAYS OFF
+capsOnOnly: CAPS ON ONLY
+shiftFreesCaps: SHIFT FREES CAPS
