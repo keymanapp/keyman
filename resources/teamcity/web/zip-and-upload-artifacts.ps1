@@ -1,6 +1,8 @@
 #
 # This script should be the identical for nightly/beta/stable for a given platform
 #
+# Working directory should be ${KEYMAN_ROOT}/web
+#
 $ErrorActionPreference = "Stop";
 
 $tier = Get-Content ..\TIER.md
