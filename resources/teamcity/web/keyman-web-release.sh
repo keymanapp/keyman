@@ -58,9 +58,7 @@ function _zip_and_upload_artifacts() {
 
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
-  cd "${KEYMAN_ROOT}/resources/teamcity/web"
   powershell -NonInteractive -ExecutionPolicy Bypass -File zip-and-upload-artifacts.ps1
-  cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
