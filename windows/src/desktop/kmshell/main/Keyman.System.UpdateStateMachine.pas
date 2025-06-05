@@ -641,7 +641,7 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and Update is available }
-  if UpdateCheckResult = wucSuccess then
+  if (UpdateCheckResult = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate)  then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -921,7 +921,9 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and go back to update available so files can be downloaded }
-  if Result = wucSuccess then
+  // TODO: first check if downloaded files are the same as the the latest files in
+  // the metadata, if not then we should download the new files.
+  if (Result = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate)  then
   begin
     ChangeState(UpdateAvailableState);
   end;
