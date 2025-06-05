@@ -5,8 +5,33 @@
 # Maps to ci/cancel-builds/trigger-definitions.mjs and must be kept in sync
 #
 
+#
+# Build levels
+#
+
+readonly build_level_skip=skip
+readonly build_level_build=build
+readonly build_level_release=release
+readonly valid_build_levels="$build_level_skip|$build_level_build|$build_level_release"
+
+#
+# Target platforms
+#
 
 available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
+
+declare -Ag main_branch_platform_build_levels
+for available_platforms_i in "${available_platforms[@]}"; do
+  main_branch_platform_build_levels[$available_platforms_i]=$build_level_build
+done
+readonly main_branch_platform_build_levels
+readonly available_platforms
+
+
+available_platforms_regex=`echo "${available_platforms[@]}" | sed 's/ /|/g'`
+
+# We also allow 'common' and 'core' platforms for Build-bot: commands
+readonly available_platforms_regex="$available_platforms_regex|common|core"
 
 # the base folder for each pattern does not need to be included, nor oem folders
 # e.g. android='common/models|common/predictive-text'
@@ -56,6 +81,13 @@ bc_test_common_web=(Keyman_Test_Common_Web)
 bc_test_common_windows=(Keyman_Test_Common_Windows)
 bc_test_common_mac=(Keyman_Test_Common_Mac)
 bc_test_common_linux=(Keyman_Test_Common_Linux)
+
+# These configuration arrays are triggered only by Build-bot commands:
+
+bc_test_common=(Keyman_Test_Common_Web Keyman_Test_Common_Windows Keyman_Test_Common_Mac Keyman_Test_Common_Linux)
+bc_test_core=(Keyman_Common_KPAPI_TestPullRequests_Linux Keyman_Common_KPAPI_TestPullRequests_macOS Keyman_Common_KPAPI_TestPullRequests_Windows)
+
+# Core is tested directly for target platforms
 
 # Keymanweb_TestPullRequestRegressions : currently this is timing out so disabled until we have
 #                                        time to investigate further
