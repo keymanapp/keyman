@@ -27,6 +27,10 @@ check_and_install_packages() {
   local PACKAGES=$*
   local TOINSTALL=""
 
+  if ! is_ubuntu; then
+    return 0
+  fi
+
   for p in ${PACKAGES}
   do
     if ! is_package_installed "${p}"; then
@@ -83,3 +87,28 @@ linux_install_dependencies_for_tests() {
   builder_echo end install_dependencies_for_tests success "Finished installing dependencies for tests"
 }
 
+linux_start_xvfb() {
+  # On Linux start Xvfb etc
+  local PID_FILE=/tmp/keymanweb-pids
+  builder_echo "Starting Xvfb..."
+  Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
+  echo "kill -9 $! || true" > "${PID_FILE}"
+  sleep 1
+  builder_echo "Starting Xephyr..."
+  DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
+  echo "kill -9 $! || true" >> "${PID_FILE}"
+  sleep 1
+  builder_echo "Starting metacity"
+  metacity --display=:32 &> /dev/null &
+  echo "kill -9 $! || true" >> "${PID_FILE}"
+  export DISPLAY=:32
+}
+
+linux_stop_xvfb() {
+  # On Linux stop Xvfb etc
+  local PID_FILE=/tmp/keymanweb-pids
+  if [[ -f "${PID_FILE}" ]]; then
+    bash "${PID_FILE}"
+    rm -f "${PID_FILE}"
+  fi
+}

@@ -59,4 +59,3 @@ linux_unit_tests_action() {
   "${KEYMAN_ROOT}/linux/build.sh" test $@
   builder_echo endTest unit_tests success "Finished running unit tests"
 }
-

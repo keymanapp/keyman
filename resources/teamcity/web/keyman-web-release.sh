@@ -13,13 +13,17 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe \
   "Run tests for native KeymanWeb" \
   "all            run all actions" \
+  "configure      install dependencies" \
   "build          build Web + embedded" \
   "publish        publish release" \
   "--s.keyman.com=S_KEYMAN_COM        path to s.keyman.com repository" \
@@ -29,25 +33,17 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/web"
 
-function build_web_action() {
-  builder_echo start web_build "Building KeymanWeb"
-
-  node ../resources/gosh/gosh.js ./ci.sh build
-
-  builder_echo end web_build success "Finished building KeymanWeb"
-}
-
 function _push_release_to_skeymancom() {
   # Push release to s.keyman.com/kmw/engine (do this before updating
   # downloads.keyman.com so we can ensure files are available)
-  builder_echo start publish "Publishing release to skeyman.com"
+  builder_echo start publish "Publishing release to s.keyman.com"
 
   cd "${S_KEYMAN_COM:=${KEYMAN_ROOT}/../s.keyman.com}"
   git pull https://github.com/keymanapp/s.keyman.com.git master
-  cd ../keyman/web
+  cd "${KEYMAN_ROOT}/web"
   "${KEYMAN_ROOT}/web/ci.sh" prepare:s.keyman.com --s.keyman.com "${S_KEYMAN_COM}"
 
-  builder_echo end publish success "Finished publishing release to skeyman.com"
+  builder_echo end publish success "Finished publishing release to s.keyman.com"
 }
 
 function _zip_and_upload_artifacts() {
@@ -68,7 +64,7 @@ function _upload_help() {
 
   export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
   cd "${KEYMAN_ROOT}/resources/build"
-  node ../gosh/gosh.js ./help-keyman-com.sh web
+  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
   cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
@@ -76,6 +72,12 @@ function _upload_help() {
 
 function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
+
+  # TODO: refactor to allow to run on Linux/macOS as well
+  if ! is_windows; then
+    builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
+    return 1
+  fi
 
   # Push release to s.keyman.com/kmw/engine (do this before updating
   # downloads.keyman.com so we can ensure files are available)
@@ -88,9 +90,17 @@ function publish_web_action() {
 }
 
 if builder_has_action all; then
-  build_web_action
+  web_install_dependencies_on_linux_action
+
+  set_variables_for_nvm
+
+  web_build_action
   publish_web_action
 else
-  builder_run_action  build       build_web_action
+  builder_run_action  configure   web_install_dependencies_on_linux_action
+
+  set_variables_for_nvm
+
+  builder_run_action  build       web_build_action
   builder_run_action  publish     publish_web_action
 fi
