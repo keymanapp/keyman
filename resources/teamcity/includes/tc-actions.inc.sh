@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
 # Run the clean action in the `linux` directory.`
 linux_clean_action() {
