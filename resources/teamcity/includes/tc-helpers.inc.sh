@@ -41,15 +41,17 @@ install_nvm() {
 # `KEYMAN_USE_NVM` variable so that the build can automatically install
 # the required node version.
 set_variables_for_nvm() {
-  # nvm.sh uses some variables that might not be initialized, so we
-  # disable the "unbound variable" check temporarily
-  set -u
-  export NVM_DIR="${HOME}/.nvm"
-  # shellcheck disable=SC1091
-  . "${NVM_DIR}/nvm.sh"
-  set +u
-  export KEYMAN_USE_NVM=1
-  PATH=${HOME}/.keyman/node:${PATH}
+  if [[ -f "${HOME}/.nvm/nvm.sh" ]] && [[ -d "${HOME}/.keyman/node" ]]; then
+    # nvm.sh uses some variables that might not be initialized, so we
+    # disable the "unbound variable" check temporarily
+    set -u
+    export NVM_DIR="${HOME}/.nvm"
+    # shellcheck disable=SC1091
+    . "${NVM_DIR}/nvm.sh"
+    set +u
+    export KEYMAN_USE_NVM=1
+    PATH=${HOME}/.keyman/node:${PATH}
+  fi
 }
 
 install_emscripten() {
