@@ -61,8 +61,10 @@ function _download_symbol_server_index() {
   # Download symbol server index from symbol server
   builder_echo start "download symbol server index" "Downloading symbol server index"
 
+  cd "${KEYMAN_ROOT}/.."
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/download-symbol-server-index.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "download symbol server index" success "Finished downloading symbol server index"
 }
@@ -71,8 +73,10 @@ function _publish_new_symbols() {
   # Publish new symbols to symbol server
   builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
 
+  cd "${KEYMAN_ROOT}/../symbols"
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-new-symbols.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }
@@ -81,8 +85,10 @@ function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
+  cd "${KEYMAN_ROOT}/developer"
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-to-downloads-keyman-com.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
 }
