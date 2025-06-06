@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.59 alpha 2025-06-05
+
+* chore(deps): bump multer from 2.0.0 to 2.0.1 (#14127)
+* maint(web): fix working directory for zipping artifacts for Web release (#14128)
+* chore(linux): Update debian changelog (#14119)
+* maint(web): improve TC build script for Keyman Web/Test (#14051)
+* maint(developer): move TC configuration for Keyman Developer to scripts (#14052)
+
 ## 19.0.58 alpha 2025-06-04
 
 * feat(developer): update strs compiler to collect context (#14064)
