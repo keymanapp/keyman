@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.60 alpha 2025-06-06
+
+* maint(developer): allow to build locally on Linux (#14059)
+
 ## 19.0.59 alpha 2025-06-05
 
 * chore(deps): bump multer from 2.0.0 to 2.0.1 (#14127)
