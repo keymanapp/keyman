@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 // TODO-web-core: remove use of OutputTargetBase
 import { Transcription, Mock, OutputTargetBase } from "keyman/engine/js-processor";
-import { OutputTarget } from 'keyman/engine/keyboard';
+import { OutputTargetInterface } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -127,7 +127,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     });
   }
 
-  public invalidateContext(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
+  public invalidateContext(outputTarget: OutputTargetInterface, layerId: string): Promise<Suggestion[]> {
     // If there's no active model, there can be no predictions.
     // We'll also be missing important data needed to even properly REQUEST the predictions.
     if(!this.currentModel || !this.configuration) {
@@ -156,7 +156,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public wordbreak(target: OutputTarget, layerId: string): Promise<string> {
+  public wordbreak(target: OutputTargetInterface, layerId: string): Promise<string> {
     if(!this.isActive) {
       return null;
     }
@@ -192,9 +192,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget, getLayerId: ()=>string): Promise<Reversion> {
+  public applySuggestion(suggestion: Suggestion, outputTarget: OutputTargetInterface, getLayerId: ()=>string): Promise<Reversion> {
     if(!outputTarget) {
-      throw "Accepting suggestions requires a destination OutputTarget instance."
+      throw "Accepting suggestions requires a destination OutputTargetInterface instance."
     }
 
     if(!this.isActive) {
@@ -269,9 +269,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     }
   }
 
-  public applyReversion(reversion: Reversion, outputTarget: OutputTarget) {
+  public applyReversion(reversion: Reversion, outputTarget: OutputTargetInterface) {
     if(!outputTarget) {
-      throw "Accepting suggestions requires a destination OutputTarget instance."
+      throw "Accepting suggestions requires a destination OutputTargetInterface instance."
     }
 
     if(!this.isActive) {
@@ -313,7 +313,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return promise;
   }
 
-  public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
+  public predictFromTarget(outputTarget: OutputTargetInterface, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive || !outputTarget) {
       return null;
     }
