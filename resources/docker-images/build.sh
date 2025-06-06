@@ -17,6 +17,7 @@ builder_describe \
   ":android" \
   ":base" \
   ":core" \
+  ":developer" \
   ":linux" \
   ":web" \
   "--distro=DISTRO                  The distribution to use for the base image (debian or ubuntu, default: ubuntu)" \
@@ -45,6 +46,7 @@ build_action() {
 
   # shellcheck disable=SC2164
   cd "${platform}"
+  export DOCKER_BUILDKIT=1
   # shellcheck disable=SC2248,SC2086
   docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
@@ -63,18 +65,20 @@ test_action() {
 
   builder_echo debug "Testing image for ${platform}"
   ./run.sh --distro "${DISTRO}" --distro-version "${DISTRO_VERSION}" \
-    "${platform}" -- ./build.sh configure,build,test:"${platform}"
+    ":${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
 
+check_buildx_available
 check_for_default_values
 convert_parameters_to_args
 
 if builder_has_action build; then
   build_action base
-  builder_run_action build:android  build_action android
-  builder_run_action build:core     build_action core
-  builder_run_action build:linux    build_action linux
-  builder_run_action build:web      build_action web
+  builder_run_action build:android    build_action android
+  builder_run_action build:core       build_action core
+  builder_run_action build:linux      build_action linux
+  builder_run_action build:web        build_action web
+  builder_run_action build:developer  build_action developer
 fi
 
 builder_run_action test:core        test_action core
@@ -82,3 +86,4 @@ builder_run_action test:linux       test_action linux
 builder_run_action test:web         test_action web
 # Android uses artifacts from web, so it has to come after web
 builder_run_action test:android     test_action android
+builder_run_action test:developer   test_action developer
