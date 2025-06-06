@@ -18,7 +18,7 @@ export {
   MetadataObj as RawKeyboardMetadata,
   LanguageAPIPropertySpec
 } from "./keyboards/keyboardProperties.js";
-export { RuleBehavior } from "./keyboards/ruleBehavior.js";
+export { ProcessorAction as ProcessorAction } from "./keyboards/processorAction.js";
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
 export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 export { type Alternate, TextTransform } from "./keyboards/textTransform.js";

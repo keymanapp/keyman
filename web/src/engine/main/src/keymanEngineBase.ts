@@ -1,4 +1,4 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, RuleBehavior } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
 import { OutputTargetBase, ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
@@ -33,7 +33,7 @@ function determineBaseLayout(): string {
   }
 }
 
-export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
+export type KeyEventFullResultCallback = (result: ProcessorAction, error?: Error) => void;
 export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
 export class KeymanEngineBase<
@@ -280,7 +280,7 @@ export class KeymanEngineBase<
       // Call the keyboard's entry point.
       // TODO-web-core
       const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTargetBase)
-      // If we have a RuleBehavior as a result, run it on the target. This should
+      // If we have a ProcessorAction as a result, run it on the target. This should
       // only change system store and variable store values.
       if (data) {
         keyboardProcessor.finalizeProcessorAction(data, predictionContext.currentTarget);
