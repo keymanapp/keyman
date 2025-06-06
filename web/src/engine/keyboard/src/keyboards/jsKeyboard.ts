@@ -4,6 +4,7 @@ import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import { KeyEvent } from "../keyEvent.js";
 import { type OutputTargetInterface } from "../outputTargetInterface.js";
 import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+import { VariableStoreDictionary } from "../variableStore.js";
 
 import ComplexKeyboardStore = KeymanWebKeyboard.ComplexKeyboardStore;
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
@@ -29,10 +30,6 @@ export enum LayoutState {
   NOT_LOADED = undefined,
   POLYFILLED = 1
 }
-
-export interface VariableStoreDictionary {
-  [name: string]: string;
-};
 
 type KmwKeyboardObject = KeyboardObject & {
   /**

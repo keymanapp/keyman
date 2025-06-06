@@ -1,6 +1,6 @@
 export { ActiveKeyBase, ActiveKey, ActiveSubKey, ActiveRow, ActiveLayer, ActiveLayout } from "./keyboards/activeLayout.js";
 export { ButtonClass, ButtonClasses, LayoutLayer, LayoutFormFactor, LayoutRow, LayoutKey, LayoutSubKey, Layouts } from "./keyboards/defaultLayouts.js";
-export { JSKeyboard, LayoutState, VariableStoreDictionary } from "./keyboards/jsKeyboard.js";
+export { JSKeyboard, LayoutState } from "./keyboards/jsKeyboard.js";
 export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.js';
 export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
@@ -32,7 +32,7 @@ export { type KeyDistribution, KeyEventSpec, KeyEvent } from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
 export { OutputTargetInterface } from "./outputTargetInterface.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
-export { type VariableStore, VariableStoreSerializer } from "./variableStore.js";
+export { type VariableStore, VariableStoreSerializer, VariableStoreDictionary } from "./variableStore.js";
 
 export * from "@keymanapp/web-utils";
 
