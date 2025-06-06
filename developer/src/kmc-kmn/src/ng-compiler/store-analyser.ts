@@ -8,7 +8,7 @@
  * System and Variable Store Rules
  */
 
-import { PrePadTextRule } from "./kmn-analyser.js";
+import { TextRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
@@ -18,21 +18,19 @@ import { ASTNode, NodeTypes } from "./tree-construction.js";
 export class SystemStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStore: Rule         = new SystemStoreRule();
-    const prePadText: Rule          = new PrePadTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
-    this.rule = new SequenceRule([systemStore, oneOrManyPaddedText]);
+    const systemStore: Rule   = new SystemStoreRule();
+    const text: Rule          = new TextRule();
+    const oneOrManyText: Rule = new OneOrManyRule(text);
+    this.rule = new SequenceRule([systemStore, oneOrManyText]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
       const children: ASTNode[]  = tmp.getChildren();
       const storeNode: ASTNode   = children.splice(0, 1)[0];
       storeNode.addChildren(children);
-      storeNode.addChildren(lineNodes);
       node.addChild(storeNode);
     }
     return parseSuccess;
@@ -90,10 +88,10 @@ export class SystemStoreNameRule extends AlternateTokenRule {
 export class NormalStoreAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const normalStore: Rule         = new NormalStoreRule();
-    const prePadText: Rule          = new PrePadTextRule();
-    const oneOrManyPaddedText: Rule = new OneOrManyRule(prePadText);
-    this.rule = new SequenceRule([normalStore, oneOrManyPaddedText]);
+    const normalStore: Rule   = new NormalStoreRule();
+    const text: Rule          = new TextRule();
+    const oneOrManyText: Rule = new OneOrManyRule(text);
+    this.rule = new SequenceRule([normalStore, oneOrManyText]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -101,10 +99,7 @@ export class NormalStoreAssignRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const storeNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STORE);
-      const lineNodes: ASTNode[] = tmp.removeChildrenOfType(NodeTypes.LINE);
-      const textNodes: ASTNode[] = tmp.getChildren();
-      storeNode.addChildren(textNodes);
-      storeNode.addChildren(lineNodes);
+      storeNode.addChildren(tmp.getChildren());
       node.addChild(storeNode);
     }
     return parseSuccess;

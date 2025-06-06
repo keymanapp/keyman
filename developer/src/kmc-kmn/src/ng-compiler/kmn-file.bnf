@@ -2,11 +2,8 @@ kmnTree: line*
 line: contentLine|blankLine
 contentLine: content COMMENT? NEWLINE
 blankLine: COMMENT? NEWLINE
-padding: continuationNewline?
-continuationNewline: CONTINUATION NEWLINE
 content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
   normalStoreAssign|ruleBlock
-prePadText: padding text
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR
@@ -32,24 +29,17 @@ usingKeysProductionBlock: usingKeysLhsBlock CHEVRON rhsBlock
 readOnlyProductionBlock: readOnlyLhsBlock CHEVRON rhsBlock
 contextProductionBlock: contextLhsBlock CHEVRON rhsBlock
 usingKeysLhsBlock: usingKeysInputBlock
-readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeBlock
+readOnlyLhsBlock: MATCH|NOMATCH|readOnlyInputBlock|ifLikeStatement+
 contextLhsBlock: contextInputBlock|nulInputBlock
-usingKeysInputBlock: postPadNul? postPadIfLikeBlock? postPadInputContext? PLUS padding keystroke
-readOnlyInputBlock: postPadNul? postPadIfLikeBlock? keystroke
-contextInputBlock: postPadNul? postPadIfLikeBlock? inputContext
-nulInputBlock: NUL prePadIfLikeBlock?
-postPadNul: NUL padding
-postPadInputContext: inputContext padding
-inputContext: inputElement prePadInputElement*
-prePadInputElement: padding inputElement
+usingKeysInputBlock: NUL? ifLikeStatement* InputContext? PLUS keystroke
+readOnlyInputBlock: NUL? ifLikeStatement* keystroke
+contextInputBlock: NUL? ifLikeStatement* inputContext
+nulInputBlock: NUL ifLikeStatement*
+inputContext: inputElement+
 inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text
 keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 notAnyStatement: NOTANY bracketedStoreName
-prePadIfLikeBlock: padding IfLikeBlock
-postPadIfLikeBlock: ifLikeBlock padding
-ifLikeBlock: ifLikeStatement prePadIfLikeStatement*
-prePadIfLikeStatement: padding IfLikeStatement
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStringStatement|ifSystemStoreStringStatement
 ifStoreStringStatement: IF LEFT_BR normalStoreName
@@ -62,11 +52,8 @@ layerStatement: LAYER_SHORTCUT bracketedString
 platformStatement: PLATFORM_SHORTCUT bracketedString
 baselayoutStatement: BASELAYOUT_SHORTCUT bracketedString
 bracketedString: LEFT_BR STRING RIGHT_BR
-rhsBlock: outputBlock|contextOutputBlock|CONTEXT|RETURN|NUL
-contextOutputBlock: postPadContext? outputBlock
-postPadContext: CONTEXT padding
-outputBlock: outputStatement prePadOutputStatement*
-prePadOutputStatement: padding outputStatement
+rhsBlock: outputStatement+|contextOutputBlock|CONTEXT|RETURN|NUL
+contextOutputBlock: CONTEXT? outputStatement+
 outputStatement: useStatement|callStatement|setStore|saveStatement|
   resetStore|deadKeyStatement|setLayer|layerStatement|indexStatement|
   contextStatement|text|BEEP
@@ -78,13 +65,13 @@ offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 
 # System and Variable Store Rules
-systemStoreAssign: systemStore prePadText+
+systemStoreAssign: systemStore Text+
 systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
 systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|
   KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|TARGETS|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
-normalStoreAssign: normalStore prePadText+
+normalStoreAssign: normalStore Text+
 normalStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL

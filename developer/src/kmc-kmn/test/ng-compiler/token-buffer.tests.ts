@@ -1227,7 +1227,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(3000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
       [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',

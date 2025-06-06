@@ -43,7 +43,6 @@ describe("KMN Store Analyser Tests", () => {
       const bitmapNode = root.getSoleChildOfType(NodeTypes.BITMAP);
       assert.isNotNull(bitmapNode);
       assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.STRING));
-      assert.isNotNull(bitmapNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse copyright store correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&copyright) "message"');
@@ -218,7 +217,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (two u_char with continuation, space before)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\nU+1781');
@@ -227,7 +225,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (two u_char with continuation, space after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\n U+1781');
@@ -236,7 +233,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (two u_char with continuation, spaces before and after)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\\n U+1781');
@@ -245,7 +241,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (two u_char with continuation, spaces before, after and between)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 \\ \n U+1781');
@@ -254,7 +249,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.equal(storeNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
-      assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.LINE));
     });
     it("can parse correctly (mixed text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) " " U+1781 [K_K] outs(ShiftOutSingle)');
@@ -283,8 +277,6 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(storeNode);
       const virtualKeyNodes = storeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
       assert.equal(virtualKeyNodes.length, 35);
-      const lineNodes = storeNode.getChildrenOfType(NodeTypes.LINE);
-      assert.equal(lineNodes.length, 6);
     });
   });
   describe("NormalStoreRule Tests", () => {
