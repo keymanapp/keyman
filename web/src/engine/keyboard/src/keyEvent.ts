@@ -9,7 +9,7 @@
 import { type JSKeyboard } from "./keyboards/jsKeyboard.js";
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
-import Codes from './codes.js';
+import { Codes } from './codes.js';
 import DefaultRules from "./defaultRules.js";
 import { ActiveKeyBase } from './keyboards/activeLayout.js';
 
