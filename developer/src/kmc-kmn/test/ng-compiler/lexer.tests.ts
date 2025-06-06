@@ -898,6 +898,60 @@ describe("Lexer Tests", () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it("can handle a single line continuation (handleContinuation:true)", () => {
+      const lexer    = new Lexer('beep\\\nbeep\n');
+      const actual   = lexer.parse(false, false, true);
+      const expected = [
+        new Token(TokenTypes.BEEP, 'beep', 1, 1),
+        new Token(TokenTypes.BEEP, 'beep', 2, 1),
+        new Token(TokenTypes.NEWLINE, '\n', 2, 5, 'beep\\\nbeep\n'),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it("can handle muliple line continuations (handleContinuation:true)", () => {
+      const line1 = 'store(LaoConsonants) U+0E81 U+0E82 U+0E84 U+0E87 U+0E88 U+0E8A U+0E8D U+0E94 \\\n';
+      const line2 = '                     U+0E95 U+0E96 U+0E97 U+0E99 U+0E9A U+0E9B U+0E9C U+0E9D \\\n';
+      const line3 = '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n';
+      const line4 = '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n';
+      const lexer    = new Lexer(`${line1}${line2}${line3}${line4}`);
+      const actual   = lexer.parse(false, false, true);
+      const expected = [
+          new Token(TokenTypes.STORE, 'store'),
+          new Token(TokenTypes.LEFT_BR, '(', 1, 6),
+          new Token(TokenTypes.PARAMETER, 'LaoConsonants', 1, 7),
+          new Token(TokenTypes.RIGHT_BR, ')', 1, 20),
+          new Token(TokenTypes.U_CHAR, 'U+0E81', 1, 22),
+          new Token(TokenTypes.U_CHAR, 'U+0E82', 1, 29),
+          new Token(TokenTypes.U_CHAR, 'U+0E84', 1, 36),
+          new Token(TokenTypes.U_CHAR, 'U+0E87', 1, 43),
+          new Token(TokenTypes.U_CHAR, 'U+0E88', 1, 50),
+          new Token(TokenTypes.U_CHAR, 'U+0E8A', 1, 57),
+          new Token(TokenTypes.U_CHAR, 'U+0E8D', 1, 64),
+          new Token(TokenTypes.U_CHAR, 'U+0E94', 1, 71),
+          new Token(TokenTypes.U_CHAR, 'U+0E95', 2, 22),
+          new Token(TokenTypes.U_CHAR, 'U+0E96', 2, 29),
+          new Token(TokenTypes.U_CHAR, 'U+0E97', 2, 36),
+          new Token(TokenTypes.U_CHAR, 'U+0E99', 2, 43),
+          new Token(TokenTypes.U_CHAR, 'U+0E9A', 2, 50),
+          new Token(TokenTypes.U_CHAR, 'U+0E9B', 2, 57),
+          new Token(TokenTypes.U_CHAR, 'U+0E9C', 2, 64),
+          new Token(TokenTypes.U_CHAR, 'U+0E9D', 2, 71),
+          new Token(TokenTypes.U_CHAR, 'U+0E9E', 3, 22),
+          new Token(TokenTypes.U_CHAR, 'U+0E9F', 3, 29),
+          new Token(TokenTypes.U_CHAR, 'U+0EA1', 3, 36),
+          new Token(TokenTypes.U_CHAR, 'U+0EA2', 3, 43),
+          new Token(TokenTypes.U_CHAR, 'U+0EA3', 3, 50),
+          new Token(TokenTypes.U_CHAR, 'U+0EA5', 3, 57),
+          new Token(TokenTypes.U_CHAR, 'U+0EA7', 3, 64),
+          new Token(TokenTypes.U_CHAR, 'U+0EAA', 3, 71),
+          new Token(TokenTypes.U_CHAR, 'U+0EAB', 4, 22),
+          new Token(TokenTypes.U_CHAR, 'U+0EAD', 4, 29),
+          new Token(TokenTypes.U_CHAR, 'U+0EAE', 4, 36),
+          new Token(TokenTypes.COMMENT, 'c list of all the Lao consonants', 4, 46),
+          new Token(TokenTypes.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
+        ]
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 

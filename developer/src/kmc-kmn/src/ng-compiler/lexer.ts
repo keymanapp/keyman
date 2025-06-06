@@ -131,13 +131,15 @@ export class Lexer {
   private charNum: number;
   private line: String;
   private tokenList: Token[];
+  private seenContinuation: boolean;
 
   public constructor(buffer: String) {
-    this.buffer    = buffer;
-    this.lineNum   = 1;
-    this.charNum   = 1;
-    this.line      = '';
-    this.tokenList = [];
+    this.buffer           = buffer;
+    this.lineNum          = 1;
+    this.charNum          = 1;
+    this.line             = '';
+    this.tokenList        = [];
+    this.seenContinuation = false;
   }
 
   private static scanRecognisers = [
@@ -234,7 +236,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i,                        true),
     new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i,             true),
     new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/,                                           false),
-    new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/,                       true),
+    new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/,                       false),
     new ScanRecogniser(TokenTypes.NEWLINE,             /^(\r\n|\n|\r)/,                                         true),
     new ScanRecogniser(TokenTypes.NAMED_CONSTANT,      /^\$\S+/,                                                true),
     new ScanRecogniser(TokenTypes.PARAMETER,           /^[^,\)\s]+/,                                            true),
@@ -247,18 +249,24 @@ export class Lexer {
     }
   }
 
-  public parse(addEOF: boolean=true, emitAll: boolean=false): Token[]  {
-    while (this.matchToken(addEOF, emitAll));
+  public parse(addEOF: boolean=true, emitAll: boolean=false, handleContinuation:boolean=true): Token[]  {
+    while (this.matchToken(addEOF, emitAll, handleContinuation));
     return this.tokenList;
   }
 
-  private matchToken(addEOF: boolean, emitAll: boolean) {
+  private matchToken(addEOF: boolean, emitAll: boolean, handleContinuation:boolean) {
     let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
     let match: RegExpExecArray | null;
     let tokenMatch: boolean      = false;
     let parseInProgress: boolean = true;
+
+    // we cannot handle line continuation if emitAll is true
+    // (i.e. emitAll:true => handleContinuation:false)
+    if (emitAll) {
+      handleContinuation = false;
+    }
 
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       recogniser = iterResult.value;
@@ -267,13 +275,32 @@ export class Lexer {
       if (match) {
         this.line = this.line.concat(match[0].toString());
         let line: String = null;
-        if (recogniser.tokenType === TokenTypes.NEWLINE) {
-          line      = this.line;
-          this.line = '';
-        }
-        const token = new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line);
-        if (emitAll || recogniser.emit) {
-          this.tokenList.push(token);
+        if (handleContinuation) {
+          // if handleContinuation is true, no CONTINUATIONs will be emitted,
+          // nor will NEWLINEs that follow CONTINUATIONs be emitted
+          if (recogniser.tokenType === TokenTypes.CONTINUATION) {
+            this.seenContinuation = true;
+          } else if (recogniser.tokenType === TokenTypes.NEWLINE) {
+            if (!this.seenContinuation) {
+              if (emitAll || recogniser.emit) {
+               this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, this.line));
+              }
+              this.line = '';
+            }
+            this.seenContinuation = false;
+          } else { // other tokens
+            if (emitAll || recogniser.emit) {
+              this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, null));
+            }
+          }
+        } else { // not handling continuation
+          if (recogniser.tokenType === TokenTypes.NEWLINE) {
+            line      = this.line;
+            this.line = '';
+          }
+          if (emitAll || recogniser.emit) {
+            this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line));
+          }
         }
         tokenMatch  = true;
         this.buffer = this.buffer.substring(match[0].length);
