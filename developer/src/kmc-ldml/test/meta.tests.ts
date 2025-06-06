@@ -1,13 +1,13 @@
 import 'mocha';
 import {assert} from 'chai';
 import { MetaCompiler } from '../src/compiler/meta.js';
-import { compilerTestCallbacks, loadSectionFixture, withOffset } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import KeyboardSettings = KMXPlus.KeyboardSettings;
 import Meta = KMXPlus.Meta;
-import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { LDMLKeyboard, withOffset } from '@keymanapp/developer-utils';
 
 describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

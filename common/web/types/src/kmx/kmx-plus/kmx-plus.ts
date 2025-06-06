@@ -393,7 +393,7 @@ export class UnicodeSetItem extends VarsItem {
     super(id, value, sections, x);
     const needRanges = sections.usetparser.sizeUnicodeSet(value);
     if (needRanges >= 0) {
-      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges, x);
     } // otherwise: error (was recorded via callback)
   }
   unicodeSet?: UnicodeSet;
