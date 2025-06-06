@@ -11,6 +11,8 @@ export enum SystemStoreIDs {
   TSS_OLDLAYER = 43
 }
 
+export type SystemStoreDictionary = { [id: number]: string };
+
 /**
  * Defines common behaviors associated with system stores.
  */

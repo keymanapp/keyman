@@ -1,6 +1,6 @@
-import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
+import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, RuleBehavior } from "keyman/engine/keyboard";
 // TODO-web-core: remove usage of OutputTargetBase
-import { OutputTargetBase, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
+import { OutputTargetBase, ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
@@ -279,11 +279,12 @@ export class KeymanEngineBase<
       keyboardProcessor.oldLayerStore.set('');
       // Call the keyboard's entry point.
       // TODO-web-core
-      keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTargetBase)
-        // If we have a RuleBehavior as a result, run it on the target. This should
-        // only change system store and variable store values.
-        // TODO-web-core
-        ?.finalize(keyboardProcessor, predictionContext.currentTarget as OutputTargetBase, true);
+      const data = keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTargetBase)
+      // If we have a RuleBehavior as a result, run it on the target. This should
+      // only change system store and variable store values.
+      if (data) {
+        keyboardProcessor.finalizeProcessorAction(data, predictionContext.currentTarget);
+      }
     });
 
     // #region Event handler wiring

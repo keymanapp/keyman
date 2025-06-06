@@ -1,5 +1,4 @@
-import { DeviceSpec, DefaultRules } from 'keyman/engine/keyboard';
-import { RuleBehavior } from 'keyman/engine/js-processor';
+import { DeviceSpec, DefaultRules, RuleBehavior } from 'keyman/engine/keyboard';
 import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';

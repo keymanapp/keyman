@@ -10,12 +10,11 @@ import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
-  DefaultRules, EmulationKeystrokes,
-  type MutableSystemStore, SystemStoreIDs,
+  DefaultRules, EmulationKeystrokes, type MutableSystemStore,
+  OutputTargetInterface, RuleBehavior, SystemStoreIDs
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
-import { RuleBehavior }  from "./ruleBehavior.js";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 
@@ -23,7 +22,7 @@ import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 
 // Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
-export type BeepHandler = (outputTarget: OutputTargetBase) => void;
+export type BeepHandler = (outputTarget: OutputTargetInterface) => void;
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
@@ -250,7 +249,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
         if(!matchBehavior) {
           matchBehavior = defaultBehavior;
         } else {
-          matchBehavior.mergeInDefaults(defaultBehavior);
+          this.mergeInOtherProcessorAction(matchBehavior, defaultBehavior);
         }
         matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
       } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
@@ -577,8 +576,8 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   private performNewContextEvent(outputTarget: OutputTargetBase): RuleBehavior {
     const ruleBehavior = this.processNewContextEvent(this.contextDevice, outputTarget);
 
-    if(ruleBehavior) {
-      ruleBehavior.finalize(this, outputTarget, true);
+    if (ruleBehavior) {
+      this.finalizeProcessorAction(ruleBehavior, outputTarget);
     }
     return ruleBehavior;
   }
@@ -610,4 +609,76 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> {
       }
     }
   };
+
+  public finalizeProcessorAction(data: RuleBehavior, outputTarget: OutputTargetInterface): void {
+    if (!data.transcription) {
+      throw "Cannot finalize a RuleBehavior with no transcription.";
+    }
+
+    if (this.beepHandler && data.beep) {
+      this.beepHandler(outputTarget);
+    }
+
+    for (const storeID in data.setStore) {
+      const sysStore = this.keyboardInterface.systemStores[storeID];
+      if (sysStore) {
+        try {
+          sysStore.set(data.setStore[storeID]);
+        } catch (error) {
+          if (this.errorLogger) {
+            this.errorLogger("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+          }
+        }
+      } else if (this.warningLogger) {
+        this.warningLogger("Unknown store affected by keyboard rule: " + storeID);
+      }
+    }
+
+    this.keyboardInterface.applyVariableStores(data.variableStores);
+
+    if (this.keyboardInterface.variableStoreSerializer) {
+      for (const storeID in data.saveStore) {
+        this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStore[storeID]);
+      }
+    }
+
+    if (data.triggersDefaultCommand) {
+      const keyEvent = data.transcription.keystroke;
+      this.defaultRules.applyCommand(keyEvent, outputTarget);
+    }
+
+    if (this.warningLogger && data.warningLog) {
+      this.warningLogger(data.warningLog);
+    } else if (this.errorLogger && data.errorLog) {
+      this.errorLogger(data.errorLog);
+    }
+  }
+
+  /**
+   * Merges default-related behaviors from another RuleBehavior into this one.  Assumes that the current instance
+   * "came first" chronologically.  Both RuleBehaviors must be sourced from the same keystroke.
+   *
+   * Intended use:  merging rule-based behavior with default key behavior during scenarios like those described
+   * at https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852.
+   *
+   * This function does not attempt a "complete" merge for two fully-constructed RuleBehaviors!  Things
+   * WILL break for unintended uses.
+   * @param other
+   */
+  private mergeInOtherProcessorAction(first: RuleBehavior, other: RuleBehavior): void {
+    const keystroke = first.transcription.keystroke;
+    const keyFromOther = other.transcription.keystroke;
+    if (keystroke.Lcode != keyFromOther.Lcode || keystroke.Lmodifiers != keyFromOther.Lmodifiers) {
+      throw "RuleBehavior default-merge not supported unless keystrokes are identical!";
+    }
+
+    first.triggersDefaultCommand = first.triggersDefaultCommand || other.triggersDefaultCommand;
+
+    const mergingMock = Mock.from(first.transcription.preInput, false);
+    mergingMock.apply(first.transcription.transform);
+    mergingMock.apply(other.transcription.transform);
+
+    first.transcription = mergingMock.buildTranscriptionFrom(first.transcription.preInput, keystroke, false, first.transcription.alternates);
+  }
+
 }

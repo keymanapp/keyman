@@ -1,8 +1,8 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 // TODO-web-core: remove use of OutputTargetBase
-import { Transcription, Mock, OutputTargetBase } from "keyman/engine/js-processor";
-import { OutputTargetInterface } from 'keyman/engine/keyboard';
+import { Mock, OutputTargetBase } from "keyman/engine/js-processor";
+import { Transcription, OutputTargetInterface } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -240,7 +240,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
       // Builds the reversion option according to the loaded lexical model's known
       // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
+      const suggestionContext = new ContextWindow(original.preInput as Mock, this.configuration, getLayerId());
 
       // We must accept the Suggestion from its original context, which was before
       // `original.transform` was applied.
@@ -305,7 +305,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     (outputTarget as OutputTargetBase).apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput as Mock, this.configuration, null))
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -333,7 +333,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
-    const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
+    const context = new ContextWindow(transcription.preInput as Mock, this.configuration, layerId);
     this.recordTranscription(transcription);
 
     if(resetContext) {
