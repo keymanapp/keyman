@@ -11,7 +11,10 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes, type MutableSystemStore,
-  OutputTargetInterface, ProcessorAction, SystemStoreIDs
+  OutputTargetInterface, ProcessorAction, SystemStoreIDs,
+  KeyboardProcessor,
+  EventMap,
+  BeepHandler
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
 import { type OutputTargetBase }  from "./outputTargetBase.js";
@@ -22,7 +25,6 @@ import { DeviceSpec, globalObject, KMWString } from "@keymanapp/web-utils";
 
 // Also relies on @keymanapp/web-utils, which is included via tsconfig.json.
 
-export type BeepHandler = (outputTarget: OutputTargetInterface) => void;
 export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
@@ -31,11 +33,7 @@ export interface ProcessorInitOptions {
   defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
 }
 
-interface EventMap {
-  statekeychange: (stateKeys: typeof JSKeyboardProcessor.prototype.stateKeys) => void;
-}
-
-export class JSKeyboardProcessor extends EventEmitter<EventMap> {
+export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
   private static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us',
     defaultOutputRules: new DefaultRules()

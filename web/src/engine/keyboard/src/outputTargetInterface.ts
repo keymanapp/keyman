@@ -1,3 +1,7 @@
+import { Alternate } from './keyboards/textTransform.js';
+import { Transcription } from './keyboards/transcription.js';
+import { KeyEvent } from './keyEvent.js';
+
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
@@ -105,4 +109,14 @@ export interface OutputTargetInterface {
    * Generates a synthetic event on the underlying element, signalling that its value has changed.
    */
   doInputEvent(): void;
+
+  /**
+   * Restores the `OutputTarget` to the indicated state.  Designed for use
+   * with `Transcription.preInput`.
+   * @param original An `OutputTargetInterface` (usually a `Mock`).
+   */
+  restoreTo(original: OutputTargetInterface): void;
+
+  buildTranscriptionFrom(original: OutputTargetInterface, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription;
+
 }

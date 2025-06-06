@@ -1,1 +1,1 @@
-export const CORE_WASM = '../../../../../build/engine/core-processor/obj/import/core';
+export const CORE_WASM = '../../../../../build/engine/core-adapter/obj/import/core';
