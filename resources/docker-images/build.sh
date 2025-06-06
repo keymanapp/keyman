@@ -64,7 +64,7 @@ test_action() {
 
   builder_echo debug "Testing image for ${platform}"
   ./run.sh --distro "${DISTRO}" --distro-version "${DISTRO_VERSION}" \
-    "${platform}" -- ./build.sh configure,build,test:"${platform}"
+    ":${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
 
 check_for_default_values

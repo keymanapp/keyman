@@ -45,7 +45,7 @@ It is possible to build locally with these images:
 
 ```shell
 # build 'Keyman Core' in docker
-resources/docker-images/run.sh core -- core/build.sh --debug build
+resources/docker-images/run.sh :core -- core/build.sh --debug build
 ```
 
 Note: For Core and Linux we put the generated binaries in a
@@ -62,5 +62,5 @@ To run the tests locally, use the `run.sh` script:
 
 ```shell
 # Run common/web tests
-resources/docker-images/run.sh web -- common/web/build.sh --debug test
+resources/docker-images/run.sh :web -- common/web/build.sh --debug test
 ```
