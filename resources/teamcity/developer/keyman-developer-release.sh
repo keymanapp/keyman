@@ -21,7 +21,12 @@ builder_describe \
   "Build Keyman Developer on Windows" \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
-  "publish        publish release of Keyman Developer"
+  "publish        publish release of Keyman Developer" \
+  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
+  "--rsync-user=RSYNC_USER            rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
 
 builder_parse "$@"
 
@@ -54,45 +59,36 @@ function _publish_sentry() {
 
 function _download_symbol_server_index() {
   # Download symbol server index from symbol server
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "download symbol server index" "Downloading symbol server index"
 
+  cd "${KEYMAN_ROOT}/.."
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/download-symbol-server-index.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "download symbol server index" success "Finished downloading symbol server index"
 }
 
 function _publish_new_symbols() {
   # Publish new symbols to symbol server
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
 
+  cd "${KEYMAN_ROOT}/../symbols"
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-new-symbols.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }
 
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
+  cd "${KEYMAN_ROOT}/developer"
   # shellcheck disable=SC2154
   powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-to-downloads-keyman-com.ps1"
+  cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
 }
@@ -101,6 +97,7 @@ function _publish_api_documentation() {
   # Upload new Keyman Developer API documentation to help.keyman.com
   builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
 
+  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
   "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
 
   builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
@@ -112,6 +109,12 @@ function build_developer_action() {
 }
 
 function publish_action() {
+  if ! is_windows; then
+    # requires Powershell, so currently only supported on Windows
+    builder_echo error "This script is intended to be run on Windows only."
+    return 1
+  fi
+
   _publish_sentry
   _download_symbol_server_index
   _publish_new_symbols

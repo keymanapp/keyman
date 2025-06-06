@@ -5,6 +5,7 @@
 
 $ErrorActionPreference = "Stop"
 
+$RSYNC_PATH = $env:RSYNC_PATH
 $RSYNC_HOME = $env:RSYNC_HOME
 $USERPROFILE = $env:USERPROFILE
 
@@ -21,7 +22,7 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  '--rsync-path="sudo -u vu2009 rsync"',    # path on remote server
+  '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
   "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/lastid.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
@@ -34,7 +35,7 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  '--rsync-path="sudo -u vu2009 rsync"',    # path on remote server
+  '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
   "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/history.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
@@ -47,7 +48,7 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  '--rsync-path="sudo -u vu2009 rsync"',    # path on remote server
+  '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
   "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/server.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder

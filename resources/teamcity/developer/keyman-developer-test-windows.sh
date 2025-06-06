@@ -12,6 +12,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+
 ################################ Main script ################################
 
 builder_describe \
@@ -53,6 +56,11 @@ function publish_sentry_action() {
 
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
+
+if ! is_windows; then
+  builder_echo error "This script is intended to be run on Windows only."
+  exit 1
+fi
 
 if builder_has_action all; then
   build_developer_action

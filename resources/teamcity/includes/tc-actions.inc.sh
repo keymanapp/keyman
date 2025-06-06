@@ -26,7 +26,7 @@ linux_additional_test_dependencies_action() {
   fi
 
   # shellcheck disable=SC2086
-  check_and_install_packages ${TOINSTALL}
+  linux_check_and_install_packages ${TOINSTALL}
 
   if ! is_os_version_or_higher 24.04; then
     builder_heading "Installing python3-coverage from pip"
