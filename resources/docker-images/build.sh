@@ -46,6 +46,7 @@ build_action() {
 
   # shellcheck disable=SC2164
   cd "${platform}"
+  export DOCKER_BUILDKIT=1
   # shellcheck disable=SC2248,SC2086
   docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
@@ -67,6 +68,7 @@ test_action() {
     ":${platform}" -- ./build.sh configure,build,test:"${platform}"
 }
 
+check_buildx_available
 check_for_default_values
 convert_parameters_to_args
 

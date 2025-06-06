@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # Keyman is copyright (C) SIL Global. MIT License.
 #
 # ARGS used in this file:
