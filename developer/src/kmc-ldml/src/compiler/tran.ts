@@ -1,6 +1,6 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes, util } from '@keymanapp/common-types';
-import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, LDMLKeyboard, ObjectWithMetadata } from "@keymanapp/developer-utils";
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -18,6 +18,7 @@ import { verifyValidAndUnique } from "../util/util.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 import { transform_from_parse, transform_to_parse } from "../util/abnf/abnf.js";
+import { StrsOptions } from "../../../../../common/web/types/src/kmx/kmx-plus/kmx-plus.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
 
@@ -26,22 +27,24 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st: Substitutions): boolean {
     keyboard?.transforms?.forEach(transforms =>
       transforms.transformGroup.forEach(transformGroup => {
-        transformGroup.transform?.forEach(({ to, from }) => {
-          st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
-          st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
+        transformGroup.transform?.forEach((transform) => {
+          const { to, from } = transform;
+          st.addSetAndStringSubtitution(SubstitutionUse.consume, from, transform);
+          st.addSetAndStringSubtitution(SubstitutionUse.emit, to, transform);
           const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(from);
           const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
           if (mapFrom) {
             // add the 'from' as a match
-            st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
+            st.set.add(SubstitutionUse.consume, [mapFrom[1]], transform);
           }
           if (mapTo) {
             // add the 'from' as a match
-            st.set.add(SubstitutionUse.emit, [mapTo[1]]);
+            st.set.add(SubstitutionUse.emit, [mapTo[1]], transform);
           }
         });
-        transformGroup.reorder?.forEach(({ before }) => {
-          st.addStringSubstitution(SubstitutionUse.consume, before);
+        transformGroup.reorder?.forEach((reorder) => {
+          const { before } = reorder;
+          st.addStringSubstitution(SubstitutionUse.consume, before, reorder);
         });
       }));
     return true;
@@ -138,6 +141,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   }
 
   private compileTransform(sections: DependencySections, transform: LKTransform) : TranTransform {
+    // we have lots of strings to allocate, that will all have these options
+    const stropts : StrsOptions = { x: transform };
     const result = new TranTransform();
     // setup for serializing
     result._from = transform.from;
@@ -146,7 +151,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
     // We run this first because it's more helpful than the ABNF.
-    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+    cookedFrom = this.checkEscapes(cookedFrom, transform); // check for \uXXXX escapes before normalizing
 
     if (cookedFrom === '') {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from: cookedFrom }, transform));
@@ -157,11 +162,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
-      result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
-      result.mapTo = sections.strs.allocString(mapTo[1]); // var name
+      result.mapFrom = sections.strs.allocString(mapFrom[1], stropts); // var name
+      result.mapTo = sections.strs.allocString(mapTo[1], stropts); // var name
     } else {
-      result.mapFrom = sections.strs.allocString('');
-      result.mapTo = sections.strs.allocString('');
+      result.mapFrom = sections.strs.allocString('', stropts);
+      result.mapTo = sections.strs.allocString('', stropts);
 
       // validate 'to' here
       if (!this.isValidTo(transform.to || '')) {
@@ -199,7 +204,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
         transform_from_parse(transform.from);
       }
     } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from: cookedFrom, message: e.toString() }, transform));
       return null;
     }
 
@@ -207,13 +212,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     try {
       transform_to_parse(transform.to || '');
     } catch (e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformTo({ to: transform.to || '', message: e.toString() }, transform));
       return null;
     }
 
     // cookedFrom is cooked above, since there's some special treatment
     result.from = sections.strs.allocString(cookedFrom, {
       unescape: false,
+      x: transform,
     }, sections);
     // 'to' is handled via allocString
     result.to = sections.strs.allocString(transform.to, {
@@ -221,6 +227,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       markers: true,
       unescape: true,
       nfd: true,
+      x: transform,
     }, sections);
     return result;
   }
@@ -230,9 +237,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * We have already checked that it's not a mapTo,
    * so there should not be any illegal substitutions.
    */
-  private isValidTo(to: string) : boolean {
+  private isValidTo(to: string, x?: ObjectWithMetadata) : boolean {
     if (/(?<!\\)(?:\\\\)*\$\[/.test(to)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }, x));
       return false;
     }
     return true;
@@ -244,18 +251,18 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param from the original from - for error reporting
    * @returns true if OK
    */
-  private isValidRegex(cookedFrom: string, from: string) : boolean {
+  private isValidRegex(cookedFrom: string, from: string, x?: ObjectWithMetadata) : boolean {
     // check for any unescaped dollar sign here
     if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }, x));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\*/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }, x));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\+/.test(cookedFrom)) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }, x));
       return false;
     }
     // Verify that the regex is syntactically valid
@@ -265,14 +272,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
       // does it match an empty string?
       if (rg.test('')) {
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }, x));
         return false;
       }
     } catch (e) {
       // We're exposing the internal regex error message here.
       // In the future, CLDR plans to expose the EBNF for the transform,
       // at which point we would have more precise validation prior to getting to this point.
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }, x));
       return false;
     }
     return true;
@@ -294,14 +301,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     result._before = reorder.before;
     result._from = reorder.from;
     result._order = reorder.order;
-    if (reorder.from && this.checkEscapes(reorder.from) === null) {
+    if (reorder.from && this.checkEscapes(reorder.from, reorder) === null) {
       return null; // error'ed
     }
-    if (reorder.before && this.checkEscapes(reorder.before) === null) {
+    if (reorder.before && this.checkEscapes(reorder.before, reorder) === null) {
       return null; // error'ed
     }
-    result.elements = sections.elem.allocElementString(sections, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
-    result.before = sections.elem.allocElementString(sections, reorder.before);
+    result.elements = sections.elem.allocElementString(sections, {x:reorder}, reorder.from, reorder.order, reorder.tertiary, reorder.tertiaryBase, reorder.preBase);
+    result.before = sections.elem.allocElementString(sections, {x:reorder}, reorder.before);
     if (!result.elements || !result.before) {
       return null; // already error'ed
     } else {
@@ -337,16 +344,21 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param cookedFrom the original string
    * @returns the original string, or null if an error was reported
    */
-  private checkEscapes(cookedFrom: string, transform?: LKTransform): string | null {
+  private checkEscapes(cookedFrom: string, transform?: ObjectWithMetadata): string | null {
     if (!cookedFrom) return cookedFrom;
 
     // should not follow marker prefix, nor marker prefix with range
     const anyQuad = /(?<!\\uffff\\u0008(?:\[[0-9a-fA-F\\u-]*)?)\\u([0-9a-fA-F]{4})/g;
 
-    for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
+    for (const [matched, sub] of cookedFrom.matchAll(anyQuad)) {
       const s = util.unescapeOne(sub);
       if (s !== '\uffff' && s !== '\u0008') { // markers
-        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }, transform));
+        const codepoint: number = s.codePointAt(0);
+        const cp: string = matched; // the original match from the file
+        const recommended: string = `\\u{${codepoint.toString(16)}}`;
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({
+          cp, recommended
+        }, transform));
         return null; // exit on the first error
       }
     }

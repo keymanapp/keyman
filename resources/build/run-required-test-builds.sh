@@ -204,8 +204,9 @@ function find_platform_changes() {
         eval watch='$'watch_$platform
         # Add common patterns to the watch list
         # TODO: remove 'resources' from this watch?
-        watch="^($platform|(oem/[^/]+/$platform)|resources|$watch)"
-        if [[ "$line" =~ $watch ]]; then
+        watch="^(${platform}|(oem/[^/]+/${platform})|resources/((?!teamcity)|teamcity/(${platform}|includes))|$watch)"
+        # Since bash doesn't support negative look-aheads we use grep to test
+        if echo "${line}" | grep --quiet --perl-regexp "${watch}"; then
           # By default, we'll build a 'release' test build for touched platforms
           build_platforms[$platform]=$build_level_release
         fi
