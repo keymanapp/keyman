@@ -158,7 +158,7 @@ if [ "$action" == "commit" ]; then
   # Trigger builds for the previous version on TeamCity and GitHub
   #
 
-  triggerBuilds
+  triggerReleaseBuilds
 
   #
   # Now, create the PR on GitHub which will be merged when ready
