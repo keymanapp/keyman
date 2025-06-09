@@ -11,8 +11,8 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, BlankLineRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule, ContentLineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -37,33 +37,10 @@ describe("KMN Analyser Tests", () => {
       const line: Rule = new LineRule();
       assert.isNotNull(line);
     });
-    it("can parse correctly (contentLine)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
-      const line: Rule = new LineRule();
-      assert.isTrue(line.parse(root));
-      const children = root.getChildren();
-      assert.equal(children[0].nodeType, NodeTypes.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-    });
-    it("can parse correctly (blankLine, comment)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
-      const line: Rule = new LineRule();
-      assert.isTrue(line.parse(root));
-      assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
-      assert.isFalse(root.getSoleChild().hasChild());
-    });
-  });
-  describe("ContentLineRule Tests", () => {
-    it("can construct a ContentLineRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isNotNull(contentLine);
-    });
     it("can parse correctly (no space before, no comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -71,8 +48,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (no space before, no comment, space before newline)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" \n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -80,8 +57,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (space before, no comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename"\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -89,8 +66,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (no space before, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename" c a comment\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -98,8 +75,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (space before, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' store(&bitmap) "filename" c a comment\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children[0].nodeType, NodeTypes.BITMAP);
       assert.equal(children[0].getSoleChild().nodeType, NodeTypes.STRING);
@@ -107,8 +84,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (variable store assign, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 c a comment\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeTypes.STORE);
@@ -117,8 +94,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (variable store assign, continuation, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781 c a comment\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeTypes.STORE);
@@ -136,8 +113,8 @@ describe("KMN Analyser Tests", () => {
       const line7 = '    	   	   	          U+179D U+179E c deprecated, but they are used in minority languages\n';
       const str = `${line1}${line2}${line3}${line4}${line5}${line6}${line7}`;
       Rule.tokenBuffer = stringToTokenBuffer(str);
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       const uCharNodes = storeNode.getChildrenOfType(NodeTypes.U_CHAR);
@@ -145,8 +122,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (ruleBlock)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F\n');
-      const contentLine: Rule = new ContentLineRule();
-      assert.isTrue(contentLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
@@ -158,42 +135,35 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
-  });
-  describe("BlankLineRule Tests", () => {
-    it("can construct a BlankLineRule", () => {
+        it("can parse correctly (blank, no comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('\n');
-      const blankLine: Rule = new BlankLineRule();
-      assert.isNotNull(blankLine);
-    });
-    it("can parse correctly (no comment)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('\n');
-      const blankLine: Rule = new BlankLineRule();
-      assert.isTrue(blankLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
-    it("can parse correctly (no comment, space before newline)", () => {
+    it("can parse correctly (blank, no comment, space before newline)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' \n');
-      const blankLine: Rule = new BlankLineRule();
-      assert.isTrue(blankLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
-    it("can parse correctly (comment)", () => {
+    it("can parse correctly (blank, comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('c This tells Keyman which keys should have casing behavior applied\n');
-      const blankLine: Rule = new BlankLineRule();
-      assert.isTrue(blankLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
-    it("can parse correctly (space before comment)", () => {
+    it("can parse correctly (blank, space before comment)", () => {
       Rule.tokenBuffer = stringToTokenBuffer(' c This tells Keyman which keys should have casing behavior applied\n');
-      const blankLine: Rule = new BlankLineRule();
-      assert.isTrue(blankLine.parse(root));
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
       assert.equal(root.getSoleChild().nodeType, NodeTypes.LINE);
       assert.isFalse(root.getSoleChild().hasChild());
     });
-  })
+  });
   describe("ContentRule Tests", () => {
     it("can construct a ContentRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');

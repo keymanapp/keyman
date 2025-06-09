@@ -24,25 +24,10 @@ export class KmnTreeRule extends SingleChildRule {
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
-    const contentLine: Rule = new ContentLineRule();
-    const blankLine: Rule   = new BlankLineRule();
-    this.rule = new AlternateRule([contentLine, blankLine]);
-  }
-}
-
-export class ContentLineRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const content: Rule       = new ContentRule();
-    const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule([content, newline]);
-  }
-}
-
-export class BlankLineRule extends SingleChildRule {
-  public constructor() {
-    super();
-    this.rule = new TokenRule(TokenTypes.NEWLINE, true);
+    const content: Rule    = new ContentRule();
+    const optContent: Rule = new OptionalRule(content);
+    const newline: Rule    = new TokenRule(TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule([optContent, newline]);
   }
 }
 
