@@ -9,5 +9,8 @@
     "rootDir": "./src"
   },
 
+  "references": [
+    { "path": "../keyboard"},
+  ],
   "include": [ "**/*.ts" ],
 }

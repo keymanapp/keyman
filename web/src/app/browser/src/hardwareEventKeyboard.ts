@@ -1,5 +1,5 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
-import { KeyboardProcessor } from 'keyman/engine/js-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, JSKeyboard } from 'keyman/engine/keyboard';
+import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
@@ -10,7 +10,7 @@ import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachm
 import ContextManager from './contextManager.js';
 
 type KeyboardState = {
-  activeKeyboard: Keyboard,
+  activeKeyboard: JSKeyboard,
   modStateFlags: number,
   baseLayout: string
 }
@@ -38,15 +38,13 @@ export function _GetEventKeyCode(e: KeyboardEvent) {
 // Keeping this as a separate function affords us the opportunity to unit-test the method more simply.
 
 /**
- * Function     _GetKeyEventProperties
- * Scope        Private
- * @param       {Event}       e         Event object
- * @return      {Object.<string,*>}     KMW keyboard event object:
- * Description  Get object with target element, key code, shift state, virtual key state
- *                Lcode=keyCode
- *                Lmodifiers=shiftState
- *                LisVirtualKeyCode e.g. ctrl/alt key
- *                LisVirtualKey     e.g. Virtual key or non-keypress event
+ * Function     preprocessKeyboardEvent
+ * @param       {Event}         e              Event object
+ * @param       {KeyboardState} keyboardState  Keyboard state object
+ * @param       {DeviceSpec}    device         Device object
+ * @return      {KeyEvent}                     KMW keyboard event object:
+ *
+ * Description  Returns the preprocessed KeyEvent object.
  */
 export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: KeyboardState, device: DeviceSpec): KeyEvent {
   if(e.cancelBubble === true) {
@@ -210,13 +208,13 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
   // - `modStateFlags`
   // - `baseLayout`
   // - `doModifierPress()` - for modifier updates on key-up.
-  private readonly processor: KeyboardProcessor;
+  private readonly processor: JSKeyboardProcessor;
   private readonly contextManager: ContextManager;
   private domEventTracker = new DomEventTracker();
 
   private swallowKeypress: boolean = false;
 
-  constructor(hardDevice: DeviceSpec, processor: KeyboardProcessor, contextManager: ContextManager) {
+  constructor(hardDevice: DeviceSpec, processor: JSKeyboardProcessor, contextManager: ContextManager) {
     super();
     this.hardDevice = hardDevice;
     this.contextManager = contextManager;
