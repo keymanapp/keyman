@@ -234,7 +234,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+/,                                         true),
     new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+/,                                               true),
     new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i,                        true),
-    new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i,             true),
+    new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i,             false),
     new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/,                                           false),
     new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/,                       false),
     new ScanRecogniser(TokenTypes.NEWLINE,             /^(\r\n|\n|\r)/,                                         true),

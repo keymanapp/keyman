@@ -376,6 +376,18 @@ describe("Lexer Tests", () => {
     it("can recognise a COMMENT token", () => {
       recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
+    it("can recognise a COMMENT token (emitAll:false)", () => {
+      const comment: String = 'c This tells Keyman which keys should have casing behavior applied';
+      recogniseTokens(
+        'c This tells Keyman which keys should have casing behavior applied\n',
+        [
+          new Token(TokenTypes.NEWLINE, '\n', 1, 67, `${comment}\n`),
+        ],
+        false,
+        false,
+        true
+      );
+    });
     it("can recognise a COMMENT token (followed by LF)", () => {
       const comment: String = 'c This tells Keyman which keys should have casing behavior applied';
       recogniseTokens(
@@ -396,8 +408,21 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a COMMENT token (immediately followed by LF)", () => {
+      const comment: String = 'c';
+      recogniseTokens(
+        'c\n',
+        [
+          new Token(TokenTypes.COMMENT, comment),
+          new Token(TokenTypes.NEWLINE, '\n', 1, 2, `c\n`),
+        ]
+      );
+    });
     it("can recognise a WHITESPACE token (single space)", () => {
       recogniseToken(TokenTypes.WHITESPACE, ' ');
+    });
+    it("can recognise a WHITESPACE token (two spaces)", () => {
+      recogniseToken(TokenTypes.WHITESPACE, '  ');
     });
     it("can recognise a CONTINUATION token (no space after)", () => {
       recogniseTokens(
@@ -947,7 +972,6 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.U_CHAR, 'U+0EAB', 4, 22),
           new Token(TokenTypes.U_CHAR, 'U+0EAD', 4, 29),
           new Token(TokenTypes.U_CHAR, 'U+0EAE', 4, 36),
-          new Token(TokenTypes.COMMENT, 'c list of all the Lao consonants', 4, 46),
           new Token(TokenTypes.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
         ]
       assert.deepEqual(actual, expected);
@@ -955,41 +979,47 @@ describe("Lexer Tests", () => {
   });
 });
 
-function recogniseToken(type: TokenTypes, text: String): void {
+function recogniseToken(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(false, true);
+  const actual   = lexer.parse(addEOF, emitAll, handleContinuation);
   const line     = (type === TokenTypes.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokens(text: String, expected: Token[]): void {
+function recogniseTokens(text: String, expected: Token[], addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(false, true);
+  const actual   = lexer.parse(addEOF, emitAll, handleContinuation);
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokenFollowedBySpace(type: TokenTypes, text: String): void {
+function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
   recogniseTokens(
     `${text} `,
     [
       new Token(type, text),
       new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
-    ]
+    ],
+    addEOF,
+    emitAll,
+    handleContinuation
   );
 }
 
-function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String): void {
+function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
   recogniseTokens(
     `${text}]`,
     [
       new Token(type, text),
       new Token(TokenTypes.RIGHT_SQ, ']', 1, 1+text.length),
-    ]
+    ],
+    addEOF,
+    emitAll,
+    handleContinuation
   );
 }
 
-function recogniseSystemStoreWithString(type: TokenTypes, text: String) {
+function recogniseSystemStoreWithString(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false) {
   const value = TokenTypes[type].toLowerCase();
   recogniseTokens(
     `store(&${value}) '${text}'`,
@@ -1000,6 +1030,9 @@ function recogniseSystemStoreWithString(type: TokenTypes, text: String) {
       new Token(TokenTypes.RIGHT_BR, ')', 1, 8+value.length),
       new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
       new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
-    ]
+    ],
+    addEOF,
+    emitAll,
+    handleContinuation
   );
 }
