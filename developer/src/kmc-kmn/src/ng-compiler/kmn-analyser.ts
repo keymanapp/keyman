@@ -34,20 +34,15 @@ export class ContentLineRule extends SingleChildRule {
   public constructor() {
     super();
     const content: Rule       = new ContentRule();
-    const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
-    const optComment: Rule    = new OptionalRule(commentRule);
     const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule([content, optComment, newline]);
+    this.rule = new SequenceRule([content, newline]);
   }
 }
 
 export class BlankLineRule extends SingleChildRule {
   public constructor() {
     super();
-    const commentRule: Rule   = new TokenRule(TokenTypes.COMMENT);
-    const optComment: Rule    = new OptionalRule(commentRule);
-    const newline: Rule       = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule([optComment, newline]);
+    this.rule = new TokenRule(TokenTypes.NEWLINE, true);
   }
 }
 

@@ -1,7 +1,7 @@
 kmnTree: line*
 line: contentLine|blankLine
-contentLine: content COMMENT? NEWLINE
-blankLine: COMMENT? NEWLINE
+contentLine: content NEWLINE
+blankLine: NEWLINE
 content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
   normalStoreAssign|ruleBlock
 text: plainText|outsStatement
