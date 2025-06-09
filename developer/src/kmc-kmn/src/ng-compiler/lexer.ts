@@ -289,6 +289,9 @@ export class Lexer {
             }
             this.seenContinuation = false;
           } else { // other tokens
+            if (this.seenContinuation && recogniser.tokenType !== TokenTypes.WHITESPACE) {
+              // TODO: warning as non-WHITESPACE tokens between CONTINUATION and NEWLINE
+            }
             if (emitAll || recogniser.emit) {
               this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, null));
             }
