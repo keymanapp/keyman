@@ -162,7 +162,7 @@ describe("TokenBuffer Tests", () => {
     it("can provide round trip text for khmer_angkor.kmn", () => {
       const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       const lexer = new Lexer(buffer);
-      const tokens: Token[] = lexer.parse(true, true);
+      const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
       const output: String = tokenBuffer.toText();
       assert.deepEqual(output.toString(), buffer.toString());
@@ -223,7 +223,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -334,7 +334,7 @@ describe("TokenBuffer Tests", () => {
           ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -445,7 +445,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -556,7 +556,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -667,7 +667,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -778,7 +778,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -889,7 +889,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -1000,7 +1000,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -1111,7 +1111,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -1222,7 +1222,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
@@ -1265,7 +1265,7 @@ describe("TokenBuffer Tests", () => {
       ].forEach((name) => {
         const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         const lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse(true, true);
+        const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
