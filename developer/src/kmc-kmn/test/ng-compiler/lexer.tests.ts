@@ -383,9 +383,7 @@ describe("Lexer Tests", () => {
         [
           new Token(TokenTypes.NEWLINE, '\n', 1, 67, `${comment}\n`),
         ],
-        false,
-        false,
-        true
+        {addEOF:false, emitAll:false, handleContinuation:true}
       );
     });
     it("can recognise a COMMENT token (followed by LF)", () => {
@@ -916,7 +914,7 @@ describe("Lexer Tests", () => {
     });
     it("can handle no newline at end of file", () => {
       const lexer    = new Lexer('beep');
-      const actual   = lexer.parse(true, true);
+      const actual   = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const expected = [
         new Token(TokenTypes.BEEP, 'beep'),
         new Token(TokenTypes.EOF, '', 1, 1, 'beep'),
@@ -925,7 +923,7 @@ describe("Lexer Tests", () => {
     });
     it("can handle a single line continuation (handleContinuation:true)", () => {
       const lexer    = new Lexer('beep\\\nbeep\n');
-      const actual   = lexer.parse(false, false, true);
+      const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
       const expected = [
         new Token(TokenTypes.BEEP, 'beep', 1, 1),
         new Token(TokenTypes.BEEP, 'beep', 2, 1),
@@ -939,7 +937,7 @@ describe("Lexer Tests", () => {
       const line3 = '                     U+0E9E U+0E9F U+0EA1 U+0EA2 U+0EA3 U+0EA5 U+0EA7 U+0EAA \\\n';
       const line4 = '                     U+0EAB U+0EAD U+0EAE    c list of all the Lao consonants\n';
       const lexer    = new Lexer(`${line1}${line2}${line3}${line4}`);
-      const actual   = lexer.parse(false, false, true);
+      const actual   = lexer.parse({addEOF:false, emitAll:false, handleContinuation:true});
       const expected = [
           new Token(TokenTypes.STORE, 'store'),
           new Token(TokenTypes.LEFT_BR, '(', 1, 6),
@@ -979,47 +977,43 @@ describe("Lexer Tests", () => {
   });
 });
 
-function recogniseToken(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
+function recogniseToken(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(addEOF, emitAll, handleContinuation);
+  const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   const line     = (type === TokenTypes.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokens(text: String, expected: Token[], addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
+function recogniseTokens(text: String, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   const lexer    = new Lexer(new String(text));
-  const actual   = lexer.parse(addEOF, emitAll, handleContinuation);
+  const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
+function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   recogniseTokens(
     `${text} `,
     [
       new Token(type, text),
       new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
     ],
-    addEOF,
-    emitAll,
-    handleContinuation
+    {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false): void {
+function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   recogniseTokens(
     `${text}]`,
     [
       new Token(type, text),
       new Token(TokenTypes.RIGHT_SQ, ']', 1, 1+text.length),
     ],
-    addEOF,
-    emitAll,
-    handleContinuation
+   {addEOF, emitAll, handleContinuation}
   );
 }
 
-function recogniseSystemStoreWithString(type: TokenTypes, text: String, addEOF: boolean=false, emitAll: boolean=true, handleContinuation:boolean=false) {
+function recogniseSystemStoreWithString(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
   const value = TokenTypes[type].toLowerCase();
   recogniseTokens(
     `store(&${value}) '${text}'`,
@@ -1031,8 +1025,6 @@ function recogniseSystemStoreWithString(type: TokenTypes, text: String, addEOF: 
       new Token(TokenTypes.WHITESPACE, ' ', 1, 9+value.length),
       new Token(TokenTypes.STRING, `'${text}'`, 1, 10+value.length),
     ],
-    addEOF,
-    emitAll,
-    handleContinuation
+    {addEOF, emitAll, handleContinuation}
   );
 }

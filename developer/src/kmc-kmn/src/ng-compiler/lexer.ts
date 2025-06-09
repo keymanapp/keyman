@@ -249,12 +249,12 @@ export class Lexer {
     }
   }
 
-  public parse(addEOF: boolean=true, emitAll: boolean=false, handleContinuation:boolean=true): Token[]  {
-    while (this.matchToken(addEOF, emitAll, handleContinuation));
+  public parse({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): Token[]  {
+    while (this.matchToken({addEOF, emitAll, handleContinuation}));
     return this.tokenList;
   }
 
-  private matchToken(addEOF: boolean, emitAll: boolean, handleContinuation:boolean) {
+  private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
     let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
