@@ -31,8 +31,7 @@ builder_parse "$@"
 function zipsource() {
   local target="$1"
   pushd "$1" > /dev/null
-  ZIP_FLAGS=("-q" "-r") # quiet, recursive
-  add_zip_files "${target}_source.zip" "-x@../zip-excludes" "${ZIP_FLAGS[@]}" .
+  add_zip_files "${target}_source.zip" -x@../zip-excludes -q -r . # -q quiet, -r recursive
   popd > /dev/null
 }
 
