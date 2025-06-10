@@ -5,6 +5,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
+
 targets=()
 # Build list of available targets from subfolders, if none specified
 for d in */; do
@@ -29,7 +31,7 @@ builder_parse "$@"
 function zipsource() {
   local target="$1"
   pushd "$1" > /dev/null
-  7z a -r -x!build -x"!$target.kpj.user" "${target}_source.zip" .
+  add_zip_files "${target}_source.zip" -x@../zip-excludes -q -r . # -q quiet, -r recursive
   popd > /dev/null
 }
 
