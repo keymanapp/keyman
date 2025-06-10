@@ -5,17 +5,20 @@ import { expectedGitDateFormat, getLastGitCommitDate } from '../src/util/getLast
 
 describe('getLastGitCommitDate', function () {
   it('should return a valid date for a folder in this repo', async function() {
+    this.timeout(5000); // getLastGitCommitDate depends on git which can sometimes take longer
     const path = makePathToFixture('.');
     const date = getLastGitCommitDate(path);
     assert.match(date, expectedGitDateFormat);
   });
 
   it('should return null for a folder outside the repo', async function() {
+    this.timeout(5000); // getLastGitCommitDate depends on git which can sometimes take longer
     const date = getLastGitCommitDate('/');
     assert.isNull(date);
   });
 
   it('should return a valid date for a specific file in the repo', async function() {
+    this.timeout(5000); // getLastGitCommitDate depends on git which can sometimes take longer
     const path = makePathToFixture('get-last-git-commit-date/README.md');
     const date = getLastGitCommitDate(path);
     // The expected date was manually extracted using the following command, with msec appended:
