@@ -37,21 +37,21 @@ else
 fi
 
 run_android() {
-  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "keymanapp/keyman-android-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_core() {
-  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "keymanapp/keyman-core-ci:${image_version}" \
     "${builder_extra_params[@]}"
 }
 
 run_developer() {
-  docker run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run -it --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "keymanapp/keyman-developer-ci:${image_version}" \
     "${builder_extra_params[@]}"
@@ -60,7 +60,7 @@ run_developer() {
 run_linux() {
   mkdir -p "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}"
   mkdir -p "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}"
-  docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     -v "${KEYMAN_ROOT}/linux/build/docker-linux/${build_dir}":/home/build/build/linux/build \
     -v "${KEYMAN_ROOT}/linux/keyman-system-service/build/docker-linux/${build_dir}":/home/build/build/linux/keyman-system-service/build \
@@ -70,7 +70,7 @@ run_linux() {
 }
 
 run_web() {
-  docker run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
+  docker_wrapper run -it --privileged --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "keymanapp/keyman-web-ci:${image_version}" \
     "${builder_extra_params[@]}"

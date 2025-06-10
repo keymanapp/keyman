@@ -35,7 +35,7 @@ build_action() {
 
   if [[ "${platform}" == "base" ]]; then
     # shellcheck disable=SC2154 # set by convert_parameters_to_args
-    docker pull "${DISTRO}:${DISTRO_VERSION}"
+    docker_wrapper pull "${DISTRO}:${DISTRO_VERSION}"
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
   fi
@@ -48,12 +48,12 @@ build_action() {
   cd "${platform}"
   export DOCKER_BUILDKIT=1
   # shellcheck disable=SC2248,SC2086
-  docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
+  docker_wrapper build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
   if is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker build -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
+    docker_wrapper build -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
   # shellcheck disable=SC2164,SC2103
   cd -
