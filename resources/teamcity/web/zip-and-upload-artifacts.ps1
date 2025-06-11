@@ -13,12 +13,9 @@ $build_counter = $build_number -replace "^\d+\.\d+\.(\d+)$", '$1'
 $upload_path = "build\upload\$build_number"
 $zip = "$upload_path\keymanweb-$build_number.zip"
 
-$7Z_HOME = $env:7Z_HOME
+$SEVENZ_HOME = $env:SEVENZ_HOME
 $RSYNC_HOME = $env:RSYNC_HOME
 $USERPROFILE = $env:USERPROFILE
-
-# Since shell-scripting doesn't like number-initial variables, we convert it to a friendlier name.
-$env:SEVEN_Z_HOME=$7Z_HOME
 
 # PowerShell fun: `--` parameters will break a PowerShell command when not escaped in some form.
 # We can build the command in string form first and then execute the string, fortunately.

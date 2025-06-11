@@ -27,7 +27,7 @@ $setup_exe = "setup.exe"
 # Debug files
 $debug_zip = "debug-$build_number.zip"
 
-$7Z_HOME = $env:7Z_HOME
+$SEVENZ_HOME = $env:SEVENZ_HOME
 $RSYNC_HOME = $env:RSYNC_HOME
 $RSYNC_PATH = $env:RSYNC_PATH
 $RSYNC_USER = $env:RSYNC_USER
@@ -61,17 +61,17 @@ if((Test-Path ..\release\$kmcomp_zip) -ne 0) {
     # Keyman versions through -16.0
     copy ..\..\common\schemas\keyboard_info\keyboard_info.source.json .
     copy ..\..\common\schemas\keyboard_info\keyboard_info.distribution.json .
-    & "$7Z_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip kmcomp.exe kmcmpdll.dll kmcomp.x64.exe kmcmpdll.x64.dll kmconvert.exe keyboard_info.source.json keyboard_info.distribution.json xml\layoutbuilder\*.keyman-touch-layout projects\
+    & "$SEVENZ_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip kmcomp.exe kmcmpdll.dll kmcomp.x64.exe kmcmpdll.x64.dll kmconvert.exe keyboard_info.source.json keyboard_info.distribution.json xml\layoutbuilder\*.keyman-touch-layout projects\
 
     # Add Keyman Developer Server to the archive (15.0 late alpha - after 171)
     if((Test-Path ..\src\server\build) -ne 0) {
       copy ..\src\server\build\ server\ -Recurse
-      & "$7Z_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip server\
+      & "$SEVENZ_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip server\
     }
   } else {
     # Keyman versions 17.0+; note, use npm install for most modules
     copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
-    & "$7Z_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
+    & "$SEVENZ_HOME\7z.exe" a -bd -bb0 ..\$upload_path\$kmcomp_zip kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
   }
   cd ..
 }
