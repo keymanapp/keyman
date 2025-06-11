@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.62 alpha 2025-06-11
+
+* maint(developer): export environment variables (#14157)
+* maint(web): use path when calling powershell script (#14156)
+* maint(resources): fix regression on mac triggering builds (#14155)
+
 ## 19.0.61 alpha 2025-06-10
 
 * chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)
