@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -634,11 +634,30 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (space before and after name)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('( main )');
-      const bracketedStoreName: Rule = new BracketedGroupNameRule();
-      assert.isTrue(bracketedStoreName.parse(root));
+      const bracketedGroupName: Rule = new BracketedGroupNameRule();
+      assert.isTrue(bracketedGroupName.parse(root));
       const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
+    });
+  });
+  describe("PermittedKeywordRule Tests", () => {
+    it("can construct a PermittedKeywordRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isNotNull(permittedKeyword);
+    });
+    it("can parse correctly (newcontext)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isTrue(permittedKeyword.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
+    });
+    it("can parse correctly (postkeystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('postkeystroke');
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      assert.isTrue(permittedKeyword.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
     });
   });
   describe("GroupBlockRule Tests", () => {

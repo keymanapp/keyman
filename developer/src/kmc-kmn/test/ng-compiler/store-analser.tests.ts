@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { PermittedKeywordRule, SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -331,25 +331,6 @@ describe("KMN Store Analyser Tests", () => {
       const storeNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.STORENAME);
       assert.isNotNull(storeNameNode);
       assert.equal(storeNameNode.getText(), 'digit');
-    });
-  });
-  describe("PermittedKeywordRule Tests", () => {
-    it("can construct a PermittedKeywordRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const permittedKeyword: Rule = new PermittedKeywordRule();
-      assert.isNotNull(permittedKeyword);
-    });
-    it("can parse correctly (newcontext)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
-      const permittedKeyword: Rule = new PermittedKeywordRule();
-      assert.isTrue(permittedKeyword.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
-    });
-    it("can parse correctly (postkeystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('postkeystroke');
-      const permittedKeyword: Rule = new PermittedKeywordRule();
-      assert.isTrue(permittedKeyword.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
     });
   });
   describe("SetStoreRule Tests", () => {
