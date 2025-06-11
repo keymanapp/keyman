@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -639,6 +639,31 @@ describe("KMN Analyser Tests", () => {
       const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
       assert.isNotNull(groupNameNode);
       assert.equal(groupNameNode.getText(), 'main');
+    });
+  });
+  describe("GroupNameRule Tests", () => {
+    it("can construct a GroupNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const groupName: Rule = new GroupNameRule();
+      assert.isNotNull(groupName);
+    });
+    it("can parse correctly (parameter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('main');
+      const groupName: Rule = new GroupNameRule();
+      assert.isTrue(groupName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'main');
+    });
+    it("can parse correctly (octal)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('1');
+      const groupName: Rule = new GroupNameRule();
+      assert.isTrue(groupName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), '1');
+    });
+    it("can parse correctly (permitted keyword)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
+      const groupName: Rule = new GroupNameRule();
+      assert.isTrue(groupName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'newcontext');
     });
   });
   describe("PermittedKeywordRule Tests", () => {

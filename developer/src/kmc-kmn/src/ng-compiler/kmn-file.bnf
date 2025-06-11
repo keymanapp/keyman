@@ -16,9 +16,9 @@ beginBlock: beginStatement CHEVRON useStatement
 beginStatement: BEGIN entryPoint?
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE bracketedGroupName
-bracketedGroupName: LEFT_BR groupNameOrKeyword RIGHT_BR
-groupNameOrKeyword: groupName|permittedKeyword
-groupName: PARAMETER|OCTAL
+bracketedGroupName: LEFT_BR groupName RIGHT_BR
+groupName: PARAMETER|OCTAL|permittedKeyword
+permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 groupBlock: groupStatement groupQualifier?
 groupStatement: GROUP bracketedGroupName
 groupQualifier: usingKeys|READONLY
@@ -73,7 +73,6 @@ normalStoreAssign: normalStore Text+
 normalStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
-permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 setStore: SET LEFT_BR normalStoreName EQUAL STRING RIGHT_BR
 setLayer: SET LEFT_BR LAYER EQUAL STRING RIGHT_BR
 resetStore: RESET bracketedStoreName

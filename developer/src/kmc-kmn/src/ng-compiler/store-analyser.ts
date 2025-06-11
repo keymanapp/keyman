@@ -156,15 +156,6 @@ export class NormalStoreNameRule extends SingleChildRule {
     };
 }
 
-export class PermittedKeywordRule extends AlternateTokenRule {
-  public constructor() {
-    super([
-      TokenTypes.NEWCONTEXT,
-      TokenTypes.POSTKEYSTROKE,
-    ], true);
-  }
-}
-
 export class SetStoreRule extends SingleChildRule {
   public constructor() {
     super();

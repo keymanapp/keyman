@@ -285,11 +285,11 @@ export class UseStatementRule extends SingleChildRule {
 export class BracketedGroupNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
-    const groupNameOrKeyword: Rule = new GroupNameOrKeywordRule();
-    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const groupName: Rule    = new GroupNameRule();
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      leftBracket, groupNameOrKeyword, rightBracket,
+      leftBracket, groupName, rightBracket,
     ]);
   }
 }
@@ -337,23 +337,20 @@ export class GroupStatementRule extends SingleChildRule {
   }
 }
 
-export class GroupNameOrKeywordRule extends SingleChildRule {
+export class GroupNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const groupName: Rule        = new GroupNameRule();
+    const parameter: Rule        = new TokenRule(TokenTypes.PARAMETER, true);
+    const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
     const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([groupName, permittedKeyword]);
+    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      if (!tmp.hasChildOfType(NodeTypes.GROUPNAME)) {
-        node.addToken(NodeTypes.GROUPNAME, tmp.getSoleChild().token);
-      } else {
-        node.addChild(tmp.getSoleChildOfType(NodeTypes.GROUPNAME));
-      }
+      node.addToken(NodeTypes.GROUPNAME, tmp.getSoleChild().token);
     }
     return parseSuccess;
   }
@@ -366,25 +363,6 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenTypes.POSTKEYSTROKE,
     ], true);
   }
-}
-
-export class GroupNameRule extends SingleChildRule {
-    public constructor() {
-      super();
-      const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
-      const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
-      this.rule = new AlternateRule([parameter, octal]);
-    }
-
-    public parse(node: ASTNode): boolean {
-      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-      const parseSuccess: boolean = this.rule.parse(tmp);
-      if (parseSuccess) {
-        const child = tmp.getSoleChild();
-        node.addToken(NodeTypes.GROUPNAME, child.token);
-      }
-      return parseSuccess;
-    };
 }
 
 export class GroupQualifierRule extends SingleChildRule {
