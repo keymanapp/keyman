@@ -14,7 +14,7 @@ import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { EntryPointRule, GroupBlockRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfSystemStoreNameRule, IfSystemStoreStringStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -685,25 +685,40 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
     });
   });
-  describe("GroupBlockRule Tests", () => {
-    it("can construct an GroupBlockRule", () => {
+  describe("GroupStatementRule Tests", () => {
+    it("can construct an GroupStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const groupBlock: Rule = new GroupBlockRule();
-      assert.isNotNull(groupBlock);
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isNotNull(groupStatement);
     });
-    it("can parse correctly (no qualifier)", () => {
+    it("can parse correctly (parameter, no qualifier)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main)');
-      const groupBlock: Rule = new GroupBlockRule();
-      assert.isTrue(groupBlock.parse(root));
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isTrue(groupStatement.parse(root));
       const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
       assert.isNotNull(groupNode);
-      assert.isNull(groupNode.getSoleChildOfType(NodeTypes.USING_KEYS));
-      assert.isNull(groupNode.getSoleChildOfType(NodeTypes.READONLY));
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+    });
+    it("can parse correctly (octal, no qualifier)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('group(1)');
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isTrue(groupStatement.parse(root));
+      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      assert.isNotNull(groupNode);
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+    });
+    it("can parse correctly (permitted keyword, no qualifier)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('group(newcontext)');
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isTrue(groupStatement.parse(root));
+      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
+      assert.isNotNull(groupNode);
+      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
     it("can parse correctly (using keys)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main) using keys');
-      const groupBlock: Rule = new GroupBlockRule();
-      assert.isTrue(groupBlock.parse(root));
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isTrue(groupStatement.parse(root));
       const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
       assert.isNotNull(groupNode);
       assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.USING_KEYS));
@@ -711,35 +726,12 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (readonly)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('group(main) readonly');
-      const groupBlock: Rule = new GroupBlockRule();
-      assert.isTrue(groupBlock.parse(root));
+      const groupStatement: Rule = new GroupStatementRule();
+      assert.isTrue(groupStatement.parse(root));
       const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
       assert.isNotNull(groupNode);
       assert.isNull(groupNode.getSoleChildOfType(NodeTypes.USING_KEYS));
       assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.READONLY));
-    });
-  });
-  describe("GroupStatementRule Tests", () => {
-    it("can construct an GroupStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const groupStatement: Rule = new GroupStatementRule();
-      assert.isNotNull(groupStatement);
-    });
-    it("can parse correctly (parameter)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('group(main)');
-      const groupStatement: Rule = new GroupStatementRule();
-      assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
-      assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
-    });
-    it("can parse correctly (permitted keyword)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('group(newcontext)');
-      const groupStatement: Rule = new GroupStatementRule();
-      assert.isTrue(groupStatement.parse(root));
-      const groupNode = root.getSoleChildOfType(NodeTypes.GROUP);
-      assert.isNotNull(groupNode);
-      assert.isNotNull(groupNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
   });
   describe("GroupQualifierRule Tests", () => {

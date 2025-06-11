@@ -192,13 +192,13 @@ export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const beginBlock: Rule               = new BeginBlockRule();
-    const groupBlock: Rule               = new GroupBlockRule();
+    const groupStatement: Rule           = new GroupStatementRule();
     const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule();
     const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule();
     const contextProductionBlock: Rule   = new ContextProductionBlockRule();
     this.rule = new AlternateRule([
       beginBlock,
-      groupBlock,
+      groupStatement,
       usingKeysProductionBlock,
       readOnlyProductionBlock,
       contextProductionBlock,
@@ -294,43 +294,22 @@ export class BracketedGroupNameRule extends SingleChildRule {
   }
 }
 
-export class GroupBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const groupStatement: Rule     = new GroupStatementRule();
-    const groupQualifierRule: Rule = new GroupQualifierRule();
-    const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
-    this.rule = new SequenceRule([groupStatement, optGroupQualifier]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const groupNode          = tmp.removeSoleChildOfType(NodeTypes.GROUP);
-      const groupQualifierNode = tmp.getSoleChild();
-      groupNode.addChild(groupQualifierNode);
-      node.addChild(groupNode);
-    }
-    return parseSuccess;
-  }
-}
-
 export class GroupStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
     const bracketedGroupName: Rule = new BracketedGroupNameRule();
-    this.rule = new SequenceRule([group, bracketedGroupName]);
+    const groupQualifierRule: Rule = new GroupQualifierRule();
+    const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
+    this.rule = new SequenceRule([group, bracketedGroupName, optGroupQualifier]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const groupNode     = tmp.getSoleChildOfType(NodeTypes.GROUP);
-      const groupNameNode = tmp.getSoleChildOfType(NodeTypes.GROUPNAME);
-      groupNode.addChild(groupNameNode);
+      const groupNode = tmp.removeSoleChildOfType(NodeTypes.GROUP);
+      groupNode.addChildren(tmp.getChildren());
       node.addChild(groupNode);
     }
     return parseSuccess;

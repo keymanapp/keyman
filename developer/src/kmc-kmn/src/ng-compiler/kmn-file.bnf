@@ -10,7 +10,7 @@ rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 outsStatement: OUTS bracketedStoreName
-ruleBlock: beginBlock|groupBlock|usingKeysProductionBlock|readOnlyProductionBlock|
+ruleBlock: beginBlock|groupStatement|usingKeysProductionBlock|readOnlyProductionBlock|
   contextProductionBlock
 beginBlock: beginStatement CHEVRON useStatement
 beginStatement: BEGIN entryPoint?
@@ -19,8 +19,7 @@ useStatement: USE bracketedGroupName
 bracketedGroupName: LEFT_BR groupName RIGHT_BR
 groupName: PARAMETER|OCTAL|permittedKeyword
 permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
-groupBlock: groupStatement groupQualifier?
-groupStatement: GROUP bracketedGroupName
+groupStatement: GROUP bracketedGroupName groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
 usingKeysProductionBlock: usingKeysLhsBlock CHEVRON rhsBlock
