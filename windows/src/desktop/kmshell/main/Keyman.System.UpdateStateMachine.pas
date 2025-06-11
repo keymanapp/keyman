@@ -776,6 +776,7 @@ begin
       // Return to Idle state
       bucStateContext.RemoveCachedFiles;
       ChangeState(IdleState);
+      Exit;
     end;
 
     DownloadResult := DownloadUpdatesBackground;
