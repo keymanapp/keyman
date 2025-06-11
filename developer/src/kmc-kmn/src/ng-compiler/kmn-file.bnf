@@ -61,17 +61,17 @@ offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 
 # System and Variable Store Rules
-systemStoreAssign: systemStore Text+
+systemStoreAssign: systemStore text+
 systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
 systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|
   KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|TARGETS|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
-normalStoreAssign: normalStore Text+
+normalStoreAssign: normalStore text+
 normalStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
-setNormalStore: SET LEFT_BR normalStoreName EQUAL STRING RIGHT_BR
+setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setLayer: SET LEFT_BR LAYER EQUAL STRING RIGHT_BR
 resetStore: RESET bracketedStoreName
 capsAlwaysOff: CAPS ALWAYS OFF

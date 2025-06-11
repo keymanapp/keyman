@@ -163,7 +163,8 @@ export class SetNormalStoreRule extends SingleChildRule {
     const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
     const normalStoreName: Rule = new NormalStoreNameRule();
     const equal: Rule           = new TokenRule(TokenTypes.EQUAL);
-    const stringRule: Rule      = new TokenRule(TokenTypes.STRING, true);
+    const text: Rule            = new TextRule();
+    const oneOrManyText: Rule   = new OneOrManyRule(text);
     const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
 
     this.rule = new SequenceRule([
@@ -171,7 +172,7 @@ export class SetNormalStoreRule extends SingleChildRule {
       leftBracket,
       normalStoreName,
       equal,
-      stringRule,
+      oneOrManyText,
       rightBracket,
     ]);
   }

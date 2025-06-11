@@ -333,19 +333,27 @@ describe("KMN Store Analyser Tests", () => {
       assert.equal(storeNameNode.getText(), 'digit');
     });
   });
-  describe("SetStoreRule Tests", () => {
-    it("can construct a SetStoreRule", () => {
+  describe("SetNormalStoreRule Tests", () => {
+    it("can construct a SetNormalStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const setStore: Rule = new SetNormalStoreRule();
-      assert.isNotNull(setStore);
+      const setNormalStore: Rule = new SetNormalStoreRule();
+      assert.isNotNull(setNormalStore);
     });
-    it("can parse correctly", () => {
+    it("can parse correctly (string)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
-      const setStore: Rule = new SetNormalStoreRule();
-      assert.isTrue(setStore.parse(root));
+      const setNormalStore: Rule = new SetNormalStoreRule();
+      assert.isTrue(setNormalStore.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (two u_chars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(storeName = U+1780 U+1781)');
+      const setNormalStore: Rule = new SetNormalStoreRule();
+      assert.isTrue(setNormalStore.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));
+      assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
     });
   });
   describe("SetLayerRule Tests", () => {
