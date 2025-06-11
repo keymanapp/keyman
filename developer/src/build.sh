@@ -32,6 +32,7 @@ builder_describe \
   ":kmc-model                   Compiler - Lexical Model Module" \
   ":kmc-model-info              Compiler - .model_info Module" \
   ":kmc-package                 Compiler - Package Module" \
+  ":kmc-test                    Compiler - Keyboard regression test Module" \
   ":kmc                         Compiler - Command Line Interface" \
   ":kmanalyze                   Legacy keyboard analysis tool" \
   ":kmdbrowserhost              Keyman Developer Browser Host" \
