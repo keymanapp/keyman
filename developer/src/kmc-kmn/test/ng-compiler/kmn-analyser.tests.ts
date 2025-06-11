@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginBlockRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -510,42 +510,28 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
-  describe("BeginBlockRule Tests", () => {
-    it("can construct an BeginBlockRule", () => {
+  describe("BeginStatementRule Tests", () => {
+    it("can construct an BeginStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const beginBlock: Rule = new BeginBlockRule();
+      const beginBlock: Rule = new BeginStatementRule();
       assert.isNotNull(beginBlock);
     });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('begin unicode > use(main)');
-      const beginBlock: Rule = new BeginBlockRule();
+    it("can parse correctly (no entrypoint)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('begin > use(main)');
+      const beginBlock: Rule = new BeginStatementRule();
       assert.isTrue(beginBlock.parse(root));
       const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
       assert.isNotNull(beginNode);
       assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
     });
-  });
-  describe("BeginStatementRule Tests", () => {
-    it("can construct an BeginStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const beginStatement: Rule = new BeginStatementRule();
-      assert.isNotNull(beginStatement);
-    });
     it("can parse correctly (entrypoint)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('begin unicode');
-      const beginStatement: Rule = new BeginStatementRule();
-      assert.isTrue(beginStatement.parse(root));
+      Rule.tokenBuffer = stringToTokenBuffer('begin unicode > use(main)');
+      const beginBlock: Rule = new BeginStatementRule();
+      assert.isTrue(beginBlock.parse(root));
       const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
       assert.isNotNull(beginNode);
       assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.UNICODE));
-    });
-    it("can parse correctly (no entrypoint)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('begin');
-      const beginStatement: Rule = new BeginStatementRule();
-      assert.isTrue(beginStatement.parse(root));
-      const beginNode = root.getSoleChildOfType(NodeTypes.BEGIN);
-      assert.isNotNull(beginNode);
-      assert.isFalse(beginNode.hasChild());
+      assert.isNotNull(beginNode.getSoleChildOfType(NodeTypes.USE));
     });
   });
   describe("EntryPointRule Tests", () => {

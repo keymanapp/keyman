@@ -191,40 +191,18 @@ export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginBlock: Rule               = new BeginBlockRule();
+    const beginStatement: Rule               = new BeginStatementRule();
     const groupStatement: Rule           = new GroupStatementRule();
     const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule();
     const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule();
     const contextProductionBlock: Rule   = new ContextProductionBlockRule();
     this.rule = new AlternateRule([
-      beginBlock,
+      beginStatement,
       groupStatement,
       usingKeysProductionBlock,
       readOnlyProductionBlock,
       contextProductionBlock,
     ]);
-  }
-}
-
-export class BeginBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const beginStatement: Rule = new BeginStatementRule();
-    const chevron: Rule        = new TokenRule(TokenTypes.CHEVRON);
-    const useStatement: Rule   = new UseStatementRule();
-    this.rule = new SequenceRule([beginStatement, chevron, useStatement]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const beginNode = tmp.getSoleChildOfType(NodeTypes.BEGIN);
-      const useNode   = tmp.getSoleChildOfType(NodeTypes.USE);
-      beginNode.addChild(useNode);
-      node.addChild(beginNode);
-    }
-    return parseSuccess;
   }
 }
 
@@ -234,16 +212,17 @@ export class BeginStatementRule extends SingleChildRule {
     const begin: Rule          = new TokenRule(TokenTypes.BEGIN, true);
     const entryPointRule: Rule = new EntryPointRule();
     const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
-    this.rule = new SequenceRule([begin, optEntryPoint]);
+    const chevron: Rule        = new TokenRule(TokenTypes.CHEVRON);
+    const useStatement: Rule   = new UseStatementRule();
+    this.rule = new SequenceRule([begin, optEntryPoint, chevron, useStatement]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const beginNode      = tmp.removeSoleChildOfType(NodeTypes.BEGIN);
-      const entryPointNode = tmp.getSoleChild();
-      beginNode.addChild(entryPointNode);
+      const beginNode = tmp.removeSoleChildOfType(NodeTypes.BEGIN);
+      beginNode.addChildren(tmp.getChildren());
       node.addChild(beginNode);
     }
     return parseSuccess;

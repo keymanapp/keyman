@@ -10,10 +10,9 @@ rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 outsStatement: OUTS bracketedStoreName
-ruleBlock: beginBlock|groupStatement|usingKeysProductionBlock|readOnlyProductionBlock|
+ruleBlock: beginStatement|groupStatement|usingKeysProductionBlock|readOnlyProductionBlock|
   contextProductionBlock
-beginBlock: beginStatement CHEVRON useStatement
-beginStatement: BEGIN entryPoint?
+beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE bracketedGroupName
 bracketedGroupName: LEFT_BR groupName RIGHT_BR
