@@ -12,9 +12,10 @@ import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 
 export class DispCompiler extends SectionCompiler {
   static validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions): boolean {
-    keyboard.displays?.display?.forEach(({ display, output }) => {
-      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output);
-      st.addStringSubstitution(SubstitutionUse.emit, display);
+    keyboard.displays?.display?.forEach((e) => {
+      const { display, output } = e;
+      st.addStringAndMarkerSubstitution(SubstitutionUse.match, output, e);
+      st.addStringSubstitution(SubstitutionUse.emit, display, e);
     });
     // no marker references in 'id'
     return true;
@@ -34,18 +35,18 @@ export class DispCompiler extends SectionCompiler {
       for (const display of this.keyboard3.displays?.display) {
         const { output, keyId } = display;
         if ((output && keyId) || (!output && !keyId)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }, display));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ display: display.display }, display));
           return false;
         } else if (output) {
           if (tos.has(output)) {
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ output }, display));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ display: display.display }, display));
             return false;
           } else {
             tos.add(output);
           }
         } else if (keyId) {
           if (ids.has(keyId)) {
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ keyId }, display));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ display: display.display }, display));
             return false;
           } else {
             ids.add(keyId);
@@ -61,7 +62,7 @@ export class DispCompiler extends SectionCompiler {
     const result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, {unescape: true});
+    result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, { unescape: true, x: this.keyboard3?.displays?.displayOptions });
 
     // displays
     result.disps = this.keyboard3.displays?.display.map(display => ({
@@ -69,11 +70,13 @@ export class DispCompiler extends SectionCompiler {
         stringVariables: true,
         markers: true,
         unescape: true,
+        x: display,
       }, sections),
-      id: sections.strs.allocString(display.keyId), // not escaped, not substituted
+      id: sections.strs.allocString(display.keyId, { x: display }), // not escaped, not substituted
       display: sections.strs.allocString(display.display, {
         stringVariables: true,
         unescape: true,
+        x: display,
       }, sections),
     })) || []; // TODO-LDML: need coverage for the []
 
