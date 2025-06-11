@@ -690,21 +690,24 @@ export class ComparisonRule extends SingleChildRule {
   }
 }
 
-export class LayerStatementRule extends SingleChildRule {
+abstract class AbstractShortcutRule extends SingleChildRule {
+  protected leftBracket: Rule;
+  protected string: Rule;
+  protected rightBracket: Rule;
+  protected shortcutNodeType: NodeTypes;
+
   public constructor() {
     super();
-    const layer: Rule        = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
-    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([layer, leftBracket, string, rightBracket]);
+    this.leftBracket  = new TokenRule(TokenTypes.LEFT_BR);
+    this.string       = new TokenRule(TokenTypes.STRING, true);
+    this.rightBracket = new TokenRule(TokenTypes.RIGHT_BR);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const layerNode  = tmp.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
+      const layerNode  = tmp.getSoleChildOfType(this.shortcutNodeType);
       const stringNode = tmp.getSoleChildOfType(NodeTypes.STRING);
       layerNode.addChild(stringNode);
       node.addChild(layerNode);
@@ -713,49 +716,30 @@ export class LayerStatementRule extends SingleChildRule {
   }
 }
 
-export class PlatformStatementRule extends SingleChildRule {
+export class LayerStatementRule extends AbstractShortcutRule {
   public constructor() {
     super();
-    const platform: Rule     = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
-    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([platform, leftBracket, string, rightBracket]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const platformNode = tmp.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT);
-      const stringNode   = tmp.getSoleChildOfType(NodeTypes.STRING);
-      platformNode.addChild(stringNode);
-      node.addChild(platformNode);
-    }
-    return parseSuccess;
+    this.shortcutNodeType = NodeTypes.LAYER_SHORTCUT;
+    const layer: Rule     = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
+    this.rule = new SequenceRule([layer, this.leftBracket, this.string, this.rightBracket]);
   }
 }
 
-export class BaselayoutStatementRule extends SingleChildRule {
+export class PlatformStatementRule extends AbstractShortcutRule {
   public constructor() {
     super();
-    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
-    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([baselayout, leftBracket, string, rightBracket]);
+    this.shortcutNodeType = NodeTypes.PLATFORM_SHORTCUT;
+    const platform: Rule  = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
+    this.rule = new SequenceRule([platform, this.leftBracket, this.string, this.rightBracket]);
   }
+}
 
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const baselayoutNode = tmp.getSoleChildOfType(NodeTypes.BASELAYOUT_SHORTCUT);
-      const stringNode     = tmp.getSoleChildOfType(NodeTypes.STRING);
-      baselayoutNode.addChild(stringNode);
-      node.addChild(baselayoutNode);
-    }
-    return parseSuccess;
+export class BaselayoutStatementRule extends AbstractShortcutRule {
+  public constructor() {
+    super();
+    this.shortcutNodeType = NodeTypes.BASELAYOUT_SHORTCUT;
+    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
+    this.rule = new SequenceRule([baselayout, this.leftBracket, this.string, this.rightBracket]);
   }
 }
 
