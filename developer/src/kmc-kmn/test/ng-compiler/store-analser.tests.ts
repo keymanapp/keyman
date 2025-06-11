@@ -362,13 +362,21 @@ describe("KMN Store Analyser Tests", () => {
       const setLayer: Rule = new SetLayerRule();
       assert.isNotNull(setLayer);
     });
-    it("can parse correctly", () => {
+    it("can parse correctly (string)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
       const setLayer: Rule = new SetLayerRule();
       assert.isTrue(setLayer.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (two u_chars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(&layer = U+1780 U+1781)');
+      const setLayer: Rule = new SetLayerRule();
+      assert.isTrue(setLayer.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
+      assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
     });
   });
   describe("ResetStoreRule Tests", () => {

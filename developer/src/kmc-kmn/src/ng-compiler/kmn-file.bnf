@@ -72,7 +72,7 @@ normalStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
-setLayer: SET LEFT_BR LAYER EQUAL STRING RIGHT_BR
+setLayer: SET LEFT_BR LAYER EQUAL text+ RIGHT_BR
 resetStore: RESET bracketedStoreName
 capsAlwaysOff: CAPS ALWAYS OFF
 capsOnOnly: CAPS ON ONLY

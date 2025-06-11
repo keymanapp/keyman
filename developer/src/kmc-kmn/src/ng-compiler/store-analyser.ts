@@ -196,7 +196,8 @@ export class SetLayerRule extends SingleChildRule {
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
     const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
     const equal: Rule         = new TokenRule(TokenTypes.EQUAL);
-    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
+    const text: Rule          = new TextRule();
+    const oneOrManyText: Rule = new OneOrManyRule(text);
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
 
     this.rule = new SequenceRule([
@@ -204,7 +205,7 @@ export class SetLayerRule extends SingleChildRule {
       leftBracket,
       layer,
       equal,
-      stringRule,
+      oneOrManyText,
       rightBracket,
     ]);
   }
