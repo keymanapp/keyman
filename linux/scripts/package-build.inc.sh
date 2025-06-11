@@ -78,5 +78,5 @@ function checkAndInstallRequirements()
   sudo mk-build-deps debian/control
   wait_for_apt_deb && sudo DEBIAN_FRONTEND="noninteractive" \
     apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
-  sudo rm -f keyman-build-deps_*
+  rm -f keyman-build-deps_*
 }
