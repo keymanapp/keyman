@@ -1,12 +1,13 @@
 import 'mocha';
 import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
-import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
+import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture, scrubContextFromMessages} from './helpers/index.js';
 import { compareXml } from './helpers/compareXml.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
 import { writeFileSync } from 'node:fs';
 import { LdmlCompilerMessages } from '../src/main.js';
+import { util } from '@keymanapp/common-types';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -53,11 +54,11 @@ describe('compiler-tests', function() {
 
     const runOutput = await k.run(inputFilename, "invalid-illegal.kmx"); // need the exact name passed to build-fixtures
     assert.isNull(runOutput, "Expect invalid-illegal to fail to run()");
-    assert.sameDeepMembers(compilerTestCallbacks.messages, [
+    assert.sameDeepMembers( scrubContextFromMessages(compilerTestCallbacks.messages), [
       // copied from strs.tests.ts
       // validation messages
-      LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: 0xFDD0 }),
-      LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+      LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: util.describeCodepoint(0xFDD0) }),
+      LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: util.describeCodepoint(0xE010) }),
     ]);
   });
 
