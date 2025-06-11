@@ -238,7 +238,7 @@ describe('vars', function () {
               'doesnt_exist_1',
               'doesnt_exist_2',
               'doesnt_exist_3',
-            ]
+            ].join(',')
           }),
         ],
       },

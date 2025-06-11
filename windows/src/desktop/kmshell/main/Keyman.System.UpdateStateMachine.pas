@@ -982,10 +982,11 @@ begin
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
-        TKeymanSentryClient.Client.MessageEvent
-          (Sentry.Client.SENTRY_LEVEL_ERROR,
-          'Executing kmshell process to install keyboard packages failed:"' +
-          IntToStr(Ord(executeResult)) + '"');
+        TKeymanSentryClient.Breadcrumb('error',
+          'Executing kmshell process to install keyboard packages failed"' +
+           IntToStr(Ord(executeResult)) + '"', 'update');
+        KL.Log('InstallingState.LaunchInstallPackageProcess failed executing kmshell ' +
+          'process to install keyboard packages: "' + IntToStr(Ord(executeResult)) + '"');
         ChangeState(IdleState);
       end;
     end
@@ -1037,9 +1038,10 @@ begin
   if not FResult then
   begin
     bucStateContext.RemoveCachedFiles;
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      'Executing kmshell process to install failed:"' +
-      IntToStr(Ord(FResult)) + '"');
+    TKeymanSentryClient.Breadcrumb('error',
+    'InstallingState.DoInstallKeyman: failed executing kmshell or file not found', 'update');
+    KL.Log('InstallingState.DoInstallKeyman failed executing kmshell ' +
+           'or the update was not found in the cache');
     ChangeState(IdleState);
   end;
 
