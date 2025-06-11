@@ -1,4 +1,5 @@
 import { LdmlKeyboardTypes } from "@keymanapp/common-types";
+import { ObjectWithMetadata } from "@keymanapp/developer-utils";
 
 /**
  * Verb for SubstitutionTracker.add()
@@ -14,7 +15,7 @@ export enum SubstitutionUse {
   variable,
 }
 
-type SubstitutionSet = Set<string>;
+type SubstitutionSet = Map<string, ObjectWithMetadata>;
 
 /** Tracks usage of markers */
 export class SubstitutionTracker {
@@ -28,10 +29,10 @@ export class SubstitutionTracker {
   all: SubstitutionSet;
 
   constructor() {
-    this.emitted = new Set<string>();
-    this.consumed = new Set<string>();
-    this.matched = new Set<string>();
-    this.all = new Set<string>();
+    this.emitted =  new Map<string, ObjectWithMetadata>();
+    this.consumed = new Map<string, ObjectWithMetadata>();
+    this.matched =  new Map<string, ObjectWithMetadata>();
+    this.all =      new Map<string, ObjectWithMetadata>();
   }
 
   /**
@@ -39,32 +40,33 @@ export class SubstitutionTracker {
    * @param verb what kind of use we are adding
    * @param markers list of substitutions to add
    */
-  add(verb: SubstitutionUse, markers: string[]) {
+  add(verb: SubstitutionUse, markers: string[], x?: ObjectWithMetadata) {
     if (!markers.length) {
       return; // skip if empty
     }
+    x = x || {}; // need at least an empty object
     if (verb == SubstitutionUse.emit) {
       markers.forEach((m) => {
-        this.emitted.add(m);
-        this.all.add(m);
+        this.emitted.set(m, x);
+        this.all.set(m,x);
       });
     } else if (verb == SubstitutionUse.consume) {
       markers.forEach((m) => {
-        this.consumed.add(m);
-        this.all.add(m);
+        this.consumed.set(m,x);
+        this.all.set(m,x);
       });
     } else if (verb == SubstitutionUse.match) {
       markers.forEach((m) => {
-        this.matched.add(m);
-        this.all.add(m);
+        this.matched.set(m,x);
+        this.all.set(m,x);
       });
     } else if (verb == SubstitutionUse.variable) {
       markers.forEach((m) => {
         // we don't know, so add it to all three
-        this.matched.add(m);
-        this.emitted.add(m);
-        this.consumed.add(m);
-        this.all.add(m);
+        this.matched.set(m,x);
+        this.emitted.set(m,x);
+        this.consumed.set(m,x);
+        this.all.set(m,x);
       });
       /* c8 skip next 3 */
     } else {
@@ -75,27 +77,27 @@ export class SubstitutionTracker {
 
 /** rollup of several substitution types */
 export class Substitutions {
-  addSetAndStringSubtitution(verb: SubstitutionUse, str?: string) {
-    this.set.add(verb, LdmlKeyboardTypes.VariableParser.allSetReferences(str));
-    this.addStringAndMarkerSubstitution(verb, str);
+  addSetAndStringSubtitution(verb: SubstitutionUse, str?: string, x?: ObjectWithMetadata) {
+    this.set.add(verb, LdmlKeyboardTypes.VariableParser.allSetReferences(str), x);
+    this.addStringAndMarkerSubstitution(verb, str, x);
   }
   /** add a string that can have string var substitutions or markers */
-  addStringAndMarkerSubstitution(verb: SubstitutionUse, str?: string) {
-    this.addMarkers(verb, str);
-    this.addStringSubstitution(verb, str);
+  addStringAndMarkerSubstitution(verb: SubstitutionUse, str?: string, x?: ObjectWithMetadata) {
+    this.addMarkers(verb, str, x);
+    this.addStringSubstitution(verb, str, x);
   }
-  addStringSubstitution(verb: SubstitutionUse, str?: string) {
-    this.string.add(verb, LdmlKeyboardTypes.VariableParser.allStringReferences(str));
+  addStringSubstitution(verb: SubstitutionUse, str?: string, x?: ObjectWithMetadata) {
+    this.string.add(verb, LdmlKeyboardTypes.VariableParser.allStringReferences(str), x);
   }
   /** add a string that's just markers */
-  addMarkers(verb: SubstitutionUse, str?: string) {
-    this.markers.add(verb, LdmlKeyboardTypes.MarkerParser.allReferences(str));
-    LdmlKeyboardTypes.MarkerParser.allBrokenReferences(str).forEach(m => this.badMarkers.add(m));
+  addMarkers(verb: SubstitutionUse, str?: string, x?: ObjectWithMetadata) {
+    this.markers.add(verb, LdmlKeyboardTypes.MarkerParser.allReferences(str), x);
+    LdmlKeyboardTypes.MarkerParser.allBrokenReferences(str).forEach(m => this.badMarkers.set(m, x));
   }
   // all valid markers
   markers: SubstitutionTracker;
   // all invalid markers
-  badMarkers: Set<string>;
+  badMarkers: SubstitutionSet;
   // all valid set ids
   set: SubstitutionTracker;
   // all valid string ids
@@ -108,6 +110,6 @@ export class Substitutions {
     this.set = new SubstitutionTracker();
     this.string = new SubstitutionTracker();
     this.uset = new SubstitutionTracker();
-    this.badMarkers = new Set<string>();
+    this.badMarkers = new Map<string, ObjectWithMetadata>();
   }
 }
