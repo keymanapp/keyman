@@ -47,14 +47,10 @@ function _push_release_to_skeymancom() {
 }
 
 function _zip_and_upload_artifacts() {
-  if ! is_windows; then
-    # requires Powershell
-    return 0
-  fi
-
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
-  powershell -NonInteractive -ExecutionPolicy Bypass -File zip-and-upload-artifacts.ps1
+  # shellcheck disable=SC2154
+  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/zip-and-upload-artifacts.ps1"
 
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
