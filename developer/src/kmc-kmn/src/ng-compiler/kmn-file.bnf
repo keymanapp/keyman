@@ -50,7 +50,7 @@ baselayoutStatement: BASELAYOUT_SHORTCUT bracketedString
 bracketedString: LEFT_BR STRING RIGHT_BR
 rhsBlock: outputStatement+|contextOutputBlock|CONTEXT|RETURN|NUL
 contextOutputBlock: CONTEXT? outputStatement+
-outputStatement: useStatement|callStatement|setStore|saveStatement|
+outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|deadKeyStatement|setLayer|layerStatement|indexStatement|
   contextStatement|text|BEEP
 callStatement: CALL bracketedStoreName
@@ -71,7 +71,7 @@ normalStoreAssign: normalStore Text+
 normalStore: STORE bracketedStoreName
 bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
-setStore: SET LEFT_BR normalStoreName EQUAL STRING RIGHT_BR
+setNormalStore: SET LEFT_BR normalStoreName EQUAL STRING RIGHT_BR
 setLayer: SET LEFT_BR LAYER EQUAL STRING RIGHT_BR
 resetStore: RESET bracketedStoreName
 capsAlwaysOff: CAPS ALWAYS OFF

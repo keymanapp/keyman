@@ -14,7 +14,7 @@ import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { SetLayerRule, SetStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { SetLayerRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -336,12 +336,12 @@ describe("KMN Store Analyser Tests", () => {
   describe("SetStoreRule Tests", () => {
     it("can construct a SetStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const setStore: Rule = new SetStoreRule();
+      const setStore: Rule = new SetNormalStoreRule();
       assert.isNotNull(setStore);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(storeName = "value")');
-      const setStore: Rule = new SetStoreRule();
+      const setStore: Rule = new SetNormalStoreRule();
       assert.isTrue(setStore.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STORENAME));

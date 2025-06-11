@@ -9,7 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetLayerRule, SetStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetLayerRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -805,7 +805,7 @@ export class OutputStatementRule extends SingleChildRule {
     super();
     const useStatement: Rule     = new UseStatementRule();
     const callStatement: Rule    = new CallStatementRule();
-    const setStore: Rule         = new SetStoreRule();
+    const setNormalStore: Rule   = new SetNormalStoreRule();
     const saveStatement: Rule    = new SaveStatementRule();
     const resetStore: Rule       = new ResetStoreRule();
     const deadKeyStatement: Rule = new DeadKeyStatementRule();
@@ -818,7 +818,7 @@ export class OutputStatementRule extends SingleChildRule {
     this.rule = new AlternateRule([
       useStatement,
       callStatement,
-      setStore,
+      setNormalStore,
       saveStatement,
       resetStore,
       deadKeyStatement,

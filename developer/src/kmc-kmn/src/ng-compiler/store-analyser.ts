@@ -156,7 +156,7 @@ export class NormalStoreNameRule extends SingleChildRule {
     };
 }
 
-export class SetStoreRule extends SingleChildRule {
+export class SetNormalStoreRule extends SingleChildRule {
   public constructor() {
     super();
     const set: Rule             = new TokenRule(TokenTypes.SET, true);
