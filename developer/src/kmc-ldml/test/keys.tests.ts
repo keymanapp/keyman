@@ -312,7 +312,7 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({id:'base',modifiers:'altR-shift'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'altR-shift' }),
       ]
     },
     {

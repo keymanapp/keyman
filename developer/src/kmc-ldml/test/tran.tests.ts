@@ -273,13 +273,14 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/fail-bad-reorder-2.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
+        // 'cp' has exact casing from original
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: "\\u1A6B", recommended: "\\u{1a6b}" }),
       ],
     },
     {
       subpath: 'sections/tran/fail-bad-reorder-3.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: "\\u1A60", recommended: "\\u{1a60}" }),
       ],
     },
     // error due to bad regex
@@ -295,7 +296,7 @@ describe('tran', function () {
       // also used in test-compiler-e2e.ts
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
-        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: "\\u0127", recommended: "\\u{127}" }),
       ],
     },
     {
@@ -466,7 +467,7 @@ describe('bksp', function () {
             'doesnt_exist_1',
             'doesnt_exist_2',
             'doesnt_exist_3',
-          ]
+          ].join(',')
         }),
       ],
     },
