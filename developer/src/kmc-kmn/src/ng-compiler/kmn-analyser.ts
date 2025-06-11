@@ -693,9 +693,11 @@ export class ComparisonRule extends SingleChildRule {
 export class LayerStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const layer: Rule           = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
-    const bracketedString: Rule = new BracketedStringRule();
-    this.rule = new SequenceRule([layer, bracketedString]);
+    const layer: Rule        = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([layer, leftBracket, string, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -714,9 +716,11 @@ export class LayerStatementRule extends SingleChildRule {
 export class PlatformStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
-    const bracketedString: Rule = new BracketedStringRule();
-    this.rule = new SequenceRule([platform, bracketedString]);
+    const platform: Rule     = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([platform, leftBracket, string, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -735,9 +739,11 @@ export class PlatformStatementRule extends SingleChildRule {
 export class BaselayoutStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
-    const bracketedString: Rule = new BracketedStringRule();
-    this.rule = new SequenceRule([baselayout, bracketedString]);
+    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const string: Rule       = new TokenRule(TokenTypes.STRING, true);
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([baselayout, leftBracket, string, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -750,16 +756,6 @@ export class BaselayoutStatementRule extends SingleChildRule {
       node.addChild(baselayoutNode);
     }
     return parseSuccess;
-  }
-}
-
-export class BracketedStringRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const string: Rule        = new TokenRule(TokenTypes.STRING, true);
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([leftBracket, string, rightBracket]);
   }
 }
 

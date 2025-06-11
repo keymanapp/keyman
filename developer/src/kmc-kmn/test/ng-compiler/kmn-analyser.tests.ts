@@ -12,7 +12,7 @@ import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { BracketedGroupNameRule, BracketedStringRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BracketedGroupNameRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1431,6 +1431,36 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"shift"');
     });
+    it("can parse correctly (spacve before name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift")');
+      const layerStatement: Rule = new LayerStatementRule();
+      assert.isTrue(layerStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
+    });
+    it("can parse correctly (space after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer("shift" )');
+      const layerStatement: Rule = new LayerStatementRule();
+      assert.isTrue(layerStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
+    });
+    it("can parse correctly (space before and after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift" )');
+      const layerStatement: Rule = new LayerStatementRule();
+      assert.isTrue(layerStatement.parse(root));
+      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
+      assert.isNotNull(layerNode);
+      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
+      assert.isNotNull(stringNode);
+      assert.equal(stringNode.getText(), '"shift"');
+    });
   });
   describe("PlatformStatementRule Tests", () => {
     it("can construct an PlatformStatementRule", () => {
@@ -1464,45 +1494,6 @@ describe("KMN Analyser Tests", () => {
       const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
       assert.isNotNull(stringNode);
       assert.equal(stringNode.getText(), '"en-US"');
-    });
-  });
-  describe("BracketedStringRule Tests", () => {
-    it("can construct a BracketedStringRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const bracketedString: Rule = new BracketedStringRule();
-      assert.isNotNull(bracketedString);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('("a")');
-      const bracketedString: Rule = new BracketedStringRule();
-      assert.isTrue(bracketedString.parse(root));
-      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"a"');
-    });
-    it("can parse correctly (space before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('( "a")');
-      const bracketedString: Rule = new BracketedStringRule();
-      assert.isTrue(bracketedString.parse(root));
-      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"a"');
-    });
-    it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('("a" )');
-      const bracketedString: Rule = new BracketedStringRule();
-      assert.isTrue(bracketedString.parse(root));
-      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"a"');
-    });
-    it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('( "a" )');
-      const bracketedStoreName: Rule = new BracketedStringRule();
-      assert.isTrue(bracketedStoreName.parse(root));
-      const stringNode: ASTNode = root.getSoleChildOfType(NodeTypes.STRING);
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"a"');
     });
   });
   describe("RhsBlockRule Tests", () => {
