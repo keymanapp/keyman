@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.61 alpha 2025-06-10
+
+* chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)
+* fix(common): Use zip.inc.sh for common test keyboards (#14145)
+* maint(developer): add docker image to build developer node modules (#14058)
+
 ## 19.0.60 alpha 2025-06-06
 
 * maint(developer): allow to build locally on Linux (#14059)
