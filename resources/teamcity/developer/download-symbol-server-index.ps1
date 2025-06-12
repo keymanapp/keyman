@@ -5,8 +5,11 @@
 
 $ErrorActionPreference = "Stop"
 
-$RSYNC_PATH = $env:RSYNC_PATH
 $RSYNC_HOME = $env:RSYNC_HOME
+$RSYNC_PATH = $env:RSYNC_PATH
+$RSYNC_USER = $env:RSYNC_USER
+$RSYNC_HOST = $env:RSYNC_HOST
+$RSYNC_ROOT = $env:RSYNC_ROOT
 $USERPROFILE = $env:USERPROFILE
 
 New-Item -Force -ItemType Directory symbols\000admin
@@ -24,7 +27,7 @@ $rsync_args = @(
   '--stats',                                # show statistics for log
   '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/lastid.txt", # target server + path
+  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/lastid.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
@@ -37,7 +40,7 @@ $rsync_args = @(
   '--stats',                                # show statistics for log
   '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/history.txt", # target server + path
+  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/history.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
@@ -50,7 +53,7 @@ $rsync_args = @(
   '--stats',                                # show statistics for log
   '--rsync-path="$RSYNC_PATH"',             # path on remote server
   "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "root@sysops.downloads.keyman.com:/var/www/virtual/downloads.keyman.com/htdocs/windows/symbols/000admin/server.txt", # target server + path
+  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/server.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
