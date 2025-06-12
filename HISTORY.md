@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.63 alpha 2025-06-12
+
+* maint(web): add some more arguments for web release build script (#14167)
+* maint(developer): use double quotes so that variable gets replaced (#14168)
+* chore(deps): bump brace-expansion from 2.0.1 to 2.0.2 in /developer/src/server/src/win32/trayicon/addon-src (#14165)
+
 ## 19.0.62 alpha 2025-06-11
 
 * maint(developer): export environment variables (#14157)
