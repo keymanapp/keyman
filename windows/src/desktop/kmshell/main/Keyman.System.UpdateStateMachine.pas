@@ -1187,6 +1187,12 @@ begin
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
+  end
+  else
+  begin
+    // There is no Keyman installer we can return to the IdleState
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
   end;
 end;
 
