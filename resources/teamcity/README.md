@@ -20,19 +20,15 @@ docker run -v $(pwd):/Develop -it ubuntu:24.04 /bin/bash
 Inside of the container, run
 
 ```bash
-apt update && apt install sudo
+apt update && apt install -y sudo
 export DOCKER_RUNNING=1
+echo "ubuntu ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+su ubuntu
 ```
 
 and then run the build, e.g.
 
 ```bash
+cd /Develop
 resources/teamcity/linux/keyman-linux-test.sh configure,build,test
 ```
-
-NOTE: by default this will run the build as `root` in the container,
-so you will end up with files owned by `root` in your tree.
-Either create a user with the same user id as your local user in the
-container, or use one of the images created by `resources/docker-images`
-(though you won't be able to test if all the dependencies get installed
-if using the docker-images containers).
