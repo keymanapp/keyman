@@ -45,18 +45,18 @@ function triggerTeamCityBuild() {
   local TEAMCITY_VCS_ID="$4"
   local TEAMCITY_BRANCH_NAME="$5"
 
-  local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
-  local command
+  local commandProperties="<properties><property name='env.KEYMAN_BUILD_LEVEL' value='$buildLevel' /></properties>"
+  local commandLastChanges=
 
-  # TODO: add buildLevel parameter
-
-  if $isTestBuild; then
-    command="<build branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'><buildType id='$TEAMCITY_BUILDTYPE' /></build>"
-  else
-    command="<build branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges></build>"
+  if ! $isTestBuild; then
+    local GIT_OID=`git rev-parse HEAD`
+    commandLastChanges="<lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges>"
   fi
+
+  local command="<build branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'><buildType id='$TEAMCITY_BUILDTYPE' />$commandLastChanges$commandProperties</build>"
+
   echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
@@ -85,7 +85,6 @@ function triggerGitHubActionsBuild() {
   local BUILD_LEVEL="$2"
   local GITHUB_ACTION="$3"
   local GIT_BRANCH="$4"
-  # TODO: support BUILD_LEVEL
   local GIT_BASE_BRANCH="${GIT_BRANCH}"
   local GIT_USER="keyman-server"
   local GIT_BUILD_SHA GIT_BASE_REF JSON
@@ -97,7 +96,8 @@ function triggerGitHubActionsBuild() {
     GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$KEYMAN_VERSION_WITH_TAG")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${KEYMAN_VERSION_WITH_TAG}"
-  elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+  elif [[ $GIT_BRANCH =~ ^[0-9]+$ ]]; then
+    # pull request
     local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
@@ -106,6 +106,7 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.sha')"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
+    # another branch: stable-x.y, beta, or master
     GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
@@ -119,7 +120,8 @@ function triggerGitHubActionsBuild() {
       \"baseBranch\": \"$GIT_BASE_BRANCH\", \
       \"baseRef\": \"$GIT_BASE_REF\", \
       \"user\": \"$GIT_USER\", \
-      \"isTestBuild\": \"$IS_TEST_BUILD\" \
+      \"isTestBuild\": \"$IS_TEST_BUILD\", \
+      \"buildLevel\": \"$BUILD_LEVEL\" \
     }}"
 
   echo "GitHub Action Data: $DATA"
