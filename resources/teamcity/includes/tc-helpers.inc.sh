@@ -66,3 +66,19 @@ set_variables_for_emscripten() {
   export EMSCRIPTEN_BASE="${EMSCRIPTEN_BASE:-${HOME}/emsdk/upstream/emscripten}"
   export KEYMAN_USE_EMSDK=1
 }
+
+upload_help() {
+  local PRODUCT=$1
+  local PRODUCT_PATH=$2
+  builder_echo start "upload help" "Uploading new ${PRODUCT} help to help.keyman.com"
+
+  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
+
+  (
+    # shellcheck disable=SC2164
+    cd "${KEYMAN_ROOT}/resources/build"
+    "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" "${PRODUCT_PATH}"
+  )
+
+  builder_echo end "upload help" success "Finished uploading new ${PRODUCT} help to help.keyman.com"
+}

@@ -5,13 +5,11 @@ $ErrorActionPreference = "Stop"
 $tier = Get-Content ..\TIER.md
 $build_number = Get-Content ..\VERSION.md
 $build_counter = ${build_number} -replace "^\d+\.\d+\.(\d+)$", '$1'
-#$msi_major_version = ${build_number} -replace "^(\d+)\.(\d+)\.(\d+)$", '$1$2'
 
 if ( ${tier} -eq "alpha" -or ${tier} -eq "beta") {
-  $version_tag = ${tier}
+  # $version_tag = ${tier}
   $version_with_tag = ${build_number}  # we may go with ${build_number} + "-" + ${version_tag} in the future one day
 } else {
-  $version_tag = ""
   $version_with_tag = ${build_number}
 }
 
@@ -21,8 +19,6 @@ $keyboards_path = "${upload_path}\keyboards"
 # Keyman Developer installers
 $kmcomp_zip = "kmcomp-${version_with_tag}.zip"
 $keyman_developer_exe = "keymandeveloper-${version_with_tag}.exe"
-
-#$setup_exe = "setup.exe"
 
 # Debug files
 $debug_zip = "debug-${build_number}.zip"
@@ -54,25 +50,14 @@ mkdir ${upload_path}
 #
 
 if((Test-Path ..\release\${kmcomp_zip}) -ne 0) {
+  # REVIEW: I guess this is the path for Keyman 18+. In which case we
+  # can remove the else block
   copy ..\release\${kmcomp_zip} ..\${upload_path}\${kmcomp_zip}
 } else {
   cd bin
-  if((Test-Path ..\..\common\schemas\keyboard_info\keyboard_info.source.json) -ne 0) {
-    # Keyman versions through -16.0
-    copy ..\..\common\schemas\keyboard_info\keyboard_info.source.json .
-    copy ..\..\common\schemas\keyboard_info\keyboard_info.distribution.json .
-    & "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmcomp.exe kmcmpdll.dll kmcomp.x64.exe kmcmpdll.x64.dll kmconvert.exe keyboard_info.source.json keyboard_info.distribution.json xml\layoutbuilder\*.keyman-touch-layout projects\
-
-    # Add Keyman Developer Server to the archive (15.0 late alpha - after 171)
-    if((Test-Path ..\src\server\build) -ne 0) {
-      copy ..\src\server\build\ server\ -Recurse
-      & "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} server\
-    }
-  } else {
-    # Keyman versions 17.0+; note, use npm install for most modules
-    copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
-    & "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
-  }
+  # Keyman versions 17.0+; note, use npm install for most modules
+  copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
+  & "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
   cd ..
 }
 

@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
 ################################ Main script ################################
 
@@ -57,37 +58,13 @@ function _publish_sentry() {
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 
-function _download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-
-  cd "${KEYMAN_ROOT}/.."
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/download-symbol-server-index.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-function _publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-
-  cd "${KEYMAN_ROOT}/../symbols"
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-new-symbols.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
-}
-
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
   cd "${KEYMAN_ROOT}/developer"
   # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-to-downloads-keyman-com.ps1"
+  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-developer-to-downloads-keyman-com.ps1"
   cd "${KEYMAN_ROOT}/developer/src"
 
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
@@ -121,8 +98,8 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  _download_symbol_server_index
-  _publish_new_symbols
+  download_symbol_server_index
+  publish_new_symbols
   _publish_to_downloads_keyman_com
   _publish_api_documentation
 }
