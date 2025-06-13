@@ -13,8 +13,8 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule } from '../../src/ng-compiler/store-analyser.js';
-import { SetLayerRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
+import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
+import { SetSystemStoreRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
 let root: ASTNode = null;
@@ -356,27 +356,54 @@ describe("KMN Store Analyser Tests", () => {
       assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
     });
   });
-  describe("SetLayerRule Tests", () => {
-    it("can construct a SetLayerRule", () => {
+  describe("SetSystemStoreRule Tests", () => {
+    it("can construct a SetSystemStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const setLayer: Rule = new SetLayerRule();
-      assert.isNotNull(setLayer);
+      const SetSystemStore: Rule = new SetSystemStoreRule();
+      assert.isNotNull(SetSystemStore);
     });
-    it("can parse correctly (string)", () => {
+    it("can parse correctly (layer, string)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
-      const setLayer: Rule = new SetLayerRule();
-      assert.isTrue(setLayer.parse(root));
+      const SetSystemStore: Rule = new SetSystemStoreRule();
+      assert.isTrue(SetSystemStore.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
     });
-    it("can parse correctly (two u_chars)", () => {
+    it("can parse correctly (layer, two u_chars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = U+1780 U+1781)');
-      const setLayer: Rule = new SetLayerRule();
-      assert.isTrue(setLayer.parse(root));
+      const SetSystemStore: Rule = new SetSystemStoreRule();
+      assert.isTrue(SetSystemStore.parse(root));
       const setNode = root.getSoleChildOfType(NodeTypes.SET);
       assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.LAYER));
       assert.equal(setNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+    });
+    it("can parse correctly (bitmap)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('set(&bitmap = "value")');
+      const SetSystemStore: Rule = new SetSystemStoreRule();
+      assert.isTrue(SetSystemStore.parse(root));
+      const setNode = root.getSoleChildOfType(NodeTypes.SET);
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(setNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+  });
+  describe("SystemStoreNameForSetRule Tests", () => {
+    it("can construct a SSystemStoreNameForSetRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
+      assert.isNotNull(systemStoreNameForSet);
+    });
+    it("can parse correctly (string system store name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('&bitmap');
+      const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
+      assert.isTrue(systemStoreNameForSet.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+    });
+    it("can parse correctly (layer)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('&layer');
+      const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
+      assert.isTrue(systemStoreNameForSet.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYER));
     });
   });
   describe("ResetStoreRule Tests", () => {

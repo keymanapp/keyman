@@ -189,21 +189,21 @@ export class SetNormalStoreRule extends SingleChildRule {
   }
 }
 
-export class SetLayerRule extends SingleChildRule {
+export class SetSystemStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const set: Rule           = new TokenRule(TokenTypes.SET, true);
-    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
-    const layer: Rule         = new TokenRule(TokenTypes.LAYER, true);
-    const equal: Rule         = new TokenRule(TokenTypes.EQUAL);
-    const text: Rule          = new TextRule();
-    const oneOrManyText: Rule = new OneOrManyRule(text);
-    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    const set: Rule                   = new TokenRule(TokenTypes.SET, true);
+    const leftBracket: Rule           = new TokenRule(TokenTypes.LEFT_BR);
+    const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
+    const equal: Rule                 = new TokenRule(TokenTypes.EQUAL);
+    const text: Rule                  = new TextRule();
+    const oneOrManyText: Rule         = new OneOrManyRule(text);
+    const rightBracket: Rule          = new TokenRule(TokenTypes.RIGHT_BR);
 
     this.rule = new SequenceRule([
       set,
       leftBracket,
-      layer,
+      systemStoreNameForSet,
       equal,
       oneOrManyText,
       rightBracket,
@@ -219,6 +219,15 @@ export class SetLayerRule extends SingleChildRule {
       node.addChild(setNode);
     }
     return parseSuccess;
+  }
+}
+
+export class SystemStoreNameForSetRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
+    const systemStoreName: Rule = new SystemStoreNameRule();
+    this.rule = new AlternateRule([systemStoreName, layer]);
   }
 }
 
