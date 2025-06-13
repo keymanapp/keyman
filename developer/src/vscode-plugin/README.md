@@ -1,10 +1,11 @@
 # Keyman Developer for VSCode
 
-This package is a standalone [VSCode](https://code.visualstudio.com) plugin.
+This package is a standalone [VSCode](https://code.visualstudio.com) plugin which offers:
 
-Its features include:
-
-- (no features yet)
+- a Build Task for building .kpj files into a package
+- when building the .kpj file, all .kmn and .xml (LDML keyboard) files will be compiled as well
+- The Build Task assumes that the .kpj will have the same name as the directory.  So, `.../some_keyboard/some_keyboard.kpj`
+- The build task will also build .kps files into packages
 
 ## Building
 
