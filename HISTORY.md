@@ -1,5 +1,62 @@
 # Keyman Version History
 
+## 19.0.64 alpha 2025-06-13
+
+* fix(windows): fix download failing when cache.json missing (#14095)
+* maint(resources): only automatically merge keyman-server PRs with automerge label (#14171)
+* maint(developer,web): use braces for variables in powershell scripts (#14184)
+
+## 19.0.63 alpha 2025-06-12
+
+* maint(web): add some more arguments for web release build script (#14167)
+* maint(developer): use double quotes so that variable gets replaced (#14168)
+* chore(deps): bump brace-expansion from 2.0.1 to 2.0.2 in /developer/src/server/src/win32/trayicon/addon-src (#14165)
+
+## 19.0.62 alpha 2025-06-11
+
+* maint(developer): export environment variables (#14157)
+* maint(web): use path when calling powershell script (#14156)
+* maint(resources): fix regression on mac triggering builds (#14155)
+
+## 19.0.61 alpha 2025-06-10
+
+* chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)
+* fix(common): Use zip.inc.sh for common test keyboards (#14145)
+* maint(developer): add docker image to build developer node modules (#14058)
+
+## 19.0.60 alpha 2025-06-06
+
+* maint(developer): allow to build locally on Linux (#14059)
+
+## 19.0.59 alpha 2025-06-05
+
+* chore(deps): bump multer from 2.0.0 to 2.0.1 (#14127)
+* maint(web): fix working directory for zipping artifacts for Web release (#14128)
+* chore(linux): Update debian changelog (#14119)
+* maint(web): improve TC build script for Keyman Web/Test (#14051)
+* maint(developer): move TC configuration for Keyman Developer to scripts (#14052)
+
+## 19.0.58 alpha 2025-06-04
+
+* feat(developer): update strs compiler to collect context (#14064)
+* feat(developer): line numbers for UsetCompiler, others (#14090)
+* feat(developer): remaining line numbers for tran/bksp compilers (#14097)
+* feat(developer): ldml: update errors for unparseable reorder (#14098)
+* chore(developer): ldml: messages cleanup (#14100)
+* maint(android): Create "archive" builder step to prep release artifacts (#14093)
+* maint(web): move TC configuration for Web to script (#14049)
+
+## 19.0.57 alpha 2025-06-03
+
+* fix(windows): change from error to breadcrumb and log (#14069)
+* maint(mac): make make-km-dmg.sh less quiet (#14105)
+
+## 19.0.56 alpha 2025-06-02
+
+* maint(ios): Use zip.inc.sh to prep release artifacts (#13919)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14094)
+* chore(linux): add Python TC test runner (#14062)
+
 ## 19.0.55 alpha 2025-05-31
 
 * maint(linux): `sudo` not required for removing temporary files (#14086)
@@ -333,6 +390,13 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.238 stable 2025-06-04
+
+* fix(developer): ldml: make sure .run() calls compile() for validation (#14071)
+* maint(linux): fix typo of temporary dependency package (#14085)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14096)
+* maint(mac): make make-km-dmg.sh less quiet (#14106)
 
 ## 18.0.237 stable 2025-05-30
 
