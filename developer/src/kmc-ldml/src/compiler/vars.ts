@@ -1,6 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { LDMLKeyboard, CompilerCallbacks, ObjectWithMetadata } from '@keymanapp/developer-utils';
+import { LDMLKeyboard, CompilerCallbacks, ObjectWithCompileContext } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -40,7 +40,7 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  private validateIdentifier(id: string, x?: ObjectWithMetadata) {
+  private validateIdentifier(id: string, x?: ObjectWithCompileContext) {
     if(!id.match(LdmlKeyboardTypes.VariableParser.ID)) { // From <string> DTD
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifier({id}, x));
       return false;

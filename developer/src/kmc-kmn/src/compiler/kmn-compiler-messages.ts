@@ -1,6 +1,6 @@
 import { KeyAddress } from "../kmw-compiler/validate-layout-file.js";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls, ObjectWithMetadata } from "@keymanapp/developer-utils";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls, ObjectWithCompileContext } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -107,7 +107,7 @@ export class KmnCompilerMessages {
   );
 
   static FATAL_UnicodeSetOutOfRange = SevFatal | 0x904;
-  static Fatal_UnicodeSetOutOfRange = (x?: ObjectWithMetadata) => mx(
+  static Fatal_UnicodeSetOutOfRange = (x?: ObjectWithCompileContext) => mx(
     this.FATAL_UnicodeSetOutOfRange, x,
     `UnicodeSet buffer was too small`,
     `Raised when caller to UnicodeSet functions provides an invalid buffer. If
@@ -118,7 +118,7 @@ export class KmnCompilerMessages {
   // TODO: rename the following functions to Error_UsetHasStrings etc
 
   static ERROR_UnicodeSetHasStrings = SevError | 0x905;
-  static Error_UnicodeSetHasStrings = (x?: ObjectWithMetadata) => mx(
+  static Error_UnicodeSetHasStrings = (x?: ObjectWithCompileContext) => mx(
     this.ERROR_UnicodeSetHasStrings, x,
     `uset contains strings, not allowed`,
     `The provided uset uses multi-character strings, (\`{}\` notation, e.g.
@@ -130,7 +130,7 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetHasProperties = SevError | 0x906;
-  static Error_UnicodeSetHasProperties = (x?: ObjectWithMetadata) => mx(
+  static Error_UnicodeSetHasProperties = (x?: ObjectWithCompileContext) => mx(
     this.ERROR_UnicodeSetHasProperties, x,
     `uset contains properties, not allowed`,
     `The provided uset uses property notation (\`\\p{…}\` or \`[:…:]\`). LDML
@@ -142,7 +142,7 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetSyntaxError = SevError | 0x907;
-  static Error_UnicodeSetSyntaxError = (x?: ObjectWithMetadata) => mx(
+  static Error_UnicodeSetSyntaxError = (x?: ObjectWithCompileContext) => mx(
     this.ERROR_UnicodeSetSyntaxError, x,
     `uset had a Syntax Error while parsing`,
     `The provided uset has a syntax error and could not be parsed. Verify the

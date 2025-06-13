@@ -3,7 +3,7 @@
  */
 import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { ObjectWithMetadata } from './symbol-utils.js';
+import { ObjectWithCompileContext } from './symbol-utils.js';
 
 const DeveloperUtilsErrMask   = CompilerErrorNamespace.DeveloperUtils;
 // const SevInfo = CompilerErrorSeverity.Info   | DeveloperUtilsErrMask;
@@ -15,7 +15,7 @@ const SevError = CompilerErrorSeverity.Error | DeveloperUtilsErrMask;
 export class DeveloperUtilsMessages {
   // structured Ajv validation error
   static ERROR_SchemaValidationError = SevError | 0x0001;
-  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}, x?: ObjectWithMetadata) => mx(
+  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}, x?: ObjectWithCompileContext) => mx(
     this.ERROR_SchemaValidationError, x,
     `Error validating LDML XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`,
   );

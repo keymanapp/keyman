@@ -12,7 +12,7 @@
  * Defined as 'any' here to reduce noise on the client side.
  * @see {@link KeymanXMLReader.getMetaData()}
  */
-export type ObjectWithMetadata = any;
+export type ObjectWithCompileContext = any;
 
 export class SymbolUtils {
   /**
@@ -21,8 +21,8 @@ export class SymbolUtils {
    * @param from source for symbols
    * @returns the onto object
    */
-  public static copySymbols<T>(onto: T, from: ObjectWithMetadata): T {
-    const o = onto as ObjectWithMetadata;
+  public static copySymbols<T>(onto: T, from: ObjectWithCompileContext): T {
+    const o = onto as ObjectWithCompileContext;
     for (const sym of Object.getOwnPropertySymbols(from)) {
       o[sym] = from[sym];
     }

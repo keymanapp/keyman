@@ -1,6 +1,6 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
-import { LDMLKeyboard, ObjectWithMetadata } from '@keymanapp/developer-utils';
+import { LDMLKeyboard, ObjectWithCompileContext } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
@@ -28,7 +28,7 @@ export class LocaCompiler extends SectionCompiler {
    * @param loc locale tag
    * @returns context metadata or null
    */
-  private contextForLocale(loc: string) : ObjectWithMetadata {
+  private contextForLocale(loc: string) : ObjectWithCompileContext {
     if (loc == this.keyboard3.locale) return this.keyboard3;
     return this.keyboard3?.locales;
   }

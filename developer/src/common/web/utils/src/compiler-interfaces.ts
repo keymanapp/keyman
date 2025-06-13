@@ -1,5 +1,5 @@
 import { CompilerCallbacks } from "./compiler-callbacks.js";
-import { ObjectWithMetadata } from "./symbol-utils.js";
+import { ObjectWithCompileContext } from "./symbol-utils.js";
 import { KeymanXMLReader, XML_FILENAME_SYMBOL } from "./xml-utils.js";
 
 /**
@@ -215,7 +215,7 @@ export class CompilerError {
    * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
    * @returns modified event object
    */
-  public static setFromMetadata(event: CompilerEvent, x?: ObjectWithMetadata): CompilerEvent {
+  public static setFromMetadata(event: CompilerEvent, x?: ObjectWithCompileContext): CompilerEvent {
     if(x) {
       const metadata = KeymanXMLReader.getMetaData(x) || {};
       const offset = metadata?.startIndex;
@@ -458,7 +458,7 @@ export function dedentCompilerMessageDetail(event: CompilerEvent) {
  *  //      it contains redundant info.
  *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
  *  //      with `${def(o.property)}` as the max complexity of interpolation.
- *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
+ *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithCompileContext) => mx(
  *    this.ERROR_InvalidScanCode, x,
  *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
  *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
@@ -474,7 +474,7 @@ export function dedentCompilerMessageDetail(event: CompilerEvent) {
  * @see CompilerMessageSpec
  * @returns the event
  */
-export function CompilerMessageObjectSpec(code: number, context: ObjectWithMetadata, message: string, detail?: string): CompilerEvent {
+export function CompilerMessageObjectSpec(code: number, context: ObjectWithCompileContext, message: string, detail?: string): CompilerEvent {
   let evt = CompilerMessageSpec(code, message, detail); // constructs raw message
   evt = CompilerError.setFromMetadata(evt, context); // updates with offset from context
   return evt;

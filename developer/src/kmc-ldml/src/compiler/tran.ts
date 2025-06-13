@@ -1,6 +1,6 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes, util } from '@keymanapp/common-types';
-import { CompilerCallbacks, LDMLKeyboard, ObjectWithMetadata } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, LDMLKeyboard, ObjectWithCompileContext } from "@keymanapp/developer-utils";
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -237,7 +237,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * We have already checked that it's not a mapTo,
    * so there should not be any illegal substitutions.
    */
-  private isValidTo(to: string, x?: ObjectWithMetadata) : boolean {
+  private isValidTo(to: string, x?: ObjectWithCompileContext) : boolean {
     if (/(?<!\\)(?:\\\\)*\$\[/.test(to)) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }, x));
       return false;
@@ -251,7 +251,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param from the original from - for error reporting
    * @returns true if OK
    */
-  private isValidRegex(cookedFrom: string, from: string, x?: ObjectWithMetadata) : boolean {
+  private isValidRegex(cookedFrom: string, from: string, x?: ObjectWithCompileContext) : boolean {
     // check for any unescaped dollar sign here
     if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }, x));
@@ -344,7 +344,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
    * @param cookedFrom the original string
    * @returns the original string, or null if an error was reported
    */
-  private checkEscapes(cookedFrom: string, transform?: ObjectWithMetadata): string | null {
+  private checkEscapes(cookedFrom: string, transform?: ObjectWithCompileContext): string | null {
     if (!cookedFrom) return cookedFrom;
 
     // should not follow marker prefix, nor marker prefix with range

@@ -102,7 +102,7 @@ Example: keys.ts  \- compiler \- call site for error
 
 ```js
 static ERROR_InvalidScanCode = SevError | 0x0009;
-static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
+static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithCompileContext) => mx(
   this.ERROR_InvalidScanCode, context,
 Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}',
   `…additional markdown detail…`
