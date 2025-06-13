@@ -39,9 +39,9 @@ ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifStoreStringStatement|ifSystemStoreStringStatement
 ifStoreStringStatement: IF LEFT_BR normalStoreName
   comparison STRING RIGHT_BR
-ifSystemStoreStringStatement: IF LEFT_BR ifSystemStoreName
+ifSystemStoreStringStatement: IF LEFT_BR systemStoreNameForIf
   comparison STRING RIGHT_BR
-ifSystemStoreName: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
+systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
 comparison:EQUAL|NOT_EQUAL
 layerStatement: LAYER_SHORTCUT LEFT_BR STRING RIGHT_BR
 platformStatement: PLATFORM_SHORTCUT LEFT_BR STRING RIGHT_BR
@@ -49,7 +49,7 @@ baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR STRING RIGHT_BR
 rhsBlock: outputStatement+|contextOutputBlock|CONTEXT|RETURN|NUL
 contextOutputBlock: CONTEXT? outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
-  resetStore|deadKeyStatement|setLayer|layerStatement|indexStatement|
+  resetStore|deadKeyStatement|setSystemStore|layerStatement|indexStatement|
   contextStatement|text|BEEP
 callStatement: CALL bracketedStoreName
 saveStatement: SAVE bracketedStoreName

@@ -646,16 +646,16 @@ export class IfStoreStringStatementRule extends AbstractIfStoreStatementRule {
 export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
-    const ifSystemStoreName: Rule = new IfSystemStoreNameRule();
-    const stringRule: Rule        = new TokenRule(TokenTypes.STRING, true);
+    const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
+    const stringRule: Rule           = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, ifSystemStoreName,
+      this.ifRule, this.leftBracket, systemStoreNameForIf,
       this.comparison, stringRule, this.rightBracket,
     ]);
   }
 }
 
-export class IfSystemStoreNameRule extends SingleChildRule {
+export class SystemStoreNameForIfRule extends SingleChildRule {
   public constructor() {
     super();
     const systemStoreName: Rule = new SystemStoreNameRule();
@@ -783,7 +783,7 @@ export class OutputStatementRule extends SingleChildRule {
     const saveStatement: Rule    = new SaveStatementRule();
     const resetStore: Rule       = new ResetStoreRule();
     const deadKeyStatement: Rule = new DeadKeyStatementRule();
-    const setLayer: Rule         = new SetSystemStoreRule();
+    const setSystemStore: Rule   = new SetSystemStoreRule();
     const layerStatement: Rule   = new LayerStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
@@ -796,7 +796,7 @@ export class OutputStatementRule extends SingleChildRule {
       saveStatement,
       resetStore,
       deadKeyStatement,
-      setLayer,
+      setSystemStore,
       layerStatement,
       indexStatement,
       contextStatement,
