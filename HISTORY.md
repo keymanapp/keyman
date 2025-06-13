@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.64 alpha 2025-06-13
+
+* fix(windows): fix download failing when cache.json missing (#14095)
+* maint(resources): only automatically merge keyman-server PRs with automerge label (#14171)
+* maint(developer,web): use braces for variables in powershell scripts (#14184)
+
 ## 19.0.63 alpha 2025-06-12
 
 * maint(web): add some more arguments for web release build script (#14167)
