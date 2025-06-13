@@ -72,10 +72,24 @@ export class PlainTextRule extends SingleChildRule {
 export class SimpleTextRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringRule = new TokenRule(TokenTypes.STRING, true);
-    const virtualKey = new VirtualKeyRule();
-    const uChar      = new TokenRule(TokenTypes.U_CHAR, true);
-    this.rule = new AlternateRule([ stringRule, virtualKey, uChar]);
+    const stringRule    = new TokenRule(TokenTypes.STRING, true);
+    const virtualKey    = new VirtualKeyRule();
+    const uChar         = new TokenRule(TokenTypes.U_CHAR, true);
+    const namedConstant = new TokenRule(TokenTypes.NAMED_CONSTANT, true);
+    const hangul        = new TokenRule(TokenTypes.HANGUL, true);
+    const decimal       = new TokenRule(TokenTypes.DECIMAL, true);
+    const hexadecimal   = new TokenRule(TokenTypes.HEXADECIMAL, true);
+    const octal         = new TokenRule(TokenTypes.OCTAL, true);
+    this.rule = new AlternateRule([
+      stringRule,
+      virtualKey,
+      uChar,
+      namedConstant,
+      hangul,
+      decimal,
+      hexadecimal,
+      octal
+    ]);
   }
 }
 
@@ -200,13 +214,11 @@ export class RuleBlockRule extends SingleChildRule {
     const beginStatement: Rule               = new BeginStatementRule();
     const groupStatement: Rule           = new GroupStatementRule();
     const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule();
-    const readOnlyProductionBlock: Rule  = new ReadOnlyProductionBlockRule();
     const contextProductionBlock: Rule   = new ContextProductionBlockRule();
     this.rule = new AlternateRule([
       beginStatement,
       groupStatement,
       usingKeysProductionBlock,
-      readOnlyProductionBlock,
       contextProductionBlock,
     ]);
   }
@@ -387,16 +399,6 @@ export class UsingKeysProductionBlockRule extends AbstractProductionBlockRule {
   }
 }
 
-export class ReadOnlyProductionBlockRule extends AbstractProductionBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType        = NodeTypes.LHS_READONLY;
-    this.productionNodeType = NodeTypes.PRODUCTION_READONLY;
-    const readOnlyLhsBlock  = new ReadOnlyLhsBlockRule();
-    this.rule = new SequenceRule([readOnlyLhsBlock, this.chevron, this.rhsBlock]);
-  }
-}
-
 export class ContextProductionBlockRule extends AbstractProductionBlockRule {
   public constructor() {
     super();
@@ -434,28 +436,23 @@ export class UsingKeysLhsBlockRule extends AbstractLhsBlockRule {
   }
 }
 
-export class ReadOnlyLhsBlockRule extends AbstractLhsBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType                     = NodeTypes.LHS_READONLY;
-    const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
-    const readOnlyInputBlock: Rule       = new ReadOnlyInputBlockRule();
-    const ifLikeStatement                = new IfLikeStatementRule();
-    const oneOrManyIfLikeStatement: Rule = new OneOrManyRule(ifLikeStatement);
-    this.rule = new AlternateRule([
-      match, noMatch, readOnlyInputBlock, oneOrManyIfLikeStatement,
-    ]);
-  }
-}
-
 export class ContextLhsBlockRule extends AbstractLhsBlockRule {
   public constructor() {
     super();
-    this.lhsNodeType              = NodeTypes.LHS_CONTEXT;
-    const contextInputBlock: Rule = new ContextInputBlockRule();
-    const nulInputBlock: Rule     = new NulInputBlockRule();
-    this.rule = new AlternateRule([contextInputBlock, nulInputBlock]);
+    this.lhsNodeType                     = NodeTypes.LHS_CONTEXT;
+    const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
+    const contextInputBlock: Rule        = new ContextInputBlockRule();
+    const nulInputBlock: Rule            = new NulInputBlockRule();
+    const ifLikeStatement                = new IfLikeStatementRule();
+    const oneOrManyIfLikeStatement: Rule = new OneOrManyRule(ifLikeStatement);
+    this.rule = new AlternateRule([
+      match,
+      noMatch,
+      contextInputBlock,
+      nulInputBlock,
+      oneOrManyIfLikeStatement,
+    ]);
   }
 }
 
@@ -476,20 +473,6 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
       optInputContext,
       plus,
       keystoke,
-    ]);
-  }
-}
-
-export class ReadOnlyInputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
-    const optNul: Rule              = new OptionalRule(nulRule);
-    const ifLikeStatement: Rule     = new IfLikeStatementRule();
-    const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
-    const keystoke: Rule            = new KeystrokeRule();
-    this.rule = new SequenceRule([
-      optNul, manyIfLikeStatement, keystoke,
     ]);
   }
 }
@@ -554,18 +537,17 @@ export class InputElementRule extends SingleChildRule {
 export class KeystrokeRule extends SingleChildRule {
   public constructor() {
     super();
-    const any: Rule  = new AnyStatementRule();
-    const text: Rule = new TextRule();
-    this.rule = new AlternateRule([any, text]);
+    const inputElement = new InputElementRule();
+    this.rule = new OneOrManyRule(inputElement);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const inputCharNode = new ASTNode(NodeTypes.KEYSTROKE);
-      inputCharNode.addChild(tmp.getSoleChild());
-      node.addChild(inputCharNode);
+      const keystrokeNode = new ASTNode(NodeTypes.KEYSTROKE);
+      keystrokeNode.addChildren(tmp.getChildren());
+      node.addChild(keystrokeNode);
     }
     return parseSuccess;
   }
