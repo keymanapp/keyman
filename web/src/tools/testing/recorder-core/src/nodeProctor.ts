@@ -8,10 +8,11 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, KeyboardHarness } from "keyman/engine/keyboard";
-import { Mock, type OutputTarget } from "keyman/engine/js-processor";
+import { KeyEvent, KeyEventSpec, KeyboardHarness, type OutputTargetInterface } from "keyman/engine/keyboard";
+// TODO-web-core: remove usage of OutputTargetBase, use OutputTargetInterface instead
+import { Mock, OutputTargetBase } from 'keyman/engine/js-processor';
 import { DeviceSpec } from "@keymanapp/web-utils";
-import { KeyboardInterface, KeyboardProcessor } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 
 export default class NodeProctor extends Proctor {
   private keyboardWithHarness: KeyboardHarness;
@@ -49,15 +50,15 @@ export default class NodeProctor extends Proctor {
     return true;
   }
 
-  async simulateSequence(sequence: TestSequence<any>, target?: OutputTarget): Promise<string> {
+  async simulateSequence(sequence: TestSequence<any>, target?: OutputTargetInterface): Promise<string> {
     // Start with an empty OutputTarget and a fresh KeyboardProcessor.
     if(!target) {
       target = new Mock();
     }
 
     // Establish a fresh processor, setting its keyboard appropriately for the test.
-    let processor = new KeyboardProcessor(this.device);
-    processor.keyboardInterface = this.keyboardWithHarness as KeyboardInterface;
+    let processor = new JSKeyboardProcessor(this.device);
+    processor.keyboardInterface = this.keyboardWithHarness as JSKeyboardInterface;
     const keyboard = processor.activeKeyboard;
 
     if(sequence instanceof RecordedKeystrokeSequence) {
@@ -88,7 +89,8 @@ export default class NodeProctor extends Proctor {
         // We don't care too much about particularities of per-keystroke behavior yet.
         // ... we _could_ if we wanted to, though.  The framework is mostly in place;
         // it's a matter of actually adding the feature.
-        let ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), target);
+        // TODO-web-core
+        const ruleBehavior = processor.processKeystroke(new KeyEvent(keyEvent), (target as OutputTargetBase));
 
         if (this.debugMode) {
           console.log("Processing %d:", keyEvent.Lcode);
