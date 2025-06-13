@@ -177,7 +177,7 @@ if((Test-Path release\${build_number}\${debug_zip}) -ne 0) {
 
   $hash = get-filehash ${upload_path}\${debug_zip} -Algorithm MD5
 
-  ${debug_zip}_download_info = @"
+  $debug_zip_download_info = @"
 {
   "name": "Keyman Developer debug files",
   "version": "${version_with_tag}",
@@ -191,7 +191,7 @@ if((Test-Path release\${build_number}\${debug_zip}) -ne 0) {
 }
 "@
 
-  [System.IO.File]::WriteAllLines("${pwd}\${upload_path}\${debug_zip}.download_info", ${debug_zip}_download_info)
+  [System.IO.File]::WriteAllLines("${pwd}\${upload_path}\${debug_zip}.download_info", ${debug_zip_download_info})
 }
 
 #
