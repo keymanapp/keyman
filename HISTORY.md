@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 19.0.63 alpha 2025-06-12
+
+* maint(web): add some more arguments for web release build script (#14167)
+* maint(developer): use double quotes so that variable gets replaced (#14168)
+* chore(deps): bump brace-expansion from 2.0.1 to 2.0.2 in /developer/src/server/src/win32/trayicon/addon-src (#14165)
+
+## 19.0.62 alpha 2025-06-11
+
+* maint(developer): export environment variables (#14157)
+* maint(web): use path when calling powershell script (#14156)
+* maint(resources): fix regression on mac triggering builds (#14155)
+
+## 19.0.61 alpha 2025-06-10
+
+* chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)
+* fix(common): Use zip.inc.sh for common test keyboards (#14145)
+* maint(developer): add docker image to build developer node modules (#14058)
+
 ## 19.0.60 alpha 2025-06-06
 
 * maint(developer): allow to build locally on Linux (#14059)
