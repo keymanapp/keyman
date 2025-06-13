@@ -598,9 +598,9 @@ export class IfLikeStatementRule extends SingleChildRule {
 export class IfStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const ifNormalStoreStatement: Rule       = new IfNormalStoreStatementRule();
-    const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
-    this.rule = new AlternateRule([ifNormalStoreStatement, ifSystemStoreStringStatement]);
+    const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
+    const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
+    this.rule = new AlternateRule([ifNormalStoreStatement, ifSystemStoreStatement]);
   }
 }
 
@@ -643,7 +643,7 @@ export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
   }
 }
 
-export class IfSystemStoreStringStatementRule extends AbstractIfStoreStatementRule {
+export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
     const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();

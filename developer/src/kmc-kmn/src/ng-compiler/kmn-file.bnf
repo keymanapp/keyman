@@ -36,10 +36,10 @@ keystroke: anyStatement|text
 anyStatement: ANY bracketedStoreName
 notAnyStatement: NOTANY bracketedStoreName
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
-ifStatement: ifNormalStoreStatement|ifSystemStoreStringStatement
+ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
 ifNormalStoreStatement: IF LEFT_BR normalStoreName
   comparison STRING RIGHT_BR
-ifSystemStoreStringStatement: IF LEFT_BR systemStoreNameForIf
+ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf
   comparison STRING RIGHT_BR
 systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
 comparison:EQUAL|NOT_EQUAL

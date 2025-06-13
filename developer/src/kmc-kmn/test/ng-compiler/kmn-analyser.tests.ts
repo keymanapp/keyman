@@ -16,7 +16,7 @@ import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfNormalStoreStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { SystemStoreNameForIfRule, IfSystemStoreStringStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { SystemStoreNameForIfRule, IfSystemStoreStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { OutputStatementRule, OutsStatementRule, PlatformStatementRule, ReadOnlyInputBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ReadOnlyLhsBlockRule, ReadOnlyProductionBlockRule, RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1317,16 +1317,16 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
   });
-  describe("IfSystemStoreStringStatementRule Tests", () => {
-    it("can construct a IfSystemStoreStringStatementRule", () => {
+  describe("IfSystemStoreStatementRule Tests", () => {
+    it("can construct a IfSystemStoreStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
-      assert.isNotNull(ifSystemStoreStringStatement);
+      const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
+      assert.isNotNull(ifSystemStoreStatement);
     });
     it("can parse correctly (equal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = "filename")');
-      const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
-      assert.isTrue(ifSystemStoreStringStatement.parse(root));
+      const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
+      assert.isTrue(ifSystemStoreStatement.parse(root));
       const ifNode = root.getSoleChildOfType(NodeTypes.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
@@ -1335,8 +1335,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (equal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap != "filename")');
-      const ifSystemStoreStringStatement: Rule = new IfSystemStoreStringStatementRule();
-      assert.isTrue(ifSystemStoreStringStatement.parse(root));
+      const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
+      assert.isTrue(ifSystemStoreStatement.parse(root));
       const ifNode = root.getSoleChildOfType(NodeTypes.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.NOT_EQUAL))
