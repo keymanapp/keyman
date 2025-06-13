@@ -115,6 +115,11 @@ function publish_action() {
     return 1
   fi
 
+  export RSYNC_PATH
+  export RSYNC_USER
+  export RSYNC_HOST
+  export RSYNC_ROOT
+
   _publish_sentry
   _download_symbol_server_index
   _publish_new_symbols
