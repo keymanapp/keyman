@@ -715,7 +715,7 @@ begin
   finally
     CheckForUpdates.Free;
   end;
-  if Result <> wucFailure then
+  if Result = wucFailure then
     begin
       KL.Log('UpdateAvailableState.HandleCheck CheckForUpdates not successful: '+
         GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
