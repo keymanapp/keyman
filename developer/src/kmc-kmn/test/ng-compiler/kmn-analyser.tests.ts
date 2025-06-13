@@ -15,7 +15,7 @@ import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStat
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { IfLikeStatementRule, IfStatementRule, IfStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { IfLikeStatementRule, IfStatementRule, IfNormalStoreStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { SystemStoreNameForIfRule, IfSystemStoreStringStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { OutputStatementRule, OutsStatementRule, PlatformStatementRule, ReadOnlyInputBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1290,16 +1290,16 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
   });
-  describe("IfStoreStringStatementRule Tests", () => {
-    it("can construct a IfStoreStringStatementRule", () => {
+  describe("IfNormalStoreStatementRule Tests", () => {
+    it("can construct a IfNormalStoreStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
-      assert.isNotNull(ifStoreStringStatement);
+      const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
+      assert.isNotNull(ifNormalStoreStatement);
     });
     it("can parse correctly (equal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(number = "1")');
-      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
-      assert.isTrue(ifStoreStringStatement.parse(root));
+      const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
+      assert.isTrue(ifNormalStoreStatement.parse(root));
       const ifNode = root.getSoleChildOfType(NodeTypes.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
@@ -1308,8 +1308,8 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (not equal)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(number != "1")');
-      const ifStoreStringStatement: Rule = new IfStoreStringStatementRule();
-      assert.isTrue(ifStoreStringStatement.parse(root));
+      const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
+      assert.isTrue(ifNormalStoreStatement.parse(root));
       const ifNode = root.getSoleChildOfType(NodeTypes.IF);
       assert.isNotNull(ifNode);
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.NOT_EQUAL))
