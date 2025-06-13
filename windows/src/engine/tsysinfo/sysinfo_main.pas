@@ -343,56 +343,17 @@ end;
 procedure TfrmDiagnostics.mnuSendToKeymanClick(Sender: TObject);
 var
   ffilename: string;
-  i: Integer;
-  f: TSearchRec;
-  FTotalSize: Int64;
-  FSavedFileList: string;
-  FDeleteFiles: Boolean;
 begin
   ffilename := TempFileName('.tsi');
-
-  FTotalSize := 0;
-
-  for i := 0 to FSIList.Files.Count - 1 do
-  begin
-    if FindFirst(FSIList.Files[i], 0, f) = 0 then
-    begin
-      FTotalSize := FTotalSize + f.Size;
-      FindClose(f);
-    end
-  end;
-
-  FSavedFileList := FSIList.Files.Text;
-
-  FDeleteFiles := False; // I2240
-
-  if FTotalSize > 1024 * 1024 * 8 then // 8MB
-  begin
-    case MessageDlg('The attached files are very large (' +
-      FileSizeKB(FTotalSize) +
-      ').  Do you want to send them - this may take some time?', mtConfirmation,
-      mbYesNoCancel, 0) of
-      mrYes:
-        FDeleteFiles := True;
-      mrNo:
-        FSIList.Files.Text := '';
-      mrCancel:
-        Exit;
-    end;
-  end
-  else
-    FDeleteFiles := True; // I2240
+  // No longer sending log files to Keyman via this upload method
+  FSIList.Files.Clear;
 
   FSIList.Save(ffilename);
-
-  FSIList.Files.Text := FSavedFileList;
 
   with TfrmEmail.Create(Self) do
     try
       AttachFile := ffilename;
       if ShowModal = mrOk then
-        if FDeleteFiles then
-          DeleteDiagFiles; // I2240
     finally
       DeleteFile(ffilename);
       Free;
