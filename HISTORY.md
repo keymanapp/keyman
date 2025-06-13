@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.65 alpha 2025-06-13
+
+* maint(developer): fix developer release build (#14185)
+* maint(developer,web): use double quotes inside `--rsync-path` again (#14194)
+
 ## 19.0.64 alpha 2025-06-13
 
 * fix(windows): fix download failing when cache.json missing (#14095)
