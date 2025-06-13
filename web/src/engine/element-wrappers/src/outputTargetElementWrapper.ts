@@ -1,7 +1,7 @@
-import { OutputTarget as OutputTargetBase } from "keyman/engine/js-processor";
+import { OutputTargetBase } from "keyman/engine/js-processor";
 import { EventEmitter } from 'eventemitter3';
 
-export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {
+export abstract class OutputTargetElementWrapper<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {
   // JS/TS can't do true multiple inheritance, so we maintain class events on a readonly field.
   public readonly events: EventEmitter<EventMap, this> = new EventEmitter<EventMap, this>();
 

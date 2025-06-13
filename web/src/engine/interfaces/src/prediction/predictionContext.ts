@@ -4,7 +4,7 @@ import Keep = LexicalModelTypes.Keep;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
-import { type OutputTarget } from "keyman/engine/keyboard";
+import { type OutputTargetInterface } from "keyman/engine/keyboard";
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
@@ -41,13 +41,13 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   /**
    * Represents the active context used when requesting and applying predictive-text operations.
    */
-  private _currentTarget: OutputTarget;
+  private _currentTarget: OutputTargetInterface;
 
-  public get currentTarget(): OutputTarget {
+  public get currentTarget(): OutputTargetInterface {
     return this._currentTarget;
   }
 
-  public setCurrentTarget(target: OutputTarget): Promise<Suggestion[]> {
+  public setCurrentTarget(target: OutputTargetInterface): Promise<Suggestion[]> {
     const originalTarget = this._currentTarget;
     this._currentTarget = target;
 
