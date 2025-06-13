@@ -27,13 +27,13 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  "--rsync-path='$RSYNC_PATH'",             # path on remote server
-  "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
+  "--rsync-path='${RSYNC_PATH}'",             # path on remote server
+  "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts",                  # use ssh
   ".",                                      # upload the whole symbols folder
-  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/" # target server + path
+  "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/windows/symbols/" # target server + path
 )
 
-& $RSYNC_HOME\rsync.exe $rsync_args
-if ($LASTEXITCODE -ne 0) { throw "Exit code is $LASTEXITCODE" }
+& ${RSYNC_HOME}\rsync.exe ${rsync_args}
+if (${LASTEXITCODE} -ne 0) { throw "Exit code is ${LASTEXITCODE}" }
 
 # EOF

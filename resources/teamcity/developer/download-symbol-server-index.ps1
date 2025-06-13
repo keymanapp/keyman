@@ -25,39 +25,39 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  "--rsync-path='$RSYNC_PATH'",             # path on remote server
-  "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/lastid.txt", # target server + path
+  "--rsync-path='${RSYNC_PATH}'",             # path on remote server
+  "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts",                  # use ssh
+  "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/windows/symbols/000admin/lastid.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
-& $RSYNC_HOME\rsync.exe $rsync_args
-if ($LASTEXITCODE -ne 0) { throw "Exit code is $LASTEXITCODE" }
+& ${RSYNC_HOME}\rsync.exe ${rsync_args}
+if (${LASTEXITCODE} -ne 0) { throw "Exit code is ${LASTEXITCODE}" }
 
 $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  "--rsync-path='$RSYNC_PATH'",             # path on remote server
-  "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/history.txt", # target server + path
+  "--rsync-path='${RSYNC_PATH}'",             # path on remote server
+  "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts",                  # use ssh
+  "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/windows/symbols/000admin/history.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
-& $RSYNC_HOME\rsync.exe $rsync_args
-if ($LASTEXITCODE -ne 0) { throw "Exit code is $LASTEXITCODE" }
+& ${RSYNC_HOME}\rsync.exe ${rsync_args}
+if (${LASTEXITCODE} -ne 0) { throw "Exit code is ${LASTEXITCODE}" }
 
 $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  "--rsync-path='$RSYNC_PATH'",             # path on remote server
-  "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "$RSYNC_USER@$RSYNC_HOST:$RSYNC_ROOT/windows/symbols/000admin/server.txt", # target server + path
+  "--rsync-path='${RSYNC_PATH}'",             # path on remote server
+  "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts",                  # use ssh
+  "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/windows/symbols/000admin/server.txt", # target server + path
   "."                                       # download the whole symbols 000Admin folder
 )
 
-& $RSYNC_HOME\rsync.exe $rsync_args
-if ($LASTEXITCODE -ne 0) { throw "Exit code is $LASTEXITCODE" }
+& ${RSYNC_HOME}\rsync.exe ${rsync_args}
+if (${LASTEXITCODE} -ne 0) { throw "Exit code is ${LASTEXITCODE}" }
 
 # EOF
