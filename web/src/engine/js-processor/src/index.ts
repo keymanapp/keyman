@@ -1,4 +1,4 @@
-export { BeepHandler, JSKeyboardProcessor, LogMessageHandler, ProcessorInitOptions } from "./jsKeyboardProcessor.js";
+export { JSKeyboardProcessor, LogMessageHandler, ProcessorInitOptions } from "./jsKeyboardProcessor.js";
 export { JSKeyboardInterface, KeyInformation, StoreNonCharEntry } from "./jsKeyboardInterface.js";
 export * from "./deadkeys.js";
 export { type ComplexKeyboardStore } from "./stores.js";

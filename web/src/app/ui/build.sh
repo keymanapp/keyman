@@ -64,8 +64,8 @@ compile_and_copy() {
   cp -R "$KEYMAN_ROOT/web/src/resources/ui/." "$KEYMAN_ROOT/web/build/app/resources/ui/"
 
   # Copy Keyman Core build artifacts for local reference
-  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/debug/"
-  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/release/"
+  cp "${KEYMAN_ROOT}/web/build/engine/core-adapter/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/core-adapter/obj/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/ui/release/"
 
   # Update the build/publish copy of our build artifacts
   prepare

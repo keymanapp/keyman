@@ -308,7 +308,7 @@ non-zero value is an error).
 ## Specification
 
 -->
-// keep in sync with web/src/engine/core-processor/src/core-factory.ts
+// keep in sync with web/src/engine/core-adapter/src/KM_Core.ts
 // (see https://github.com/emscripten-core/emscripten/issues/18585)
 <!--
 ```c */
