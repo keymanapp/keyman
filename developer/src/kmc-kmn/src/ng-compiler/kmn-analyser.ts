@@ -243,9 +243,11 @@ export class EntryPointRule extends SingleChildRule {
 export class UseStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const use: Rule                = new TokenRule(TokenTypes.USE, true);
-    const bracketedGroupName: Rule = new BracketedGroupNameRule();
-    this.rule = new SequenceRule([use, bracketedGroupName]);
+    const use: Rule          = new TokenRule(TokenTypes.USE, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const groupName: Rule    = new GroupNameRule();
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -261,26 +263,18 @@ export class UseStatementRule extends SingleChildRule {
   }
 }
 
-export class BracketedGroupNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
-    const groupName: Rule    = new GroupNameRule();
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      leftBracket, groupName, rightBracket,
-    ]);
-  }
-}
-
 export class GroupStatementRule extends SingleChildRule {
   public constructor() {
     super();
     const group: Rule              = new TokenRule(TokenTypes.GROUP, true);
-    const bracketedGroupName: Rule = new BracketedGroupNameRule();
+    const leftBracket: Rule        = new TokenRule(TokenTypes.LEFT_BR);
+    const groupName: Rule          = new GroupNameRule();
+    const rightBracket: Rule       = new TokenRule(TokenTypes.RIGHT_BR);
     const groupQualifierRule: Rule = new GroupQualifierRule();
     const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
-    this.rule = new SequenceRule([group, bracketedGroupName, optGroupQualifier]);
+    this.rule = new SequenceRule([
+      group, leftBracket, groupName, rightBracket, optGroupQualifier
+    ]);
   }
 
   public parse(node: ASTNode): boolean {

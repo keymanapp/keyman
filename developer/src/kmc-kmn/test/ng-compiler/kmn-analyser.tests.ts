@@ -12,7 +12,7 @@ import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { BracketedGroupNameRule, ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfStoreStringStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -579,6 +579,36 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(useNode);
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
+    it("can parse correctly (space before parameter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use( main)');
+      const useStatement: Rule = new UseStatementRule();
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+    it("can parse correctly (space after parameter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(main )');
+      const useStatement: Rule = new UseStatementRule();
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
+    it("can parse correctly (space before and after parameter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use( main )');
+      const useStatement: Rule = new UseStatementRule();
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      const groupNameNode: ASTNode = useNode.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getText(), 'main');
+    });
     it("can parse correctly (permitted keyword)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('use(postkeystroke)');
       const useStatement: Rule = new UseStatementRule();
@@ -586,45 +616,6 @@ describe("KMN Analyser Tests", () => {
       const useNode = root.getSoleChildOfType(NodeTypes.USE);
       assert.isNotNull(useNode);
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
-    });
-  });
-  describe("BracketedGroupNameRule Tests", () => {
-    it("can construct a BracketedGroupNameRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const bracketedGroupName: Rule = new BracketedGroupNameRule();
-      assert.isNotNull(bracketedGroupName);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('(main)');
-      const bracketedGroupName: Rule = new BracketedGroupNameRule();
-      assert.isTrue(bracketedGroupName.parse(root));
-      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
-      assert.isNotNull(groupNameNode);
-      assert.equal(groupNameNode.getText(), 'main');
-    });
-    it("can parse correctly (space before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('( main)');
-      const bracketedGroupName: Rule = new BracketedGroupNameRule();
-      assert.isTrue(bracketedGroupName.parse(root));
-      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
-      assert.isNotNull(groupNameNode);
-      assert.equal(groupNameNode.getText(), 'main');
-    });
-    it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('(main )');
-      const bracketedGroupName: Rule = new BracketedGroupNameRule();
-      assert.isTrue(bracketedGroupName.parse(root));
-      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
-      assert.isNotNull(groupNameNode);
-      assert.equal(groupNameNode.getText(), 'main');
-    });
-    it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('( main )');
-      const bracketedGroupName: Rule = new BracketedGroupNameRule();
-      assert.isTrue(bracketedGroupName.parse(root));
-      const groupNameNode: ASTNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
-      assert.isNotNull(groupNameNode);
-      assert.equal(groupNameNode.getText(), 'main');
     });
   });
   describe("GroupNameRule Tests", () => {

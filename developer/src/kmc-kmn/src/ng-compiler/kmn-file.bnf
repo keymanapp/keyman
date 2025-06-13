@@ -14,11 +14,10 @@ ruleBlock: beginStatement|groupStatement|usingKeysProductionBlock|readOnlyProduc
   contextProductionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
-useStatement: USE bracketedGroupName
-bracketedGroupName: LEFT_BR groupName RIGHT_BR
+useStatement: USE LEFT_BR groupName RIGHT_BR
 groupName: PARAMETER|OCTAL|permittedKeyword
 permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
-groupStatement: GROUP bracketedGroupName groupQualifier?
+groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
 usingKeysProductionBlock: usingKeysLhsBlock CHEVRON rhsBlock
