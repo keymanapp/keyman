@@ -609,13 +609,17 @@ export class AbstractIfStoreStatementRule extends SingleChildRule {
   protected leftBracket: Rule;
   protected comparison: Rule;
   protected rightBracket: Rule;
+  protected plainText: Rule;
+  protected oneOrManyPlainText: Rule;
 
   public constructor() {
     super();
-    this.ifRule        = new TokenRule(TokenTypes.IF, true);
-    this.leftBracket   = new TokenRule(TokenTypes.LEFT_BR);
-    this.comparison    = new ComparisonRule();
-    this.rightBracket  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.ifRule             = new TokenRule(TokenTypes.IF, true);
+    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
+    this.comparison         = new ComparisonRule();
+    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
+    this.plainText          = new PlainTextRule();
+    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
   }
 
   public parse(node: ASTNode): boolean {
@@ -635,10 +639,9 @@ export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
     const normalStoreName: Rule = new NormalStoreNameRule();
-    const stringRule: Rule      = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
       this.ifRule, this.leftBracket, normalStoreName,
-      this.comparison, stringRule, this.rightBracket,
+      this.comparison, this.oneOrManyPlainText, this.rightBracket,
     ]);
   }
 }
@@ -647,10 +650,9 @@ export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
   public constructor() {
     super();
     const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-    const stringRule: Rule           = new TokenRule(TokenTypes.STRING, true);
     this.rule = new SequenceRule([
       this.ifRule, this.leftBracket, systemStoreNameForIf,
-      this.comparison, stringRule, this.rightBracket,
+      this.comparison, this.oneOrManyPlainText, this.rightBracket,
     ]);
   }
 }

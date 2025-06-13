@@ -38,9 +38,9 @@ notAnyStatement: NOTANY bracketedStoreName
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
 ifNormalStoreStatement: IF LEFT_BR normalStoreName
-  comparison STRING RIGHT_BR
+  comparison plainText+ RIGHT_BR
 ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf
-  comparison STRING RIGHT_BR
+  comparison plainText+ RIGHT_BR
 systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
 comparison:EQUAL|NOT_EQUAL
 layerStatement: LAYER_SHORTCUT LEFT_BR STRING RIGHT_BR

@@ -1316,6 +1316,16 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
     });
+    it("can parse correctly (equal, two u_chars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(number = U+1780 U+1781)');
+      const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
+      assert.isTrue(ifNormalStoreStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STORENAME))
+      assert.equal(ifNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
+    });
   });
   describe("IfSystemStoreStatementRule Tests", () => {
     it("can construct a IfSystemStoreStatementRule", () => {
@@ -1342,6 +1352,16 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.NOT_EQUAL))
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.BITMAP))
       assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.STRING))
+    });
+    it("can parse correctly (equal, two u_chars)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('if(&bitmap = U+1780 U+1781)');
+      const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
+      assert.isTrue(ifSystemStoreStatement.parse(root));
+      const ifNode = root.getSoleChildOfType(NodeTypes.IF);
+      assert.isNotNull(ifNode);
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.EQUAL))
+      assert.isNotNull(ifNode.getSoleChildOfType(NodeTypes.BITMAP))
+      assert.equal(ifNode.getChildrenOfType(NodeTypes.U_CHAR).length, 2);
     });
   });
   describe("SystemStoreNameForIfRule Tests", () => {
