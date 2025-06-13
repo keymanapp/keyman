@@ -6,12 +6,15 @@
 #
 
 #
-# Build levels
+# # Build levels
+#
+# See /docs/build-bot.md
 #
 
 readonly build_level_skip=skip
 readonly build_level_build=build
 readonly build_level_release=release
+# TODO: future build_level_fulltest=fulltest --> do all expensive e2e tests as well as producing release artifacts
 readonly valid_build_levels="$build_level_skip|$build_level_build|$build_level_release"
 
 #
@@ -20,6 +23,8 @@ readonly valid_build_levels="$build_level_skip|$build_level_build|$build_level_r
 
 available_platforms=(android common_web common_windows common_mac common_linux ios linux mac web windows developer)
 
+# For test builds on master, beta, and stable-x.y branches, we always "build",
+# not "release" -- that is, we don't produce artifacts
 declare -Ag main_branch_platform_build_levels
 for available_platforms_i in "${available_platforms[@]}"; do
   main_branch_platform_build_levels[$available_platforms_i]=$build_level_build
