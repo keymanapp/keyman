@@ -108,13 +108,13 @@ describe('layr', function () {
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
-      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(258))],
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
       retainOffsetInMessages: true,
     },
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer2.xml',
-      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
       retainOffsetInMessages: true,
     },
     {
