@@ -9,7 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { BracketedStoreNameRule, CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -158,12 +158,16 @@ export class ModifierRule extends SingleChildRule {
 }
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
-  protected bracketedStoreName: Rule;
+  protected leftBracket: Rule;
+  protected normalStoreName: Rule;
+  protected rightBracket: Rule;
   protected cmdNodeType: NodeTypes;
 
   public constructor() {
     super();
-    this.bracketedStoreName = new BracketedStoreNameRule();
+    this.leftBracket     = new TokenRule(TokenTypes.LEFT_BR);
+    this.normalStoreName = new NormalStoreNameRule();
+    this.rightBracket    = new TokenRule(TokenTypes.RIGHT_BR);
   }
 
   public parse(node: ASTNode): boolean {
@@ -184,7 +188,9 @@ export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
     super();
     const outs: Rule = new TokenRule(TokenTypes.OUTS, true);
     this.cmdNodeType = NodeTypes.OUTS;
-    this.rule = new SequenceRule([outs, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      outs, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 
@@ -570,7 +576,9 @@ export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
     super();
     const any: Rule  = new TokenRule(TokenTypes.ANY, true);
     this.cmdNodeType = NodeTypes.ANY;
-    this.rule = new SequenceRule([any, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      any, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 
@@ -579,7 +587,9 @@ export class NotAnyStatementRule extends AbstractBracketedStoreNameStatementRule
     super();
     const notAny: Rule = new TokenRule(TokenTypes.NOTANY, true);
     this.cmdNodeType   = NodeTypes.NOTANY;
-    this.rule = new SequenceRule([notAny, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      notAny, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 
@@ -813,7 +823,9 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
     super();
     const call: Rule = new TokenRule(TokenTypes.CALL, true);
     this.cmdNodeType = NodeTypes.CALL;
-    this.rule = new SequenceRule([call, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      call, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 
@@ -822,7 +834,9 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
     super();
     const save: Rule = new TokenRule(TokenTypes.SAVE, true);
     this.cmdNodeType = NodeTypes.SAVE;
-    this.rule = new SequenceRule([save, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      save, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 
@@ -831,7 +845,9 @@ export class DeadKeyStatementRule extends AbstractBracketedStoreNameStatementRul
     super();
     const deadKey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
     this.cmdNodeType = NodeTypes.DEADKEY;
-    this.rule = new SequenceRule([deadKey, this.bracketedStoreName]);
+    this.rule = new SequenceRule([
+      deadKey, this.leftBracket, this.normalStoreName, this.rightBracket
+    ]);
   }
 }
 

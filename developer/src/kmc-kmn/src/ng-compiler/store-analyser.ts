@@ -109,9 +109,11 @@ export class NormalStoreAssignRule extends SingleChildRule {
 export class NormalStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const store: Rule              = new TokenRule(TokenTypes.STORE, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([store, bracketedStoreName]);
+    const store: Rule           = new TokenRule(TokenTypes.STORE, true);
+    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
+    const normalStoreName: Rule = new NormalStoreNameRule();
+    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([store, leftBracket, normalStoreName, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -124,16 +126,6 @@ export class NormalStoreRule extends SingleChildRule {
       node.addChild(storeNode);
     }
     return parseSuccess;
-  }
-}
-
-export class BracketedStoreNameRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([leftBracket, normalStoreName, rightBracket]);
   }
 }
 
@@ -234,9 +226,11 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
 export class ResetStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const reset: Rule = new TokenRule(TokenTypes.RESET, true);
-    const bracketedStoreName: Rule = new BracketedStoreNameRule();
-    this.rule = new SequenceRule([reset, bracketedStoreName]);
+    const reset: Rule           = new TokenRule(TokenTypes.RESET, true);
+    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
+    const normalStoreName: Rule = new NormalStoreNameRule();
+    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([reset, leftBracket, normalStoreName, rightBracket]);
   }
 
   public parse(node: ASTNode): boolean {

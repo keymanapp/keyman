@@ -487,6 +487,30 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(outsNode);
       assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
+    it("can parse correctly (space before name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs( digit)');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+    });
+    it("can parse correctly (space after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs(digit )');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+    });
+    it("can parse correctly (space before and after name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs( digit )');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
+    });
   });
   describe("RuleBlockRule Tests", () => {
     it("can construct a RuleBlockRule", () => {

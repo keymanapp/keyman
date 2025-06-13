@@ -9,7 +9,7 @@ textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
-outsStatement: OUTS bracketedStoreName
+outsStatement: OUTS LEFT_BR normalStoreName RIGHT_BR
 ruleBlock: beginStatement|groupStatement|usingKeysProductionBlock|readOnlyProductionBlock|
   contextProductionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
@@ -33,8 +33,8 @@ nulInputBlock: NUL ifLikeStatement*
 inputContext: inputElement+
 inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text
 keystroke: anyStatement|text
-anyStatement: ANY bracketedStoreName
-notAnyStatement: NOTANY bracketedStoreName
+anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
+notAnyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
 ifNormalStoreStatement: IF LEFT_BR normalStoreName
@@ -51,9 +51,9 @@ contextOutputBlock: CONTEXT? outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|deadKeyStatement|setSystemStore|layerStatement|indexStatement|
   contextStatement|text|BEEP
-callStatement: CALL bracketedStoreName
-saveStatement: SAVE bracketedStoreName
-deadKeyStatement: DEADKEY bracketedStoreName
+callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
+saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
+deadKeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR
 indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
 offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
@@ -66,13 +66,12 @@ systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|TARGETS|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
 normalStoreAssign: normalStore text+
-normalStore: STORE bracketedStoreName
-bracketedStoreName: LEFT_BR normalStoreName RIGHT_BR
+normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER
-resetStore: RESET bracketedStoreName
+resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
 capsAlwaysOff: CAPS ALWAYS OFF
 capsOnOnly: CAPS ON ONLY
 shiftFreesCaps: SHIFT FREES CAPS
