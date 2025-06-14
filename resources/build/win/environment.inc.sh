@@ -73,6 +73,11 @@ run_in_delphi_env() {
 }
 
 sentrytool_delphiprep() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping sentrytool_delphiprep - buildLevel=build: $@"
+    return 0
+  fi
+
   local EXE_PATH="$1"
   local DPR_PATH="$2"
   (
@@ -83,6 +88,11 @@ sentrytool_delphiprep() {
 }
 
 tds2dbg() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping tds2dbg - buildLevel=build: $@"
+    return 0
+  fi
+
   "$TDS2DBG" "$@"
 }
 
@@ -108,6 +118,11 @@ clean_windows_project_files() {
 }
 
 wrap-signcode() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping code signing - buildLevel=build: $@"
+    return 0
+  fi
+
   # CI will usually pass in a full path for signtool.exe; for local builds we
   # will hopefully find what we want on the path already
   if [[ -z "${SIGNTOOL+x}" ]]; then
@@ -117,6 +132,11 @@ wrap-signcode() {
 }
 
 wrap-symstore() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping symstore - buildLevel=build"
+    return 0
+  fi
+
   if [[  -z "${KEYMAN_SYMSTOREPATH+x}" ]]; then
     builder_warn "\$KEYMAN_SYMSTOREPATH is not set. Skipping symstore for $@"
     return 0
