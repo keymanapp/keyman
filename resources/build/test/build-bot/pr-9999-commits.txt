@@ -1,0 +1,17 @@
+[
+  {
+    "commit": {
+      "message": "maint(common): test\nBuild-bot: build windows\n"
+    }
+  },
+  {
+    "commit": {
+      "message": "maint(common): test\nBuild-bot: release windows\n"
+    }
+  },
+  {
+    "commit": {
+      "message": "maint(common): test\nBuild-bot: skip windows\n"
+    }
+  }
+]

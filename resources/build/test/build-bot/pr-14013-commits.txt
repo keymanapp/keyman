@@ -1,0 +1,171 @@
+[
+  {
+    "sha": "b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+    "node_id": "C_kwDOAY2xT9oAKGI3OTcwZDQzOWNkZDE4ZTg0ZmQ3NTRiZjBmMDZhODg3OGMxOGJiOTc",
+    "commit": {
+      "author": {
+        "name": "Marc Durdin",
+        "email": "marc@durdin.net",
+        "date": "2025-04-30T01:59:27Z"
+      },
+      "committer": {
+        "name": "Marc Durdin",
+        "email": "marc@durdin.net",
+        "date": "2025-04-30T01:59:27Z"
+      },
+      "message": "maint(common): consolidate VC++ environment setup for meson\n\nUse the automated environment setup that we built for Windows and\nDeveloper builds in our meson build configurations, so we don't need to\ncall out to vsdevcmd.bat for every build step. This makes the build\nfaster, more consistent across the various ways we call VC++, and\nsimplifies the shell scripts. Removes the complicated build.bat wrappers.\n\nAlso removes the `cleanup_visual_studio_path` function which should no\nlonger be necessary, as our environment builder does the job for us.\n\nMinor complication in that `$TARGET_PATH` variable in kmcmplib/build.sh\nis also used in the Windows environment setup, so eliminated its use in\nkmcmplib/build.sh.\n\nFinally, removes the `$MESON_LOW_VERSION` variable as we know we are\nalways on Meson 1.0 or later now.\n\nBuild-bot: skip developer, windows, foo\nBuild-bot: bash windows",
+      "tree": {
+        "sha": "df937f0cb23e2e3736d92cf39b3b7f62ce20bcc1",
+        "url": "https://api.github.com/repos/keymanapp/keyman/git/trees/df937f0cb23e2e3736d92cf39b3b7f62ce20bcc1"
+      },
+      "url": "https://api.github.com/repos/keymanapp/keyman/git/commits/b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/keymanapp/keyman/commits/b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+    "html_url": "https://github.com/keymanapp/keyman/commit/b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+    "comments_url": "https://api.github.com/repos/keymanapp/keyman/commits/b7970d439cdd18e84fd754bf0f06a8878c18bb97/comments",
+    "author": {
+      "login": "mcdurdin",
+      "id": 4498365,
+      "node_id": "MDQ6VXNlcjQ0OTgzNjU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4498365?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mcdurdin",
+      "html_url": "https://github.com/mcdurdin",
+      "followers_url": "https://api.github.com/users/mcdurdin/followers",
+      "following_url": "https://api.github.com/users/mcdurdin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mcdurdin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mcdurdin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mcdurdin/subscriptions",
+      "organizations_url": "https://api.github.com/users/mcdurdin/orgs",
+      "repos_url": "https://api.github.com/users/mcdurdin/repos",
+      "events_url": "https://api.github.com/users/mcdurdin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mcdurdin/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "mcdurdin",
+      "id": 4498365,
+      "node_id": "MDQ6VXNlcjQ0OTgzNjU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4498365?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mcdurdin",
+      "html_url": "https://github.com/mcdurdin",
+      "followers_url": "https://api.github.com/users/mcdurdin/followers",
+      "following_url": "https://api.github.com/users/mcdurdin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mcdurdin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mcdurdin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mcdurdin/subscriptions",
+      "organizations_url": "https://api.github.com/users/mcdurdin/orgs",
+      "repos_url": "https://api.github.com/users/mcdurdin/repos",
+      "events_url": "https://api.github.com/users/mcdurdin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mcdurdin/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "926be6e9463e0497dbf1d32d4ef908ae2aad20db",
+        "url": "https://api.github.com/repos/keymanapp/keyman/commits/926be6e9463e0497dbf1d32d4ef908ae2aad20db",
+        "html_url": "https://github.com/keymanapp/keyman/commit/926be6e9463e0497dbf1d32d4ef908ae2aad20db"
+      }
+    ]
+  },
+  {
+    "sha": "0230010a509e317f835d18e1d3be116c30047cf9",
+    "node_id": "C_kwDOAY2xT9oAKDAyMzAwMTBhNTA5ZTMxN2Y4MzVkMThlMWQzYmUxMTZjMzAwNDdjZjk",
+    "commit": {
+      "author": {
+        "name": "Marc Durdin",
+        "email": "marc@durdin.net",
+        "date": "2025-04-30T02:18:26Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2025-04-30T02:18:26Z"
+      },
+      "message": "Merge branch 'maint/meson-versioning-improvements' into maint/core-developer/12639-meson-no-batch-wrappers\n\nBuild-bot: skip all",
+      "tree": {
+        "sha": "47bb7ca6f52998e8a14e478f5e9f5d7ba415ace3",
+        "url": "https://api.github.com/repos/keymanapp/keyman/git/trees/47bb7ca6f52998e8a14e478f5e9f5d7ba415ace3"
+      },
+      "url": "https://api.github.com/repos/keymanapp/keyman/git/commits/0230010a509e317f835d18e1d3be116c30047cf9",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJoEYhyCRC1aQ7uu5UhlAAAg4MQAFxQGq7WPhHNzlspVIFv5k8W\nJPmC2SP+eUXyDKpO38MqnAPlMqaNrleB071BtE9i2DeWHwYvGwJ87ki95aAtg00F\ne4RbhJYy5sW/F/0fNzHgGNFPNb3EcRyt6I7X3xRB+i1k0PgTSVIpnLzXn3gj9GwU\n7PuLgNO0CUpcgWc6X7a259RAlLInEJ+I8p9XhW827eRalogwgALt4IuJmWyJALFL\nJFeWGlCKdVfbHEgBgEyA98zNnvtoxQ+FlJn1V1jJEBpCY+MPB5tyCXZ4LZbn/n7V\n0+2Pp3c5lnZKmaOyUykwQw7P8s4R2+aQnghRHEHa5Fm6hjQkHMiCOwgTwpIrUV+U\n4AWzPjZSw71cBmAUJBUe7SIBv51r1TUeuNy9x3/0r588znBItR12C91KQD8u9o3/\nMqcWTkpEuGgD2nYbhTdb9PNF4Ik/wbBKLDvjQg180b/ocklVaGAAqjOHdvkyQ4in\nIBRqiaeI3zD5TQ7936Sk1JQPil97PWzk27vde0KAeCR59yL8lCnHr2Rtp8hEpytX\nGrlL14GIaVK6YEvumloPFXrWnbdETu0yRllVa4T2RbWskZUtPG93l/fmOV6tiAr2\np79lgJQ0eEJ1fBNm9UsvjDXU478fSU5Dobg1pwv+wxr10u43tPbqmMI6VLxOjt7i\nz44SZyX8udppGuASFSsw\n=3UIv\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 47bb7ca6f52998e8a14e478f5e9f5d7ba415ace3\nparent b7970d439cdd18e84fd754bf0f06a8878c18bb97\nparent e976b5563589a9e38c778f3c06e404e82526358a\nauthor Marc Durdin <marc@durdin.net> 1745979506 +0700\ncommitter GitHub <noreply@github.com> 1745979506 +0700\n\nMerge branch 'maint/meson-versioning-improvements' into maint/core-developer/12639-meson-no-batch-wrappers",
+        "verified_at": "2025-04-30T02:18:29Z"
+      }
+    },
+    "url": "https://api.github.com/repos/keymanapp/keyman/commits/0230010a509e317f835d18e1d3be116c30047cf9",
+    "html_url": "https://github.com/keymanapp/keyman/commit/0230010a509e317f835d18e1d3be116c30047cf9",
+    "comments_url": "https://api.github.com/repos/keymanapp/keyman/commits/0230010a509e317f835d18e1d3be116c30047cf9/comments",
+    "author": {
+      "login": "mcdurdin",
+      "id": 4498365,
+      "node_id": "MDQ6VXNlcjQ0OTgzNjU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4498365?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/mcdurdin",
+      "html_url": "https://github.com/mcdurdin",
+      "followers_url": "https://api.github.com/users/mcdurdin/followers",
+      "following_url": "https://api.github.com/users/mcdurdin/following{/other_user}",
+      "gists_url": "https://api.github.com/users/mcdurdin/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/mcdurdin/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/mcdurdin/subscriptions",
+      "organizations_url": "https://api.github.com/users/mcdurdin/orgs",
+      "repos_url": "https://api.github.com/users/mcdurdin/repos",
+      "events_url": "https://api.github.com/users/mcdurdin/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/mcdurdin/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+        "url": "https://api.github.com/repos/keymanapp/keyman/commits/b7970d439cdd18e84fd754bf0f06a8878c18bb97",
+        "html_url": "https://github.com/keymanapp/keyman/commit/b7970d439cdd18e84fd754bf0f06a8878c18bb97"
+      },
+      {
+        "sha": "e976b5563589a9e38c778f3c06e404e82526358a",
+        "url": "https://api.github.com/repos/keymanapp/keyman/commits/e976b5563589a9e38c778f3c06e404e82526358a",
+        "html_url": "https://github.com/keymanapp/keyman/commit/e976b5563589a9e38c778f3c06e404e82526358a"
+      }
+    ]
+  }
+]
