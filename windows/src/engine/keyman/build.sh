@@ -42,7 +42,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
+  if_release_build_level cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
 
   # Also copy sentry files here
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" \

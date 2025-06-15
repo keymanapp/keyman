@@ -32,7 +32,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp "$WIN32_TARGET_PATH/kmconfig.dbg" "$WINDOWS_DEBUGPATH_APP/kmconfig.dbg"
+  if_release_build_level cp "$WIN32_TARGET_PATH/kmconfig.dbg" "$WINDOWS_DEBUGPATH_APP/kmconfig.dbg"
 }
 
 function do_publish() {

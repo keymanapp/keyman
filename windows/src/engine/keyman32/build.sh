@@ -41,7 +41,7 @@ function do_build_x86() {
   build_version.res
   vs_msbuild keyman32.vcxproj //t:Build "//p:Platform=Win32"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/keyman32.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  if_release_build_level cp "$WIN32_TARGET_PATH/keyman32.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_build_x64() {
@@ -49,7 +49,7 @@ function do_build_x64() {
   run_in_vs_env rc version64.rc
   vs_msbuild keyman32.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$X64_TARGET_PATH/keyman64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  if_release_build_level cp "$X64_TARGET_PATH/keyman64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish_x86() {

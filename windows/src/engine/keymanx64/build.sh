@@ -33,7 +33,7 @@ function do_build() {
   build_manifest.res
   vs_msbuild keymanx64.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$X64_TARGET_PATH/keymanx64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  if_release_build_level cp "$X64_TARGET_PATH/keymanx64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish() {
