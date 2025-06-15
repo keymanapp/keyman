@@ -105,7 +105,7 @@ function copy-installer() {
   cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
   cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe"
 
-  verify-installer-signatures
+  if_release_build_level verify-installer-signatures
 }
 
 function verify-installer-signatures() {

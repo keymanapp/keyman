@@ -53,7 +53,7 @@ function do_build_desktop_resources() {
 }
 
 function do_publish() {
-  verify-program-signatures
+  if_release_build_level verify-program-signatures
 
   "$KEYMAN_ROOT/common/windows/cef-checkout.sh"
 
@@ -73,6 +73,7 @@ function do_publish() {
     -sice:ICE82 -sice:ICE80 \
     -nologo \
     -dWixUILicenseRtf=License.rtf \
+    "$WIXLIGHTCOMPRESSION" \
     -out keymandesktop.msi -ext WixUIExtension \
     keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
@@ -106,7 +107,7 @@ function copy-installer() {
   cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe"
   cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup.exe"
 
-  verify-installer-signatures
+  if_release_build_level verify-installer-signatures
 
   # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
   wzzip "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "$WINDOWS_PROGRAM_APP/setup-redist.exe"

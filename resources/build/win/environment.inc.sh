@@ -32,7 +32,7 @@ COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
 OUTLIB="$WINDOWS_ROOT/lib"
 COMMON_OUTLIB="$KEYMAN_ROOT/common/windows/lib"
 
-if builder_is_debug_build || [[ $KEYMAN_VERSION_ENVIRONMENT == local ]] || [[ ! -z ${TEAMCITY_PR_NUMBER+x} ]]; then
+if builder_is_debug_build || [[ $KEYMAN_VERSION_ENVIRONMENT == local ]] || builder_is_ci_test_build; then
   # We do a fast build for debug builds, local builds, test PR builds but not for master/beta/stable release builds
   GO_FAST=1
 else
