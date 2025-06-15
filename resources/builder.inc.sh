@@ -2250,6 +2250,18 @@ builder_is_ci_build_level_build() {
   return 0
 }
 
+#
+# Executes statement if a ci build level of 'release', and for local builds, but
+# not for a ci build level of 'build'
+#
+builder_if_release_build_level() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping - buildLevel=build: $@"
+    return 0
+  fi
+  "$@"
+}
+
 ################################################################################
 # Final initialization
 ################################################################################

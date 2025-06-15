@@ -30,7 +30,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_publish() {
-  if_release_build_level verify-program-signatures
+  builder_if_release_build_level verify-program-signatures
 
   #
   # Build the installation archive

@@ -47,7 +47,7 @@ function do_build() {
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   cp *.xslt "$WINDOWS_PROGRAM_ENGINE/"
-  if_release_build_level cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
 }
 
 function do_publish() {

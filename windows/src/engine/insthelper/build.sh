@@ -31,7 +31,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  if_release_build_level cp "$WIN32_TARGET_PATH/insthelper.dbg" "$WINDOWS_DEBUGPATH_ENGINE/insthelper.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/insthelper.dbg" "$WINDOWS_DEBUGPATH_ENGINE/insthelper.dbg"
 }
 
 function do_publish() {

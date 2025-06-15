@@ -51,7 +51,7 @@ function do_clean() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_publish() {
-  if_release_build_level verify-program-signatures
+  builder_if_release_build_level verify-program-signatures
   verify-node-installer-version
 
   "$KEYMAN_ROOT/common/windows/cef-checkout.sh"
@@ -80,7 +80,7 @@ function do_publish() {
 
   copy-kmdev
 
-  if_release_build_level verify-installer-signatures
+  builder_if_release_build_level verify-installer-signatures
 }
 
 function do_test() {

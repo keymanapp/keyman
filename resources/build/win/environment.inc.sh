@@ -87,21 +87,8 @@ sentrytool_delphiprep() {
   )
 }
 
-if_release_build_level() {
-  if builder_is_ci_build && builder_is_ci_build_level_build; then
-    builder_echo "Skipping - buildLevel=build: $@"
-    return 0
-  fi
-  "$@"
-}
-
 tds2dbg() {
-  if builder_is_ci_build && builder_is_ci_build_level_build; then
-    builder_echo "Skipping tds2dbg - buildLevel=build: $@"
-    return 0
-  fi
-
-  "$TDS2DBG" "$@"
+  builder_if_release_build_level "$TDS2DBG" "$@"
 }
 
 delphi_msbuild() {
