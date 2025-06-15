@@ -34,9 +34,9 @@ function do_build() {
   vs_msbuild kmrefresh.vcxproj //t:Build "//p:Platform=Win32"
   vs_msbuild kmrefresh.vcxproj //t:Build "//p:Platform=x64"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/kmrefresh.x86.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmrefresh.x86.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$X64_TARGET_PATH/kmrefresh.x64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$X64_TARGET_PATH/kmrefresh.x64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish() {

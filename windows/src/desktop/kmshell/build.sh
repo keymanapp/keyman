@@ -39,7 +39,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp "$WIN32_TARGET_PATH/kmshell.dbg" "$WINDOWS_DEBUGPATH_APP/kmshell.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmshell.dbg" "$WINDOWS_DEBUGPATH_APP/kmshell.dbg"
 
   do_build_data
 }

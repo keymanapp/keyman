@@ -32,9 +32,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  if [[ -f "$WIN32_TARGET_PATH/kmdbrowserhost.dbg" ]]; then
-    cp "$WIN32_TARGET_PATH/kmdbrowserhost.dbg" "$DEVELOPER_DEBUGPATH"
-  fi
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmdbrowserhost.dbg" "$DEVELOPER_DEBUGPATH"
 }
 
 function do_publish() {

@@ -31,7 +31,7 @@ function do_build() {
   build_version.res
   vs_msbuild etl2log.vcxproj //t:Build "//p:Platform=Win32"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_SUPPORT"
-  cp "$WIN32_TARGET_PATH/etl2log.pdb" "$WINDOWS_DEBUGPATH_SUPPORT"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/etl2log.pdb" "$WINDOWS_DEBUGPATH_SUPPORT"
 }
 
 builder_run_action clean:project        do_clean
