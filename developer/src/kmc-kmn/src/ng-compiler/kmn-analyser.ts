@@ -211,13 +211,13 @@ export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginStatement: Rule         = new BeginStatementRule();
-    const groupStatement: Rule         = new GroupStatementRule();
-    const contextProductionBlock: Rule = new ContextProductionBlockRule();
+    const beginStatement: Rule  = new BeginStatementRule();
+    const groupStatement: Rule  = new GroupStatementRule();
+    const productionBlock: Rule = new ProductionBlockRule();
     this.rule = new AlternateRule([
       beginStatement,
       groupStatement,
-      contextProductionBlock,
+      productionBlock,
     ]);
   }
 }
@@ -360,40 +360,27 @@ export class UsingKeysRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractProductionBlockRule extends SingleChildRule {
-  protected chevron: Rule;
-  protected rhsBlock: Rule;
-  protected lhsNodeType: NodeTypes;
-  protected productionNodeType: NodeTypes;
-
+export class ProductionBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    this.chevron  = new TokenRule(TokenTypes.CHEVRON);
-    this.rhsBlock = new RhsBlockRule();
+    const contextLhsBlock = new ContextLhsBlockRule();
+    const chevron         = new TokenRule(TokenTypes.CHEVRON);
+    const rhsBlock        = new RhsBlockRule();
+    this.rule = new SequenceRule([contextLhsBlock, chevron, rhsBlock]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(this.lhsNodeType);
+      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
-      const productionNode = new ASTNode(this.productionNodeType);
+      const productionNode = new ASTNode(NodeTypes.PRODUCTION_CONTEXT);
       productionNode.addChild(lhsNode);
       productionNode.addChild(rhsNode);
       node.addChild(productionNode);
     }
     return parseSuccess;
-  }
-}
-
-export class ContextProductionBlockRule extends AbstractProductionBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType        = NodeTypes.LHS_CONTEXT;
-    this.productionNodeType = NodeTypes.PRODUCTION_CONTEXT;
-    const contextLhsBlock   = new ContextLhsBlockRule();
-    this.rule = new SequenceRule([contextLhsBlock, this.chevron, this.rhsBlock]);
   }
 }
 

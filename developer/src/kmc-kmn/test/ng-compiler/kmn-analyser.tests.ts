@@ -13,7 +13,7 @@ import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, ContextLhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { ContextInputBlockRule, ContextProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { ContextInputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfNormalStoreStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { SystemStoreNameForIfRule, IfSystemStoreStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -797,15 +797,15 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
     });
   });
-  describe("ContextProductionBlockRule Tests", () => {
-    it("can construct a ContextProductionBlockRule", () => {
+  describe("ProductionBlockRule Tests", () => {
+    it("can construct a ProductionBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isNotNull(productionBlock);
     });
     it("can parse correctly (plus, any, index)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -818,7 +818,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (plus, virtual key, two uChars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ [SHIFT K_A] > U+17B6 U+17C6');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -832,7 +832,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (u_char, plus, virtual key, context, u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -847,7 +847,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (two uChars, uChar)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -860,7 +860,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (two uChars, two uChars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C6 U+17BB > U+17BB U+17C6');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -874,7 +874,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (platform, use)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
@@ -887,7 +887,7 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (ifs, any, context, layer)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(&newLayer = "") if(&layer = "shift") any(ShiftOutSingle) > context layer("default")');
-      const productionBlock: Rule = new ContextProductionBlockRule();
+      const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
