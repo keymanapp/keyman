@@ -389,7 +389,7 @@ export class LhsBlockRule extends SingleChildRule {
     super();
     const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
     const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
-    const contextInputBlock: Rule        = new ContextInputBlockRule();
+    const contextInputBlock: Rule        = new InputBlockRule();
     const ifLikeStatement                = new IfLikeStatementRule();
     const oneOrManyIfLikeStatement: Rule = new OneOrManyRule(ifLikeStatement);
     this.rule = new AlternateRule([
@@ -412,7 +412,7 @@ export class LhsBlockRule extends SingleChildRule {
   }
 }
 
-export class ContextInputBlockRule extends SingleChildRule {
+export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
