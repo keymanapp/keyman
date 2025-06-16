@@ -1220,7 +1220,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(keystroke);
     });
     it("can parse correctly (any)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(digit)');
       const keystroke: Rule = new KeystrokeRule();
       assert.isTrue(keystroke.parse(root));
       const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
@@ -1228,7 +1228,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
     });
     it("can parse correctly (text)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('U+1780');
+      Rule.tokenBuffer = stringToTokenBuffer('+ U+1780');
       const keystroke: Rule = new KeystrokeRule();
       assert.isTrue(keystroke.parse(root));
       const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);

@@ -465,13 +465,11 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
     const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
     const inputContext: Rule        = new InputContextRule();
     const optInputContext: Rule     = new OptionalRule(inputContext);
-    const plus: Rule                = new TokenRule(TokenTypes.PLUS);
     const keystoke: Rule            = new KeystrokeRule();
     this.rule = new SequenceRule([
       optNul,
       manyIfLikeStatement,
       optInputContext,
-      plus,
       keystoke,
     ]);
   }
@@ -537,8 +535,10 @@ export class InputElementRule extends SingleChildRule {
 export class KeystrokeRule extends SingleChildRule {
   public constructor() {
     super();
-    const inputElement = new InputElementRule();
-    this.rule = new OneOrManyRule(inputElement);
+    const plus: Rule            = new TokenRule(TokenTypes.PLUS);
+    const inputElement          = new InputElementRule();
+    const oneOrManyInputElement = new OneOrManyRule(inputElement);
+    this.rule = new SequenceRule([plus, oneOrManyInputElement]);
   }
 
   public parse(node: ASTNode): boolean {
