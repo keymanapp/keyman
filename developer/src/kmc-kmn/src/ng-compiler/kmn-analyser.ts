@@ -390,14 +390,12 @@ export class LhsBlockRule extends SingleChildRule {
     const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
     const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
     const contextInputBlock: Rule        = new ContextInputBlockRule();
-    const nulInputBlock: Rule            = new NulInputBlockRule();
     const ifLikeStatement                = new IfLikeStatementRule();
     const oneOrManyIfLikeStatement: Rule = new OneOrManyRule(ifLikeStatement);
     this.rule = new AlternateRule([
       match,
       noMatch,
       contextInputBlock,
-      nulInputBlock,
       oneOrManyIfLikeStatement,
     ]);
   }
@@ -428,16 +426,6 @@ export class ContextInputBlockRule extends SingleChildRule {
     this.rule = new SequenceRule([
       optNul, manyIfLikeStatement, optInputContext, optKeystroke,
     ]);
-  }
-}
-
-export class NulInputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
-    const ifLikeStatement: Rule     = new IfLikeStatementRule();
-    const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
-    this.rule = new SequenceRule([nulRule, manyIfLikeStatement]);
   }
 }
 

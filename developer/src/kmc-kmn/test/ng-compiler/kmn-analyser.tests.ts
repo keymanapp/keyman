@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1075,23 +1075,16 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(keystrokeNode);
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
     });
-  });
-  describe("NulInputBlockRule Tests", () => {
-    it("can construct a NulInputBlockRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const nulInputBlock: Rule = new NulInputBlockRule();
-      assert.isNotNull(nulInputBlock);
-    });
     it("can parse correctly (nul only)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul');
-      const nulInputBlock: Rule = new NulInputBlockRule();
-      assert.isTrue(nulInputBlock.parse(root));
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
     });
     it("can parse correctly (nul, if-like block)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch")');
-      const nulInputBlock: Rule = new NulInputBlockRule();
-      assert.isTrue(nulInputBlock.parse(root));
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
     });

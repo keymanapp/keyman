@@ -22,7 +22,6 @@ usingKeys: USING KEYS
 productionBlock: lhsBlock CHEVRON rhsBlock
 lhsBlock: MATCH|NOMATCH|contextInputBlock|nulInputBlock|ifLikeStatement+
 contextInputBlock: NUL? ifLikeStatement* inputContext? keystroke?
-nulInputBlock: NUL ifLikeStatement*
 inputContext: inputElement+
 keystroke: PLUS inputElement+
 inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text
