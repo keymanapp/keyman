@@ -2,9 +2,9 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
   DefaultRules,
-  type KeyEvent
+  type KeyEvent,
+  type OutputTargetInterface
 } from 'keyman/engine/keyboard';
-import { type OutputTarget } from 'keyman/engine/js-processor';
 
 import ContextManager from './contextManager.js';
 
@@ -30,9 +30,9 @@ export default class DefaultBrowserRules extends DefaultRules {
   }
 
   /**
-   * applyCommand - used when a RuleBehavior represents a non-text "command" within the Engine.
+   * applyCommand - used when a ProcessorAction represents a non-text "command" within the Engine.
    */
-  applyCommand(Lkc: KeyEvent, outputTarget: OutputTarget): void {
+  applyCommand(Lkc: KeyEvent, outputTarget: OutputTargetInterface): void {
     const code = this.codeForEvent(Lkc);
 
     const moveToNext = (back: boolean) => {

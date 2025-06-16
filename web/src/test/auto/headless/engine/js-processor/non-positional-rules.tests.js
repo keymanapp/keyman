@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing
@@ -27,7 +27,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
@@ -106,7 +106,7 @@ describe('Engine - rule processing', function() {
 
     before(async () => {
       // -- START: Standard keyboard unit test loading boilerplate --
-      let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+      let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       let keyboardLoader = new NodeKeyboardLoader(harness);
       let keyboard = await keyboardLoader.loadKeyboardFromPath(armenianPath);
       // --  END:  Standard keyboard unit test loading boilerplate --
