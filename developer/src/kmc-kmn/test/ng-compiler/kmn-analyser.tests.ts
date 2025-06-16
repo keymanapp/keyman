@@ -1822,13 +1822,9 @@ describe("KMN Analyser Tests", () => {
     });
   });
   describe("Analyser Tests", () => {
-    it("can parse (part of) Khmer Angkor correctly", () => {
-      const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
-      const lexer = new Lexer(buffer);
-      const tokens: Token[] = lexer.parse();
-      //const subset: Token[] = tokens.filter((token) => token.lineNum <= 660);
-      //Rule.tokenBuffer = new TokenBuffer(subset);
-      Rule.tokenBuffer = new TokenBuffer(tokens);
+    it("can parse Khmer Angkor correctly", () => {
+      const buffer: String    = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      Rule.tokenBuffer        = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
@@ -1880,6 +1876,79 @@ describe("KMN Analyser Tests", () => {
       const productionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION);
       assert.equal(productionNodes.length, 268);
       //assert.equal(root.toString(), '');
+    });
+    it("can parse Khmer Angkor correctly", () => {
+      const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      Rule.tokenBuffer = stringToTokenBuffer(buffer);
+      const kmnTreeRule: Rule = new KmnTreeRule();
+      assert.isTrue(kmnTreeRule.parse(root));
+      assert.deepEqual(root.toText(), buffer.toString());
+    });
+    it("can provide round trip text for baseline keyboards", () => {
+      [
+        'k_000___null_keyboard',
+        'k_001___basic_input_unicodei',
+        'k_002___basic_input_unicode',
+        'k_003___nul',
+        'k_004___basic_input__shift_2_',
+        'k_005___nul_with_initial_context',
+        'k_006___vkey_input__shift_ctrl_',
+        'k_007___vkey_input__ctrl_alt_',
+        'k_008___vkey_input__ctrl_alt_2_',
+        'k_012___ralt',
+        'k_013___deadkeys',
+        'k_014___groups_and_virtual_keys',
+        'k_015___ralt_2',
+        'k_017___space_mnemonic_kbd',
+        'k_018___nul_testing',
+        'k_019___multiple_deadkeys',
+        'k_020___deadkeys_and_backspace',
+        'k_021___options',
+        'k_022___options_with_preset',
+        'k_023___options_with_save',
+        'k_024___options_with_save_and_preset',
+        'k_025___options_with_reset',
+        'k_026___system_stores',
+        'k_027___system_stores_2',
+        'k_028___smp',
+        'k_029___beep',
+        'k_030___multiple_groups',
+        'k_031___caps_lock',
+        'k_032___caps_control',
+        'k_033___caps_always_off',
+        'k_034___options_double_set_reset',
+        'k_035___options_double_set_staged',
+        'k_036___options___double_reset_staged',
+        'k_037___options___double_reset',
+        'k_038___punctkeys',
+        'k_039___generic_ctrlalt',
+        'k_040___long_context',
+        'k_041___long_context_and_deadkeys',
+        'k_042___long_context_and_split_deadkeys',
+        'k_043___output_and_keystroke',
+        'k_044___if_and_context',
+        'k_045___deadkey_and_context',
+        'k_046___deadkey_and_contextex',
+        'k_047___caps_always_off_initially_on',
+        'k_048___modifier_keys_keep_context',
+        'k_049___enter_invalidates_context',
+        'k_050___nul_and_context',
+        'k_051___if_and_context',
+        'k_052___nul_and_index',
+        'k_054___nul_and_contextex',
+        'k_055___deadkey_cancelled_by_arrow',
+      ].slice(0, 11).forEach((name) => {
+        const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
+        const lexer: Lexer = new Lexer(buffer);
+        const tokens: Token[] = lexer.parse();
+        //const subset: Token[] = tokens.filter((token) => token.lineNum <= 660);
+        //Rule.tokenBuffer = new TokenBuffer(subset);
+        Rule.tokenBuffer = new TokenBuffer(tokens);
+        const kmnTreeRule: Rule = new KmnTreeRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(kmnTreeRule.parse(root));
+        assert.deepEqual(root.toText(), buffer.toString());
+      });
     });
   });
 });

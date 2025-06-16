@@ -103,7 +103,7 @@ export class ASTNode {
 
   public constructor(nodeType: NodeTypes, token: Token=null) {
     this._nodeType = nodeType;
-    this._token     = token;
+    this._token    = token;
   }
 
   public addChild(child: ASTNode): ASTNode {
@@ -224,5 +224,14 @@ export class ASTNode {
     }
     buf = buf.concat(']');
     return buf;
+  }
+
+  public toText(): string {
+    let text: string = ""
+    const lineNodes: ASTNode[] = this.getChildrenOfType(NodeTypes.LINE);
+    for (let lineNode of lineNodes) {
+      text = text.concat(lineNode.token.line.toString())
+    }
+    return text;
   }
 }
