@@ -15,6 +15,7 @@ builder_parse "$@"
 
 if builder_start_action test; then
   ./build/test/test.sh
+  ./build/test/build-bot/trigger-build-bot.test.sh
   ./build/publish-minimum-versions.sh test
   builder_finish_action success test
 fi
