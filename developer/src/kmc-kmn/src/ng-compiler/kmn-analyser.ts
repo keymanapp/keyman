@@ -375,7 +375,7 @@ export class ProductionBlockRule extends SingleChildRule {
     if (parseSuccess) {
       const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
-      const productionNode = new ASTNode(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = new ASTNode(NodeTypes.PRODUCTION);
       productionNode.addChild(lhsNode);
       productionNode.addChild(rhsNode);
       node.addChild(productionNode);

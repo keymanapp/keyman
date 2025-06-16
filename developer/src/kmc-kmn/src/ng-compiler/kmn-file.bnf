@@ -19,7 +19,7 @@ permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
-contextProductionBlock: contextLhsBlock CHEVRON rhsBlock
+productionBlock: contextLhsBlock CHEVRON rhsBlock
 contextLhsBlock: MATCH|NOMATCH|contextInputBlock|nulInputBlock|ifLikeStatement+
 contextInputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 nulInputBlock: NUL ifLikeStatement*

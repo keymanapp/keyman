@@ -71,7 +71,7 @@ export enum NodeTypes {
   PLATFORM              = "PLATFORM",
   PLATFORM_SHORTCUT     = "PLATFORM_SHORTCUT",
   POSTKEYSTROKE         = "POSTKEYSTROKE",
-  PRODUCTION_CONTEXT    = "PRODUCTION_CONTEXT",
+  PRODUCTION            = "PRODUCTION",
   RANGE                 = "RANGE",
   READONLY              = "READONLY",
   RESET                 = "RESET",

@@ -124,7 +124,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -552,7 +552,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new RuleBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -807,7 +807,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -820,7 +820,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ [SHIFT K_A] > U+17B6 U+17C6');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -834,7 +834,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -849,7 +849,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -862,7 +862,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C6 U+17BB > U+17BB U+17C6');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -876,7 +876,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") > use(detectStartOfSentence)');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -889,7 +889,7 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('if(&newLayer = "") if(&layer = "shift") any(ShiftOutSingle) > context layer("default")');
       const productionBlock: Rule = new ProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
@@ -1884,8 +1884,8 @@ describe("KMN Analyser Tests", () => {
       assert.equal(groupNodes[4].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'normalise');
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.USING_KEYS));
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
-      const contextProductionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION_CONTEXT);
-      assert.equal(contextProductionNodes.length, 268);
+      const productionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION);
+      assert.equal(productionNodes.length, 268);
       //assert.equal(root.toString(), '');
     });
   });
