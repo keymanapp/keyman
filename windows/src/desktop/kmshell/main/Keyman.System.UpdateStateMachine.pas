@@ -618,12 +618,11 @@ begin
     CheckForUpdates.Free;
   end;
 
-  { Response wucSuccess and Update is available }
-  if (Result = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate) then
+  if (Result = wucUpdateAvailable) then
   begin
     ChangeState(UpdateAvailableState);
   end;
-  // else staty in idle state
+  // else stay in idle state
 end;
 
 function IdleState.HandleKmShell;
@@ -641,7 +640,7 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and Update is available }
-  if (UpdateCheckResult = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate)  then
+  if UpdateCheckResult = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -723,7 +722,7 @@ begin
   finally
     CheckForUpdates.Free;
   end;
-  if Result <> wucSuccess then
+  if Result = wucFailure then
     begin
       KL.Log('UpdateAvailableState.HandleCheck CheckForUpdates not successful: '+
         GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
@@ -922,9 +921,9 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and go back to update available so files can be downloaded }
-  // TODO: #14126 first check if already downloaded files are the same as the the latest files in
-  // the metadata, if not then we should download the new files.
-  if (Result = wucSuccess) and (TUpdateCheckStorage.CheckMetaDataForUpdate)  then
+  // TODO: This actually needs to check if the updates available are newer than the already downloaded updates
+
+  if Result = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -1197,6 +1196,12 @@ begin
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
+  end
+  else
+  begin
+    // There is no Keyman installer we can return to the IdleState
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
   end;
 end;
 
