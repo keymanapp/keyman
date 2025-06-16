@@ -921,7 +921,7 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and go back to update available so files can be downloaded }
-  // TODO: This actually needs to check if the updates available are newer then the already downloaded updates
+  // TODO: This actually needs to check if the updates available are newer than the already downloaded updates
 
   if Result = wucUpdateAvailable then
   begin
