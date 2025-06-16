@@ -20,7 +20,7 @@ groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
 productionBlock: lhsBlock CHEVRON rhsBlock
-lhsBlock: MATCH|NOMATCH|inputBlock|ifLikeStatement+
+lhsBlock: MATCH|NOMATCH|inputBlock
 inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 keystroke: PLUS inputElement+

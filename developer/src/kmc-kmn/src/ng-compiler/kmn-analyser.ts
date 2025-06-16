@@ -387,17 +387,10 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
-    const contextInputBlock: Rule        = new InputBlockRule();
-    const ifLikeStatement                = new IfLikeStatementRule();
-    const oneOrManyIfLikeStatement: Rule = new OneOrManyRule(ifLikeStatement);
-    this.rule = new AlternateRule([
-      match,
-      noMatch,
-      contextInputBlock,
-      oneOrManyIfLikeStatement,
-    ]);
+    const match: Rule             = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch: Rule           = new TokenRule(TokenTypes.NOMATCH, true);
+    const contextInputBlock: Rule = new InputBlockRule();
+    this.rule = new AlternateRule([match, noMatch,contextInputBlock]);
   }
 
   public parse(node: ASTNode): boolean {
