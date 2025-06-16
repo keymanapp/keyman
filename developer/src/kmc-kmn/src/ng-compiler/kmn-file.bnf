@@ -10,7 +10,7 @@ rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 outsStatement: OUTS LEFT_BR normalStoreName RIGHT_BR
-ruleBlock: beginStatement|groupStatement|usingKeysProductionBlock|contextProductionBlock
+ruleBlock: beginStatement|groupStatement|contextProductionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE LEFT_BR groupName RIGHT_BR
@@ -19,12 +19,9 @@ permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
 groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
-usingKeysProductionBlock: usingKeysLhsBlock CHEVRON rhsBlock
 contextProductionBlock: contextLhsBlock CHEVRON rhsBlock
-usingKeysLhsBlock: usingKeysInputBlock
 contextLhsBlock: MATCH|NOMATCH|contextInputBlock|nulInputBlock|ifLikeStatement+
-usingKeysInputBlock: NUL? ifLikeStatement* inputContext? keystroke
-contextInputBlock: NUL? ifLikeStatement* inputContext
+contextInputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 nulInputBlock: NUL ifLikeStatement*
 inputContext: inputElement+
 inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text

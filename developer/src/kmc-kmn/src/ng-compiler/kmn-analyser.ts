@@ -211,14 +211,12 @@ export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginStatement: Rule               = new BeginStatementRule();
-    const groupStatement: Rule           = new GroupStatementRule();
-    const usingKeysProductionBlock: Rule = new UsingKeysProductionBlockRule();
-    const contextProductionBlock: Rule   = new ContextProductionBlockRule();
+    const beginStatement: Rule         = new BeginStatementRule();
+    const groupStatement: Rule         = new GroupStatementRule();
+    const contextProductionBlock: Rule = new ContextProductionBlockRule();
     this.rule = new AlternateRule([
       beginStatement,
       groupStatement,
-      usingKeysProductionBlock,
       contextProductionBlock,
     ]);
   }
@@ -389,16 +387,6 @@ abstract class AbstractProductionBlockRule extends SingleChildRule {
   }
 }
 
-export class UsingKeysProductionBlockRule extends AbstractProductionBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType        = NodeTypes.LHS_USING_KEYS;
-    this.productionNodeType = NodeTypes.PRODUCTION_USING_KEYS;
-    const usingKeysLhsBlock = new UsingKeysLhsBlockRule();
-    this.rule = new SequenceRule([usingKeysLhsBlock, this.chevron, this.rhsBlock]);
-  }
-}
-
 export class ContextProductionBlockRule extends AbstractProductionBlockRule {
   public constructor() {
     super();
@@ -428,14 +416,6 @@ abstract class AbstractLhsBlockRule extends SingleChildRule {
   }
 }
 
-export class UsingKeysLhsBlockRule extends AbstractLhsBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType = NodeTypes.LHS_USING_KEYS;
-    this.rule        = new UsingKeysInputBlockRule();
-  }
-}
-
 export class ContextLhsBlockRule extends AbstractLhsBlockRule {
   public constructor() {
     super();
@@ -456,7 +436,7 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
   }
 }
 
-export class UsingKeysInputBlockRule extends SingleChildRule {
+export class ContextInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
@@ -466,25 +446,9 @@ export class UsingKeysInputBlockRule extends SingleChildRule {
     const inputContext: Rule        = new InputContextRule();
     const optInputContext: Rule     = new OptionalRule(inputContext);
     const keystoke: Rule            = new KeystrokeRule();
+    const optKeystroke: Rule        = new OptionalRule(keystoke);
     this.rule = new SequenceRule([
-      optNul,
-      manyIfLikeStatement,
-      optInputContext,
-      keystoke,
-    ]);
-  }
-}
-
-export class ContextInputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
-    const optNul: Rule              = new OptionalRule(nulRule);
-    const ifLikeStatement: Rule     = new IfLikeStatementRule();
-    const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
-    const inputContext: Rule        = new InputContextRule();
-    this.rule = new SequenceRule([
-      optNul, manyIfLikeStatement, inputContext,
+      optNul, manyIfLikeStatement, optInputContext, optKeystroke,
     ]);
   }
 }

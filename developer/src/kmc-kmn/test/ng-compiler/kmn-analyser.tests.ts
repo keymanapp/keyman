@@ -20,8 +20,8 @@ import { SystemStoreNameForIfRule, IfSystemStoreStatementRule, IndexStatementRul
 import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { OutputStatementRule, OutsStatementRule, PlatformStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { TextRangeRule, TextRule, UseStatementRule, UsingKeysInputBlockRule, UsingKeysLhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { UsingKeysProductionBlockRule, UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { readFileSync } from 'fs';
 
@@ -124,9 +124,9 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -552,9 +552,9 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new RuleBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -797,19 +797,19 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.USING_KEYS));
     });
   });
-  describe("UsingKeysProductionBlockRule Tests", () => {
-    it("can construct a UsingKeysProductionBlockRule", () => {
+  describe("ContextProductionBlockRule Tests", () => {
+    it("can construct a ContextProductionBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      const productionBlock: Rule = new ContextProductionBlockRule();
       assert.isNotNull(productionBlock);
     });
     it("can parse correctly (plus, any, index)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
-      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      const productionBlock: Rule = new ContextProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -818,11 +818,11 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (plus, virtual key, two uChars)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ [SHIFT K_A] > U+17B6 U+17C6');
-      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      const productionBlock: Rule = new ContextProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -832,11 +832,11 @@ describe("KMN Analyser Tests", () => {
     });
     it("can parse correctly (u_char, plus, virtual key, context, u_char)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
-      const productionBlock: Rule = new UsingKeysProductionBlockRule();
+      const productionBlock: Rule = new ContextProductionBlockRule();
       assert.isTrue(productionBlock.parse(root));
-      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_USING_KEYS);
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION_CONTEXT);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -844,13 +844,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
-    });
-  });
-  describe("ContextProductionBlockRule Tests", () => {
-    it("can construct a ContextProductionBlockRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const productionBlock: Rule = new ContextProductionBlockRule();
-      assert.isNotNull(productionBlock);
     });
     it("can parse correctly (two uChars, uChar)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
@@ -909,23 +902,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT));
     });
   });
-  describe("UsingKeysLhsBlockRule Tests", () => {
-    it("can construct a UsingKeysLhsBlockRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const lhsBlock: Rule = new UsingKeysLhsBlockRule();
-      assert.isNotNull(lhsBlock);
-    });
-    it("can parse correctly (plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
-      const lhsBlock: Rule = new UsingKeysLhsBlockRule();
-      assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_USING_KEYS);
-      assert.isNotNull(lhsNode);
-      const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE)
-      assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
-    });
-  });
   describe("ContextLhsBlockRule Tests", () => {
     it("can construct a ContextLhsBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -956,7 +932,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
     });
-    it("can parse correctly (if-like, keystroke)", () => {
+    it("can parse correctly (if-like, input context)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(digit)');
       const lhsBlock: Rule = new ContextLhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
@@ -965,75 +941,17 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
     });
-  });
-  describe("UsingKeysInputBlockRule Tests", () => {
-    it("can construct a UsingKeysInputBlockRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isNotNull(usingKeysInputBlock);
-    });
     it("can parse correctly (plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      const lhsBlock: Rule = new ContextLhsBlockRule();
+      assert.isTrue(lhsBlock.parse(root));
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      assert.isNotNull(lhsNode);
+      const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE)
       assert.isNotNull(keystrokeNode);
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
     });
-    it("can parse correctly (if-like block, plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") + any(c_key)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
-    });
-    it("can parse correctly (inputContext, plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('any(output) + any(diacriticKey)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
-      assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
-      assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
-    });
-    it("can parse correctly (if-like, inputContext, plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(output) + any(diacriticKey)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
-      assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
-      assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
-    });
-    it("can parse correctly (nul, if-like, plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") + any(diacriticKey)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
-      assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
-    });
-    it("can parse correctly (nul, if-like, inputContext, plus, keystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1) + any(diacriticKey)');
-      const usingKeysInputBlock: Rule = new UsingKeysInputBlockRule();
-      assert.isTrue(usingKeysInputBlock.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
-      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
-      assert.isNotNull(inputContextNode);
-      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
-      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
-      assert.isNotNull(keystrokeNode);
-      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
-    });
-  })
+  });
   describe("ContextInputBlockRule Tests", () => {
     it("can construct a ContextInputBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1095,6 +1013,67 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
+    });
+    it("can parse correctly (plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (if-like block, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") + any(c_key)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYSTROKE));
+    });
+    it("can parse correctly (inputContext, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('any(output) + any(diacriticKey)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (if-like, inputContext, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(output) + any(diacriticKey)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getSoleChildOfType(NodeTypes.ANY));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (nul, if-like, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") + any(diacriticKey)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
+    });
+    it("can parse correctly (nul, if-like, inputContext, plus, keystroke)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul platform("touch") dk(1) + any(diacriticKey)');
+      const contextInputBlock: Rule = new ContextInputBlockRule();
+      assert.isTrue(contextInputBlock.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
+      const inputContextNode = root.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      assert.isNotNull(inputContextNode.getChildrenOfType(NodeTypes.DEADKEY));
+      const keystrokeNode = root.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.ANY));
     });
   });
   describe("NulInputBlockRule Tests", () => {
@@ -1905,10 +1884,8 @@ describe("KMN Analyser Tests", () => {
       assert.equal(groupNodes[4].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'normalise');
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.USING_KEYS));
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
-      const usingKeysProductionNodes = root.getChildrenOfType(NodeTypes.PRODUCTION_USING_KEYS);
       const contextProductionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION_CONTEXT);
-      assert.equal(usingKeysProductionNodes.length, 53);
-      assert.equal(contextProductionNodes.length, 215);
+      assert.equal(contextProductionNodes.length, 268);
       //assert.equal(root.toString(), '');
     });
   });
