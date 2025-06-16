@@ -49,17 +49,11 @@ mkdir ${upload_path}
 # Build Keyman Compiler WINE archive
 #
 
-if((Test-Path ..\release\${kmcomp_zip}) -ne 0) {
-  # REVIEW: I guess this is the path for Keyman 18+. In which case we
-  # can remove the else block
-  copy ..\release\${kmcomp_zip} ..\${upload_path}\${kmcomp_zip}
-} else {
-  cd bin
-  # Keyman versions 17.0+; note, use npm install for most modules
-  copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
-  & "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
-  cd ..
-}
+cd bin
+# Keyman versions 17.0+; note, use npm install for most modules
+copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
+& "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
+cd ..
 
 #
 # Copy source files

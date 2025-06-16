@@ -9,7 +9,7 @@ download_symbol_server_index() {
     # shellcheck disable=SC2164
     cd "${KEYMAN_ROOT}/.."
     # shellcheck disable=SC2154
-    powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/../includes/download-symbol-server-index.ps1"
+    powershell -NonInteractive -ExecutionPolicy Bypass -File "${KEYMAN_ROOT}/resources/teamcity/includes/download-symbol-server-index.ps1"
   )
 
   builder_echo end "download symbol server index" success "Finished downloading symbol server index"
@@ -22,7 +22,7 @@ publish_new_symbols() {
   (
     cd "${KEYMAN_ROOT}/../symbols"
     # shellcheck disable=SC2154
-    powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/../includes/publish-new-symbols.ps1"
+    powershell -NonInteractive -ExecutionPolicy Bypass -File "${KEYMAN_ROOT}/resources/teamcity/includes/publish-new-symbols.ps1"
   )
 
   builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"

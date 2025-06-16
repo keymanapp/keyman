@@ -72,8 +72,6 @@ upload_help() {
   local PRODUCT_PATH=$2
   builder_echo start "upload help" "Uploading new ${PRODUCT} help to help.keyman.com"
 
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-
   (
     # shellcheck disable=SC2164
     cd "${KEYMAN_ROOT}/resources/build"

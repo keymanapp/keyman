@@ -13,10 +13,6 @@ windows_test_action() {
   builder_echo end "test windows" success "Finished running Keyman for Windows tests"
 }
 
-call_windows_publish() {
-  "${KEYMAN_ROOT}/windows/build.sh" publish
-}
-
 windows_upload_symbols_to_sentry() {
   "${KEYMAN_ROOT}/windows/src/buildtools/sentry-upload-difs.sh"
 }
