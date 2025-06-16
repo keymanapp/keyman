@@ -49,7 +49,7 @@ export enum NodeTypes {
   LAYER                 = "LAYER",
   LAYER_SHORTCUT        = "LAYER_SHORTCUT",
   LAYOUTFILE            = "LAYOUTFILE",
-  LHS_CONTEXT           = "LHS_CONTEXT",
+  LHS                   = "LHS",
   LINE                  = "LINE",
   MATCH                 = "MATCH",
   MESSAGE               = "MESSAGE",

@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, ContextLhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, NulInputBlockRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContextInputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -126,7 +126,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -554,7 +554,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -809,7 +809,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -822,7 +822,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -836,7 +836,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
@@ -851,7 +851,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -864,7 +864,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -878,7 +878,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
@@ -891,7 +891,7 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(productionBlock.parse(root));
       const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
       assert.isNotNull(productionNode);
-      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       const ifNodes = lhsNode.getChildrenOfType(NodeTypes.IF);
       assert.equal(ifNodes.length, 2);
@@ -902,50 +902,50 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT));
     });
   });
-  describe("ContextLhsBlockRule Tests", () => {
-    it("can construct a ContextLhsBlockRule", () => {
+  describe("LhsBlockRule Tests", () => {
+    it("can construct a LhsBlockRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isNotNull(lhsBlock);
     });
     it("can parse correctly (match)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('match');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.MATCH));
     });
     it("can parse correctly (nomatch)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('nomatch');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.NOMATCH));
     });
     it("can parse correctly (if-like)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
     });
     it("can parse correctly (if-like, input context)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('platform("touch") any(digit)');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
     });
     it("can parse correctly (plus, keystroke)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key)');
-      const lhsBlock: Rule = new ContextLhsBlockRule();
+      const lhsBlock: Rule = new LhsBlockRule();
       assert.isTrue(lhsBlock.parse(root));
-      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode = root.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
       const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE)
       assert.isNotNull(keystrokeNode);

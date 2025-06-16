@@ -363,17 +363,17 @@ export class UsingKeysRule extends SingleChildRule {
 export class ProductionBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const contextLhsBlock = new ContextLhsBlockRule();
-    const chevron         = new TokenRule(TokenTypes.CHEVRON);
-    const rhsBlock        = new RhsBlockRule();
-    this.rule = new SequenceRule([contextLhsBlock, chevron, rhsBlock]);
+    const lhsBlock = new LhsBlockRule();
+    const chevron  = new TokenRule(TokenTypes.CHEVRON);
+    const rhsBlock = new RhsBlockRule();
+    this.rule = new SequenceRule([lhsBlock, chevron, rhsBlock]);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS_CONTEXT);
+      const lhsNode        = tmp.getSoleChildOfType(NodeTypes.LHS);
       const rhsNode        = tmp.getSoleChildOfType(NodeTypes.RHS);
       const productionNode = new ASTNode(NodeTypes.PRODUCTION);
       productionNode.addChild(lhsNode);
@@ -384,29 +384,9 @@ export class ProductionBlockRule extends SingleChildRule {
   }
 }
 
-abstract class AbstractLhsBlockRule extends SingleChildRule {
-  protected lhsNodeType: NodeTypes;
-
+export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const lhsNode = new ASTNode(this.lhsNodeType);
-      lhsNode.addChildren(tmp.getChildren());
-      node.addChild(lhsNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class ContextLhsBlockRule extends AbstractLhsBlockRule {
-  public constructor() {
-    super();
-    this.lhsNodeType                     = NodeTypes.LHS_CONTEXT;
     const match: Rule                    = new TokenRule(TokenTypes.MATCH, true);
     const noMatch: Rule                  = new TokenRule(TokenTypes.NOMATCH, true);
     const contextInputBlock: Rule        = new ContextInputBlockRule();
@@ -420,6 +400,17 @@ export class ContextLhsBlockRule extends AbstractLhsBlockRule {
       nulInputBlock,
       oneOrManyIfLikeStatement,
     ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const lhsNode = new ASTNode(NodeTypes.LHS);
+      lhsNode.addChildren(tmp.getChildren());
+      node.addChild(lhsNode);
+    }
+    return parseSuccess;
   }
 }
 
@@ -443,7 +434,7 @@ export class ContextInputBlockRule extends SingleChildRule {
 export class NulInputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const nulRule: Rule        = new TokenRule(TokenTypes.NUL, true);
+    const nulRule: Rule             = new TokenRule(TokenTypes.NUL, true);
     const ifLikeStatement: Rule     = new IfLikeStatementRule();
     const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
     this.rule = new SequenceRule([nulRule, manyIfLikeStatement]);
