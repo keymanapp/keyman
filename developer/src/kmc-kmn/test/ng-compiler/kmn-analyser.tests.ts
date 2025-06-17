@@ -317,20 +317,20 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.HANGUL));
     });
-    it("can parse correctly (decimal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('d99');
+    it("can parse correctly (decimal, space)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('d99 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.DECIMAL));
     });
-    it("can parse correctly (hexadecimal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('xa99');
+    it("can parse correctly (hexadecimal, space)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('xa99 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.HEXADECIMAL));
     });
-    it("can parse correctly (octal)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('77');
+    it("can parse correctly (octal, space)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('77 ');
       const simpleText: Rule = new SimpleTextRule();
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.OCTAL));
@@ -1937,7 +1937,7 @@ describe("KMN Analyser Tests", () => {
         'k_052___nul_and_index',
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
-      ].slice(0, 15).forEach((name) => {
+      ].slice(0, 30).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
         const lexer: Lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();
