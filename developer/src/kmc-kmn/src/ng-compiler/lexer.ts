@@ -230,16 +230,16 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.STRING,              /^('.*?'|\".*?\")/,                                      true),
     new ScanRecogniser(TokenTypes.MODIFIER,            /^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\S\r\n])/i, true),
     new ScanRecogniser(TokenTypes.KEY_CODE,            /^(((K_|T_|U_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/,     true),
-    new ScanRecogniser(TokenTypes.DECIMAL,             /^d\d+(?=[\s,\)\]])/,                                                 true),
-    new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+(?=[\s,\)\]])/,                                         true),
-    new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+(?=[\s,\)\]])/,                                               true),
+    new ScanRecogniser(TokenTypes.DECIMAL,             /^d\d+(?=[\s,\)\]])/,                                    true),
+    new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+(?=[\s,\)\]])/,                            true),
+    new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+(?=[\s,\)\]])/,                                  true),
     new ScanRecogniser(TokenTypes.HANGUL,              /^\$HANGUL_SYLLABLE_[A-Z]{1,7}/i,                        true),
     new ScanRecogniser(TokenTypes.COMMENT,             /^c(([^\S\r\n][^\r\n]*)|(?=(\r\n|\n|\r)))/i,             false),
     new ScanRecogniser(TokenTypes.WHITESPACE,          /^[^\S\r\n]+/,                                           false),
     new ScanRecogniser(TokenTypes.CONTINUATION,        /^\\(?=([^\S\r\n]*(\r\n|\n|\r)))/,                       false),
     new ScanRecogniser(TokenTypes.NEWLINE,             /^(\r\n|\n|\r)/,                                         true),
     new ScanRecogniser(TokenTypes.NAMED_CONSTANT,      /^\$\S+/,                                                true),
-    new ScanRecogniser(TokenTypes.PARAMETER,           /^[^,\)\s]+/,                                            true),
+    new ScanRecogniser(TokenTypes.PARAMETER,           /^[^=,\)\s]+/,                                           true),
   ];
 
   static {
