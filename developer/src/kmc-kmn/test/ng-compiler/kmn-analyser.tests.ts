@@ -1984,13 +1984,9 @@ describe("KMN Analyser Tests", () => {
         'k_052___nul_and_index',
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
-      ].slice(41, 42).forEach((name) => {
+      ].forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
-        const lexer: Lexer = new Lexer(buffer);
-        const tokens: Token[] = lexer.parse();
-        //const subset: Token[] = tokens.filter((token) => token.lineNum <= 660);
-        //Rule.tokenBuffer = new TokenBuffer(subset);
-        Rule.tokenBuffer = new TokenBuffer(tokens);
+        Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
