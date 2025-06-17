@@ -4,7 +4,7 @@ title: Keyman® Developer License
 
 MIT License
 
-Copyright (c) 1994-2025 SIL Global
+Copyright (c) 1994-2018 SIL International
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
