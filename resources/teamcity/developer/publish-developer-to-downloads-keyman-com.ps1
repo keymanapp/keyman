@@ -48,12 +48,7 @@ mkdir ${upload_path}
 #
 # Build Keyman Compiler WINE archive
 #
-
-cd bin
-# Keyman versions 17.0+; note, use npm install for most modules
-copy ..\..\common\schemas\keyboard_info\keyboard_info.schema.json .
-& "${7Z_HOME}\7z.exe" a -bd -bb0 ..\${upload_path}\${kmcomp_zip} kmconvert.exe keyboard_info.schema.json xml\layoutbuilder\*.keyman-touch-layout projects\ server\
-cd ..
+copy ..\release\${kmcomp_zip} ..\${upload_path}\${kmcomp_zip}
 
 #
 # Copy source files
