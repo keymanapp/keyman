@@ -36,11 +36,10 @@ comparison:EQUAL|NOT_EQUAL
 layerStatement: LAYER_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
-rhsBlock: outputStatement+|contextOutputBlock|CONTEXT|RETURN|NUL
-contextOutputBlock: CONTEXT? outputStatement+
+rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|deadKeyStatement|setSystemStore|layerStatement|indexStatement|
-  contextStatement|text|BEEP
+  contextStatement|CONTEXT|RETURN|NUL|text|BEEP
 callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
 saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
 deadKeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR

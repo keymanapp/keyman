@@ -853,12 +853,44 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(productionNode);
       const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
       assert.isNotNull(lhsNode);
-      //assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
-      //assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.IF));
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
       const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
       assert.isNotNull(rhsNode);
-      //assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
-      //assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
+      const outputNodes = rhsNode.getChildren();
+      assert.equal(outputNodes.length, 5);
+      assert.equal(outputNodes[0].nodeType, NodeTypes.STRING);
+      assert.equal(outputNodes[1].nodeType, NodeTypes.SET);
+      assert.equal(outputNodes[2].nodeType, NodeTypes.RESET);
+      assert.equal(outputNodes[3].nodeType, NodeTypes.SET);
+      assert.equal(outputNodes[4].nodeType, NodeTypes.RESET);
+    });
+    it("can parse correctly (dk, string, dk, string, dk, plus, string, string, context, string)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer("dk(1) 'a' dk(2) 'b' dk(3) + 'z' > '<' context '>'");
+      const productionBlock: Rule = new ProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      const inputContextNode = lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT);
+      assert.isNotNull(inputContextNode);
+      const inputNodes = inputContextNode.getChildren();
+      assert.equal(inputNodes.length, 5);
+      assert.equal(inputNodes[0].nodeType, NodeTypes.DEADKEY);
+      assert.equal(inputNodes[1].nodeType, NodeTypes.STRING);
+      assert.equal(inputNodes[2].nodeType, NodeTypes.DEADKEY);
+      assert.equal(inputNodes[3].nodeType, NodeTypes.STRING);
+      assert.equal(inputNodes[4].nodeType, NodeTypes.DEADKEY);
+      const keystrokeNode = lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE);
+      assert.isNotNull(keystrokeNode);
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      const outputNodes = rhsNode.getChildren();
+      assert.equal(outputNodes.length, 3);
+      assert.equal(outputNodes[0].nodeType, NodeTypes.STRING);
+      assert.equal(outputNodes[1].nodeType, NodeTypes.CONTEXT);
+      assert.equal(outputNodes[2].nodeType, NodeTypes.STRING);
     });
     it("can parse correctly (two uChars, uChar)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17C1 U+17B6 > U+17C4');
@@ -1952,7 +1984,7 @@ describe("KMN Analyser Tests", () => {
         'k_052___nul_and_index',
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
-      ].slice(0, 41).forEach((name) => {
+      ].slice(41, 42).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
         const lexer: Lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();

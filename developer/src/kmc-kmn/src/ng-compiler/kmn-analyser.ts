@@ -664,15 +664,8 @@ export class BaselayoutStatementRule extends AbstractShortcutRule {
 export class RhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const outputStatement: Rule          = new OutputStatementRule();
-    const oneOrManyOutputStatement: Rule = new OneOrManyRule(outputStatement);
-    const contextOutputBlock: Rule       = new ContextOutputBlockRule();
-    const context: Rule                  = new TokenRule(TokenTypes.CONTEXT, true);
-    const returnRule: Rule               = new TokenRule(TokenTypes.RETURN, true);
-    const nul: Rule                      = new TokenRule(TokenTypes.NUL, true);
-    this.rule = new AlternateRule([
-      oneOrManyOutputStatement, contextOutputBlock, context, returnRule, nul
-    ]);
+    const outputStatement: Rule = new OutputStatementRule();
+    this.rule = new OneOrManyRule(outputStatement);
   }
 
   public parse(node: ASTNode): boolean {
@@ -684,17 +677,6 @@ export class RhsBlockRule extends SingleChildRule {
       node.addChild(rhsNode);
     }
     return parseSuccess;
-  }
-}
-
-export class ContextOutputBlockRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const context: Rule                  = new TokenRule(TokenTypes.CONTEXT, true);
-    const optContext: Rule               = new OptionalRule(context)
-    const outputStatement: Rule          = new OutputStatementRule();
-    const oneOrManyOutputStatement: Rule = new OneOrManyRule(outputStatement);
-    this.rule = new SequenceRule([optContext, oneOrManyOutputStatement]);
   }
 }
 
@@ -711,6 +693,9 @@ export class OutputStatementRule extends SingleChildRule {
     const layerStatement: Rule   = new LayerStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
+    const context: Rule          = new TokenRule(TokenTypes.CONTEXT, true);
+    const returnRule: Rule       = new TokenRule(TokenTypes.RETURN, true);
+    const nul: Rule              = new TokenRule(TokenTypes.NUL, true);
     const text: Rule             = new TextRule();
     const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
@@ -724,6 +709,9 @@ export class OutputStatementRule extends SingleChildRule {
       layerStatement,
       indexStatement,
       contextStatement,
+      context,
+      returnRule,
+      nul,
       text,
       beep,
     ]);
