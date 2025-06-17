@@ -614,6 +614,28 @@ describe("Lexer Tests", () => {
         ]
       );
     });
+    it("can recognise a PARAMETER token (contains an equal sign)", () => {
+      recogniseTokens(
+        'foo = "1"',
+        [
+          new Token(TokenTypes.PARAMETER, 'foo'),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 4),
+          new Token(TokenTypes.EQUAL, '=', 1, 5),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 6),
+          new Token(TokenTypes.STRING, '"1"', 1, 7),
+        ]
+      );
+    });
+    it("can recognise a PARAMETER token (contains an equal sign without whitespace)", () => {
+      recogniseTokens(
+        'foo="2"',
+        [
+          new Token(TokenTypes.PARAMETER, 'foo'),
+          new Token(TokenTypes.EQUAL, '=', 1, 4),
+          new Token(TokenTypes.STRING, '"2"', 1, 5),
+        ]
+      );
+    });
     it("can recognise a bitmap store", () => {
       recogniseSystemStoreWithString(TokenTypes.BITMAP, 'khmer_angkor.ico');
     });
