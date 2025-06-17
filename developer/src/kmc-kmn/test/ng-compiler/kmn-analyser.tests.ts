@@ -1952,7 +1952,7 @@ describe("KMN Analyser Tests", () => {
         'k_052___nul_and_index',
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
-      ].slice(30, 31).forEach((name) => {
+      ].slice(0, 41).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
         const lexer: Lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse();
