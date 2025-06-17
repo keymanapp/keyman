@@ -139,25 +139,16 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.FREES, 'frees');
     });
     it("can recognise a BASELAYOUT_SHORTCUT token", () => {
-      recogniseToken(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
     });
     it("can recognise a LAYER_SHORTCUT token", () => {
-      recogniseToken(TokenTypes.LAYER_SHORTCUT, 'layer');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.LAYER_SHORTCUT, 'layer');
     });
     it("can recognise a PLATFORM_SHORTCUT token", () => {
-      recogniseToken(TokenTypes.PLATFORM_SHORTCUT, 'platform');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.PLATFORM_SHORTCUT, 'platform');
     });
     it("can recognise an ANY token", () => {
-      recogniseToken(TokenTypes.ANY, 'any');
-    });
-    it("can recognise an ANY token (followed by comma)", () => {
-      recogniseTokens(
-        'any,',
-        [
-          new Token(TokenTypes.ANY, 'any'),
-          new Token(TokenTypes.COMMA, ',', 1, 4),
-        ]
-      );
+      recogniseTokenFollowedByLeftBracket(TokenTypes.ANY, 'any');
     });
     it("can recognise a BEEP token", () => {
       recogniseToken(TokenTypes.BEEP, 'beep');
@@ -166,25 +157,25 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.BEGIN, 'begin');
     });
     it("can recognise a CALL token", () => {
-      recogniseToken(TokenTypes.CALL, 'call');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.CALL, 'call');
     });
     it("can recognise a CONTEXT token", () => {
       recogniseToken(TokenTypes.CONTEXT, 'context');
     });
     it("can recognise a DEADKEY token (deadkey)", () => {
-      recogniseToken(TokenTypes.DEADKEY, 'deadkey');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.DEADKEY, 'deadkey');
     });
     it("can recognise a DEADKEY token (dk)", () => {
-      recogniseToken(TokenTypes.DEADKEY, 'dk');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.DEADKEY, 'dk');
     });
     it("can recognise a GROUP token", () => {
-      recogniseToken(TokenTypes.GROUP, 'group');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.GROUP, 'group');
     });
     it("can recognise a IF token", () => {
-      recogniseToken(TokenTypes.IF, 'if');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.IF, 'if');
     });
     it("can recognise a INDEX token", () => {
-      recogniseToken(TokenTypes.INDEX, 'index');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.INDEX, 'index');
     });
     it("can recognise a MATCH token", () => {
       recogniseToken(TokenTypes.MATCH, 'match');
@@ -193,37 +184,37 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.NOMATCH, 'nomatch');
     });
     it("can recognise a NOTANY token", () => {
-      recogniseToken(TokenTypes.NOTANY, 'notany');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.NOTANY, 'notany');
     });
     it("can recognise a NUL token", () => {
       recogniseToken(TokenTypes.NUL, 'nul');
     });
     it("can recognise a OUTS token", () => {
-      recogniseToken(TokenTypes.OUTS, 'outs');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.OUTS, 'outs');
     });
     it("can recognise a RESET token", () => {
-      recogniseToken(TokenTypes.RESET, 'reset');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.RESET, 'reset');
     });
     it("can recognise a RETURN token", () => {
       recogniseToken(TokenTypes.RETURN, 'return');
     });
     it("can recognise a SAVE token", () => {
-      recogniseToken(TokenTypes.SAVE, 'save');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.SAVE, 'save');
     });
     it("can recognise a SET token", () => {
-      recogniseToken(TokenTypes.SET, 'set');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.SET, 'set');
     });
     it("can recognise a STORE token", () => {
-      recogniseToken(TokenTypes.STORE, 'store');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'store');
     });
     it("can recognise a STORE token in upper case", () => {
-      recogniseToken(TokenTypes.STORE, 'STORE');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'STORE');
     });
     it("can recognise a STORE token in mixed case", () => {
-      recogniseToken(TokenTypes.STORE, 'Store');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.STORE, 'Store');
     });
     it("can recognise a USE token", () => {
-      recogniseToken(TokenTypes.USE, 'use');
+      recogniseTokenFollowedByLeftBracket(TokenTypes.USE, 'use');
     });
     it("can recognise a UNICODE token", () => {
       recogniseToken(TokenTypes.UNICODE, 'unicode');
@@ -999,6 +990,17 @@ function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, {addEOF=f
       new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
     ],
     {addEOF, emitAll, handleContinuation}
+  );
+}
+
+function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+  recogniseTokens(
+    `${text}(`,
+    [
+      new Token(type, text),
+      new Token(TokenTypes.LEFT_BR, '(', 1, 1+text.length),
+    ],
+   {addEOF, emitAll, handleContinuation}
   );
 }
 
