@@ -1,8 +1,9 @@
 name: Keyman Build Summary
 on:
-  # push:
-  #   branches:
-  #     - "maint/resources/14172-pr-build-status-2"
+  # Temporary for testing:
+  push:
+    branches:
+      - "maint/resources/14172-pr-build-status-2"
 
   check_run:
     types: [completed]
