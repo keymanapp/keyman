@@ -65,6 +65,8 @@ function triggerTestBuilds() {
   local -n platforms=$1
   local branch="$2"
 
+  local found_build=false
+
   # Cancel any already running builds for this branch
   if builder_has_option --dry-run; then
     builder_echo "DRY RUN: cancel current builds for $branch"
@@ -83,6 +85,7 @@ function triggerTestBuilds() {
     eval test_builds='(${'bc_test_$platform'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
+      found_build=true
       if [ "${test_build:(-7)}" == "_GitHub" ]; then
         local job=${test_build%_GitHub}
 
@@ -102,6 +105,26 @@ function triggerTestBuilds() {
       fi
     done
   done
+
+  if [[ $found_build == false ]]; then
+    postSkippedBuildsStatusResult
+  fi
+}
+
+#
+# Add a 'Test Build (Keyman)' successful status check to the commit
+#
+function postSkippedBuildsStatusResult() {
+  if builder_has_option --dry-run; then
+    builder_echo "DRY RUN: write successful status check 'Skipping since no platform builds necessary'"
+  else
+    curl --silent --write-out '\n' \
+      --request POST \
+      --header "Accept: application/vnd.github+json" \
+      --header "Authorization: token $GITHUB_TOKEN" \
+      --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
+      "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
+  fi
 }
 
 #
@@ -241,16 +264,7 @@ if (( ${#build_platforms[@]} > 0)); then
   triggerTestBuilds build_platforms $PRNUM
 else
   builder_echo heading "No builds to start"
-  if builder_has_option --dry-run; then
-    builder_echo "DRY RUN: write successful status check 'Skipping since no platform builds necessary'"
-  else
-    curl --silent --write-out '\n' \
-      --request POST \
-      --header "Accept: application/vnd.github+json" \
-      --header "Authorization: token $GITHUB_TOKEN" \
-      --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
-      "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
-  fi
+  postSkippedBuildsStatusResult
 fi
 
 exit 0

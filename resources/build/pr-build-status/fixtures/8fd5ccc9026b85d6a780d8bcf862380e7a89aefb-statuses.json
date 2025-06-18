@@ -1,0 +1,35 @@
+[
+  {
+    "url": "https://api.github.com/repos/keymanapp/keyman/statuses/8fd5ccc9026b85d6a780d8bcf862380e7a89aefb",
+    "avatar_url": "https://avatars.githubusercontent.com/in/133554?v=4",
+    "id": 37011551277,
+    "node_id": "SC_kwDOAY2xT88AAAAIng90LQ",
+    "state": "success",
+    "description": "User tests are not required",
+    "target_url": "https://github.com/keymanapp/keyman/pull/14199#issuecomment-2975084272",
+    "context": "user_testing",
+    "created_at": "2025-06-16T20:38:04Z",
+    "updated_at": "2025-06-16T20:38:04Z",
+    "creator": {
+      "login": "keymanapp-test-bot[bot]",
+      "id": 89363325,
+      "node_id": "MDM6Qm90ODkzNjMzMjU=",
+      "avatar_url": "https://avatars.githubusercontent.com/in/133554?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D",
+      "html_url": "https://github.com/apps/keymanapp-test-bot",
+      "followers_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/keymanapp-test-bot%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    }
+  }
+]
