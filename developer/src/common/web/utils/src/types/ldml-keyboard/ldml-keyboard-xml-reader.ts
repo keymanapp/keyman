@@ -12,7 +12,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
 import boxXmlArray = util.boxXmlArray;
 import { LineFinderEventResolver } from '../../line-utils.js';
-import { XML_FILENAME_SYMBOL, KeymanXMLReader } from '../../xml-utils.js';
+import { XML_FILENAME_SYMBOL, KeymanXMLReader, findInstanceObject } from '../../xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -310,12 +310,13 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
     if(!SchemaValidators.default.ldmlKeyboard3(source)) {
       for (const err of (<any>SchemaValidators.default.ldmlKeyboard3).errors) {
+        const context = findInstanceObject(source, err?.instancePath?.split('/'));
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
           message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
           params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
-        }));
+        }, context));
       }
       return false;
     }

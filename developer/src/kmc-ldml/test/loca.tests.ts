@@ -1,11 +1,12 @@
 import 'mocha';
 import { assert } from 'chai';
 import { LocaCompiler } from '../src/compiler/loca.js';
-import { compilerTestCallbacks, loadSectionFixture, withOffset } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import Loca = KMXPlus.Loca;
+import { withOffset } from '@keymanapp/developer-utils';
 
 describe('loca', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
-import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases, withOffset } from './helpers/index.js';
+import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -9,7 +9,7 @@ import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
-import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { LDMLKeyboard, withOffset } from '@keymanapp/developer-utils';
 const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
