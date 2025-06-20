@@ -30,13 +30,21 @@ The following are all examples of valid BCP 47 tags:
 * `en-US`: English, in United States
 * `km-Khmr-KH`: Khmer, written in the Khmer script, in Cambodia
 * `km-fonipa`: Khmer, transcribed in IPA
+* `und-cpmn`: Undetermined (Cypro-Minoan)
+* `tok-Zzzz-AA`: Toki Pona (Unknown Script)
+
+> [!NOTE]
+> `Zzzz` is an uncoded script of IOS 15924 and one of the Special codes of the Script subtag.
+> `AA` is a Private Use Code.
 
 ### The language subtag
 
 The only required option is the Language subtag, which is an [ISO 639-1][2] or
 [ISO 639-3][3] code.
 
-ISO 639-1 tags are a two-letter code. ISO 639-3 tags are a three-letter code.
+- ISO 639-1 tags are a two-letter code. 
+- ISO 639-3 tags are a three-letter code.
+
 First, try to find your language on the list of two-letter ISO 639-1 codes.
 [This Wikipedia page][4] lists all of the two-letter codes.
 
@@ -46,10 +54,11 @@ it will give you an appropriate code. In this example, I searched Glottolog for
 “[Saanich][6]” (name of the First Nations that speak SENĆOŦEN) and found `str`
 as the code for all Straits Salish languages.
 
-The Language subtag is conventionally written in lower case.
+> [!IMPORTANT] 
+> The Language subtag is conventionally written in lower case.
 
-The next two subtags are **optional**, however, they allow you to be more
-specific about your language.
+> [!NOTE]
+>  The next two subtags are **optional**, however, they allow you to be more specific about your language.
 
 ### The script subtag
 
@@ -67,8 +76,8 @@ of the **Canadian Aboriginal syllabics** family of writing systems. If I wrote a
 keyboard or lexical model that produced syllabics, I would choose `Cans`, as
 that is the **ISO 15924** tag for Canadian Aboriginal syllabics.
 
-The Script subtag is conventionally written in title case - first letter
-capitalized.
+> [!IMPORTANT] 
+> The Script subtag is conventionally written in title case - first letter capitalized.
 
 ### The region subtag
 
@@ -100,7 +109,8 @@ and Mexico.
 
 Another common UN M49 region code is `001` for the whole world.
 
-Alphabetic region subtags are conventionally written in upper case.
+> [!IMPORTANT] 
+> Alphabetic region subtags are conventionally written in upper case.
 
 [1]: https://en.wikipedia.org/wiki/IETF_language_tag
 [2]: https://en.wikipedia.org/wiki/ISO_639-1
