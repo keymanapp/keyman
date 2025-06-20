@@ -40,7 +40,7 @@ platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
-  resetStore|deadKeyStatement|setSystemStore|layerStatement|indexStatement|
+  resetStore|setSystemStore|layerStatement|indexStatement|
   contextStatement|CONTEXT|RETURN|text|BEEP
 callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
 saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
