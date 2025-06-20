@@ -72,14 +72,15 @@ export class PlainTextRule extends SingleChildRule {
 export class SimpleTextRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringRule    = new TokenRule(TokenTypes.STRING, true);
-    const virtualKey    = new VirtualKeyRule();
-    const uChar         = new TokenRule(TokenTypes.U_CHAR, true);
-    const namedConstant = new TokenRule(TokenTypes.NAMED_CONSTANT, true);
-    const hangul        = new TokenRule(TokenTypes.HANGUL, true);
-    const decimal       = new TokenRule(TokenTypes.DECIMAL, true);
-    const hexadecimal   = new TokenRule(TokenTypes.HEXADECIMAL, true);
-    const octal         = new TokenRule(TokenTypes.OCTAL, true);
+    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
+    const virtualKey: Rule    = new VirtualKeyRule();
+    const uChar: Rule         = new TokenRule(TokenTypes.U_CHAR, true);
+    const namedConstant: Rule = new TokenRule(TokenTypes.NAMED_CONSTANT, true);
+    const hangul: Rule        = new TokenRule(TokenTypes.HANGUL, true);
+    const decimal: Rule       = new TokenRule(TokenTypes.DECIMAL, true);
+    const hexadecimal: Rule   = new TokenRule(TokenTypes.HEXADECIMAL, true);
+    const octal: Rule         = new TokenRule(TokenTypes.OCTAL, true);
+    const nul: Rule           = new TokenRule(TokenTypes.NUL, true);
     this.rule = new AlternateRule([
       stringRule,
       virtualKey,
@@ -88,7 +89,8 @@ export class SimpleTextRule extends SingleChildRule {
       hangul,
       decimal,
       hexadecimal,
-      octal
+      octal,
+      nul,
     ]);
   }
 }
@@ -695,7 +697,6 @@ export class OutputStatementRule extends SingleChildRule {
     const contextStatement: Rule = new ContextStatementRule();
     const context: Rule          = new TokenRule(TokenTypes.CONTEXT, true);
     const returnRule: Rule       = new TokenRule(TokenTypes.RETURN, true);
-    const nul: Rule              = new TokenRule(TokenTypes.NUL, true);
     const text: Rule             = new TextRule();
     const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
@@ -711,7 +712,6 @@ export class OutputStatementRule extends SingleChildRule {
       contextStatement,
       context,
       returnRule,
-      nul,
       text,
       beep,
     ]);

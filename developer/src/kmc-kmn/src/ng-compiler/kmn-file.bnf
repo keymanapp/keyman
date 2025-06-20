@@ -4,7 +4,8 @@ content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
   normalStoreAssign|ruleBlock
 text: plainText|outsStatement
 plainText: textRange|simpleText
-simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|DECIMAL|HEXADECIMAL|OCTAL
+simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
+  DECIMAL|HEXADECIMAL|OCTAL|NUL
 textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
@@ -39,7 +40,7 @@ baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|deadKeyStatement|setSystemStore|layerStatement|indexStatement|
-  contextStatement|CONTEXT|RETURN|NUL|text|BEEP
+  contextStatement|CONTEXT|RETURN|text|BEEP
 callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
 saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
 deadKeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR

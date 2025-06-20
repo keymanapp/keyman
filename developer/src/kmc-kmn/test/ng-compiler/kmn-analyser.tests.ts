@@ -335,6 +335,12 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.OCTAL));
     });
+    it("can parse correctly (nul)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul');
+      const simpleText: Rule = new SimpleTextRule();
+      assert.isTrue(simpleText.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
+    });
   });
   describe("TextRangeRule Tests", () => {
     it("can construct a TextRangeRule", () => {
@@ -1660,7 +1666,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(deadKeyNode);
       assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
-    it("can parse correctly (set layer statement)", () => {
+    it("can parse correctly (set system store statement)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('set(&layer = "value")');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
@@ -1698,6 +1704,12 @@ describe("KMN Analyser Tests", () => {
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+    it("can parse correctly (nul [as text])", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('nul');
+      const outputStatement: Rule = new OutputStatementRule();
+      assert.isTrue(outputStatement.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
     });
     it("can parse correctly (beep)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('beep');

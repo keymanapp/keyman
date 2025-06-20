@@ -294,7 +294,7 @@ describe("TokenBuffer Tests", () => {
         'experimental/w/wakhi_standard/source/wakhi_standard',
         'experimental/w/wancho/source/wancho',
         'experimental/w/wenchow/source/wenchow',
-        'experimental/w/winchus/source/winchus',
+    //  'experimental/w/winchus/source/winchus', no longer in repository
         'legacy/gff/gff_awn_7/archive/gff-awn-7',
         'legacy/gff/gff_bcq_7/archive/gff-bcq-7',
         'legacy/gff/gff_byn_7/archive/gff-byn-7',
