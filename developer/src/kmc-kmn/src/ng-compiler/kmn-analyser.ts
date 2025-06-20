@@ -149,7 +149,7 @@ export class VirtualKeyRule extends SingleChildRule {
     const leftSquare: Rule   = new TokenRule(TokenTypes.LEFT_SQ);
     const modifier: Rule     = new ModifierRule();
     const manyModifier: Rule = new ManyRule(modifier);
-    const keyCode: Rule      = new TokenRule(TokenTypes.KEY_CODE, true);
+    const keyCode: Rule      = new KeyCodeRule();
     const rightSquare: Rule  = new TokenRule(TokenTypes.RIGHT_SQ);
     this.rule = new SequenceRule([
       leftSquare, manyModifier, keyCode, rightSquare
@@ -188,6 +188,15 @@ export class ModifierRule extends SingleChildRule {
       node.addChild(modifierNode);
     }
     return parseSuccess;
+  }
+}
+
+export class KeyCodeRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const keyCode: Rule    = new TokenRule(TokenTypes.KEY_CODE, true);
+    const stringRule: Rule = new TokenRule(TokenTypes.STRING, true);
+    this.rule = new AlternateRule([keyCode, stringRule]);
   }
 }
 
@@ -426,10 +435,10 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const match: Rule             = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch: Rule           = new TokenRule(TokenTypes.NOMATCH, true);
-    const contextInputBlock: Rule = new InputBlockRule();
-    this.rule = new AlternateRule([match, noMatch,contextInputBlock]);
+    const match: Rule      = new TokenRule(TokenTypes.MATCH, true);
+    const noMatch: Rule    = new TokenRule(TokenTypes.NOMATCH, true);
+    const inputBlock: Rule = new InputBlockRule();
+    this.rule = new AlternateRule([match, noMatch,inputBlock]);
   }
 
   public parse(node: ASTNode): boolean {

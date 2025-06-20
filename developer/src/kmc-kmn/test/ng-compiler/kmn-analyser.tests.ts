@@ -179,6 +179,16 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[1].getSoleChild().nodeType, NodeTypes.STRING);
       assert.equal(children[2].nodeType, NodeTypes.LINE);
     });
+    it("can parse correctly (compile target, plus, virtual key, u_char)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('$keymanonly: + [CTRL "."] > U+135E\n');
+      const line: Rule = new LineRule();
+      assert.isTrue(line.parse(root));
+      const children = root.getChildren();
+      assert.equal(children.length, 3);
+      assert.equal(children[0].nodeType, NodeTypes.KEYMANONLY);
+      assert.equal(children[1].nodeType, NodeTypes.PRODUCTION);
+      assert.equal(children[2].nodeType, NodeTypes.LINE);
+    });
   });
   describe("CompileTargetRule Tests", () => {
     it("can construct a CompileTargetRule", () => {
@@ -535,6 +545,23 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(virtualKeyNode);
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
     });
+    it("can parse correctly (virtual character)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('["A"]');
+      const virtualKey: Rule = new VirtualKeyRule();
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.STRING));
+    });
+    it("can parse correctly (virtual character with modifier)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('[CTRL "A"]');
+      const virtualKey: Rule = new VirtualKeyRule();
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.STRING));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+    });
   });
   describe("ModifierRule Tests", () => {
     it("can construct a ModifierRule", () => {
@@ -607,7 +634,7 @@ describe("KMN Analyser Tests", () => {
       const ruleBlock: Rule = new RuleBlockRule();
       assert.isNotNull(ruleBlock);
     });
-    it("can parse correctly (usingKeysProductionBlock)", () => {
+    it("can parse correctly (production block)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+17D2 + [K_D] > context(1) U+178F');
       const productionBlock: Rule = new RuleBlockRule();
       assert.isTrue(productionBlock.parse(root));
@@ -1025,6 +1052,19 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT));
+    });
+    it("can parse correctly (plus, virtual key, u_char)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ [CTRL "."] > U+135E');
+      const productionBlock: Rule = new ProductionBlockRule();
+      assert.isTrue(productionBlock.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      assert.isNotNull(productionNode);
+      const lhsNode = productionNode.getSoleChildOfType(NodeTypes.LHS);
+      assert.isNotNull(lhsNode);
+      assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      assert.isNotNull(rhsNode);
+      assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
   describe("LhsBlockRule Tests", () => {

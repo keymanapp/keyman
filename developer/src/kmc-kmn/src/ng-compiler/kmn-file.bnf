@@ -9,10 +9,11 @@ simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
   DECIMAL|HEXADECIMAL|OCTAL|NUL|deadKeyStatement
 textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
-virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
+virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
+keyCode: KEY_CODE|STRING
 outsStatement: OUTS LEFT_BR normalStoreName RIGHT_BR
-ruleBlock: beginStatement|groupStatement|contextProductionBlock
+ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE LEFT_BR groupName RIGHT_BR
