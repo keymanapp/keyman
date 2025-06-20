@@ -24,10 +24,26 @@ export class KmnTreeRule extends SingleChildRule {
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
-    const content: Rule    = new ContentRule();
-    const optContent: Rule = new OptionalRule(content);
-    const newline: Rule    = new TokenRule(TokenTypes.NEWLINE, true);
-    this.rule = new SequenceRule([optContent, newline]);
+    const compileTarget: Rule    = new CompileTargetRule();
+    const optCompileTarget: Rule = new OptionalRule(compileTarget);
+    const content: Rule          = new ContentRule();
+    const optContent: Rule       = new OptionalRule(content);
+    const newline: Rule          = new TokenRule(TokenTypes.NEWLINE, true);
+    this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+  }
+}
+
+export class CompileTargetRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const keyman: Rule     = new TokenRule(TokenTypes.KEYMAN, true);
+    const keymanonly: Rule = new TokenRule(TokenTypes.KEYMANONLY, true);
+    const keymanweb: Rule  = new TokenRule(TokenTypes.KEYMANWEB, true);
+    const kmfl: Rule       = new TokenRule(TokenTypes.KMFL, true);
+    const weaver: Rule     = new TokenRule(TokenTypes.WEAVER, true);
+    this.rule = new AlternateRule([
+      keyman, keymanonly, keymanweb, kmfl, weaver,
+    ]);
   }
 }
 

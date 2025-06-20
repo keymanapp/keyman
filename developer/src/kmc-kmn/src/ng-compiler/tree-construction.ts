@@ -39,7 +39,11 @@ export enum NodeTypes {
   INPUT_CONTEXT         = "INPUT_CONTEXT",
   KEY_CODE              = "KEY_CODE",
   KEYBOARDVERSION       = "KEYBOARDVERSION",
+  KEYMAN                = "KEYMAN",
+  KEYMANONLY            = "KEYMANONLY",
+  KEYMANWEB             = "KEYMANWEB",
   KEYSTROKE             = "KEYSTROKE",
+  KMFL                  = "KMFL",
   KMW_EMBEDCSS          = "KMW_EMBEDCSS",
   KMW_EMBEDJS           = "KMW_EMBEDJS",
   KMW_HELPFILE          = "KMW_HELPFILE",
@@ -93,6 +97,7 @@ export enum NodeTypes {
   VERSION               = "VERSION",
   VIRTUAL_KEY           = "VIRTUAL_KEY",
   VISUALKEYBOARD        = "VISUALKEYBOARD",
+  WEAVER                = "WEAVER",
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",
 }
 

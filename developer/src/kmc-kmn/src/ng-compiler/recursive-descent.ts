@@ -214,6 +214,10 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.INDEX,               nodeType: NodeTypes.INDEX},
     {tokenType: TokenTypes.KEYBOARDVERSION,     nodeType: NodeTypes.KEYBOARDVERSION},
     {tokenType: TokenTypes.KEY_CODE,            nodeType: NodeTypes.KEY_CODE},
+    {tokenType: TokenTypes.KEYMAN,              nodeType: NodeTypes.KEYMAN},
+    {tokenType: TokenTypes.KEYMANONLY,          nodeType: NodeTypes.KEYMANONLY},
+    {tokenType: TokenTypes.KEYMANWEB,           nodeType: NodeTypes.KEYMANWEB},
+    {tokenType: TokenTypes.KMFL,                nodeType: NodeTypes.KMFL},
     {tokenType: TokenTypes.KMW_EMBEDCSS,        nodeType: NodeTypes.KMW_EMBEDCSS},
     {tokenType: TokenTypes.KMW_EMBEDJS,         nodeType: NodeTypes.KMW_EMBEDJS},
     {tokenType: TokenTypes.KMW_HELPFILE,        nodeType: NodeTypes.KMW_HELPFILE},
@@ -258,6 +262,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.USE,                 nodeType: NodeTypes.USE},
     {tokenType: TokenTypes.VERSION,             nodeType: NodeTypes.VERSION},
     {tokenType: TokenTypes.VISUALKEYBOARD,      nodeType: NodeTypes.VISUALKEYBOARD},
+    {tokenType: TokenTypes.WEAVER,              nodeType: NodeTypes.WEAVER},
     {tokenType: TokenTypes.WINDOWSLANGUAGES,    nodeType: NodeTypes.WINDOWSLANGUAGES},
   ];
 
