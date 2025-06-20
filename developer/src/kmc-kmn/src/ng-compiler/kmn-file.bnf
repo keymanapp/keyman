@@ -6,7 +6,7 @@ content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
-  DECIMAL|HEXADECIMAL|OCTAL|NUL
+  DECIMAL|HEXADECIMAL|OCTAL|NUL|deadKeyStatement
 textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* KEY_CODE RIGHT_SQ
@@ -26,7 +26,7 @@ lhsBlock: MATCH|NOMATCH|inputBlock
 inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 keystroke: PLUS inputElement+
-inputElement: anyStatement|notAnyStatement|deadKeyStatement|contextStatement|text
+inputElement: anyStatement|notAnyStatement|contextStatement|text
 anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
 notAnyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement

@@ -1268,7 +1268,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(notAnyNode);
       assert.isNotNull(notAnyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
-    it("can parse correctly (deadKey)", () => {
+    it("can parse correctly (deadKey [as text])", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const inputElement: Rule = new InputElementRule();
       assert.isTrue(inputElement.parse(root));
@@ -1711,7 +1711,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(resetNode);
       assert.isNotNull(resetNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
-    it("can parse correctly (deadkey statement)", () => {
+    it("can parse correctly (deadkey statement [as text])", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));

@@ -97,6 +97,7 @@ export class SimpleTextRule extends SingleChildRule {
     const hexadecimal: Rule   = new TokenRule(TokenTypes.HEXADECIMAL, true);
     const octal: Rule         = new TokenRule(TokenTypes.OCTAL, true);
     const nul: Rule           = new TokenRule(TokenTypes.NUL, true);
+    const deadKey: Rule       = new DeadKeyStatementRule();
     this.rule = new AlternateRule([
       stringRule,
       virtualKey,
@@ -107,6 +108,7 @@ export class SimpleTextRule extends SingleChildRule {
       hexadecimal,
       octal,
       nul,
+      deadKey,
     ]);
   }
 }
@@ -464,12 +466,9 @@ export class InputElementRule extends SingleChildRule {
     super();
     const any: Rule              = new AnyStatementRule();
     const notAny: Rule           = new NotAnyStatementRule();
-    const deadKey: Rule          = new DeadKeyStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
     const text: Rule             = new TextRule();
-    this.rule = new AlternateRule([
-      any, notAny, deadKey, contextStatement, text,
-    ]);
+    this.rule = new AlternateRule([any, notAny, contextStatement, text]);
   }
 }
 
@@ -706,7 +705,6 @@ export class OutputStatementRule extends SingleChildRule {
     const setNormalStore: Rule   = new SetNormalStoreRule();
     const saveStatement: Rule    = new SaveStatementRule();
     const resetStore: Rule       = new ResetStoreRule();
-    const deadKeyStatement: Rule = new DeadKeyStatementRule();
     const setSystemStore: Rule   = new SetSystemStoreRule();
     const layerStatement: Rule   = new LayerStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
@@ -721,7 +719,6 @@ export class OutputStatementRule extends SingleChildRule {
       setNormalStore,
       saveStatement,
       resetStore,
-      deadKeyStatement,
       setSystemStore,
       layerStatement,
       indexStatement,
