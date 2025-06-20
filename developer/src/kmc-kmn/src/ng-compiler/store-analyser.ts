@@ -8,7 +8,7 @@
  * System and Variable Store Rules
  */
 
-import { TextRule } from "./kmn-analyser.js";
+import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
@@ -134,15 +134,15 @@ export class NormalStoreNameRule extends SingleChildRule {
       super();
       const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
       const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
-      this.rule = new AlternateRule([parameter, octal]);
+      const permittedKeyword: Rule = new PermittedKeywordRule();
+      this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
     }
 
     public parse(node: ASTNode): boolean {
       const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
       const parseSuccess: boolean = this.rule.parse(tmp);
       if (parseSuccess) {
-        const child = tmp.getSoleChild();
-        node.addToken(NodeTypes.STORENAME, child.token);
+        node.addToken(NodeTypes.STORENAME, tmp.getSoleChild().token);
       }
       return parseSuccess;
     };

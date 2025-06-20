@@ -17,7 +17,9 @@ beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE LEFT_BR groupName RIGHT_BR
 groupName: PARAMETER|OCTAL|permittedKeyword
-permittedKeyword: NEWCONTEXT|POSTKEYSTROKE
+permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|CAPS|CONTEXT|FREES|KEYS|
+  MATCH|NEWCONTEXT|NOMATCH|NUL|OFF|ON|ONLY|POSTKEYSTROKE|
+  READONLY|RETURN|SHIFT|UNICODE|USING
 groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
@@ -58,7 +60,7 @@ systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
 normalStoreAssign: normalStore text+
 normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
-normalStoreName: PARAMETER|OCTAL
+normalStoreName: PARAMETER|OCTAL|permittedKeyword
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER

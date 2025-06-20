@@ -9,6 +9,7 @@
 import { Token } from "./lexer.js";
 
 export enum NodeTypes {
+  ALWAYS                = "ALWAYS",
   ANSI                  = "ANSI",
   ANY                   = "ANY",
   BASELAYOUT            = "BASELAYOUT",
@@ -28,6 +29,7 @@ export enum NodeTypes {
   DISPLAYMAP            = "DISPLAYMAP",
   EQUAL                 = "EQUAL",
   ETHNOLOGUECODE        = "ETHNOLOGUECODE",
+  FREES                 = "FREES",
   GROUP                 = "GROUP",
   GROUPNAME             = "GROUPNAME",
   HANGUL                = "HANGUL",
@@ -42,6 +44,7 @@ export enum NodeTypes {
   KEYMAN                = "KEYMAN",
   KEYMANONLY            = "KEYMANONLY",
   KEYMANWEB             = "KEYMANWEB",
+  KEYS                  = "KEYS",
   KEYSTROKE             = "KEYSTROKE",
   KMFL                  = "KMFL",
   KMW_EMBEDCSS          = "KMW_EMBEDCSS",
@@ -68,8 +71,11 @@ export enum NodeTypes {
   NOTANY                = "NOTANY",
   NUL                   = "NUL",
   OCTAL                 = "OCTAL",
+  OFF                   = "OFF",
   OFFSET                = "OFFSET",
   OLDLAYER              = "OLDLAYER",
+  ON                    = "ON",
+  ONLY                  = "ONLY",
   OUTS                  = "OUTS",
   PARAMETER             = "PARAMETER",
   PLATFORM              = "PLATFORM",
@@ -93,6 +99,7 @@ export enum NodeTypes {
   U_CHAR                = "U_CHAR",
   UNICODE               = "UNICODE",
   USE                   = "USE",
+  USING                 = "USING",
   USING_KEYS            = "USING_KEYS",
   VERSION               = "VERSION",
   VIRTUAL_KEY           = "VIRTUAL_KEY",

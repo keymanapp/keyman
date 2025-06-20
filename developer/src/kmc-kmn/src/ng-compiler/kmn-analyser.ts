@@ -347,8 +347,27 @@ export class GroupNameRule extends SingleChildRule {
 export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
     super([
+      TokenTypes.CAPS,
+      TokenTypes.ALWAYS,
+      TokenTypes.OFF,
+      TokenTypes.ON,
+      TokenTypes.ONLY,
+      TokenTypes.SHIFT,
+      TokenTypes.FREES,
+      TokenTypes.BEEP,
+      TokenTypes.BEGIN,
+      TokenTypes.CONTEXT,
+      TokenTypes.MATCH,
+      TokenTypes.NOMATCH,
+      TokenTypes.NUL,
+      TokenTypes.RETURN,
+      TokenTypes.UNICODE,
       TokenTypes.NEWCONTEXT,
       TokenTypes.POSTKEYSTROKE,
+      TokenTypes.ANSI,
+      TokenTypes.READONLY,
+      TokenTypes.USING,
+      TokenTypes.KEYS,
     ], true);
   }
 }

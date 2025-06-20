@@ -762,17 +762,36 @@ describe("KMN Analyser Tests", () => {
       const permittedKeyword: Rule = new PermittedKeywordRule();
       assert.isNotNull(permittedKeyword);
     });
-    it("can parse correctly (newcontext)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
-      const permittedKeyword: Rule = new PermittedKeywordRule();
-      assert.isTrue(permittedKeyword.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NEWCONTEXT));
-    });
-    it("can parse correctly (postkeystroke)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('postkeystroke');
-      const permittedKeyword: Rule = new PermittedKeywordRule();
-      assert.isTrue(permittedKeyword.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.POSTKEYSTROKE));
+    it("can parse correctly", () => {
+      [
+        {input: 'always',        nodeType: NodeTypes.ALWAYS},
+        {input: 'ansi',          nodeType: NodeTypes.ANSI},
+        {input: 'beep',          nodeType: NodeTypes.BEEP},
+        {input: 'begin',         nodeType: NodeTypes.BEGIN},
+        {input: 'caps',          nodeType: NodeTypes.CAPS},
+        {input: 'context',       nodeType: NodeTypes.CONTEXT},
+        {input: 'frees',         nodeType: NodeTypes.FREES},
+        {input: 'keys',          nodeType: NodeTypes.KEYS},
+        {input: 'match',         nodeType: NodeTypes.MATCH},
+        {input: 'newcontext',    nodeType: NodeTypes.NEWCONTEXT},
+        {input: 'nomatch',       nodeType: NodeTypes.NOMATCH},
+        {input: 'nul',           nodeType: NodeTypes.NUL},
+        {input: 'off',           nodeType: NodeTypes.OFF},
+        {input: 'on',            nodeType: NodeTypes.ON},
+        {input: 'only',          nodeType: NodeTypes.ONLY},
+        {input: 'postkeystroke', nodeType: NodeTypes.POSTKEYSTROKE},
+        {input: 'readonly',      nodeType: NodeTypes.READONLY},
+        {input: 'return',        nodeType: NodeTypes.RETURN},
+        {input: 'shift',         nodeType: NodeTypes.SHIFT},
+        {input: 'unicode',       nodeType: NodeTypes.UNICODE},
+        {input: 'using',         nodeType: NodeTypes.USING},
+      ].forEach((testCase) => {
+        Rule.tokenBuffer = stringToTokenBuffer(testCase.input);
+        const permittedKeyword: Rule = new PermittedKeywordRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(permittedKeyword.parse(root));
+        assert.isNotNull(root.getSoleChildOfType(testCase.nodeType), `${testCase.input}`);
+      });
     });
   });
   describe("GroupStatementRule Tests", () => {
@@ -1989,7 +2008,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(productionNodes.length, 268);
       //assert.equal(root.toString(), '');
     });
-    it("can parse Khmer Angkor correctly", () => {
+    it("can parse Khmer Angkor correctly (round trip text)", () => {
       const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
       Rule.tokenBuffer = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
@@ -2160,7 +2179,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-      ].splice(0, 7).forEach((name) => {
+      ].splice(0, 10).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();

@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, ShiftFreesCapsRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
+import { CapsAlwaysOffRule, CapsOnOnlyRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
 import { SetSystemStoreRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -282,16 +282,41 @@ describe("KMN Store Analyser Tests", () => {
   describe("NormalStoreRule Tests", () => {
     it("can construct a NormalStoreRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const variableStore: Rule = new NormalStoreRule();
-      assert.isNotNull(variableStore);
+      const normalStore: Rule = new NormalStoreRule();
+      assert.isNotNull(normalStore);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(digit)');
-      const variableStore: Rule = new NormalStoreRule();
-      assert.isTrue(variableStore.parse(root));
+      const normalStore: Rule = new NormalStoreRule();
+      assert.isTrue(normalStore.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE);
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.STORENAME));
+    });
+  });
+  describe("NormalStoreNameRule Tests", () => {
+    it("can construct a NormalStoreNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const normalStoreName: Rule = new NormalStoreNameRule();
+      assert.isNotNull(normalStoreName);
+    });
+    it("can parse correctly (parameter)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('main');
+      const normalStoreName: Rule = new NormalStoreNameRule();
+      assert.isTrue(normalStoreName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'main');
+    });
+    it("can parse correctly (octal)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('1');
+      const normalStoreName: Rule = new NormalStoreNameRule();
+      assert.isTrue(normalStoreName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), '1');
+    });
+    it("can parse correctly (permitted keyword)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('newcontext');
+      const normalStoreName: Rule = new NormalStoreNameRule();
+      assert.isTrue(normalStoreName.parse(root));
+      assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'newcontext');
     });
   });
   describe("SetNormalStoreRule Tests", () => {

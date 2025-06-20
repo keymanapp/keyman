@@ -186,6 +186,7 @@ export class TokenRule extends Rule {
   }
 
   private static tokenToNode = [
+    {tokenType: TokenTypes.ALWAYS,              nodeType: NodeTypes.ALWAYS},
     {tokenType: TokenTypes.ANSI,                nodeType: NodeTypes.ANSI},
     {tokenType: TokenTypes.ANY,                 nodeType: NodeTypes.ANY},
     {tokenType: TokenTypes.BASELAYOUT,          nodeType: NodeTypes.BASELAYOUT},
@@ -205,6 +206,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.DISPLAYMAP,          nodeType: NodeTypes.DISPLAYMAP},
     {tokenType: TokenTypes.EQUAL,               nodeType: NodeTypes.EQUAL},
     {tokenType: TokenTypes.ETHNOLOGUECODE,      nodeType: NodeTypes.ETHNOLOGUECODE},
+    {tokenType: TokenTypes.FREES,               nodeType: NodeTypes.FREES},
     {tokenType: TokenTypes.GROUP,               nodeType: NodeTypes.GROUP},
     {tokenType: TokenTypes.HANGUL,              nodeType: NodeTypes.HANGUL},
     {tokenType: TokenTypes.HEXADECIMAL,         nodeType: NodeTypes.HEXADECIMAL},
@@ -217,6 +219,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.KEYMAN,              nodeType: NodeTypes.KEYMAN},
     {tokenType: TokenTypes.KEYMANONLY,          nodeType: NodeTypes.KEYMANONLY},
     {tokenType: TokenTypes.KEYMANWEB,           nodeType: NodeTypes.KEYMANWEB},
+    {tokenType: TokenTypes.KEYS,                nodeType: NodeTypes.KEYS},
     {tokenType: TokenTypes.KMFL,                nodeType: NodeTypes.KMFL},
     {tokenType: TokenTypes.KMW_EMBEDCSS,        nodeType: NodeTypes.KMW_EMBEDCSS},
     {tokenType: TokenTypes.KMW_EMBEDJS,         nodeType: NodeTypes.KMW_EMBEDJS},
@@ -241,7 +244,10 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.NUL,                 nodeType: NodeTypes.NUL},
     {tokenType: TokenTypes.NEWLINE,             nodeType: NodeTypes.LINE},
     {tokenType: TokenTypes.OCTAL,               nodeType: NodeTypes.OCTAL},
+    {tokenType: TokenTypes.OFF,                 nodeType: NodeTypes.OFF},
     {tokenType: TokenTypes.OLDLAYER,            nodeType: NodeTypes.OLDLAYER},
+    {tokenType: TokenTypes.ON,                  nodeType: NodeTypes.ON},
+    {tokenType: TokenTypes.ONLY,                nodeType: NodeTypes.ONLY},
     {tokenType: TokenTypes.OUTS,                nodeType: NodeTypes.OUTS},
     {tokenType: TokenTypes.PARAMETER,           nodeType: NodeTypes.PARAMETER},
     {tokenType: TokenTypes.PLATFORM,            nodeType: NodeTypes.PLATFORM},
@@ -260,6 +266,7 @@ export class TokenRule extends Rule {
     {tokenType: TokenTypes.U_CHAR,              nodeType: NodeTypes.U_CHAR},
     {tokenType: TokenTypes.UNICODE,             nodeType: NodeTypes.UNICODE},
     {tokenType: TokenTypes.USE,                 nodeType: NodeTypes.USE},
+    {tokenType: TokenTypes.USING,               nodeType: NodeTypes.USING},
     {tokenType: TokenTypes.VERSION,             nodeType: NodeTypes.VERSION},
     {tokenType: TokenTypes.VISUALKEYBOARD,      nodeType: NodeTypes.VISUALKEYBOARD},
     {tokenType: TokenTypes.WEAVER,              nodeType: NodeTypes.WEAVER},
