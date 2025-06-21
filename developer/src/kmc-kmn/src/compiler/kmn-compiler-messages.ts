@@ -1,7 +1,7 @@
 import { KeyAddress } from "../kmw-compiler/validate-layout-file.js";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls, ObjectWithCompileContext } from "@keymanapp/developer-utils";
-
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
@@ -107,8 +107,8 @@ export class KmnCompilerMessages {
   );
 
   static FATAL_UnicodeSetOutOfRange = SevFatal | 0x904;
-  static Fatal_UnicodeSetOutOfRange = (x?: ObjectWithCompileContext) => mx(
-    this.FATAL_UnicodeSetOutOfRange, x,
+  static Fatal_UnicodeSetOutOfRange = (compileContext?: ObjectWithCompileContext) => mx(
+    this.FATAL_UnicodeSetOutOfRange, compileContext,
     `UnicodeSet buffer was too small`,
     `Raised when caller to UnicodeSet functions provides an invalid buffer. If
     you experience this error, it should be reported to the Keyman team for
@@ -118,8 +118,8 @@ export class KmnCompilerMessages {
   // TODO: rename the following functions to Error_UsetHasStrings etc
 
   static ERROR_UnicodeSetHasStrings = SevError | 0x905;
-  static Error_UnicodeSetHasStrings = (x?: ObjectWithCompileContext) => mx(
-    this.ERROR_UnicodeSetHasStrings, x,
+  static Error_UnicodeSetHasStrings = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetHasStrings, compileContext,
     `uset contains strings, not allowed`,
     `The provided uset uses multi-character strings, (\`{}\` notation, e.g.
     \`[żġħ{ie}{għ}]\`. ). Although full UnicodeSets support strings, LDML
@@ -130,8 +130,8 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetHasProperties = SevError | 0x906;
-  static Error_UnicodeSetHasProperties = (x?: ObjectWithCompileContext) => mx(
-    this.ERROR_UnicodeSetHasProperties, x,
+  static Error_UnicodeSetHasProperties = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetHasProperties, compileContext,
     `uset contains properties, not allowed`,
     `The provided uset uses property notation (\`\\p{…}\` or \`[:…:]\`). LDML
     keyboards do not support Unicode properties in usets, because that would
@@ -142,8 +142,8 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetSyntaxError = SevError | 0x907;
-  static Error_UnicodeSetSyntaxError = (x?: ObjectWithCompileContext) => mx(
-    this.ERROR_UnicodeSetSyntaxError, x,
+  static Error_UnicodeSetSyntaxError = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetSyntaxError, compileContext,
     `uset had a Syntax Error while parsing`,
     `The provided uset has a syntax error and could not be parsed. Verify the
     format of the uset against the specification.

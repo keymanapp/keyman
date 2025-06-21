@@ -1,5 +1,5 @@
 import { CompilerCallbacks } from "./compiler-callbacks.js";
-import { ObjectWithCompileContext } from "./symbol-utils.js";
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 import { KeymanXMLReader, XML_FILENAME_SYMBOL } from "./xml-utils.js";
 
 /**
@@ -215,9 +215,9 @@ export class CompilerError {
    * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
    * @returns modified event object
    */
-  public static setFromMetadata(event: CompilerEvent, x?: ObjectWithCompileContext): CompilerEvent {
-    if(x) {
-      const metadata = KeymanXMLReader.getMetaData(x) || {};
+  public static setFromMetadata(event: CompilerEvent, compileContext?: ObjectWithCompileContext): CompilerEvent {
+    if (compileContext) {
+      const metadata = KeymanXMLReader.getMetaData(compileContext) || {};
       const offset = metadata?.startIndex;
       if (offset) {
         event.offset = offset;
@@ -458,8 +458,8 @@ export function dedentCompilerMessageDetail(event: CompilerEvent) {
  *  //      it contains redundant info.
  *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
  *  //      with `${def(o.property)}` as the max complexity of interpolation.
- *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithCompileContext) => mx(
- *    this.ERROR_InvalidScanCode, x,
+ *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, compileContext: ObjectWithCompileContext) => mx(
+ *    this.ERROR_InvalidScanCode, compileContext,
  *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
  *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
  *  `…additional markdown detail…`

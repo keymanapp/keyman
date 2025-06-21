@@ -1,6 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
-import { LDMLKeyboard, ObjectWithCompileContext } from '@keymanapp/developer-utils';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
 import { SectionCompiler } from "./section-compiler.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
@@ -71,7 +72,7 @@ export class LocaCompiler extends SectionCompiler {
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
     const canonicalLocales = (Intl as any).getCanonicalLocales(locales) as string[];
-    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale, {x: this.contextForLocale(locale)}));
+    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale, {compileContext: this.contextForLocale(locale)}));
 
     if(result.locales.length < locales.length) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales(this.keyboard3?.locales));

@@ -6,13 +6,7 @@
  * Utilities for manipulating Symbol properties
  */
 
-
-/**
- * Any object with metadata, for example for line number errs.
- * Defined as 'any' here to reduce noise on the client side.
- * @see {@link KeymanXMLReader.getMetaData()}
- */
-export type ObjectWithCompileContext = any;
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 
 export class SymbolUtils {
   /**
