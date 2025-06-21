@@ -364,6 +364,7 @@ export class KeymanXMLWriter {
  * traverse an AJV instancePath and map to an object if possible
  * @param source object tree root (contains the root object)
  * @param path ajv split instancePath, such as '/keyboard3/layers/0'.split('/')
+ * @returns undefined if the path was not present, null if path went to something that wasn't an object, otherwise the compileContext object is returned.
  */
 export function findInstanceObject(source: any, path: string[]) : any {
   if(!path || !source || path.length == 0) {
