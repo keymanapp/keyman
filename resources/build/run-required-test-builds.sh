@@ -19,7 +19,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Run test builds for the given pull request/primary branch" \
   "--dry-run,-n       Only report back which builds would be started" \
-  "--branch,-b=PRNUM  Branch (master,beta) or pull-request to test"
+  "--branch,-b=PRNUM  Branch (master,beta,stable-x.y) or pull-request to test"
 
 if [[ $# -eq 1 ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
   # For transitional period, when build configuration on TC needs to support
@@ -110,7 +110,7 @@ function triggerTestBuilds() {
 #
 
 if [[ ! "$PRNUM" =~ ^[[:digit:]]+$ ]]; then
-  # branch name is 'master', 'beta' [, or 'stable' -- in the future]
+  # branch name is 'master', 'beta', or 'stable-x.y'
   builder_echo "Branch $PRNUM needs to pass tests on all platforms."
   triggerTestBuilds main_branch_platform_build_levels $PRNUM
   exit 0

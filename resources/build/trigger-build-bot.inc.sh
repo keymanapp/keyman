@@ -38,7 +38,7 @@ function test_bot_check_pr_body() {
 }
 
 #
-# Check PR commit messages for Build-bot commands Later commands override
+# Check PR commit messages for Build-bot commands. Later commands override
 # earlier ones. Also checks PR body for any overriding commands. Note, only
 # checks the first 250 commits, so later build commands will be ignored; in this
 # situation, use the PR body command. Also ignores build commands in PR
@@ -77,15 +77,15 @@ function build_bot_check_messages() {
     buildBotCommands+=("${prCommands[@]}")
   fi
 
-  # We now know that our command has only a-z, comma and space, so we can parse
-  # without risking escaping our bash jail
-
   for buildBotCommand in "${buildBotCommands[@]}"; do
     # Block illegal Build-bot: commands
     if [[ ! "$buildBotCommand" =~ ^[a-z,\ ]+$ ]]; then
       builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
       continue
     fi
+
+    # We now know that our command has only a-z, comma and space, so we can
+    # parse without risking escaping our bash jail
 
     if [[ ! -z "${buildBotCommand// }" ]]; then
       build_bot_update_commands $buildBotCommand
@@ -97,8 +97,9 @@ function build_bot_check_messages() {
 
 #
 # parses a 'Build-bot: <level> [platform...]' command and modifies
-# the global build_platforms associative array with new levels
-# note that this function assumes that inputs are sanitized, see
+# the global build_platforms associative array with new levels.
+#
+# Note that this function assumes that inputs are sanitized, see
 # build_bot_check_messages
 #
 function build_bot_update_commands() {

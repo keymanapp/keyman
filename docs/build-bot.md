@@ -29,6 +29,59 @@ Or you may want to ensure that an artifact is built for Windows:
 Build-bot: release windows
 ```
 
+## Build Level
+
+The build level specifies what we want to be run for a test build on a PR.
+
+There is a bit of nomenclature overlap with a 'release build'. A 'release'
+buildLevel for a 'test build' is roughly equivalent to what is performed in a
+'release build', however, a test build is only ever uploaded to test endpoints
+(i.e. TestFlight, Play Store 'test' streams), and never to *.keyman.com, or to
+other release distribution endpoints.
+
+The build level is controlled by the Build-bot commit trailer and PR body
+Build-bot/Test-bot trailers. The default build level will be 'build'.
+
+For target branch builds, the build level will always be 'build', and Build-bot:
+commit trailers are ignored.
+
+### 'skip' build level
+
+Don't do a build at all. This would be appropriate for documentation PRs, for
+example, or changes only to comments in source files.
+
+### 'build' build level
+
+Build the code and run unit tests, but don't create artifacts. What this looks
+like will vary from platform to platform, but there are some common things we
+won't do:
+* we won't upload artifacts to TeamCity or *.keyman.com
+* we won't upload artifacts to any endpoint such as Play Store
+* we won't upload symbols to Sentry
+* we won't codesign
+
+However, we _will_ still build an installer (skipping codesigning), as this is
+part of the 'build' buildLevel rather than the 'release' buildLevel. The
+installer will be thrown away for 'build' build level -- it will not be
+available for download as an artifact.
+
+For a platform-specific example, on macOS we will also skip notarizing, as this
+is costly and depends on external network resources, making it fragile.
+
+### 'release' build level
+
+A full test build will be run, roughly equivalent to a release build. We will do
+the following steps:
+* codesign (many platforms) and notarization (macOS)
+* upload artifacts to TeamCity (all platforms)
+* upload builds to TestFlight / Play Store 'test' endpoints (iOS/Android)
+* upload symbols to Sentry
+
+For a 'release' build level:
+* we won't upload artifacts to *.keyman.com
+* we won't upload artifacts to any release endpoint such as Debian,
+  packages.sil.org, etc, or to the release areas for Play Store or App Store
+
 ## Controlling the build bot with trailers
 
 The build bot respects commit trailers and trailers in the PR body. The commands
@@ -81,56 +134,6 @@ Note that other platforms are still 'skip' but not included in the build set.
 Finally, the PR author pushes another commit, with `Build-bot: release windows`.
 The build set is now: `(android:skip ios:skip windows:release)`.
 
-## Build Level
-
-The build level specifies what we want to be run for a test build on a PR.
-
-There is a bit of nomenclature overlap with a 'release build'. A 'release'
-buildLevel for a 'test build' is roughly equivalent to what is performed in a
-'release build', however, a test build is only ever uploaded to test endpoints
-(i.e. TestFlight, Play Store 'test' streams), and never to *.keyman.com, or to
-other release distribution endpoints.
-
-The build level is controlled by the Build-bot commit trailer and PR body
-Build-bot/Test-bot trailers. The default build level will be 'build'.
-
-For target branch builds, the build level will always be 'build', and Build-bot:
-commit trailers are ignored.
-
-### 'skip' build level
-
-Don't do a build at all. This would be appropriate for documentation PRs, for
-example, or changes only to comments in source files.
-
-### 'build' build level
-
-Build the code and run unit tests, but don't create artifacts. What this looks
-like will vary from platform to platform, but there are some common things we
-won't do:
-* we won't upload artifacts to TeamCity or *.keyman.com
-* we won't upload artifacts to any endpoint such as Play Store
-* we won't upload symbols to Sentry
-* we won't codesign
-
-However, we _will_ still build an installer (skipping codesigning), as this is
-part of the 'build' buildLevel rather than the 'release' buildLevel.
-
-For a platform-specific example, on macOS we will also skip notarizing, as this
-is costly and depends on external network resources, making it fragile.
-
-### 'release' build level
-
-A full test build will be run, roughly equivalent to a release build. We will do
-the following steps:
-* codesign (many platforms) and notarization (macOS)
-* upload artifacts to TeamCity (all platforms)
-* upload builds to TestFlight / Play Store 'test' endpoints (iOS/Android)
-* upload symbols to Sentry
-
-For a 'release' build level:
-* we won't upload artifacts to *.keyman.com
-* we won't upload artifacts to any release endpoint such as Debian,
-  packages.sil.org, etc, or to the release areas for Play Store or App Store
 
 
 [Build Level]: #Build_Level

@@ -28,6 +28,10 @@ test_build_bot_check_messages() {
   _do_test_build_bot_check_messages_file 14013 "[windows]=release" "$ALL_BUILD_PLATFORMS_SKIP_EXPECTED"
   # Simplified data for testing Build-bot command sequences only
   _do_test_build_bot_check_messages_file 9999 "[windows]=release" '[windows]="skip" [developer]="release"'
+
+  # test another sequence of commands
+  _do_test_build_bot_check_messages_inline 8 "[windows]=release" '[common]="release" [windows]="skip" [developer]="build"' '{ "body": "Build-bot: skip windows\nBuild-bot: build developer\nBuild-bot: release common" }' '[]'
+
   # Test some bad inputs
   _do_test_build_bot_check_messages_inline 1 "[windows]=release" '[windows]="release"' '{}' '[{ "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
   # empty body, 'foo windows' in commit

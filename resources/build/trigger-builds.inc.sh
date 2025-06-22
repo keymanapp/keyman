@@ -32,8 +32,12 @@ function triggerReleaseBuilds() {
 # Trigger a build on TeamCity
 #
 # Parameters:
-#   1: 'true' if this is for a PR branch, otherwise 'false' (for master/beta/stable-x.y)
-#   2: 'skip' - don't run build; 'build' - run build and unit tests; 'release' - run build, unit tests, and deploy
+#   1: isTestBuild: 'true' if this is for a PR branch or a test build
+#                   for a primary branch; false is this is a release
+#                   build for a primary branch (master/beta/stable-x.y)
+#   2: buildLevel:  'skip' - don't run build;
+#                   'build' - run build and unit tests;
+#                   'release' - run build, unit tests, and deploy
 #   3: TeamCity build configuration name
 #   4: TeamCity VCS id, which is different for PR test configurations
 #   5: branch name in git
