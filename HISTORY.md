@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.67 alpha 2025-06-22
+
+* chore(developer): ldml: additional line numbers (#14104)
+
 ## 19.0.66 alpha 2025-06-16
 
 * fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult  enum (#14123)
