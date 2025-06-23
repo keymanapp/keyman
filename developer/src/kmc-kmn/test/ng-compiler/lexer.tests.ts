@@ -144,6 +144,30 @@ describe("Lexer Tests", () => {
     it("can recognise a CLEARCONTEXT token", () => {
       recogniseToken(TokenTypes.CLEARCONTEXT, 'clearcontext');
     });
+    it("can recognise a BITMAP_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.BITMAP_HEADER, 'bitmap');
+    });
+    it("can recognise a COPYRIGHTP_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.COPYRIGHT_HEADER, 'copyright');
+    });
+    it("can recognise a HOTKEY_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.HOTKEY_HEADER, 'hotkey');
+    });
+    it("can recognise a LANGUAGE_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.LANGUAGE_HEADER, 'language');
+    });
+    it("can recognise a LAYOUT_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.LAYOUT_HEADER, 'layout');
+    });
+    it("can recognise a MESSAGE_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.MESSAGE_HEADER, 'message');
+    });
+    it("can recognise a NAME_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.NAME_HEADER, 'name');
+    });
+    it("can recognise a VERSION_HEADER token", () => {
+      recogniseTokenFollowedBySpace(TokenTypes.VERSION_HEADER, 'version');
+    });
     it("can recognise a BASELAYOUT_SHORTCUT token", () => {
       recogniseTokenFollowedByLeftBracket(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
     });
