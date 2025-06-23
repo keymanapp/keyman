@@ -2133,7 +2133,6 @@ describe("KMN Analyser Tests", () => {
         'experimental/e/elymaic/source/elymaic',
         'experimental/f/finongan/source/finongan',
         'experimental/g/gaahmg/source/gaahmg',
-        'experimental/gff/gff_geez_emufi/extras/gff_geez_emufi-pua',
         'experimental/gff/gff_geez_emufi/source/gff_geez_emufi',
         'experimental/gff/gff_sbs/source/gff_sbs',
         'experimental/i/ife_mn/source/ife_mn',
@@ -2221,7 +2220,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-      ].splice(0, 12).forEach((name) => {
+      ].splice(0, 34).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
