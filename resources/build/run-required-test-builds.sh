@@ -21,7 +21,7 @@ builder_describe "Run test builds for the given pull request/primary branch" \
   "--dry-run,-n       Only report back which builds would be started" \
   "--branch,-b=PRNUM  Branch (master,beta,stable-x.y) or pull-request to test"
 
-if [[ $# -eq 1 ]] && [[ "$1" =~ ^[0-9]+$ ]]; then
+if [[ $# -eq 1 ]] && [[ "$1" =~ ^([0-9]+|master|beta|stable-[0-9]+\.[0-9]+)$ ]]; then
   # For transitional period, when build configuration on TC needs to support
   # both forms, we will pass a modified set of params to builder_parse
   #
