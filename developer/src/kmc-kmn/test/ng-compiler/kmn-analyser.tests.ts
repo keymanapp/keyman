@@ -627,6 +627,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(outsNode);
       assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
     });
+    it("can parse correctly (system store)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('outs(&keyboardversion)');
+      const outsStatement: Rule = new OutsStatementRule();
+      assert.isTrue(outsStatement.parse(root));
+      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
+      assert.isNotNull(outsNode);
+      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
+    });
   });
   describe("RuleBlockRule Tests", () => {
     it("can construct a RuleBlockRule", () => {
@@ -2183,7 +2191,7 @@ describe("KMN Analyser Tests", () => {
         'experimental/w/wakhi_standard/source/wakhi_standard',
         'experimental/w/wancho/source/wancho',
         'experimental/w/wenchow/source/wenchow',
-        'experimental/w/winchus/source/winchus',
+     // 'experimental/w/winchus/source/winchus', no longer in repository
         'legacy/gff/gff_awn_7/archive/gff-awn-7',
         'legacy/gff/gff_bcq_7/archive/gff-bcq-7',
         'legacy/gff/gff_byn_7/archive/gff-byn-7',
@@ -2220,7 +2228,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-      ].splice(0, 34).forEach((name) => {
+      ].splice(0, 62).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();

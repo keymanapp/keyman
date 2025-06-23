@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { CapsAlwaysOffRule, CapsOnOnlyRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
+import { CapsAlwaysOffRule, CapsOnOnlyRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, StoreNameRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
 import { SetSystemStoreRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -105,6 +105,12 @@ describe("KMN Store Analyser Tests", () => {
       const hotkeyNode = root.getSoleChildOfType(NodeTypes.HOTKEY)
       assert.isNotNull(hotkeyNode);
       assert.isNotNull(hotkeyNode.getSoleChildOfType(NodeTypes.VIRTUAL_KEY));
+    });
+    it("can parse correctly (no text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&bitmap)');
+      const systemStoreAssign: Rule = new SystemStoreAssignRule();
+      assert.isTrue(systemStoreAssign.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
     });
   });
   describe("SystemStoreRule Tests", () => {
@@ -278,6 +284,12 @@ describe("KMN Store Analyser Tests", () => {
       const virtualKeyNodes = storeNode.getChildrenOfType(NodeTypes.VIRTUAL_KEY);
       assert.equal(virtualKeyNodes.length, 35);
     });
+    it("can parse correctly (no text)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(c_key)');
+      const normalStoreAssign: Rule = new NormalStoreAssignRule();
+      assert.isTrue(normalStoreAssign.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.STORE));
+    });
   });
   describe("NormalStoreRule Tests", () => {
     it("can construct a NormalStoreRule", () => {
@@ -317,6 +329,13 @@ describe("KMN Store Analyser Tests", () => {
       const normalStoreName: Rule = new NormalStoreNameRule();
       assert.isTrue(normalStoreName.parse(root));
       assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'newcontext');
+    });
+  });
+  describe("StoreNameRule Tests", () => {
+    it("can construct a StoreNameRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const storeName: Rule = new StoreNameRule();
+      assert.isNotNull(storeName);
     });
   });
   describe("SetNormalStoreRule Tests", () => {

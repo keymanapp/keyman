@@ -9,7 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule } from "./store-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -226,14 +226,27 @@ abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   }
 }
 
-export class OutsStatementRule extends AbstractBracketedStoreNameStatementRule {
+export class OutsStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const outs: Rule = new TokenRule(TokenTypes.OUTS, true);
-    this.cmdNodeType = NodeTypes.OUTS;
+    const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const storeName: Rule    = new StoreNameRule();
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      outs, this.leftBracket, this.normalStoreName, this.rightBracket
+      outs, leftBracket, storeName, rightBracket
     ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const outsNode = tmp.removeSoleChildOfType(NodeTypes.OUTS);
+      outsNode.addChild(tmp.getSoleChild());
+      node.addChild(outsNode);
+    }
+    return parseSuccess;
   }
 }
 

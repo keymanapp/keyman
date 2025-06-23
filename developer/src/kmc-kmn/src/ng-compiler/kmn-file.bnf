@@ -12,7 +12,7 @@ rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 keyCode: KEY_CODE|STRING
-outsStatement: OUTS LEFT_BR normalStoreName RIGHT_BR
+outsStatement: OUTS LEFT_BR storeName RIGHT_BR
 ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
@@ -53,15 +53,16 @@ offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 
 # System and Variable Store Rules
-systemStoreAssign: systemStore text+
+systemStoreAssign: systemStore text*
 systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
 systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|
   KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|TARGETS|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
-normalStoreAssign: normalStore text+
+normalStoreAssign: normalStore text*
 normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
 normalStoreName: PARAMETER|OCTAL|permittedKeyword
+storeName: systemStoreName|normalStoreName
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER
