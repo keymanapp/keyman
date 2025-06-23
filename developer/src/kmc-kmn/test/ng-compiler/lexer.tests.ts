@@ -138,6 +138,12 @@ describe("Lexer Tests", () => {
     it("can recognise a FREES token", () => {
       recogniseToken(TokenTypes.FREES, 'frees');
     });
+    it("can recognise a FIX token", () => {
+      recogniseToken(TokenTypes.FIX, 'fix');
+    });
+    it("can recognise a CLEARCONTEXT token", () => {
+      recogniseToken(TokenTypes.CLEARCONTEXT, 'clearcontext');
+    });
     it("can recognise a BASELAYOUT_SHORTCUT token", () => {
       recogniseTokenFollowedByLeftBracket(TokenTypes.BASELAYOUT_SHORTCUT, 'baselayout');
     });
