@@ -1,0 +1,28 @@
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Do not modify the script in .github/workflows/pr-build-status.yml directly;
+# instead work on the sources in resources/build/pr-build-status and use the
+# build.sh script to rebuild the .github/workflows/pr-build-status.yml file from
+# them.
+#
+# build.sh will append the relevant portions of
+# resources/build/pr-build-status/pr-build-status.mjs to the content in
+# resources/build/pr-build-status/pr-build-status.prefix.yml to form the .github
+# workflow file.
+#
+name: Keyman Build Summary
+on:
+  check_run:
+    types: [completed]
+
+jobs:
+  run_pr_build_status:
+    name: Summarize build status checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR build status
+        id: run_pr_build_status_script
+        uses: actions/github-script@v7
+        with:
+          script: |
