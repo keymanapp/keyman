@@ -310,3 +310,18 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
     this.rule = new SequenceRule([shift, frees, caps]);
   }
 }
+
+export class HeaderNameRule extends AlternateTokenRule {
+  public constructor() {
+    super([
+      TokenTypes.BITMAP_HEADER,
+      TokenTypes.COPYRIGHT_HEADER,
+      TokenTypes.HOTKEY_HEADER,
+      TokenTypes.LANGUAGE_HEADER,
+      TokenTypes.LAYOUT_HEADER,
+      TokenTypes.MESSAGE_HEADER,
+      TokenTypes.NAME_HEADER,
+      TokenTypes.VERSION_HEADER,
+    ], true);
+  }
+}
