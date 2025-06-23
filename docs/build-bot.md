@@ -82,6 +82,8 @@ For a 'release' build level:
 * we won't upload artifacts to any release endpoint such as Debian,
   packages.sil.org, etc, or to the release areas for Play Store or App Store
 
+(uploading to *.keyman.com and to release endpoints happens in the release TC build config/GHA)
+
 ## Controlling the build bot with trailers
 
 The build bot respects commit trailers and trailers in the PR body. The commands
