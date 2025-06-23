@@ -93,7 +93,7 @@ jobs:
                 counts.pending ? 'pending' :
                 'success';
 
-              let description = ''; //;
+              let description = '';
               function appendDescription(count, state) {
                 if(!count) return;
                 if(description != '') description += '; ';
@@ -160,7 +160,6 @@ jobs:
             }
 
             async function updateCheck(github, owner, repo, checkRunId, status, description) {
-              // To ensure that
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
