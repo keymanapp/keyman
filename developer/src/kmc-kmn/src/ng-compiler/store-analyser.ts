@@ -311,6 +311,28 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
   }
 }
 
+export class HeaderAssignRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const headerName: Rule    = new HeaderNameRule();
+    const text: Rule          = new TextRule();
+    const oneOrManyText: Rule = new ManyRule(text);
+    this.rule = new SequenceRule([headerName, oneOrManyText]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const children: ASTNode[] = tmp.getChildren();
+      const headerNode: ASTNode = children.splice(0, 1)[0];
+      headerNode.addChildren(children);
+      node.addChild(headerNode);
+    }
+    return parseSuccess;
+  }
+}
+
 export class HeaderNameRule extends AlternateTokenRule {
   public constructor() {
     super([

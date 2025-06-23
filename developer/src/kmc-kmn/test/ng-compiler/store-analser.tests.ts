@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
-import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderNameRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, StoreNameRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
+import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, StoreNameRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';
 import { SetSystemStoreRule, SetNormalStoreRule, SystemStoreAssignRule, SystemStoreNameRule } from '../../src/ng-compiler/store-analyser.js';
 import { SystemStoreRule, NormalStoreAssignRule, NormalStoreRule } from '../../src/ng-compiler/store-analyser.js';
 
@@ -463,6 +463,32 @@ describe("KMN Store Analyser Tests", () => {
       const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
       assert.isTrue(shiftFreesCaps.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
+    });
+  });
+  describe("HeaderAssignRule Tests", () => {
+    it("can construct a HeaderAssignRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const systemStoreName: Rule = new HeaderAssignRule();
+      assert.isNotNull(systemStoreName);
+    });
+    it("can parse correctly", () => {
+      [
+        {code: 'bitmap',    nodeType: NodeTypes.BITMAP_HEADER},
+        {code: 'copyright', nodeType: NodeTypes.COPYRIGHT_HEADER},
+        {code: 'hotkey',    nodeType: NodeTypes.HOTKEY_HEADER},
+        {code: 'language',  nodeType: NodeTypes.LANGUAGE_HEADER},
+        {code: 'layout',    nodeType: NodeTypes.LAYOUT_HEADER},
+        {code: 'message',   nodeType: NodeTypes.MESSAGE_HEADER},
+        {code: 'name',      nodeType: NodeTypes.NAME_HEADER},
+        {code: 'version',   nodeType: NodeTypes.VERSION_HEADER},
+      ].forEach((testCase) => {
+        Rule.tokenBuffer = stringToTokenBuffer(`${testCase.code} "value"`);
+        const headerName: Rule = new HeaderAssignRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(headerName.parse(root));
+        const headerNode = root.getSoleChildOfType(testCase.nodeType);
+        assert.equal(headerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"value"');
+      });
     });
   });
   describe("HeaderNameRule Tests", () => {
