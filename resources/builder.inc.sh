@@ -2237,6 +2237,47 @@ builder_is_ci_test_build() {
   return 1
 }
 
+#
+# Returns 0 if current ci build is a release-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_release() {
+  if builder_is_ci_release_build; then
+    return 0
+  fi
+  if [[ "$KEYMAN_BUILD_LEVEL" == release ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current ci build is a build-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_build() {
+  if builder_is_ci_release_build; then
+    return 1
+  fi
+  if builder_is_ci_build_level_release; then
+    # KEYMAN_BUILD_LEVEL == release, i.e. not build
+    return 1
+  fi
+  return 0
+}
+
+#
+# Executes statement if a ci build level of 'release', and for local builds, but
+# not for a ci build level of 'build'
+#
+builder_if_release_build_level() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping - buildLevel=build: $@"
+    return 0
+  fi
+  "$@"
+}
+
 ################################################################################
 # Final initialization
 ################################################################################
