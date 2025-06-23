@@ -7,8 +7,8 @@ function assert-equal() {
   fi
 
   if [[ "$actual" != "$expected" ]]; then
-    builder_die "FAIL: ${message}expected actual '$actual' to equal expected '$expected'"
+    builder_die "  ✕ FAIL: ${message}actual result '$actual' should equal expected '$expected'"
   else
-    builder_echo green "PASS: ${message}expected actual '$actual' to be equal to expected '$expected'"
+    builder_echo green "  ✓ PASS: ${message}result '$actual' is correct"
   fi
 }
