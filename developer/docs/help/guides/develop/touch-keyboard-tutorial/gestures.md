@@ -2,7 +2,7 @@
 title: Using Gestures in Keyman Developer
 ---
 
-Keyman Developer offers **Longpress** keys, **Flicks**, and **Multitaps** for touch keyboard layout. To allow gestures onto your keyboard, go to the Touch layout tab and define the keys as followed:
+Keyman Developer offers **Longpress** keys, **Flicks**, and **Multitaps** for touch keyboard layout. To allow gestures onto your keyboard, go to the Touch layout tab and define the keys as follows:
 
 <img src="../../../images/touch-layout-gestures.jpg" alt="Keyman Developer touch layout gestures" width="70%"/>
 
