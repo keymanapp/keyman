@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.68 alpha 2025-06-24
+
+* maint(resources): Build-bot now available to control test builds (#14125)
+* maint(developer): support buildLevel (#14196)
+* fix(resources): allow branch names in run-required-test-builds shortcut call (#14217)
+* maint(resources): add pr-build-status GitHub Action to summarize build status (#14199)
+
 ## 19.0.67 alpha 2025-06-22
 
 * chore(developer): ldml: additional line numbers (#14104)
