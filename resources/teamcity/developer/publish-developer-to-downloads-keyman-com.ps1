@@ -48,7 +48,7 @@ mkdir ${upload_path}
 #
 # Build Keyman Compiler WINE archive
 #
-copy ..\release\${kmcomp_zip} ..\${upload_path}\${kmcomp_zip}
+copy release\${build_number}\${kmcomp_zip} ${upload_path}\${kmcomp_zip}
 
 #
 # Copy source files
