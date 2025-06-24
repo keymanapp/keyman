@@ -73,7 +73,7 @@ upload_help() {
   builder_echo start "upload help" "Uploading new ${PRODUCT} help to help.keyman.com"
 
   (
-    # shellcheck disable=SC2164
+    # shellcheck disable=SC2164,SC2154
     cd "${KEYMAN_ROOT}/resources/build"
     "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" "${PRODUCT_PATH}"
   )
