@@ -102,7 +102,7 @@ jobs:
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Checks have not yet been triggered ⌛'];
+                return ['pending', 'Builds have not yet been triggered ⌛'];
               }
 
               const state =
