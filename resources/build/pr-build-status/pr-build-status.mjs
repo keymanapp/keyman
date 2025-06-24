@@ -3,7 +3,7 @@
  *
  * Source script of pr-build-status.yml file for unit testing and development.
  * The indented section of this file below is copied verbatim into
- * .github/workflows/pr-build-status.yml by build.sh build, and allows us to
+ * .github/workflows/pr-build-status.yml by `build.sh build`, and allows us to
  * develop the YAML script without introducing a dependency on the repository.
  */
 
