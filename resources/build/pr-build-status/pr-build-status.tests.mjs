@@ -12,8 +12,8 @@ const commits = {
   '825f7d2df0069fa56a8f2a534b42a49ee1f21ca1': [ 'success', '24 checks completed successfully ✅' ],
   '870d37f56b489ef5067b4352a06505369d9038e0': [ 'error', '6 checks in an error state ❌; 17 checks completed successfully ✅' ],
   '11a558e926370253db37026c95b7ff5a6aa1e8fc': [ 'success', '22 checks completed successfully ✅' ],
-  '8fd5ccc9026b85d6a780d8bcf862380e7a89aefb': [ 'pending', 'Checks have not yet been triggered ⌛' ],
-  '153683cfb007c6066c9dcf71d25afa4c66efa17f': [ 'pending', 'Checks have not yet been triggered ⌛' ],
+  '8fd5ccc9026b85d6a780d8bcf862380e7a89aefb': [ 'pending', 'Builds have not yet been triggered ⌛' ],
+  '153683cfb007c6066c9dcf71d25afa4c66efa17f': [ 'pending', 'Builds have not yet been triggered ⌛' ],
 };
 
 // When adding new SHAs to test, run this to collect data from GitHub
