@@ -10,15 +10,12 @@
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
-import { KeylayoutToKmnConverter } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
-
-
 
   /**
    * @brief  member function to box single-entry objects into arrays
@@ -50,7 +47,6 @@ export class KeylayoutFileReader {
    */
   public read(inputFilename: string): Object {
 
-
     const options = {
       ignoreAttributes: false,
       trimValues: false,           // preserve spaces
@@ -58,7 +54,8 @@ export class KeylayoutFileReader {
     };
 
     try {
-      const xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
+      //const xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
+      const xmlFile = this.callbacks.fs.readFileSync(inputFilename, 'utf8');
       const parser = new XMLParser(options);
       const jsonObj = parser.parse(xmlFile);       // get plain Object
       this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields

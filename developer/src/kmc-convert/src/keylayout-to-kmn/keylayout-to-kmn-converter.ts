@@ -29,7 +29,6 @@ export class KeylayoutToKmnConverter {
   static readonly USED_KEYS_COUNT = 49;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly KMC_CONVERT_VERSION = "0.1";
 
   static readonly DATA_SUBFOLDER = 'data';
   static readonly TEST_SUBFOLDER = 'test';
@@ -71,11 +70,27 @@ export class KeylayoutToKmnConverter {
     }
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
+
     const out_text_ok: boolean = kmnFileWriter.write(outArray);
     if (!out_text_ok) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
       return null;
     }
+
+    /*const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
+    if (!out_Uint8) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+      return null;
+    }*/
+
+    /*const out_str: string = kmnFileWriter.writeToString(outArray);
+     if (!out_str) {
+       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+       return null;
+     }*/
+
+
+
     return null;
   }
 
@@ -84,7 +99,7 @@ export class KeylayoutToKmnConverter {
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an convert_object containing all data ready to print out
    */
-  public convert(jsonObj: any, outputfilename: string = ""): convert_object {
+  private convert(jsonObj: any, outputfilename: string = ""): convert_object {
 
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
     const rules: Rule[] = [];                          // an array of data for a kmn rule
@@ -407,6 +422,17 @@ export class KeylayoutToKmnConverter {
             }
           }
         } else {
+
+          /* QUESTION
+          // _S2 why does this not work here? Correct data in this.callback.messages is available !?!?!
+           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
+               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
+               key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']
+             }));
+           return null;*/
+
           console.log("ERROR : some output characters can not be used in Keyman \"",
             (jsonObj.keyboard['@_name'] + ".keylayout\""),
             "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
@@ -951,6 +977,11 @@ export class KeylayoutToKmnConverter {
     }
     return mapIndexArray_2D;
   }
+
+  /** @internal */
+  public convert_bound = {
+    convert: this.convert.bind(this),
+  };
 }
 
 /**

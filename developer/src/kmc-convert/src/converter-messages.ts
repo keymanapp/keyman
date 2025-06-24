@@ -46,4 +46,8 @@ export class ConverterMessages {
     this.ERROR_UnableToWrite, `Output file for '${def(o.inputFilename)}
     ' could not be written.`);
 
-}
+  static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
+  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, output: string; }) => m(
+    this.ERROR_UnsupportedCharactersDetected, `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key (${def(o.key)}) at keyMap index ${def(o.keymap_index)}`);
+
+  }

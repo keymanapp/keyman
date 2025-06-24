@@ -37,11 +37,45 @@ export class KmnFileWriter {
       this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
-      //console.log('ERROR writing kmn file:' + err.message);
       this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
       return false;
     }
   }
+
+  public writeToString(data_ukelele: convert_object): string {
+    let data: string = "\n";
+
+    // add top part of kmn file: STORES
+    data += this.writeData_Stores(data_ukelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeData_Rules(data_ukelele);
+
+    try {
+      return data;
+    } catch (err) {
+      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      return null;
+    }
+  }
+
+  public writeToUint8Array(data_ukelele: convert_object): Uint8Array {
+    let data: string = "\n";
+
+    // add top part of kmn file: STORES
+    data += this.writeData_Stores(data_ukelele);
+
+    // add bottom part of kmn file: RULES
+    data += this.writeData_Rules(data_ukelele);
+
+    try {
+      return new TextEncoder().encode(data);
+    } catch (err) {
+      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      return null;
+    }
+  }
+
 
   /**
    * @brief  member function to create data for stores that will be printed to the resulting kmn file
@@ -142,25 +176,27 @@ export class KmnFileWriter {
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);//new
+        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if ((Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
+        if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
 
-          version_output_character = output_Unicode_CodePoint;
+          // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+          if ((Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
-          if (output_Unicode_CodePoint.length > 1) {
-            if (warn_text[2] == "") {
-              warn_text[2] = warn_text[2] + "c WARNING: use of a control character " /*+ output_Unicode_CodePoint*/;
+            version_output_character = output_Unicode_CodePoint;
+
+            if (output_Unicode_CodePoint.length > 1) {
+              if (warn_text[2] == "") {
+                warn_text[2] = warn_text[2] + "c WARNING: use of a control character " /*+ output_Unicode_CodePoint*/;
+              }
+              else {
+                warn_text[2] = warn_text[2] + " Use of a control character "/* + output_Unicode_CodePoint*/;
+              }
             }
-            else {
-              warn_text[2] = warn_text[2] + " Use of a control character "/* + output_Unicode_CodePoint*/;
-            }
+          } else {
+            version_output_character = output_Unicode_Character;
           }
-        } else {
-          version_output_character = output_Unicode_Character;
         }
-
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before
@@ -195,23 +231,25 @@ export class KmnFileWriter {
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
         const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);//new
+        const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-        if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+        if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
+          // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
+          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
-          version_output_character = output_Unicode_CodePoint;
-          if (output_Unicode_Character.length > 1) {
-            if (warn_text[2] == "") {
-              warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+            version_output_character = output_Unicode_CodePoint;
+            if (output_Unicode_Character.length > 1) {
+              if (warn_text[2] == "") {
+                warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+              }
+              else {
+                warn_text[2] = warn_text[2] + "; Use of a control character ";
+              }
             }
-            else {
-              warn_text[2] = warn_text[2] + "; Use of a control character ";
-            }
+
+          } else {
+            version_output_character = output_Unicode_Character;
           }
-
-        } else {
-          version_output_character = output_Unicode_Character;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -269,23 +307,24 @@ export class KmnFileWriter {
         const output_Unicode_Character = util.convertToUnicodeCharacter(output_character);
         const output_Unicode_CodePoint = util.convertToUnicodeCodePoint(output_character);
 
-        // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-        if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+        if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
+          // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
+          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
-          version_output_character = output_Unicode_CodePoint;
+            version_output_character = output_Unicode_CodePoint;
 
-          if (output_Unicode_Character.length > 1) {
-            if (warn_text[2] == "") {
-              warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+            if (output_Unicode_Character.length > 1) {
+              if (warn_text[2] == "") {
+                warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
+              }
+              else {
+                warn_text[2] = warn_text[2] + "; Use of a control character ";
+              }
             }
-            else {
-              warn_text[2] = warn_text[2] + "; Use of a control character ";
-            }
+          } else {
+            version_output_character = output_Unicode_Character;
           }
-        } else {
-          version_output_character = output_Unicode_Character;
         }
-
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
         // (even if there are other warnings for the same rule) since that rule had been written before

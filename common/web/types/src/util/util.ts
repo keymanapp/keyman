@@ -284,6 +284,10 @@ export function convertToUnicodeCharacter(in_str: string): string {
 
 export function convertToUnicodeCodePoint(instr: string): string {
 
+  if ((instr === null) || (instr === undefined)) {
+    return undefined;
+  }
+
   if (instr.substring(0, 3) === "&#x") {
     const num_length = instr.length - instr.indexOf("x") - 1;
     const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
