@@ -171,10 +171,11 @@
 
             // const { owner, repo } = context.repo;
             // const sha =
-            //   context.payload?.check_suite?.sha ||    /* check run / status completed */
+            //   context.payload?.check_suite?.sha ||    /* check run completed */
             //   context.payload?.inputs?.commit ||      /* manual run */
-            //   context.payload?.push?.after ||         /* push */
-            //   context.sha;
+            //   context.payload?.after ||               /* push */
+            //   context.payload?.commit?.sha ||         /* status */
+            //   context.sha;                            /* probably 'master'! */
 
             // const checkRunId = await createCheck(github, owner, repo, sha);
             // const res = await test(github, owner, repo, sha);
