@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # Keyman is copyright (C) SIL Global. MIT License.
-#
-# TC build script to test Keyman Core
 
 # shellcheck disable=SC2164
 # shellcheck disable=SC1091
@@ -20,12 +18,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Test Keyman Core" \
-  "all            run all actions" \
-  "build          full meson build and test of Keyman Core"
+  "all            full meson build and test of Keyman Core"
 
 builder_parse "$@"
-
-cd "${KEYMAN_ROOT}/core"
 
 if is_ubuntu; then
   ARCH=arch
@@ -38,12 +33,11 @@ else
   return 1
 fi
 
-if builder_has_action all; then
+function do_all() {
   "${KEYMAN_ROOT}/core/build.sh" configure:${ARCH} build:${ARCH} test:${ARCH}
-else
-  builder_run_action build  "${KEYMAN_ROOT}/core/build.sh" configure:${ARCH} build:${ARCH} test:${ARCH}
-fi
+  if is_windows; then
+    "${KEYMAN_ROOT}/core/build.sh" configure:x64 build:x64 test:x64
+  fi
+}
 
-if is_windows; then
-  "${KEYMAN_ROOT}/core/build.sh" configure:x64 build:x64 test:x64
-fi
+builder_run_action  all  do_all
