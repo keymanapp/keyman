@@ -33,7 +33,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  cp "$WIN32_TARGET_PATH/kmconvert.dbg" "$DEVELOPER_DEBUGPATH"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmconvert.dbg" "$DEVELOPER_DEBUGPATH"
 
   rm -rf "$DEVELOPER_PROGRAM/projects/templates"
   mkdir -p "$DEVELOPER_PROGRAM/projects/templates"

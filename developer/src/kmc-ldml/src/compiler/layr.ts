@@ -60,7 +60,7 @@ export class LayrCompiler extends SectionCompiler {
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere
       valid = false;
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(this.keyboard3?.layers[0]));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(this.keyboard3));
     }
     return valid;
   }

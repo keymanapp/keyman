@@ -30,7 +30,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_publish() {
-  verify-program-signatures
+  builder_if_release_build_level verify-program-signatures
 
   #
   # Build the installation archive
@@ -38,7 +38,12 @@ function do_publish() {
   "$WIXCANDLE" -dKEYMAN_VERSION=$KEYMAN_VERSION_WIN -dRELEASE=$KEYMAN_VERSION_RELEASE -ext WixUtilExtension keymanengine.wxs components.wxs
 
   # warning 1072 relates to Error table defined by WixUtilExtension. Doesn't really affect us.
-  "$WIXLIGHT" -sw1072 -ext WixUtilExtension keymanengine.wixobj components.wixobj -o keymanengine.msm
+  "$WIXLIGHT" \
+    -sw1072 \
+    -ext WixUtilExtension \
+    "$WIXLIGHTCOMPRESSION" \
+    keymanengine.wixobj components.wixobj \
+    -o keymanengine.msm
 
   #
   # Sign the installation archive
