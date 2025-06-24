@@ -170,7 +170,12 @@
 // CLONE-COMMENTED:START
 
             // const { owner, repo } = context.repo;
-            // const sha = context.payload?.check_suite?.sha || context.sha;
+            // const sha =
+            //   context.payload?.check_suite?.sha ||    /* check run / status completed */
+            //   context.payload?.inputs?.commit ||      /* manual run */
+            //   context.payload?.push?.after ||         /* push */
+            //   context.sha;
+
             // const checkRunId = await createCheck(github, owner, repo, sha);
             // const res = await test(github, owner, repo, sha);
             // await updateCheck(github, owner, repo, checkRunId, res[0], res[1]);

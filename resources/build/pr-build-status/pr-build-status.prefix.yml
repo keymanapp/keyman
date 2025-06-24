@@ -13,9 +13,18 @@
 #
 name: Keyman Build Summary
 on:
-  check_run:
-    types: [completed]
-
+  status:
+  push:
+    branches-ignore:
+      - master
+      - beta
+      - stable-*
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit sha'
+        required: true
+        type: string
 jobs:
   run_pr_build_status:
     name: Summarize build status checks
