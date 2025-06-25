@@ -419,6 +419,18 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(simpleText.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NUL));
     });
+    it("can parse correctly (deadkey)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('dk(1)');
+      const simpleText: Rule = new SimpleTextRule();
+      assert.isTrue(simpleText.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DEADKEY));
+    });
+    it("can parse correctly (beep)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('beep');
+      const simpleText: Rule = new SimpleTextRule();
+      assert.isTrue(simpleText.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
+    });
   });
   describe("TextRangeRule Tests", () => {
     it("can construct a TextRangeRule", () => {
@@ -2584,7 +2596,7 @@ describe("KMN Analyser Tests", () => {
         'release/fv/fv_hlgaagilda_xaayda_kil/source/fv_hlgaagilda_xaayda_kil',
         'release/fv/fv_hulquminum/source/fv_hulquminum',
         'release/fv/fv_hulquminum_combine/source/fv_hulquminum_combine',
-      ].splice(0, 20).forEach((name) => {
+      ].splice(0, 21).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();

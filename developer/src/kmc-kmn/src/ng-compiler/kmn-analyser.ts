@@ -100,6 +100,7 @@ export class SimpleTextRule extends SingleChildRule {
     const octal: Rule         = new TokenRule(TokenTypes.OCTAL, true);
     const nul: Rule           = new TokenRule(TokenTypes.NUL, true);
     const deadKey: Rule       = new DeadKeyStatementRule();
+    const beep: Rule          = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
       stringRule,
       virtualKey,
@@ -111,6 +112,7 @@ export class SimpleTextRule extends SingleChildRule {
       octal,
       nul,
       deadKey,
+      beep,
     ]);
   }
 }

@@ -6,7 +6,7 @@ content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
-  DECIMAL|HEXADECIMAL|OCTAL|NUL|deadKeyStatement
+  DECIMAL|HEXADECIMAL|OCTAL|NUL|deadKeyStatement|BEEP
 textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
