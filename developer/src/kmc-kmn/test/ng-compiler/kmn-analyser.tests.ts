@@ -2596,7 +2596,7 @@ describe("KMN Analyser Tests", () => {
         'release/fv/fv_hlgaagilda_xaayda_kil/source/fv_hlgaagilda_xaayda_kil',
         'release/fv/fv_hulquminum/source/fv_hulquminum',
         'release/fv/fv_hulquminum_combine/source/fv_hulquminum_combine',
-      ].splice(0, 21).forEach((name) => {
+      ].splice(0, 75).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
