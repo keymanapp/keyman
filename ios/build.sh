@@ -16,8 +16,8 @@ builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices
   ":engine                      Builds KeymanEngine.xcframework, usable by our main app and by third-party apps" \
   ":app=keyman                  Builds the Keyman app for iOS platforms" \
   ":help                        Online documentation" \
-  ":sample1=Samples/KMSample1   Builds the first KeymanEngine sample app" \
-  ":sample2=Samples/KMSample2   Builds the second KeymanEngine sample app" \
+  ":sample1=samples/KMSample1   Builds the first KeymanEngine sample app" \
+  ":sample2=samples/KMSample2   Builds the second KeymanEngine sample app" \
   ":fv=../oem/firstvoices/ios   Builds OEM FirstVoices for iOS platforms" \
   "--sim-artifact+              Also outputs a simulator-friendly test artifact corresponding to the build"
 
