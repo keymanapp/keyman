@@ -9,7 +9,7 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule } from "./store-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -54,6 +54,7 @@ export class ContentRule extends SingleChildRule {
     const capsAlwaysOff: Rule      = new CapsAlwaysOffRule();
     const capsOnOnly: Rule         = new CapsOnOnlyRule();
     const shiftFreesCaps: Rule     = new ShiftFreesCapsRule();
+    const headerAssign: Rule       = new HeaderAssignRule();
     const normalStoreAssign: Rule  = new NormalStoreAssignRule();
     const ruleBlock: Rule          = new RuleBlockRule();
     this.rule = new AlternateRule([
@@ -61,6 +62,7 @@ export class ContentRule extends SingleChildRule {
       capsAlwaysOff,
       capsOnOnly,
       shiftFreesCaps,
+      headerAssign,
       normalStoreAssign,
       ruleBlock,
     ]);

@@ -2,7 +2,7 @@ kmnTree: line*
 line: compileTarget? content? NEWLINE
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
 content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
-  normalStoreAssign|ruleBlock
+  headerAssign|normalStoreAssign|ruleBlock
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|

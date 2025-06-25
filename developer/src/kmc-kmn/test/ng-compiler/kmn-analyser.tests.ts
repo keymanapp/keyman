@@ -274,13 +274,28 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(content.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.SHIFTFREESCAPS));
     });
-    it("can parse correctly (variable store assign)", () => {
+    it("can parse correctly (header assign)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('hotkey [SHIFT K_H]');
+      const content: Rule = new ContentRule();
+      assert.isTrue(content.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.HOTKEY_HEADER));
+    });
+    it("can parse correctly (normal store assign)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(c_out) U+1780');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(root));
       const storeNode = root.getSoleChildOfType(NodeTypes.STORE)
       assert.isNotNull(storeNode);
       assert.isNotNull(storeNode.getSoleChildOfType(NodeTypes.U_CHAR));
+    });
+    it("can parse correctly (plus, any, index)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('+ any(c_key) > index(c_out,1)');
+      const content: Rule = new ContentRule();
+      assert.isTrue(content.parse(root));
+      const productionNode = root.getSoleChildOfType(NodeTypes.PRODUCTION);
+      assert.isNotNull(productionNode);
+      assert.isNotNull(productionNode.getSoleChildOfType(NodeTypes.LHS));
+      assert.isNotNull(productionNode.getSoleChildOfType(NodeTypes.RHS));
     });
   });
   describe("TextRule Tests", () => {
@@ -652,7 +667,7 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(lhsNode);
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.INPUT_CONTEXT));
       assert.isNotNull(lhsNode.getSoleChildOfType(NodeTypes.KEYSTROKE));
-      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS)
+      const rhsNode = productionNode.getSoleChildOfType(NodeTypes.RHS);
       assert.isNotNull(rhsNode);
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.CONTEXT));
       assert.isNotNull(rhsNode.getSoleChildOfType(NodeTypes.U_CHAR));
@@ -2236,7 +2251,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-      ].splice(0, 62).forEach((name) => {
+      ].splice(0, 63).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
