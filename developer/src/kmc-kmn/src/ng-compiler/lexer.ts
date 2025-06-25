@@ -249,7 +249,7 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.U_CHAR,              /^U\+[0-9A-F]{1,6}/i,                                    true),
     new ScanRecogniser(TokenTypes.STRING,              /^('.*?'|\".*?\")/,                                      true),
     new ScanRecogniser(TokenTypes.MODIFIER,            /^(CTRL|LCTRL|RCTRL|ALT|LALT|RALT|NCAPS)(?=[^\S\r\n])/i, true),
-    new ScanRecogniser(TokenTypes.KEY_CODE,            /^(((K_|T_|U_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/,     true),
+    new ScanRecogniser(TokenTypes.KEY_CODE,            /^((([Kk]_|[Tt]_|[Uu]_)[^\]\s]+)|[A-E]\d\d)(?=[^\S\r\n]*\])/,     true),
     new ScanRecogniser(TokenTypes.DECIMAL,             /^d\d+(?=[\s,\)\]])/,                                    true),
     new ScanRecogniser(TokenTypes.HEXADECIMAL,         /^x[a-fA-F\d]+(?=[\s,\)\]])/,                            true),
     new ScanRecogniser(TokenTypes.OCTAL,               /^[0-7]+(?=[\s,\)\]])/,                                  true),
