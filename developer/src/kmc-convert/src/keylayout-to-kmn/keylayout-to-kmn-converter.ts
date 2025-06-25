@@ -106,6 +106,75 @@ export class KeylayoutToKmnConverter {
     return null;
   }
 
+  async run_new(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnArtifacts> {
+
+    if (!inputFilename) {
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      return null;
+    }
+
+    const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
+    const jsonO: object = KeylayoutReader.read(inputFilename);
+    if (!jsonO) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
+      return null;
+    }
+
+    const outArray: convert_object = await this.convert(jsonO, outputFilename);
+    if (!outArray) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
+      return null;
+    }
+
+    const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
+
+    const out_text_ok: boolean = kmnFileWriter.write(outArray);
+    if (!out_text_ok) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+      return null;
+    }
+
+
+    // xxx write my data
+    const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
+    if (!out_Uint8) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+      return null;
+    }
+    // xxx get my name
+    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
+    // xxx return filled artifact
+    /* return {
+      artifacts: {
+        kmx: { data: out_Uint8, filename: outputFilename },
+      }
+    };
+    */
+
+    /*const out_str: string = kmnFileWriter.writeToString(outArray);
+     if (!out_str) {
+       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+       return null;
+     }*/
+
+
+    /*
+      const a: ConverterToKmnArtifacts = null;
+      const ddd= a.data
+      return a ? a : null;
+
+      data of convert_object needs to be in ConverterToKmnArtifacts:
+      (ConverterToKmnArtifacts= outArray ???)
+      return ConverterToKmnArtifacts ? { ConverterToKmnArtifacts } : null;
+      ---
+      const converter = new ConverterClass(this.callbacks, converterOptions);
+      const artifacts = await converter.run(inputFilename, outputFilename);
+      return artifacts ? { artifacts } : null;
+    */
+
+    return null;
+  }
+
   /**
    * @brief  member function to read filename and behaviour of a json object into a convert_object
    * @param  jsonObj containing filename, behaviour and rules of a json object
@@ -749,16 +818,11 @@ export class KeylayoutToKmnConverter {
       "K_SPACE"      /* \ */
     ];
 
-    if ((pos >= 0 && pos <= 0x31))
-      return vk[pos];
-    else return "";
-
-
-    /*if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined))
+    if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined))
       return "";
-    else return vk[pos];*/
-
+    else return vk[pos];
   }
+
   /* @brief  member function to return an index for a given actionID
     * @param  data   :any - an object containing all data read from a .keylayout file
     * @param  search :string - value 'id' to be found
