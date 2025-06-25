@@ -250,6 +250,7 @@ describe('KmnFileWriter', function () {
       ["a", 'a'],
       ["ሴ", 'ሴ'],
       ['😎', '😎'],
+      ["W̊", "W̊"],
       ["ab", undefined],
       ["", ''],
       [undefined, undefined],

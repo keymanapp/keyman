@@ -20,7 +20,7 @@ describe('KeylayoutToKmnConverter', function () {
   before(function () {
     compilerTestCallbacks.clear();
   });
- // todo remove
+  // todo remove
   describe('RunOneFile', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const inputFilename = makePathToFixture('../data/Italian.keylayout');
@@ -41,9 +41,9 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Polish.keylayout')],
       [makePathToFixture('../data/French.keylayout')],
       [makePathToFixture('../data/Latin_American.keylayout')],
-     /* [makePathToFixture('../data/German_complete.keylayout')],
-      [makePathToFixture('../data/German_complete_reduced.keylayout')],
-      [makePathToFixture('../data/German_Standard.keylayout')],*/
+      [makePathToFixture('../data/German_complete.keylayout')],
+      /* [makePathToFixture('../data/German_complete_reduced.keylayout')],
+       [makePathToFixture('../data/German_Standard.keylayout')],*/
     ].forEach(function (files_) {
       sut.run(files_[0]);
       assert.isTrue(true);
@@ -246,7 +246,6 @@ describe('KeylayoutToKmnConverter', function () {
 
   describe('map_UkeleleKC_To_VK ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-
     [
       [0x00, 'K_A'],
       [0x31, 'K_SPACE'],
@@ -257,6 +256,8 @@ describe('KeylayoutToKmnConverter', function () {
       [0x999, ''],
       [-1, ''],
       [null, ''],
+      [undefined, ''],
+      [, ''],
     ].forEach(function (values) {
       it(("map_UkeleleKC_To_VK(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
         const result = sut.map_UkeleleKC_To_VK(values[0] as number);

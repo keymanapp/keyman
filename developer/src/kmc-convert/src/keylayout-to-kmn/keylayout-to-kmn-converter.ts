@@ -90,6 +90,18 @@ export class KeylayoutToKmnConverter {
      }*/
 
 
+    /*
+    const a: ConverterToKmnArtifacts = null;
+    const ddd= a.data
+    return a ? a : null;
+
+    data of convert_object needs to be in ConverterToKmnArtifacts:
+    (ConverterToKmnArtifacts= outArray ???)
+    return ConverterToKmnArtifacts ? { ConverterToKmnArtifacts } : null;
+    ---
+    const converter = new ConverterClass(this.callbacks, converterOptions);
+    const artifacts = await converter.run(inputFilename, outputFilename);
+    return artifacts ? { artifacts } : null;*/
 
     return null;
   }
@@ -684,72 +696,74 @@ export class KeylayoutToKmnConverter {
    * @return keycode on a Windows Keyboard
    */
   public map_UkeleleKC_To_VK(pos: number): string {
+    const vk = [
+      "K_A"          /* A */,
+      "K_S"          /* S */,
+      "K_D"          /* D */,
+      "K_F"          /* F */,
+      "K_H"          /* H */,
+      "K_G"          /* G */,
+      "K_Z"          /* Z */,
+      "K_X"          /* X */,
+      "K_C"          /* C */,
+      "K_V"          /* V */,
+      "K_BKQUOTE"    /* ^ */,
+      "K_B"          /* B */,
+      "K_Q"          /* Q */,
+      "K_W"          /* W */,
+      "K_E"          /* E */,
+      "K_R"          /* R */,
+      "K_Y"          /* Y */,
+      "K_T"          /* T */,
+      "K_1"          /* 1 */,
+      "K_2"          /* 2 */,
+      "K_3"          /* 3 */,
+      "K_4"          /* 4 */,
+      "K_6"          /* 6 */,
+      "K_5"          /* 5 */,
+      "K_EQUAL"      /* ´ */,
+      "K_9"          /* 9 */,
+      "K_7"          /* 7 */,
+      "K_HYPHEN"     /* ß */,
+      "K_8"          /* 8 */,
+      "K_0"          /* 0 */,
+      "K_RBRKT"      /* ] */,
+      "K_O"          /* O */,
+      "K_U"          /* U */,
+      "K_LBRKT"      /* [ */,
+      "K_I"          /* I */,
+      "K_P"          /* P */,
+      "K_ENTER",
+      "K_L"          /* L */,
+      "K_J"          /* J */,
+      "K_QUOTE"      /* " */,
+      "K_K"          /* K */,
+      "K_COLON"      /* : */,
+      "K_BKSLASH"    /* \ */,   // 42 for ISO  correct??
+      "K_COMMA"      /* , */,
+      "K_SLASH"      /* / */,
+      "K_N"          /* N */,
+      "K_M"          /* M */,
+      "K_PERIOD"     /* . */,
+      "K_?C1"        /* \ */,   // 48 for ANSI  correct??
+      "K_SPACE"      /* \ */
+    ];
 
-    // ukelele KC  -->  VK_US
-    if (pos === 0x0A) return "K_BKQUOTE";         /* ^ */
-    else if (pos === 0x12) return "K_1";          /* 1 */
-    else if (pos === 0x13) return "K_2";          /* 2 */
-    else if (pos === 0x14) return "K_3";          /* 3 */
-    else if (pos === 0x15) return "K_4";          /* 4 */
-    else if (pos === 0x17) return "K_5";          /* 5 */
-    else if (pos === 0x16) return "K_6";          /* 6 */
-    else if (pos === 0x1A) return "K_7";          /* 7 */
-    else if (pos === 0x1C) return "K_8";          /* 8 */
-    else if (pos === 0x19) return "K_9";          /* 9 */
-    else if (pos === 0x1D) return "K_0";          /* 0 */
-    else if (pos === 0x1B) return "K_HYPHEN";     /* ß */
-    else if (pos === 0x18) return "K_EQUAL";      /* ´ */
-
-    else if (pos === 0x0C) return "K_Q";          /* Q */
-    else if (pos === 0x0D) return "K_W";          /* W */
-    else if (pos === 0x0E) return "K_E";          /* E */
-    else if (pos === 0x0F) return "K_R";          /* R */
-    else if (pos === 0x11) return "K_T";          /* T */
-    else if (pos === 0x10) return "K_Y";          /* Y */
-    else if (pos === 0x20) return "K_U";          /* U */
-    else if (pos === 0x22) return "K_I";          /* I */
-    else if (pos === 0x1F) return "K_O";          /* O */
-    else if (pos === 0x23) return "K_P";          /* P */
-    else if (pos === 0x21) return "K_LBRKT";      /* [ */
-    else if (pos === 0x1E) return "K_RBRKT";      /* ] */
-    else if (pos === 0x31) return "K_SPACE";      /* \ */
-    else if (pos === 0x2A) return "K_BKSLASH";    /* \ */   // 42 for ISO  correct??
-    // else if (pos === 0x30) return "K_?C1"     /* \ */   // 48 for ANSI  correct??
-
-    else if (pos === 0x00) return "K_A";          /* A */
-    else if (pos === 0x01) return "K_S";          /* S */
-    else if (pos === 0x02) return "K_D";          /* D */
-    else if (pos === 0x03) return "K_F";          /* F */
-    else if (pos === 0x05) return "K_G";          /* G */
-    else if (pos === 0x04) return "K_H";          /* H */
-    else if (pos === 0x26) return "K_J";          /* J */
-    else if (pos === 0x28) return "K_K";          /* K */
-    else if (pos === 0x25) return "K_L";          /* L */
-    else if (pos === 0x29) return "K_COLON";      /* : */
-    else if (pos === 0x27) return "K_QUOTE";      /* " */
-
-    else if (pos === 0x23) return "K_oE2";        /* | */
-    else if (pos === 0x06) return "K_Z";          /* Z */
-    else if (pos === 0x07) return "K_X";          /* X */
-    else if (pos === 0x08) return "K_C";          /* C */
-    else if (pos === 0x09) return "K_V";          /* V */
-    else if (pos === 0x0B) return "K_B";          /* B */
-    else if (pos === 0x2D) return "K_N";          /* N */
-    else if (pos === 0x2E) return "K_M";          /* M */
-    else if (pos === 0x2B) return "K_COMMA";      /* , */
-    else if (pos === 0x2F) return "K_PERIOD";     /* . */
-    else if (pos === 0x2C) return "K_SLASH";      /* / */
-
-    else if (pos === 0x24) return "K_ENTER";
+    if ((pos >= 0 && pos <= 0x31))
+      return vk[pos];
     else return "";
-  }
 
-  /**
-  * @brief  member function to return an index for a given actionID
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string - value 'id' to be found
-  * @return a number specifying the index of an actionId
-  */
+
+    /*if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined))
+      return "";
+    else return vk[pos];*/
+
+  }
+  /* @brief  member function to return an index for a given actionID
+    * @param  data   :any - an object containing all data read from a .keylayout file
+    * @param  search :string - value 'id' to be found
+    * @return a number specifying the index of an actionId
+    */
   public get_ActionIndex__From__ActionId(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {

@@ -272,15 +272,13 @@ export function convertToUnicodeCharacter(in_str: string): string {
     return decodeUniHexValue(in_str);
   }
 
-  else if ([...in_str].length <= 1) {
+  else if ( [...new Intl.Segmenter().segment(in_str)].length <= 1) {
     return in_str;
   }
-
   else {
     return undefined;
   }
 }
-
 
 export function convertToUnicodeCodePoint(instr: string): string {
 
