@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.69 alpha 2025-06-25
+
+* maint(resources): support additional workflow events for pr-build-status (#14219)
+* chore: add tips and caution of gestures for Keyman Developer + update license + removal of span tag (#14204)
+
 ## 19.0.68 alpha 2025-06-24
 
 * maint(resources): Build-bot now available to control test builds (#14125)
