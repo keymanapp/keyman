@@ -26,6 +26,10 @@ builder_describe \
   "configure      install dependencies" \
   "build          build Web + embedded" \
   "publish        publish release" \
+  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
+  "--rsync-user=RSYNC_USER            rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
   "--s.keyman.com=S_KEYMAN_COM        path to s.keyman.com repository" \
   "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
 
@@ -74,6 +78,11 @@ function publish_web_action() {
     builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
     return 1
   fi
+
+  export RSYNC_PATH
+  export RSYNC_USER
+  export RSYNC_HOST
+  export RSYNC_ROOT
 
   # Push release to s.keyman.com/kmw/engine (do this before updating
   # downloads.keyman.com so we can ensure files are available)

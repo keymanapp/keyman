@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 19.0.68 alpha 2025-06-24
+
+* maint(resources): Build-bot now available to control test builds (#14125)
+* maint(developer): support buildLevel (#14196)
+* fix(resources): allow branch names in run-required-test-builds shortcut call (#14217)
+* maint(resources): add pr-build-status GitHub Action to summarize build status (#14199)
+
+## 19.0.67 alpha 2025-06-22
+
+* chore(developer): ldml: additional line numbers (#14104)
+
+## 19.0.66 alpha 2025-06-16
+
+* fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult  enum (#14123)
+
+## 19.0.65 alpha 2025-06-13
+
+* maint(developer): fix developer release build (#14185)
+* maint(developer,web): use double quotes inside `--rsync-path` again (#14194)
+
+## 19.0.64 alpha 2025-06-13
+
+* fix(windows): fix download failing when cache.json missing (#14095)
+* maint(resources): only automatically merge keyman-server PRs with automerge label (#14171)
+* maint(developer,web): use braces for variables in powershell scripts (#14184)
+
+## 19.0.63 alpha 2025-06-12
+
+* maint(web): add some more arguments for web release build script (#14167)
+* maint(developer): use double quotes so that variable gets replaced (#14168)
+* chore(deps): bump brace-expansion from 2.0.1 to 2.0.2 in /developer/src/server/src/win32/trayicon/addon-src (#14165)
+
+## 19.0.62 alpha 2025-06-11
+
+* maint(developer): export environment variables (#14157)
+* maint(web): use path when calling powershell script (#14156)
+* maint(resources): fix regression on mac triggering builds (#14155)
+
 ## 19.0.61 alpha 2025-06-10
 
 * chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)

@@ -97,7 +97,7 @@ export class VarsCompiler extends SectionCompiler {
       // Sets
       for (const e of variables.set) {
         const { id, value } = e;
-        if(!this.validateIdentifier(id)) {
+        if(!this.validateIdentifier(id, e)) {
           valid = false;
           continue;
         }
@@ -124,7 +124,7 @@ export class VarsCompiler extends SectionCompiler {
       // UnicodeSets
       for (const e of variables.uset) {
         const { id, value } = e;
-        if(!this.validateIdentifier(id)) {
+        if(!this.validateIdentifier(id, e)) {
           valid = false;
           continue;
         }
@@ -291,7 +291,7 @@ export class VarsCompiler extends SectionCompiler {
     let { value } = e;
     // fix any variables
     value = result.substituteStrings(value, sections);
-    result.strings.push(new StringVarItem(id, value, sections));
+    result.strings.push(new StringVarItem(id, value, sections, e));
   }
   addSet(result: Vars, e: LDMLKeyboard.LKSet, sections: DependencySections): void {
     const { id } = e;
@@ -306,14 +306,14 @@ export class VarsCompiler extends SectionCompiler {
     // this is not 'forMatch', all variables are to be assumed as string literals, not regex
     // content.
     const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
-    result.sets.push(new SetVarItem(id, cookedItems, sections));
+    result.sets.push(new SetVarItem(id, cookedItems, sections, e));
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     value = result.substituteStrings(value, sections);
     value = result.substituteUnicodeSets(value, sections);
-    result.usets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
+    result.usets.push(new UnicodeSetItem(id, value, sections, sections.usetparser, e));
   }
   // routines for using/substituting variables have been moved to the Vars class and its
   // properties

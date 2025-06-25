@@ -8,21 +8,25 @@ $ErrorActionPreference = "Stop";
 
 $tier = Get-Content ..\TIER.md
 $build_number = Get-Content ..\VERSION.md
-$build_counter = $build_number -replace "^\d+\.\d+\.(\d+)$", '$1'
+$build_counter = ${build_number} -replace "^\d+\.\d+\.(\d+)$", '$1'
 
-$upload_path = "build\upload\$build_number"
-$zip = "$upload_path\keymanweb-$build_number.zip"
+$upload_path = "build\upload\${build_number}"
+$zip = "${upload_path}\keymanweb-${build_number}.zip"
 
 $SEVENZ_HOME = $env:SEVENZ_HOME
 $RSYNC_HOME = $env:RSYNC_HOME
+$RSYNC_PATH = $env:RSYNC_PATH
+$RSYNC_USER = $env:RSYNC_USER
+$RSYNC_HOST = $env:RSYNC_HOST
+$RSYNC_ROOT = $env:RSYNC_ROOT
 $USERPROFILE = $env:USERPROFILE
 
 # PowerShell fun: `--` parameters will break a PowerShell command when not escaped in some form.
 # We can build the command in string form first and then execute the string, fortunately.
 $cmd = '"C:\Program Files\Git\bin\bash.exe" --init-file "c:\Program Files\Git\etc\profile" -l ./ci.sh prepare:downloads.keyman.com'
-cmd /c $cmd
+cmd /c ${cmd}
 
-$hash = get-filehash $zip -Algorithm MD5
+$hash = get-filehash ${zip} -Algorithm MD5
 
 #
 # Construct .build_info
@@ -31,20 +35,20 @@ $hash = get-filehash $zip -Algorithm MD5
 $download_info = @"
 {
   "name": "KeymanWeb",
-  "version": "$build_number",
+  "version": "${build_number}",
   "date": "$([DateTime]::Now.ToString("yyyy-MM-dd"))",
   "platform": "web",
-  "stability": "$tier",
-  "file": "keymanweb-$build_number.zip",
-  "md5": "$($hash.Hash)",
+  "stability": "${tier}",
+  "file": "keymanweb-${build_number}.zip",
+  "md5": "$(${hash}.Hash)",
   "type": "zip",
-  "build": "$build_counter"
+  "build": "${build_counter}"
 }
 "@
 
 # WriteAllLines is needed to avoid BOM
-[System.IO.File]::WriteAllLines("$pwd\$upload_path\keymanweb-$build_number.zip.download_info", $download_info)
-# $download_info | Out-File $upload_path\keymanweb-$build_number.zip.download_info -Encoding utf8
+[System.IO.File]::WriteAllLines("${pwd}\${upload_path}\keymanweb-${build_number}.zip.download_info", ${download_info})
+# ${download_info} | Out-File ${upload_path}\keymanweb-${build_number}.zip.download_info -Encoding utf8
 
 #
 # Upload with rsync to downloads.keyman.com
@@ -56,17 +60,17 @@ $rsync_args = @(
   '-vrzltp',                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
   '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r',      # map Windows security to host security
   '--stats',                                # show statistics for log
-  '--rsync-path="%downloads_rsync_path%"',    # path on remote server
-  "--rsh=$RSYNC_HOME\ssh -i $USERPROFILE\.ssh\id_rsa -o UserKnownHostsFile=$USERPROFILE\.ssh\known_hosts",                  # use ssh
-  "$build_number",                          # upload the whole build folder
-  "%downloads_rsync_user%@%downloads_rsync_host%:%downloads_rsync_root%/web/$tier/" # target server + path
+  "--rsync-path=""${RSYNC_PATH}""",         # path on remote server
+  "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts",                  # use ssh
+  "${build_number}",                          # upload the whole build folder
+  "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/web/${tier}/" # target server + path
 )
 
-# Write-Output "rsync parameters:" $rsync_args
+# Write-Output "rsync parameters:" ${rsync_args}
 
-cd "$upload_path\.."
-& $RSYNC_HOME\rsync.exe $rsync_args
-if ($LASTEXITCODE -ne 0) { throw "Exit code is $LASTEXITCODE" }
+cd "${upload_path}\.."
+& ${RSYNC_HOME}\rsync.exe ${rsync_args}
+if (${LASTEXITCODE} -ne 0) { throw "Exit code is ${LASTEXITCODE}" }
 cd ..
 
 # EOF

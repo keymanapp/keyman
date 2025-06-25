@@ -158,7 +158,7 @@ if [ "$action" == "commit" ]; then
   # Trigger builds for the previous version on TeamCity and GitHub
   #
 
-  triggerBuilds
+  triggerReleaseBuilds
 
   #
   # Now, create the PR on GitHub which will be merged when ready
@@ -166,7 +166,7 @@ if [ "$action" == "commit" ]; then
 
   cd "$KEYMAN_ROOT"
   git checkout "$branch"
-  hub pull-request -f --no-edit -b $base -l auto
+  hub pull-request -f --no-edit -b $base -l auto,automerge
 
   #
   # If we are on a stable-x.y branch, then we also want to merge changes to
@@ -174,6 +174,8 @@ if [ "$action" == "commit" ]; then
   # beta changes will be merged to master periodically anyway.
   #
   if [[ "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
+    # TODO: why is this not happening?
+
     git switch master
 
     # In order to avoid potential git conflicts, we run the history collater
@@ -190,8 +192,8 @@ if [ "$action" == "commit" ]; then
       git switch -c "chore/version-$base-$NEWVERSION-master-history" master
       git add HISTORY.md
       git commit -m "$message (history cherry-pick to master)"
-      # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
-      # label
+      # TODO: once we are sure this is stable, add `-l auto,automerge` to get
+      # the "auto" label
       hub pull-request -fp --no-edit
     fi
 
