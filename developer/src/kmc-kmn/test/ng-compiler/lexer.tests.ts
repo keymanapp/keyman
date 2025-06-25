@@ -358,6 +358,10 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'T_17D2_1780');
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'U_0030');
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'A21');
+      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'k_k');
+      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'k_colon');
+      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 't_17D2_1780');
+      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'u_0030');
     });
     it("can recognise a KEY_CODE token (followed by space)", () => {
       recogniseTokens(
