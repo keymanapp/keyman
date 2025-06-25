@@ -798,18 +798,25 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(permittedKeyword);
     });
     it("can parse correctly", () => {
+      // *_HEADER tokens must be followed by a space
       [
         {input: 'always',        nodeType: NodeTypes.ALWAYS},
         {input: 'ansi',          nodeType: NodeTypes.ANSI},
         {input: 'beep',          nodeType: NodeTypes.BEEP},
         {input: 'begin',         nodeType: NodeTypes.BEGIN},
+        {input: 'bitmap ',       nodeType: NodeTypes.BITMAP_HEADER},
         {input: 'caps',          nodeType: NodeTypes.CAPS},
         {input: 'clearcontext',  nodeType: NodeTypes.CLEARCONTEXT},
         {input: 'context',       nodeType: NodeTypes.CONTEXT},
+        {input: 'copyright ',    nodeType: NodeTypes.COPYRIGHT_HEADER},
         {input: 'fix',           nodeType: NodeTypes.FIX},
         {input: 'frees',         nodeType: NodeTypes.FREES},
+        {input: 'hotkey ',       nodeType: NodeTypes.HOTKEY_HEADER},
         {input: 'keys',          nodeType: NodeTypes.KEYS},
+        {input: 'language ',     nodeType: NodeTypes.LANGUAGE_HEADER},
+        {input: 'layout ',       nodeType: NodeTypes.LAYOUT_HEADER},
         {input: 'match',         nodeType: NodeTypes.MATCH},
+        {input: 'name ',         nodeType: NodeTypes.NAME_HEADER},
         {input: 'newcontext',    nodeType: NodeTypes.NEWCONTEXT},
         {input: 'nomatch',       nodeType: NodeTypes.NOMATCH},
         {input: 'nul',           nodeType: NodeTypes.NUL},
@@ -822,6 +829,7 @@ describe("KMN Analyser Tests", () => {
         {input: 'shift',         nodeType: NodeTypes.SHIFT},
         {input: 'unicode',       nodeType: NodeTypes.UNICODE},
         {input: 'using',         nodeType: NodeTypes.USING},
+        {input: 'version ',      nodeType: NodeTypes.VERSION_HEADER},
       ].forEach((testCase) => {
         Rule.tokenBuffer = stringToTokenBuffer(testCase.input);
         const permittedKeyword: Rule = new PermittedKeywordRule();

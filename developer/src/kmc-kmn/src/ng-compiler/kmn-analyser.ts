@@ -373,13 +373,20 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenTypes.ANSI,
       TokenTypes.BEEP,
       TokenTypes.BEGIN,
+      TokenTypes.BITMAP_HEADER,
       TokenTypes.CAPS,
       TokenTypes.CLEARCONTEXT,
       TokenTypes.CONTEXT,
+      TokenTypes.COPYRIGHT_HEADER,
       TokenTypes.FIX,
       TokenTypes.FREES,
+      TokenTypes.HOTKEY_HEADER,
       TokenTypes.KEYS,
+      TokenTypes.LANGUAGE_HEADER,
+      TokenTypes.LAYOUT_HEADER,
       TokenTypes.MATCH,
+      TokenTypes.MESSAGE_HEADER,
+      TokenTypes.NAME_HEADER,
       TokenTypes.NEWCONTEXT,
       TokenTypes.NOMATCH,
       TokenTypes.NUL,
@@ -392,6 +399,7 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenTypes.SHIFT,
       TokenTypes.UNICODE,
       TokenTypes.USING,
+      TokenTypes.VERSION_HEADER,
     ], true);
   }
 }
