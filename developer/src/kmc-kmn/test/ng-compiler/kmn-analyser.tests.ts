@@ -2251,7 +2251,7 @@ describe("KMN Analyser Tests", () => {
         'release/b/bangla_probhat/source/bangla_probhat',
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
-      ].splice(0, 63).forEach((name) => {
+      ].forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
