@@ -129,12 +129,13 @@ function _publish_to_downloads() {
   # "-vrzltp "   # verbose, recurse, zip, copy symlinks, preserve times, permissions
   # "--perms "   # perfectly matches existing file permissions on the build agent
   # "--stats "   # show statistics for log
-  # "--rsync-path=\"sudo -u vu2009 rsync\" # path on remote server
+  # "--rsync-path=\"sudo -u $USER rsync\" # path on remote server
   # "--rsh=ssh " # use ssh
 
   # The actual rsync call.
   # We run into weird quote-based issues if we don't do a monolithic call as seen below, at least at present.
   builder_echo "Performing rsync call"
+  # shellcheck disable=SC2154
   rsync -vrzltp --perms --stats --rsync-path="${RSYNC_PATH}" --rsh=ssh "${UPLOAD_DIR}" "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/linux/${KEYMAN_TIER}"
 
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
