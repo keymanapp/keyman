@@ -8,7 +8,7 @@
  */
 
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, } from "@keymanapp/developer-utils";
-import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
+//import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
@@ -100,7 +100,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
       return null;
     }
-
     return Result_toBeReturned;
   }
 
