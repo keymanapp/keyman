@@ -8,11 +8,11 @@
  */
 
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, } from "@keymanapp/developer-utils";
-//import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts } from "../converter-artifacts.js";
+import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 export interface ConverterResult extends KeymanCompilerResult {
   /**
@@ -20,6 +20,14 @@ export interface ConverterResult extends KeymanCompilerResult {
    * can write these to disk with {@link Converter.write}
    */
   artifacts: ConverterArtifacts;
+};
+
+export interface ConverterToKmnResult extends ConverterResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link Converter.write}
+   */
+  artifacts: ConverterToKmnArtifacts;
 };
 
 export interface convert_object {
@@ -57,7 +65,7 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -86,10 +94,10 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    // write to object/ConverterResult
+    // write to object/ConverterToKmnResult
     outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
     const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
-    const Result_toBeReturned: ConverterResult = {
+    const Result_toBeReturned: ConverterToKmnResult = {
       artifacts: {
         kmn: { data: out_Uint8, filename: outputFilename }
       }
