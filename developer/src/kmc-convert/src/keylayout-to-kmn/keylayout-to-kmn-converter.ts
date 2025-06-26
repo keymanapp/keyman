@@ -89,9 +89,9 @@ export class KeylayoutToKmnConverter {
     // write to object/ConverterResult
     outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
     const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
-    const Result_toBeReturned = {
+    const Result_toBeReturned: ConverterResult = {
       artifacts: {
-        kmn: { data: out_Uint8, filename: outputFilename },
+        kmn: { data: out_Uint8, filename: outputFilename }
       }
     };
 
