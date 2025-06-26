@@ -1327,6 +1327,8 @@ _builder_parse_expanded_parameters() {
   _builder_current_action=
   _builder_is_child=1
   _builder_offline=
+  _builder_ignore_unknown_options=1
+  builder_ignored_options=()
 
   local n=0
 
@@ -1471,6 +1473,9 @@ _builder_parse_expanded_parameters() {
         --offline)
           _builder_offline=--offline
           ;;
+        --builder-ignore-unknown-options)
+          _builder_ignore_unknown_options=0
+          ;;
         *)
           # script does not recognize anything of action or target form at this point.
           if [[ $key =~ ^: ]]; then
@@ -1487,6 +1492,9 @@ _builder_parse_expanded_parameters() {
             # For child builds, don't fail the build when pass inheritable
             # parameters (#11408)
             builder_echo_debug "Parameter '$key' is not supported, ignoring"
+          elif [[ $key =~ ^- ]] && builder_ignore_unknown_options; then
+            builder_echo warning "Ignoring unknown option $key"
+            builder_ignored_options+=("$key")
           else
             _builder_parameter_error "$0" parameter "$key"
           fi
@@ -1563,6 +1571,14 @@ _builder_parse_expanded_parameters() {
     # not running in bashdb
     trap _builder_failure_trap err exit
   fi
+}
+
+#
+# Returns 0 (true) if --builder-ignore-unknown-options flag has been specified
+# in the command line
+#
+function builder_ignore_unknown_options() {
+  return $_builder_ignore_unknown_options
 }
 
 _builder_pad() {
