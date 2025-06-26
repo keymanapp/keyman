@@ -389,9 +389,9 @@ export function findInstanceObject(source: any, path: string[]) : any {
  * @param c number for the offset setting
  * @param x if set, this object will be used as the base object instead of {}
  */
-export function withOffset(c: number, x?: any) : KeymanXMLMetadata {
+export function withOffset(c: number, compileContext?: any) : KeymanXMLMetadata {
   // set metadata on an empty object
-  const o = Object.assign({}, x);
+  const o = Object.assign({}, compileContext);
   KeymanXMLReader.setMetaData(o, {
     startIndex: c
   });
