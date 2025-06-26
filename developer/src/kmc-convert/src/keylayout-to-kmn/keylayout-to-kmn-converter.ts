@@ -100,7 +100,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
       return null;
     }
-
     return Result_toBeReturned;
   }
 
