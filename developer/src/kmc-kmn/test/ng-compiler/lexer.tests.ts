@@ -343,6 +343,22 @@ describe("Lexer Tests", () => {
     it("does not pick out tokens from inside strings", () => {
       recogniseToken(TokenTypes.STRING, '"store"');
     });
+    it("can recognise a DECIMAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd999');
+    });
+    it("can recognise a HEXDECIMAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xa99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xA99');
+    });
+    it("can recognise an OCTAL token", () => {
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '77');
+      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '777');
+    });
     it("can recognise a MODIFIER token", () => {
       recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'CTRL');
       recogniseTokenFollowedBySpace(TokenTypes.MODIFIER, 'LCTRL');
@@ -362,6 +378,7 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'k_colon');
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 't_17D2_1780');
       recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'u_0030');
+      recogniseTokenFollowedByRightSquare(TokenTypes.KEY_CODE, 'a21');
     });
     it("can recognise a KEY_CODE token (followed by space)", () => {
       recogniseTokens(
@@ -373,21 +390,15 @@ describe("Lexer Tests", () => {
         ]
       );
     });
-    it("can recognise a DECIMAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd999');
-    });
-    it("can recognise a HEXDECIMAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xa99');
-      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xA99');
-    });
-    it("can recognise an OCTAL token", () => {
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '0');
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '77');
-      recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '777');
+    it("can recognise an ambiguous DECIMAL token (could be KEY_CODE)", () => {
+      recogniseTokens(
+        'd99 ]',
+        [
+          new Token(TokenTypes.DECIMAL, 'd99'),
+          new Token(TokenTypes.WHITESPACE, ' ', 1, 4),
+          new Token(TokenTypes.RIGHT_SQ, ']', 1, 5),
+        ]
+      );
     });
     it("can recognise a HANGUL token", () => {
       recogniseToken(TokenTypes.HANGUL, '$HANGUL_SYLLABLE_A');
