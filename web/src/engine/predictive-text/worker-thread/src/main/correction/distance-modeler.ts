@@ -9,7 +9,6 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
@@ -48,15 +47,15 @@ export class SearchNode {
   calculation: ClassicalDistanceCalculation<string, EditToken<string>, TraversableToken<string>>;
 
   currentTraversal: LexiconTraversal;
-  toKey: (wordform: USVString) => USVString = str => str;
+  toKey: (wordform: string) => string = str => str;
   priorInput: RealizedInput;
 
   // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
   private _inputCost?: number;
 
-  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: USVString) => USVString);
+  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: string) => string);
   constructor(node: SearchNode);
-  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: USVString) => USVString) {
+  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: string) => string) {
     toKey = toKey || (x => x);
 
     if(rootTraversal instanceof SearchNode) {
@@ -294,11 +293,11 @@ export class SearchResult {
     return this.resultNode.priorInput;
   }
 
-  get matchSequence(): TraversableToken<USVString>[] {
+  get matchSequence(): TraversableToken<string>[] {
     return this.resultNode.calculation.matchSequence;
   };
 
-  get matchString(): USVString {
+  get matchString(): string {
     return this.resultNode.resultKey;
   }
 

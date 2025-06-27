@@ -40,11 +40,15 @@ export {
   CompilerPathCallbacks,
   CompilerFileSystemCallbacksFolderEntry as FileSystemFolderEntry,
   DefaultCompilerFileSystemAsyncCallbacks,
+  EventResolver,
+  NullEventResolver,
+  DelegatingCompilerCallbacks,
+  ResolvingCompilerCallbacks,
 } from './compiler-callbacks.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
   CompilerErrorSeverity,  CompilerCallbackOptions,
-  CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
+  CompilerError, CompilerMessageSpec, CompilerMessageObjectSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
   compilerErrorFormatCode, CompilerMessageDef,
   compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
   ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
@@ -63,8 +67,9 @@ export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.j
 
 export { DeveloperUtilsMessages } from './developer-utils-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
-export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
-
+export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader, KeymanXMLMetadata, XML_FILENAME_SYMBOL } from './xml-utils.js';
+export { SymbolUtils, ObjectWithMetadata } from './symbol-utils.js';
+export * as LineUtils from './line-utils.js';
 export * as GitHubUrls from './github-urls.js';
 export * as CloudUrls from './cloud-urls.js';
 

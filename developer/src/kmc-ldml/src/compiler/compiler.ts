@@ -8,7 +8,9 @@ import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
   defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
   LDMLKeyboardTestDataXMLSourceFile, KMXBuilder,
-  KeymanCompilerArtifactOptional
+  KeymanCompilerArtifactOptional,
+  ResolvingCompilerCallbacks,
+  KeymanXMLReader,
 } from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
@@ -94,6 +96,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
   // uset parser
   private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
+  private reader?: LDMLKeyboardXMLSourceFileReader;
 
   /**
    * Initialize the compiler, including loading the WASM host for uset parsing.
@@ -105,7 +108,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
     this.options = { ...options };
-    this.callbacks = callbacks;
+    this.reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, callbacks);
+    // wrap the callbacks so that the eventresolver is called
+    this.callbacks = new ResolvingCompilerCallbacks(this.reader, this.options, callbacks);
     return true;
   }
 
@@ -122,16 +127,16 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    */
   async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
 
-    let compilerOptions: LdmlCompilerOptions = {
+    const compilerOptions: LdmlCompilerOptions = {
       ...defaultCompilerOptions,
       ...this.options,
     };
 
-    let source = this.load(inputFilename);
+    const source = this.load(inputFilename);
     if (!source) {
       return null;
     }
-    let kmx = await this.compile(source);
+    const kmx = await this.compile(source, true);
     if (!kmx) {
       return null;
     }
@@ -238,9 +243,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          the source file, or null if invalid
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    const reader = this.reader;
     // load the file from disk into a string
-    const data = this.callbacks.loadFile(filename);
+    const data = reader.readFile(filename);
     if (!data) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
@@ -261,6 +266,9 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       return null;
     }
 
+    // record the default filename - for error reporting.
+    KeymanXMLReader.setDefaultFilename(source, filename);
+
     return source;
   }
 
@@ -272,7 +280,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns          the source file, or null if invalid
    */
   public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
-    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    const reader = this.reader;
     const data = this.callbacks.loadFile(filename);
     if (!data) {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
@@ -344,6 +352,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Transforms in-memory LDML keyboard xml file to an intermediate
    * representation of a .kmx file.
    * @param   source - in-memory representation of LDML keyboard xml file
+   * @param   postValidate - pass true if sections should run a 'validate' phase at the very end.
+   *                         Set this to true if you aren't calling validate() separately.
    * @returns          KMXPlusFile intermediate file
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
@@ -352,7 +362,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     const kmx = new KMXPlusFile();
 
-    for (let section of sections) {
+    for (const section of sections) {
       if (!section.validate()) {
         // TODO-LDML: coverage
         passed = false;
@@ -405,7 +415,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     // give all sections a chance to postValidate
     if (postValidate) {
-      for (let section of sections) {
+      for (const section of sections) {
         if (!section.postValidate(kmx.kmxplus[section.id])) {
           passed = false;
         }

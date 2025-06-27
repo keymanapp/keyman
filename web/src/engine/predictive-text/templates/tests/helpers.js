@@ -7,13 +7,13 @@ var _ = global;
 // TODO: then mocha invocation is as follows:
 // TODO:     mocha -r @keymanapp/models-test-helpers test/
 
-import { extendString } from '@keymanapp/web-utils';
+import { KMWString } from '@keymanapp/web-utils';
+
+// The predictive-text engine always keeps these enabled.
+KMWString.enableSupplementaryPlane(true);
 
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';
-
-extendString();
-assert.ok('💩'.kmwLength);
 
 /**
  * Load JSON fixtures from a well-known place.

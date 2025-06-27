@@ -6,25 +6,23 @@ import Outcome = LexicalModelTypes.Outcome;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import WithOutcome = LexicalModelTypes.WithOutcome;
-import { extendString } from "@keymanapp/web-utils";
-
-extendString();
+import { KMWString } from "@keymanapp/web-utils";
 
 export const SENTINEL_CODE_UNIT = '\uFDD0';
 
 export function applyTransform(transform: Transform, context: Context): Context {
   // First, get the current context
   let fullLeftContext = context.left || '';
-  let lLen = fullLeftContext.kmwLength();
+  let lLen = KMWString.length(fullLeftContext);
   let lDel = lLen < transform.deleteLeft ? lLen : transform.deleteLeft;
 
-  let leftContext = fullLeftContext.kmwSubstr(0, lLen - lDel) + (transform.insert || '');
+  let leftContext = KMWString.substr(fullLeftContext, 0, lLen - lDel) + (transform.insert || '');
 
   let fullRightContext = context.right || '';
-  let rLen = fullRightContext.kmwLength();
+  let rLen = KMWString.length(fullRightContext);
   let rDel = (rLen < (transform.deleteRight ?? 0)) ? rLen : (transform.deleteRight ?? 0);
 
-  let rightContext = fullRightContext.kmwSubstr(rDel);
+  let rightContext = KMWString.substr(fullRightContext, rDel);
 
   return {
     left: leftContext,
@@ -47,12 +45,12 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
 
   // The 'fun' case:  the second Transform wants to delete something from the first.
   if(second.deleteLeft) {
-    let firstLength = first.insert.kmwLength();
+    let firstLength = KMWString.length(first.insert);
     if(firstLength <= second.deleteLeft) {
       mergedFirstInsert = '';
       mergedSecondDelete = second.deleteLeft - firstLength;
     } else {
-      mergedFirstInsert = first.insert.kmwSubstr(0, firstLength - second.deleteLeft);
+      mergedFirstInsert = KMWString.substr(first.insert, 0, firstLength - second.deleteLeft);
       mergedSecondDelete = 0;
     }
   }

@@ -30,7 +30,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
       throw new Error("Invalid state:  must be linked with a CloudQueryEngine instance.");
     }
 
-    let promise = new ManagedPromise<T>();
+    const promise = new ManagedPromise<T>();
 
     // Set callback timer
     const timeoutObj = setTimeout(() => {
@@ -42,7 +42,7 @@ export default class NodeCloudRequester implements CloudRequesterInterface {
     const tFlag='&timerid='+ queryId;
     const fullRef = query + tFlag;
 
-    let _this = this;
+    const _this = this;
 
     const finalize = (fetchedContents: string) => {
       clearTimeout(timeoutObj);

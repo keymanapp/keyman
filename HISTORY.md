@@ -1,5 +1,277 @@
 # Keyman Version History
 
+## 19.0.63 alpha 2025-06-12
+
+* maint(web): add some more arguments for web release build script (#14167)
+* maint(developer): use double quotes so that variable gets replaced (#14168)
+* chore(deps): bump brace-expansion from 2.0.1 to 2.0.2 in /developer/src/server/src/win32/trayicon/addon-src (#14165)
+
+## 19.0.62 alpha 2025-06-11
+
+* maint(developer): export environment variables (#14157)
+* maint(web): use path when calling powershell script (#14156)
+* maint(resources): fix regression on mac triggering builds (#14155)
+
+## 19.0.61 alpha 2025-06-10
+
+* chore(developer): extend unit test timeout for getLastGitCommitDate (#14147)
+* fix(common): Use zip.inc.sh for common test keyboards (#14145)
+* maint(developer): add docker image to build developer node modules (#14058)
+
+## 19.0.60 alpha 2025-06-06
+
+* maint(developer): allow to build locally on Linux (#14059)
+
+## 19.0.59 alpha 2025-06-05
+
+* chore(deps): bump multer from 2.0.0 to 2.0.1 (#14127)
+* maint(web): fix working directory for zipping artifacts for Web release (#14128)
+* chore(linux): Update debian changelog (#14119)
+* maint(web): improve TC build script for Keyman Web/Test (#14051)
+* maint(developer): move TC configuration for Keyman Developer to scripts (#14052)
+
+## 19.0.58 alpha 2025-06-04
+
+* feat(developer): update strs compiler to collect context (#14064)
+* feat(developer): line numbers for UsetCompiler, others (#14090)
+* feat(developer): remaining line numbers for tran/bksp compilers (#14097)
+* feat(developer): ldml: update errors for unparseable reorder (#14098)
+* chore(developer): ldml: messages cleanup (#14100)
+* maint(android): Create "archive" builder step to prep release artifacts (#14093)
+* maint(web): move TC configuration for Web to script (#14049)
+
+## 19.0.57 alpha 2025-06-03
+
+* fix(windows): change from error to breadcrumb and log (#14069)
+* maint(mac): make make-km-dmg.sh less quiet (#14105)
+
+## 19.0.56 alpha 2025-06-02
+
+* maint(ios): Use zip.inc.sh to prep release artifacts (#13919)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14094)
+* chore(linux): add Python TC test runner (#14062)
+
+## 19.0.55 alpha 2025-05-31
+
+* maint(linux): `sudo` not required for removing temporary files (#14086)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14089)
+
+## 19.0.54 alpha 2025-05-30
+
+* maint(linux): move TC build scripts to `resources/teamcity/linux` (#14061)
+
+## 19.0.53 alpha 2025-05-29
+
+* fix(developer): ensure that kmc doesn't skip validate phase of kmc-ldml (#14068)
+
+## 19.0.52 alpha 2025-05-28
+
+* feat(developer): line numbers for tran compiler (#14037)
+* feat(developer): add line numbers to disp compiler (#14048)
+* feat(developer): line numbers for layr compiler (#14050)
+* feat(developer): line numbers for LocaCompiler (#14054)
+* fix(common): properly use newly installed node version (#14057)
+* maint(common): update build coordinator and labels for `resources/teamcity` changes (#14047)
+
+## 19.0.51 alpha 2025-05-27
+
+* maint: add stable-19.0 triggers (#14043)
+* maint: add empty 'scripts' tag to package.json to silence warning (#14044)
+* fix(linux): fix version variable references in kmconfig (#14032)
+
+## 19.0.50 alpha 2025-05-26
+
+* chore(web): mark async methods in UI components (#14034)
+
+## 19.0.49 alpha 2025-05-25
+
+* feat(developer): revamp line numbers per design doc (#14016)
+* docs(developer): add compiler message internal documentation (#14025)
+* feat(developer): add line numbers to vars compiler (#14036)
+
+## 19.0.48 alpha 2025-05-23
+
+* maint(web): upgrade Sentry to 8.55.0 (#14030)
+
+## 19.0.47 alpha 2025-05-22
+
+* fix(windows): only breadcrumb unexpected state on first run (#13984)
+* maint: change builder_completion script to a .inc.sh (#14007)
+* fix(windows): skip sending handle kmshell events to upgrade state machine  for keyboard install modes (#13989)
+* fix(windows): fix sentry error message reporting (#14027)
+
+## 19.0.46 alpha 2025-05-21
+
+* docs(common): update README with number of languages and keyboards (#14023)
+
+## 19.0.45 alpha 2025-05-21
+
+* maint(linux): use correct syntax to define local variables in script (#14021)
+* maint(developer): update multer to v2.0.0 (#14012)
+
+## 19.0.44 alpha 2025-05-21
+
+* feat(android): log active keyboard, model IDs with reported errors (#13983)
+* fix(windows): rename Enter and Exit methods TState (#13920)
+* maint: update macOS environment setup, related documentation (#13979)
+* chore(deps): bump multer from 1.4.5-lts.1 to 2.0.0 (#13982)
+* feat(ios): log active keyboard, model IDs with reported errors (#13987)
+* maint(linux): add quilt to release build configuration (#13986)
+* chore(ios): update FirstVoices AppIcon (#13976)
+* docs(developer): add security note to Upload documentation (#14015)
+* fix(android): Check network access before trying to download keyboard (#13978)
+
+## 19.0.43 alpha 2025-05-20
+
+* chore(ios): FirstVoices certificate update (#13991)
+* fix(linux): configurable path in `.service` file when using basu (#13980)
+
+## 19.0.42 alpha 2025-05-20
+
+* maint(linux): add `--no-werror` option to not report warnings as errors (#13988)
+
+## 19.0.41 alpha 2025-05-19
+
+* fix(web): inspectable test-script mode should not be auto-enabled in local-env tests (#13895)
+* maint(common): evaluate and apply npm audit fix (without forced changes) (#13897)
+* maint: update mocha (#13899)
+* maint: update @actions/github + @octokit references (#13900)
+* maint(common): update fast-json-patch to ^3.1.1 (#13901)
+* change(web): cancel flicks when both returning to and releasing at original tap location (#13683)
+* fix(web): empty layout fontSize property should default to 1em (#13959)
+* maint(linux): fix release build to run all tests except integration tests (#13968)
+
+## 19.0.40 alpha 2025-05-17
+
+* maint(common): Add zip.inc.sh for cross-platform zipping (#13812)
+
+## 19.0.39 alpha 2025-05-16
+
+* chore(mac,windows): Update Crowdin strings for Italian (#13871)
+* refactor(web): rename generic type variables (#13930)
+* maint(linux): properly fallback to `VERSION` in deb-packaging (#13961)
+* maint(linux): update gha-ubuntu-packaging dependency (#13964)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13962)
+* maint(linux): don't include `dockerbuild` log files (#13965)
+* maint(linux): update GHA dependencies for Linux package builds (#13966)
+
+## 19.0.38 alpha 2025-05-15
+
+* chore(android): Update FirstVoices launcher icon and red theme (#13907)
+* feat(developer): add more line number issues for KeysCompiler (#13915)
+* feat(developer):  add line number for MetaCompiler (#13916)
+* maint(linux): address comments from Debian package review (#13904)
+* maint(linux): add Questing to launchpad package builds (#13910)
+* maint(linux): fix logging in `deb-packaging.sh` (#13912)
+* maint(linux): remove temporary files created during dependency installation (#13913)
+* maint(common): move TC build configs for Linux to scripts (#13754)
+* fix(developer): remove ngrok binary at build time (#13847)
+* chore(linux): Update debian changelog (#13889)
+* refactor(web): rename `HardKeyboard` to `HardKeyboardBase` (#13929)
+* refactor(web): rename base `KeymanEngine` to `KeymanEngineBase` (#13942)
+
+## 19.0.37 alpha 2025-05-14
+
+* maint(linux): remove generated file that got accidentally committed (#13902)
+* maint(linux): remove check for patched ibus from `meson.build` (#13909)
+* maint(common): report builder errors to stderr (#13882)
+
+## 19.0.36 alpha 2025-05-13
+
+* feat(developer): line numbers for XML parsing and kmc-ldml (#13375)
+* maint(android): Update to Java 21 and Gradle dependencies (#13858)
+* maint(linux): improve getting PR# in `upload-to-debian.sh` (#13890)
+* fix(linux): fallback to `VERSION` if `KEYMAN_VERSION` isn't set during package build (#13891)
+* maint(common): move and document `builder_is_ci_*` functions (#13892)
+* maint(android): use new variable name `KEYMAN_TIER` (#13898)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13876)
+
+## 19.0.35 alpha 2025-05-12
+
+* maint(common): add two more functions to detect if running on CI (#13869)
+* maint(common): use unique names for Keyman version variables (#13854)
+* maint(common): use new `builder_is_running_on_*` functions (#13875)
+* maint(common): remove obsolete code from docker-images `run.sh` (#13879)
+* chore(mac): remove obsolete key processing code (#13848)
+
+## 19.0.34 alpha 2025-05-08
+
+* docs(common): update `builder_echo` documentation for TC blocks (#13855)
+* fix(windows): add breadcrumb to download failures (#13826)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13860)
+* maint(common): remove obsolete code from docker-images `build.sh` (#13861)
+* maint(common): output start/end messages if not running on TC (#13868)
+
+## 19.0.33 alpha 2025-05-07
+
+* maint(common): automatically set --debug option for local-environment builder-script uses (#13827)
+* docs(web): add a Web engine keystroke lifecycle internal doc (#13759)
+* maint(common): use function to detect if running on TC (#13844)
+* docs(common): document new `builder_is_running_on_teamcity` function (#13852)
+
+## 19.0.32 alpha 2025-05-06
+
+* change(web): replace USVString with string in predictive-text engine (#13785)
+* chore(web): replace --ci flag with builder_is_ci_build (#13819)
+* maint(web): simplify worker-main test.sh (#13820)
+* change(web): lint kmwstring web-utility (#13800)
+* fix(web): fix extraction of gesture-engine fixture used in DOM-based unit tests (#13805)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13774)
+* fix(web): fix var declaration affected by linter strictness + length-style fix (#13839)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13840)
+* chore(common): override check when running on TC (#13779)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13842)
+* maint(common): add support for TC blocks (#13810)
+
+## 19.0.31 alpha 2025-05-05
+
+* fix(mac): add version metadata after building tests (#13818)
+* maint(common): remove `eslint:recommended` configuration for .ts (#13825)
+* maint(common): Update write_download_info() to be cross-platform (#13813)
+* change(ios): limit reports about devices without predefined scaling entries (#13806)
+* change(web): lint engine/common/web-utils (#13797)
+* chore(web): replace kmwFromCharCode with its ES6 equivalent (#13716)
+* chore(web): add unit tests for SMP-aware string-handling helper methods (#13719)
+* refactor(web): refactor string-helper library to eliminate its module side-effect (#13726)
+
+## 19.0.30 alpha 2025-05-02
+
+* chore(android): Use `builder_is_ci_build` rather than `--ci` flag (#13772)
+* docs: add `--deps` flags and move builder.md into /docs (#13815)
+* chore(web): improve clean actions (#13804)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13773)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13807)
+* maint(core): batch build kmx in tests for performance (#13795)
+* maint(common): cleanup meson versioning (#13796)
+* maint(common): test imported resource versions (#13803)
+
+## 19.0.29 alpha 2025-04-30
+
+* change(web): enable linting for Keyman Engine for Web modules (#13787)
+* fix(web): reconnect unit tests for low-level web utility classes/methods (#13714)
+* fix(android): Change Alert Dialog instead of Toast if package missing languages (#13786)
+* maint(common): remove platform advocates from CODEOWNERS (#13801)
+* chore(common): allow to run tests in virtual environment (#13793)
+* chore: increase linter strictness (#13788)
+
+## 19.0.28 alpha 2025-04-29
+
+* chore(common): Update dependencies in crowdin GitHub action (#13775)
+* chore: additional tweaks to scopes/labels (#13765)
+* chore(common): rename `chore` GH label to `maint` (#13780)
+* change(linux): add link to issue (#13778)
+
+## 19.0.27 alpha 2025-04-28
+
+* chore: update labels for v19 (#13744)
+
+## 19.0.26 alpha 2025-04-24
+
+* chore: merge beta version 18.0.235 history to master (#13735)
+* chore(linux): Update debian changelog (#13738)
+* chore: comment out CODEOWNERS (#13739)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13740)
+
 ## 19.0.25 alpha 2025-04-22
 
 * chore: merge beta to master (pre-release prep) (#13730)
@@ -112,6 +384,49 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.238 stable 2025-06-04
+
+* fix(developer): ldml: make sure .run() calls compile() for validation (#14071)
+* maint(linux): fix typo of temporary dependency package (#14085)
+* maint(linux): update to new version of gha-ubuntu-packaging (#14096)
+* maint(mac): make make-km-dmg.sh less quiet (#14106)
+
+## 18.0.237 stable 2025-05-30
+
+* maint(android): Update FirstVoices launcher icon and red theme (#13917)
+* fix(web): empty layout fontSize property should default to 1em (#13960)
+* fix(linux): use correct header guard define in OrderedOutputDevice.h (#13963)
+* chore(linux): Update debian changelog (#13888)
+* fix(mac): handle PackageInfo section in kmp.inf file (#13957)
+* feat(android): log active keyboard, model IDs with reported errors (#14003)
+* chore(ios): FirstVoices certificate update (#14005)
+* feat(ios): log active keyboard, model IDs with reported errors (#14006)
+* fix(linux): configurable path in `.service` file when using basu (#13999)
+* maint(linux): add `--no-werror` option to not report warnings as errors (#14000)
+* fix(windows): use json file name against cache folder and ename Enter and Exit methods for TState Object (#14010)
+* chore(ios): update FirstVoices AppIcon (#14011)
+* maint: change builder_completion script to a .inc.sh (#14008)
+* fix(windows): only breadcrumb unexpected state on first run (#14026)
+* fix(windows): skip sending handle kmshell events to upgrade state machine for keyboard install modes (#14028)
+* fix(windows): fix sentry error message reporting (#14029)
+
+## 18.0.236 stable 2025-05-12
+
+* chore(linux): Update debian changelog (#13737)
+* chore(linux): add a stub unit test to allow successful coverage reporting (#13741)
+* fix(android): Use Alert Dialog if keyboard pkg missing languages (#13802)
+* maint(web): merge LMLayer CI build config with standard Web CI build config (#13808)
+* fix(ios): restore keyboard-scale settings for older, still-supported iOS devices (#13817)
+* change(ios): limit reports about devices without predefined scaling entries (#13828)
+* chore(ios): Update inuktitut_pirurvik to 1.4.1 (#13841)
+* fix(web): add robustness for bad touch-layout fontsize specs (#13838)
+* change(linux): add ICU dependency needed to build on Arch Linux (#13843)
+* fix(mac): add version metadata after building tests (#13853)
+* fix(web): sustain active batched-layout mode when keyboard is switched (#13863)
+* fix(developer): remove ngrok binary at build time (#13873)
+* maint(common): apply new codeowners from master (#13874)
+* chore(mac,windows): Update Crowdin strings for Italian (#13872)
 
 ## 18.0.234 beta 2025-04-22
 

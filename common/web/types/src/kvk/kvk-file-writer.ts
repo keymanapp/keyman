@@ -50,7 +50,7 @@ export default class KvkFileWriter {
     this.setString(binary.header.ansiFont.name, source.header.ansiFont.name);
     this.setString(binary.header.unicodeFont.name, source.header.unicodeFont.name);
 
-    for(let sourceKey of source.keys) {
+    for(const sourceKey of source.keys) {
       const binaryKey: BUILDER_KVK_KEY = {
         flags: sourceKey.flags,
         vkey: sourceKey.vkey,

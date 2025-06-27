@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="*"
            UpgradeCode="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}" Manufacturer="SIL International"
-           Name="Keyman Developer $(var.RELEASE)" Version="$(var.VERSION)" Language="1033">
+           Name="Keyman Developer $(var.RELEASE)" Version="$(var.KEYMAN_VERSION)" Language="1033">
     <Package Keywords="Keyman,Keyboard,Engine" Compressed="yes"
              Description="Keyman Developer $(var.RELEASE)" Comments="Contact:  Your local administrator"
              Manufacturer="SIL International" InstallerVersion="200" Platform="x86" Languages="1033" SummaryCodepage="1252" />
@@ -40,10 +40,10 @@
 
     <Upgrade Id="{E99A1F1E-7046-44F9-89EF-D3A59F84B209}">
       <UpgradeVersion OnlyDetect="no" Minimum="11.0.0.0" IncludeMinimum="yes"
-                      Maximum="$(var.VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="yes"
-                      Maximum="$(var.VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
-      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
+                      Maximum="$(var.KEYMAN_VERSION)" IncludeMaximum="no" MigrateFeatures="yes" Property="VERSION11FOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.KEYMAN_VERSION)" IncludeMinimum="yes"
+                      Maximum="$(var.KEYMAN_VERSION)" IncludeMaximum="yes" Property="CURRENTVERSIONFOUND" />
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.KEYMAN_VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
 
     <Property Id="ALLUSERS"><![CDATA[1]]></Property>
@@ -309,7 +309,7 @@
 
     <Icon Id="TIKE.ico" SourceFile="..\images\KeymanDeveloper90.ico" />
 
-    <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.VERSION) or newer.' />
+    <CustomAction Id='AlreadyUpdated' Error='[ProductName] has already been updated to $(var.KEYMAN_VERSION) or newer.' />
     <CustomAction Id='NoDowngrade' Error='A later version of [ProductName] is already installed.' />
 
     <Property Id='OLDINSTALLDIR'>
