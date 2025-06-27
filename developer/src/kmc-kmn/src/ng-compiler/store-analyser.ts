@@ -10,7 +10,7 @@
 
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
 import { Token, TokenTypes } from "./lexer.js";
-import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, ManyRule } from "./recursive-descent.js";
+import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, ManyRule, OptionalRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -314,10 +314,9 @@ export class ShiftFreesCapsRule extends CapsLockStatementRule {
 export class HeaderAssignRule extends SingleChildRule {
   public constructor() {
     super();
-    const headerName: Rule    = new HeaderNameRule();
-    const text: Rule          = new TextRule();
-    const oneOrManyText: Rule = new ManyRule(text);
-    this.rule = new SequenceRule([headerName, oneOrManyText]);
+    const headerName: Rule  = new HeaderNameRule();
+    const headerValue: Rule = new HeaderValueRule();
+    this.rule = new SequenceRule([headerName, headerValue]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -325,11 +324,22 @@ export class HeaderAssignRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const children: ASTNode[] = tmp.getChildren();
-      const headerNode: ASTNode = children.splice(0, 1)[0];
-      headerNode.addChildren(children);
-      node.addChild(headerNode);
+      const nameNode: ASTNode = children.splice(0, 1)[0];
+      nameNode.addChildren(children);
+      node.addChild(nameNode);
     }
     return parseSuccess;
+  }
+}
+
+export class HeaderValueRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const text: Rule         = new TextRule();
+    const manyText: Rule     = new ManyRule(text);
+    const parameter: Rule    = new TokenRule(TokenTypes.PARAMETER, true);
+    const optParameter: Rule = new OptionalRule(parameter);
+    this.rule = new SequenceRule([manyText, optParameter]);
   }
 }
 

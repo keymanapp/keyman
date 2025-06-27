@@ -471,7 +471,7 @@ describe("KMN Store Analyser Tests", () => {
       const systemStoreName: Rule = new HeaderAssignRule();
       assert.isNotNull(systemStoreName);
     });
-    it("can parse correctly", () => {
+    it("can parse correctly (value is string)", () => {
       [
         {code: 'bitmap',    nodeType: NodeTypes.BITMAP_HEADER},
         {code: 'copyright', nodeType: NodeTypes.COPYRIGHT_HEADER},
@@ -488,6 +488,13 @@ describe("KMN Store Analyser Tests", () => {
         assert.isTrue(headerName.parse(root));
         const headerNode = root.getSoleChildOfType(testCase.nodeType);
         assert.equal(headerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"value"');
+      });
+      it("can parse correctly (version with value as float)", () => {
+        Rule.tokenBuffer = stringToTokenBuffer('VERSION 10.0');
+        const headerName: Rule = new HeaderAssignRule();
+        assert.isTrue(headerName.parse(root));
+        const versionNode = root.getSoleChildOfType(NodeTypes.VERSION_HEADER);
+        assert.equal(versionNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), '10.0')
       });
     });
   });

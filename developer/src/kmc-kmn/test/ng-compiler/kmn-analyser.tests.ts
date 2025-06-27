@@ -3059,7 +3059,7 @@ describe("KMN Analyser Tests", () => {
         'release/sil/sil_kayah_latn/source/sil_kayah_latn',
         'release/sil/sil_kayah_mymr/source/sil_kayah_mymr',
         'release/sil/sil_kcho/source/sil_kcho',
-      ].splice(0,86).forEach((name) => {
+      ].splice(0,87).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
