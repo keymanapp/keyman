@@ -6,6 +6,8 @@
  * Utilities for manipulating Symbol properties
  */
 
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
+
 export class SymbolUtils {
   /**
    * Copy symbols shallowly from 'from' onto 'onto'
@@ -13,8 +15,8 @@ export class SymbolUtils {
    * @param from source for symbols
    * @returns the onto object
    */
-  public static copySymbols<T>(onto: T, from: any): T {
-    const o = onto as any;
+  public static copySymbols<T>(onto: T, from: ObjectWithCompileContext): T {
+    const o = onto as ObjectWithCompileContext;
     for (const sym of Object.getOwnPropertySymbols(from)) {
       o[sym] = from[sym];
     }

@@ -1,6 +1,7 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
 import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
 import { SectionCompiler } from "./section-compiler.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
@@ -21,7 +22,17 @@ export class LocaCompiler extends SectionCompiler {
    */
   private getLocales =
     (keyboard: LKKeyboard) =>
-    [keyboard.locale].concat(Array.isArray(keyboard.locales?.locale) ? keyboard.locales.locale.map(v => v.id) : [])
+    [keyboard.locale].concat(Array.isArray(keyboard.locales?.locale) ? keyboard.locales.locale.map(v => v.id) : []);
+
+  /**
+   * Attempt to locate context metadata for a locale, for error messages
+   * @param loc locale tag
+   * @returns context metadata or null
+   */
+  private contextForLocale(loc: string) : ObjectWithCompileContext {
+    if (loc == this.keyboard3.locale) return this.keyboard3;
+    return this.keyboard3?.locales;
+  }
 
   public validate(): boolean {
     let valid = true;
@@ -31,7 +42,7 @@ export class LocaCompiler extends SectionCompiler {
         new Intl.Locale(tag);
       } catch(e) {
         if(e instanceof RangeError) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLocale({tag}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLocale({tag}, this.contextForLocale(tag)));
           valid = false;
         } else {
           /* c8 ignore next 2 */
@@ -51,7 +62,8 @@ export class LocaCompiler extends SectionCompiler {
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {
-        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_LocaleIsNotMinimalAndClean({ sourceLocale, locale },
+        this.contextForLocale(sourceLocale)));
       }
       return locale;
     });
@@ -60,10 +72,10 @@ export class LocaCompiler extends SectionCompiler {
     // yet include `getCanonicalLocales` but node 16 does include it so we can
     // safely use it. Also well supported in modern browsers.
     const canonicalLocales = (Intl as any).getCanonicalLocales(locales) as string[];
-    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale));
+    result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale, {compileContext: this.contextForLocale(locale)}));
 
     if(result.locales.length < locales.length) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales(this.keyboard3?.locales));
     }
 
     return result;

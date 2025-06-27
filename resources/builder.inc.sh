@@ -181,28 +181,30 @@ function builder_heading() {
 
 
 builder_echo() {
-  local color=white message= mark= block= action= do_output=true
+  local color=white message= mark= block= action= do_output=true test=
   local echo_target=echo
 
   if [[ $# -gt 1 ]]; then
     if [[ $1 =~ ^(white|grey|green|success|blue|heading|yellow|warning|red|error|purple|brightwhite|teal|debug|setmark)$ ]]; then
       color="$1"
       shift
-    elif [[ $1 == "start" ]]; then
+    elif [[ $1 == "start" ]] || [[ $1 == "startTest" ]]; then
       # builder_echo start block message
-      action="$1"
+      test="$1"
       block="$2"
       shift 2
+      action="start"
       color="heading"
       if ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
-    elif [[ $1 == "end" ]]; then
+    elif [[ $1 == "end" ]] || [[ $1 == "endTest" ]]; then
       # builder_echo end block status message
-      action="$1"
+      test="$1"
       block="$2"
       color="$3"
       shift 3
+      action="end"
       if [[ "${color}" != "error" ]] && ! builder_is_running_on_teamcity && builder_is_child_build; then
         do_output=${_builder_debug_internal:-false}
       fi
@@ -211,7 +213,11 @@ builder_echo() {
   message="$*"
 
   if [[ "${action}" == "start" ]] && builder_is_running_on_teamcity; then
-    $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    if [[ "${test}" == "startTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteStarted name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    else
+      $echo_target -e "##teamcity[blockOpened name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    fi
   fi
 
   if ${do_output}; then
@@ -241,7 +247,11 @@ builder_echo() {
   fi
 
   if [[ "${action}" == "end" ]] && builder_is_running_on_teamcity; then
-    $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    if [[ "${test}" == "endTest" ]]; then
+      $echo_target -e "##teamcity[testSuiteFinished name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    else
+      $echo_target -e "##teamcity[blockClosed name='|[${THIS_SCRIPT_IDENTIFIER}|] ${block}']"
+    fi
   fi
 }
 
@@ -2209,6 +2219,47 @@ builder_is_ci_test_build() {
     return 0
   fi
   return 1
+}
+
+#
+# Returns 0 if current ci build is a release-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_release() {
+  if builder_is_ci_release_build; then
+    return 0
+  fi
+  if [[ "$KEYMAN_BUILD_LEVEL" == release ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current ci build is a build-level build. Do not use for non-ci
+# builds.
+#
+builder_is_ci_build_level_build() {
+  if builder_is_ci_release_build; then
+    return 1
+  fi
+  if builder_is_ci_build_level_release; then
+    # KEYMAN_BUILD_LEVEL == release, i.e. not build
+    return 1
+  fi
+  return 0
+}
+
+#
+# Executes statement if a ci build level of 'release', and for local builds, but
+# not for a ci build level of 'build'
+#
+builder_if_release_build_level() {
+  if builder_is_ci_build && builder_is_ci_build_level_build; then
+    builder_echo "Skipping - buildLevel=build: $@"
+    return 0
+  fi
+  "$@"
 }
 
 ################################################################################

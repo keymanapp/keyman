@@ -1,5 +1,5 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { DependencySections, StrsItem, UsetItem } from './kmx-plus.js';
+import { DependencySections, StrsItem, StrsOptions, UsetItem } from './kmx-plus.js';
 import { ElementParser, ElementSegment, ElementType } from '../../ldml-keyboard/pattern-parser.js';
 import * as util from '../../util/util.js';
 import MATCH_HEX_ESCAPE = util.MATCH_HEX_ESCAPE;
@@ -33,7 +33,7 @@ export class ElementString extends Array<ElemElement> {
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element rules.
    */
-  static fromStrings(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) : ElementString {
+  static fromStrings(sections: DependencySections, options: StrsOptions, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string) : ElementString {
     // the returned array
     const array = new ElementString();
     if(!source) {
@@ -81,21 +81,21 @@ export class ElementString extends Array<ElemElement> {
           // error. So we can just exit here.
           return null; // UnicodeSet error
         }
-        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
+        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges, options?.compileContext);
         if (!uset) {
-          return null; // UnicodeSet error already thrown
+          return null; // UnicodeSet error already added to callback
         }
-        elem.uset = sections.uset.allocUset(uset, sections);
-        elem.value = sections.strs.allocString('', {singleOk: true}); // no string
+        elem.uset = sections.uset.allocUset(uset, sections, options?.compileContext);
+        elem.value = sections.strs.allocString('', {...options, singleOk: true}); // no string
       } else if (item.type === ElementType.codepoint || item.type === ElementType.escaped || item.type === ElementType.string) {
         // some kind of a string
         let str = item.segment;
         if (item.type === ElementType.escaped && !MATCH_HEX_ESCAPE.test(str)) {
           str = unescapeOneQuadString(str);
           // TODO-LDML: any other escape forms here?
-          elem.value = sections.strs.allocString(str, { singleOk: true });
+          elem.value = sections.strs.allocString(str, { ...options, singleOk: true });
         } else {
-          elem.value = sections.strs.allocString(str, { unescape: true, singleOk: true });
+          elem.value = sections.strs.allocString(str, { ...options, unescape: true, singleOk: true });
         }
         // Now did we end up with one char or no?
         if (elem.value.isOneChar) {

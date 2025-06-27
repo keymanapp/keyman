@@ -41,14 +41,14 @@ export class Elem extends Section {
   strings: ElementString[] = [];
   constructor(sections: DependencySections) {
     super();
-    this.strings.push(ElementString.fromStrings(sections, '')); // C7043: null element string
+    this.strings.push(ElementString.fromStrings(sections, {}, '')); // C7043: null element string
   }
   /**
    * @param source if a string array, does not get reinterpreted as UnicodeSet. This is used with vars, etc. Or pass `["str"]` for an explicit 1-element elem.
    * If it is a string, will be interpreted per reorder element ruls.
    */
-  allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
-    const s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+  allocElementString(sections: DependencySections, options: StrsOptions, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
+    const s = ElementString.fromStrings(sections, options, source, order, tertiary, tertiary_base, prebase);
     if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
@@ -135,6 +135,18 @@ export class StrsItem {
   isEqual(a: StrsItem): boolean {
     return a.value === this.value && a.char === this.char;
   }
+
+  private _context: any = undefined;
+
+  /** add any context from the options to this strsitem */
+  setContext(opts?: StrsOptions) {
+    // At present, there's only a single piece of context available
+    this._context = this._context || opts?.compileContext;
+  }
+
+  get context() : any {
+    return this._context;
+  }
 };
 
 /**
@@ -161,6 +173,8 @@ export interface StrsOptions {
   nfd?: boolean;
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
+  /** optional context */
+  compileContext?: any;
 };
 
 export class Strs extends Section {
@@ -192,6 +206,8 @@ export class Strs extends Section {
       result = new StrsItem(s);
       this.strings.push(result);
     }
+    // give an option to set the context
+    result.setContext(opts);
     return result;
   }
 
@@ -200,7 +216,7 @@ export class Strs extends Section {
     s = s ?? '';
     // type check everything else
     if (typeof s !== 'string') {
-      throw new Error('alloc_string: s must be a string, undefined, or null.');
+      throw new Error(`Internal Error: processString: s must be a string, undefined, or null, not ${typeof s} ${s}`);
     }
     // substitute variables
     if (opts?.stringVariables) {
@@ -358,11 +374,13 @@ export class Vars extends Section {
 export class VarsItem extends Section {
   id: StrsItem;
   value: StrsItem;
+  compileContext?: any;
 
-  constructor(id: string, value: string, sections: DependencySections) {
+  constructor(id: string, value: string, sections: DependencySections, compileContext?: any) {
     super();
     this.id = sections.strs.allocString(id);
-    this.value = sections.strs.allocString(value, {unescape: true});
+    this.value = sections.strs.allocString(value, { unescape: true });
+    this.compileContext = compileContext;
   }
 
   valid() : boolean {
@@ -371,11 +389,11 @@ export class VarsItem extends Section {
 };
 
 export class UnicodeSetItem extends VarsItem {
-  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser) {
-    super(id, value, sections);
+  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser, compileContext?: any) {
+    super(id, value, sections, compileContext);
     const needRanges = sections.usetparser.sizeUnicodeSet(value);
     if (needRanges >= 0) {
-      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges, compileContext);
     } // otherwise: error (was recorded via callback)
   }
   unicodeSet?: UnicodeSet;
@@ -385,9 +403,9 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections) {
-    super(id, value.join(' '), sections);
-    this.items = sections.elem.allocElementString(sections, value);
+  constructor(id: string, value: string[], sections: DependencySections, compileContext?: any) {
+    super(id, value.join(' '), sections, compileContext);
+    this.items = sections.elem.allocElementString(sections, { compileContext }, value);
   }
   items: ElementString;  // element string array
   valid() : boolean {
@@ -396,8 +414,8 @@ export class SetVarItem extends VarsItem {
 };
 
 export class StringVarItem extends VarsItem {
-  constructor(id: string, value: string, sections: DependencySections) {
-    super(id, value, sections);
+  constructor(id: string, value: string, sections: DependencySections, compileContext?: any) {
+    super(id, value, sections, compileContext);
   }
   // no added fields
 };
@@ -435,7 +453,7 @@ export class Tran extends Section {
 };
 
 export class UsetItem {
-  constructor(public uset: UnicodeSet, public str: StrsItem) {
+  constructor(public uset: UnicodeSet, public str: StrsItem, public compileContext?: any) {
   }
   compareTo(other: UsetItem) : number {
     return this.str.compareTo(other.str);
@@ -444,11 +462,11 @@ export class UsetItem {
 
 export class Uset extends Section {
   usets: UsetItem[] = [];
-  allocUset(set: UnicodeSet, sections: DependencySections) : UsetItem {
+  allocUset(set: UnicodeSet, sections: DependencySections, compileContext?: any) : UsetItem {
     // match the same pattern
     let result = this.usets.find(s => set.pattern == s.uset.pattern);
     if (result === undefined) {
-      result = new UsetItem(set, sections.strs.allocString(set.pattern));
+      result = new UsetItem(set, sections.strs.allocString(set.pattern), compileContext);
       this.usets.push(result);
     }
     return result;

@@ -37,7 +37,7 @@ export class KeysCompiler extends SectionCompiler {
     for (const keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // key not found is handled elsewhere.
-      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
+      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output, key);
     }
     return true;
   }
@@ -324,15 +324,16 @@ export class KeysCompiler extends SectionCompiler {
 
       // allocate the in-memory <flick id=…>
       const flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(flickId)
+        sections.strs.allocString(flickId, { compileContext: flick })
       );
 
       // add data from each segment
-      for (const { keyId, directions } of flick.flickSegment) {
-        const keyIdStr = sections.strs.allocString(keyId);
+      for (const flickSegment of flick.flickSegment) {
+        const { keyId, directions } = flickSegment;
+        const keyIdStr = sections.strs.allocString(keyId, { compileContext: flickSegment });
         const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
-          { },
+          { compileContext: flickSegment },
           sections);
         flicks.flicks.push({
           directions: directionsList,
@@ -369,20 +370,20 @@ export class KeysCompiler extends SectionCompiler {
       if (!!gap) {
         flags |= constants.keys_key_flags_gap;
       }
-      const id = sections.strs.allocString(key.id);
+      const id = sections.strs.allocString(key.id, { compileContext: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(
-        longPressKeyIds, {},
+        longPressKeyIds, { compileContext: key },
         sections);
 
       const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
-        {},
+        { compileContext: key },
         sections);
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
         multiTapKeyIds,
-        {},
+        { compileContext: key },
         sections);
-      const keySwitch = sections.strs.allocString(layerId); // 'switch' is a reserved word
+      const keySwitch = sections.strs.allocString(layerId, { compileContext: key }); // 'switch' is a reserved word
 
       const toRaw = output;
 
@@ -395,6 +396,7 @@ export class KeysCompiler extends SectionCompiler {
           unescape: true,
           singleOk: true,
           nfd: true,
+          compileContext: key,
         },
         sections);
       if (!to.isOneChar) {
@@ -461,7 +463,7 @@ export class KeysCompiler extends SectionCompiler {
     const { modifiers } = layer;
     if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers, id: layer.id }, layer)
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer)
       );
       valid = false;
     }
@@ -482,7 +484,7 @@ export class KeysCompiler extends SectionCompiler {
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
             hardware: layers.formId,
-            modifiers,
+            modifiers: modifiers || 'none',
           }, row)
         );
         valid = false;

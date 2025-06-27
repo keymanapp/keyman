@@ -618,12 +618,11 @@ begin
     CheckForUpdates.Free;
   end;
 
-  { Response OK and Update is available }
-  if Result = wucSuccess then
+  if (Result = wucUpdateAvailable) then
   begin
     ChangeState(UpdateAvailableState);
   end;
-  // else staty in idle state
+  // else stay in idle state
 end;
 
 function IdleState.HandleKmShell;
@@ -641,7 +640,7 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and Update is available }
-  if UpdateCheckResult = wucSuccess then
+  if UpdateCheckResult = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
@@ -723,7 +722,7 @@ begin
   finally
     CheckForUpdates.Free;
   end;
-  if Result <> wucSuccess then
+  if Result = wucFailure then
     begin
       KL.Log('UpdateAvailableState.HandleCheck CheckForUpdates not successful: '+
         GetEnumName(TypeInfo(TUpdateState), Ord(Result)));
@@ -762,7 +761,6 @@ end;
 procedure DownloadingState.EnterState;
 var
   DownloadResult: Boolean;
-  RetryCount: Integer;
   FMutex: TKeymanMutex;
 begin
   // Enter DownloadingState
@@ -778,12 +776,16 @@ begin
       TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
       Exit;
     end;
+    // verify there is an update available
+    if not TUpdateCheckStorage.CheckMetaDataForUpdate then
+    begin
+      // Return to Idle state
+      bucStateContext.RemoveCachedFiles;
+      ChangeState(IdleState);
+      Exit;
+    end;
 
-    RetryCount := 0;
-    repeat
-      DownloadResult := DownloadUpdatesBackground;
-      Inc(RetryCount);
-    until DownloadResult or (RetryCount >= 3);
+    DownloadResult := DownloadUpdatesBackground;
     FMutex.ReleaseOwnership;
   finally
     FreeAndNil(FMutex);
@@ -791,10 +793,10 @@ begin
 
   if (not DownloadResult) then
   begin
-    // Failed three times in this process; return to the
+    // Failed download; return to the
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-    'Error Updates not downloaded after 3 attempts');
+    'Error Updates not downloaded');
     bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
@@ -919,16 +921,15 @@ begin
     CheckForUpdates.Free;
   end;
   { Response OK and go back to update available so files can be downloaded }
-  if Result = wucSuccess then
+  // TODO: This actually needs to check if the updates available are newer than the already downloaded updates
+
+  if Result = wucUpdateAvailable then
   begin
     ChangeState(UpdateAvailableState);
   end;
 end;
 
 function WaitingRestartState.HandleKmShell;
-var
-  ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall: Boolean;
 begin
   // Still can't go if keyman has run
   if HasKeymanRun then
@@ -937,14 +938,7 @@ begin
   end
   else
   begin
-    hasPackages := False;
-    hasKeymanInstall := False;
-    if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
-    begin
-      hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-      hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
-    end;
-    if not (hasPackages Or hasKeymanInstall) then
+    if not (TUpdateCheckStorage.CheckMetaDataForUpdate) then
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
@@ -987,10 +981,11 @@ begin
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
-        TKeymanSentryClient.Client.MessageEvent
-          (Sentry.Client.SENTRY_LEVEL_ERROR,
-          'Executing kmshell process to install keyboard packages failed:"' +
-          IntToStr(Ord(executeResult)) + '"');
+        TKeymanSentryClient.Breadcrumb('error',
+          'Executing kmshell process to install keyboard packages failed"' +
+           IntToStr(Ord(executeResult)) + '"', 'update');
+        KL.Log('InstallingState.LaunchInstallPackageProcess failed executing kmshell ' +
+          'process to install keyboard packages: "' + IntToStr(Ord(executeResult)) + '"');
         ChangeState(IdleState);
       end;
     end
@@ -1042,9 +1037,10 @@ begin
   if not FResult then
   begin
     bucStateContext.RemoveCachedFiles;
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      'Executing kmshell process to install failed:"' +
-      IntToStr(Ord(FResult)) + '"');
+    TKeymanSentryClient.Breadcrumb('error',
+    'InstallingState.DoInstallKeyman: failed executing kmshell or file not found', 'update');
+    KL.Log('InstallingState.DoInstallKeyman failed executing kmshell ' +
+           'or the update was not found in the cache');
     ChangeState(IdleState);
   end;
 
@@ -1118,7 +1114,7 @@ begin
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
-    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   end;
   { Notes: The reason packages (keyboards) is installed first is
   because we are trying to reduce the number of times the user has
@@ -1182,7 +1178,7 @@ var
   hasKeymanInstall : Boolean;
 begin
   TUpdateCheckStorage.LoadUpdateCacheData(ucr);
-  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
+  hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFileUpdate(ucr);
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman
   if not kmcom.SystemInfo.IsAdministrator then
@@ -1200,6 +1196,12 @@ begin
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
+  end
+  else
+  begin
+    // There is no Keyman installer we can return to the IdleState
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
   end;
 end;
 
