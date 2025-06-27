@@ -6,7 +6,7 @@
  * @return      {Array<Element>}
  */
 export function arrayFromNodeList(nl: NodeList|HTMLCollectionOf<Element>): HTMLElement[] {
-  let res: (HTMLElement)[] = [];
+  const res: (HTMLElement)[] = [];
   for(let i=0; i < nl.length; i++) {
     // Typing says we could get Node instances; it's up to use to use this method responsibly.
     res.push(nl[i] as HTMLElement);

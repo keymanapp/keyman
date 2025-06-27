@@ -27,7 +27,8 @@ builder_describe \
   "--no-integration+         don't run integration tests" \
   "--coverage+               capture test coverage" \
   "--report+                 create coverage report" \
-  "--open                    open the coverage reports in the browser"
+  "--open                    open the coverage reports in the browser" \
+  "--no-werror+              don't report warnings as errors"
 
 builder_parse "$@"
 
@@ -40,5 +41,5 @@ test_action() {
   fi
 }
 
-builder_run_action test test_action
-builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/linux/docs/help"
+builder_run_action  test        test_action
+builder_run_action  test:help   check-markdown  "${KEYMAN_ROOT}/linux/docs/help"

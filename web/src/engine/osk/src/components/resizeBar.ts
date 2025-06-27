@@ -54,12 +54,12 @@ export default class ResizeBar extends EventEmitter<EventMap, ResizeBar> impleme
    * Create a bottom bar with a resizing icon for the desktop OSK
    */
   buildResizeBar(): HTMLDivElement {
-    var bar = createUnselectableElement('div');
+    const bar = createUnselectableElement('div');
     bar.className='kmw-footer';
     bar.onmousedown = this.mouseCancellingHandler;
 
     // Add caption
-    var Ltitle=createUnselectableElement('div');
+    const Ltitle=createUnselectableElement('div');
     Ltitle.className='kmw-footer-caption';
     Ltitle.innerHTML='<a href="https://keyman.com/developer/keymanweb/">KeymanWeb</a>';
     Ltitle.id='keymanweb-osk-footer-caption';
@@ -73,7 +73,7 @@ export default class ResizeBar extends EventEmitter<EventMap, ResizeBar> impleme
 
     bar.appendChild(Ltitle);
 
-    var Limg = createUnselectableElement('div');
+    const Limg = createUnselectableElement('div');
     Limg.className='kmw-footer-resize';
     bar.appendChild(Limg);
     this._resizeHandle=Limg;

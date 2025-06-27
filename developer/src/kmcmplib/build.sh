@@ -92,12 +92,10 @@ fi
 do_action clean
 
 # Note, we have a 'global' configure and also a per-arch configure
-if builder_start_action configure; then
-  # Import our standard compiler defines; this is copied from
-  # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-  # allow us to reference a file outside its root
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+if builder_has_action configure; then
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
 
   # We have to checkout the keyboards repo in a 'configure' action because
   # otherwise meson will not get the right list of keyboard source files,
@@ -105,8 +103,6 @@ if builder_start_action configure; then
   if should_do_full_test; then
     checkout_keyboards
   fi
-
-  builder_finish_action success configure
 fi
 
 do_action configure

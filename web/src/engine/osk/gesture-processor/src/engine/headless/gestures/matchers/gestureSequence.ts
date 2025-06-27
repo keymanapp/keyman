@@ -243,7 +243,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
         )
       }).reduce((flattened, arr) => flattened.concat(arr))
       .reduce((deduplicated, arr) => {
-        for(let entry of arr) {
+        for(const entry of arr) {
           if(deduplicated.indexOf(entry) == -1) {
             deduplicated.push(entry);
           }
@@ -491,7 +491,7 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     };
 
     // Sanitizes the actual keystrokes involved but preserves a decent amount of gesture diagnostic information.
-    let logs = this.stageReports.map((entry) => padding + `${logTouches(entry.currentSourceIds)} - ${entry.matchedId} ${logInterval(entry.interval)}`)
+    const logs = this.stageReports.map((entry) => padding + `${logTouches(entry.currentSourceIds)} - ${entry.matchedId} ${logInterval(entry.interval)}`)
       // Orders each stage from most recent to least recent
       .reverse();
     if(this.markedComplete) {

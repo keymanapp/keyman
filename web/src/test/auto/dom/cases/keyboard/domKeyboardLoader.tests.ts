@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal } from 'keyman/engine/keyboard';
+import { KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal } from 'keyman/engine/keyboard';
 import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 
 declare let window: typeof globalThis;
@@ -9,9 +9,6 @@ declare let window: typeof globalThis;
 // At this level, though... we just mock it.
 declare let keyman: KeyboardKeymanGlobal;
 declare let KeymanWeb: KeyboardInterface;
-
-// Note:  rule processing tests will fail if string extensions are not established beforehand.
-extendString();
 
 const device: DeviceSpec = {
   touchable: false,

@@ -6,16 +6,16 @@ import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
-import KeymanEngine from "./keymanEngine.js";
+import { KeymanEngineBase } from "./keymanEngineBase.js";
 import { EngineConfiguration } from "./engineConfiguration.js";
 
 export default class KeyboardInterface<ContextManagerType extends ContextManagerBase<any>> extends KeyboardInterfaceBase {
-  protected readonly engine: KeymanEngine<EngineConfiguration, ContextManagerType, any>;
+  protected readonly engine: KeymanEngineBase<EngineConfiguration, ContextManagerType, any>;
   private stubNamespacer?: (stub: RawKeyboardStub) => void;
 
   constructor(
     _jsGlobal: any,
-    engine: KeymanEngine<any, ContextManagerType, any>,
+    engine: KeymanEngineBase<any, ContextManagerType, any>,
     stubNamespacer?: (stub: RawKeyboardStub) => void
   ) {
     super(_jsGlobal, engine, new VariableStoreCookieSerializer());
@@ -25,14 +25,14 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
 
   // Preserves a keyboard's ID, even if namespaced, via script tag tagging.
   preserveID(Pk: any /** a `Keyboard`'s `scriptObject` entry */) {
-    var trueID;
+    let trueID;
 
     // Find the currently-executing script tag; KR is called directly from each keyboard's definition script.
     if(document.currentScript) {
       trueID = document.currentScript.id;
     } else {
-      var scripts = document.getElementsByTagName('script');
-      var currentScript = scripts[scripts.length-1];
+      const scripts = document.getElementsByTagName('script');
+      const currentScript = scripts[scripts.length-1];
 
       trueID = currentScript.id;
     }

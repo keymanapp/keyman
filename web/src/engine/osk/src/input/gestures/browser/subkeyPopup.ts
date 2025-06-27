@@ -121,7 +121,7 @@ export default class SubkeyPopup implements GestureHandler {
     e.key.highlight(true);
 
     // A tag we directly set on a key element during its construction.
-    let subKeySpec: ActiveSubKey[] = e['subKeys'];
+    const subKeySpec: ActiveSubKey[] = e['subKeys'];
 
     // The holder is position:fixed, but the keys do not need to be, as no scrolling
     // is possible while the array is visible.  So it is simplest to let the keys have
@@ -133,7 +133,7 @@ export default class SubkeyPopup implements GestureHandler {
     // #3718: No longer prepend base key to popup array
 
     // Must set position dynamically, not in CSS
-    var ss=elements.style;
+    const ss=elements.style;
 
     // Set key font according to layout, or defaulting to OSK font
     // (copied, not inherited, since OSK is not a parent of popup keys)
@@ -264,7 +264,7 @@ export default class SubkeyPopup implements GestureHandler {
         }
 
         // Step 2:  okay, selection is permitted.  So... what to select?
-        for(let key of this.subkeys) {
+        for(const key of this.subkeys) {
           const keyBounds = key.getBoundingClientRect();
 
           let xDist = Number.MAX_VALUE;
@@ -298,16 +298,16 @@ export default class SubkeyPopup implements GestureHandler {
   }
 
   reposition(vkbd: VisualKeyboard) {
-    let subKeys = this.element;
-    let e = this.baseKey;
+    const subKeys = this.element;
+    const e = this.baseKey;
 
     // And correct its position with respect to that element
     const _Box = vkbd.topContainer;
-    let rowElement = (e.key as OSKBaseKey).row.element;
-    let ss=subKeys.style;
-    let parentOffsetLeft = e.offsetParent ? (<HTMLElement>e.offsetParent).offsetLeft : 0;
-    var x = e.offsetLeft + parentOffsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
-    var xMax = vkbd.width - subKeys.offsetWidth;
+    const rowElement = (e.key as OSKBaseKey).row.element;
+    const ss=subKeys.style;
+    const parentOffsetLeft = e.offsetParent ? (<HTMLElement>e.offsetParent).offsetLeft : 0;
+    let x = e.offsetLeft + parentOffsetLeft + 0.5*(e.offsetWidth-subKeys.offsetWidth);
+    const xMax = vkbd.width - subKeys.offsetWidth;
 
     if(x > xMax) {
       x=xMax;
@@ -317,18 +317,18 @@ export default class SubkeyPopup implements GestureHandler {
     }
     ss.left=x+'px';
 
-    let _BoxRect = _Box.getBoundingClientRect();
-    let rowElementRect = rowElement.getBoundingClientRect();
+    const _BoxRect = _Box.getBoundingClientRect();
+    const rowElementRect = rowElement.getBoundingClientRect();
     ss.top = (rowElementRect.top - _BoxRect.top - subKeys.offsetHeight - SUBKEY_MENU_VERT_OFFSET) + 'px';
 
     // Make the popup keys visible
     ss.visibility='visible';
 
     // For now, should only be true (in production) when keyman.isEmbedded == true.
-    let constrainPopup = vkbd.isEmbedded;
+    const constrainPopup = vkbd.isEmbedded;
 
-    let cs = getComputedStyle(subKeys);
-    let topY = parseFloat(cs.top);
+    const cs = getComputedStyle(subKeys);
+    const topY = parseFloat(cs.top);
 
     // Adjust the vertical position of the popup to keep it within the
     // bounds of the keyboard rectangle, when on iPhone (system keyboard)
@@ -362,14 +362,14 @@ export default class SubkeyPopup implements GestureHandler {
     const borderRadius = Math.max(Number.parseInt(cms.borderRadius), 0);
 
     // Create the callout
-    let keyRect = key.getBoundingClientRect();
-    let _BoxRect = _Box.getBoundingClientRect();
+    const keyRect = key.getBoundingClientRect();
+    const _BoxRect = _Box.getBoundingClientRect();
 
     // Set position and style
     // We're going to adjust the top of the box to ensure it stays
     // pixel aligned, otherwise we can get antialiasing artifacts
     // that look ugly
-    let calloutTop = Math.floor(
+    const calloutTop = Math.floor(
       Number.parseInt(cms.top, 10) +
       Number.parseInt(cms.height, 10) +
       // Padding is not included in content-box (or in content-box's top positioning)...
@@ -423,11 +423,11 @@ export default class SubkeyPopup implements GestureHandler {
   }
 
   selectDefaultSubkey(baseKey: KeyElement, popupBase: HTMLElement) {
-    var bk: KeyElement;
-    let subkeys = baseKey['subKeys'];
+    let bk: KeyElement;
+    const subkeys = baseKey['subKeys'];
     for(let i=0; i < subkeys.length; i++) {
-      let skSpec = subkeys[i];
-      let skElement = <KeyElement> popupBase.childNodes[i].firstChild;
+      const skSpec = subkeys[i];
+      const skElement = <KeyElement> popupBase.childNodes[i].firstChild;
 
       // Preference order:
       // #1:  if a default subkey has been specified, select it.
@@ -517,14 +517,14 @@ export default class SubkeyPopup implements GestureHandler {
      */
 
     // The concept:  how likely is it that the user MEANT to output a subkey?
-    let timeDistance = Math.min(
+    const timeDistance = Math.min(
       // The full path is included by the model - meaning the base wait is included here in
       // in the stats;  we subtract it to get just the duration of the subkey menu.
       gestureSource.path.stats.duration - baseStage.sources[0].path.stats.duration,
       this.gestureParams.longpress.waitLength
       ) / (2 * this.gestureParams.longpress.waitLength);  // normalize:  max time distance of 0.5
 
-    let pathDistance = Math.min(
+    const pathDistance = Math.min(
       gestureSource.path.stats.rawDistance,
       this.gestureParams.longpress.noiseTolerance*4
     ) / (this.gestureParams.longpress.noiseTolerance * 8); // normalize similarly.

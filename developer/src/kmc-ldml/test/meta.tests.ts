@@ -1,18 +1,19 @@
 import 'mocha';
 import {assert} from 'chai';
 import { MetaCompiler } from '../src/compiler/meta.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture, withOffset } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import KeyboardSettings = KMXPlus.KeyboardSettings;
 import Meta = KMXPlus.Meta;
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 
 describe('meta', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal metadata', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/minimal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.isEmpty(meta.author.value);        // TODO-LDML: default author string "unknown"?
@@ -24,7 +25,7 @@ describe('meta', function () {
   });
 
   it('should compile maximal metadata', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/maximal.xml', compilerTestCallbacks) as Meta;
     assert.equal(compilerTestCallbacks.messages.length, 0);
 
     assert.equal(meta.author.value, 'The Keyman Team');
@@ -36,22 +37,22 @@ describe('meta', function () {
   });
 
   it('should hint when normalization=disabled', async function() {
-    let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
+    const meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
     assert.isNotNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Hint_NormalizationDisabled());
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Hint_NormalizationDisabled(withOffset(177) as LDMLKeyboard.LKSettings));
   });
 
   it('should reject invalid version', async function() {
     let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'1.0'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'1.0'}, withOffset(40) as LDMLKeyboard.LKKeyboard));
 
     meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'v1.0.3'}, withOffset(40) as LDMLKeyboard.LKKeyboard));
   });
 });
 

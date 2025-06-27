@@ -154,7 +154,7 @@ function initialize(options: any): MessageOptions {
 }
 
 function allMessageDetails(): CompilerMessageDetail[] {
-  let result: CompilerMessageDetail[] = [];
+  const result: CompilerMessageDetail[] = [];
   messageNamespaceKeys.forEach((namespace: CompilerErrorNamespace) => {
     const ms = messageSources[namespace] as CompilerMessageSource;
 
