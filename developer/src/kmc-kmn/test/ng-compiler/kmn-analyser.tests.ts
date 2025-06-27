@@ -1409,6 +1409,15 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(contextNode);
       assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
     });
+    it("can parse correctly (indexStatement)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('index(cons, 1)');
+      const inputElement: Rule = new InputElementRule();
+      assert.isTrue(inputElement.parse(root));
+      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
+      assert.isNotNull(indexNode);
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'cons');
+      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
+    });
     it("can parse correctly (text)", () => {
       Rule.tokenBuffer = stringToTokenBuffer('U+1780');
       const inputElement: Rule = new InputElementRule();
@@ -3050,7 +3059,7 @@ describe("KMN Analyser Tests", () => {
         'release/sil/sil_kayah_latn/source/sil_kayah_latn',
         'release/sil/sil_kayah_mymr/source/sil_kayah_mymr',
         'release/sil/sil_kcho/source/sil_kcho',
-      ].splice(59,60).forEach((name) => {
+      ].splice(0,86).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();

@@ -31,7 +31,7 @@ lhsBlock: MATCH|NOMATCH|inputBlock
 inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 keystroke: PLUS inputElement+
-inputElement: anyStatement|notAnyStatement|contextStatement|text
+inputElement: anyStatement|notAnyStatement|contextStatement|indexStatement|text
 anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
 notAnyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
