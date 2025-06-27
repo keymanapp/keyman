@@ -65,7 +65,7 @@ export class Converter implements KeymanCompiler {
   // _S2 finds converter e.g.keylayout->kmn  ( uses converter-class-factory)
   // _S2 factory uses/instanciates child class ( ~ in C++ virtual function in base class <-> use fun of derived class)
   // _S2 loads file
-  // _S2 creates a new converter (-object)
+  // _S2 creates a new (derived) converter (-object)
   // _S2 runs conversion for this object ( run-method of this converter of keylayout-to-kmn-tonverter.ts  )
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
     const converterOptions: CompilerOptions = {
@@ -93,7 +93,8 @@ export class Converter implements KeymanCompiler {
     const converter = new ConverterClass(this.callbacks, converterOptions);
     const artifacts = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
-    return artifacts ? { artifacts } : null;
+    //return artifacts ? { artifacts } : null;
+    return artifacts ?  artifacts : null;
   }
 
   /**
