@@ -347,12 +347,19 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd0');
       recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd99');
       recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'd999');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.DECIMAL, 'D999');
     });
     it("can recognise a HEXDECIMAL token", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x0');
       recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'x99');
       recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xa99');
       recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'xA99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'X0');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'X99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'Xa99');
+      recogniseTokenFollowedByRightSquare(TokenTypes.HEXADECIMAL, 'XA99');
     });
     it("can recognise an OCTAL token", () => {
       recogniseTokenFollowedByRightSquare(TokenTypes.OCTAL, '0');
