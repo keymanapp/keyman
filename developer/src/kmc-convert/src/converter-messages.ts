@@ -42,8 +42,8 @@ export class ConverterMessages {
     ' could not be converted.`);
 
   static ERROR_UnableToWrite = SevError | 0x0006;
-  static Error_UnableToWrite = (o: { inputFilename: string; }) => m(
-    this.ERROR_UnableToWrite, `Output file for '${def(o.inputFilename)}
+  static Error_UnableToWrite = (o: { outputFilename: string; }) => m(
+    this.ERROR_UnableToWrite, `Output file for '${def(o.outputFilename)}
     ' could not be written.`);
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
