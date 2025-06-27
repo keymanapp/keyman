@@ -22,6 +22,11 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('run() ', function () {
+
+    // _S2 can I do this??? - some tests of the run() function might take longer than 2000 ms
+    // see https://pramod-mallick.medium.com/mocha-with-selenium-webdriver-exception-timeout-of-2000ms-exceeded-89df7b6230c6
+    this.timeout(10000);
+
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     it('run() should throw on null input file name and null output file name', async function () {
