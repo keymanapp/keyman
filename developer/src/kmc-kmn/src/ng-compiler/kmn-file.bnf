@@ -11,7 +11,7 @@ textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
-keyCode: KEY_CODE|STRING
+keyCode: KEY_CODE|STRING|DECIMAL
 outsStatement: OUTS LEFT_BR storeName RIGHT_BR
 ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement

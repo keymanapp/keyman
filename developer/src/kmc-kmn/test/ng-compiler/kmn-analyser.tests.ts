@@ -589,6 +589,24 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.STRING));
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
     });
+    it("can parse correctly (ISO9995 code)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('[CTRL A10]');
+      const virtualKey: Rule = new VirtualKeyRule();
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.KEY_CODE));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+    });
+    it("can parse correctly (ISO9995 code parsed as DECIMAL)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('[CTRL D10]');
+      const virtualKey: Rule = new VirtualKeyRule();
+      assert.isTrue(virtualKey.parse(root));
+      const virtualKeyNode = root.getSoleChildOfType(NodeTypes.VIRTUAL_KEY);
+      assert.isNotNull(virtualKeyNode);
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.DECIMAL));
+      assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeTypes.MODIFIER));
+    });
   });
   describe("ModifierRule Tests", () => {
     it("can construct a ModifierRule", () => {

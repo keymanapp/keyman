@@ -196,11 +196,13 @@ export class ModifierRule extends SingleChildRule {
 }
 
 export class KeyCodeRule extends SingleChildRule {
+  // DECIMAL is included because of e.g. d10, which could be ISO9995 code
   public constructor() {
     super();
     const keyCode: Rule    = new TokenRule(TokenTypes.KEY_CODE, true);
     const stringRule: Rule = new TokenRule(TokenTypes.STRING, true);
-    this.rule = new AlternateRule([keyCode, stringRule]);
+    const decimal: Rule    = new TokenRule(TokenTypes.DECIMAL, true);
+    this.rule = new AlternateRule([keyCode, stringRule, decimal]);
   }
 }
 
