@@ -1,11 +1,7 @@
 import { assert } from 'chai';
 
 import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
-import { extendString } from '@keymanapp/web-utils';
-
-extendString();  // Ensure KMW's string-extension functionality is available.
-
-String.kmwEnableSupplementaryPlane(false);
+import { KMWString } from '@keymanapp/web-utils';
 
 // A unicode-coding like alias for use in constructing non-BMP strings.
 const u = String.fromCodePoint;
@@ -265,7 +261,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
     it("handles deletions around the caret without text insertion (non-BMP text)", function() {
       try {
-        String.kmwEnableSupplementaryPlane(true);
+        KMWString.enableSupplementaryPlane(true);
         var target = new Mock(smpApple, 2);
         var original = Mock.from(target);
         target.setSelection(3);
@@ -280,7 +276,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
         assert.equal(transcription.transform.deleteRight, 1, "Incorrect count for right-of-caret deletions");
       } finally {
-        String.kmwEnableSupplementaryPlane(false);
+        KMWString.enableSupplementaryPlane(false);
       }
     });
 
@@ -357,7 +353,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
 
     it("handles deletions around the caret with text insertion (non-BMP text)", function() {
       try {
-        String.kmwEnableSupplementaryPlane(true);
+        KMWString.enableSupplementaryPlane(true);
 
         // We have other texts validating Mocks; by using them as our base 'element', this unit test file
         // could eventually run in 'headless' mode.
@@ -433,7 +429,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
         assert.equal(transcription.transform.deleteLeft, 1, "Incorrect count for left-of-caret deletions");
         assert.equal(transcription.transform.deleteRight, 3, "Incorrect count for right-of-caret deletions");
       } finally {
-        String.kmwEnableSupplementaryPlane(false);
+        KMWString.enableSupplementaryPlane(false);
       }
     });
 

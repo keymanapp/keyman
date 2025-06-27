@@ -362,6 +362,16 @@ class Constants {
    */
   readonly length_layr_key = 4;
 
+  /**
+   * Minimum allowed minDeviceWidth for a layer list
+   */
+  readonly layr_min_minDeviceWidth = 1;
+
+  /**
+   * Maximum allowed minDeviceWidth for a layer list
+   */
+  readonly layr_max_minDeviceWidth = 999;
+
   /* ------------------------------------------------------------------
    * list section
       ------------------------------------------------------------------ */

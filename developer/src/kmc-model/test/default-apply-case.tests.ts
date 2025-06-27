@@ -57,7 +57,7 @@ describe('The default applyCasing() function', function () {
       ['1234.?!', '1234.?!']
     ];
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should lowercase '${input}' as '${expected}'`, function() {
         assert.equal(defaultApplyCasing('lower', input), expected);
       });
@@ -88,7 +88,7 @@ describe('The default applyCasing() function', function () {
       ['1234.?!', '1234.?!']
     ];
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should uppercase '${input}' as '${expected}'`, function() {
         assert.equal(defaultApplyCasing('upper', input), expected);
       });
@@ -119,7 +119,7 @@ describe('The default applyCasing() function', function () {
       ['1234.?!', '1234.?!']
     ];
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should initial-case '${input}' as '${expected}'`, function() {
         assert.equal(defaultApplyCasing('initial', input), expected);
       });

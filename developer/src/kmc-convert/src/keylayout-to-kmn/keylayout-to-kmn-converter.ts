@@ -39,15 +39,11 @@ export interface convert_object {
 
 export class KeylayoutToKmnConverter {
 
-
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly USED_KEYS_COUNT = 49;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
-
-  static readonly DATA_SUBFOLDER = 'data';
-  static readonly TEST_SUBFOLDER = 'test';
 
   private options: CompilerOptions;
 
@@ -66,6 +62,7 @@ export class KeylayoutToKmnConverter {
    * @return null on success
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
+
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -111,13 +108,13 @@ export class KeylayoutToKmnConverter {
     return Result_toBeReturned;
   }
 
+
   /**
    * @brief  member function to read filename and behaviour of a json object into a convert_object
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an convert_object containing all data ready to print out
    */
-  private convert(jsonObj: any, outputfilename: string = ""): convert_object {
-
+  private convert(jsonObj: any, outputfilename: string): convert_object {
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
     const rules: Rule[] = [];                          // an array of data for a kmn rule
 
@@ -131,24 +128,13 @@ export class KeylayoutToKmnConverter {
     // ToDo in a new PR: check tags  ( issue # 13599)
     if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
 
-      // get filename from data that had been read
-      const fileNameNoExtention = jsonObj.keyboard['@_name'];
-      const filePath = this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER);
-
-      data_object.keylayout_filename = this.callbacks.path.join(filePath, (fileNameNoExtention + ".keylayout"));
-
-      // if no outputfile name is specified: create one from input file name
-      if ((outputfilename === "") || (outputfilename === null)) {
-        data_object.kmn_filename = this.callbacks.path.join(filePath, fileNameNoExtention + ".kmn");
-      }
-      // if outputfile name is specified: use it
-      else
-        data_object.kmn_filename = outputfilename;
-
-      console.log("RUN kmc convert - input file: ", data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
-
+      data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');
+      data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
+
+      // _S2 ToDo remove this console.log
+      console.log("RUN kmc convert - input file: ",data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
 
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
@@ -754,9 +740,11 @@ export class KeylayoutToKmnConverter {
       "K_SPACE"      /* \ */
     ];
 
-    if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined))
+    if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined)) {
       return "";
-    else return vk[pos];
+    } else {
+      return vk[pos];
+    }
   }
 
   /* @brief  member function to return an index for a given actionID

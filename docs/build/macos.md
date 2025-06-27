@@ -50,9 +50,37 @@ The remaining dependencies can be installed via script:
 This script will also update your environment to the values in:
   `resources/devbox/macos/keyman.macos.env.sh`
 
-It will also add these environment settings to your `~/.bashrc`.
-
 These dependencies are also listed below if you'd prefer to install manually.
+
+### Example shell profile script
+
+`keyman.macos.env.sh` may be `source`d within your `~/.bashrc` / `~/.zprofile` in
+order to regularly apply its path settings to the terminal during local development.
+
+For a `.zprofile`...
+
+```zsh
+# Adds homebrew-managed dependencies to $PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Replace right-hand side with the path to your local copy of the repo
+export KEYMAN_ROOT=~/keymanapp/keyman
+
+# May be called to apply build-path settings, such as those allowing
+# direct call of npm scripts without `npm run`.
+set_keyman_standard_build_path() {
+  PATH="${KEYMAN_ROOT}/node_modules/.bin:$PATH"
+}
+
+# builder-script tab autocompletion
+autoload -Uz compinit && compinit
+autoload bashcompinit
+bashcompinit
+source "${KEYMAN_ROOT}/resources/builder_completion.inc.sh"
+
+# environment variable initialization
+source "${KEYMAN_ROOT}/resources/devbox/macos/keyman.macos.env.sh"
+```
 
 ## Shared Dependencies
 
@@ -155,10 +183,10 @@ brew install carthage cocoapods
 
 ## Keyman for Android Dependencies
 
-* openjdk 11, Android SDK, Android Studio, Ant, Gradle, Maven
+* openjdk 21, Android SDK, Android Studio, Ant, Gradle, Maven
 
 ```shell
-brew install openjdk@11 android-sdk android-studio ant gradle maven
+brew install openjdk@21 android-sdk android-studio ant gradle maven
 # update path
 source ../resources/devbox/macos/keyman.macos.env.sh
 # optionally install sdk images

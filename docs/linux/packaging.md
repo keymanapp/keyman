@@ -98,8 +98,8 @@ You'll have to create the docker image.
 
   ```bash
   cd $KEYMAN_ROOT
-  TIER=$(cat TIER.md)
-  export TIER
+  KEYMAN_TIER=$(cat TIER.md)
+  export KEYMAN_TIER
   cd linux
   ./scripts/deb-packaging.sh source
   ```
@@ -149,13 +149,13 @@ for the different distros and architectures.
 To upload the packages to launchpad, run the following script from the `linux/` directory:
 
 ```bash
-./scripts/launchpad.sh [UPLOAD="yes"] [TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
+./scripts/launchpad.sh [UPLOAD="yes"] [KEYMAN_TIER="<tier>"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"]
 ```
 
 #### Parameters
 
 - `UPLOAD="yes"` - do the dput for real
-- `TIER="<tier>"` - alpha, beta, or stable, default from `../TIER.md`
+- `KEYMAN_TIER="<tier>"` - alpha, beta, or stable, default from `../TIER.md`
 - `PROJECT="<project>"` - only upload this package
 - `DIST="<dist>"` - only upload for this distribution
 - `PACKAGEVERSION="<version>"` - normally use the default so don't specify

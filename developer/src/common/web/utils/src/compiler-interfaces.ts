@@ -1,11 +1,23 @@
 import { CompilerCallbacks } from "./compiler-callbacks.js";
+import { ObjectWithMetadata } from "./symbol-utils.js";
+import { KeymanXMLReader, XML_FILENAME_SYMBOL } from "./xml-utils.js";
 
 /**
  * Abstract interface for compiler error and warning messages
  */
 export interface CompilerEvent {
   filename?: string;
+  /** line where a message applies */
   line?: number;
+  /**
+   * column where a message applies.
+   */
+  column?: number;
+  /**
+   * offset where a message applies.
+   * If set, encompasses line and column.
+   */
+  offset?: number;
   code: number;
   message: string;
   /**
@@ -195,6 +207,27 @@ export class CompilerError {
       }
     }
     return null;
+  }
+
+    /**
+   * Get an offset from o and set event's offset field
+   * @param event a compiler event, such as from functions in this class
+   * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
+   * @returns modified event object
+   */
+  public static setFromMetadata(event: CompilerEvent, x?: ObjectWithMetadata): CompilerEvent {
+    if(x) {
+      const metadata = KeymanXMLReader.getMetaData(x) || {};
+      const offset = metadata?.startIndex;
+      if (offset) {
+        event.offset = offset;
+      }
+      const filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      if (filename) {
+        event.filename = filename;
+      }
+    }
+    return event;
   }
 };
 
@@ -416,6 +449,40 @@ export function dedentCompilerMessageDetail(event: CompilerEvent) {
   // non-zero whitespace line as amount to dedent
   return (event.detail ?? '').replace(/^[ ]+/gm, '');
 }
+
+/**
+ * Convenience function for constructing CompilerEvents with line numbers.
+ * Use it as below: (abbreviated as mx())
+ *
+ * ```js
+ *  // Note: Indentation makes "InvalidScanCode" line up thrice
+ *  static ERROR_InvalidScanCode = SevError | 0x0009;
+ *  // Note:
+ *  //   1. All parameters are passed in 'o', the context object is only used for context even if
+ *  //      it contains redundant info.
+ *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
+ *  //      with `${def(o.property)}` as the max complexity of interpolation.
+ *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
+ *    this.ERROR_InvalidScanCode, x,
+ *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
+ *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
+ *  `…additional markdown detail…`
+ *  );
+ * ```
+ *
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param context  Object to be used as a source for line number information
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
+ * @see CompilerMessageSpec
+ * @returns the event
+ */
+export function CompilerMessageObjectSpec(code: number, context: ObjectWithMetadata, message: string, detail?: string): CompilerEvent {
+  let evt = CompilerMessageSpec(code, message, detail); // constructs raw message
+  evt = CompilerError.setFromMetadata(evt, context); // updates with offset from context
+  return evt;
+};
 
 export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
 

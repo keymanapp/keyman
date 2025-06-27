@@ -22,7 +22,7 @@ const SENCOTEN_WORDLIST = {
 
 
 describe('parsing a word list', function () {
-  let testCallbacks = new TestCompilerCallbacks();
+  const testCallbacks = new TestCompilerCallbacks();
 
   beforeEach(function () {
     testCallbacks.clear();
@@ -34,18 +34,18 @@ describe('parsing a word list', function () {
   });
 
   it('should remove the UTF-8 byte order mark from files', function () {
-    let word = 'hello';
-    let count = 1;
-    let expected: WordList = {};
+    const word = 'hello';
+    const count = 1;
+    const expected: WordList = {};
     expected[word] = count;
 
-    let file = `# this is a comment\n${word}\t${count}`;
-    let withoutBOM: WordList = {};
+    const file = `# this is a comment\n${word}\t${count}`;
+    const withoutBOM: WordList = {};
     parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
     assert.isEmpty(testCallbacks.messages);
 
-    let withBOM: WordList = {};
+    const withBOM: WordList = {};
     parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
     assert.isEmpty(testCallbacks.messages);
@@ -54,7 +54,7 @@ describe('parsing a word list', function () {
   it('should read word lists in UTF-8', function () {
     // N.B.: this is the format exported by Google Drive when selecting "TSV".
     const filename = makePathToFixture('example.qaa.sencoten', 'wordlist.tsv');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
@@ -65,7 +65,7 @@ describe('parsing a word list', function () {
     // N.B.: this is the format exported by MS Excel when selecting
     // "UTF-16" text (tested on Excel for macOS).
     const filename = makePathToFixture('example.qaa.utf16le', 'wordlist.txt');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
@@ -75,7 +75,7 @@ describe('parsing a word list', function () {
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
     // N.B.: Does anything output this format...?
     const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     assert.throws(() => {
       parseWordListFromFilename(wordlist, filename);
     }, 'UTF-16BE is unsupported');
@@ -101,7 +101,7 @@ describe('parsing a word list', function () {
     for(let i = 0; i < words.length; i++) {
       file += `${words[i]}\t${i+1}\n`;
     }
-    let repeatedWords: WordList = {};
+    const repeatedWords: WordList = {};
     parseWordListFromContents(repeatedWords, file);
 
     assert.deepEqual(repeatedWords, expected);

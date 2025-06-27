@@ -30,7 +30,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const headSample = recordedSource.path.coords[0];
 
     const pathID = this.PATH_ID_SEED++;
-    let replaySource = this.createTouchpoint(pathID, recordedSource.isFromTouch);
+    const replaySource = this.createTouchpoint(pathID, recordedSource.isFromTouch);
     replaySource.update(headSample); // is included before the point is made available.
     replaySource.path.on('invalidated', () => this.dropTouchpoint(replaySource));
     replaySource.path.on('complete', () => this.dropTouchpoint(replaySource));

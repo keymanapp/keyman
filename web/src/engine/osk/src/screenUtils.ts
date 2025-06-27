@@ -16,7 +16,7 @@ export function getViewportScale(formFactor: DeviceSpec.FormFactor): number {
     }
 
     // Get viewport width
-    var viewportWidth = document.documentElement.clientWidth;
+    const viewportWidth = document.documentElement.clientWidth;
 
     // Return a default value if screen width is greater than the viewport width (not fullscreen).
     if(screen.width > viewportWidth) {
@@ -24,7 +24,7 @@ export function getViewportScale(formFactor: DeviceSpec.FormFactor): number {
     }
 
     // Get the orientation corrected screen width
-    var screenWidth = screen.width;
+    let screenWidth = screen.width;
     if(landscapeView()) {
       // Take larger of the two dimensions
       if(screen.width < screen.height) {

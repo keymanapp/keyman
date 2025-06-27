@@ -84,13 +84,13 @@ function VisualKeyboardToKLS(FVK: VisualKeyboard.VisualKeyboard): string {
     keys: string[];
   };
 
-  let layers: TLayer[] = [];
+  const layers: TLayer[] = [];
 
   // Discover the layers used in the visual keyboard
-  for(let key of FVK.keys) {
+  for(const key of FVK.keys) {
     if(key.flags & KvkFile.BUILDER_KVK_KEY_FLAGS.kvkkUnicode) {
       // Find the index of the key in KMW VK arrays
-      let n = CKeymanWebKeyCodes[key.vkey];
+      const n = CKeymanWebKeyCodes[key.vkey];
       if(n == 0xFF) {
         continue;
       }
@@ -110,7 +110,7 @@ function VisualKeyboardToKLS(FVK: VisualKeyboard.VisualKeyboard): string {
   let result = nl+FTabStop+'this.KV.KLS={'+nl;
 
   for(let i = 0; i < layers.length; i++) {
-    let layer = layers[i];
+    const layer = layers[i];
     result += `${FTabStop}${FTabStop}"${VKShiftToLayerName(layer.shift)}": [`;
     for(let j = 0; j < layer.keys.length - 1; j++) {
       result += '"'+WideQuote(layer.keys[j] ?? '')+'",';

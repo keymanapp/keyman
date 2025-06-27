@@ -5,7 +5,7 @@ export default class EmptyView implements KeyboardView {
   readonly element: HTMLDivElement;
 
   constructor() {
-    let Ldiv = this.element = document.createElement('div');
+    const Ldiv = this.element = document.createElement('div');
     Ldiv.style.userSelect = 'none';
     Ldiv.className='kmw-osk-none';
   }
