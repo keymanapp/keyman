@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.70 alpha 2025-06-27
+
+* docs(developer): Add details on Template choices (#14228)
+* chore(common,developer): expand 'x' to 'compileContext' (#14218)
+
 ## 19.0.69 alpha 2025-06-25
 
 * maint(resources): support additional workflow events for pr-build-status (#14219)
