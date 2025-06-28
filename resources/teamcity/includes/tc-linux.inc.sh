@@ -15,7 +15,7 @@ is_os_version_or_higher() {
 # Returns 0 if the specified package is installed.
 # Parameter:
 #   $1 - Package name to check (e.g., "curl")
-is_package_installed() {
+_is_package_installed() {
   local PACKAGE=$1
 
   dpkg -s "${PACKAGE}" >/dev/null 2>&1
@@ -24,7 +24,7 @@ is_package_installed() {
 # Check if the specified packages are installed and install them if not.
 # Parameters:
 #   $* - List of package names to check and install (e.g., "lcov jq")
-linux_check_and_install_packages() {
+ba_linux_check_and_install_packages() {
   if ! is_ubuntu; then
     return 0
   fi
@@ -35,7 +35,7 @@ linux_check_and_install_packages() {
 
   for p in ${PACKAGES}
   do
-    if ! is_package_installed "${p}"; then
+    if ! _is_package_installed "${p}"; then
       TOINSTALL="${TOINSTALL} ${p}"
     fi
   done
@@ -49,7 +49,7 @@ linux_check_and_install_packages() {
 }
 
 # Install nvm if it is not already installed and install the latest LTS
-linux_install_nvm() {
+ba_linux_install_nvm() {
   builder_echo start install_nvm "Checking and installing nvm"
   if [[ -f "${HOME}/.nvm/nvm.sh" ]]; then
     builder_echo "nvm is already installed"
@@ -66,7 +66,7 @@ linux_install_nvm() {
   builder_echo end install_nvm success "Finished checking and installing nvm"
 }
 
-linux_install_emscripten() {
+ba_linux_install_emscripten() {
   builder_echo start "install emscripten" "Checking and installing emscripten"
   if { [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -f "${EMSCRIPTEN_BASE}/emcc" ]] ; } ||
     [[ -f "${HOME}/emsdk/upstream/emscripten/emcc" ]]; then
@@ -90,15 +90,15 @@ linux_install_emscripten() {
 }
 
 # Install additional dependencies required for running integration tests.
-linux_install_dependencies_for_tests() {
+ba_linux_install_dependencies_for_tests() {
   builder_echo start install_dependencies_for_tests "Installing dependencies for tests"
 
-  linux_check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
+  ba_linux_check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
 
   builder_echo end install_dependencies_for_tests success "Finished installing dependencies for tests"
 }
 
-linux_start_xvfb() {
+ba_linux_start_xvfb() {
   # On Linux start Xvfb etc
   local PID_FILE=/tmp/keymanweb-pids
   builder_echo "Starting Xvfb..."
@@ -115,7 +115,7 @@ linux_start_xvfb() {
   export DISPLAY=:32
 }
 
-linux_stop_xvfb() {
+ba_linux_stop_xvfb() {
   # On Linux stop Xvfb etc
   local PID_FILE=/tmp/keymanweb-pids
   if [[ -f "${PID_FILE}" ]]; then

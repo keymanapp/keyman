@@ -26,15 +26,15 @@ linux_additional_test_dependencies_action() {
   fi
 
   # shellcheck disable=SC2086
-  linux_check_and_install_packages ${TOINSTALL}
+  ba_linux_check_and_install_packages ${TOINSTALL}
 
   if ! is_os_version_or_higher 24.04; then
     builder_heading "Installing python3-coverage from pip"
     pip3 install --user coverage
   fi
 
-  linux_install_nvm
-  linux_install_dependencies_for_tests
+  ba_linux_install_nvm
+  ba_linux_install_dependencies_for_tests
 
   builder_echo end additional_dependencies success "Finished installing additional dependencies"
 }
