@@ -13,6 +13,10 @@ import { util } from '@keymanapp/common-types';
 import { KeylayoutToKmnConverter } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { SchemaValidators } from '@keymanapp/common-types';
+
+// _S2 which folder should keylayout-xml.js live??
+import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
@@ -23,7 +27,17 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: any): boolean {
+
+  //public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
+  public validate(source: KeylayoutXMLSourceFile): boolean {
+    // public validate(source: any): boolean {
+    console.log("SchemaValidators.default.keylayout(source) ", SchemaValidators.default.keylayout(source));
+
+
+    //SchemaValidators.default.keylayout(source);
+
+
+
     if (!SchemaValidators.default.keylayout(source)) {
       console.log("SchemaValidators.default.keylayout).errors ", (<any>SchemaValidators.default.keylayout).errors);
 
@@ -68,14 +82,14 @@ export class KeylayoutFileReader {
    * @param  absolutefilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(inputFilename: string): Object {
+  public read(inputFilename: string): KeylayoutXMLSourceFile  {
 
 
     const options = {
       ignoreAttributes: false,
       trimValues: false,           // preserve spaces
       attributeNamePrefix: '@_',   // to access the attribute
-      ignoreDeclaration:true
+      ignoreDeclaration: true
     };
 
     try {

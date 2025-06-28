@@ -11,6 +11,10 @@ import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 
+
+// _S2 which folder should keylayout-xml.js live??
+import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+
 export interface convert_object {
   keylayout_filename: string,
   kmn_filename: string,
@@ -53,14 +57,14 @@ export class KeylayoutToKmnConverter {
     }
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
-    const jsonO: object = KeylayoutReader.read(inputFilename);
+    const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
 
 
     // to check if it works: validate file with stevens schema file -------------------------------------------------
 
-    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ I will validate ",inputFilename, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ I will validate ", inputFilename, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     try {
-     if (!KeylayoutReader.validate(jsonO)) {
+      if (!KeylayoutReader.validate(jsonO)) {
         return null;
       }
     } catch (e) {
