@@ -14,3 +14,11 @@ ba_mac_clean_xcode_derived_data() {
   rm -rf "${HOME}/Library/Developer/Xcode/DerivedData"
   builder_echo end "clean" success "Finished cleaning XCode DerivedData mess"
 }
+
+ba_mac_unmount_volumes_keyman() {
+  builder_echo start "unmount" "Unmounting Keyman volumes"
+  if [[ -d /Volumes/Keyman ]]; then
+    hdiutil detach /Volumes/Keyman;
+  fi
+  builder_echo end success "unmount" "Finished unmounting Keyman volumes"
+}
