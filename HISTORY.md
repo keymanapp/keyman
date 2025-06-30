@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.71 alpha 2025-06-30
+
+* refactor(linux): rename linux agent specific functions (#14231)
+
 ## 19.0.70 alpha 2025-06-27
 
 * docs(developer): Add details on Template choices (#14228)
