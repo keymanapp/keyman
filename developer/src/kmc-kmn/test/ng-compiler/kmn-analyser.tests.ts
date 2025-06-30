@@ -3170,7 +3170,7 @@ describe("KMN Analyser Tests", () => {
         'release/t/tohono_oodham/source/tohono_oodham',
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
-      ].splice(0, 33).forEach((name) => {
+      ].splice(0, 67).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
