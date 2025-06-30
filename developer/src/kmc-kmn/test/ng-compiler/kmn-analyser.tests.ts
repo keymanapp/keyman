@@ -3187,7 +3187,7 @@ describe("KMN Analyser Tests", () => {
         'release/t/tohono_oodham/source/tohono_oodham',
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
-      ].splice(0, 68).forEach((name) => {
+      ].forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
@@ -3196,6 +3196,45 @@ describe("KMN Analyser Tests", () => {
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
     }).timeout(3000);
+    it("can provide round trip text for repository keyboards (900-end)", () => {
+      [
+        'release/t/turkmen_cyrl/source/turkmen_cyrl',
+        'release/t/txo_toto/source/txo_toto',
+        'release/u/udi_keyboard/source/udi_keyboard',
+        'release/u/ugaritic/source/ugaritic',
+        'release/u/ukwuani/source/ukwuani',
+        'release/u/uma_graphic/source/uma_graphic',
+        'release/u/uma_phonetic/source/uma_phonetic',
+        'release/u/urdu_phonetic/source/urdu_phonetic',
+        'release/u/urdu_phonetic_crulp/source/urdu_phonetic_crulp',
+        'release/v/venetia_et_histria/source/venetia_et_histria',
+        'release/v/vietnamese_telex/source/vietnamese_telex',
+        'release/v/vietnamese_telex_legacy/source/vietnamese_telex_legacy',
+        'release/v/vietnamese_vni/source/vietnamese_vni',
+        'release/v/vithkuqi/source/vithkuqi',
+        'release/v/vm_tamil_modular/source/vm_tamil_modular',
+        'release/v/vm_tamil_typewriter/source/vm_tamil_typewriter',
+        'release/w/wakhi_anglicized/source/wakhi_anglicized',
+        'release/w/warang_citi/source/warang_citi',
+        'release/w/way/source/way',
+        'release/w/wolofal/source/wolofal',
+        'release/x/xinaliq/source/xinaliq',
+        'release/x/xpert/source/xpert',
+        'release/y/yezidi/source/yezidi',
+        'release/y/yiddish_pasekh/source/yiddish_pasekh',
+        'release/y/yidgha/source/yidgha',
+        'release/y/yo/source/yo',
+        'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
+        'release/z/zanabazar_square/source/zanabazar_square',
+      ].forEach((name) => {
+        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        Rule.tokenBuffer = stringToTokenBuffer(buffer);
+        const kmnTreeRule: Rule = new KmnTreeRule();
+        root = new ASTNode(NodeTypes.TMP);
+        assert.isTrue(kmnTreeRule.parse(root));
+        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+      });
+    }).timeout(10000);
   });
 });
 
