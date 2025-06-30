@@ -810,6 +810,14 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(useNode);
       assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
     });
+    it("can parse correctly (multi word name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('use(Unicode Group)');
+      const useStatement: Rule = new UseStatementRule();
+      assert.isTrue(useStatement.parse(root));
+      const useNode = root.getSoleChildOfType(NodeTypes.USE);
+      assert.isNotNull(useNode);
+      assert.isNotNull(useNode.getSoleChildOfType(NodeTypes.GROUPNAME));
+    });
   });
   describe("GroupNameRule Tests", () => {
     it("can construct a GroupNameRule", () => {
@@ -834,6 +842,15 @@ describe("KMN Analyser Tests", () => {
       const groupName: Rule = new GroupNameRule();
       assert.isTrue(groupName.parse(root));
       assert.equal(root.getSoleChildOfType(NodeTypes.GROUPNAME).getText(), 'newcontext');
+    });
+    it("can parse correctly (multi word name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('Unicode Group');
+      const groupName: Rule = new GroupNameRule();
+      assert.isTrue(groupName.parse(root));
+      const groupNameNode = root.getSoleChildOfType(NodeTypes.GROUPNAME);
+      assert.isNotNull(groupNameNode);
+      assert.equal(groupNameNode.getSoleChildOfType(NodeTypes.UNICODE).getText(), 'Unicode');
+      assert.equal(groupNameNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), 'Group');
     });
   });
   describe("PermittedKeywordRule Tests", () => {
@@ -3170,7 +3187,7 @@ describe("KMN Analyser Tests", () => {
         'release/t/tohono_oodham/source/tohono_oodham',
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
-      ].splice(0, 67).forEach((name) => {
+      ].splice(0, 68).forEach((name) => {
         const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();

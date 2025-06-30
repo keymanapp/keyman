@@ -330,6 +330,15 @@ describe("KMN Store Analyser Tests", () => {
       assert.isTrue(normalStoreName.parse(root));
       assert.equal(root.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'newcontext');
     });
+    it("can parse correctly (multi word name)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('Unicode Area');
+      const normalStoreName: Rule = new NormalStoreNameRule();
+      assert.isTrue(normalStoreName.parse(root));
+      const normalStoreNameNode = root.getSoleChildOfType(NodeTypes.STORENAME);
+      assert.isNotNull(normalStoreNameNode);
+      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeTypes.UNICODE).getText(), 'Unicode');
+      assert.equal(normalStoreNameNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), 'Area');
+    });
   });
   describe("StoreNameRule Tests", () => {
     it("can construct a StoreNameRule", () => {

@@ -17,7 +17,8 @@ ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
 useStatement: USE LEFT_BR groupName RIGHT_BR
-groupName: PARAMETER|OCTAL|permittedKeyword
+groupName: groupNameElement+
+groupNameElement: PARAMETER|OCTAL|permittedKeyword
 permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CLEARCONTEXT|
   CONTEXT|COPYRIGHT_HEADER|DECIMAL|FIX|FREES|HEXADECIMAL|HOTKEY_HEADER|
   KEYS|LANGUAGE_HEADER|LAYOUT_HEADER|MATCH|MESSAGE_HEADER|NAME_HEADER|
@@ -63,7 +64,8 @@ systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
   VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|CAPSONONLY|SHIFTFREESCAPS
 normalStoreAssign: normalStore text*
 normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
-normalStoreName: PARAMETER|OCTAL|permittedKeyword
+normalStoreName: normalStoreNameElement+
+normalStoreNameElement: PARAMETER|OCTAL|permittedKeyword
 storeName: systemStoreName|normalStoreName
 setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR

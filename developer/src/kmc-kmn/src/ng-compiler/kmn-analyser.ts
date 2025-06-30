@@ -337,7 +337,11 @@ export class GroupStatementRule extends SingleChildRule {
     const groupQualifierRule: Rule = new GroupQualifierRule();
     const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
     this.rule = new SequenceRule([
-      group, leftBracket, groupName, rightBracket, optGroupQualifier
+      group,
+      leftBracket,
+      groupName,
+      rightBracket,
+      optGroupQualifier,
     ]);
   }
 
@@ -356,19 +360,34 @@ export class GroupStatementRule extends SingleChildRule {
 export class GroupNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const parameter: Rule        = new TokenRule(TokenTypes.PARAMETER, true);
-    const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
-    const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+    const groupNameElement: Rule = new GroupNameElementRule();
+    this.rule = new OneOrManyRule(groupNameElement);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      node.addToken(NodeTypes.GROUPNAME, tmp.getSoleChild().token);
+      const children = tmp.getChildren();
+      if (children.length === 1) {
+        node.addToken(NodeTypes.GROUPNAME, children[0].token);
+      } else {
+        const groupNameNode = new ASTNode(NodeTypes.GROUPNAME);
+        groupNameNode.addChildren(children);
+        node.addChild(groupNameNode);
+      }
     }
     return parseSuccess;
+  }
+}
+
+export class GroupNameElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const parameter: Rule        = new TokenRule(TokenTypes.PARAMETER, true);
+    const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
+    const permittedKeyword: Rule = new PermittedKeywordRule();
+    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
   }
 }
 

@@ -132,20 +132,35 @@ export class NormalStoreRule extends SingleChildRule {
 export class NormalStoreNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
-    const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
-    const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+    const normalStoreNameElement: Rule = new NormalStoreNameElementRule();
+    this.rule = new OneOrManyRule(normalStoreNameElement);
   }
 
   public parse(node: ASTNode): boolean {
     const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
-      node.addToken(NodeTypes.STORENAME, tmp.getSoleChild().token);
+      const children = tmp.getChildren();
+      if (children.length === 1) {
+        node.addToken(NodeTypes.STORENAME, children[0].token);
+      } else {
+        const normalStoreNameNode = new ASTNode(NodeTypes.STORENAME);
+        normalStoreNameNode.addChildren(children);
+        node.addChild(normalStoreNameNode);
+      }
     }
     return parseSuccess;
-  };
+  }
+}
+
+export class NormalStoreNameElementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const parameter: Rule        = new TokenRule(TokenTypes.PARAMETER, true);
+    const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
+    const permittedKeyword: Rule = new PermittedKeywordRule();
+    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+  }
 }
 
 export class StoreNameRule extends SingleChildRule {
