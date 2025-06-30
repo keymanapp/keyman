@@ -336,6 +336,14 @@ export class Lexer {
       }
     }
 
+    // discard matching empty brackets
+    if (!emitAll && (this.tokenList.length >= 2) &&
+      this.tokenList.at(-1).isTokenType(TokenTypes.RIGHT_BR) &&
+      this.tokenList.at(-2).isTokenType(TokenTypes.LEFT_BR)) {
+      this.tokenList.pop();
+      this.tokenList.pop();
+    }
+
     if (this.buffer.length === 0 && addEOF) {
       this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line));
     }

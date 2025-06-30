@@ -210,6 +210,30 @@ describe("Lexer Tests", () => {
     it("can recognise a MATCH token", () => {
       recogniseToken(TokenTypes.MATCH, 'match');
     });
+    it("can recognise a MATCH token (empty brackets)", () => {
+      const lexer    = new Lexer(new String('match()'));
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenTypes.MATCH, 'match')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a MATCH token (space before empty brackets)", () => {
+      const lexer    = new Lexer(new String('match ()'));
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenTypes.MATCH, 'match')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a MATCH token (space after empty brackets)", () => {
+      const lexer    = new Lexer(new String('match() '));
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenTypes.MATCH, 'match')];
+      assert.deepEqual(actual, expected);
+    });
+    it("can recognise a MATCH token (space in empty brackets)", () => {
+      const lexer    = new Lexer(new String('match( )'));
+      const actual   = lexer.parse({addEOF:false, emitAll:false});
+      const expected = [new Token(TokenTypes.MATCH, 'match')];
+      assert.deepEqual(actual, expected);
+    });
     it("can recognise a NOMATCH token", () => {
       recogniseToken(TokenTypes.NOMATCH, 'nomatch');
     });
