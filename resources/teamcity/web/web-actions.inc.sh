@@ -9,9 +9,9 @@ web_install_dependencies_on_linux_action() {
   builder_echo start "install dependencies" "Install dependencies"
 
   # shellcheck disable=SC2086
-  linux_check_and_install_packages devscripts jq
+  ba_linux_check_and_install_packages devscripts jq
 
-  linux_install_nvm
+  ba_linux_install_nvm
   _install_playwright_dependencies
 
   builder_echo end "install dependencies" success "Finished installing dependencies"
@@ -23,7 +23,7 @@ _install_playwright_dependencies() {
   fi
 
   # shellcheck disable=SC2086
-  linux_check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 \
+  ba_linux_check_and_install_packages ibevent-2.1-7t64 libxslt1.1 libwoff1 \
     libvpx9 libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 \
     libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 \
     gstreamer1.0-libav libnss3 libnspr4 libatk1.0-0t64 libatk-bridge2.0-0t64 \
@@ -41,14 +41,14 @@ web_build_action() {
 web_test_action() {
   builder_echo start web_test "Running tests for native KeymanWeb"
   if is_ubuntu; then
-    linux_start_xvfb
-    trap "linux_stop_xvfb" ERR
+    ba_linux_start_xvfb
+    trap "ba_linux_stop_xvfb" ERR
   fi
 
   "${KEYMAN_ROOT}/web/ci.sh" test
 
   if is_ubuntu; then
-    linux_stop_xvfb
+    ba_linux_stop_xvfb
     trap ERR
   fi
 
