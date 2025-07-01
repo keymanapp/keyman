@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.72 alpha 2025-07-01
+
+* maint(web): cleanup rsync call from bash for Windows agents and refactor (#14236)
+
 ## 19.0.71 alpha 2025-06-30
 
 * refactor(linux): rename linux agent specific functions (#14231)
