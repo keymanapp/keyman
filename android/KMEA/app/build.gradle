@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+KEYMAN_VERSION_NAME+"\""

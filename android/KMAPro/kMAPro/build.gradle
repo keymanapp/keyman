@@ -12,7 +12,7 @@ apply from: "$rootPath/version.gradle"
 String tier = new File('../../TIER.md').getText('UTF-8').trim();
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
