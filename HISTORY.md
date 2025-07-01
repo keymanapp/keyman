@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.73 alpha 2025-07-01
+
+* fix(web): deploy `web/build/publish` folder (#14237)
+* fix(web): change env variable name (#14244)
+
 ## 19.0.72 alpha 2025-07-01
 
 * maint(web): cleanup rsync call from bash for Windows agents and refactor (#14236)
