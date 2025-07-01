@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.74 alpha 2025-07-01
+
+* maint(web): adjust rsync path (#14249)
+
 ## 19.0.73 alpha 2025-07-01
 
 * fix(web): deploy `web/build/publish` folder (#14237)
