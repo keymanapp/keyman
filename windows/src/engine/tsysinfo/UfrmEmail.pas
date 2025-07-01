@@ -138,7 +138,7 @@ begin
       Upload;
       if Response.StatusCode = 413 then
       begin
-        ShowMessage('The diagnostic report file was too large: '+IntToStr(Response.StatusCode)+ 'Contact us via the Keyman Community Forum for help.');
+        ShowMessage('The diagnostic report file was too large: '+IntToStr(Response.StatusCode)+ '. Contact us via the Keyman Community Forum for help.');
         Exit;
       end;
       if Response.StatusCode <> 200 then
