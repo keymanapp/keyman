@@ -11,7 +11,7 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AnyStatementRule, CallStatementRule, DeadKeyStatementRule, NotAnyStatementRule, SaveStatementRule } from "./statement-analyser.js";
+import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, DeadKeyStatementRule, LayerStatementRule, NotAnyStatementRule, PlatformStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
@@ -657,66 +657,6 @@ export class ComparisonRule extends SingleChildRule {
     const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
     const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
     this.rule = new AlternateRule([equal, notEqual]);
-  }
-}
-
-abstract class AbstractShortcutRule extends SingleChildRule {
-  protected leftBracket: Rule;
-  protected plainText: Rule;
-  protected oneOrManyPlainText: Rule;
-  protected rightBracket: Rule;
-  protected shortcutNodeType: NodeTypes;
-
-  public constructor() {
-    super();
-    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
-    this.plainText          = new PlainTextRule();
-    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
-    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const shortcutNode = tmp.removeSoleChildOfType(this.shortcutNodeType);
-      shortcutNode.addChildren(tmp.getChildren());
-      node.addChild(shortcutNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class LayerStatementRule extends AbstractShortcutRule {
-  public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.LAYER_SHORTCUT;
-    const layer: Rule     = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
-    this.rule = new SequenceRule([
-      layer, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
-    ]);
-  }
-}
-
-export class PlatformStatementRule extends AbstractShortcutRule {
-  public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.PLATFORM_SHORTCUT;
-    const platform: Rule  = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
-    this.rule = new SequenceRule([
-      platform, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
-    ]);
-  }
-}
-
-export class BaselayoutStatementRule extends AbstractShortcutRule {
-  public constructor() {
-    super();
-    this.shortcutNodeType = NodeTypes.BASELAYOUT_SHORTCUT;
-    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
-    this.rule = new SequenceRule([
-      baselayout, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
-    ]);
   }
 }
 

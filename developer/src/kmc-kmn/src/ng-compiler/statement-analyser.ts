@@ -9,7 +9,8 @@
  */
 
 import { TokenTypes } from "./lexer.js";
-import { Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
+import { PlainTextRule } from "./kmn-analyser.js";
+import { OneOrManyRule, Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -94,3 +95,62 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
+abstract class AbstractShortcutRule extends SingleChildRule {
+  protected leftBracket: Rule;
+  protected plainText: Rule;
+  protected oneOrManyPlainText: Rule;
+  protected rightBracket: Rule;
+  protected shortcutNodeType: NodeTypes;
+
+  public constructor() {
+    super();
+    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
+    this.plainText          = new PlainTextRule();
+    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
+    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const shortcutNode = tmp.removeSoleChildOfType(this.shortcutNodeType);
+      shortcutNode.addChildren(tmp.getChildren());
+      node.addChild(shortcutNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class BaselayoutStatementRule extends AbstractShortcutRule {
+  public constructor() {
+    super();
+    this.shortcutNodeType = NodeTypes.BASELAYOUT_SHORTCUT;
+    const baselayout: Rule   = new TokenRule(TokenTypes.BASELAYOUT_SHORTCUT, true);
+    this.rule = new SequenceRule([
+      baselayout, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
+    ]);
+  }
+}
+
+export class LayerStatementRule extends AbstractShortcutRule {
+  public constructor() {
+    super();
+    this.shortcutNodeType = NodeTypes.LAYER_SHORTCUT;
+    const layer: Rule     = new TokenRule(TokenTypes.LAYER_SHORTCUT, true);
+    this.rule = new SequenceRule([
+      layer, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
+    ]);
+  }
+}
+
+export class PlatformStatementRule extends AbstractShortcutRule {
+  public constructor() {
+    super();
+    this.shortcutNodeType = NodeTypes.PLATFORM_SHORTCUT;
+    const platform: Rule  = new TokenRule(TokenTypes.PLATFORM_SHORTCUT, true);
+    this.rule = new SequenceRule([
+      platform, this.leftBracket, this.oneOrManyPlainText, this.rightBracket
+    ]);
+  }
+}

@@ -11,14 +11,14 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BaselayoutStatementRule, BeginStatementRule, InputElementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule, CompileTargetRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BeginStatementRule, InputElementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule, CompileTargetRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { InputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { IfLikeStatementRule, IfStatementRule, IfNormalStoreStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { SystemStoreNameForIfRule, IfSystemStoreStatementRule, IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { KeystrokeRule, KmnTreeRule, LayerStatementRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { OutputStatementRule, OutsStatementRule, PlatformStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { KeystrokeRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { OutputStatementRule, OutsStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1663,87 +1663,6 @@ describe("KMN Analyser Tests", () => {
       const comparison: Rule = new ComparisonRule();
       assert.isTrue(comparison.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.NOT_EQUAL));
-    });
-  });
-  describe("LayerStatementRule Tests", () => {
-    it("can construct an LayerStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const layerStatement: Rule = new LayerStatementRule();
-      assert.isNotNull(layerStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer("shift")');
-      const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
-      assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
-    });
-    it("can parse correctly (spacve before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift")');
-      const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
-      assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
-    });
-    it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer("shift" )');
-      const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
-      assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
-    });
-    it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('layer( "shift" )');
-      const layerStatement: Rule = new LayerStatementRule();
-      assert.isTrue(layerStatement.parse(root));
-      const layerNode = root.getSoleChildOfType(NodeTypes.LAYER_SHORTCUT);
-      assert.isNotNull(layerNode);
-      const stringNode = layerNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"shift"');
-    });
-  });
-  describe("PlatformStatementRule Tests", () => {
-    it("can construct an PlatformStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const platformStatement: Rule = new PlatformStatementRule();
-      assert.isNotNull(platformStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('platform("touch")');
-      const platformStatement: Rule = new PlatformStatementRule();
-      assert.isTrue(platformStatement.parse(root));
-      const platformNode = root.getSoleChildOfType(NodeTypes.PLATFORM_SHORTCUT);
-      assert.isNotNull(platformNode);
-      const stringNode = platformNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"touch"');
-    });
-  });
-  describe("BaselayoutStatementRule Tests", () => {
-    it("can construct an BaselayoutStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const baselayoutStatement: Rule = new BaselayoutStatementRule();
-      assert.isNotNull(baselayoutStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('baselayout("en-US")');
-      const baselayoutStatement: Rule = new BaselayoutStatementRule();
-      assert.isTrue(baselayoutStatement.parse(root));
-      const baselayoutNode = root.getSoleChildOfType(NodeTypes.BASELAYOUT_SHORTCUT);
-      assert.isNotNull(baselayoutNode);
-      const stringNode = baselayoutNode.getSoleChildOfType(NodeTypes.STRING)
-      assert.isNotNull(stringNode);
-      assert.equal(stringNode.getText(), '"en-US"');
     });
   });
   describe("RhsBlockRule Tests", () => {
