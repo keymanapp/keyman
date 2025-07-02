@@ -8,14 +8,14 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
+import { Rule } from '../../src/ng-compiler/recursive-descent.js';
+import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { BeginStatementRule, InputElementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule, CompileTargetRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { InputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { InputBlockRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { IndexStatementRule, InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { OutputStatementRule, OutsStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1608,123 +1608,6 @@ describe("KMN Analyser Tests", () => {
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
-    });
-  });
-  describe("IndexStatementRule Tests", () => {
-    it("can construct a IndexStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isNotNull(indexStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1)');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space after open)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1)');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space before close)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit,1 )');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space after open and before close)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index( digit,1 )');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space before comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit ,1)');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space after comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit, 1)');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("can parse correctly (space before and after comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('index(digit , 1)');
-      const indexStatement: Rule = new IndexStatementRule();
-      assert.isTrue(indexStatement.parse(root));
-      const indexNode = root.getSoleChildOfType(NodeTypes.INDEX);
-      assert.isNotNull(indexNode);
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-      assert.equal(indexNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-  });
-  describe("CommaRule Tests", () => {
-    it("can construct a CommaRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
-      assert.isNotNull(comma);
-    });
-    it("can parse correctly (comma)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(',');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
-      assert.isTrue(comma.parse(root));
-    });
-    it("can parse correctly (comma, space before)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(' ,');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
-      assert.isTrue(comma.parse(root));
-    });
-    it("can parse correctly (comma, space after)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(', ');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
-      assert.isTrue(comma.parse(root));
-    });
-    it("can parse correctly (comma, space before and after)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer(' , ');
-      const comma: Rule = new TokenRule(TokenTypes.COMMA);
-      assert.isTrue(comma.parse(root));
-    });
-  });
-  describe("ContextStatementRule Tests", () => {
-    it("can construct a ContextStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const contextStatement: Rule = new ContextStatementRule();
-      assert.isNotNull(contextStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('context(1)');
-      const contextStatement: Rule = new ContextStatementRule();
-      assert.isTrue(contextStatement.parse(root));
-      const contextNode = root.getSoleChildOfType(NodeTypes.CONTEXT);
-      assert.isNotNull(contextNode);
-      assert.equal(contextNode.getSoleChildOfType(NodeTypes.OFFSET).getText(), '1');
-    });
-    it("rejects a context without brackets", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('context');
-      const contextStatement: Rule = new ContextStatementRule();
-      assert.isFalse(contextStatement.parse(root));
     });
   });
   describe("Analyser Tests", () => {

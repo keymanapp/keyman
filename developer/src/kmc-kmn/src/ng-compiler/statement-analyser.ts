@@ -257,3 +257,80 @@ export class ComparisonRule extends SingleChildRule {
     this.rule = new AlternateRule([equal, notEqual]);
   }
 }
+
+export class ContextStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const index: Rule         = new TokenRule(TokenTypes.CONTEXT, true);
+    const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
+    const offset: Rule        = new OffsetRule();
+    const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      index,
+      leftBracket,
+      offset,
+      rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const contextNode = tmp.removeSoleChildOfType(NodeTypes.CONTEXT);
+      contextNode.addChildren(tmp.getChildren());
+      node.addChild(contextNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class IndexStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const index: Rule           = new TokenRule(TokenTypes.INDEX, true);
+    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
+    const normalStoreName: Rule = new NormalStoreNameRule();
+    const comma: Rule           = new TokenRule(TokenTypes.COMMA);
+    const offset: Rule          = new OffsetRule();
+    const rightBracket: Rule    = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      index,
+      leftBracket,
+      normalStoreName,
+      comma,
+      offset,
+      rightBracket,
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const indexNode = tmp.removeSoleChildOfType(NodeTypes.INDEX);
+      indexNode.addChildren(tmp.getChildren());
+      node.addChild(indexNode);
+    }
+    return parseSuccess;
+  }
+}
+
+export class OffsetRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const octal: Rule     = new TokenRule(TokenTypes.OCTAL, true);
+    const parameter: Rule = new TokenRule(TokenTypes.PARAMETER, true);
+    this.rule = new AlternateRule([octal, parameter]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const child = tmp.getSoleChild();
+      node.addToken(NodeTypes.OFFSET, child.token);
+    }
+    return parseSuccess;
+  };
+}

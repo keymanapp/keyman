@@ -37,9 +37,6 @@ rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|setSystemStore|layerStatement|indexStatement|
   contextStatement|CONTEXT|RETURN|text|BEEP
-indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
-offset: OCTAL|PARAMETER
-contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 
 # Statement Rules
 anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
@@ -56,6 +53,9 @@ ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_B
 ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
 systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
 comparison:EQUAL|NOT_EQUAL
+contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
+indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
+offset: OCTAL|PARAMETER
 
 # System and Variable Store Rules
 systemStoreAssign: systemStore text*
