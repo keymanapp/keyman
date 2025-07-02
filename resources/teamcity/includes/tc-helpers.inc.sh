@@ -82,27 +82,45 @@ upload_help() {
 }
 
 _tc_rsync() {
-  local rsync_args CYGPATH_RSYNC_HOME SOURCE DESTINATION
+  local rsync_args SOURCE DESTINATION
   SOURCE=$1
   DESTINATION=$2
 
-  if ! is_windows; then
-    echo "This function is currently only supported on Windows."
-    return 1
-  fi
-
   rsync_args=(
     '-vrzltp'                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
-    '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
     '--stats'                                # show statistics for log
     "--rsync-path=${RSYNC_PATH}"             # path on remote server
-    "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
-    "${SOURCE}"
-    "${DESTINATION}"
   )
 
-  CYGPATH_RSYNC_HOME=$(cygpath -w "${RSYNC_HOME}")
-  MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
+  if is_windows; then
+    rsync_args+=(
+      '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
+      "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
+    )
+  else
+    rsync_args+=(
+      "--rsh=ssh"                          # use ssh
+    )
+  fi
+
+  rsync_args+=(
+      "${SOURCE}"
+      "${DESTINATION}"
+  )
+
+  if is_windows; then
+    local CYGPATH_RSYNC_HOME
+    CYGPATH_RSYNC_HOME=$(cygpath -w "${RSYNC_HOME}")
+    MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
+  else
+    local RSYNC=rsync
+    if is_macos; then
+      RSYNC=/usr/local/bin/rsync
+      [[ -f /opt/homebrew/bin/rsync ]] && RSYNC=/opt/homebrew/bin/rsync
+    fi
+
+    ${RSYNC} "${rsync_args[@]}"
+  fi
 }
 
 # Download file or directory $1 from the remote server to $2.
