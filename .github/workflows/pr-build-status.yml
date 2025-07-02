@@ -1,13 +1,31 @@
+# GENERATED FILE - DO NOT EDIT!
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Do not modify the script in .github/workflows/pr-build-status.yml directly;
+# instead work on the sources in resources/build/pr-build-status and use the
+# build.sh script to rebuild the .github/workflows/pr-build-status.yml file from
+# them.
+#
+# build.sh will append the relevant portions of
+# resources/build/pr-build-status/pr-build-status.mjs to the content in
+# resources/build/pr-build-status/pr-build-status.prefix.yml to form the .github
+# workflow file.
+#
 name: Keyman Build Summary
 on:
-  # Temporary for testing:
+  status:
   push:
-    branches:
-      - "maint/resources/14172-pr-build-status-2"
-
-  check_run:
-    types: [completed]
-
+    branches-ignore:
+      - master
+      - beta
+      - stable-*
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: 'Commit sha'
+        required: true
+        type: string
 jobs:
   run_pr_build_status:
     name: Summarize build status checks
@@ -84,7 +102,7 @@ jobs:
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Checks have not yet been triggered ⌛'];
+                return ['pending', 'Builds have not yet been triggered ⌛'];
               }
 
               const state =
@@ -177,7 +195,14 @@ jobs:
             }
 
             const { owner, repo } = context.repo;
-            const sha = context.payload?.check_suite?.sha || context.sha;
+            const sha =
+              context.payload?.check_suite?.sha ||    /* check run completed */
+              context.payload?.inputs?.commit ||      /* manual run */
+              context.payload?.after ||               /* push */
+              context.payload?.commit?.sha ||         /* status */
+              context.sha;                            /* probably 'master'! */
+
             const checkRunId = await createCheck(github, owner, repo, sha);
             const res = await test(github, owner, repo, sha);
             await updateCheck(github, owner, repo, checkRunId, res[0], res[1]);
+

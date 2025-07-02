@@ -23,7 +23,7 @@ $keyman_developer_exe = "keymandeveloper-${version_with_tag}.exe"
 # Debug files
 $debug_zip = "debug-${build_number}.zip"
 
-$7Z_HOME = $env:7Z_HOME
+$SEVENZ_HOME = $env:SEVENZ_HOME
 $RSYNC_HOME = $env:RSYNC_HOME
 $RSYNC_PATH = $env:RSYNC_PATH
 $RSYNC_USER = $env:RSYNC_USER

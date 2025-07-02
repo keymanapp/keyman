@@ -34,7 +34,7 @@ install_nvm() {
     # on Windows and macOS build agents are configured manually
     return 0
   fi
-  linux_install_nvm
+  ba_linux_install_nvm
 }
 
 # Set the environment variables required to use node/nvm and set the
@@ -59,7 +59,7 @@ install_emscripten() {
     # on Windows and macOS build agents are configured manually
     return 0
   fi
-  linux_install_emscripten
+  ba_linux_install_emscripten
 }
 
 set_variables_for_emscripten() {

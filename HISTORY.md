@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 19.0.74 alpha 2025-07-01
+
+* maint(web): adjust rsync path (#14249)
+
+## 19.0.73 alpha 2025-07-01
+
+* fix(web): deploy `web/build/publish` folder (#14237)
+* fix(web): change env variable name (#14244)
+
+## 19.0.72 alpha 2025-07-01
+
+* maint(web): cleanup rsync call from bash for Windows agents and refactor (#14236)
+
+## 19.0.71 alpha 2025-06-30
+
+* refactor(linux): rename linux agent specific functions (#14231)
+
+## 19.0.70 alpha 2025-06-27
+
+* docs(developer): Add details on Template choices (#14228)
+* chore(common,developer): expand 'x' to 'compileContext' (#14218)
+
+## 19.0.69 alpha 2025-06-25
+
+* maint(resources): support additional workflow events for pr-build-status (#14219)
+* chore: add tips and caution of gestures for Keyman Developer + update license + removal of span tag (#14204)
+
+## 19.0.68 alpha 2025-06-24
+
+* maint(resources): Build-bot now available to control test builds (#14125)
+* maint(developer): support buildLevel (#14196)
+* fix(resources): allow branch names in run-required-test-builds shortcut call (#14217)
+* maint(resources): add pr-build-status GitHub Action to summarize build status (#14199)
+
 ## 19.0.67 alpha 2025-06-22
 
 * chore(developer): ldml: additional line numbers (#14104)

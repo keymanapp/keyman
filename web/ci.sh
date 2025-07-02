@@ -154,14 +154,14 @@ function prepare_downloads_keyman_com_action() {
 
   mkdir -p "${UPLOAD_PATH}"
 
-  # On Windows, we use 7-zip (SEVEN_Z_HOME env var).  On other platforms, we use zip.
+  # On Windows, we use 7-zip (SEVENZ_HOME env var).  On other platforms, we use zip.
 
   COMPRESS_CMD=
   COMPRESS_ADD=
 
-  # Marc's preference; use $SEVEN_Z_HOME and have the BAs set up with THAT as an env var.
-  if [[ ! -z "${SEVEN_Z_HOME+x}" ]]; then
-    COMPRESS_CMD="${SEVEN_Z_HOME}/7z"
+  # Marc's preference; use $SEVENZ_HOME and have the BAs set up with THAT as an env var.
+  if [[ ! -z "${SEVENZ_HOME+x}" ]]; then
+    COMPRESS_CMD="${SEVENZ_HOME}/7z"
     COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
   fi
 
@@ -189,9 +189,10 @@ function prepare_downloads_keyman_com_action() {
   mkdir -p "${STATIC}"
 
   mkdir -p "${STATIC}/build"
-  cp -rf build/app    "${STATIC}/build/app"
-  cp -rf build/engine "${STATIC}/build/engine"
-  cp -rf build/tools  "${STATIC}/build/tools"
+  cp -rf build/app     "${STATIC}/build/app"
+  cp -rf build/engine  "${STATIC}/build/engine"
+  cp -rf build/publish "${STATIC}/build/publish"
+  cp -rf build/tools   "${STATIC}/build/tools"
   # avoid build/upload, since that's the folder we're building!
 
   cp -f index.html "${STATIC}/index.html"

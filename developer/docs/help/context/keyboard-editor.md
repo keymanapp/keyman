@@ -265,6 +265,20 @@ Template...
     current layout are not in the new template, their definitions will
     be lost. Therefore, selecting an appropriate template early in the
     development process is suggested.
+    
+    - template-basic: has only a phone layout (4 rows of keys), with three layers: default (K_A through K_Z 
+    plus some punctuation), shift (Shift K_A through Shift K_Z, plus some punctuation), numeric (K_0 through 
+    K_9 unshifted and shifted, plus other non-alphanumerice keys).
+    
+    - template-latin: has both phone and tablet layouts (which are identical except for some key spacing, 
+    each with 4 rows of keys), with four layers: default, shift, numeric, symbol. The first three layers 
+    are similar to those of template-basic, with the addition of longpress keys for accented characters. 
+    The symbol layer has many symbols not usually seen on a physical keyboard.
+    
+    - template-traditional: has both phone (4 rows of keys) and tablet (5 rows of keys) layouts. The phone 
+    layout is similar to the template-basic layout. The tablet layout has eight layers: default, shift, ctrl, 
+    shift-ctrl, alt, shift-alt, ctrl-alt, shift-ctrl-alt. The default layer has the keys from the default layer 
+    of the desktop layout, the shift layer has the keys from the shift layer of the desktop layout, and so on.
 
 Import from On Screen
 :   If you have an existing On-Screen Keyboard for your keyboard layout,

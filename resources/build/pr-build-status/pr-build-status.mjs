@@ -1,16 +1,13 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  *
- * Clone of the pr-build-status.yml file for unit testing and development. The
- * indented section of this file below is copied verbatim into
- * .github/workflows/pr-build-status.yml, and allows us to develop the YAML
- * script without introducing a dependency on the repository.
+ * Source script of pr-build-status.yml file for unit testing and development.
+ * The indented section of this file below is copied verbatim into
+ * .github/workflows/pr-build-status.yml by `build.sh build`, and allows us to
+ * develop the YAML script without introducing a dependency on the repository.
  */
 
-// Copy the indented section into the step for pr-build-status.mjs.
-
-// START OF CLONED SECTION
-
+// CLONE:START
             // This code is copied out of resources/build/pr-build-status/pr-build-status.mjs
             // where it is tested. It is copied inline here in order to avoid requiring the
             // repository to be checked out, which dramatically reduces the run time of the
@@ -77,7 +74,7 @@
 
               // If we do not have any statuses yet, we wait
               if(Object.keys(filtered_statuses).length == 0 || !hasBuilds) {
-                return ['pending', 'Checks have not yet been triggered ⌛'];
+                return ['pending', 'Builds have not yet been triggered ⌛'];
               }
 
               const state =
@@ -86,7 +83,7 @@
                 counts.pending ? 'pending' :
                 'success';
 
-              let description = ''; //;
+              let description = '';
               function appendDescription(count, state) {
                 if(!count) return;
                 if(description != '') description += '; ';
@@ -153,7 +150,6 @@
             }
 
             async function updateCheck(github, owner, repo, checkRunId, status, description) {
-              // To ensure that
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
@@ -170,16 +166,22 @@
               });
             }
 
-// END OF CLONED SECTION
-// THIS SECTION MUST BE INCLUDED, UNCOMMENTED IN THE .yml
+// CLONE:END
+// CLONE-COMMENTED:START
 
             // const { owner, repo } = context.repo;
-            // const sha = context.payload?.check_suite?.sha || context.sha;
+            // const sha =
+            //   context.payload?.check_suite?.sha ||    /* check run completed */
+            //   context.payload?.inputs?.commit ||      /* manual run */
+            //   context.payload?.after ||               /* push */
+            //   context.payload?.commit?.sha ||         /* status */
+            //   context.sha;                            /* probably 'master'! */
+
             // const checkRunId = await createCheck(github, owner, repo, sha);
             // const res = await test(github, owner, repo, sha);
             // await updateCheck(github, owner, repo, checkRunId, res[0], res[1]);
 
-// END OF COMMENTED SECTION
+// CLONE-COMMENTED:END
 
 // Following code is used only for unit testing; do not include in the .yml
 
