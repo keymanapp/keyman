@@ -82,14 +82,25 @@ export class KeylayoutFileReader {
    * @param  absolutefilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
-  public read(inputFilename: string): KeylayoutXMLSourceFile  {
+  public read(inputFilename: string): KeylayoutXMLSourceFile {
 
 
     const options = {
+      /*ignoreAttributes: false,
+      attributeNamePrefix: '@_',   // to access the attribute
+      ignoreDeclaration: true,
+      parseTagValue: false,  // does this prevent output of  #text ????,
+      // trimValues: false,           // preserve spaces
+      trimValues: true,
+      textNodeName: "##text",*/
+
       ignoreAttributes: false,
-      trimValues: false,           // preserve spaces
+      trimValues: true,
+      //textNodeName: "##text",
+      parseTagValue: false,  // does this prevent output of  #text ????,
       attributeNamePrefix: '@_',   // to access the attribute
       ignoreDeclaration: true
+
     };
 
     try {

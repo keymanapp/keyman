@@ -5,6 +5,18 @@
     "keyboard": {
       "additionalProperties": false,
       "properties": {
+        "@_group": {
+          "type": "string"
+        },
+        "@_id": {
+          "type": "string"
+        },
+        "@_maxout": {
+          "type": "string"
+        },
+        "@_name": {
+          "type": "string"
+        },
         "actions": {
           "additionalProperties": false,
           "properties": {
@@ -12,69 +24,23 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "action": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "when": {
-                          "items": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "next": {
-                                "maximum": 255,
-                                "minimum": 0,
-                                "type": "integer"
-                              },
-                              "output": {
-                                "type": "string"
-                              },
-                              "state": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "state"
-                            ],
-                            "type": "object"
-                          },
-                          "minItems": 1,
-                          "type": "array"
-                        }
-                      },
-                      "required": [
-                        "when",
-                        "id"
-                      ],
-                      "type": "object"
-                    },
-                    "minItems": 1,
-                    "type": "array"
-                  },
-                  "id": {
+                  "@_id": {
                     "type": "string"
                   },
                   "when": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "next": {
-                          "maximum": 255,
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "output": {
+                        "@_next": {
                           "type": "string"
                         },
-                        "state": {
+                        "@_output": {
+                          "type": "string"
+                        },
+                        "@_state": {
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "state"
-                      ],
                       "type": "object"
                     },
                     "minItems": 1,
@@ -82,9 +48,7 @@
                   }
                 },
                 "required": [
-                  "when",
-                  "id",
-                  "action"
+                  "when"
                 ],
                 "type": "object"
               },
@@ -97,139 +61,81 @@
           ],
           "type": "object"
         },
-        "group": {
-          "maximum": 255,
-          "minimum": 0,
-          "type": "integer"
-        },
-        "id": {
-          "maximum": 32767,
-          "minimum": -32768,
-          "type": "integer"
-        },
         "keyMapSet": {
-          "additionalProperties": false,
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "keyMap": {
-              "items": {
-                "additionalProperties": false,
-                "properties": {
-                  "index": {
-                    "maximum": 255,
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  "key": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "action": {
-                          "type": "string"
-                        },
-                        "code": {
-                          "maximum": 255,
-                          "minimum": 0,
-                          "type": "integer"
-                        },
-                        "output": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "code"
-                      ],
-                      "type": "object"
-                    },
-                    "minItems": 1,
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "key",
-                  "index"
-                ],
-                "type": "object"
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "@_id": {
+                "type": "string"
               },
-              "minItems": 1,
-              "type": "array"
-            }
+              "keyMap": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "@_index": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "@_action": {
+                            "type": "string"
+                          },
+                          "@_code": {
+                            "type": "string"
+                          },
+                          "@_output": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "minItems": 1,
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "key"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array"
+              }
+            },
+            "required": [
+              "keyMap"
+            ],
+            "type": "object"
           },
-          "required": [
-            "keyMap",
-            "id"
-          ],
-          "type": "object"
+          "minItems": 1,
+          "type": "array"
         },
         "layouts": {
           "additionalProperties": false,
           "properties": {
             "layout": {
-              "additionalProperties": false,
-              "properties": {
-                "first": {
-                  "maximum": 255,
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "last": {
-                  "maximum": 255,
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "layout": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "first": {
-                      "maximum": 255,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "last": {
-                      "maximum": 255,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "mapSet": {
-                      "maximum": 255,
-                      "minimum": 0,
-                      "type": "integer"
-                    },
-                    "modifiers": {
-                      "maximum": 255,
-                      "minimum": 0,
-                      "type": "integer"
-                    }
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "@_first": {
+                    "type": "string"
                   },
-                  "required": [
-                    "first",
-                    "last",
-                    "mapSet",
-                    "modifiers"
-                  ],
-                  "type": "object"
+                  "@_last": {
+                    "type": "string"
+                  },
+                  "@_mapSet": {
+                    "type": "string"
+                  },
+                  "@_modifiers": {
+                    "type": "string"
+                  }
                 },
-                "mapSet": {
-                  "maximum": 255,
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "modifiers": {
-                  "maximum": 255,
-                  "minimum": 0,
-                  "type": "integer"
-                }
+                "type": "object"
               },
-              "required": [
-                "first",
-                "last",
-                "mapSet",
-                "modifiers",
-                "layout"
-              ],
-              "type": "object"
+              "minItems": 1,
+              "type": "array"
             }
           },
           "required": [
@@ -237,44 +143,30 @@
           ],
           "type": "object"
         },
-        "maxout": {
-          "maximum": 255,
-          "minimum": 0,
-          "type": "integer"
-        },
         "modifierMap": {
           "additionalProperties": false,
           "properties": {
-            "defaultIndex": {
-              "maximum": 255,
-              "minimum": 0,
-              "type": "integer"
+            "@_defaultIndex": {
+              "type": "string"
             },
-            "id": {
-              "maximum": 255,
-              "minimum": 0,
-              "type": "integer"
+            "@_id": {
+              "type": "string"
             },
             "keyMapSelect": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "mapIndex": {
-                    "maximum": 255,
-                    "minimum": 0,
-                    "type": "integer"
+                  "@_mapIndex": {
+                    "type": "string"
                   },
                   "modifier": {
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "keys": {
+                        "@_keys": {
                           "type": "string"
                         }
                       },
-                      "required": [
-                        "keys"
-                      ],
                       "type": "object"
                     },
                     "minItems": 1,
@@ -282,8 +174,7 @@
                   }
                 },
                 "required": [
-                  "modifier",
-                  "mapIndex"
+                  "modifier"
                 ],
                 "type": "object"
               },
@@ -292,14 +183,9 @@
             }
           },
           "required": [
-            "keyMapSelect",
-            "id",
-            "defaultIndex"
+            "keyMapSelect"
           ],
           "type": "object"
-        },
-        "name": {
-          "type": "string"
         },
         "terminators": {
           "additionalProperties": false,
@@ -308,42 +194,13 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "output": {
+                  "@_output": {
                     "type": "string"
                   },
-                  "state": {
-                    "maximum": 255,
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  "when": {
-                    "items": {
-                      "additionalProperties": false,
-                      "properties": {
-                        "output": {
-                          "type": "string"
-                        },
-                        "state": {
-                          "maximum": 255,
-                          "minimum": 0,
-                          "type": "integer"
-                        }
-                      },
-                      "required": [
-                        "state",
-                        "output"
-                      ],
-                      "type": "object"
-                    },
-                    "minItems": 1,
-                    "type": "array"
+                  "@_state": {
+                    "type": "string"
                   }
                 },
-                "required": [
-                  "state",
-                  "output",
-                  "when"
-                ],
                 "type": "object"
               },
               "minItems": 1,
@@ -361,12 +218,9 @@
         "modifierMap",
         "keyMapSet",
         "actions",
-        "terminators",
-        "group",
-        "id",
-        "name",
-        "maxout"
-      ]
+        "terminators"
+      ],
+      "type": "object"
     }
   },
   "required": [
