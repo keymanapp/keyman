@@ -33,8 +33,6 @@ inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 keystroke: PLUS inputElement+
 inputElement: anyStatement|notAnyStatement|contextStatement|indexStatement|text
-anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
-notAnyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
 ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
 ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
 ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
@@ -48,12 +46,16 @@ rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|setSystemStore|layerStatement|indexStatement|
   contextStatement|CONTEXT|RETURN|text|BEEP
-callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
-saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
-deadKeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR
 indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
 offset: OCTAL|PARAMETER
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
+
+# Statement Rules
+anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
+callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
+deadKeyStatement: DEADKEY LEFT_BR normalStoreName RIGHT_BR
+notAnyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
+saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
 
 # System and Variable Store Rules
 systemStoreAssign: systemStore text*

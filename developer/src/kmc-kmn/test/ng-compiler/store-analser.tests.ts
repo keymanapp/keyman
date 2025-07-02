@@ -4,8 +4,8 @@
  * Created by Dr Mark C. Sinclair on 2025-03-18
  *
  * Tests for KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
- * 
- * System and Variable Store Rules
+ *
+ * System and Normal Store Rule Tests
  */
 
 import 'mocha';

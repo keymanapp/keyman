@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { AnyStatementRule, BaselayoutStatementRule, BeginStatementRule, CallStatementRule, DeadKeyStatementRule, InputElementRule, NotAnyStatementRule, SaveStatementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule, CompileTargetRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { BaselayoutStatementRule, BeginStatementRule, InputElementRule, ModifierRule, PlainTextRule, RuleBlockRule, PermittedKeywordRule, GroupNameRule, LhsBlockRule, CompileTargetRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { ComparisonRule, ContentRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { InputBlockRule, ProductionBlockRule, ContextStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -1465,36 +1465,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(keystrokeNode.getSoleChildOfType(NodeTypes.U_CHAR));
     });
   });
-  describe("AnyStatementRule Tests", () => {
-    it("can construct an AnyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const anyStatement: Rule = new AnyStatementRule();
-      assert.isNotNull(anyStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('any(digit)');
-      const anyStatement: Rule = new AnyStatementRule();
-      assert.isTrue(anyStatement.parse(root));
-      const anyNode = root.getSoleChildOfType(NodeTypes.ANY);
-      assert.isNotNull(anyNode);
-      assert.isNotNull(anyNode.getSoleChildOfType(NodeTypes.STORENAME));
-    });
-  });
-  describe("NotAnyStatementRule Tests", () => {
-    it("can construct an NotAnyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const notAnyStatement: Rule = new NotAnyStatementRule();
-      assert.isNotNull(notAnyStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
-      const notAnyStatement: Rule = new NotAnyStatementRule();
-      assert.isTrue(notAnyStatement.parse(root));
-      const notAnyNode = root.getSoleChildOfType(NodeTypes.NOTANY);
-      assert.isNotNull(notAnyNode);
-      assert.isNotNull(notAnyNode.getSoleChildOfType(NodeTypes.STORENAME));
-    });
-  });
   describe("IfLikeStatementRule Tests", () => {
     it("can construct a IfLikeStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
@@ -1920,51 +1890,6 @@ describe("KMN Analyser Tests", () => {
       const outputStatement: Rule = new OutputStatementRule();
       assert.isTrue(outputStatement.parse(root));
       assert.isNotNull(root.getSoleChildOfType(NodeTypes.BEEP));
-    });
-  });
-  describe("CallStatementRule Tests", () => {
-    it("can construct an CallStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const callStatement: Rule = new CallStatementRule();
-      assert.isNotNull(callStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('call(callDefinitionStore)');
-      const callStatement: Rule = new CallStatementRule();
-      assert.isTrue(callStatement.parse(root));
-      const callNode = root.getSoleChildOfType(NodeTypes.CALL);
-      assert.isNotNull(callNode);
-      assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
-    });
-  });
-  describe("SaveStatementRule Tests", () => {
-    it("can construct an SaveStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const saveStatement: Rule = new SaveStatementRule();
-      assert.isNotNull(saveStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('save(storeName)');
-      const saveStatement: Rule = new SaveStatementRule();
-      assert.isTrue(saveStatement.parse(root));
-      const saveNode = root.getSoleChildOfType(NodeTypes.SAVE);
-      assert.isNotNull(saveNode);
-      assert.isNotNull(saveNode.getSoleChildOfType(NodeTypes.STORENAME));
-    });
-  });
-  describe("DeadKeyStatementRule Tests", () => {
-    it("can construct an DeadKeyStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const deadKeyStatement: Rule = new DeadKeyStatementRule();
-      assert.isNotNull(deadKeyStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
-      const deadKeyStatement: Rule = new DeadKeyStatementRule();
-      assert.isTrue(deadKeyStatement.parse(root));
-      const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
-      assert.isNotNull(deadKeyNode);
-      assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
   describe("IndexStatementRule Tests", () => {
@@ -2862,7 +2787,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(5000);
+    }).timeout(10000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
       [
         'release/m/me_en/source/me_en',

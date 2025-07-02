@@ -4,11 +4,14 @@
  * Created by Dr Mark C. Sinclair on 2025-03-18
  *
  * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
+ *NotAny
+ * KMN Analyser Tests
  */
 
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
+import { AnyStatementRule, CallStatementRule, DeadKeyStatementRule, NotAnyStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
@@ -203,32 +206,6 @@ export class KeyCodeRule extends SingleChildRule {
     const stringRule: Rule = new TokenRule(TokenTypes.STRING, true);
     const decimal: Rule    = new TokenRule(TokenTypes.DECIMAL, true);
     this.rule = new AlternateRule([keyCode, stringRule, decimal]);
-  }
-}
-
-abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
-  protected leftBracket: Rule;
-  protected normalStoreName: Rule;
-  protected rightBracket: Rule;
-  protected cmdNodeType: NodeTypes;
-
-  public constructor() {
-    super();
-    this.leftBracket     = new TokenRule(TokenTypes.LEFT_BR);
-    this.normalStoreName = new NormalStoreNameRule();
-    this.rightBracket    = new TokenRule(TokenTypes.RIGHT_BR);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const cmdNode       = tmp.getSoleChildOfType(this.cmdNodeType);
-      const storeNameNode = tmp.getSoleChildOfType(NodeTypes.STORENAME);
-      cmdNode.addChild(storeNameNode);
-      node.addChild(cmdNode);
-    }
-    return parseSuccess;
   }
 }
 
@@ -580,28 +557,6 @@ export class KeystrokeRule extends SingleChildRule {
   }
 }
 
-export class AnyStatementRule extends AbstractBracketedStoreNameStatementRule {
-  public constructor() {
-    super();
-    const any: Rule  = new TokenRule(TokenTypes.ANY, true);
-    this.cmdNodeType = NodeTypes.ANY;
-    this.rule = new SequenceRule([
-      any, this.leftBracket, this.normalStoreName, this.rightBracket
-    ]);
-  }
-}
-
-export class NotAnyStatementRule extends AbstractBracketedStoreNameStatementRule {
-  public constructor() {
-    super();
-    const notAny: Rule = new TokenRule(TokenTypes.NOTANY, true);
-    this.cmdNodeType   = NodeTypes.NOTANY;
-    this.rule = new SequenceRule([
-      notAny, this.leftBracket, this.normalStoreName, this.rightBracket
-    ]);
-  }
-}
-
 export class IfLikeStatementRule extends SingleChildRule {
   public constructor() {
     super();
@@ -814,39 +769,6 @@ export class OutputStatementRule extends SingleChildRule {
       returnRule,
       text,
       beep,
-    ]);
-  }
-}
-
-export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
-  public constructor() {
-    super();
-    const call: Rule = new TokenRule(TokenTypes.CALL, true);
-    this.cmdNodeType = NodeTypes.CALL;
-    this.rule = new SequenceRule([
-      call, this.leftBracket, this.normalStoreName, this.rightBracket
-    ]);
-  }
-}
-
-export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
-  public constructor() {
-    super();
-    const save: Rule = new TokenRule(TokenTypes.SAVE, true);
-    this.cmdNodeType = NodeTypes.SAVE;
-    this.rule = new SequenceRule([
-      save, this.leftBracket, this.normalStoreName, this.rightBracket
-    ]);
-  }
-}
-
-export class DeadKeyStatementRule extends AbstractBracketedStoreNameStatementRule {
-  public constructor() {
-    super();
-    const deadKey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
-    this.cmdNodeType = NodeTypes.DEADKEY;
-    this.rule = new SequenceRule([
-      deadKey, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
   }
 }

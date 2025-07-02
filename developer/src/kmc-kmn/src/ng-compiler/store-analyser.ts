@@ -3,9 +3,9 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-05-05
  *
- * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
- * 
- * System and Variable Store Rules
+ * KMC KMN Next Generation Parser (Recursive Descent/Store Analyser)
+ *
+ * System and Normal Store Rule Tests
  */
 
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
