@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.75 alpha 2025-07-02
+
+* feat(resources): support ignoring unknown options in builder (#14216)
+* maint(common): consolidate 7Z_HOME, SEVENZ_HOME, SEVEN_Z_HOME env vars (#14162)
+
 ## 19.0.74 alpha 2025-07-01
 
 * maint(web): adjust rsync path (#14249)
