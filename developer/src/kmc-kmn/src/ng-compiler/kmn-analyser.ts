@@ -11,8 +11,8 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, DeadKeyStatementRule, LayerStatementRule, NotAnyStatementRule, PlatformStatementRule, SaveStatementRule } from "./statement-analyser.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, SystemStoreNameRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
+import { AnyStatementRule, CallStatementRule, DeadKeyStatementRule, IfLikeStatementRule, LayerStatementRule, NotAnyStatementRule, SaveStatementRule } from "./statement-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule, NormalStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -554,109 +554,6 @@ export class KeystrokeRule extends SingleChildRule {
       node.addChild(keystrokeNode);
     }
     return parseSuccess;
-  }
-}
-
-export class IfLikeStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const ifStatement: Rule         = new IfStatementRule();
-    const platformStatement: Rule   = new PlatformStatementRule();
-    const baselayoutStatement: Rule = new BaselayoutStatementRule();
-    this.rule = new AlternateRule([
-      ifStatement, platformStatement, baselayoutStatement,
-    ]);
-  }
-}
-
-export class IfStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const ifNormalStoreStatement: Rule = new IfNormalStoreStatementRule();
-    const ifSystemStoreStatement: Rule = new IfSystemStoreStatementRule();
-    this.rule = new AlternateRule([ifNormalStoreStatement, ifSystemStoreStatement]);
-  }
-}
-
-export class AbstractIfStoreStatementRule extends SingleChildRule {
-  protected ifRule: Rule;
-  protected leftBracket: Rule;
-  protected comparison: Rule;
-  protected rightBracket: Rule;
-  protected plainText: Rule;
-  protected oneOrManyPlainText: Rule;
-
-  public constructor() {
-    super();
-    this.ifRule             = new TokenRule(TokenTypes.IF, true);
-    this.leftBracket        = new TokenRule(TokenTypes.LEFT_BR);
-    this.comparison         = new ComparisonRule();
-    this.rightBracket       = new TokenRule(TokenTypes.RIGHT_BR);
-    this.plainText          = new PlainTextRule();
-    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const ifNode   = tmp.removeSoleChildOfType(NodeTypes.IF);
-      const children = tmp.getChildren();
-      ifNode.addChildren(children);
-      node.addChild(ifNode);
-    }
-    return parseSuccess;
-  }
-}
-
-export class IfNormalStoreStatementRule extends AbstractIfStoreStatementRule {
-  public constructor() {
-    super();
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, normalStoreName,
-      this.comparison, this.oneOrManyPlainText, this.rightBracket,
-    ]);
-  }
-}
-
-export class IfSystemStoreStatementRule extends AbstractIfStoreStatementRule {
-  public constructor() {
-    super();
-    const systemStoreNameForIf: Rule = new SystemStoreNameForIfRule();
-    this.rule = new SequenceRule([
-      this.ifRule, this.leftBracket, systemStoreNameForIf,
-      this.comparison, this.oneOrManyPlainText, this.rightBracket,
-    ]);
-  }
-}
-
-export class SystemStoreNameForIfRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const systemStoreName: Rule = new SystemStoreNameRule();
-    const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
-    const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
-    const newLayer: Rule        = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldLayer: Rule        = new TokenRule(TokenTypes.OLDLAYER, true);
-    const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
-    this.rule = new AlternateRule([
-      systemStoreName,
-      baselayout,
-      layer,
-      newLayer,
-      oldLayer,
-      platform,
-    ]);
-  }
-}
-
-export class ComparisonRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const equal: Rule    = new TokenRule(TokenTypes.EQUAL, true);
-    const notEqual: Rule = new TokenRule(TokenTypes.NOT_EQUAL, true);
-    this.rule = new AlternateRule([equal, notEqual]);
   }
 }
 

@@ -33,12 +33,6 @@ inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
 inputContext: inputElement+
 keystroke: PLUS inputElement+
 inputElement: anyStatement|notAnyStatement|contextStatement|indexStatement|text
-ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
-ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
-ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
-ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
-systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
-comparison:EQUAL|NOT_EQUAL
 rhsBlock: outputStatement+
 outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
   resetStore|setSystemStore|layerStatement|indexStatement|
@@ -56,6 +50,12 @@ saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
 baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 layerStatement: LAYER_SHORTCUT LEFT_BR plainText+ RIGHT_BR
 platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
+ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
+ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
+ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
+systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
+comparison:EQUAL|NOT_EQUAL
 
 # System and Variable Store Rules
 systemStoreAssign: systemStore text*
