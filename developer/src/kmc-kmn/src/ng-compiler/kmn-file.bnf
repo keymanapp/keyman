@@ -12,7 +12,6 @@ rangeEnd: RANGE simpleText
 virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
 modifier: SHIFT|CAPS|MODIFIER
 keyCode: KEY_CODE|STRING|DECIMAL
-outsStatement: OUTS LEFT_BR storeName RIGHT_BR
 ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
 entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
@@ -56,6 +55,7 @@ comparison:EQUAL|NOT_EQUAL
 contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
 indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
 offset: OCTAL|PARAMETER
+outsStatement: OUTS LEFT_BR storeName RIGHT_BR
 
 # System and Variable Store Rules
 systemStoreAssign: systemStore text*

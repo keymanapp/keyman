@@ -11,7 +11,7 @@
 import { TokenTypes } from "./lexer.js";
 import { PlainTextRule } from "./kmn-analyser.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
-import { NormalStoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
+import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
@@ -333,4 +333,28 @@ export class OffsetRule extends SingleChildRule {
     }
     return parseSuccess;
   };
+}
+
+export class OutsStatementRule extends SingleChildRule {
+  public constructor() {
+    super();
+    const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);
+    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
+    const storeName: Rule    = new StoreNameRule();
+    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
+    this.rule = new SequenceRule([
+      outs, leftBracket, storeName, rightBracket
+    ]);
+  }
+
+  public parse(node: ASTNode): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const outsNode = tmp.removeSoleChildOfType(NodeTypes.OUTS);
+      outsNode.addChild(tmp.getSoleChild());
+      node.addChild(outsNode);
+    }
+    return parseSuccess;
+  }
 }

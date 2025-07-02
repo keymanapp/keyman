@@ -17,7 +17,7 @@ import { InputBlockRule, ProductionBlockRule } from '../../src/ng-compiler/kmn-a
 import { EntryPointRule, GroupStatementRule, GroupQualifierRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { InputContextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { KeystrokeRule, KmnTreeRule, LineRule } from '../../src/ng-compiler/kmn-analyser.js';
-import { OutputStatementRule, OutsStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
+import { OutputStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { RhsBlockRule, SimpleTextRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyser.js';
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyser.js';
@@ -631,53 +631,6 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(modifier.parse(root));
         assert.equal(root.getSoleChildOfType(NodeTypes.MODIFIER).getText(), code);
       });
-    });
-  });
-  describe("OutsStatementRule Tests", () => {
-    it("can construct an OutsStatementRule", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isNotNull(outsStatement);
-    });
-    it("can parse correctly", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(digit)');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.STORENAME));
-    });
-    it("can parse correctly (space before name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs( digit)');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-    });
-    it("can parse correctly (space after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(digit )');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-    });
-    it("can parse correctly (space before and after name)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs( digit )');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.equal(outsNode.getSoleChildOfType(NodeTypes.STORENAME).getText(), 'digit');
-    });
-    it("can parse correctly (system store)", () => {
-      Rule.tokenBuffer = stringToTokenBuffer('outs(&keyboardversion)');
-      const outsStatement: Rule = new OutsStatementRule();
-      assert.isTrue(outsStatement.parse(root));
-      const outsNode = root.getSoleChildOfType(NodeTypes.OUTS);
-      assert.isNotNull(outsNode);
-      assert.isNotNull(outsNode.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
     });
   });
   describe("RuleBlockRule Tests", () => {

@@ -11,8 +11,8 @@
 import { TokenTypes } from "./lexer.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, SaveStatementRule } from "./statement-analyser.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, StoreNameRule, HeaderAssignRule } from "./store-analyser.js";
+import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
+import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule } from "./store-analyser.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 
@@ -206,30 +206,6 @@ export class KeyCodeRule extends SingleChildRule {
     const stringRule: Rule = new TokenRule(TokenTypes.STRING, true);
     const decimal: Rule    = new TokenRule(TokenTypes.DECIMAL, true);
     this.rule = new AlternateRule([keyCode, stringRule, decimal]);
-  }
-}
-
-export class OutsStatementRule extends SingleChildRule {
-  public constructor() {
-    super();
-    const outs: Rule         = new TokenRule(TokenTypes.OUTS, true);
-    const leftBracket: Rule  = new TokenRule(TokenTypes.LEFT_BR);
-    const storeName: Rule    = new StoreNameRule();
-    const rightBracket: Rule = new TokenRule(TokenTypes.RIGHT_BR);
-    this.rule = new SequenceRule([
-      outs, leftBracket, storeName, rightBracket
-    ]);
-  }
-
-  public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const outsNode = tmp.removeSoleChildOfType(NodeTypes.OUTS);
-      outsNode.addChild(tmp.getSoleChild());
-      node.addChild(outsNode);
-    }
-    return parseSuccess;
   }
 }
 
