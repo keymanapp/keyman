@@ -129,7 +129,7 @@ function _publish_to_downloads() {
   # "-vrzltp "   # verbose, recurse, zip, copy symlinks, preserve times, permissions
   # "--perms "   # perfectly matches existing file permissions on the build agent
   # "--stats "   # show statistics for log
-  # "--rsync-path=\"sudo -u vu2009 rsync\" # path on remote server
+  # "--rsync-path= # path on remote server
   # "--rsh=ssh " # use ssh
 
   # The actual rsync call.

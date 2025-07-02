@@ -8,7 +8,7 @@ developer_install_dependencies_on_linux_action() {
 
   builder_echo start "install dependencies" "Installing dependencies"
 
-  linux_check_and_install_packages devscripts jq meson
+  ba_linux_check_and_install_packages devscripts jq meson
   install_nvm
   install_emscripten
 

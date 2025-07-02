@@ -189,9 +189,10 @@ function prepare_downloads_keyman_com_action() {
   mkdir -p "${STATIC}"
 
   mkdir -p "${STATIC}/build"
-  cp -rf build/app    "${STATIC}/build/app"
-  cp -rf build/engine "${STATIC}/build/engine"
-  cp -rf build/tools  "${STATIC}/build/tools"
+  cp -rf build/app     "${STATIC}/build/app"
+  cp -rf build/engine  "${STATIC}/build/engine"
+  cp -rf build/publish "${STATIC}/build/publish"
+  cp -rf build/tools   "${STATIC}/build/tools"
   # avoid build/upload, since that's the folder we're building!
 
   cp -f index.html "${STATIC}/index.html"

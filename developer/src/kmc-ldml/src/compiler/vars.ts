@@ -1,6 +1,7 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { LDMLKeyboard, CompilerCallbacks, ObjectWithMetadata } from '@keymanapp/developer-utils';
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
+import { LDMLKeyboard, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -40,9 +41,9 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
-  private validateIdentifier(id: string, x?: ObjectWithMetadata) {
+  private validateIdentifier(id: string, compileContext?: ObjectWithCompileContext) {
     if(!id.match(LdmlKeyboardTypes.VariableParser.ID)) { // From <string> DTD
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifier({id}, x));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifier({id}, compileContext));
       return false;
     }
     return true;
@@ -65,11 +66,11 @@ export class VarsCompiler extends SectionCompiler {
      * @param id id
      * @param x context
      */
-    function addId(id: string, x: LDMLKeyboard.Variable): void {
+    function addId(id: string, compileContext: LDMLKeyboard.Variable): void {
       if (allIds.has(id)) {
         dups.add(id);
       } else {
-        allIds.set(id, x);
+        allIds.set(id, compileContext);
       }
     }
 
@@ -270,7 +271,7 @@ export class VarsCompiler extends SectionCompiler {
     const allMarkers : string[] = Array.from(mt.all.keys()).filter(m => m !== LdmlKeyboardTypes.MarkerParser.ANY_MARKER_ID).sort();
     result.markers = sections.list.allocList(allMarkers, {
       // pass the first object in the listr
-      x: mt.all.get(allMarkers[0]||'')
+      compileContext: mt.all.get(allMarkers[0]||'')
       // however, this is the string with the marker *id*. So, from the StrsCompiler
       // point of view, the value of this context would be if the marker ID had, say,
       // invalid Unicode in it for ERROR_IllegalCharacters - but, that wouldn't be a

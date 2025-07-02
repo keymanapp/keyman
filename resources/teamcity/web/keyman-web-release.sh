@@ -17,6 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 
 ################################ Main script ################################
 
@@ -53,8 +54,32 @@ function _push_release_to_skeymancom() {
 function _zip_and_upload_artifacts() {
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/zip-and-upload-artifacts.ps1"
+  cd "${KEYMAN_ROOT}/web"
+
+  local UPLOAD_DIR="build/upload/$KEYMAN_VERSION"
+
+  ./ci.sh prepare:downloads.keyman.com
+
+  write_download_info "$UPLOAD_DIR" "keymanweb-$KEYMAN_VERSION.zip" KeymanWeb zip web
+
+  rsync_args=(
+    '-vrzltp'                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
+    '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
+    '--stats'                                # show statistics for log
+    "--rsync-path=${RSYNC_PATH}"             # path on remote server
+    "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
+    "${KEYMAN_VERSION}"                          # upload the whole build folder
+    "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/web/${KEYMAN_TIER}/" # target server + path
+  )
+
+  cd build/upload
+
+  local CYGPATH_RSYNC_HOME=$(cygpath -w "$RSYNC_HOME")
+  # DEBUG: echo "${rsync_args[@]}"
+  # DEBUG: MSYS_NO_PATHCONV=1 "C:\\Users\\marc\\source\\repos\\doecho\\Debug\\doecho.exe" "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
+  MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
+
+  cd "${KEYMAN_ROOT}/web"
 
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
