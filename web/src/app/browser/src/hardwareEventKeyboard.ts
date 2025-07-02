@@ -2,7 +2,7 @@ import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
-import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
+import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
@@ -59,10 +59,11 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   }
 
   // Stage 1 - track the true state of the keyboard's modifiers.
-  var prevModState = keyboardState.modStateFlags, curModState = 0x0000;
-  var ctrlEvent = false, altEvent = false;
+  const prevModState = keyboardState.modStateFlags;
+  let curModState = 0x0000;
+  let ctrlEvent = false, altEvent = false;
 
-  let keyCodes = Codes.keyCodes;
+  const keyCodes = Codes.keyCodes;
   switch(Lcode) {
     case keyCodes['K_CTRL']:      // The 3 shorter "K_*CTRL" entries exist in some legacy keyboards.
     case keyCodes['K_LCTRL']:
@@ -129,7 +130,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   keyboardState.modStateFlags = curModState;
 
   // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-  let altGrMask = ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.LCTRLFLAG;
+  const altGrMask = ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.LCTRLFLAG;
   if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
     // We just released AltGr - make sure it's all released.
     curModState &= ~ altGrMask;
@@ -139,7 +140,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     curModState &= ~ModifierKeyConstants.LCTRLFLAG;
   }
 
-  let modifierBitmasks = Codes.modifierBitmasks;
+  const modifierBitmasks = Codes.modifierBitmasks;
   // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
   const activeKeyboard = keyboardState.activeKeyboard;
   let Lmodifiers: number;
@@ -192,17 +193,17 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   });
 
   // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
-  let LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
+  const LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
   s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
   s = processForMnemonicsAndLegacy(s, activeKeyboard, keyboardState.baseLayout);
 
-  let processedEvent = new KeyEvent(s);
+  const processedEvent = new KeyEvent(s);
   processedEvent.source = e;
   return processedEvent;
 }
 
-export default class HardwareEventKeyboard extends HardKeyboard {
+export default class HardwareEventKeyboard extends HardKeyboardBase {
   private readonly hardDevice: DeviceSpec;
 
   // Needed properties & methods:
@@ -304,17 +305,17 @@ export default class HardwareEventKeyboard extends HardKeyboard {
    */
   _KeyUp: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
-    var Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
+    const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
     if(Levent == null || target == null) {
       return true;
     }
 
-    var inputEle = target.getElement();
+    const inputEle = target.getElement();
 
     // Since this part concerns DOM element + browser interaction management, we preprocess it for
     // browser form commands before passing control to the Processor module.
     if(Levent.Lcode == 13) {
-      var ignore = false;
+      let ignore = false;
       if(nestedInstanceOf(inputEle, "HTMLTextAreaElement")) {
         ignore = true;
       }
@@ -349,12 +350,12 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     this.swallowKeypress = false;
 
     // Get event properties
-    var Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
+    const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
     if(Levent == null) {
       return true;
     }
 
-    let resultCapture: { LeventMatched: boolean } = {
+    const resultCapture: { LeventMatched: boolean } = {
       LeventMatched: false
     }
 
@@ -385,17 +386,17 @@ export default class HardwareEventKeyboard extends HardKeyboard {
   // 1)  To detect browser form submissions (handled in kmwdomevents.ts)
   // 2)  To detect modifier state changes.
   private keyUp(e: KeyboardEvent): boolean {
-    var Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
+    const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
     if(Levent == null) {
       return true;
     }
 
-    let outputTarget = eventOutputTarget(e);
+    const outputTarget = eventOutputTarget(e);
     return this.processor.doModifierPress(Levent, outputTarget, false);
   }
 
   private keyPress(e: KeyboardEvent): boolean {
-    var Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
+    const Levent = preprocessKeyboardEvent(e, this.processor, this.hardDevice);
     if(Levent == null || Levent.LisVirtualKey) {
       return true;
     }
@@ -417,7 +418,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Only reached if it's a mnemonic keyboard.
 
-    let resultCapture: { preventDefaultKeystroke?: boolean } = {};
+    const resultCapture: { preventDefaultKeystroke?: boolean } = {};
 
     // Should only be run if `preventDefaultKeystroke` is required by the following conditional
     // block.  If it isn't - that is, swallowKeypress == true, we want to swallow that keypress

@@ -11,51 +11,56 @@ docs: docs/**
 # Add labels based on changed files using actions/labeler
 #
 
-android/: android/**
+android/:
+  - android/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/android/**
 android/app/: android/KMAPro/**
 android/engine/: android/KMEA/**
 android/samples/: android/Samples/**
 
 common/:
   - common/**
-  - resources/**
-
-common/models/templates/: web/src/engine/predictive-text/templates/**
-common/models/wordbreakers/: web/src/engine/predictive-text/wordbreakers/**
-
-common/resources/: resources/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/common/**
 common/web/: common/web/**
 
 core/:
   - core/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/core/**
 
 developer/:
   - developer/**
-
+  - resources/teamcity/includes/**
+  - resources/teamcity/developer/**
 developer/compilers/:
   - developer/src/kmc/**
   - developer/src/kmcmplib/**
   - developer/src/kmc-*/**
-
 developer/ide/:
   - developer/src/server/**
   - developer/src/tike/**
 
-
-ios/: ios/**
+ios/:
+  - ios/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/ios/**
 ios/app/: ios/keyman/**
 ios/engine/: ios/engine/**
 ios/samples/: ios/samples/**
 
-linux/: linux/**
+linux/:
+  - linux/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/linux/**
 linux/config/: linux/keyman-config/**
-linux/engine/:
-  - linux/ibus-keyman/**
-  - linux/legacy/ibus-kmfl/**
-  - linux/legacy/kmflcomp/**
-  - linux/legacy/libkmfl/**
+linux/engine/: linux/ibus-keyman/**
 
-mac/: mac/**
+mac/:
+  - mac/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/mac/**
 # mac/config/:
 # mac/engine/: mac/**
 
@@ -65,12 +70,21 @@ oem/fv/android/: oem/firstvoices/android/**
 oem/fv/ios/: oem/firstvoices/ios/**
 oem/fv/windows/: oem/firstvoices/windows/**
 
-web/: web/**
+resources/: resources/**
+
+web/:
+  - web/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/web/**
 # web/bookmarklet/
 web/engine/: web/source/**
 web/ui/: web/source/kmwui*
 web/samples/: web/samples/**
+web/predictive-text/: web/src/engine/predictive-text/**
 
-windows/: windows/**
+windows/:
+  - windows/**
+  - resources/teamcity/includes/**
+  - resources/teamcity/windows/**
 windows/config/: windows/src/desktop/**
 windows/engine/: windows/src/engine/**

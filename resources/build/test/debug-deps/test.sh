@@ -17,6 +17,6 @@ function do_build() {
   echo "PASS: parent: builder_has_option --debug is true"
 }
 
-builder_parse build:child -d
+builder_parse build:child --debug
 builder_run_action build do_build
 builder_run_child_actions build

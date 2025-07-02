@@ -740,11 +740,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _contextBuffer;
 }
 
-- (void)setContextBuffer:(NSMutableString *)contextBuffer {
-  _contextBuffer = [contextBuffer mutableCopy];
-  if (_contextBuffer.length)
-    [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-  [self.kme setCoreContextIfNeeded:self.contextBuffer];
+- (void)clearContextBuffer {
+  [self.kme clearCoreContext];
 }
 
 - (void)awakeFromNib {
@@ -880,8 +877,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString *keyboardName = [self.activeKeyboards objectAtIndex:0];
   [self setSelectedKeyboard:keyboardName inMenuItem:menuItem];
   [self setSelectedKeyboard:keyboardName];
-  [self setContextBuffer:nil];
-  
+  [self clearContextBuffer];
+
   [KMSentryHelper addInfoBreadCrumb:@"startup" message:[NSString stringWithFormat:@"setDefaultSelectedKeyboard: %@", keyboardName]];
 }
 
@@ -893,7 +890,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setKvk:nil];
   [self setKeyboardName:nil];
   [self setKeyboardIcon:nil];
-  [self setContextBuffer:nil];
+  [self clearContextBuffer];
   [self setSelectedKeyboard:@""];
 }
 
@@ -932,7 +929,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_info([KMLogs keyboardLog], "Selected keyboard from menu: %{public}@", keyboardName);
   [self setKeyboardName:keyboardName];
   [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-  [self setContextBuffer:nil];
+  [self clearContextBuffer];
   [self setSelectedKeyboard:path];
   [self applyPersistedOptions];
 }

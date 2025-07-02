@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 # ################################ Main script ################################
 
@@ -28,8 +29,7 @@ builder_describe "Builds Keyman Engine for Android." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  ":engine          Builds Engine" \
-  "--ci             Don't start the Gradle daemon. For CI"
+  ":engine          Builds Engine"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -37,7 +37,7 @@ builder_parse "$@"
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
-  BUILD_FLAGS="assembleDebug -x lint -x test"
+  BUILD_FLAGS="assembleDebug -x lintDebug -x testDebug"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
 fi
@@ -51,7 +51,7 @@ builder_describe_outputs \
 # Parse args
 
 DAEMON_FLAG=
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   DAEMON_FLAG=--no-daemon
 fi
 
@@ -82,8 +82,6 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
-
-  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
   cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"
@@ -98,7 +96,7 @@ fi
 
 if builder_start_action test:engine; then
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     # Report JUnit test results to CI
     echo "$JUNIT_RESULTS"
   fi

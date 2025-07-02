@@ -1,6 +1,6 @@
 # Keystroke Processing
 
-In addition to handling keystroke events produced from hardware keyboards, Keyman Engine for Web manages an on-screen keyboard that can also be used to generate such events.  This document will enumerate the various components of data management and control flow used to handle and process keystrokes.
+In addition to handling keystroke events produced from hardware keyboards, Keyman Engine for Web manages an on-screen keyboard that can also be used to generate such events.  This document will enumerate the various components of data management and control flow used to handle and process keystrokes.  For a more thorough examination of the keystroke lifecycle, see the [keystroke-lifecycle](./keystroke-lifecycle.md) page.
 
 ## Input:  KeyEvent - the pre-processed keystroke
 

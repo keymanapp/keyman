@@ -88,7 +88,7 @@ function do_bundle() {
   sentry-cli sourcemaps inject \
     --org keyman \
     --project keyman-developer \
-    --release "$VERSION_GIT_TAG"  \
+    --release "$KEYMAN_VERSION_GIT_TAG"  \
     build/dist/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module

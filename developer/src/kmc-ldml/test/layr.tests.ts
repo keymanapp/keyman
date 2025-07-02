@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
-import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
+import { compilerTestCallbacks, testCompilationCases, withOffset } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -96,8 +96,7 @@ describe('layr', function () {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
         LdmlCompilerMessages.Error_InvalidModifier({
-          layer: 'base',
-          modifiers: 'altR-shift'
+          modifiers: 'altR-shift',
         }),
       ],
     },
@@ -108,7 +107,14 @@ describe('layr', function () {
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(258))],
+      retainOffsetInMessages: true,
+    },
+    {
+      // missing layer element
+      subpath: 'sections/layr/invalid-missing-layer2.xml',
       errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      retainOffsetInMessages: true,
     },
     {
       // keep in sync with similar test in test-keys.ts
@@ -132,7 +138,7 @@ describe('layr', function () {
     {
       subpath: 'sections/layr/error-bogus-modifiers.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'caps bogus' }),
       ]
     },
     {
@@ -160,5 +166,18 @@ describe('layr', function () {
         }
       },
     },
+    {
+      subpath: 'sections/layr/error-dup-width.xml',
+      errors: [
+        LdmlCompilerMessages.Error_DuplicateLayerWidth({ minDeviceWidth: 120}),
+      ]
+    },
+    ...[0, 1024, 1500, `x` as unknown as number].map(minDeviceWidth => ({
+      subpath: `sections/layr/error-bad-width-${minDeviceWidth}.xml`,
+      errors: [
+        //
+        LdmlCompilerMessages.Error_InvalidLayerWidth({ minDeviceWidth }),
+      ]
+    })),
   ]);
 });

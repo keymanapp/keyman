@@ -1,11 +1,26 @@
 # This file will be appended to meson.build by build.sh
+cfg = configuration_data()
+cfg.set('LIBEXECDIR', get_option('prefix') / get_option('libexecdir'))
+
 install_data('com.keyman.SystemService1.conf', install_dir: get_option('datadir') / 'dbus-1/system.d/')
 
 if systemd.name() == 'libsystemd'
   install_data('com.keyman.SystemService1.service.systemd', install_dir: get_option('datadir') / 'dbus-1/system-services/', rename: ['com.keyman.SystemService1.service'])
 else
   # libelogind or basu
-  install_data('com.keyman.SystemService1.service.basu', install_dir: get_option('datadir') / 'dbus-1/system-services/')
+  configure_file(
+    configuration: cfg,
+    input: 'com.keyman.SystemService1.service.basu',
+    output: 'com.keyman.SystemService1.service',
+    install: true,
+    install_dir: get_option('datadir') / 'dbus-1/system-services/'
+  )
 endif
 
-install_data('systemd-keyman.service', install_dir: get_option('prefix') / 'lib/systemd/system/')
+configure_file(
+  configuration: cfg,
+  input: 'systemd-keyman.service.in',
+  output: 'systemd-keyman.service',
+  install: true,
+  install_dir: get_option('prefix') / 'lib/systemd/system/'
+)

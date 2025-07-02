@@ -45,7 +45,7 @@ export function WriteCompiledKeyboard(
   kmxResult: KmnCompilerResult,
   FDebug: boolean = false
 ): string {
-  let opts: CompilerOptions = {
+  const opts: CompilerOptions = {
     shouldAddCompilerVersion: false,
     saveDebug: FDebug
   };
@@ -67,7 +67,6 @@ export function WriteCompiledKeyboard(
   let sBegin_NewContext: string = "", sBegin_PostKeystroke: string = "";
   let sLayoutFilename: string = "", sVKDictionary: string = "";
   let linecomment: string;  // I3438
-  let sModifierBitmask: string;
   let FOptionStores: string;
   let FKeyboardVersion = "1.0";
   let sHelpFileStoreIndex, sEmbedJSStoreIndex, sEmbedCSSStoreIndex;
@@ -167,7 +166,7 @@ export function WriteCompiledKeyboard(
   if (sLayoutFilename != '') {  // I3483
     sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
-    let result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
+    const result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
     if(!result) {
       sLayoutFile = '';
       return null;
@@ -195,7 +194,7 @@ export function WriteCompiledKeyboard(
 
   const fMnemonic = vMnemonic == 1;
 
-  sModifierBitmask = GetKeyboardModifierBitmask(keyboard, fMnemonic);
+  const sModifierBitmask = GetKeyboardModifierBitmask(keyboard, fMnemonic);
 
   result +=
     `${JavaScript_SetupProlog()}${nl}` +
@@ -241,7 +240,7 @@ export function WriteCompiledKeyboard(
 	// Write the stores out
   FOptionStores = '';
 	for(let i = 0; i < keyboard.stores.length; i++) {
-    let fsp = keyboard.stores[i];
+    const fsp = keyboard.stores[i];
     // I3438 - Save all system stores to the keyboard, for now   // I3684
 
     if (!isDebugStore(i)) {
@@ -287,14 +286,14 @@ export function WriteCompiledKeyboard(
     result += WriteBeginStatement(keyboard, 'gpk', rec.Use.GroupIndex);
   }
 
-  let fgp = keyboard.groups[keyboard.startGroup.unicode];
+  const fgp = keyboard.groups[keyboard.startGroup.unicode];
   result +=
     `${FTabStop}this.gs=function(t,e) {${nl}` +
     `${FTabStop+FTabStop}return this.g${JavaScript_Name(keyboard.startGroup.unicode, fgp.dpName)}(t,e);${nl}` +
     `${FTabStop}};${nl}`; // I3681
 
 	for(let i = 0; i < keyboard.groups.length; i++) {  // I1964
-    let fgp = keyboard.groups[i];
+    const fgp = keyboard.groups[i];
     /*
       Note on `r` and `m` variables in a group function:
 
@@ -331,7 +330,7 @@ export function WriteCompiledKeyboard(
     }
     else {
       for (let j = 0; j < fgp.keys.length; j++) {    // I1964
-        let fkp = fgp.keys[j];
+        const fkp = fgp.keys[j];
         if (!RuleIsExcludedByPlatform(keyboard, fkp)) {
           result += FTabStop+FTabStop;   // I3681
           if (HasRules) {
@@ -427,9 +426,9 @@ export function WriteCompiledKeyboard(
 ///
 function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean): string {
   let bitMask = 0;
-  for(let gp of keyboard.groups) {
+  for(const gp of keyboard.groups) {
     if(gp.fUsingKeys) {
-      for(let kp of gp.keys) {
+      for(const kp of gp.keys) {
         if(!RuleIsExcludedByPlatform(keyboard, kp)) {
           bitMask |= JavaScript_Shift(kp, fMnemonic);
         }
@@ -490,14 +489,14 @@ function JavaScript_SetupEpilog() {
 function HasSupplementaryPlaneChars() {
   const suppChar = /[\uD800-\uDBFF][\uDC00-\uDFFF]/;
 
-  for(let sp of fk.stores) {
+  for(const sp of fk.stores) {
     if(suppChar.test(sp.dpString)) {
       return true;
     }
   }
 
-  for(let gp of fk.groups) {
-    for(let kp of gp.keys) {
+  for(const gp of fk.groups) {
+    for(const kp of gp.keys) {
       if(suppChar.test(kp.dpContext) || suppChar.test(kp.dpOutput)) {
         return true;
       }
@@ -516,7 +515,7 @@ export function RuleIsExcludedByPlatform(keyboard: KMX.KEYBOARD, fkp: KMX.KEY): 
 
   let x = 0;
   while(x < fkp.dpContext.length) {
-    let rec = ExpandSentinel(keyboard, fkp.dpContext, x);
+    const rec = ExpandSentinel(keyboard, fkp.dpContext, x);
     if(rec.IsSentinel &&
         (rec.Code == KMX.KMXFile.CODE_IFSYSTEMSTORE) &&
         (rec.IfSystemStore.dwSystemID == KMX.KMXFile.TSS_PLATFORM) &&

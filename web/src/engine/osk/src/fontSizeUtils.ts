@@ -2,7 +2,7 @@ import { DeviceSpec } from "@keymanapp/web-utils";
 import { ParsedLengthStyle } from "./lengthStyle.js";
 
 export function getFontSizeStyle(e: HTMLElement|string): {val: number, absolute: boolean} {
-  var fs: string;
+  let fs: string;
 
   if(typeof e == 'string') {
     fs = e;
