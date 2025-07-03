@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
-# We only import JQ if not already defined; jq is used by
-# _select_node_version_with_nvm()
-
-if [[ -z "${JQ+x}" ]]; then
-  if [[ "$BUILDER_OS" == win ]]; then
-    . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-  else
-    JQ=jq
-  fi
-fi
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/build/jq.inc.sh"
 
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
@@ -25,70 +18,74 @@ projects=("android" "ios" "linux" "lmlayer" "mac" "web" "windows")
 # Used to validate a specified 'project' parameter.
 verify_project() {
   match=false
-  for proj in ${projects[@]}
+  for proj in "${projects[@]}"
   do
-    if [ $proj = $1 ]; then
+    if [[ "${proj}" = "$1" ]]; then
       match=true
     fi
   done
 
-  if [ $match = false ]; then
+  if [[ ${match} = false ]]; then
     builder_die "Invalid project specified!"
   fi
 }
 
 displayInfo() {
-    if [ "$QUIET" != true ]; then
-        while [[ $# -gt 0 ]] ; do
-            echo $1
-            shift # past argument
-        done
-    fi
+  # TODO: can we replace this function with builder_debug?
+  if [[ "${QUIET}" != true ]]; then
+    while [[ $# -gt 0 ]] ; do
+      echo "$1"
+      shift # past argument
+    done
+  fi
 }
 
 assertFileExists() {
-    if ! [ -f $1 ]; then
-        builder_die "Build failed:  missing $1"
-    fi
+  if ! [[ -f $1 ]]; then
+    builder_die "Build failed:  missing $1"
+  fi
 }
 
 assertDirExists() {
-    if ! [ -d $1 ]; then
-        builder_die "Build failed:  missing $1"
-    fi
+  if ! [[ -d $1 ]]; then
+    builder_die "Build failed:  missing $1"
+  fi
 }
 
 assertValidVersionNbr()
 {
-    if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.BuildCounter"
-    fi
+  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
+  if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.BuildCounter"
+  fi
 }
 
 assertValidPRVersionNbr()
 {
-    if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.pull\.[0-9]+$ ]]; then
-        builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.pull.BuildCounter"
-    fi
+  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
+  if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.pull\.[0-9]+$ ]]; then
+    builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.pull.BuildCounter"
+  fi
 }
 
 dl_info_display_usage() {
-    echo "Used to create a metadata file needed on the download site"
-    echo "for it to connect to the download.keyman.com API functions."
-    echo
-    echo "usage: write-download_info <name> <filepath> <version> <tier> <platform>"
-    echo
-    echo "  name           Specifies the user-friendly name of the product represented by the file."
-    echo "  filepath       Specifies the path and file in need of a .download_info metadata file."
-    echo "  version        Specifies the build version number, which should be in the"
-    echo "                   form Major.Minor.BuildCounter"
-    echo "  tier           Specifies tier (typically one of: alpha, beta, stable)."
-    echo "  platform       Specifies the target platforms for the file."
-    echo "                 (Should be one of: android, ios, mac, web, windows)"
-    echo
-    echo "The resulting .downloadinfo file will be automatically placed in the same directory"
-    echo "as the originally-specified file."
-    exit 1
+  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
+  echo "Used to create a metadata file needed on the download site"
+  echo "for it to connect to the download.keyman.com API functions."
+  echo
+  echo "usage: write-download_info <name> <filepath> <version> <tier> <platform>"
+  echo
+  echo "  name           Specifies the user-friendly name of the product represented by the file."
+  echo "  filepath       Specifies the path and file in need of a .download_info metadata file."
+  echo "  version        Specifies the build version number, which should be in the"
+  echo "                   form Major.Minor.BuildCounter"
+  echo "  tier           Specifies tier (typically one of: alpha, beta, stable)."
+  echo "  platform       Specifies the target platforms for the file."
+  echo "                 (Should be one of: android, ios, mac, web, windows)"
+  echo
+  echo "The resulting .downloadinfo file will be automatically placed in the same directory"
+  echo "as the originally-specified file."
+  exit 1
 }
 
 write_download_info() {
@@ -168,6 +165,7 @@ write_download_info() {
 
 # set_version sets the file version on mac/ios projects
 set_version ( ) {
+  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
   PRODUCT_PATH=$1
 
   if [ $KEYMAN_VERSION ]; then
@@ -189,6 +187,8 @@ set_version ( ) {
 #   set_npm_version
 #
 set_npm_version () {
+  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
+
   # We use --no-git-tag-version because our CI system controls version numbering and
   # already tags releases. We also want to have the version of this match the
   # release of Keyman Developer -- these two versions should be in sync. Because this
