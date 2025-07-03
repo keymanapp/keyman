@@ -38,15 +38,23 @@ available_platforms_regex=`echo "${available_platforms[@]}" | sed 's/ /|/g'`
 # We also allow 'common' and 'core' platforms for Build-bot: commands
 readonly available_platforms_regex="$available_platforms_regex|common|core"
 
-# the base folder for each pattern does not need to be included, nor oem folders
-# e.g. android='common/models|common/predictive-text'
-# will expand into android='^(android|(oem/[^/]+/android)|common/models|common/predictive-text)'
+# the base folder for each pattern does not need to be included, nor oem
+# folders, nor resources/teamcity folders
+#
+# e.g. watch_android='web|comon/web' will expand to cover:
+#   android
+#   oem/*/android
+#   web
+#   common/web
+#   resources/teamcity/android
+#   resources/teamcity/includes
 
-watch_android='web|common/models|common/predictive-text|common/web'
-watch_ios='web|common/models|common/predictive-text|common/web'
+
+watch_android='web|common/web'
+watch_ios='web|common/web'
 watch_linux='core|common/test/keyboards/baseline'
 watch_mac='core'
-watch_web='common/models|common/predictive-text|common/web|core'
+watch_web='common/web|core'
 watch_windows='common|core|web'
 watch_developer='common|core|web'
 
@@ -55,10 +63,10 @@ watch_developer='common|core|web'
 watch_common_web='common/web'
 # Currently, we run web tests on all three of our build platforms, to ensure
 # that they work in all our environments. So we need to include common/web in
-# the matches for these
-watch_common_windows='common/windows|common/web'
-watch_common_mac='common/mac|common/web'
-watch_common_linux='common/linux|common/web'
+# the matches for these, as well as resources/teamcity/common
+watch_common_windows='common/windows|common/web|resources/teamcity/common'
+watch_common_mac='common/mac|common/web|resources/teamcity/common'
+watch_common_linux='common/linux|common/web|resources/teamcity/common'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
