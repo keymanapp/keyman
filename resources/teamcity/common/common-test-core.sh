@@ -34,9 +34,9 @@ else
 fi
 
 function do_all() {
-  "${KEYMAN_ROOT}/core/build.sh" configure:${ARCH} build:${ARCH} test:${ARCH}
+  "${KEYMAN_ROOT}/core/build.sh" configure,build,test:${ARCH}
   if is_windows; then
-    "${KEYMAN_ROOT}/core/build.sh" configure:x64 build:x64 test:x64
+    "${KEYMAN_ROOT}/core/build.sh" configure,build,test:x64
   fi
 }
 
