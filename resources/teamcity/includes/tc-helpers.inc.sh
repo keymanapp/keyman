@@ -66,3 +66,42 @@ set_variables_for_emscripten() {
   export EMSCRIPTEN_BASE="${EMSCRIPTEN_BASE:-${HOME}/emsdk/upstream/emscripten}"
   export KEYMAN_USE_EMSDK=1
 }
+
+_tc_rsync() {
+  local rsync_args CYGPATH_RSYNC_HOME SOURCE DESTINATION
+  SOURCE=$1
+  DESTINATION=$2
+
+  if ! is_windows; then
+    echo "This function is currently only supported on Windows."
+    return 1
+  fi
+
+  rsync_args=(
+    '-vrzltp'                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
+    '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
+    '--stats'                                # show statistics for log
+    "--rsync-path=${RSYNC_PATH}"             # path on remote server
+    "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
+    "${SOURCE}"
+    "${DESTINATION}"
+  )
+
+  CYGPATH_RSYNC_HOME=$(cygpath -w "${RSYNC_HOME}")
+  MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
+}
+
+# Download file or directory $1 from the remote server to $2.
+tc_rsync_download() {
+  # shellcheck disable=SC2154
+  _tc_rsync \
+    "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/$1" \
+    "$2"
+}
+
+# Upload file or directory $1 to the remote server at $2.
+tc_rsync_upload() {
+  _tc_rsync \
+    "$1" \
+    "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/$2"
+}
