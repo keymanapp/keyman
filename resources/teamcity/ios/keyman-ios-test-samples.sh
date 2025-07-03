@@ -35,5 +35,7 @@ function _build_sample2() {
   builder_echo end "kmsample2" success "Finished building KMSample2"
 }
 
-_build_sample1
-_build_sample2
+if builder_has_action all; then
+  _build_sample1
+  _build_sample2
+fi
