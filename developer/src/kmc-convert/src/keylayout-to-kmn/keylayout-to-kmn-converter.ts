@@ -88,20 +88,6 @@ export class KeylayoutToKmnConverter {
        return null;
      }*/
 
-
-    /*
-    const a: ConverterToKmnArtifacts = null;
-    const ddd= a.data
-    return a ? a : null;
-
-    data of convert_object needs to be in ConverterToKmnArtifacts:
-    (ConverterToKmnArtifacts= outArray ???)
-    return ConverterToKmnArtifacts ? { ConverterToKmnArtifacts } : null;
-    ---
-    const converter = new ConverterClass(this.callbacks, converterOptions);
-    const artifacts = await converter.run(inputFilename, outputFilename);
-    return artifacts ? { artifacts } : null;*/
-
     return null;
   }
 
