@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 windows_build_action() {
