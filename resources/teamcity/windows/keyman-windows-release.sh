@@ -84,6 +84,7 @@ function _publish_to_downloads_keyman_com() {
     write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_EXE}" "FirstVoices Keyboards" exe win
     write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_MSI}" "FirstVoices Keyboards MSI installer" msi win
 
+    # TODO: is this still needed?
     if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
       cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}"
       write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Desktop and Keyman Developer debug files" zip win
