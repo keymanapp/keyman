@@ -20,6 +20,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# ENHANCE: In the future if we ever have OEM builds other than FV, we could go
+# with `--oem=OEM` instead of `--fv` where $OEM could be a comma separated
+# list, e.g. `firstvoices`.
+# See https://github.com/keymanapp/keyman/pull/14222/files#r2181208750.
+
 builder_describe \
   "Build release of Keyman for Android" \
   "all            run all actions" \
@@ -87,13 +92,9 @@ function _publish_to_playstore() {
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
 
-function do_build() {
-  android_build_action
-}
-
 function do_publish() {
   if ! is_windows; then
-    # requires Powershell, so currently only supported on Windows
+    # currently only tested on Windows, TODO: test cross-platform
     builder_echo error "This script is intended to be run on Windows only."
     return 1
   fi
@@ -119,10 +120,10 @@ fi
 
 if builder_has_action all; then
   android_clean_action
-  do_build
+  android_build_action "${TARGETS}"
   do_publish
 else
   builder_run_action  clean    android_clean_action
-  builder_run_action  build    do_build
+  builder_run_action  build    android_build_action "${TARGETS}"
   builder_run_action  publish  do_publish
 fi

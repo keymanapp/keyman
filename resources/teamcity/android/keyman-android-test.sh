@@ -38,8 +38,8 @@ fi
 
 if builder_has_action all; then
   android_clean_action
-  android_build_action
+  android_build_action "${TARGETS}"
 else
   builder_run_action  clean   android_clean_action
-  builder_run_action  build   android_build_action
+  builder_run_action  build   android_build_action "${TARGETS}"
 fi

@@ -10,6 +10,9 @@ android_clean_action() {
 
 android_build_action() {
   builder_echo start "build" "Building Keyman for Android"
-  "${KEYMAN_ROOT}/android/build.sh" configure build,test:${TARGETS} --debug --ci
+  local TARGETS="$1"
+
+  # REVIEW: is it deliberate that we `configure` all targets but only `build,test` `$TARGETS`?
+  "${KEYMAN_ROOT}/android/build.sh" configure build,test:"${TARGETS}" --debug --ci
   builder_echo end "build" success "Finished building Keyman for Android"
 }

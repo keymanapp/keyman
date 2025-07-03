@@ -22,41 +22,16 @@ builder_describe \
   "Build KMSample1, KMSample2, and Test projects" \
   "all            run all actions" \
   "clean          clean artifact directories" \
-  "build          configure, build and test Keyman for Android"
+  "build          configure and build Keyman for Android samples"
 
 builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/android"
 
-function _build_kmea() {
-  builder_echo start "build" "Configuring and building KMEA"
-  "${KEYMAN_ROOT}/android/build.sh" configure:engine build:engine --debug --ci
-  builder_echo end "build" success "Finished configuring and building KMEA"
-}
-
-function _build_kmsample1() {
-  builder_echo start "build" "Building KMSample1"
-  "${KEYMAN_ROOT}/android/build.sh" build:sample1 --debug --ci
-  builder_echo end "build" success "Finished building KMSample1"
-}
-
-function _build_kmsample2() {
-  builder_echo start "build" "Building KMSample2"
-  "${KEYMAN_ROOT}/android/build.sh" build:sample2 --debug --ci
-  builder_echo end "build" success "Finished building KMSample2"
-}
-
-function _build_keyboardharness() {
-  builder_echo start "build" "Building KeyboardHarness"
-  "${KEYMAN_ROOT}/android/build.sh" build:keyboardharness --debug --ci
-  builder_echo end "build" success "Finished building KeyboardHarness"
-}
-
 function do_build() {
-  _build_kmea
-  _build_kmsample1
-  _build_kmsample2
-  _build_keyboardharness
+  "${KEYMAN_ROOT}/android/build.sh" \
+    configure,build:kmea,kmsample1,kmsample2,keyboardharness \
+    --debug --ci
 }
 
 if builder_has_action all; then
