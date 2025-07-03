@@ -16,9 +16,10 @@
                 <xs:attribute name="@_last" />
                 <xs:attribute name="@_mapSet" />
                 <xs:attribute name="@_modifiers" />
+                <xs:attribute name="#_text" />
               </xs:element>
             </xs:sequence>
-            <xs:attribute />
+            <xs:attribute name="#_text" />
           </xs:complexType>
         </xs:element>
 
@@ -30,14 +31,17 @@
                   <xs:sequence>
                     <xs:element name="modifier" minOccurs="1" maxOccurs="unbounded">
                       <xs:attribute name="@_keys" />
+                      <xs:attribute name="#_text" />
                     </xs:element>
                   </xs:sequence>
                   <xs:attribute name="@_mapIndex" />
+                  <xs:attribute name="#_text" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
             <xs:attribute name="@_defaultIndex" />
             <xs:attribute name="@_id" />
+            <xs:attribute name="#_text" />
           </xs:complexType>
         </xs:element>
 
@@ -51,14 +55,19 @@
                       <xs:attribute name="@_code" />
                       <xs:attribute name="@_action" />
                       <xs:attribute name="@_output" />
+                      <xs:attribute name="#_text" />
                     </xs:element>
                   </xs:sequence>
                   <xs:attribute name="@_index" />
                   <xs:attribute name="@_baseIndex" />
                   <xs:attribute name="@_baseMapSet" />
+                  <xs:attribute name="#_text" />
                 </xs:complexType>
               </xs:element>
-              <xs:attribute name="@_id" />
+                <xs:complexType>
+                 <xs:attribute name="@_id" />
+                 <xs:attribute name="#_text" />
+                </xs:complexType>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -73,13 +82,15 @@
                       <xs:attribute name="@_state" />
                       <xs:attribute name="@_output" />
                       <xs:attribute name="@_next" />
+                      <xs:attribute name="#_text" />
                     </xs:element>
                   </xs:sequence>
                   <xs:attribute name="@_id" />
+                  <xs:attribute name="#_text" />
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
-            <xs:attribute />
+            <xs:attribute name="#_text" />
           </xs:complexType>
         </xs:element>
 
@@ -89,9 +100,10 @@
               <xs:element name="when" minOccurs="1" maxOccurs="unbounded">
                 <xs:attribute name="@_state" />
                 <xs:attribute name="@_output" />
+                <xs:attribute name="#_text" />
               </xs:element>
             </xs:sequence>
-            <xs:attribute />
+            <xs:attribute name="#_text" />
           </xs:complexType>
         </xs:element>
 
@@ -99,6 +111,7 @@
         <xs:attribute name="@_id" />
         <xs:attribute name="@_name" />
         <xs:attribute name="@_maxout" />
+        <xs:attribute name="#_text" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

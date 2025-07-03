@@ -30,16 +30,6 @@ export class ConverterMessages {
   static Error_FileNotFound = (o: { inputFilename: string; }) =>
     m(this.ERROR_FileNotFound, `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`);
 
-  // from SRL
-  static ERROR_InvalidFile = SevError | 0x0007;
-  static Error_InvalidFile = (o:{errorText: string}) =>
-  m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
-
-  // from SRL
-  static ERROR_SchemaValidationError = SevError | 0x0011;
-  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
-    `!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Error validating Keylayout XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
-
   static ERROR_UnableToRead = SevError | 0x0004;
   static Error_UnableToRead = (o: { inputFilename: string; }) => m(
     this.ERROR_UnableToRead, `Input file '${def(o.inputFilename)}
@@ -58,5 +48,15 @@ export class ConverterMessages {
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
   static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected, `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key (${def(o.key)}) at keyMap index ${def(o.keymap_index)}`);
+
+  // from SRL
+  static ERROR_InvalidFile = SevError | 0x0008;
+  static Error_InvalidFile = (o:{errorText: string}) =>
+  m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
+
+  // from SRL
+  static ERROR_SchemaValidationError = SevError | 0x009;
+  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
+    `!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Error validating Keylayout XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
 
   }

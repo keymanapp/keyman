@@ -18,6 +18,50 @@ import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keyl
 
 import boxXmlArray = util.boxXmlArray;
 
+//.modifier[k]['@_keys']
+
+
+export function remove_text(o: any, x: string): void {
+console.log("ooooooooooooo",o);
+
+console.log(" o.item ", o.layout);
+console.log(" o.item ", o.layout['@_mapSet']);
+//console.log(" o.item ", o.['@_first']);
+console.log(" o.item", o['@_text'],"----", o['@_text']==="",o['@_text']==='\n        \n    ');
+
+
+// assume tagName is the name of the tag you want to remove
+//const tagsToRemove = o.getElementsByTagName('@_text');
+//const tagsToRemove = o.layout['@_mapSet']
+const tagsToRemove = o.layout
+console.log("tagsToRemove ",/*tagsToRemove.length,*/tagsToRemove);
+
+for (let i = 4 - 1; i >= 0; i -- ) {
+tagsToRemove[i].parentNode.removeChild(tagsToRemove[i]);
+}
+
+
+if(o['@_text']==='\n        \n    ')
+  o.remove(o['@_text'])
+
+if(o.item[0]==="@'_first'")
+  console.log("_first_first ",);
+
+
+
+  if (typeof o == 'object' && !Array.isArray(o[x])) {
+    if (o[x] === null || o[x] === undefined) {
+      o[x] = [];
+    }
+    else {
+      o[x] = [o[x]];
+    }
+  }
+
+}
+
+
+
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
@@ -53,12 +97,17 @@ export class KeylayoutFileReader {
     return true;
   }
 
+
   /**
    * @brief  member function to box single-entry objects into arrays
    * @param  source the object to be changed
    * @return objects that contain only boxed arrays
    */
   public boxArray(source: any) {
+
+//remove_text(source.layouts, 'layout')
+
+
     boxXmlArray(source.layouts, 'layout');
     boxXmlArray(source.terminators, 'when');
     boxXmlArray(source, 'keyMapSet');
@@ -92,13 +141,49 @@ export class KeylayoutFileReader {
       trimValues: true,
       textNodeName: "##text",*/
 
+
+
+
+       //ignoreAttributes: false,
+
+     ignoreAttributes: [''],
+      //ignoreAttributes: /^[ ]/,
+      //trimValues: true,   // prevents '#text' but then cannot use ' ' as output character
+      trimValues: false,  //_S2 was true !!!
+      textNodeName: "#_text",
+      parseTagValue: false,  // does this prevent output of  #text ????,
+      attributeNamePrefix: '@_',   // to access the attribute
+      ignoreDeclaration: true
+
+
+
+  /*
       ignoreAttributes: false,
-      trimValues: true,
+      //ignoreAttributes: ['#text', ''],
+      //ignoreAttributes: (aName) => aName.startsWith('ou')  === 'tag.tag2'
+      //ignoreAttributes: false,
+     //ignoreAttributes: (/^[ ]/gm),
+      //ignoreAttributes: [/^[ ]/gm],
+      //ignoreAttributes: [/^[ ]/gm],
+      //ignoreAttributes: ('#text', jPath) => aName.startsWith('#tex'),
+      //trimValues: true,   // prevents '#text' but then cannot use ' ' as output character
+      trimValues: false,  //_S2 was true !!!
       //textNodeName: "##text",
       parseTagValue: false,  // does this prevent output of  #text ????,
       attributeNamePrefix: '@_',   // to access the attribute
       ignoreDeclaration: true
 
+
+  
+  
+  suppressBooleanAttributes?: boolean;
+  allowBooleanAttributes?: boolean;
+      stopNodes?: string[];
+  allowBooleanAttributes?: boolean;
+  
+  cdataPropName?: false | string;
+  tagValueProcessor?: (tagName: string, tagValue: string, jPath: string, hasAttributes: boolean, isLeafNode: boolean) => unknown;
+*/
     };
 
     try {

@@ -14,6 +14,7 @@ const { argv } = require('process');
 const input = readFileSync(argv[2] || 0, "utf-8");
 const data = JSON.parse(input);
 
+// _S2 do I need this func & replace .xds´s type???
 /**
  * Turn a schema node from a singleton of some type into an array of that type
  * @param {Object} o
