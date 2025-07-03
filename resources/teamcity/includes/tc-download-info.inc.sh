@@ -1,5 +1,7 @@
+#!/usr/bin/env bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
+# shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/build/jq.inc.sh"
 
 #
@@ -25,11 +27,13 @@ write_download_info() {
 
   # Construct .download_info
   DATE=$(date +%F)
+  # shellcheck disable=SC2312
   HASH=$(md5sum "${UPLOAD_DIR}/${ARTIFACT_FILENAME}" | cut -d ' ' -f 1)
   SIZE=$(stat --print="%s" "${UPLOAD_DIR}/${ARTIFACT_FILENAME}")
 
+  # shellcheck disable=SC2016
   DOWNLOAD_INFO=$(
-    "$JQ" -n \
+    "${JQ}" -n \
     --arg NAME "${ARTFIACT_NAME}" \
     --arg BUILD_NUMBER "${KEYMAN_VERSION}" \
     --arg DATE "${DATE}" \
@@ -46,5 +50,5 @@ write_download_info() {
       build: $BUILD_COUNTER, size: $SIZE
     }'
   )
-  echo "${DOWNLOAD_INFO}" | "$JQ" . >> "${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info"
+  echo "${DOWNLOAD_INFO}" | "${JQ}" . >> "${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info"
 }
