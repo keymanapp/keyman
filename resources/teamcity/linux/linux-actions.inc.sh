@@ -1,16 +1,11 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
-
-# Run the clean action in the `linux` directory.`
-linux_clean_action() {
-  builder_heading "Cleaning up"
-  # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/linux/build.sh" clean
-}
 
 # Install required dependencies for building Keyman on Linux.
 linux_install_dependencies_action() {
   builder_echo start "install dependencies" "Installing dependencies"
+
+  # shellcheck disable=SC2154
   . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
   checkAndInstallRequirements
   builder_echo end "install dependencies" success "Finished installing dependencies"

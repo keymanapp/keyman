@@ -244,7 +244,7 @@ function do_build() {
 
 function do_publish() {
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for iOS" ios
+  tc_upload_help "Keyman for iOS" ios
 
   if [[ "${KEYMAN_TIER}" == "stable" ]]; then
     _publish_to_appstore
