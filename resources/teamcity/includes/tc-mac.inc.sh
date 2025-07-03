@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 ba_mac_unlock_keychain() {

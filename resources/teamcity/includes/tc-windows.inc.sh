@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 download_symbol_server_index() {

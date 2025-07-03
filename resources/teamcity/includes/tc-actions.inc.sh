@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 # Run the clean action in the `linux` directory.`
