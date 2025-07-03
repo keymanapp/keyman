@@ -15,11 +15,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe \
-  "Build Keyman Developer on Windows" \
+  "Build release of Keyman Developer" \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish release of Keyman Developer" \
@@ -136,16 +137,6 @@ function _publish_to_downloads_keyman_com() {
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
 }
 
-function _publish_api_documentation() {
-  # Upload new Keyman Developer API documentation to help.keyman.com
-  builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
-
-  builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
-}
-
 function build_developer_action() {
   _build_developer
   _build_testkeyboards
@@ -164,10 +155,10 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  _download_symbol_server_index
-  _publish_new_symbols
+  download_symbol_server_index
+  publish_new_symbols
   _publish_to_downloads_keyman_com
-  _publish_api_documentation
+  upload_help "api documentation" developer
 }
 
 if builder_has_action all; then

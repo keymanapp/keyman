@@ -22,7 +22,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe \
-  "Run tests for native KeymanWeb" \
+  "Build and publish KeymanWeb" \
   "all            run all actions" \
   "configure      install dependencies" \
   "build          build Web + embedded" \
@@ -70,17 +70,6 @@ function _zip_and_upload_artifacts() {
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
 
-function _upload_help() {
-  builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  cd "${KEYMAN_ROOT}/resources/build"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
-  cd "${KEYMAN_ROOT}/web"
-
-  builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
-}
-
 function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
 
@@ -100,7 +89,7 @@ function publish_web_action() {
   _push_release_to_skeymancom
 
   _zip_and_upload_artifacts
-  _upload_help
+  upload_help "Keyman for Web" web
 
   builder_echo end publish success "Finished publishing KeymanWeb release"
 }
