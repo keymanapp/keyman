@@ -13,6 +13,6 @@ android_build_action() {
   local TARGETS="$1"
 
   # REVIEW: is it deliberate that we `configure` all targets but only `build,test` `$TARGETS`?
-  "${KEYMAN_ROOT}/android/build.sh" configure build,test:"${TARGETS}" --debug --ci
+  "${KEYMAN_ROOT}/android/build.sh" configure build,test:"${TARGETS}" --debug
   builder_echo end "build" success "Finished building Keyman for Android"
 }
