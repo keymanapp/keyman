@@ -668,8 +668,19 @@ function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine;
 // UI elements from the state machine we have bring some of logic here.
 var
   frmStartInstall: TfrmStartInstall;
+  ReadyToInstall: Boolean;
 begin
-  if not FSilent and BUpdateSM.ReadyToInstall and
+  ReadyToInstall := BUpdateSM.ReadyToInstall;
+  // The setting for automatic updates may have been set to disable
+  // after updates where checked and downloaded. The user should
+  // not be prompted for an update in this case and the update should
+  // abort.
+  if BUpdateSM.GetAutomaticUpdates and ReadyToInstall then
+  begin
+    BUpdateSM.HandleAbort;
+  end;
+
+  if not FSilent and ReadyToInstall and
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
@@ -680,7 +691,7 @@ begin
       frmStartInstall.Free;
     end;
   end
-  else if FSilent and BUpdateSM.ReadyToInstall then
+  else if FSilent and ReadyToInstall then
     Result := False
   else
     Result := True;
@@ -722,10 +733,10 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the presence of the following package related switches means we 
+        // the presence of the following package related switches means we
         // should skip running the update state machine HandleKmShell event
         SkipBUpdate := (FMode in [
-          fmInstallTip, fmInstallTipsForPackages, 
+          fmInstallTip, fmInstallTipsForPackages,
           fmRegisterTip, fmUpgradeKeyboards,
           fmUpgradeMnemonicLayout
         ]);

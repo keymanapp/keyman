@@ -69,7 +69,6 @@ type
     procedure RemoveCachedFiles;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
-    function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value: Boolean): Boolean;
     function GetApplyNow: Boolean;
 
@@ -99,6 +98,7 @@ type
     function ReadyToInstall: Boolean;
     function IsInstallingState: Boolean;
 
+    function GetAutomaticUpdates: Boolean;
     function CheckRegistryState: TUpdateState;
 
   end;
@@ -731,6 +731,7 @@ end;
 
 function UpdateAvailableState.HandleKmShell;
 begin
+
   if bucStateContext.FAutomaticUpdate then
   begin
     // we will use a new kmshell process to enable
@@ -747,7 +748,8 @@ end;
 
 procedure UpdateAvailableState.HandleAbort;
 begin
-
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure UpdateAvailableState.HandleInstallNow;
@@ -872,7 +874,7 @@ end;
 
 procedure DownloadingState.HandleAbort;
 begin
-  // To abort during the downloading
+  // don't abort during the downloading which is executing in a separate process
 end;
 
 procedure DownloadingState.HandleInstallNow;
@@ -899,6 +901,16 @@ end;
 
 procedure WaitingRestartState.EnterState;
 begin
+  // Entering this state means that it was not an 'apply now' update
+  // It should be then a automatic update. However, the automatic update
+  // may have been set to disable after the idle state. Is so abort
+  if not bucStateContext.FAutomaticUpdate then
+  begin
+    bucStateContext.RemoveCachedFiles;
+    ChangeState(IdleState);
+    Exit;
+  end;
+
   // Enter WaitingRestartState
   bucStateContext.SetRegistryState(usWaitingRestart);
 end;
@@ -938,7 +950,8 @@ begin
   end
   else
   begin
-    if not (TUpdateCheckStorage.CheckMetaDataForUpdate) then
+    if not (TUpdateCheckStorage.CheckMetaDataForUpdate) or
+      not bucStateContext.FAutomaticUpdate then // set by user after idle state
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
@@ -960,7 +973,8 @@ end;
 
 procedure WaitingRestartState.HandleAbort;
 begin
-   ChangeState(UpdateAvailableState);
+  bucStateContext.RemoveCachedFiles;
+  ChangeState(IdleState);
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
