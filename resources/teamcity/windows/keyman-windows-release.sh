@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
@@ -41,16 +42,58 @@ if ! is_windows; then
   exit 1
 fi
 
+# TODO: move to parameters (#14202)
+LOCAL_SYMBOLS_PATH="${KEYMAN_ROOT}/../symbols"
+REMOTE_SYMBOLS_PATH="windows/symbols"
+SYMBOLS_SUBDIR="000admin"
+
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
-
   (
     cd "${KEYMAN_ROOT}/windows"
-    # shellcheck disable=SC2154
-    powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-windows-to-downloads-keyman-com.ps1"
-  )
 
+    local UPLOAD_PATH KEYMAN_EXE KEYMAN_DESKTOP_MSI SETUP_EXE SETUP_REDIST_ZIP DEBUG_ZIP
+    local FIRSTVOICES_MSI FIRSTVOICES_EXE
+
+    # shellcheck disable=SC2154
+    UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+    KEYMAN_EXE="keyman-${KEYMAN_VERSION}.exe"
+    KEYMAN_DESKTOP_MSI="keymandesktop.msi"
+    SETUP_EXE="setup.exe"
+    SETUP_REDIST_ZIP="setup-redist.zip"
+    FIRSTVOICES_MSI="firstvoices.msi"
+    FIRSTVOICES_EXE="firstvoices-${KEYMAN_VERSION}.exe"
+    DEBUG_ZIP="debug-${KEYMAN_VERSION}.zip"
+
+    rm -rf "${UPLOAD_PATH}"
+    mkdir -p "${UPLOAD_PATH}"
+
+    cp "release/${KEYMAN_VERSION}/${KEYMAN_EXE}" "${UPLOAD_PATH}"
+    cp "release/${KEYMAN_VERSION}/${KEYMAN_DESKTOP_MSI}" "${UPLOAD_PATH}"
+    cp "release/${KEYMAN_VERSION}/${SETUP_EXE}" "${UPLOAD_PATH}"
+    cp "release/${KEYMAN_VERSION}/${SETUP_REDIST_ZIP}" "${UPLOAD_PATH}"
+    cp "release/${KEYMAN_VERSION}/${FIRSTVOICES_EXE}" "${UPLOAD_PATH}"
+    cp "release/${KEYMAN_VERSION}/${FIRSTVOICES_MSI}" "${UPLOAD_PATH}"
+
+    write_download_info "${UPLOAD_PATH}" "${KEYMAN_EXE}" "Keyman for Windows" exe win
+    write_download_info "${UPLOAD_PATH}" "${KEYMAN_DESKTOP_MSI}" "Keyman for Windows MSI installer" msi win
+    write_download_info "${UPLOAD_PATH}" "${SETUP_EXE}" "Keyman for Windows setup bootstrap" exe win
+    write_download_info "${UPLOAD_PATH}" "${SETUP_REDIST_ZIP}" "Keyman for Windows setup bootstrap (unsigned for bundling)" zip win
+
+    write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_EXE}" "FirstVoices Keyboards" exe win
+    write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_MSI}" "FirstVoices Keyboards MSI installer" msi win
+
+    # TODO: is this still needed?
+    if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
+      cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}"
+      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Desktop and Keyman Developer debug files" zip win
+    fi
+
+    cd upload
+    # shellcheck disable=SC2154
+    tc_rsync_upload "${KEYMAN_VERSION}" "windows/${KEYMAN_TIER}"
+  )
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
 }
 
