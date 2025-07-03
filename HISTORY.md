@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 19.0.76 alpha 2025-07-03
+
+* maint(common): move TC configuration for common tests (#14205)
+* refactor(common): improve downloads include script (#14253)
+* maint(web): move rsync code to shared functions (#14254)
+* maint(developer): replace Powershell scripts (#14255)
+* maint(windows): move TC configuration for Keyman Windows to scripts (#14186)
+* feat(windows): human text message for 413 error (#14055)
+* refactor(web): move helper functions to beginning of function (#14252)
+* maint(android): add TC build scripts for Keyman for Android (#14222)
+* maint(linux): use `tc_rsync_upload` and `write_download_info` functions (#14258)
+* maint(ios): add TC build scripts for iOS (#14229)
+* maint(mac): add TC build scripts for macOS (#14239)
+
 ## 19.0.75 alpha 2025-07-02
 
 * feat(resources): support ignoring unknown options in builder (#14216)
