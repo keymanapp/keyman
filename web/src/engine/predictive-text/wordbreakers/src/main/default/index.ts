@@ -293,7 +293,6 @@ function isNonSpace(chunk: string, options?: DefaultWordBreakerOptions): boolean
  * @param text Text to find word boundaries in.
  */
 function findBoundaries(text: string, options?: DefaultWordBreakerOptions): number[] {
-  //#region Internal utility functions
   /**
    * Returns the position of the start of the next scalar value. This jumps
    * over surrogate pairs.
@@ -301,7 +300,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
    * If asked for the character AFTER the end of the string, this always
    * returns the length of the string.
    */
-  function positionAfter(pos: number): number {
+  const positionAfter = function(pos: number): number {
     if (pos >= text.length) {
       return text.length;
     } else if (isStartOfSurrogatePair(text[pos])) {
@@ -309,7 +308,6 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
     }
     return pos + 1;
   }
-  //#endregion Internal utility functions
 
   // WB1 and WB2: no boundaries if given an empty string.
   if (text.length === 0) {

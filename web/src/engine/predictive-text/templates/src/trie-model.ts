@@ -303,8 +303,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   predict(transform: Transform, context: Context): Distribution<Suggestion> {
-    //#region Helper function
-    function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
+    const makeDistribution = function(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
       const distribution: Distribution<Suggestion> = [];
 
       for (const s of suggestions) {
@@ -313,7 +312,6 @@ export default class TrieModel implements LexicalModel {
 
       return distribution;
     }
-    //#endregion Helper function
 
     // Special-case the empty buffer/transform: return the top suggestions.
     if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
