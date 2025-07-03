@@ -25,19 +25,16 @@ builder_parse "$@"
 if is_ubuntu; then
   ARCH=arch
 elif is_windows; then
-  ARCH=x86
+  ARCH=win
 elif is_macos; then
   ARCH=mac
 else
   builder_echo error "Unknown architecture"
-  return 1
+  exit 1
 fi
 
 function do_all() {
   "${KEYMAN_ROOT}/core/build.sh" configure,build,test:${ARCH}
-  if is_windows; then
-    "${KEYMAN_ROOT}/core/build.sh" configure,build,test:x64
-  fi
 }
 
 builder_run_action  all  do_all
