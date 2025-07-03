@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { KeymanFileTypes } from "@keymanapp/common-types";
-import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, KeymanDeveloperProject, ProjectLoader } from "@keymanapp/developer-utils";
 import { InfrastructureMessages } from "../messages/infrastructureMessages.js";
 
 export const isProject = (filename: string): boolean =>
@@ -26,7 +26,7 @@ export async function loadProject(infile: string, callbacks: CompilerCallbacks) 
   }
 
   const project = callbacks.fs.existsSync(infile) ?
-    await loadProjectFromFile(infile, callbacks) :
+    await ProjectLoader.loadProjectFromFile(infile, callbacks) :
     await loadDefaultProjectFromFolder(infile, callbacks);
 
   return project;
@@ -42,21 +42,3 @@ async function loadDefaultProjectFromFolder(infile: string, callbacks: CompilerC
   return project;
 }
 
-async function loadProjectFromFile(infile: string, callbacks: CompilerCallbacks): Promise<KeymanDeveloperProject> {
-  const kpjData = await callbacks.fsAsync.readFile(infile);
-  const reader = new KPJFileReader(callbacks);
-  let kpj = null;
-  try {
-    kpj = reader.read(kpjData);
-    if(kpj.KeymanDeveloperProject?.Options?.Version && kpj.KeymanDeveloperProject.Options.Version != "1.0" && kpj.KeymanDeveloperProject.Options.Version != "2.0") {
-      callbacks.reportMessage(InfrastructureMessages.Error_UnsupportedProjectVersion({version: kpj.KeymanDeveloperProject.Options.Version}));
-      return null;
-    }
-    reader.validate(kpj);
-  } catch(e) {
-    callbacks.reportMessage(InfrastructureMessages.Error_InvalidProjectFile({message: (e??'').toString()}));
-    return null;
-  }
-  const project = await reader.transform(infile, kpj);
-  return project;
-}

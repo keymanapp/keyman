@@ -23,7 +23,7 @@ describe('WindowsPackageInstallerCompiler', function () {
     };
 
     const callbacks = new TestCompilerCallbacks();
-    let compiler = new WindowsPackageInstallerCompiler();
+    const compiler = new WindowsPackageInstallerCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
 
     const result = await compiler.run(kpsPath, null);

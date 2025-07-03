@@ -62,8 +62,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       Log.d(TAG, "Initializing Sentry");
       SentryAndroid.init(getApplicationContext(), options -> {
         options.setEnableAutoSessionTracking(false);
-        options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
-        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
+        options.setRelease(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_GIT_TAG);
+        options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.KEYMAN_VERSION_ENVIRONMENT);
       });
     }
     if (BuildConfig.DEBUG) {
@@ -110,9 +110,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onInitializeInterface() {
     super.onInitializeInterface();
-
-    // KeymanWeb reloaded, so we have to pass the banner again
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
@@ -272,7 +269,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardShown() {
-    // Do nothing
+    // Refresh banner theme
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   @Override

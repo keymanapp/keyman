@@ -49,7 +49,7 @@ bc_test_ios=(Keyman_iOS_TestPullRequests Keyman_iOS_TestSamplesAndTestProjects)
 bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman_Common_KPAPI_TestPullRequests_Linux deb-pr-packaging_GitHub)
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
-bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
+bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
 bc_test_developer=(Keyman_Developer_Test Keyman_Test_Developer_Mac Keyman_Test_Developer_Linux)
 
 bc_test_common_web=(Keyman_Test_Common_Web)
@@ -62,7 +62,7 @@ bc_test_common_linux=(Keyman_Test_Common_Linux)
 
 vcs_test=HttpsGithubComKeymanappKeymanPRs
 
-# Master (Alpha) Build Configurations; these diverge when we need new build configurations for new versions
+# Master (Alpha) Build Configurations; these may diverge when we need new build configurations for new versions
 
 bc_master_android=(KeymanAndroid_Build)
 bc_master_ios=(Keyman_iOS_Master)
@@ -86,57 +86,7 @@ bc_beta_developer=(Keyman_Developer_Release)
 
 vcs_beta=HttpsGithubComKeymanappKeyman
 
-# Stable 14.0 Build Configurations
-
-bc_stable_14_0_android=(KeymanAndroid_Build)
-bc_stable_14_0_ios=(Keyman_iOS_Master)
-bc_stable_14_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
-bc_stable_14_0_mac=(KeymanMac_Master)
-bc_stable_14_0_windows=(Keyman_Build)
-bc_stable_14_0_web=(Keymanweb_Build)
-
-# 16.0+ Keyman Developer is split from Windows, but TC configuration will not fail
-# on older versions, just no-op
-bc_stable_14_0_developer=(Keyman_Developer_Release)
-
-vcs_stable_14_0=HttpsGithubComKeymanappKeyman
-
-# Stable 15.0 Build Configurations
-
-bc_stable_15_0_android=(KeymanAndroid_Build)
-bc_stable_15_0_ios=(Keyman_iOS_Master)
-bc_stable_15_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
-bc_stable_15_0_mac=(KeymanMac_Master)
-bc_stable_15_0_windows=(Keyman_Build)
-bc_stable_15_0_web=(Keymanweb_Build)
-
-vcs_stable_15_0=HttpsGithubComKeymanappKeyman
-
-# Stable 16.0 Build Configurations
-
-bc_stable_16_0_android=(KeymanAndroid_Build)
-bc_stable_16_0_ios=(Keyman_iOS_Master)
-bc_stable_16_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
-bc_stable_16_0_mac=(KeymanMac_Master)
-bc_stable_16_0_windows=(Keyman_Build)
-bc_stable_16_0_web=(Keymanweb_Build)
-bc_stable_16_0_developer=(Keyman_Developer_Release)
-
-vcs_stable_16_0=HttpsGithubComKeymanappKeyman
-
-# Stable 17.0 Build Configurations
-
-bc_stable_17_0_android=(KeymanAndroid_Build)
-bc_stable_17_0_ios=(Keyman_iOS_Master)
-bc_stable_17_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
-bc_stable_17_0_mac=(KeymanMac_Master)
-bc_stable_17_0_windows=(Keyman_Build)
-bc_stable_17_0_web=(Keymanweb_Build)
-bc_stable_17_0_developer=(Keyman_Developer_Release)
-
-vcs_stable_17_0=HttpsGithubComKeymanappKeyman
-
-# Stable 17.0 Build Configurations
+# Stable 18.0 Build Configurations
 
 bc_stable_18_0_android=(KeymanAndroid_Build)
 bc_stable_18_0_ios=(Keyman_iOS_Master)
@@ -147,3 +97,15 @@ bc_stable_18_0_web=(Keymanweb_Build)
 bc_stable_18_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_18_0=HttpsGithubComKeymanappKeyman
+
+# Stable 19.0 Build Configurations
+
+bc_stable_19_0_android=(KeymanAndroid_Build)
+bc_stable_19_0_ios=(Keyman_iOS_Master)
+bc_stable_19_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
+bc_stable_19_0_mac=(KeymanMac_Master)
+bc_stable_19_0_windows=(Keyman_Build)
+bc_stable_19_0_web=(Keymanweb_Build)
+bc_stable_19_0_developer=(Keyman_Developer_Release)
+
+vcs_stable_19_0=HttpsGithubComKeymanappKeyman

@@ -8,7 +8,7 @@ import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } fr
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
 import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
-import { getOption } from '@keymanapp/developer-utils';
+import { getOption } from '../../util/options.js';
 
 export class BuildProject extends BuildActivity {
   public get name(): string { return 'Project'; }
@@ -21,7 +21,7 @@ export class BuildProject extends BuildActivity {
       return false;
     }
 
-    let builder = new ProjectBuilder(infile, callbacks, options);
+    const builder = new ProjectBuilder(infile, callbacks, options);
     return builder.run();
   }
 }
@@ -52,7 +52,7 @@ class ProjectBuilder {
     }
 
     // Go through the various file types and build them
-    for(let builder of buildActivities) {
+    for(const builder of buildActivities) {
       if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
         // We don't support nested projects
         continue;
@@ -97,7 +97,7 @@ class ProjectBuilder {
     }
 
     let result = true;
-    for(let file of this.project.files) {
+    for(const file of this.project.files) {
       if(file.fileType.toLowerCase() == activity.sourceExtension) {
         result = await this.buildTarget(file, activity) && result;
       }

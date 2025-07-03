@@ -1,6 +1,8 @@
 /*
  * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
+ * Created by S. Schmitt on 2025-05-12
+ *
  * Convert macOS/Ukelele .keylayout files to Keyman .kmn
  *
  */
@@ -26,13 +28,9 @@ export class KeylayoutToKmnConverter {
 
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly USED_KEYS_COUNT = 51;               // we use key Nr 0 (A) -> key Nr 49 (Space)
+  static readonly USED_KEYS_COUNT = 49;               // we use key Nr 0 (A) -> key Nr 49 (Space)
   static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly KMC_CONVERT_VERSION = "0.1";
-
-  static readonly DATA_SUBFOLDER = 'data';
-  static readonly TEST_SUBFOLDER = 'test';
 
   private options: CompilerOptions;
 
@@ -50,10 +48,12 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename: string = ""): Promise<ConverterToKmnArtifacts> {
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnArtifacts> {
+
 
     if (!inputFilename) {
-      throw new Error('Invalid parameters');
+      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      return null;
     }
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
@@ -75,30 +75,48 @@ export class KeylayoutToKmnConverter {
 
 
     if (!jsonO) {
-      throw new Error('Error while processing read()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
+      return null;
     }
+
+    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
     if (!outArray) {
-      throw new Error('Error while processing convert()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
+      return null;
     }
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
-    const out_text_ok: boolean = kmnFileWriter.write(outArray);
 
+    const out_text_ok: boolean = kmnFileWriter.write(outArray);
     if (!out_text_ok) {
-      throw new Error('Error while processing write()');
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
+      return null;
     }
+
+    /*const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
+    if (!out_Uint8) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+      return null;
+    }*/
+
+    /*const out_str: string = kmnFileWriter.writeToString(outArray);
+     if (!out_str) {
+       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
+       return null;
+     }*/
+
     return null;
   }
+
 
   /**
    * @brief  member function to read filename and behaviour of a json object into a convert_object
    * @param  jsonObj containing filename, behaviour and rules of a json object
    * @return an convert_object containing all data ready to print out
    */
-  public convert(jsonObj: any, outputfilename: string = ""): convert_object {
-
+  private convert(jsonObj: any, outputfilename: string): convert_object {
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
     const rules: Rule[] = [];                          // an array of data for a kmn rule
 
@@ -112,24 +130,13 @@ export class KeylayoutToKmnConverter {
     // ToDo in a new PR: check tags  ( issue # 13599)
     if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
 
-      // get filename from data that had been read
-      const fileNameNoExtention = jsonObj.keyboard['@_name'];
-      const filePath = this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER);
-
-      data_object.keylayout_filename = this.callbacks.path.join(filePath, (fileNameNoExtention + ".keylayout"));
-
-      // if no outputfile name is specified: create one from input file name
-      if ((outputfilename === "") || (outputfilename === null)) {
-        data_object.kmn_filename = this.callbacks.path.join(filePath, fileNameNoExtention + ".kmn");
-      }
-      // if outputfile name is specified: use it
-      else
-        data_object.kmn_filename = outputfilename;
-
-      console.log("RUN kmc convert - input file: ", data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
-
+      data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');
+      data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
+
+      // _S2 ToDo remove this console.log
+      console.log("RUN kmc convert - input file: ",data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
 
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
@@ -162,7 +169,7 @@ export class KeylayoutToKmnConverter {
     const isCapsused: boolean = this.checkIfCapsIsUsed(data_ukelele.arrayOf_Modifiers);
 
     // loop keys 0-50 (= all keys we use)
-    for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+    for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
 
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
@@ -420,6 +427,17 @@ export class KeylayoutToKmnConverter {
             }
           }
         } else {
+
+          /* QUESTION
+          // _S2 why does this not work here? Correct data in this.callback.messages is available !?!?!
+           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
+               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
+               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
+               key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']
+             }));
+           return null;*/
+
           console.log("ERROR : some output characters can not be used in Keyman \"",
             (jsonObj.keyboard['@_name'] + ".keylayout\""),
             "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
@@ -466,13 +484,12 @@ export class KeylayoutToKmnConverter {
         }
 
         if (isFirstUsedHere_dk) {
-          const ruleArray: string[] = [];
           object_array[i].unique_deadkey = unique_dkB_count;
-          ruleArray.push(object_array[i].modifier_deadkey);
-          ruleArray.push(object_array[i].deadkey);
-          ruleArray.push(String(unique_dkB_count));
+          list_of_unique_Text2_rules.push([
+            object_array[i].modifier_deadkey,
+            object_array[i].deadkey,
+            String(unique_dkB_count)]);
           unique_dkB_count++;
-          list_of_unique_Text2_rules.push(ruleArray);
         }
       }
     }
@@ -508,13 +525,13 @@ export class KeylayoutToKmnConverter {
         }
 
         if (isFirstUsedHere_prev_dk) {
-          const ruleArray: string[] = [];
           object_array[i].unique_deadkey = unique_dkB_count;
-          ruleArray.push(object_array[i].modifier_prev_deadkey);
-          ruleArray.push(object_array[i].prev_deadkey);
-          ruleArray.push(String(unique_dkB_count));
+          list_of_unique_Text2_rules.push([
+            object_array[i].modifier_prev_deadkey,
+            object_array[i].prev_deadkey,
+            String(unique_dkB_count)
+          ]);
           unique_dkB_count++;
-          list_of_unique_Text2_rules.push(ruleArray);
         }
       }
     }
@@ -672,72 +689,71 @@ export class KeylayoutToKmnConverter {
    * @return keycode on a Windows Keyboard
    */
   public map_UkeleleKC_To_VK(pos: number): string {
+    const vk = [
+      "K_A"          /* A */,
+      "K_S"          /* S */,
+      "K_D"          /* D */,
+      "K_F"          /* F */,
+      "K_H"          /* H */,
+      "K_G"          /* G */,
+      "K_Z"          /* Z */,
+      "K_X"          /* X */,
+      "K_C"          /* C */,
+      "K_V"          /* V */,
+      "K_BKQUOTE"    /* ^ */,
+      "K_B"          /* B */,
+      "K_Q"          /* Q */,
+      "K_W"          /* W */,
+      "K_E"          /* E */,
+      "K_R"          /* R */,
+      "K_Y"          /* Y */,
+      "K_T"          /* T */,
+      "K_1"          /* 1 */,
+      "K_2"          /* 2 */,
+      "K_3"          /* 3 */,
+      "K_4"          /* 4 */,
+      "K_6"          /* 6 */,
+      "K_5"          /* 5 */,
+      "K_EQUAL"      /* ´ */,
+      "K_9"          /* 9 */,
+      "K_7"          /* 7 */,
+      "K_HYPHEN"     /* ß */,
+      "K_8"          /* 8 */,
+      "K_0"          /* 0 */,
+      "K_RBRKT"      /* ] */,
+      "K_O"          /* O */,
+      "K_U"          /* U */,
+      "K_LBRKT"      /* [ */,
+      "K_I"          /* I */,
+      "K_P"          /* P */,
+      "K_ENTER",
+      "K_L"          /* L */,
+      "K_J"          /* J */,
+      "K_QUOTE"      /* " */,
+      "K_K"          /* K */,
+      "K_COLON"      /* : */,
+      "K_BKSLASH"    /* \ */,   // 42 for ISO  correct??
+      "K_COMMA"      /* , */,
+      "K_SLASH"      /* / */,
+      "K_N"          /* N */,
+      "K_M"          /* M */,
+      "K_PERIOD"     /* . */,
+      "K_?C1"        /* \ */,   // 48 for ANSI  correct??
+      "K_SPACE"      /* \ */
+    ];
 
-    // ukelele KC  -->  VK_US
-    if (pos === 0x0A) return "K_BKQUOTE";         /* ^ */
-    else if (pos === 0x12) return "K_1";          /* 1 */
-    else if (pos === 0x13) return "K_2";          /* 2 */
-    else if (pos === 0x14) return "K_3";          /* 3 */
-    else if (pos === 0x15) return "K_4";          /* 4 */
-    else if (pos === 0x17) return "K_5";          /* 5 */
-    else if (pos === 0x16) return "K_6";          /* 6 */
-    else if (pos === 0x1A) return "K_7";          /* 7 */
-    else if (pos === 0x1C) return "K_8";          /* 8 */
-    else if (pos === 0x19) return "K_9";          /* 9 */
-    else if (pos === 0x1D) return "K_0";          /* 0 */
-    else if (pos === 0x1B) return "K_HYPHEN";     /* ß */
-    else if (pos === 0x18) return "K_EQUAL";      /* ´ */
-
-    else if (pos === 0x0C) return "K_Q";          /* Q */
-    else if (pos === 0x0D) return "K_W";          /* W */
-    else if (pos === 0x0E) return "K_E";          /* E */
-    else if (pos === 0x0F) return "K_R";          /* R */
-    else if (pos === 0x11) return "K_T";          /* T */
-    else if (pos === 0x10) return "K_Y";          /* Y */
-    else if (pos === 0x20) return "K_U";          /* U */
-    else if (pos === 0x22) return "K_I";          /* I */
-    else if (pos === 0x1F) return "K_O";          /* O */
-    else if (pos === 0x23) return "K_P";          /* P */
-    else if (pos === 0x21) return "K_LBRKT";      /* [ */
-    else if (pos === 0x1E) return "K_RBRKT";      /* ] */
-    else if (pos === 0x31) return "K_SPACE";      /* \ */
-    else if (pos === 0x2A) return "K_BKSLASH";    /* \ */   // 42 for ISO  correct??
-    // else if (pos === 0x30) return "K_?C1"     /* \ */   // 48 for ANSI  correct??
-
-    else if (pos === 0x00) return "K_A";          /* A */
-    else if (pos === 0x01) return "K_S";          /* S */
-    else if (pos === 0x02) return "K_D";          /* D */
-    else if (pos === 0x03) return "K_F";          /* F */
-    else if (pos === 0x05) return "K_G";          /* G */
-    else if (pos === 0x04) return "K_H";          /* H */
-    else if (pos === 0x26) return "K_J";          /* J */
-    else if (pos === 0x28) return "K_K";          /* K */
-    else if (pos === 0x25) return "K_L";          /* L */
-    else if (pos === 0x29) return "K_COLON";      /* : */
-    else if (pos === 0x27) return "K_QUOTE";      /* " */
-
-    else if (pos === 0x23) return "K_oE2";        /* | */
-    else if (pos === 0x06) return "K_Z";          /* Z */
-    else if (pos === 0x07) return "K_X";          /* X */
-    else if (pos === 0x08) return "K_C";          /* C */
-    else if (pos === 0x09) return "K_V";          /* V */
-    else if (pos === 0x0B) return "K_B";          /* B */
-    else if (pos === 0x2D) return "K_N";          /* N */
-    else if (pos === 0x2E) return "K_M";          /* M */
-    else if (pos === 0x2B) return "K_COMMA";      /* , */
-    else if (pos === 0x2F) return "K_PERIOD";     /* . */
-    else if (pos === 0x2C) return "K_SLASH";      /* / */
-
-    else if (pos === 0x24) return "K_ENTER";
-    else return "";
+    if (!(pos >= 0 && pos <= 0x31) || (pos === null) || (pos === undefined)) {
+      return "";
+    } else {
+      return vk[pos];
+    }
   }
 
-  /**
-  * @brief  member function to return an index for a given actionID
-  * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string - value 'id' to be found
-  * @return a number specifying the index of an actionId
-  */
+  /* @brief  member function to return an index for a given actionID
+    * @param  data   :any - an object containing all data read from a .keylayout file
+    * @param  search :string - value 'id' to be found
+    * @return a number specifying the index of an actionId
+    */
   public get_ActionIndex__From__ActionId(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
@@ -816,17 +832,15 @@ export class KeylayoutToKmnConverter {
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          const returnarray: string[] = [];
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] < KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-            returnarray.push(this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])));
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i]['@_index']);
-            returnarray.push(search[k][2]);
-          }
-          if (returnarray.length > 0) {
-            returnarray2D.push(returnarray);
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+            returnarray2D.push([
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              search[k][2]
+            ]);
           }
         }
       }
@@ -845,14 +859,12 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
-        const returnarray: string[] = [];
         if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
-          returnarray.push(data.keyboard.actions.action[i]['@_id']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_state']);
-          returnarray.push(data.keyboard.actions.action[i].when[j]['@_output']);
-        }
-        if (returnarray.length > 0) {
-          returnarray2D.push(returnarray);
+          returnarray2D.push([
+            data.keyboard.actions.action[i]['@_id'],
+            data.keyboard.actions.action[i].when[j]['@_state'],
+            data.keyboard.actions.action[i].when[j]['@_output']
+          ]);
         }
       }
     }
@@ -872,23 +884,19 @@ export class KeylayoutToKmnConverter {
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
         const behaviour: number = Number(search[i][3]);
-
         for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
-          const returnarray1D: string[] = [];
-          // KeyName
-          returnarray1D.push(String(search[i][1]));
-          // actionId
-          returnarray1D.push(String(search[i][2]));
-          // behaviour
-          returnarray1D.push(String(search[i][3]));
-          // modifier
-          returnarray1D.push(String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)));
-          // output
-          returnarray1D.push(String(search[i][4]));
-
-          if (returnarray1D.length > 0) {
-            returnarray.push(returnarray1D);
-          }
+          returnarray.push([
+            // KeyName
+            String(search[i][1]),
+            // actionId
+            String(search[i][2]),
+            // behaviour
+            String(search[i][3]),
+            // modifier
+            String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
+            // output
+            String(search[i][4])
+          ]);
         }
       }
     }
@@ -924,24 +932,19 @@ export class KeylayoutToKmnConverter {
 
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
-            const returnarray: string[] = [];
             const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
             const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
             const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
-
-            returnarray.push(search);
-            returnarray.push(outchar);
-            returnarray.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']);
-            returnarray.push(behaviour);
-            returnarray.push(keyName);
-            returnarray.push(modifierkmn);
-
-            if (returnarray.length > 0) {
-              returnarray2D.push(returnarray);
-            }
+            returnarray2D.push([
+              search,
+              outchar,
+              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              behaviour,
+              keyName,
+              modifierkmn]);
           }
         }
       }
@@ -970,19 +973,19 @@ export class KeylayoutToKmnConverter {
   public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
     const mapIndexArray_2D: number[][] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j < KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
-        const mapIndexArrayperKey: number[] = [];
+      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          mapIndexArrayperKey.push(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']);
-          mapIndexArrayperKey.push(i);
-        }
-        if (mapIndexArrayperKey.length > 0) {
-          mapIndexArray_2D.push(mapIndexArrayperKey);
+          mapIndexArray_2D.push([data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], i]);
         }
       }
     }
     return mapIndexArray_2D;
   }
+
+  /** @internal */
+  public convert_bound = {
+    convert: this.convert.bind(this),
+  };
 }
 
 /**

@@ -1,15 +1,5 @@
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
-
-// Unfortunately, we can't bundle Sentry via direct import - something in the process breaks
-// esbuild due to needing to transform to ES5.
-import { default as SentryType } from '@sentry/browser';
-
-// But this will get us sufficient typing to work with as long as we also link (or prepend)
-// a pre-bundled Sentry build artifact.
-let Sentry: {
-  init: typeof SentryType.init;
-  // @ts-ignore
-} = window['Sentry'];
+import * as Sentry from '@sentry/browser';
 
 /**
  * Controls whether or not the generated Sentry event is logged to the console (true)
@@ -22,8 +12,8 @@ type Options = {
 };
 
 export class KeymanSentryManager {
-  keymanPlatform: string;
-  _enabled: boolean = true;
+  private keymanPlatform: string;
+  private _enabled: boolean = true;
 
   static STANDARD_ALIASABLE_FILES = {
     'keymanweb.js':             'keymanweb.js',
@@ -44,7 +34,7 @@ export class KeymanSentryManager {
   }
 
   // If we've recognized one of our source files,
-  aliasFilename(filename: string): string|null {
+  private aliasFilename(filename: string): string|null {
     if(!this.mayAlias(filename)) {
       return null;
     }
@@ -59,14 +49,14 @@ export class KeymanSentryManager {
     }
   }
 
-  mayAlias(filename: string): boolean {
+  private mayAlias(filename: string): boolean {
     return !!KeymanSentryManager.STANDARD_ALIASABLE_FILES[filename];
   }
 
   // Filters all expected but unnecessary path prefixes, affixes, and suffixes reported by Sentry from our products.
   // This allows us to mask all different sorts of installations with a single uploaded path.
   // Modifies original object.
-  pathFilter(event: any) {
+  private pathFilter(event: any) {
     // Get the underlying JS error.
     let exception = event.exception;
     if(!exception) {
@@ -100,7 +90,7 @@ export class KeymanSentryManager {
   }
 
   // Attaches some useful debugging information to the specified object, pass-by-reference style.
-  attachEventMetadata(event: any) {
+  private attachEventMetadata(event: any) {
     // Ensure that the 'extra' object exists.  (May not exist for synthetic/custom Errors.)
     event.extra = event.extra || {};
     //@ts-ignore
@@ -110,7 +100,7 @@ export class KeymanSentryManager {
 
   // Sanitizes the event object (in-place) to remove sensitive information
   // from the breadcrumbs and url (for embedded KeymanWeb)
-  sanitizeEvent(event: any) {
+  private sanitizeEvent(event: any) {
     if (event && event.breadcrumbs) {
       event.breadcrumbs.forEach((b: any) => {
         if (b.category == 'navigation') {
@@ -133,7 +123,7 @@ export class KeymanSentryManager {
    * Also will sanitize the Sentry event.
    * @param event A Sentry-generated event
    */
-  prepareEvent(event: any): boolean {
+  private prepareEvent(event: any): boolean {
     this.pathFilter(event);
     this.attachEventMetadata(event);
     this.sanitizeEvent(event);
@@ -158,7 +148,7 @@ export class KeymanSentryManager {
    * if we want to prevent the event from being sent to the server.
    * @param event
    */
-  prepareEventDebugWrapper(event: any) {
+  public prepareEventDebugWrapper(event: any) {
     if(DEBUG) {
       try {
         if(this.prepareEvent(event)) {
@@ -188,7 +178,7 @@ export class KeymanSentryManager {
    *
    * https://stackoverflow.com/a/53214615/1836776
    */
-  initConsole() {
+  private initConsole() {
     // creating function declarations for better stacktraces (otherwise they'd be anonymous function expressions)
     let oldConsoleError = console.error;
     let _this = this;
@@ -233,7 +223,7 @@ export class KeymanSentryManager {
     }
   }
 
-  init() {
+  public init() {
     // Do the actual Sentry initialization.
     //@ts-ignore
     Sentry.init({
@@ -248,11 +238,11 @@ export class KeymanSentryManager {
     this.initConsole();
   }
 
-  get enabled(): boolean {
+  public get enabled(): boolean {
     return this._enabled;
   }
 
-  set enabled(value: boolean) {
+  public set enabled(value: boolean) {
     this._enabled = value;
   }
 }

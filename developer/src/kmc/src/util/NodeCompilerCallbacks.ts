@@ -13,7 +13,7 @@ import { CompilerCallbacks, CompilerEvent,
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';
-import { KeymanSentry } from '@keymanapp/developer-utils';
+import { KeymanSentry } from './KeymanSentry.js';
 import { fileURLToPath } from 'url';
 
 const color = chalk.default;
@@ -45,6 +45,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  /** cache of the contentes of the text */
+  messageFiletext: string = '';
   maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
@@ -55,6 +57,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.messages = [];
     this.messageCount = 0;
     this.messageFilename = '';
+    this.messageFiletext = '';
   }
 
   /**
@@ -154,6 +157,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Reset max message limit when a new file is being processed
       this.messageFilename = event.filename;
       this.messageCount = 0;
+      this.messageFiletext = '';
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);

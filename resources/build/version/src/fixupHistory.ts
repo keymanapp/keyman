@@ -2,8 +2,10 @@ import {
     warning as logWarning
 } from '@actions/core';
 
-import { GitHub } from '@actions/github';
-import { readFileSync, writeFileSync } from 'fs';
+import { getOctokit } from '@actions/github';
+type GitHub = ReturnType<typeof getOctokit>;
+
+import { readFileSync, writeFileSync } from 'node:fs';
 import { gt } from 'semver';
 import { reportHistory } from './reportHistory.js';
 import { spawnChild } from './util/spawnAwait.js';
@@ -39,7 +41,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[], base?: string): Pr
       tier = (await spawnChild('git', ['show', base+':TIER.md'])).trim();
     }
   }
-  //logInfo(`VERSION="${version}"`);
+  //logInfo(`KEYMAN_VERSION="${version}"`);
 
   //
   // Load and parse history file, looking for our version
@@ -176,7 +178,7 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
       // Always serially rather than in parallel
       .then(() => {
         console.log(`Creating comment on Pull Request #${pull}`);
-        return octokit.issues.createComment({
+        return octokit.rest.issues.createComment({
           owner: 'keymanapp',
           repo: 'keyman',
           issue_number: pull,

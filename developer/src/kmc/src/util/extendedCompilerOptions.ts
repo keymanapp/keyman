@@ -56,7 +56,7 @@ function commanderOptionsMessagesToCompilerOptionsMessages(messages: any, callba
   }
 
   const result: CompilerMessageOverrideMap = {};
-  for(let message of messages) {
+  for(const message of messages) {
     const override = commanderOptionsMessageToCompilerOptionsMessage(message, callbacks);
     if(!override) {
       return null;

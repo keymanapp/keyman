@@ -17,12 +17,14 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
  */
 export class ConverterMessages {
   static ERROR_OutputFilenameIsRequired = SevError | 0x0001;
-  static Error_OutputFilenameIsRequired = () =>
-    m(this.ERROR_OutputFilenameIsRequired, `An output filename is required for keyboard conversion.`);
+  static Error_OutputFilenameIsRequired = () => m(
+    this.ERROR_OutputFilenameIsRequired,
+    `An output filename is required for keyboard conversion.`);
 
   static ERROR_NoConverterFound = SevError | 0x0002;
-  static Error_NoConverterFound = (o: { inputFilename: string, outputFilename: string; }) =>
-    m(this.ERROR_NoConverterFound, `No converter is available that can convert from '${def(o.inputFilename)}' to '${def(o.outputFilename)}'.`);
+  static Error_NoConverterFound = (o: { inputFilename: string, outputFilename: string; }) => m(
+    this.ERROR_NoConverterFound,
+    `No converter is available that can convert from '${def(o.inputFilename)}' to '${def(o.outputFilename)}'.`);
 
   static ERROR_FileNotFound = SevError | 0x0003;
   static Error_FileNotFound = (o: { inputFilename: string; }) =>
@@ -38,5 +40,23 @@ export class ConverterMessages {
   static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
     `!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Error validating Keylayout XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
 
+  static ERROR_UnableToRead = SevError | 0x0004;
+  static Error_UnableToRead = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToRead, `Input file '${def(o.inputFilename)}
+    ' could not be read.`);
 
-}
+  static ERROR_UnableToConvert = SevError | 0x0005;
+  static Error_UnableToConvert = (o: { inputFilename: string; }) => m(
+    this.ERROR_UnableToConvert, `Input file '${def(o.inputFilename)}
+    ' could not be converted.`);
+
+  static ERROR_UnableToWrite = SevError | 0x0006;
+  static Error_UnableToWrite = (o: { outputFilename: string; }) => m(
+    this.ERROR_UnableToWrite, `Output file for '${def(o.outputFilename)}
+    ' could not be written.`);
+
+  static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
+  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, output: string; }) => m(
+    this.ERROR_UnsupportedCharactersDetected, `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key (${def(o.key)}) at keyMap index ${def(o.keymap_index)}`);
+
+  }

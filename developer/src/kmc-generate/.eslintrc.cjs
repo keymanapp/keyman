@@ -14,8 +14,5 @@ module.exports = {
       files:"src/**/*.ts",
       extends: ["../../../common/tools/eslint/eslintNoNodeImports.js"],
     }
-  ],
-  rules: {
-    "prefer-const": 1,
-  },
+  ]
 };

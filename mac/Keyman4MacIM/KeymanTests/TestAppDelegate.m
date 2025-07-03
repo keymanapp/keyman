@@ -35,13 +35,6 @@
   return _contextBuffer;
 }
 
-- (void)setContextBuffer:(NSMutableString *)contextBuffer {
-  _contextBuffer = [contextBuffer mutableCopy];
-  if (_contextBuffer.length)
-    [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
-  [self.kme setCoreContextIfNeeded:self.contextBuffer];
-}
-
 -(NSEvent *)keyStrokeEventForCharacter:(NSString *)character keyCode:(unsigned short) keyCode {
   return [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSZeroPoint modifierFlags:0 timestamp:NSTimeIntervalSince1970 windowNumber:0 context:nil characters:character charactersIgnoringModifiers:character isARepeat:NO keyCode:keyCode];
 }
