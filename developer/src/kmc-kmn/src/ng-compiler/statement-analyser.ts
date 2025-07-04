@@ -12,7 +12,8 @@ import { TokenTypes } from "./token-types.js";
 import { PlainTextRule } from "./kmn-analyser.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";
-import { ASTNode, NodeTypes } from "./tree-construction.js";
+import { NodeTypes } from "./node-types.js";
+import { ASTNode } from "./tree-construction.js";
 
 abstract class AbstractBracketedStoreNameStatementRule extends SingleChildRule {
   protected leftBracket: Rule;

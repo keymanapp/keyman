@@ -10,7 +10,8 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+import { NodeTypes } from "../../src/ng-compiler/node-types.js";
+import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule, ResetStoreRule, ShiftFreesCapsRule, StoreNameRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyser.js';

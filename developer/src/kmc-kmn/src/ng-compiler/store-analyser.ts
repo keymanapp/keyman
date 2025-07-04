@@ -13,7 +13,8 @@ import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, ManyRule, OptionalRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
-import { ASTNode, NodeTypes } from "./tree-construction.js";
+import { NodeTypes } from "./node-types.js";
+import { ASTNode } from "./tree-construction.js";
 
 
 

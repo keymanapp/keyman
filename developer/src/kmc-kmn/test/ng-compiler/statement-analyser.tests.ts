@@ -10,7 +10,8 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { ASTNode, NodeTypes } from '../../src/ng-compiler/tree-construction.js';
+import { NodeTypes } from "../../src/ng-compiler/node-types.js";
+import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
 import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, PlatformStatementRule, SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyser.js';

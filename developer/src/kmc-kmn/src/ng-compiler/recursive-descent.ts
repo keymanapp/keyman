@@ -9,7 +9,8 @@
 import { TokenTypes } from "./token-types.js";
 import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTNode, NodeTypes } from "./tree-construction.js";
+import { NodeTypes } from "./node-types.js";
+import { ASTNode } from "./tree-construction.js";
 
 export abstract class Rule { // equivalent to a no-child rule
   protected static _tokenBuffer: TokenBuffer = null;

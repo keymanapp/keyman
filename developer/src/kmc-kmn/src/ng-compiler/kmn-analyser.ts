@@ -4,7 +4,7 @@
  * Created by Dr Mark C. Sinclair on 2025-03-18
  *
  * KMC KMN Next Generation Parser (Recursive Descent/KMN Analyser)
- *NotAny
+ *
  * KMN Analyser Tests
  */
 
@@ -14,7 +14,8 @@ import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule } from "./store-analyser.js";
-import { ASTNode, NodeTypes } from "./tree-construction.js";
+import { NodeTypes } from "./node-types.js";
+import { ASTNode } from "./tree-construction.js";
 
 export class KmnTreeRule extends SingleChildRule {
   public constructor() {
