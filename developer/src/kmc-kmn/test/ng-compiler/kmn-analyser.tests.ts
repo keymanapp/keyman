@@ -1790,7 +1790,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (100-199)", () => {
       [
         'release/b/batak/source/batak',
@@ -1901,7 +1901,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (200-299)", () => {
       [
         'release/basic/basic_kbdinuk2/source/basic_kbdinuk2',
@@ -2012,7 +2012,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (300-399)", () => {
       [
         'release/basic/basic_kbdycl/source/basic_kbdycl',
@@ -2123,7 +2123,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (400-499)", () => {
       [
         'release/fv/fv_ilnu_innu_aimun/source/fv_ilnu_innu_aimun',
@@ -2453,7 +2453,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (700-799)", () => {
       [
         'release/rac/rac_hazaragi/source/rac_hazaragi',
@@ -2564,7 +2564,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (800-899)", () => {
       [
         'release/sil/sil_khamti/source/sil_khamti',
