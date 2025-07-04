@@ -18,50 +18,6 @@ import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keyl
 
 import boxXmlArray = util.boxXmlArray;
 
-//.modifier[k]['@_keys']
-
-
-export function remove_text(o: any, x: string): void {
-console.log("ooooooooooooo",o);
-
-console.log(" o.item ", o.layout);
-console.log(" o.item ", o.layout['@_mapSet']);
-//console.log(" o.item ", o.['@_first']);
-console.log(" o.item", o['@_text'],"----", o['@_text']==="",o['@_text']==='\n        \n    ');
-
-
-// assume tagName is the name of the tag you want to remove
-//const tagsToRemove = o.getElementsByTagName('@_text');
-//const tagsToRemove = o.layout['@_mapSet']
-const tagsToRemove = o.layout
-console.log("tagsToRemove ",/*tagsToRemove.length,*/tagsToRemove);
-
-for (let i = 4 - 1; i >= 0; i -- ) {
-tagsToRemove[i].parentNode.removeChild(tagsToRemove[i]);
-}
-
-
-if(o['@_text']==='\n        \n    ')
-  o.remove(o['@_text'])
-
-if(o.item[0]==="@'_first'")
-  console.log("_first_first ",);
-
-
-
-  if (typeof o == 'object' && !Array.isArray(o[x])) {
-    if (o[x] === null || o[x] === undefined) {
-      o[x] = [];
-    }
-    else {
-      o[x] = [o[x]];
-    }
-  }
-
-}
-
-
-
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
@@ -71,15 +27,8 @@ export class KeylayoutFileReader {
    * @returns true if valid, false if invalid
    */
 
-  //public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
   public validate(source: KeylayoutXMLSourceFile): boolean {
-    // public validate(source: any): boolean {
     console.log("SchemaValidators.default.keylayout(source) ", SchemaValidators.default.keylayout(source));
-
-
-    //SchemaValidators.default.keylayout(source);
-
-
 
     if (!SchemaValidators.default.keylayout(source)) {
       console.log("SchemaValidators.default.keylayout).errors ", (<any>SchemaValidators.default.keylayout).errors);
@@ -105,23 +54,40 @@ export class KeylayoutFileReader {
    */
   public boxArray(source: any) {
 
-//remove_text(source.layouts, 'layout')
-
-
     boxXmlArray(source.layouts, 'layout');
-    boxXmlArray(source.terminators, 'when');
-    boxXmlArray(source, 'keyMapSet');
-    boxXmlArray(source.keyMapSet, 'keyMap');
-    boxXmlArray(source.action, 'actions');
 
+    //_S2 todo do not use remove_text in util.ts!!
     boxXmlArray(source?.modifierMap, 'keyMapSelect');
     for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
       boxXmlArray(keyMapSelect, 'modifier');
     }
+
+    if (!Array.isArray(source?.keyMapSet) === false) {
+      for (let i = 0; i < source?.keyMapSet.length; i++) {
+        for (const keyMap of source?.keyMapSet[i]?.keyMap) {
+          boxXmlArray(keyMap, 'key');
+        }
+        boxXmlArray(source.keyMapSet[i], 'keyMap');
+      }
+    } else {
+      for (const keyMap of source?.keyMapSet?.keyMap) {
+        boxXmlArray(keyMap, 'key');
+      }
+      boxXmlArray(source.keyMapSet, 'keyMap');
+      // keyMapSet is the only top level tag that might occur several times
+      boxXmlArray(source, 'keyMapSet');
+    }
+
     boxXmlArray(source?.actions, 'action');
     for (const action of source?.actions?.action) {
       boxXmlArray(action, 'when');
     }
+
+    boxXmlArray(source.terminators, 'when');
+    for (const action of source?.actions?.action) {
+      boxXmlArray(action, 'when');
+    }
+
     return source;
   }
 
@@ -133,64 +99,19 @@ export class KeylayoutFileReader {
   public read(inputFilename: string): KeylayoutXMLSourceFile {
 
     const options = {
-      /*ignoreAttributes: false,
-      attributeNamePrefix: '@_',   // to access the attribute
-      ignoreDeclaration: true,
-      parseTagValue: false,  // does this prevent output of  #text ????,
-      // trimValues: false,           // preserve spaces
-      trimValues: true,
-      textNodeName: "##text",*/
-
-
-
-
-       //ignoreAttributes: false,
-
-     ignoreAttributes: [''],
-      //ignoreAttributes: /^[ ]/,
-      //trimValues: true,   // prevents '#text' but then cannot use ' ' as output character
-      trimValues: false,  //_S2 was true !!!
-      textNodeName: "#_text",
-      parseTagValue: false,  // does this prevent output of  #text ????,
-      attributeNamePrefix: '@_',   // to access the attribute
+      ignoreAttributes: [''],
+      trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (whitespace)
+      textNodeName: "#_text",       // #_text will be added for textnodes and will be removed later ( in remove_text() in boxXmlArray 
+      parseTagValue: false,
+      attributeNamePrefix: '@_',    // to access the attribute
       ignoreDeclaration: true
-
-
-
-  /*
-      ignoreAttributes: false,
-      //ignoreAttributes: ['#text', ''],
-      //ignoreAttributes: (aName) => aName.startsWith('ou')  === 'tag.tag2'
-      //ignoreAttributes: false,
-     //ignoreAttributes: (/^[ ]/gm),
-      //ignoreAttributes: [/^[ ]/gm],
-      //ignoreAttributes: [/^[ ]/gm],
-      //ignoreAttributes: ('#text', jPath) => aName.startsWith('#tex'),
-      //trimValues: true,   // prevents '#text' but then cannot use ' ' as output character
-      trimValues: false,  //_S2 was true !!!
-      //textNodeName: "##text",
-      parseTagValue: false,  // does this prevent output of  #text ????,
-      attributeNamePrefix: '@_',   // to access the attribute
-      ignoreDeclaration: true
-
-
-  
-  
-  suppressBooleanAttributes?: boolean;
-  allowBooleanAttributes?: boolean;
-      stopNodes?: string[];
-  allowBooleanAttributes?: boolean;
-  
-  cdataPropName?: false | string;
-  tagValueProcessor?: (tagName: string, tagValue: string, jPath: string, hasAttributes: boolean, isLeafNode: boolean) => unknown;
-*/
     };
 
     try {
       const xmlFile = this.callbacks.fs.readFileSync(inputFilename, 'utf8');
       const parser = new XMLParser(options);
-      const jsonObj = parser.parse(xmlFile);       // get plain Object
-      this.boxArray(jsonObj.keyboard);       // jsonObj now contains arrays; no single fields
+      const jsonObj = parser.parse(xmlFile);      // get plain Object
+      this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
     catch (err) {

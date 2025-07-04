@@ -50,7 +50,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Polish.keylayout')],
       [makePathToFixture('../data/French.keylayout')],
       [makePathToFixture('../data/Latin_American.keylayout')],
-     // [makePathToFixture('../data/German_complete.keylayout')],
+      //[makePathToFixture('../data/German_complete.keylayout')],
       [makePathToFixture('../data/German_complete_reduced.keylayout')],
      // [makePathToFixture('../data/German_Standard.keylayout')],
     ].forEach(function (files_) {

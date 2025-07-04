@@ -23,16 +23,10 @@
         "actions": {
           "additionalProperties": false,
           "properties": {
-            "#_text": {
-              "type": "string"
-            },
             "action": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "#_text": {
-                    "type": "string"
-                  },
                   "@_id": {
                     "type": "string"
                   },
@@ -40,9 +34,6 @@
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#_text": {
-                          "type": "string"
-                        },
                         "@_next": {
                           "type": "string"
                         },
@@ -77,9 +68,6 @@
           "items": {
             "additionalProperties": false,
             "properties": {
-              "#_text": {
-                "type": "string"
-              },
               "@_id": {
                 "type": "string"
               },
@@ -87,9 +75,6 @@
                 "items": {
                   "additionalProperties": false,
                   "properties": {
-                    "#_text": {
-                      "type": "string"
-                    },
                     "@_baseIndex": {
                       "type": "string"
                     },
@@ -103,9 +88,6 @@
                       "items": {
                         "additionalProperties": false,
                         "properties": {
-                          "#_text": {
-                            "type": "string"
-                          },
                           "@_action": {
                             "type": "string"
                           },
@@ -142,16 +124,10 @@
         "layouts": {
           "additionalProperties": false,
           "properties": {
-            "#_text": {
-              "type": "string"
-            },
             "layout": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "#_text": {
-                    "type": "string"
-                  },
                   "@_first": {
                     "type": "string"
                   },
@@ -179,9 +155,6 @@
         "modifierMap": {
           "additionalProperties": false,
           "properties": {
-            "#_text": {
-              "type": "string"
-            },
             "@_defaultIndex": {
               "type": "string"
             },
@@ -192,9 +165,6 @@
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "#_text": {
-                    "type": "string"
-                  },
                   "@_mapIndex": {
                     "type": "string"
                   },
@@ -202,9 +172,6 @@
                     "items": {
                       "additionalProperties": false,
                       "properties": {
-                        "#_text": {
-                          "type": "string"
-                        },
                         "@_keys": {
                           "type": "string"
                         }
@@ -232,16 +199,10 @@
         "terminators": {
           "additionalProperties": false,
           "properties": {
-            "#_text": {
-              "type": "string"
-            },
             "when": {
               "items": {
                 "additionalProperties": false,
                 "properties": {
-                  "#_text": {
-                    "type": "string"
-                  },
                   "@_output": {
                     "type": "string"
                   },
