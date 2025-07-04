@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.77 alpha 2025-07-04
+
+* maint(mac): rename `_do_publish` function to `do_publish` to fix release build (#14273)
+* maint(ios): remove extra `cd` command from ios release builds (#14272)
+* maint(android): remove `--ci` parameter from android builds (#14264)
+* refactor(resources): replace shebang for TC include files (#14265)
+* fix(core): fix failing `common-test-core.sh` script (#14271)
+* maint(common): match OSTYPE correctly on macOS (#14277)
+* fix(common): fix triggering builds if no builds to start (#14274)
+* maint(common): trigger common builds for resources/teamcity/common changes (#14279)
+
 ## 19.0.76 alpha 2025-07-03
 
 * maint(common): move TC configuration for common tests (#14205)
