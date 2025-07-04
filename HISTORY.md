@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.78 alpha 2025-07-04
+
+* docs(developer): Fix links in gestures guide (#14297)
+
 ## 19.0.77 alpha 2025-07-04
 
 * maint(mac): rename `_do_publish` function to `do_publish` to fix release build (#14273)
