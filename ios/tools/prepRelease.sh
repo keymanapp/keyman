@@ -129,11 +129,9 @@ fi
 # Write download info files
 #
 
-cd "${UPLOAD_DIR}"
+write_download_info "${UPLOAD_DIR}" "${KMEI_DST_NAME}" "Keyman Engine for iOS" zip ios
+write_download_info "${UPLOAD_DIR}" "${KEYMANAPP_IPA_DST}" "Keyman for iPhone and iPad" ipa ios
 
-write_download_info "Keyman Engine for iOS" "${KMEI_DST_NAME}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
-write_download_info "Keyman for iPhone and iPad" "${KEYMANAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
-
-if [ ${RELEASE_OEM_FIRSTVOICES} = true ]; then
-  write_download_info "FirstVoices Keyboards" "${FIRSTVOICESAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
+if [[ ${RELEASE_OEM_FIRSTVOICES} = true ]]; then
+  write_download_info "${UPLOAD_DIR}" "${FIRSTVOICESAPP_IPA_DST}" "FirstVoices Keyboards" ipa ios
 fi
