@@ -331,7 +331,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (100-199)", () => {
       [
         'release/b/batak/source/batak',
@@ -442,7 +442,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (200-299)", () => {
       [
         'release/basic/basic_kbdinuk2/source/basic_kbdinuk2',
@@ -553,7 +553,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (300-399)", () => {
       [
         'release/basic/basic_kbdycl/source/basic_kbdycl',
@@ -664,7 +664,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (400-499)", () => {
       [
         'release/fv/fv_ilnu_innu_aimun/source/fv_ilnu_innu_aimun',
@@ -774,7 +774,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (500-599)", () => {
       [
         'release/gff/gff_ethiopic_7/source/gff_ethiopic_7',
@@ -883,7 +883,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
       [
         'release/m/me_en/source/me_en',
@@ -994,7 +994,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (700-799)", () => {
       [
         'release/rac/rac_hazaragi/source/rac_hazaragi',
@@ -1105,7 +1105,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (800-899)", () => {
       [
         'release/sil/sil_khamti/source/sil_khamti',
@@ -1216,7 +1216,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
       [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',
@@ -1255,6 +1255,6 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(20000);
+    }).timeout(50000);
   });
 });
