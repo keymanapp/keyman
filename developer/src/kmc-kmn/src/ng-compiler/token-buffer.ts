@@ -6,7 +6,8 @@
  * KMC KMN Next Generation Parser (TokenBuffer)
  */
 
-import { Token, TokenTypes } from "./lexer.js";
+import { TokenTypes } from "./token-types.js";
+import { Token } from "./lexer.js";
 
 export class TokenBuffer {
   private list: Token[];

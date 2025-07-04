@@ -8,7 +8,7 @@
  * KMN Analyser Tests
  */
 
-import { TokenTypes } from "./lexer.js";
+import { TokenTypes } from "./token-types.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";

@@ -8,7 +8,8 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { Lexer, Token, TokenTypes } from '../../src/ng-compiler/lexer.js';
+import { TokenTypes } from '../../src/ng-compiler/token-types.js';
+import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { readFileSync } from 'fs';
 

@@ -6,7 +6,8 @@
  * KMC KMN Next Generation Parser (Recursive Descent/Kleene Operator Rules)
  */
 
-import { Token, TokenTypes } from "./lexer.js";
+import { TokenTypes } from "./token-types.js";
+import { Token } from "./lexer.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
 

@@ -8,7 +8,7 @@
  * Statement Rule Tests
  */
 
-import { TokenTypes } from "./lexer.js";
+import { TokenTypes } from "./token-types.js";
 import { PlainTextRule } from "./kmn-analyser.js";
 import { AlternateRule, OneOrManyRule, Rule, SequenceRule, SingleChildRule, TokenRule } from "./recursive-descent.js";
 import { NormalStoreNameRule, StoreNameRule, SystemStoreNameRule } from "./store-analyser.js";

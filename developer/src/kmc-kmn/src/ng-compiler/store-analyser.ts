@@ -8,11 +8,13 @@
  * System and Normal Store Rule Tests
  */
 
+import { TokenTypes } from "./token-types.js";
+import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
-import { Token, TokenTypes } from "./lexer.js";
 import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, ManyRule, OptionalRule } from "./recursive-descent.js";
 import { OneOrManyRule  } from "./recursive-descent.js";
 import { ASTNode, NodeTypes } from "./tree-construction.js";
+
 
 
 export class SystemStoreAssignRule extends SingleChildRule {
