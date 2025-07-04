@@ -8,7 +8,7 @@ Keyman Developer offers **Longpress** keys, **Flicks**, and **Multitaps** for to
 
 ## Tips
 
-***Flicks** and **long presses** can both be used in a single keyboard. In this scenario, it is recommended to use flicks in only one direction—south (down). Long presses work well alongside this pattern. See, for example, [sil_euro_latin](/keyboard/sil_euro_latin/3.0.3/sil_euro_latin#toc-mobile-keyboard-layout). 
+***Flicks** and **long presses** can both be used in a single keyboard. In this scenario, it is recommended to use flicks in only one direction—south (down). Long presses work well alongside this pattern. See, for example, [sil_euro_latin](https://help.keyman.com/keyboard/sil_euro_latin/3.0.3/sil_euro_latin#toc-mobile-keyboard-layout). 
     * Another helpful tip seen in the sil_euro_latin keyboard is using south-flicks on the base and shift layers corresponding to the numeric/symbol layer, this aids in both memorization and discovery.
 * **Flicks** in multiple directions are possible, but currently Keyman does not support hints for multiple directions, so they are not very discoverable.
 * **Long presses** are more discoverable, but **flicks** are faster. We suggest using south flicks along with long presses, and including the flick output in the long press for maximum discoverability and optimum ergonomics.
@@ -22,5 +22,5 @@ Keyman Developer offers **Longpress** keys, **Flicks**, and **Multitaps** for to
 
 ## See also
 
-* The [Winchus keyboard](/keyboard/winchus/1.4/winchus#guia-rapida-celular)
-* The [GFF Amharic keyboard](/keyboard/gff_amharic/3.2.1/gff_amharic#toc-using-this-keyboard)
+* The [Winchus keyboard](https://help.keyman.com/keyboard/winchus/1.4/winchus#guia-rapida-celular)
+* The [GFF Amharic keyboard](https://help.keyman.com/keyboard/gff_amharic/3.2.1/gff_amharic#toc-using-this-keyboard)
