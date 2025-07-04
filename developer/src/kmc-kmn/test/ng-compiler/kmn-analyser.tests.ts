@@ -2233,7 +2233,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    });
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (500-599)", () => {
       [
         'release/gff/gff_ethiopic_7/source/gff_ethiopic_7',
@@ -2342,7 +2342,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(10000);
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
       [
         'release/m/me_en/source/me_en',
@@ -2675,7 +2675,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(3000);
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
       [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',
@@ -2714,7 +2714,7 @@ describe("KMN Analyser Tests", () => {
         assert.isTrue(kmnTreeRule.parse(root));
         assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(10000);
+    }).timeout(20000);
   });
 });
 

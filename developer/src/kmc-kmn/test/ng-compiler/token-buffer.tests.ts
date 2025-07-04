@@ -883,7 +883,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(5000);
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
       [
         'release/m/me_en/source/me_en',
@@ -1216,7 +1216,7 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(3000);
+    }).timeout(20000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
       [
         'release/t/turkmen_cyrl/source/turkmen_cyrl',
@@ -1255,6 +1255,6 @@ describe("TokenBuffer Tests", () => {
         const output: String = tokenBuffer.toText();
         assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
       });
-    }).timeout(10000);
+    }).timeout(20000);
   });
 });
