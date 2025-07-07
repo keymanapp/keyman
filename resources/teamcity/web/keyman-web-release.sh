@@ -22,7 +22,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe \
-  "Run tests for native KeymanWeb" \
+  "Build and publish KeymanWeb" \
   "all            run all actions" \
   "configure      install dependencies" \
   "build          build Web + embedded" \
@@ -56,43 +56,18 @@ function _zip_and_upload_artifacts() {
 
   cd "${KEYMAN_ROOT}/web"
 
-  local UPLOAD_DIR="build/upload/$KEYMAN_VERSION"
+  local UPLOAD_DIR="build/upload/${KEYMAN_VERSION}"
 
   ./ci.sh prepare:downloads.keyman.com
 
-  write_download_info "$UPLOAD_DIR" "keymanweb-$KEYMAN_VERSION.zip" KeymanWeb zip web
+  write_download_info "${UPLOAD_DIR}" "keymanweb-${KEYMAN_VERSION}.zip" KeymanWeb zip web
 
-  rsync_args=(
-    '-vrzltp'                                # verbose, recurse, zip, copy symlinks, preserve times, permissions
-    '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
-    '--stats'                                # show statistics for log
-    "--rsync-path=${RSYNC_PATH}"             # path on remote server
-    "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
-    "${KEYMAN_VERSION}"                          # upload the whole build folder
-    "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/web/${KEYMAN_TIER}/" # target server + path
+  (
+    cd build/upload
+    tc_rsync_upload "${KEYMAN_VERSION}" "web/${KEYMAN_TIER}"
   )
 
-  cd build/upload
-
-  local CYGPATH_RSYNC_HOME=$(cygpath -w "$RSYNC_HOME")
-  # DEBUG: echo "${rsync_args[@]}"
-  # DEBUG: MSYS_NO_PATHCONV=1 "C:\\Users\\marc\\source\\repos\\doecho\\Debug\\doecho.exe" "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
-  MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
-
-  cd "${KEYMAN_ROOT}/web"
-
   builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
-}
-
-function _upload_help() {
-  builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  cd "${KEYMAN_ROOT}/resources/build"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
-  cd "${KEYMAN_ROOT}/web"
-
-  builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
 }
 
 function publish_web_action() {
@@ -114,7 +89,7 @@ function publish_web_action() {
   _push_release_to_skeymancom
 
   _zip_and_upload_artifacts
-  _upload_help
+  upload_help "Keyman for Web" web
 
   builder_echo end publish success "Finished publishing KeymanWeb release"
 }

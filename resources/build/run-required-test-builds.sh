@@ -259,7 +259,7 @@ fi
 # Start test builds as required
 #
 
-if (( ${#build_platforms[@]} > 0)); then
+if [[ ! -z ${build_platforms:-} ]] && (( ${#build_platforms[@]:-0} > 0)); then
   builder_echo heading "Start test builds"
   triggerTestBuilds build_platforms $PRNUM
 else
