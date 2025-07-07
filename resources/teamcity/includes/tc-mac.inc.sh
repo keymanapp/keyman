@@ -1,5 +1,7 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
+#
+# Shared functions for any builds that run on Mac agents
 
 ba_mac_unlock_keychain() {
   if [[ -z "${MAC_BUILDAGENT_PASSWORD}" ]]; then

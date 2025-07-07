@@ -106,7 +106,7 @@ function do_publish() {
 
   _publish_to_downloads_keyman_com
   _publish_to_playstore
-  upload_help "Keyman for Android" android
+  tc_upload_help "Keyman for Android" android
 }
 
 if builder_has_option --fv; then

@@ -18,7 +18,7 @@ web_install_dependencies_on_linux_action() {
 }
 
 _install_playwright_dependencies() {
-  if ! is_ubuntu || ! is_os_version_or_higher 24.04; then
+  if ! is_ubuntu || ! ba_linux_is_os_version_or_higher 24.04; then
     return 0
   fi
 

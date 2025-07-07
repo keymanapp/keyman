@@ -10,10 +10,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/linux/linux-actions.inc.sh"
 
 ################################ Main script ################################
 
@@ -141,7 +141,7 @@ if builder_has_action all; then
   linux_install_dependencies_action
   _install_additional_dependencies
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   linux_build_action
   linux_unit_tests_action --no-integration
@@ -150,7 +150,7 @@ else
   builder_run_action  configure   linux_install_dependencies_action
   builder_run_action  configure   _install_additional_dependencies
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       linux_build_action
   builder_run_action  test        linux_unit_tests_action --no-integration
