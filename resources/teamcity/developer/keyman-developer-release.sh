@@ -95,9 +95,9 @@ function _publish_to_downloads_keyman_com() {
   (
     cd "${KEYMAN_ROOT}/developer"
 
-    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP COMPRESS_CMD
+    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP
     # shellcheck disable=SC2154
-    UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+    UPLOAD_PATH="${KEYMAN_ROOT}/developer/upload/${KEYMAN_VERSION}"
     KEYBOARDS_PATH="${UPLOAD_PATH}/keyboards"
     KMCOMP_ZIP="kmcomp-${KEYMAN_VERSION}.zip"
     DEVELOPER_EXE="keymandeveloper-${KEYMAN_VERSION}.exe"
@@ -106,17 +106,8 @@ function _publish_to_downloads_keyman_com() {
     rm -rf "${UPLOAD_PATH}"
     mkdir -p "${UPLOAD_PATH}"
 
-    (
-      cd bin
-      cp "${KEYMAN_ROOT}/common/schemas/keyboard_info/keyboard_info.schema.json" .
-
-      # shellcheck disable=SC2154
-      COMPRESS_CMD="${SEVENZ_HOME}/7z"
-
-      "${COMPRESS_CMD}" a -bd -bb0 "../${UPLOAD_PATH}/${KMCOMP_ZIP}" kmconvert.exe keyboard_info.schema.json xml/layoutbuilder/*.keyman-touch-layout projects/ server/
-    )
-
-    cp "release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${KMCOMP_ZIP}"    "${UPLOAD_PATH}/"
 
     write_download_info "${UPLOAD_PATH}" "${DEVELOPER_EXE}" "Keyman Developer" exe win
     write_download_info "${UPLOAD_PATH}" "${KMCOMP_ZIP}" "Keyman Developer Command-Line Compiler" zip win
@@ -124,12 +115,12 @@ function _publish_to_downloads_keyman_com() {
     mkdir -p "${KEYBOARDS_PATH}"
     cp -r "${KEYMAN_ROOT}/common/test/keyboards"/*/build/*.kmp "${KEYBOARDS_PATH}/"
 
-    if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
-      cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
+    if [[ -f "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
+      cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
       write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Developer debug files" zip win
     fi
 
-    cd upload
+    cd "${KEYMAN_ROOT}/developer/upload"
     # shellcheck disable=SC2154
     tc_rsync_upload "${KEYMAN_VERSION}" "developer/${KEYMAN_TIER}"
   )
