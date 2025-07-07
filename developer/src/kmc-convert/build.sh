@@ -29,10 +29,26 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
+do_kmc_convert_test() {
+
+  builder_echo heading "Creating keylayout.schema.JSON"
+  cd $KEYMAN_ROOT/resources/standards-data/keylayout/
+  ./create_keylayout_schema.sh
+
+  builder_echo heading "Creating keylayout.schema.validator"
+  cd $KEYMAN_ROOT/common/web/types
+  ./build.sh configure
+
+  builder_echo heading "Starting kmc-convert test"
+  cd $KEYMAN_ROOT/developer/src/kmc-convert
+}
+
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure   verify_npm_setup
 builder_run_action build       tsc --build
 builder_run_action api         api-extractor run --local --verbose
+
+builder_run_action test        do_kmc_convert_test
 
 do_test() {
   eslint .
@@ -47,3 +63,4 @@ do_test() {
 
 builder_run_action test        do_test
 builder_run_action publish     builder_publish_npm
+

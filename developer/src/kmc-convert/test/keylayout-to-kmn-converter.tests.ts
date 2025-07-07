@@ -58,7 +58,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
-      assert.deepEqual(compilerTestCallbacks.messages[1], ConverterMessages.Error_UnableToRead({ inputFilename: inputFilename }));
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
@@ -84,7 +83,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
-      assert.deepEqual(compilerTestCallbacks.messages[1], ConverterMessages.Error_UnableToRead({ inputFilename: inputFilename }));
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {

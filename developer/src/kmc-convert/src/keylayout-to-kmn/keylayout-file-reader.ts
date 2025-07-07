@@ -24,11 +24,8 @@ export class KeylayoutFileReader {
    */
 
   public validate(source: KeylayoutXMLSourceFile): boolean {
-    console.log("SchemaValidators.default.keylayout(source) ", SchemaValidators.default.keylayout(source));
 
     if (!SchemaValidators.default.keylayout(source)) {
-      console.log("SchemaValidators.default.keylayout).errors ", (<any>SchemaValidators.default.keylayout).errors);
-
       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
         this.callbacks.reportMessage(ConverterMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
