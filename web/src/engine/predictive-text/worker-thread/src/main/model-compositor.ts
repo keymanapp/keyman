@@ -286,7 +286,7 @@ export class ModelCompositor {
     // when reverting.
     if(contextState.tail.replacement) {
       console.log(contextState.tail.replacement);
-      
+
       // No trace of the original text (currently) remains (end of day 2025-01-17)
       //
       // Or is there one?  I found a tagged 'keep', even if not in the standard position within replacements.
@@ -328,12 +328,13 @@ export class ModelCompositor {
       let substitutionTokenIndex = (contextState.tokens.length - 1) - matchResults.headTokensRemoved;
 
       const tokenizer = determineModelTokenizer(this.lexicalModel)
-      // TODO:  
       let tokenizedApplication = tokenizeTransform(tokenizer, context, suggestion.transform);
 
       // We build our suggestions to do whole-word replacement.  Fortunately, that means we already have
       // the full suggestions!
       const suggestions = contextState.tail.replacements;
+
+      // FIXME: Does not handle cases where the prior context is an applied suggestion, thus already has the wordbreak!
       if(suggestions && (substitutionTokenIndex + tokenizedApplication.length == matchResults.state.tokens.length)) {
 
         for(let j = 1; j <= tokenizedApplication.length; j++) {
