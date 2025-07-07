@@ -310,6 +310,7 @@ export async function correctAndEnumerate(
 
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
+      preContextState: contextState,
       postContextState: postContextState,
       rawPredictions: predictions
     }
@@ -413,9 +414,9 @@ export async function correctAndEnumerate(
  * suggestions based on the current state of the context, altering the 'keep' suggestion
  * into a 'revert' suggestion that will restore the original input.
  * @param postContextState
- * @param inputTransform 
- * @param punctuation 
- * @returns 
+ * @param inputTransform
+ * @param punctuation
+ * @returns
  */
 export function suggestFromPriorContext(
   postContextState: TrackedContextState,
@@ -437,7 +438,7 @@ export function suggestFromPriorContext(
   // First up:  we can safely use the raw insert string as the needed length to erase.
   // Also, we need to include whatever backspacing occured to reach that point, as the suggestion
   // is applied to the context BEFORE the backspace takes effect.
-  const deleteLeft = appliedSuggestion.suggestion.transform.insert.kmwLength() + inputTransform.deleteLeft;
+  const deleteLeft = KMWString.length(appliedSuggestion.suggestion.transform.insert) + inputTransform.deleteLeft;
   suggestions.forEach((entry) => {
     entry.suggestion.transform.deleteLeft = deleteLeft;
     if(inputTransform.id) {
@@ -724,12 +725,12 @@ export function processSimilarity(
  * unexpected ways.  For example, when typing numbers in English, we don't expect
  * '5' to auto-correct to '5th' just because there are no pure-number entries in
  * the lexicon rooted on '5'.
- * @param correction 
- * @returns 
+ * @param correction
+ * @returns
  */
 export function correctionValidForAutoSelect(correction: string) {
   let chars = [...correction];
-  
+
   // If the _correction_ - the actual, existing text - does not include any letters,
   // then predictions built upon it should not be considered valid for auto-correction.
   for(let c of chars) {
