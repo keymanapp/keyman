@@ -773,11 +773,10 @@ export class SuggestionBanner extends Banner {
       if(suggestions.length > i) {
         const suggestion = suggestions[i];
         d.update(suggestion, optionFormat);
-        if(this.predictionContext.selected == suggestion) {
-          d.highlight(true);
-        }
+        d.highlight(this.predictionContext.selected == suggestion);
       } else {
         d.update(null, optionFormat);
+        d.highlight(false);
       }
     }
 
