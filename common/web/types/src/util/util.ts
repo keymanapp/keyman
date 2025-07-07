@@ -1,19 +1,6 @@
 import { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE } from './consts.js';
 export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
 
-
-/**
- * If object contains attribute #text this will be removed
- * this is to box them ourselves as needed. Ensures that o.x is an array.
- *
- * @param o Object with possible property #text
- */
-export function remove_text(o: any): void {
-  if (o['#_text'] ) {
-    delete o['#_text'];
-  }
-}
-
 /**
  * xml2js will not place single-entry objects into arrays. Easiest way to fix
  * this is to box them ourselves as needed. Ensures that o.x is an array.
@@ -22,11 +9,6 @@ export function remove_text(o: any): void {
  * @param x Name of element to box
  */
 export function boxXmlArray(o: any, x: string): void {
-
-  /*if (o['#_text'] ) {
-    delete o['#_text'];
-  }*/
-  remove_text(o)
 
   if (typeof o == 'object' && !Array.isArray(o[x])) {
     if (o[x] === null || o[x] === undefined) {

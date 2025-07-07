@@ -12,16 +12,12 @@ import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import { SchemaValidators } from '@keymanapp/common-types';
-
-// _S2 which folder should keylayout-xml.js live??
 import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
-
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
-
 
   /**
    * @returns true if valid, false if invalid
@@ -46,6 +42,28 @@ export class KeylayoutFileReader {
     return true;
   }
 
+  /**
+   * If object contains attribute #text it will be removed.
+   * @param o Object with possible property #text
+   * @return objects that do not contain  property #text
+   */
+  public remove_whitespace(o: any): void {
+    if (o['#text']) {
+      delete o['#text'];
+    }
+  }
+
+  /**
+   * @brief wrapper to remove whitespace and box single-entry objects into arrays
+   * @param o Object with property to box/remove whitespace from
+   * @param x Name of element to box
+   * @return objects that contain only boxed arrays
+   */
+  public removeWhitespace_boxArray(o: any, x: string): void {
+
+    this.remove_whitespace(o);
+    boxXmlArray(o, x);
+  }
 
   /**
    * @brief  member function to box single-entry objects into arrays
@@ -54,38 +72,39 @@ export class KeylayoutFileReader {
    */
   public boxArray(source: any) {
 
-    boxXmlArray(source.layouts, 'layout');
+    this.remove_whitespace(source);
 
-    //_S2 todo do not use remove_text in util.ts!!
-    boxXmlArray(source?.modifierMap, 'keyMapSelect');
+    this.removeWhitespace_boxArray(source.layouts, 'layout');
+
+    this.removeWhitespace_boxArray(source?.modifierMap, 'keyMapSelect');
     for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
-      boxXmlArray(keyMapSelect, 'modifier');
+      this.removeWhitespace_boxArray(keyMapSelect, 'modifier');
     }
 
+    // keyMapSet is the only top level tag that might occur several times => we need to consider 2 cases
     if (!Array.isArray(source?.keyMapSet) === false) {
       for (let i = 0; i < source?.keyMapSet.length; i++) {
         for (const keyMap of source?.keyMapSet[i]?.keyMap) {
-          boxXmlArray(keyMap, 'key');
+          this.removeWhitespace_boxArray(keyMap, 'key');
         }
-        boxXmlArray(source.keyMapSet[i], 'keyMap');
+        this.removeWhitespace_boxArray(source.keyMapSet[i], 'keyMap');
       }
     } else {
       for (const keyMap of source?.keyMapSet?.keyMap) {
-        boxXmlArray(keyMap, 'key');
+        this.removeWhitespace_boxArray(keyMap, 'key');
       }
-      boxXmlArray(source.keyMapSet, 'keyMap');
-      // keyMapSet is the only top level tag that might occur several times
-      boxXmlArray(source, 'keyMapSet');
+      this.removeWhitespace_boxArray(source.keyMapSet, 'keyMap');
+      this.removeWhitespace_boxArray(source, 'keyMapSet');
     }
 
-    boxXmlArray(source?.actions, 'action');
+    this.removeWhitespace_boxArray(source?.actions, 'action');
     for (const action of source?.actions?.action) {
-      boxXmlArray(action, 'when');
+      this.removeWhitespace_boxArray(action, 'when');
     }
 
-    boxXmlArray(source.terminators, 'when');
+    this.removeWhitespace_boxArray(source.terminators, 'when');
     for (const action of source?.actions?.action) {
-      boxXmlArray(action, 'when');
+      this.removeWhitespace_boxArray(action, 'when');
     }
 
     return source;
@@ -93,15 +112,15 @@ export class KeylayoutFileReader {
 
   /**
    * @brief  member function to parse data from a .keylayout-file and store to a json object
-   * @param  absolutefilename the ukelele .keylayout-file to be parsed
+   *         we need to be able to ignore an output character of "", process an output character of " " (space) and allow surrounding whitespace in #text (which will be removed later)
+   * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
    */
   public read(inputFilename: string): KeylayoutXMLSourceFile {
 
     const options = {
-      ignoreAttributes: [''],
-      trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (whitespace)
-      textNodeName: "#_text",       // #_text will be added for textnodes and will be removed later ( in remove_text() in boxXmlArray 
+      ignoreAttributes: [''],       // we do not process an output character of ""
+      trimValues: false,            // we do not trim values because if we do we cannot process an output character of " " (space)
       parseTagValue: false,
       attributeNamePrefix: '@_',    // to access the attribute
       ignoreDeclaration: true
@@ -120,5 +139,3 @@ export class KeylayoutFileReader {
     }
   }
 }
-
-

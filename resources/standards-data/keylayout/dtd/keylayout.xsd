@@ -99,7 +99,6 @@
         <xs:attribute name="@_id" />
         <xs:attribute name="@_name" />
         <xs:attribute name="@_maxout" />
-        <xs:attribute name="#_text" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

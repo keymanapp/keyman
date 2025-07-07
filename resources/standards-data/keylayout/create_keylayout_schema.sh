@@ -34,10 +34,6 @@ do
     builder_echo debug "${xsd} -> ${json}"
     (cd .. ; npx -p  jgexml xsd2json ${THIS_SCRIPT_PATH}/"${xsd}"  ${THIS_SCRIPT_PATH}/"${json}") || exit
 
-    #builder_echo debug 'fixup-schema.js' "${json}"
-    # old ldml:  node ../fixup-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
-    node fixup-keylayout-schema.js "${json}" || builder_die "failed to fixup schema ${json}"
-
     mv "${json}" tmp.json
     # reformat with prettier(JQ)
     ${JQ} . -S < tmp.json > "${json}" || (rm tmp.json ; builder_die "failed to transform final schema ${json}")

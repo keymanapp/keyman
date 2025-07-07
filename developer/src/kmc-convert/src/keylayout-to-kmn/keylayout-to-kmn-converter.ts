@@ -12,9 +12,6 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-
-
-// _S2 which folder should keylayout-xml.js live??
 import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 
 export interface convert_object {
@@ -59,10 +56,6 @@ export class KeylayoutToKmnConverter {
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
 
-
-    // to check if it works: validate file with stevens schema file -------------------------------------------------
-
-    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ I will validate ", inputFilename, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
     try {
       if (!KeylayoutReader.validate(jsonO)) {
         return null;
@@ -71,8 +64,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
     }
-    // to check if it works: validate file with stevens schema file -------------------------------------------------
-
 
     if (!jsonO) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
@@ -94,18 +85,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
     }
-
-    /*const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
-    if (!out_Uint8) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
-      return null;
-    }*/
-
-    /*const out_str: string = kmnFileWriter.writeToString(outArray);
-     if (!out_str) {
-       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
-       return null;
-     }*/
 
     return null;
   }
