@@ -16,6 +16,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
 
 ################################ Main script ################################
@@ -106,8 +107,8 @@ function windows_publish_action() {
 
   "${KEYMAN_ROOT}/windows/build.sh" publish
   windows_upload_symbols_to_sentry
-  tc_download_symbol_server_index
-  tc_publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
   tc_upload_help "Keyman for Windows" windows
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"

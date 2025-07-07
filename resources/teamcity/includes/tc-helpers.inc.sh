@@ -32,10 +32,9 @@ is_macos() {
 # Returns 0 if the OS version is greater than or equal to the specified version.
 # Parameter:
 #   $1 - OS version to compare against (e.g., "20.04")
-is_os_version_or_higher() {
+ba_linux_is_os_version_or_higher() {
   if ! is_ubuntu; then
-    builder_warning "This function is only implemented for Ubuntu"
-    return 0  # Not Ubuntu, so we assume the version check is not applicable.
+     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
   fi
 
   local OS_VERSION=$1
@@ -136,32 +135,4 @@ tc_rsync_upload() {
   _tc_rsync \
     "$1" \
     "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/$2"
-}
-
-tc_download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-  (
-    # shellcheck disable=SC2154
-    mkdir -p "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-    # shellcheck disable=SC2164
-    cd "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-
-    # shellcheck disable=SC2154
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/lastid.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/history.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/server.txt" "."
-  )
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-tc_publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-  (
-    # shellcheck disable=SC2164
-    cd "${LOCAL_SYMBOLS_PATH}"
-    tc_rsync_upload "." "${REMOTE_SYMBOLS_PATH}"
-  )
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }

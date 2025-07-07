@@ -16,14 +16,14 @@ linux_additional_test_dependencies_action() {
   builder_echo start additional_dependencies "Installing additional dependencies"
   local TOINSTALL="lcov libdatetime-perl gcovr python3-venv jq"
 
-  if is_os_version_or_higher 24.04; then
+  if ba_linux_is_os_version_or_higher 24.04; then
     TOINSTALL="${TOINSTALL} libgirepository-2.0-dev python3-coverage"
   fi
 
   # shellcheck disable=SC2086
   ba_linux_check_and_install_packages ${TOINSTALL}
 
-  if ! is_os_version_or_higher 24.04; then
+  if ! ba_linux_is_os_version_or_higher 24.04; then
     builder_heading "Installing python3-coverage from pip"
     pip3 install --user coverage
   fi

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # Keyman is copyright (C) SIL Global. MIT License.
+#
+# Shared functions for any builds that run on Linux agents,
+# e.g. linux, android, web, ...
 
 # Returns 0 if the specified package is installed.
 # Parameter:
@@ -111,4 +114,19 @@ ba_linux_stop_xvfb() {
     bash "${PID_FILE}"
     rm -f "${PID_FILE}"
   fi
+}
+
+# Returns 0 if the OS version is greater than or equal to the specified version.
+# Parameter:
+#   $1 - OS version to compare against (e.g., "20.04")
+ba_linux_is_os_version_or_higher() {
+  if ! is_ubuntu; then
+     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
+  fi
+
+  local OS_VERSION=$1
+
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  # shellcheck disable=SC2312
+  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
 }

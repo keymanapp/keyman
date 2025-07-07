@@ -15,6 +15,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
 ################################ Main script ################################
 
@@ -130,8 +131,8 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  tc_download_symbol_server_index
-  tc_publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
   tc_upload_help "api documentation" developer
 }
