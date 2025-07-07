@@ -203,7 +203,6 @@ function __do_upload_to_fastlane() {
       export PILOT_GROUPS="Alpha"
     fi
 
-    cd "upload/${KEYMAN_VERSION}"
     command -v fastlane
     # shellcheck disable=SC2154
     fastlane pilot upload \

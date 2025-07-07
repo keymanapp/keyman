@@ -39,7 +39,6 @@ builder_describe \
   test \
   "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
   "archive                                  Copy release artifacts to upload/ and rsync to downloads.keyman" \
-  "--ci+                                    Deprecated build option. Remove in 20.0" \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \

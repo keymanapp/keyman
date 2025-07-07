@@ -69,7 +69,7 @@ function _build_publish() {
   builder_echo end success "publish" "Finished publishing Keyman for macOS"
 }
 
-function _do_publish() {
+function do_publish() {
   _build_publish
   _publish_to_downloads_keyman_com
   tc_upload_help "Keyman for macOS" mac

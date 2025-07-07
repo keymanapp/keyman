@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 # Returns 0 if we're running on Ubuntu.
@@ -22,7 +22,7 @@ is_windows() {
 
 # Returns 0 if we're running on macOS.
 is_macos() {
-  if [[ "${OSTYPE:-}" == "darwin" ]]; then
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
     return 0
   else
     return 1

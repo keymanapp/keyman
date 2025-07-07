@@ -31,7 +31,7 @@ cd "${KEYMAN_ROOT}/android"
 function do_build() {
   "${KEYMAN_ROOT}/android/build.sh" \
     configure,build:engine,sample1,sample2,keyboardharness \
-    --debug --ci
+    --debug
 }
 
 if builder_has_action all; then
