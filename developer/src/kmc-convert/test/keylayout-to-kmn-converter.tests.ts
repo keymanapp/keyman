@@ -21,45 +21,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  // todo remove
-  describe('RunOneFile', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    sut.run(inputFilename);
-    assert.isTrue(true);
-  });
-  
-  // todo remove
-  describe('RunOneFile', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const inputFilename = makePathToFixture('../data/Italian.keylayout');
-    sut.run(inputFilename);
-    assert.isTrue(true);
-  });
-
-  // todo remove
-  describe('RunAllFiles', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      [makePathToFixture('../data/Italian.keylayout')],
-      [makePathToFixture('../data/Italian_command.keylayout')],
-      [makePathToFixture('../data/Swiss_French.keylayout')],
-      [makePathToFixture('../data/Spanish.keylayout')],
-      [makePathToFixture('../data/Swiss_German.keylayout')],
-      [makePathToFixture('../data/US.keylayout')],
-      [makePathToFixture('../data/Polish.keylayout')],
-      [makePathToFixture('../data/French.keylayout')],
-      [makePathToFixture('../data/Latin_American.keylayout')],
-      //[makePathToFixture('../data/German_complete.keylayout')],
-      [makePathToFixture('../data/German_complete_reduced.keylayout')],
-     // [makePathToFixture('../data/German_Standard.keylayout')],
-    ].forEach(function (files_) {
-      sut.run(files_[0]);
-      assert.isTrue(true);
-    });
-  });
-
-
   describe('run() ', function () {
 
     // _S2 can I do this??? - some tests of the run() function might take longer than 2000 ms

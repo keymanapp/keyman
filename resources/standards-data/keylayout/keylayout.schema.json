@@ -5,9 +5,6 @@
     "keyboard": {
       "additionalProperties": false,
       "properties": {
-        "#_text": {
-          "type": "string"
-        },
         "@_group": {
           "type": "string"
         },
@@ -228,8 +225,7 @@
         "keyMapSet",
         "actions",
         "terminators"
-      ],
-      "type": "object"
+      ]
     }
   },
   "required": [
