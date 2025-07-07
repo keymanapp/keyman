@@ -76,8 +76,6 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
-
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
     if (!outArray) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
@@ -89,7 +87,7 @@ export class KeylayoutToKmnConverter {
     // _S2 still write to file - may be removed later
     const out_text_ok: boolean = kmnFileWriter.write(outArray);
     if (!out_text_ok) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
       return null;
     }
 
