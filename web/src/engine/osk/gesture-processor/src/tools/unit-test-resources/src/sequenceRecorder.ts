@@ -41,15 +41,15 @@ export class SequenceRecorder {
   }
 
   public recordingsToJSON() {
-    let arr = [];
+    const arr = [];
 
     // Ensure a deterministic ordering for the recording's sequences.
     // This facilitates copmarison checks needed for unit testing.
-    for(let entry of this.startOrder) {
+    for(const entry of this.startOrder) {
       arr.push(this.records[entry].toJSON());
     }
 
-    let jsonOut: RecordedCoordSequenceSet = {
+    const jsonOut: RecordedCoordSequenceSet = {
       inputs: arr,
       config: this.controller.layoutConfiguration
     }

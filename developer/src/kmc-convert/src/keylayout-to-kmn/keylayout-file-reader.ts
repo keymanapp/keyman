@@ -54,7 +54,6 @@ export class KeylayoutFileReader {
     };
 
     try {
-      //const xmlFile = this.callbacks.fs.readFileSync(this.callbacks.path.join(process.cwd(), KeylayoutToKmnConverter.TEST_SUBFOLDER, KeylayoutToKmnConverter.DATA_SUBFOLDER, this.callbacks.path.basename(inputFilename)), 'utf8');
       const xmlFile = this.callbacks.fs.readFileSync(inputFilename, 'utf8');
       const parser = new XMLParser(options);
       const jsonObj = parser.parse(xmlFile);       // get plain Object

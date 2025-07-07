@@ -3,7 +3,7 @@ import { FloatingOSKView } from 'keyman/engine/osk';
 import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
 
 import ContextManager from './contextManager.js';
-import KeymanEngine from './keymanEngine.js';
+import { KeymanEngine } from './keymanEngine.js';
 
 export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   constructor(

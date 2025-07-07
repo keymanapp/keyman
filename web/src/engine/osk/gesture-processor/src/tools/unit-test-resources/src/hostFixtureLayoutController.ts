@@ -53,14 +53,14 @@ export class HostFixtureLayoutController extends EventEmitter {
   };
 
   private _setup: () => void = function(this: HostFixtureLayoutController) {
-    let config = this.buildBaseFixtureConfig();
+    const config = this.buildBaseFixtureConfig();
     this._recognizer = new GestureRecognizer<any>(null /* TODO */, config);
     this._hostFixture = document.getElementById('host-fixture');
   }.bind(this);
 
   public connect(): Promise<GestureRecognizer<any>> {
     this._loadPromise = new Promise<GestureRecognizer<any>>((resolve, reject) => {
-      let pageLoadHandler = () => {
+      const pageLoadHandler = () => {
         try {
           this._setup();
           this._applyLayoutConfig();

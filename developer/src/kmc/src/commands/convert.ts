@@ -13,7 +13,7 @@ import { Converter, ConverterOptions } from '@keymanapp/kmc-convert';
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
 
 export function declareConvert(program: Command) {
-  let command = program.command('convert <infile...>');
+  const command = program.command('convert <infile...>');
   BaseOptions.addLogLevel(command);
   BaseOptions.addLogFormat(command);
   command

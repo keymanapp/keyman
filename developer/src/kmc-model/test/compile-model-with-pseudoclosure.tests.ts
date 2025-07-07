@@ -13,7 +13,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const PATH = makePathToFixture(MODEL_ID);
 
   describe('specifying custom methods: applyCasing and searchTermToKey', function () {
-    let casingWithPrependedSymbols: LexicalModelTypes.CasingFunction = function(casingName: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: LexicalModelTypes.CasingFunction) {
+    const casingWithPrependedSymbols: LexicalModelTypes.CasingFunction = function(casingName: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: LexicalModelTypes.CasingFunction) {
       switch(casingName) {
         // Use of symbols, and of the `casingName` name, exist to serve as regex targets.
         case 'lower':
@@ -28,9 +28,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
     };
 
     it('variant 1:  applyCasing prepends symbols, searchTermToKey removes them', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         languageUsesCasing: true, // applyCasing won't appear without this!
@@ -62,7 +62,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\^'/);
       assert.match(code, /§/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      const modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
       modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
@@ -77,15 +77,15 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(modelInitCode, /['"]§['"]/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });
 
     it('variant 2:  applyCasing prepends symbols, searchTermToKey keeps them', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         languageUsesCasing: true, // applyCasing won't appear without this!
@@ -111,7 +111,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\+'/);
       assert.match(code, /'\^'/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      const modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
       modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
@@ -122,15 +122,15 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(modelInitCode, /['"]-['"]/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });
 
     it('variant 3:  applyCasing prepends symbols, default searchTermToKey', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         languageUsesCasing: true, // applyCasing won't appear without this!
@@ -150,7 +150,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /'\+'/);
       assert.match(code, /'\^'/);
 
-      let modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
+      const modelInitIndex = code.indexOf('LMLayerWorker.loadModel');
       let modelInitCode = code.substring(modelInitIndex);
       // Chop off the IIFE terminator.  Not strictly necessary, but whatever.
       modelInitCode = modelInitCode.substring(0, modelInitCode.lastIndexOf('\n})();'))
@@ -161,7 +161,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(modelInitCode, /['"]-['"]/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });
@@ -169,9 +169,9 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
 
   describe('relying on default applyCasing + searchTermToKey', function() {
     it('languageUsesCasing: true', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         languageUsesCasing: true, // applyCasing should appear!
@@ -188,15 +188,15 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /languageUsesCasing/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });
 
     it('languageUsesCasing: false', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         languageUsesCasing: false, // applyCasing should not appear!
@@ -214,15 +214,15 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.match(code, /languageUsesCasing/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });
 
     it('languageUsesCasing: undefined', async function() {
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv']
         // languageUsesCasing: undefined
@@ -241,7 +241,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
       assert.notMatch(code, /languageUsesCasing/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });

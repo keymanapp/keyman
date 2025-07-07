@@ -21,7 +21,7 @@ import { outputTargetForElement } from 'keyman/engine/attachment';
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
-declare var keyman: KeymanEngine;
+declare let keyman: KeymanEngine;
 
 // // Makes sure the code below knows that the namespaces exist.
 // namespace com.keyman {
@@ -45,7 +45,7 @@ declare var keyman: KeymanEngine;
 export class Scribe extends EventEmitter {
   //#region Static methods for recording input events
   static recordKeystroke(e: KeyEvent, eventSpec: InputEventSpec) {
-    var recording: RecordedKeystroke;
+    let recording: RecordedKeystroke;
     if(e.isSynthetic) {
       recording = new RecordedSyntheticKeystroke(e);
     } else {
@@ -56,16 +56,16 @@ export class Scribe extends EventEmitter {
   }
 
   static recordKeyboardEvent(e: KeyboardEvent): PhysicalInputEventSpec {
-    let recording = new PhysicalInputEventSpec();
+    const recording = new PhysicalInputEventSpec();
 
     recording.key    = e.key;
     recording.code    = e.code;
     recording.keyCode = e.keyCode;
     recording.location = e.location;
 
-    var flagSet: number = 0;
+    let flagSet: number = 0;
 
-    for(var key in PhysicalInputEventSpec.modifierCodes) {
+    for(const key in PhysicalInputEventSpec.modifierCodes) {
       if(e.getModifierState(key)) {
         flagSet |= PhysicalInputEventSpec.modifierCodes[key];
       }
@@ -77,13 +77,13 @@ export class Scribe extends EventEmitter {
   }
 
   static recordOSKEvent(e: HTMLDivElement): OSKInputEventSpec {
-    let recording = new OSKInputEventSpec();
+    const recording = new OSKInputEventSpec();
     recording.keyID = e.id;
     return recording;
   }
 
   static recordKeyboardStub(activeStub: any, basePath: string): KeyboardStub {
-    let recording = new KeyboardStub();
+    const recording = new KeyboardStub();
 
     recording.id = activeStub.KI;
     recording.id = recording.id.replace('Keyboard_', '');
@@ -97,7 +97,7 @@ export class Scribe extends EventEmitter {
   }
 
   private static _setStubBasePath(filename: string, filePath: string, force?: boolean): string {
-    var linkParser = document.createElement<"a">("a");
+    const linkParser = document.createElement<"a">("a");
     linkParser.href = filePath;
 
     if(force === undefined) {
@@ -105,10 +105,10 @@ export class Scribe extends EventEmitter {
     }
 
     if(force || (filename.indexOf(linkParser.protocol) < 0 && filename.indexOf('/') != 0)) {
-      var file = filename.substr(filename.lastIndexOf('/')+1);
+      const file = filename.substr(filename.lastIndexOf('/')+1);
       return filePath + '/' + file;
     } else {
-      return file;
+      return filePath;
     }
   }
   //#endregion
@@ -180,16 +180,16 @@ export class Scribe extends EventEmitter {
 
   // Time for the 'magic'.  Yay, JavaScript method extension strategies...
   initHooks(recordingElement: HTMLElement) {
-    let recorderScribe = this;
+    const recorderScribe = this;
 
     keyman.hardKeyboard.on('keyevent', (e) => {
-      let in_output = outputTargetForElement(recordingElement);
+      const in_output = outputTargetForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;
       }
 
-      let event = Scribe.recordKeyboardEvent(e.source as KeyboardEvent);
-      let recording = Scribe.recordKeystroke(e, event);
+      const event = Scribe.recordKeyboardEvent(e.source as KeyboardEvent);
+      const recording = Scribe.recordKeystroke(e, event);
 
       // Record the keystroke as part of a test sequence!
       // Miniature delay in case the keyboard relies upon default backspace/delete behavior!
@@ -199,27 +199,27 @@ export class Scribe extends EventEmitter {
     });
 
     keyman.osk.on('keyevent', (e) => {
-      let in_output = outputTargetForElement(recordingElement);
+      const in_output = outputTargetForElement(recordingElement);
       if(!in_output || keyman.contextManager.activeTarget != in_output) {
         return;
       }
 
-      let event = Scribe.recordOSKEvent((e.source).target);
-      let recording = Scribe.recordKeystroke(e, event);
+      const event = Scribe.recordOSKEvent((e.source).target);
+      const recording = Scribe.recordKeystroke(e, event);
 
       // Record the click/touch as part of a test sequence!
       recorderScribe.addInputRecord(recording, in_output.getText());
     });
 
     keyman.contextManager.on('keyboardchange', (kbdTuple) => {
-      let in_output = outputTargetForElement(recordingElement);
+      const in_output = outputTargetForElement(recordingElement);
       // If it's not on our recording control, ignore the change and do nothing special.
       if(!in_output || document.activeElement != in_output.getElement()) {
         return;
       }
 
-      let testDefinition = recorderScribe.testDefinition;
-      var sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == kbdTuple.keyboard.id)
+      const testDefinition = recorderScribe.testDefinition;
+      const sameKbd = (testDefinition.keyboard && ("Keyboard_" + testDefinition.keyboard.id) == kbdTuple.keyboard.id)
         && (!testDefinition.keyboard.getFirstLanguage() || (testDefinition.keyboard.getFirstLanguage() == kbdTuple.metadata.langId));
 
       // if(!testDefinition.isEmpty() && !sameKbd && !recorderScribe.keyboardJustActivated) {
@@ -229,9 +229,9 @@ export class Scribe extends EventEmitter {
       // }
 
       // What's the active stub immediately after our _SetActiveKeyboard call?
-      var internalStub = kbdTuple.metadata;
+      const internalStub = kbdTuple.metadata;
       if(internalStub && (keyman.contextManager.activeTarget == in_output)) {
-        var kbdRecord = Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
+        const kbdRecord = Scribe.recordKeyboardStub(internalStub, 'resources/keyboards');
 
         recorderScribe.emit('stub-changed', JSON.stringify(kbdRecord));
         // var ta_activeStub = document.getElementById('activeStub');

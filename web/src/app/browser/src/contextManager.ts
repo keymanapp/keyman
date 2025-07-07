@@ -112,7 +112,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
           // For design-mode iframes:
 
           // This block:  has to do with maintaining focus.
-          var Lelem=(elem as HTMLIFrameElement).contentWindow.document;
+          const Lelem=(elem as HTMLIFrameElement).contentWindow.document;
           // I2404 - Attach to IFRAMEs child objects, only editable IFRAMEs here
           if(device.browser == 'firefox') {
             this.domEventTracker.attachDOMEvent(Lelem,'focus', this._ControlFocus);
@@ -149,7 +149,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
           // For design-mode iframes:
 
           // This block:  has to do with maintaining focus.
-          let Lelem = (elem as HTMLIFrameElement).contentWindow.document;
+          const Lelem = (elem as HTMLIFrameElement).contentWindow.document;
           // Mozilla      // I2404 - Attach to  IFRAMEs child objects, only editable IFRAMEs here
           if(device.browser == 'firefox') {
             // Firefox won't handle these events on Lelem.body - only directly on Lelem (the doc) instead.
@@ -162,7 +162,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
         }
 
         // This block:  has to do with maintaining focus (and consequences)
-        var lastElem = this.mostRecentTarget?.getElement();
+        const lastElem = this.mostRecentTarget?.getElement();
         if(lastElem && lastElem == elem) {
           this.forgetActiveTarget(); // should already auto-hide the OSK while at it via event.
         }
@@ -268,7 +268,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // We condition on 'priorElement' below as a check to allow KMW to set a default active keyboard.
-    let hadRecentElement = !!previousTarget;
+    const hadRecentElement = !!previousTarget;
 
     // Must set before _Blur / _Focus to avoid infinite recursion due to complications
     // in setActiveKeyboard behavior with managed keyboard settings.
@@ -368,7 +368,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * This is based on the current `.activeTarget` and its related attachment metadata.
    */
   protected currentKeyboardSrcTarget(): OutputTarget<any> {
-    let target = this.currentTarget || this.mostRecentTarget;
+    const target = this.currentTarget || this.mostRecentTarget;
 
     if(this.isTargetKeyboardIndependent(target)) {
       return target;
@@ -378,7 +378,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   }
 
   private isTargetKeyboardIndependent(target: OutputTarget<any>): boolean {
-    let attachmentInfo = target?.getElement()._kmwAttachment;
+    const attachmentInfo = target?.getElement()._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
     return !!(attachmentInfo?.keyboard || attachmentInfo?.keyboard === '');
@@ -386,7 +386,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
   activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget<any>) {
-    let attachment = target?.getElement()._kmwAttachment;
+    const attachment = target?.getElement()._kmwAttachment;
 
     if(!attachment) {
       // if not set with an "independent keyboard", changes the global.
@@ -425,7 +425,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       return;
     }
 
-    let attachment = target.getElement()._kmwAttachment;
+    const attachment = target.getElement()._kmwAttachment;
 
     // Catches if the target is already in independent-mode, even if it's being cancelled
     // during this call.
@@ -504,7 +504,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     try {
-      let result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
+      const result = await super.activateKeyboard(keyboardId, languageCode, saveCookie);
 
       this.engineConfig.alertHost?.wait(); // clear any pending waits.
 
@@ -568,8 +568,8 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    *                      whenever a KMW-enabled page element loses control.
    */
   _BlurKeyboardSettings(lastElem: HTMLElement, PInternalName?: string, PLgCode?: string) {
-    var keyboardID = this.activeKeyboard ? this.activeKeyboard.keyboard.id : '';
-    var langCode = this.activeKeyboard?.metadata.langId;
+    let keyboardID = this.activeKeyboard ? this.activeKeyboard.keyboard.id : '';
+    let langCode = this.activeKeyboard?.metadata.langId;
 
     if(PInternalName !== undefined && PLgCode !== undefined) {
       keyboardID = PInternalName;
@@ -593,7 +593,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    */
   _FocusKeyboardSettings(lastElem: HTMLElement, blockGlobalChange: boolean) {
     // Important pre-condition:  the newly-focused element must be set as active.
-    let attachment = lastElem._kmwAttachment;
+    const attachment = lastElem._kmwAttachment;
     const global = this.globalKeyboard;
 
     if(attachment.keyboard != null) {
@@ -615,7 +615,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   _CommonFocusHelper(outputTarget: OutputTarget<any>): boolean {
     const focusAssistant = this.focusAssistant;
 
-    let activeKeyboard = this.activeKeyboard?.keyboard;
+    const activeKeyboard = this.activeKeyboard?.keyboard;
     if(!focusAssistant.restoringFocus) {
       outputTarget?.deadkeys().clear();
       activeKeyboard?.notify(0, outputTarget, 1);  // I2187
@@ -684,7 +684,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
 
     // Step 1: determine the corresponding OutputTarget instance.
-    let target = eventOutputTarget(e);
+    const target = eventOutputTarget(e);
     if (target == null) {
       return true;
     }
@@ -715,7 +715,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
      */
     this.focusAssistant.restoringFocus = false;
 
-    let activeKeyboard = this.activeKeyboard;
+    const activeKeyboard = this.activeKeyboard;
     const maintainingFocus = this.focusAssistant.maintainingFocus;
     if(!maintainingFocus && activeKeyboard) {
       activeKeyboard.keyboard.notify(0, target, 0);  // I2187
@@ -738,7 +738,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
   doChangeEvent(target: OutputTarget<any>) {
     if(target.changed) {
-      let event = new Event('change', {"bubbles": true, "cancelable": false});
+      const event = new Event('change', {"bubbles": true, "cancelable": false});
       target.getElement().dispatchEvent(event);
     }
 
@@ -756,7 +756,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    **/
   getSavedKeyboardRaw(): string {
     const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
-    var v = cookie.load(decodeURIComponent);
+    const v = cookie.load(decodeURIComponent);
 
     if(typeof(v.current) != 'string') {
       return null;
@@ -776,7 +776,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
    * @return      {string}          InternalName:LanguageCode
    **/
   getSavedKeyboard(): string {
-    let cookieValue = this.getSavedKeyboardRaw();
+    const cookieValue = this.getSavedKeyboardRaw();
 
     // Check that the requested keyboard is included in the available keyboard stubs
     const stubs = this.keyboardCache.getStubList()
@@ -814,13 +814,13 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     const d=kbd;
 
     // Identify the stub with the saved keyboard
-    let t=d.split(':');
+    const t=d.split(':');
     if(t.length < 2) {
       t[1]='';
     }
 
     // Find the matching stub; if it doesn't exist, default to the first available stub.
-    let stub = this.keyboardCache.getStub(t[0], t[1]);
+    const stub = this.keyboardCache.getStub(t[0], t[1]);
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {

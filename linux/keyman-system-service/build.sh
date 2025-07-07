@@ -19,16 +19,17 @@ builder_describe \
   "uninstall                 uninstall artifacts" \
   "--no-integration          don't run integration tests" \
   "--report                  create coverage report" \
-  "--coverage                capture test coverage"
+  "--coverage                capture test coverage" \
+  "--no-werror               don't report warnings as errors"
 
 builder_parse "$@"
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
-# then includes `resources` as a subdir.
 if builder_has_action configure; then
-  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
+
+  # TODO: it would be cleaner to split this from the standard.meson.build file/folder
   cat "${THIS_SCRIPT_PATH}/resources/meson.build.in" >> "${THIS_SCRIPT_PATH}/resources/meson.build"
 fi
 
@@ -41,6 +42,11 @@ else
   MESON_TARGET=release
 fi
 MESON_PATH="build/$(uname -m)/$MESON_TARGET"
+
+MESON_ARGS=--werror
+if builder_has_option --no-werror; then
+  MESON_ARGS=
+fi
 
 clean_action() {
   rm -rf "$THIS_SCRIPT_PATH/build/"
@@ -61,7 +67,7 @@ check_missing_coverage_configuration() {
 
 configure_action() {
   # shellcheck disable=SC2086,SC2154,SC2248
-  meson setup ${MESON_COVERAGE} --werror --buildtype ${MESON_TARGET} "${builder_extra_params[@]}" "${MESON_PATH}"
+  meson setup ${MESON_COVERAGE} ${MESON_ARGS} --buildtype ${MESON_TARGET} "${builder_extra_params[@]}" "${MESON_PATH}"
 }
 
 test_action() {

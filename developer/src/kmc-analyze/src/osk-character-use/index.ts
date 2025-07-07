@@ -82,7 +82,7 @@ export class AnalyzeOskCharacterUse {
   public async analyze(file: string): Promise<boolean> {
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard: {
-        let strings = this.scanVisualKeyboard(file);
+        const strings = this.scanVisualKeyboard(file);
         if(!strings) {
           return false;
         }
@@ -90,7 +90,7 @@ export class AnalyzeOskCharacterUse {
         break;
       }
       case KeymanFileTypes.Source.TouchLayout: {
-        let strings = this.scanTouchLayout(file);
+        const strings = this.scanTouchLayout(file);
         if(!strings) {
           return false;
         }
@@ -122,17 +122,17 @@ export class AnalyzeOskCharacterUse {
   private async analyzeKmnKeyboard(filename: string): Promise<boolean> {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'keyboard source', name:filename}));
 
-    let osk = await getOskFromKmnFile(this.callbacks, filename);
+    const osk = await getOskFromKmnFile(this.callbacks, filename);
 
     if(osk.kvksFilename) {
-      let strings = this.scanVisualKeyboard(osk.kvksFilename);
+      const strings = this.scanVisualKeyboard(osk.kvksFilename);
       if(!strings) {
         return false;
       }
       this.addStrings(strings, osk.kvksFilename);
     }
     if(osk.touchLayoutFilename) {
-      let strings = this.scanTouchLayout(osk.touchLayoutFilename);
+      const strings = this.scanTouchLayout(osk.touchLayoutFilename);
       if(!strings) {
         return false;
       }
@@ -144,13 +144,13 @@ export class AnalyzeOskCharacterUse {
 
   private addStrings(strings: string[], filename: string) {
     // Reduce all references to get usage count per file
-    let reducedStrings: Osk.StringRef[] = [...new Set(strings)].map(e =>({
+    const reducedStrings: Osk.StringRef[] = [...new Set(strings)].map(e =>({
       str:e,
       usages: [{filename: this.callbacks.path.basename(filename), count: strings.filter(n => n===e).length }]
     }));
 
     // Merge result with existing found strings
-    for(let e of reducedStrings) {
+    for(const e of reducedStrings) {
       this._strings[e.str] = [].concat(this._strings[e.str] ?? [], ...e.usages);
     }
   }
@@ -168,7 +168,7 @@ export class AnalyzeOskCharacterUse {
 
   private scanVisualKeyboard(filename: string): string[] {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'visual keyboard', name:filename}));
-    let strings: string[] = [];
+    const strings: string[] = [];
     const reader = new KvksFileReader();
     let source: KvksFile.default;
     try {
@@ -177,13 +177,13 @@ export class AnalyzeOskCharacterUse {
       this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
-    let invalidKeys: string[] = [];
+    const invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
     if(!vk) {
       this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e:null}));
       return null;
     }
-    for(let key of vk.keys) {
+    for(const key of vk.keys) {
       if(key.text) {
         strings.push(this.cleanString(key.text));
       }
@@ -193,7 +193,7 @@ export class AnalyzeOskCharacterUse {
 
   private scanTouchLayout(filename: string): string[] {
     this.callbacks.reportMessage(AnalyzerMessages.Info_ScanningFile({type:'touch layout', name:filename}));
-    let strings: string[] = [];
+    const strings: string[] = [];
     const reader = new TouchLayoutFileReader();
     const source = reader.read(this.callbacks.loadFile(filename));
 
@@ -212,9 +212,9 @@ export class AnalyzeOskCharacterUse {
       if(!platform) {
         return;
       }
-      for(let layer of platform.layer) {
-        for(let row of layer.row) {
-          for(let key of row.key) {
+      for(const layer of platform.layer) {
+        for(const row of layer.row) {
+          for(const key of row.key) {
             scanKey(key);
             if(key.hint && !key.hint.match(/^\*.+\*$/)) {
               strings.push(this.cleanString(key.hint));
@@ -223,10 +223,10 @@ export class AnalyzeOskCharacterUse {
             for(f in key.flick ?? {}) {
               scanKey(key.flick[f]);
             }
-            for(let sk of key.sk ?? []) {
+            for(const sk of key.sk ?? []) {
               scanKey(sk);
             }
-            for(let mt of key.multitap ?? []) {
+            for(const mt of key.multitap ?? []) {
               scanKey(mt);
             }
           }
@@ -258,12 +258,12 @@ export class AnalyzeOskCharacterUse {
       previousMap = [];
     }
 
-    let result: Osk.StringResult[] = [...previousMap];
+    const result: Osk.StringResult[] = [...previousMap];
 
     // Note: we are assuming same base as previous runs
     let pua = Math.max(this.options.puaBase, ...previousMap.map(item => parseInt(item.pua,16) + 1));
 
-    for(let str of Object.keys(strings)) {
+    for(const str of Object.keys(strings)) {
       const r = result.find(item => item.str == str);
       if(!r) {
         result.push({
@@ -370,8 +370,8 @@ export class AnalyzeOskCharacterUse {
 
   private static getStringsAsText(strings: Osk.StringResult[]) {
     // Text result only returns PUA, unicode sequence, and plain string
-    let lines: string[] = [];
-    for(let s of strings) {
+    const lines: string[] = [];
+    for(const s of strings) {
       const ux = this.stringToUnicodeSequence(s.str);
       lines.push('U+'+s.pua + '\t' + ux + '\t' + s.str);
     }
@@ -380,10 +380,10 @@ export class AnalyzeOskCharacterUse {
 
   private static getStringsAsMarkdown(strings: Osk.StringResult[]) {
     // Markdown result only returns PUA, unicode sequence, and plain string
-    let lines: string[] = [];
+    const lines: string[] = [];
     lines.push('PUA    | Code Points | Key Caps');
     lines.push('-------|-------------|---------');
-    for(let s of strings) {
+    for(const s of strings) {
       const ux = this.stringToUnicodeSequence(s.str);
       lines.push('U+'+s.pua + ' | ' + ux + ' | ' + escapeMarkdownChar(s.str, true));
     }
@@ -392,13 +392,13 @@ export class AnalyzeOskCharacterUse {
 
   private static getStringsAsJson(strings: Osk.StringResult[]) {
     // For future expansion, we wrap the array in a 'map' property
-    let map = { "map": strings };
+    const map = { "map": strings };
     return JSON.stringify(map, null, 2).split('\n');
   }
 
   private static stringToUnicodeSequence(s: string, addUPlusPrefix: boolean = true): string {
-    let result = [];
-    for(let ch of s) {
+    const result = [];
+    for(const ch of s) {
       let c = ch.codePointAt(0).toString(16).toUpperCase();
       if(c.length < 4) c = '0'.repeat(4 - c.length) + c;
       result.push((addUPlusPrefix ? 'U+' : '') + c);

@@ -107,8 +107,6 @@ function update_bundle ( ) {
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
-
-  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$BUNDLE_PATH/sentry.min.js"
   cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
@@ -118,9 +116,9 @@ function build_engine() {
 
   echo
   echo "Build products will be set with the following version metadata:"
-  echo "  * VERSION=$VERSION"
-  echo "  * VERSION_WITH_TAG=$VERSION_WITH_TAG"
-  echo "  * VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT"
+  echo "  * KEYMAN_VERSION=$KEYMAN_VERSION"
+  echo "  * KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG"
+  echo "  * KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT"
   echo "  * UPLOAD_SENTRY=$UPLOAD_SENTRY"
   echo
   echo "Building KMEI..."
@@ -130,9 +128,9 @@ function build_engine() {
   run_xcodebuild $XCODEFLAGS_EXT \
             $CODE_SIGN \
             -scheme KME-universal \
-            VERSION=$VERSION \
-            VERSION_WITH_TAG=$VERSION_WITH_TAG \
-            VERSION_ENVIRONMENT=$VERSION_ENVIRONMENT \
+            KEYMAN_VERSION=$KEYMAN_VERSION \
+            KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG \
+            KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
             UPLOAD_SENTRY=$UPLOAD_SENTRY
 
   assertDirExists "$KEYMAN_XCFRAMEWORK"

@@ -7,7 +7,7 @@
  */
 export function transcodeToCP1252(s: string): Uint8Array {
   buildUnicodeToCP1252();
-  let result = new Uint8Array(s.length);
+  const result = new Uint8Array(s.length);
   for(let i = 0; i < s.length; i++) {
     result[i] = UNICODE_CP1252[s.charCodeAt(i)] ?? '?'.charCodeAt(0);
   }
@@ -23,7 +23,7 @@ function buildUnicodeToCP1252() {
   }
 }
 
-let UNICODE_CP1252: {[index:number]: number} = {}
+const UNICODE_CP1252: {[index:number]: number} = {}
 
 // Source: https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP1252.TXT
 // _undefined_ values have been mapped to the same USV even though this isn't a

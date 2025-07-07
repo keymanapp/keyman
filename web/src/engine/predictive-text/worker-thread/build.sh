@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 WORKER_OUTPUT=build/obj
 WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
@@ -30,7 +31,8 @@ builder_describe \
   "@/web/src/tools/es-bundling" \
   "@../wordbreakers" \
   "@../templates" \
-  configure clean build test --ci
+  configure clean build test \
+  "--inspect  Runs browser-based tests in a locally-inspectable mode"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -47,11 +49,6 @@ function do_configure() {
 }
 
 function do_build() {
-  EXT_FLAGS=
-  if builder_has_option --ci; then
-    EXT_FLAGS=--ci
-  fi
-
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-main.d.ts
 
@@ -96,20 +93,20 @@ function do_build() {
 function do_test() {
   local MOCHA_FLAGS=
   local WTR_CONFIG=
-  local WTR_DEBUG=
+  local WTR_INSPECT=
 
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.CI
   fi
 
-  if builder_has_option --debug; then
-    WTR_DEBUG=" --manual"
+  if builder_has_option --inspect; then
+    WTR_INSPECT=" --manual"
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./src/tests/mocha/cases/
 
-  web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
+  web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}
 }
 
 builder_run_action configure  do_configure

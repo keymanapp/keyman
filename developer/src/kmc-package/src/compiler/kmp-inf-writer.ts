@@ -64,7 +64,7 @@ export class KmpInfWriter {
     }
     this.addSection('StartMenuEntries');
     let hasIcon = false, hasLocation = false;
-    for(let item of this.data.startMenu.items) {
+    for(const item of this.data.startMenu.items) {
       this.addString(item.name, `"${item.filename}","${item.arguments ?? ''}"`);
       hasIcon = hasIcon || !!item.icon;
       hasLocation = hasLocation || (item.location??'psmelStartMenu') != 'psmelStartMenu';
@@ -75,7 +75,7 @@ export class KmpInfWriter {
 
     if(hasIcon) {
       this.addSection('StartMenuEntries_Icon');
-      for(let item of this.data.startMenu.items) {
+      for(const item of this.data.startMenu.items) {
         if(item.icon) {
           this.addString(item.name, item.icon);
         }
@@ -84,7 +84,7 @@ export class KmpInfWriter {
 
     if(hasLocation) {
       this.addSection('StartMenuEntries_Location');
-      for(let item of this.data.startMenu.items) {
+      for(const item of this.data.startMenu.items) {
         if(item.location != 'psmelStartMenu') {
           this.addString(item.name, '1'); // psmelDesktop ordinal = 1 is the only other supported value
         }
