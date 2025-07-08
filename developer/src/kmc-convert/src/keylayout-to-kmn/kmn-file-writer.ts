@@ -76,7 +76,6 @@ export class KmnFileWriter {
     }
   }
 
-
   /**
    * @brief  member function to create data for stores that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
