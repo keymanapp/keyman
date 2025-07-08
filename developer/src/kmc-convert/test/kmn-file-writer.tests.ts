@@ -28,7 +28,8 @@ describe('KmnFileWriter', function () {
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const read = sut_r.read(inputFilename);
-    const converted = sut.convert_bound.convert(read, '/Test.keylayout'.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+
 
     // empty convert_object from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../' + 'data' + '/X.keylayout');
@@ -72,8 +73,7 @@ describe('KmnFileWriter', function () {
       + "\n";
 
     // empty convert_object from unavailable file name
-    //const inputFilename_unavailable = makePathToFixture('../' + 'data' + '/X.keylayout');
-    const inputFilename_unavailable =  '/X.keylayout';
+    const inputFilename_unavailable = makePathToFixture('../' + 'data' + '/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
@@ -89,8 +89,7 @@ describe('KmnFileWriter', function () {
   });
 
   describe("writeToUint8Array() ", function () {
-    //const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
-    const inputFilename =  '/Test.keylayout';
+    const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);

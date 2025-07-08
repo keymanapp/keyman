@@ -54,7 +54,6 @@ describe('KeylayoutToKmnConverter', function () {
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../' + 'data' + '/Unavailable.keylayout');
-
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
@@ -102,12 +101,12 @@ describe('KeylayoutToKmnConverter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from unavailable file name
-    const inputFilename_unavailable = makePathToFixture('X.keylayout');
+    // convert_object from unavailable file name
+    const inputFilename_unavailable = makePathToFixture('../' + 'data' + '/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from empty filename
+    // convert_object from empty filename
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
     const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty.replace(/\.keylayout$/, '.kmn'));
@@ -265,7 +264,6 @@ describe('KeylayoutToKmnConverter', function () {
 
     [
       [[['0', 0]], [['', 'shift? caps? ']]],
-      // Italian:  [[['0', 1]], [['anyShift caps?', 'shift? rightShift caps? ', 'shift? leftShift caps? ', 'shift leftShift caps ']]],
       [[['0', 2]], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
       [[['0', 999]], [null]],
       [[['999',]], [null]],
@@ -299,13 +297,9 @@ describe('KeylayoutToKmnConverter', function () {
     const read = sut_r.read(inputFilename);
 
     [
-      // Italian:   ['a16', [['32', 3]]],
-      // Italian:   ['a19', [['45', 3]]],
-      // Italian:   ['a18', [['24', 0], ['24', 3]]],
       ['A_16', [['32', 5]]],
       ['A_19', [['45', 5]]],
       ['A_18', [['24', 0], ['24', 5]]],
-
       ['unknown', []],
       [undefined, []],
       [null, []],
@@ -333,17 +327,11 @@ describe('KeylayoutToKmnConverter', function () {
 
     [
       ['none', ''],
-      // Italian: ['a18', ''],
       ['0', ''],
-      // Italian:  ['1', 'a16'],
-      // Italian:  // Italian: ['2', 'a8'],
-      // Italian:  ['3', 'a17'],
-
       ['A_18', ''],
       ['1', 'A_16'],
       ['2', 'A_8'],
       ['3', 'A_17'],
-
       ['', ''],
       [' ', ''],
       ['99', ''],
@@ -366,9 +354,6 @@ describe('KeylayoutToKmnConverter', function () {
 
     [
       ['none', 0],
-      // Italian:  ['a16', 8],
-      // Italian:  ['a18', 10],
-      // Italian:  ['a19', 11],
       ['A_16', 8],
       ['A_18', 10],
       ['A_19', 11],
@@ -393,11 +378,9 @@ describe('KeylayoutToKmnConverter', function () {
     const read = sut_r.read(inputFilename);
 
     [
-      // Italian: ['a14', 'u'],
       ['A_14', 'u'],
       ['', ''],
       [' ', ''],
-      // Italian: ['a18', undefined],
       ['A_18', undefined],
       ['unknown', ''],
     ].forEach(function (values) {
@@ -424,74 +407,6 @@ describe('KeylayoutToKmnConverter', function () {
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
-    /*Italian: 
-       
-     const b1_keycode_arr = [
-        ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '1', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '2', 'ˆ'],
-        ['6', 'K_Z', 'a0', '4', 'ˆ'],
-        ['25', 'K_9', 'a0', '4', 'ˆ'],
-        ['43', 'K_COMMA', 'a0', '4', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '7', 'ˆ'],
-        ['0', 'K_A', 'a1', '1', 'Â'],
-        ['0', 'K_A', 'a1', '2', 'Â'],
-        ['14', 'K_E', 'a10', '0', 'ê'],
-        ['34', 'K_I', 'a11', '0', 'î'],
-        ['31', 'K_O', 'a13', '0', 'ô'],
-        ['32', 'K_U', 'a14', '0', 'û'],
-        ['14', 'K_E', 'a2', '1', 'Ê'],
-        ['14', 'K_E', 'a2', '2', 'Ê'],
-        ['34', 'K_I', 'a3', '1', 'Î'],
-        ['34', 'K_I', 'a3', '2', 'Î'],
-        ['31', 'K_O', 'a5', '1', 'Ô'],
-        ['31', 'K_O', 'a5', '2', 'Ô'],
-        ['32', 'K_U', 'a6', '1', 'Û'],
-        ['32', 'K_U', 'a6', '2', 'Û'],
-        ['0', 'K_A', 'a9', '0', 'â']
-      ];
-      const b1_modifierKey_arr = [
-        ['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ'],
-        ['K_SPACE', 'a0', '1', 'NCAPS SHIFT', 'ˆ'],
-        ['K_SPACE', 'a0', '1', 'SHIFT CAPS', 'ˆ'],
-        ['K_SPACE', 'a0', '2', 'CAPS', 'ˆ'],
-        ['K_Z', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
-        ['K_9', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
-        ['K_COMMA', 'a0', '4', 'NCAPS SHIFT RALT', 'ˆ'],
-        ['K_SPACE', 'a0', '7', 'NCAPS CTRL', 'ˆ'],
-        ['K_SPACE', 'a0', '7', 'NCAPS RALT CTRL', 'ˆ'],
-        ['K_A', 'a1', '1', 'NCAPS SHIFT', 'Â'],
-        ['K_A', 'a1', '1', 'SHIFT CAPS', 'Â'],
-        ['K_A', 'a1', '2', 'CAPS', 'Â'],
-        ['K_E', 'a10', '0', 'NCAPS', 'ê'],
-        ['K_I', 'a11', '0', 'NCAPS', 'î'],
-        ['K_O', 'a13', '0', 'NCAPS', 'ô'],
-        ['K_U', 'a14', '0', 'NCAPS', 'û'],
-        ['K_E', 'a2', '1', 'NCAPS SHIFT', 'Ê'],
-        ['K_E', 'a2', '1', 'SHIFT CAPS', 'Ê'],
-        ['K_E', 'a2', '2', 'CAPS', 'Ê'],
-        ['K_I', 'a3', '1', 'NCAPS SHIFT', 'Î'],
-        ['K_I', 'a3', '1', 'SHIFT CAPS', 'Î'],
-        ['K_I', 'a3', '2', 'CAPS', 'Î'],
-        ['K_O', 'a5', '1', 'NCAPS SHIFT', 'Ô'],
-        ['K_O', 'a5', '1', 'SHIFT CAPS', 'Ô'],
-        ['K_O', 'a5', '2', 'CAPS', 'Ô'],
-        ['K_U', 'a6', '1', 'NCAPS SHIFT', 'Û'],
-        ['K_U', 'a6', '1', 'SHIFT CAPS', 'Û'],
-        ['K_U', 'a6', '2', 'CAPS', 'Û'],
-        ['K_A', 'a9', '0', 'NCAPS', 'â']
-      ];
-  
-      [[b1_keycode_arr, b1_modifierKey_arr],
-      [[['49', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ']]],
-      [[['49', 'K_SPACE', 'a0', '0', '']], [['K_SPACE', 'a0', '0', 'NCAPS', '']]],
-      [[['49', 'K_SPACE', 'a0', '', 'ˆ']], [['K_SPACE', 'a0', '', 'NCAPS', 'ˆ']]],
-      [[['49', 'K_SPACE', '', '0', 'ˆ']], [['K_SPACE', '', '0', 'NCAPS', 'ˆ']]],
-      [[['49', '', 'a0', '0', 'ˆ']], [['', 'a0', '0', 'NCAPS', 'ˆ']]],
-      [[['', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ']]],
-      [[['', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', 'NCAPS', 'ˆ']]],
-      [[['', '', '', '', '']], [['', '', '', 'NCAPS', '']]],
-    */
 
     const b1_keycode_arr = [
       ['49', 'K_SPACE', 'A_0', '0', 'ˆ'],
@@ -571,12 +486,6 @@ describe('KeylayoutToKmnConverter', function () {
         });
     });
 
-    /* Italian:      [[[['49', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', '', 'ˆ']]],
-     [[['49', 'K_SPACE', 'a0', '0', '']], [['K_SPACE', 'a0', '0', '', '']]],
-     [[['', 'K_SPACE', 'a0', '0', 'ˆ']], [['K_SPACE', 'a0', '0', '', 'ˆ']]],
-     [[['', '', '', '', '']], [['', '', '', '', '']]],
-     ].forEach(function (values) {       */
-
     [[[['49', 'K_SPACE', 'A_0', '0', 'ˆ']], [['K_SPACE', 'A_0', '0', '', 'ˆ']]],
     [[['49', 'K_SPACE', 'A_0', '0', '']], [['K_SPACE', 'A_0', '0', '', '']]],
     [[['', 'K_SPACE', 'A_0', '0', 'ˆ']], [['K_SPACE', 'A_0', '0', '', 'ˆ']]],
@@ -611,32 +520,6 @@ describe('KeylayoutToKmnConverter', function () {
     const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
-    /*  
-      Italian:[['1', [
-        ['a0', '1', 'ˆ'],
-        ['a1', '1', 'Â'],
-        ['a10', '1', 'ê'],
-        ['a11', '1', 'î'],
-        ['a13', '1', 'ô'],
-        ['a14', '1', 'û'],
-        ['a2', '1', 'Ê'],
-        ['a3', '1', 'Î'],
-        ['a5', '1', 'Ô'],
-        ['a6', '1', 'Û'],
-        ['a9', '1', 'â']],],
-      ['2', [
-        ['a0', '2', '`'],
-        ['a1', '2', 'À'],
-        ['a10', '2', 'è'],
-        ['a11', '2', 'ì'],
-        ['a13', '2', 'ò'],
-        ['a14', '2', 'ù'],
-        ['a2', '2', 'È'],
-        ['a3', '2', 'Ì'],
-        ['a5', '2', 'Ò'],
-        ['a6', '2', 'Ù'],
-        ['a9', '2', 'à']],],
-    */
     [['1', [
       ['A_0', '1', 'ˆ'],
       ['A_1', '1', 'Â'],
@@ -683,26 +566,6 @@ describe('KeylayoutToKmnConverter', function () {
     const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
-    /*  Italian:      [
-        ['a1', 'A', true, [
-          ['a1', 'A', 'a1', '1', 'K_A', 'NCAPS SHIFT'],
-          ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT CAPS'],
-          ['a1', 'A', 'a1', '2', 'K_A', 'CAPS']]
-        ],
-        ['a1', 'A', false, [
-          ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT'],
-          ['a1', 'A', 'a1', '1', 'K_A', 'SHIFT CAPS'],
-          ['a1', 'A', 'a1', '2', 'K_A', 'CAPS']]
-        ],
-        ['a9', 'a', true, [['a9', 'a', 'a9', '0', 'K_A', 'NCAPS']]],
-        ['a9', 'a', false, [['a9', 'a', 'a9', '0', 'K_A', '']]],
-        ['a9', 'a', , [['a9', 'a', 'a9', '0', 'K_A', '']]],
-        ['a9', '', true, [['a9', '', 'a9', '0', 'K_A', 'NCAPS']]],
-        ['a9', '', false, [['a9', '', 'a9', '0', 'K_A', '']]],
-        ['', 'a', true, []],
-        ['', 'a', false, []],
-        ['', '', , []],
-      */
 
     [
       ['A_1', 'A', true, [
@@ -741,44 +604,6 @@ describe('KeylayoutToKmnConverter', function () {
     const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
-    /* Italian: const b6_actionId_arr = [
-        ['a0', '1', 'ˆ'],
-        ['a1', '1', 'Â'],
-        ['a10', '1', 'ê'],
-        ['a11', '1', 'î'],
-        ['a13', '1', 'ô'],
-        ['a14', '1', 'û'],
-        ['a2', '1', 'Ê'],
-        ['a3', '1', 'Î'],
-        ['a5', '1', 'Ô'],
-        ['a6', '1', 'Û'],
-        ['a9', '1', 'â']
-      ];
-      const b1_keycode_arr = [
-        ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '1', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '2', 'ˆ'],
-        ['6', 'K_Z', 'a0', '4', 'ˆ'],
-        ['25', 'K_9', 'a0', '4', 'ˆ'],
-        ['43', 'K_COMMA', 'a0', '4', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '7', 'ˆ'],
-        ['0', 'K_A', 'a1', '1', 'Â'],
-        ['0', 'K_A', 'a1', '2', 'Â'],
-        ['14', 'K_E', 'a10', '0', 'ê'],
-        ['34', 'K_I', 'a11', '0', 'î'],
-        ['31', 'K_O', 'a13', '0', 'ô'],
-        ['32', 'K_U', 'a14', '0', 'û'],
-        ['14', 'K_E', 'a2', '1', 'Ê'],
-        ['14', 'K_E', 'a2', '2', 'Ê'],
-        ['34', 'K_I', 'a3', '1', 'Î'],
-        ['34', 'K_I', 'a3', '2', 'Î'],
-        ['31', 'K_O', 'a5', '1', 'Ô'],
-        ['31', 'K_O', 'a5', '2', 'Ô'],
-        ['32', 'K_U', 'a6', '1', 'Û'],
-        ['32', 'K_U', 'a6', '2', 'Û'],
-        ['0', 'K_A', 'a9', '0', 'â']
-      ];
-    */
     const b6_actionId_arr = [
       ['A_0', '1', 'ˆ'],
       ['A_1', '1', 'Â'],
@@ -793,8 +618,6 @@ describe('KeylayoutToKmnConverter', function () {
       ['A_9', '1', 'â']
     ];
     const b1_keycode_arr = [
-
-
       ['49', 'K_SPACE', 'A_0', '0', 'ˆ'],
       ['49', 'K_SPACE', 'A_0', '1', 'ˆ'],
       ['49', 'K_SPACE', 'A_0', '2', 'ˆ'],
@@ -828,27 +651,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-----------------
-    /* Italian:  const oneEntryResult = [
-        ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '1', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '2', 'ˆ'],
-        ['6', 'K_Z', 'a0', '4', 'ˆ'],
-        ['25', 'K_9', 'a0', '4', 'ˆ'],
-        ['43', 'K_COMMA', 'a0', '4', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '7', 'ˆ']
-      ];
-      const oneEntryResultNoOutput = [
-        ['49', 'K_SPACE', 'a0', '0', ''],
-        ['49', 'K_SPACE', 'a0', '1', ''],
-        ['49', 'K_SPACE', 'a0', '2', ''],
-        ['6', 'K_Z', 'a0', '4', ''],
-        ['25', 'K_9', 'a0', '4', ''],
-        ['43', 'K_COMMA', 'a0', '4', ''],
-        ['49', 'K_SPACE', 'a0', '7', '']
-      ]      ;
-    */
-
     const oneEntryResult = [
       ['49', 'K_SPACE', 'A_0', '0', 'ˆ'],
       ['49', 'K_SPACE', 'A_0', '1', 'ˆ'],
@@ -878,7 +680,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-------------------------------------------------------------------------------------
     [[[['', '1', 'ˆ']], []],
     [[['', '', '']], []],
     [[[' ', ' ', '']], []],
@@ -889,7 +690,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-------------------------------------------------------------------------------------
     [[[], []],
     [undefined, []],
     [null, []],
