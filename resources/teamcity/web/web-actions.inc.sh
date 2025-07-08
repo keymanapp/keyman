@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
 web_install_dependencies_on_linux_action() {

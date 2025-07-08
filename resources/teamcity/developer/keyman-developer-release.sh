@@ -14,11 +14,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe \
-  "Build Keyman Developer on Windows" \
+  "Build release of Keyman Developer" \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish release of Keyman Developer" \
@@ -32,6 +33,11 @@ builder_parse "$@"
 
 # shellcheck disable=SC2154
 cd "${KEYMAN_ROOT}/developer/src"
+
+# TODO: move to parameters (#14202)
+LOCAL_SYMBOLS_PATH="${KEYMAN_ROOT}/../symbols"
+REMOTE_SYMBOLS_PATH="windows/symbols"
+SYMBOLS_SUBDIR="000admin"
 
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
@@ -60,24 +66,24 @@ function _publish_sentry() {
 function _download_symbol_server_index() {
   # Download symbol server index from symbol server
   builder_echo start "download symbol server index" "Downloading symbol server index"
+  (
+    mkdir -p "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
+    cd "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
 
-  cd "${KEYMAN_ROOT}/.."
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/download-symbol-server-index.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
+    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/lastid.txt" "."
+    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/history.txt" "."
+    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/server.txt" "."
+  )
   builder_echo end "download symbol server index" success "Finished downloading symbol server index"
 }
 
 function _publish_new_symbols() {
   # Publish new symbols to symbol server
   builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-
-  cd "${KEYMAN_ROOT}/../symbols"
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-new-symbols.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
+  (
+    cd "${LOCAL_SYMBOLS_PATH}"
+    tc_rsync_upload "." "${REMOTE_SYMBOLS_PATH}"
+  )
   builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }
 
@@ -85,22 +91,49 @@ function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
-  cd "${KEYMAN_ROOT}/developer"
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-to-downloads-keyman-com.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
+  (
+    cd "${KEYMAN_ROOT}/developer"
+
+    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP COMPRESS_CMD
+    # shellcheck disable=SC2154
+    UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+    KEYBOARDS_PATH="${UPLOAD_PATH}/keyboards"
+    KMCOMP_ZIP="kmcomp-${KEYMAN_VERSION}.zip"
+    DEVELOPER_EXE="keymandeveloper-${KEYMAN_VERSION}.exe"
+    DEBUG_ZIP="debug-${KEYMAN_VERSION}.zip"
+
+    rm -rf "${UPLOAD_PATH}"
+    mkdir -p "${UPLOAD_PATH}"
+
+    (
+      cd bin
+      cp "${KEYMAN_ROOT}/common/schemas/keyboard_info/keyboard_info.schema.json" .
+
+      # shellcheck disable=SC2154
+      COMPRESS_CMD="${SEVENZ_HOME}/7z"
+
+      "${COMPRESS_CMD}" a -bd -bb0 "../${UPLOAD_PATH}/${KMCOMP_ZIP}" kmconvert.exe keyboard_info.schema.json xml/layoutbuilder/*.keyman-touch-layout projects/ server/
+    )
+
+    cp "release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+
+    write_download_info "${UPLOAD_PATH}" "${DEVELOPER_EXE}" "Keyman Developer" exe win
+    write_download_info "${UPLOAD_PATH}" "${KMCOMP_ZIP}" "Keyman Developer Command-Line Compiler" zip win
+
+    mkdir -p "${KEYBOARDS_PATH}"
+    cp -r "${KEYMAN_ROOT}/common/test/keyboards"/*/build/*.kmp "${KEYBOARDS_PATH}/"
+
+    if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
+      cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
+      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Developer debug files" zip win
+    fi
+
+    cd upload
+    # shellcheck disable=SC2154
+    tc_rsync_upload "${KEYMAN_VERSION}" "developer/${KEYMAN_TIER}"
+  )
 
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
-}
-
-function _publish_api_documentation() {
-  # Upload new Keyman Developer API documentation to help.keyman.com
-  builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
-
-  builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
 }
 
 function build_developer_action() {
@@ -121,10 +154,10 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  _download_symbol_server_index
-  _publish_new_symbols
+  download_symbol_server_index
+  publish_new_symbols
   _publish_to_downloads_keyman_com
-  _publish_api_documentation
+  upload_help "api documentation" developer
 }
 
 if builder_has_action all; then
