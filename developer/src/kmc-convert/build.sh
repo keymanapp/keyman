@@ -32,7 +32,7 @@ builder_parse "$@"
 do_kmc_convert_test() {
 
   builder_echo heading "Creating keylayout.schema.JSON"
-  cd $KEYMAN_ROOT/resources/standards-data/keylayout/
+  cd $KEYMAN_ROOT/resources/standards-data/keylayout
   ./create_keylayout_schema.sh
 
   builder_echo heading "Creating keylayout.schema.validator"
@@ -48,8 +48,6 @@ builder_run_action configure   verify_npm_setup
 builder_run_action build       tsc --build
 builder_run_action api         api-extractor run --local --verbose
 
-builder_run_action test        do_kmc_convert_test
-
 do_test() {
   eslint .
   cd test
@@ -61,6 +59,7 @@ do_test() {
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
+builder_run_action test        do_kmc_convert_test
 builder_run_action test        do_test
 builder_run_action publish     builder_publish_npm
 
