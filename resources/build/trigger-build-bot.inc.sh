@@ -88,7 +88,9 @@ function build_bot_check_messages() {
     # parse without risking escaping our bash jail
 
     if [[ ! -z "${buildBotCommand// }" ]]; then
-      build_bot_update_commands $buildBotCommand
+      local build_bot_args
+      read -r -a build_bot_args <<< "${buildBotCommand}"
+      build_bot_update_commands "${build_bot_args[@]}"
     fi
   done
 
@@ -120,9 +122,10 @@ function build_bot_update_commands() {
     unset IFS
   fi
 
-  if [[ ! $level =~ ^$valid_build_levels$ ]]; then
+  # shellcheck disable=SC2154
+  if [[ ! ${level} =~ ^${valid_build_levels}$ ]]; then
     # Just skip this build command
-    builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '$level' in command '$command'"
+    builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '${level}' in command '${command}'"
     return 0
   fi
 
@@ -132,8 +135,8 @@ function build_bot_update_commands() {
 
   local platform
   for platform in "${platforms[@]}"; do
-    builder_echo "Build-bot: Updating build level for $platform to $level"
-    build_platforms[$platform]=$level
+    builder_echo "Build-bot: Updating build level for ${platform} to ${level}"
+    build_platforms[${platform}]=${level}
   done
 }
 

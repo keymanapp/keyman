@@ -14,7 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # Initialize builder, no input parameters needed for these tests
 builder_parse ""
 
-readonly ALL_BUILD_PLATFORMS_SKIP_EXPECTED='[ios]="skip" [web]="skip" [linux]="skip" [common_mac]="skip" [common_windows]="skip" [mac]="skip" [windows]="skip" [common_web]="skip" [android]="skip" [developer]="skip" [common_linux]="skip"'
+readonly ALL_BUILD_PLATFORMS_SKIP_EXPECTED='[ios]="skip" [web]="skip" [linux]="skip" [common_mac]="skip" [common_windows]="skip" [mac]="skip" [windows]="skip" [common_web]="skip" [android]="release" [developer]="skip" [common_linux]="skip"'
 readonly ALL_BUILD_PLATFORMS_BUILD_EXPECTED='[ios]="build" [web]="build" [linux]="build" [common_mac]="build" [common_windows]="build" [mac]="build" [windows]="build" [common_web]="build" [android]="build" [developer]="build" [common_linux]="build"'
 
 #----------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@ test_build_bot_check_messages() {
   builder_echo start test_build_bot_check_messages 'START TEST: build_bot_check_messages'
 
   # Mostly real data (only Build-bot commands edited for test)
-  _do_test_build_bot_check_messages_file 14013 "[windows]=release" "$ALL_BUILD_PLATFORMS_SKIP_EXPECTED"
+  _do_test_build_bot_check_messages_file 14013 "[windows]=release" "${ALL_BUILD_PLATFORMS_SKIP_EXPECTED}"
   # Simplified data for testing Build-bot command sequences only
   _do_test_build_bot_check_messages_file 9999 "[windows]=release" '[windows]="skip" [developer]="release"'
 
