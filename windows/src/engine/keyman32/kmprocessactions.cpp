@@ -5,7 +5,7 @@
  *              Keyman for Windows engine.
  */
 #include "pch.h"
-
+/* adding a test line to force a build to check if this pr build is signed */
 /**
 * Adds characters to the queue to be inserted into the application
 * @param app           A pointer to the AITIP instance.
