@@ -162,7 +162,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return this.lmEngine.wordbreak(context);
   }
 
-  public predict(transcription: Transcription, layerId: string): Promise<Suggestion[]> {
+  public predict(transcription: Transcription, layerId: string, blockAutoSelect?: boolean): Promise<Suggestion[]> {
     if(!this.isActive) {
       return null;
     }
@@ -177,7 +177,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // may as well officially invalidate them via event.
     this.emit("invalidatesuggestions", 'new');
 
-    return this.predict_internal(transcription, false, layerId);
+    return this.predict_internal(transcription, false, layerId, blockAutoSelect);
   }
 
   /**
@@ -255,7 +255,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
         // // If using the version from lm-layer:
         // let mappedReversion = reversion;
         // mappedReversion.transformId = reversionTranscription.token;
-        this.predictFromTarget(outputTarget, getLayerId());
+        this.predictFromTarget(outputTarget, getLayerId(), true);
         return mappedReversion;
       });
 
@@ -297,7 +297,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     outputTarget.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null)).then((suggestions) => {
+      suggestions.forEach((suggestion) => suggestion.autoAccept = false);
+      return suggestions;
+    })
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -305,13 +308,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return promise;
   }
 
-  public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
+  public predictFromTarget(outputTarget: OutputTarget, layerId: string, blockAutoSelect?: boolean): Promise<Suggestion[]> {
     if(!this.isActive || !outputTarget) {
       return null;
     }
+    blockAutoSelect ||= false;
 
     const transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
-    return this.predict(transcription, layerId);
+    return this.predict(transcription, layerId, true).then((suggestions) => {
+      return suggestions;
+    });
   }
 
   /**
@@ -319,7 +325,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    * have been raised.
    * @param transcription The triggering transcription (if it exists)
    */
-  private predict_internal(transcription: Transcription, resetContext: boolean, layerId: string): Promise<Suggestion[]> {
+  private predict_internal(transcription: Transcription, resetContext: boolean, layerId: string, blockAutoSelect?: boolean): Promise<Suggestion[]> {
     if(!this.isActive || !transcription) {
       return null;
     }
@@ -344,6 +350,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     return promise.then((suggestions: Suggestion[]) => {
       if(promise == this.currentPromise) {
+        if(blockAutoSelect) {
+          suggestions.forEach((entry) => entry.autoAccept = false);
+        }
         const result = new ReadySuggestions(suggestions, transform.id);
         this.emit("suggestionsready", result);
         this.currentPromise = null;

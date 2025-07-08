@@ -168,6 +168,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.selected = null;
     this.doRevert = false;
 
+    // By default, we assume we were triggered by the banner.
+    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
+    this.recentAcceptCause = 'banner';
+    this.recentRevert = false;
+    this.selected = null;
+
     this.revertAcceptancePromise = this.acceptInternal(suggestion);
     if(!this.revertAcceptancePromise) {
       // We get here either if suggestion acceptance fails or if it was a reversion.
@@ -186,11 +192,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         _this.revertSuggestion = suggestion;
       }
     });
-
-    // By default, we assume we were triggered by the banner.
-    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
-    this.recentAcceptCause = 'banner';
-    this.recentRevert = false;
 
     this.swallowPrediction = true;
 
@@ -211,6 +212,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
     const recentAcceptCause = this.recentAcceptCause;
 
+    // TODO:  rotating suggestions on the banner; should check if it's the same suggestion that was just applied or
+    // if we're replacing the prior one... I think?
     if(!recentAcceptCause && this.selected) {
       this.accept(this.selected);
       // If there is right-context, DO emit the space instead of swallowing it.
