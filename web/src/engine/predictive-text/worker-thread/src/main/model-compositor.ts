@@ -1,6 +1,5 @@
 import * as models from '@keymanapp/models-templates';
-import * as correction from './correction/index.js'
-import APPLIED_SUGGESTION_COMPONENT = correction.APPLIED_SUGGESTION_COMPONENT;
+import * as correction from './correction/index.js';
 
 import { KMWString } from '@keymanapp/web-utils';
 
@@ -312,7 +311,7 @@ export class ModelCompositor {
       // We build our suggestions to do whole-word replacement.  Fortunately, that means we already have
       // the full suggestions!
       // Also, prevent duplication of suggestions caused by changing the suggestion ID for old replacements.
-      const suggestions = contextState.tail.replacements?.filter((entry) => entry.suggestion.id != APPLIED_SUGGESTION_COMPONENT);
+      const suggestions = contextState.tail.replacements;
       if(!suggestions) {
         return;
       }
@@ -326,23 +325,24 @@ export class ModelCompositor {
 
       if(substitutionTokenIndex + tokenizedApplication.length == matchResults.state.tokens.length) {
         for(let j = 1; j <= tokenizedApplication.length; j++) {
-          const replacementPortion: correction.TrackedContextSuggestion = {
-            suggestion: {
-              ...suggestion,
-              id: APPLIED_SUGGESTION_COMPONENT, // Actual suggestions always present non-negative IDs; this can uniquely mark.
-              transformId: suggestion.transformId,
-              // this as a component of an applied suggestion.
-              transform: tokenizedApplication.slice(0, j).reduce((accum, current) => models.buildMergedTransform(accum, current), { insert: '', deleteLeft: 0}),
-            },
-            tokenWidth: j
-          }
-
           const token = matchResults.state.tokens[substitutionTokenIndex + j - 1];
           // Attach our fragmented version of the suggestion - the part useful for rewinding it -
-          // as its own suggestion with a distinct, unique ID indicative of this property.
+          // as its own suggestion.
           //
-          token.replacements = [ replacementPortion ].concat(suggestions);
-          token.activeReplacementId = APPLIED_SUGGESTION_COMPONENT; // perhaps give unique ID + overwrite the original suggestion ID.
+          token.replacements = suggestions.map((entry) => {
+            const tokenizedSuggestion = tokenizeTransform(tokenizer, context, entry.suggestion.transform);
+            return {
+              suggestion: {
+                ...entry.suggestion,
+                // this as a component of an applied suggestion.
+                transform: tokenizedSuggestion
+                  .slice(0, Math.max(j, tokenizedSuggestion.length))
+                  .reduce((accum, current) => models.buildMergedTransform(accum, current), { insert: '', deleteLeft: 0}),
+              },
+            tokenWidth: j
+            };
+          });
+          token.activeReplacementId = suggestion.id; // perhaps give unique ID + overwrite the original suggestion ID.
           token.replacementTransformId = suggestion.transformId;
         }
       }
@@ -350,13 +350,14 @@ export class ModelCompositor {
     }
   }
 
+  // reversion:  reproduces the net effect originally applied after `preInput`
+  // context:  matches original Transcription's `preInput` value
   async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
-    // If we are unable to track context (because the model does not support LexiconTraversal),
-    // we need a "fallback" strategy.
+    // If we are unable to track context (because the model does not support LexiconTraversal
+    // or because the context becomes outdated), we need a "fallback" strategy.
     let compositor = this;
     let fallbackSuggestions = async function() {
-      let revertedContext = models.applyTransform(reversion.transform, context);
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict(reversion.transform, context);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.

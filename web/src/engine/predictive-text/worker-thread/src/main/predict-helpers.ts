@@ -3,7 +3,7 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { APPLIED_SUGGESTION_COMPONENT, ContextTracker, TrackedContextState } from './correction/context-tracker.js';
+import { ContextTracker, TrackedContextState, TrackedContextSuggestion } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -20,7 +20,6 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
-import { deepCopy } from '@keymanapp/web-utils';
 import { LexicalModelPunctuation } from '../../../../../../../common/web/types/src/lexical-model-types.js';
 
 /*
@@ -101,16 +100,23 @@ export function isContextAtAcceptedSuggestionEdge(
       return false;
     } else {
       const penultimateToken = postContextState.tokens[postContextState.tokens.length - 2];
-      if(penultimateToken.replacement?.suggestion?.id != APPLIED_SUGGESTION_COMPONENT) {
+      if(penultimateToken.activeReplacementId == -1) {
         return false;
       }
 
       // Restore the empty tail token to the original application state, which
       // has properties that clearly 'continue' the prior replaced token.
       const tailToken = postContextState.tail;
-      // FIXME:  clone first, simply append the rest.
-      tailToken.replacements = [...penultimateToken.replacements].map((entry) => { return {...entry}});
-      tailToken.activeReplacementId = APPLIED_SUGGESTION_COMPONENT; // perhaps give unique ID + overwrite the original suggestion ID.
+
+      tailToken.replacements = [...penultimateToken.replacements].map((entry) => {
+        return {
+          suggestion: {
+            ...entry.suggestion,
+          },
+          tokenWidth: entry.tokenWidth + 1
+        }
+      });
+      tailToken.activeReplacementId = penultimateToken.activeReplacementId;
       tailToken.replacementTransformId = tailToken.replacementTransformId;
       tailToken.replacement.tokenWidth = penultimateToken.replacement.tokenWidth + 1;
     }
@@ -121,7 +127,7 @@ export function isContextAtAcceptedSuggestionEdge(
   // Original suggestion set:  acquired.  But... they're based on a different context...
   const appliedSuggestion = postContextState.tail.replacement;
 
-  if(appliedSuggestion?.suggestion?.id != APPLIED_SUGGESTION_COMPONENT) {
+  if(appliedSuggestion?.suggestion?.id == -1) {
     return false;
   }
 
@@ -449,25 +455,25 @@ export function suggestFromPriorContext(
 ) {
   const currentToken = postContextState.tail;
 
-  // Original suggestion set:  acquired.  But... they're based on a different context...
-  const appliedSuggestion = currentToken.replacement;
-
   // We added a partial, synthetic 'replacement' useful for tracking how much to revert.
   // It should have a set, distinct ID corresponding to the check below.  This partial
   // version was never a real suggestion; even if it were, the original is still within our list!
-  const suggestions = currentToken.replacements.filter((entry) => entry.suggestion.id != APPLIED_SUGGESTION_COMPONENT).map((entry) => deepCopy(entry));
+  const suggestions = [...currentToken.replacements];
 
   // TODO:  also hide the original suggestion matching the active 'replacement'.
 
-  const keepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
-  const keepId = keepSuggestion.suggestion.transformId;
+  const baseKeepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
+  const keepSuggestion: TrackedContextSuggestion = {
+    suggestion: {...baseKeepSuggestion.suggestion},
+    tokenWidth: baseKeepSuggestion.tokenWidth
+  };
+  const keepId = baseKeepSuggestion.suggestion.transformId;
+  suggestions[suggestions.indexOf(baseKeepSuggestion)] = keepSuggestion;
 
   // First up:  we can safely use the raw insert string as the needed length to erase.
   // Also, we need to include whatever backspacing occured to reach that point, as the suggestion
   // is applied to the context BEFORE the backspace takes effect.
-  const deleteLeft = KMWString.length(appliedSuggestion.suggestion.transform.insert) + inputTransform.deleteLeft;
   suggestions.forEach((entry) => {
-    entry.suggestion.transform.deleteLeft = deleteLeft;
     entry.suggestion.transformId = keepId;
   });
 

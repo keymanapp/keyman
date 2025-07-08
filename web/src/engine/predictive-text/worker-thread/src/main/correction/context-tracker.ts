@@ -13,12 +13,6 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
-/**
- * Indicates that the owning token's 'replacement' represents part of an
- * actually-applied suggestion.
- */
-export const APPLIED_SUGGESTION_COMPONENT = -2;
-
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
