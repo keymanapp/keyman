@@ -53,7 +53,7 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
@@ -61,24 +61,24 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, ''));
     });
 
     it('run() should return on correct input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, null));
     });
 
     it('run() should return on correct input file name and given output file name ', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
-      const outputFilename = makePathToFixture('../data/OutputName.kmn');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
+      const outputFilename =  makePathToFixture('../' + 'data' + '/OutputName.kmn');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
     });
 
     it('run() should throw on incorrect input file extention and output file extention', async function () {
-      const inputFilename = makePathToFixture('../data/Test_command.A');
-      const outputFilename = makePathToFixture('../data/data/OutputXName.B');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Test_command.A');
+      const outputFilename =  makePathToFixture('../' + 'data' + '/data/OutputXName.B');
       const result = sut.run(inputFilename, outputFilename);
       assert.isNotNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
@@ -86,8 +86,8 @@ describe('KeylayoutToKmnConverter', function () {
     });
 
     it('run() return on correct input file extention and unsupperted output file extention', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
-      const outputFilename = makePathToFixture('../data/OutputXName.B');
+      const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
+      const outputFilename =  makePathToFixture('../' + 'data' + '/OutputXName.B');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, outputFilename));
     });
   });
@@ -95,7 +95,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('convert() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
@@ -256,13 +256,12 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_Modifier_array__From__KeyModifier_array ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     [
       [[['0', 0]], [['', 'shift? caps? ']]],
-      // Italian:  [[['0', 1]], [['anyShift caps?', 'shift? rightShift caps? ', 'shift? leftShift caps? ', 'shift leftShift caps ']]],
       [[['0', 2]], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
       [[['0', 999]], [null]],
       [[['999',]], [null]],
@@ -292,17 +291,13 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_KeyModifier_array__From__ActionID ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
-      // Italian:   ['a16', [['32', 3]]],
-      // Italian:   ['a19', [['45', 3]]],
-      // Italian:   ['a18', [['24', 0], ['24', 3]]],
       ['A_16', [['32', 5]]],
       ['A_19', [['45', 5]]],
       ['A_18', [['24', 0], ['24', 5]]],
-
       ['unknown', []],
       [undefined, []],
       [null, []],
@@ -325,22 +320,16 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_ActionID__From__ActionNext ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
       ['none', ''],
-      // Italian: ['a18', ''],
       ['0', ''],
-      // Italian:  ['1', 'a16'],
-      // Italian:  // Italian: ['2', 'a8'],
-      // Italian:  ['3', 'a17'],
-
       ['A_18', ''],
       ['1', 'A_16'],
       ['2', 'A_8'],
       ['3', 'A_17'],
-
       ['', ''],
       [' ', ''],
       ['99', ''],
@@ -358,14 +347,11 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_ActionIndex__From__ActionId ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
       ['none', 0],
-      // Italian:  ['a16', 8],
-      // Italian:  ['a18', 10],
-      // Italian:  ['a19', 11],
       ['A_16', 8],
       ['A_18', 10],
       ['A_19', 11],
@@ -386,15 +372,13 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_Output__From__ActionId_None ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     [
-      // Italian: ['a14', 'u'],
       ['A_14', 'u'],
       ['', ''],
       [' ', ''],
-      // Italian: ['a18', undefined],
       ['A_18', undefined],
       ['unknown', ''],
     ].forEach(function (values) {
@@ -419,7 +403,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     /*Italian: 
        
@@ -605,7 +589,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_ActionStateOutput_array__From__ActionState ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     /*  
@@ -677,7 +661,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
     /*  Italian:      [
@@ -735,7 +719,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('get_KeyActionOutput_array__From__ActionStateOutput_array ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
+    const inputFilename =  makePathToFixture('../' + 'data' + '/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
     /* Italian: const b6_actionId_arr = [
@@ -825,27 +809,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-----------------
-    /* Italian:  const oneEntryResult = [
-        ['49', 'K_SPACE', 'a0', '0', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '1', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '2', 'ˆ'],
-        ['6', 'K_Z', 'a0', '4', 'ˆ'],
-        ['25', 'K_9', 'a0', '4', 'ˆ'],
-        ['43', 'K_COMMA', 'a0', '4', 'ˆ'],
-        ['49', 'K_SPACE', 'a0', '7', 'ˆ']
-      ];
-      const oneEntryResultNoOutput = [
-        ['49', 'K_SPACE', 'a0', '0', ''],
-        ['49', 'K_SPACE', 'a0', '1', ''],
-        ['49', 'K_SPACE', 'a0', '2', ''],
-        ['6', 'K_Z', 'a0', '4', ''],
-        ['25', 'K_9', 'a0', '4', ''],
-        ['43', 'K_COMMA', 'a0', '4', ''],
-        ['49', 'K_SPACE', 'a0', '7', '']
-      ]      ;
-    */
-
     const oneEntryResult = [
       ['49', 'K_SPACE', 'A_0', '0', 'ˆ'],
       ['49', 'K_SPACE', 'A_0', '1', 'ˆ'],
@@ -875,7 +838,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-------------------------------------------------------------------------------------
     [[[['', '1', 'ˆ']], []],
     [[['', '', '']], []],
     [[[' ', ' ', '']], []],
@@ -886,7 +848,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
 
-    //-------------------------------------------------------------------------------------
     [[[], []],
     [undefined, []],
     [null, []],
