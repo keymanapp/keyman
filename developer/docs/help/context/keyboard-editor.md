@@ -226,7 +226,8 @@ Display 102nd Key (as on European keyboards)
     *See the difference between the two layouts in Keyman Developer.*
 
     > [!NOTE]
-    > To ensure compatibility with both ANSI and ISO physical keyboards, you should tick the "Display 102nd Key (as on European keyboards)" checkbox in Keyman Developer.
+    > The "Display 102nd Key (as on European keyboards)" checkbox can be left unchecked. 
+    > To ensure compatibility, the extra key shouldn't be assigned since it won't be accessible on an ANSI physical keyboard.
 
 Auto-fill underlying layout
 :   When the Fill from layout button is clicked, if this option is
