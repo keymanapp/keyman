@@ -281,27 +281,6 @@ export class ModelCompositor {
   }
 
   markAcceptedSuggestion(suggestion: Suggestion, context: Context, contextState: correction.TrackedContextState) {
-    // TODO:  Important - if there's an active replacement already, we may need special handling
-    // for calculating the reversion - we wish to restore the ORIGINAL, not the prior application
-    // when reverting.
-    if(contextState.tail.replacement) {
-      console.log(contextState.tail.replacement);
-
-      // No trace of the original text (currently) remains (end of day 2025-01-17)
-      //
-      // Or is there one?  I found a tagged 'keep', even if not in the standard position within replacements.
-      // THAT could prove very useful!
-      //
-      // Question, though:  why is index 1 in the tricky case, not 0?  Something's shifting the position...
-      // ... because the applied replacement section gets placed in front!
-      // See `token.replacements = [ replacementPortion ].concat(suggestions);` down below!
-      let baseAppliedToken = contextState.tokens[contextState.tokens.length - contextState.tail.replacement.tokenWidth];
-      console.log(baseAppliedToken);
-
-      let reverterReplacment = baseAppliedToken.replacements.find((repl) => repl.suggestion.tag == 'keep');
-      console.log(reverterReplacment);
-    }
-
     // Suggestion IDs at this level are unique.
     contextState.tail.activeReplacementId = suggestion.id;
     contextState.tail.replacementTransformId = suggestion.transformId;
@@ -332,11 +311,20 @@ export class ModelCompositor {
 
       // We build our suggestions to do whole-word replacement.  Fortunately, that means we already have
       // the full suggestions!
-      const suggestions = contextState.tail.replacements;
+      // Also, prevent duplication of suggestions caused by changing the suggestion ID for old replacements.
+      const suggestions = contextState.tail.replacements?.filter((entry) => entry.suggestion.id != APPLIED_SUGGESTION_COMPONENT);
+      if(!suggestions) {
+        return;
+      }
 
-      // FIXME: Does not handle cases where the prior context is an applied suggestion, thus already has the wordbreak!
-      if(suggestions && (substitutionTokenIndex + tokenizedApplication.length == matchResults.state.tokens.length)) {
+      // Restore to original tokenization in prep for following block, which is designed to
+      // apply to the pre-applied state.
+      if (isContextAtAcceptedSuggestionEdge(matchResults.baseState)) {
+        const appliedWidth = matchResults.baseState.tail.replacement.tokenWidth;
+        substitutionTokenIndex = matchResults.baseState.tokens.length - appliedWidth;
+      }
 
+      if(substitutionTokenIndex + tokenizedApplication.length == matchResults.state.tokens.length) {
         for(let j = 1; j <= tokenizedApplication.length; j++) {
           const replacementPortion: correction.TrackedContextSuggestion = {
             suggestion: {
@@ -352,6 +340,7 @@ export class ModelCompositor {
           const token = matchResults.state.tokens[substitutionTokenIndex + j - 1];
           // Attach our fragmented version of the suggestion - the part useful for rewinding it -
           // as its own suggestion with a distinct, unique ID indicative of this property.
+          //
           token.replacements = [ replacementPortion ].concat(suggestions);
           token.activeReplacementId = APPLIED_SUGGESTION_COMPONENT; // perhaps give unique ID + overwrite the original suggestion ID.
           token.replacementTransformId = suggestion.transformId;

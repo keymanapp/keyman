@@ -92,7 +92,29 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
 export function isContextAtAcceptedSuggestionEdge(
   postContextState: TrackedContextState
 ): boolean {
-  if(!postContextState || postContextState.tail.replacements?.length == 0) {
+  if(!postContextState) {
+    return false;
+  }
+
+  if(postContextState.tail.raw == '') {
+    if(postContextState.tokens.length == 1) {
+      return false;
+    } else {
+      const penultimateToken = postContextState.tokens[postContextState.tokens.length - 2];
+      if(penultimateToken.replacement?.suggestion?.id != APPLIED_SUGGESTION_COMPONENT) {
+        return false;
+      }
+
+      // Restore the empty tail token to the original application state, which
+      // has properties that clearly 'continue' the prior replaced token.
+      const tailToken = postContextState.tail;
+      // FIXME:  clone first, simply append the rest.
+      tailToken.replacements = [...penultimateToken.replacements].map((entry) => { return {...entry}});
+      tailToken.activeReplacementId = APPLIED_SUGGESTION_COMPONENT; // perhaps give unique ID + overwrite the original suggestion ID.
+      tailToken.replacementTransformId = tailToken.replacementTransformId;
+      tailToken.replacement.tokenWidth = penultimateToken.replacement.tokenWidth + 1;
+    }
+  } else if(postContextState.tail.replacements?.length == 0) {
     return false;
   }
 
@@ -433,7 +455,12 @@ export function suggestFromPriorContext(
   // We added a partial, synthetic 'replacement' useful for tracking how much to revert.
   // It should have a set, distinct ID corresponding to the check below.  This partial
   // version was never a real suggestion; even if it were, the original is still within our list!
-  const suggestions = currentToken.replacements.filter((entry) => entry != appliedSuggestion).map((entry) => deepCopy(entry));
+  const suggestions = currentToken.replacements.filter((entry) => entry.suggestion.id != APPLIED_SUGGESTION_COMPONENT).map((entry) => deepCopy(entry));
+
+  // TODO:  also hide the original suggestion matching the active 'replacement'.
+
+  const keepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
+  const keepId = keepSuggestion.suggestion.transformId;
 
   // First up:  we can safely use the raw insert string as the needed length to erase.
   // Also, we need to include whatever backspacing occured to reach that point, as the suggestion
@@ -441,21 +468,16 @@ export function suggestFromPriorContext(
   const deleteLeft = KMWString.length(appliedSuggestion.suggestion.transform.insert) + inputTransform.deleteLeft;
   suggestions.forEach((entry) => {
     entry.suggestion.transform.deleteLeft = deleteLeft;
-    if(inputTransform.id) {
-      // TODO: Consider replacing with or annotating with the ORIGINAL ID - the one that prompted the
-      // original suggestion pass.
-      entry.suggestion.transformId = inputTransform.id;
-    }
+    entry.suggestion.transformId = keepId;
   });
 
   // oh yeah, make sure we map the input's transform ID...
 
-  const keepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
   // Convert the original 'keep' suggestion into a REVERT suggestion; this will restore the
   // original context.
   keepSuggestion.suggestion.tag = 'revert';
   if(currentToken.replacementTransformId) {
-    keepSuggestion.suggestion.transformId = -currentToken.replacementTransformId;
+    keepSuggestion.suggestion.transformId = -keepId;
   }
 
   // Remove any keep-added punctuation; we wish to place the caret immediately after the token,
