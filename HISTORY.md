@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.79 alpha 2025-07-07
+
+* maint(android): use `--release` for release builds (#14307)
+* refactor(common): some reformattings in `shellHelperFunctions.sh` (#14269)
+* maint(common): consolidate `write_download_info` functions (#14270)
+
 ## 19.0.78 alpha 2025-07-04
 
 * docs(developer): Fix links in gestures guide (#14297)

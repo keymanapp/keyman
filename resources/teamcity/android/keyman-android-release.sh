@@ -14,7 +14,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
 
@@ -120,10 +119,10 @@ fi
 
 if builder_has_action all; then
   android_clean_action
-  android_build_action "${TARGETS}"
+  android_build_action "${TARGETS}" --release
   do_publish
 else
   builder_run_action  clean    android_clean_action
-  builder_run_action  build    android_build_action "${TARGETS}"
+  builder_run_action  build    android_build_action "${TARGETS}" --release
   builder_run_action  publish  do_publish
 fi
