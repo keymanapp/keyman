@@ -33,14 +33,17 @@ do_kmc_convert_test() {
 
   builder_echo heading "Creating keylayout.schema.JSON"
   cd $KEYMAN_ROOT/resources/standards-data/keylayout
-  ./create_keylayout_schema.sh
+  #./create_keylayout_schema.sh
+  "$KEYMAN_ROOT/resources/standards-data/keylayout/create_keylayout_schema.sh"
 
   builder_echo heading "Creating keylayout.schema.validator"
   cd $KEYMAN_ROOT/common/web/types
-  ./build.sh configure
+  #./build.sh configure
+  # _S2 how would I start configure???
+  "$KEYMAN_ROOT/common/web/types/build.sh"
 
   builder_echo heading "Starting kmc-convert test"
-  cd $KEYMAN_ROOT/developer/src/kmc-convert
+  cd $THIS_SCRIPT_PATH
 }
 
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
