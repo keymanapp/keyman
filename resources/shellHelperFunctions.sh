@@ -15,7 +15,7 @@ verify_on_mac() {
 # The list of valid platforms that our build scripts ought expect.
 platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "win")
 
-# Used to validate a specified 'project' parameter.
+# Used to validate a specified 'platform' parameter.
 _verify_platform() {
   match=false
   for proj in "${platforms[@]}"
