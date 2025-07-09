@@ -107,7 +107,7 @@ describe('KeylayoutToKmnConverter', function () {
     // convert_object from empty filename
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
-    const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty.replace(/\.keylayout$/, '.kmn'));
+    const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);
 
     it('should return converted array on correct input', async function () {
       assert.isTrue(converted.arrayOf_Rules.length !== 0);
