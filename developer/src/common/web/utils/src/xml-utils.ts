@@ -15,8 +15,9 @@ const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
 export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
-  'keyboard3'           // LDML <keyboard3>
+  'keyboard3'             // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
+  | 'keylayout'           // keylayout
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
@@ -63,6 +64,14 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     ignoreAttributes: false, // We'd like attributes, please
     ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
+  },
+  'keylayout': {
+    attributeNamePrefix: '', // avoid @_
+    htmlEntities: true,
+    ignoreAttributes: false, // We do not like attributes
+    ignorePiTags: true,
+    preserveOrder: true,     // Gives us a 'special' format
+    ignoreDeclaration: true,
   },
   'kps': {
     ...PARSER_COMMON_OPTIONS,
