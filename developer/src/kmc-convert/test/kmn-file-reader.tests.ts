@@ -23,7 +23,7 @@ describe('KeylayoutFileReader', function () {
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
 
     it('read() should return filled array on correct input', async function () {
-      const inputFilename = makePathToFixture('../' + 'data' + '/Test.keylayout');
+      const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result = sut_r.read(inputFilename);
       assert.isNotEmpty(result);
     });
@@ -44,13 +44,13 @@ describe('KeylayoutFileReader', function () {
     });
 
     it('read() should return empty array on unavailable file name', async function () {
-      const inputFilename_unavailable = makePathToFixture('../' + 'data' + '/X.keylayout');
+      const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
       const result = sut_r.read(inputFilename_unavailable);
       assert.isNull(result);
     });
 
     it('read() should return empty array on typo in path', async function () {
-      const result = sut_r.read(makePathToFixture('../' + 'data' + '|Test.keylayout'));
+      const result = sut_r.read(makePathToFixture('../data|Test.keylayout'));
       assert.isNull(result);
     });
   });
