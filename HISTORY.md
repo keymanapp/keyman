@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.81 alpha 2025-07-09
+
+* docs(developer): explanation of the Description field added in Details section. (#14304)
+* fix(ios): restore keyboard scale map for iPad Air 2 (#14305)
+* maint(linux): remove Oracular, add Questing (#14319)
+* maint(android): remove `--ci` parameter from Android release builds (#14320)
+* maint(android): use absolute paths (#14308)
+* maint(windows): fix platform name for Windows (#14321)
+* maint(developer): include missing shellHelperFunctions.sh file (#14322)
+* maint(windows): replace hardcoded `symbols` paths with parameters (#14323)
+
 ## 19.0.80 alpha 2025-07-08
 
 * maint(common): remove include of deleted `tc-download-info.inc.sh` (#14311)
