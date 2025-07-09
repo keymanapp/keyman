@@ -124,7 +124,6 @@ export class KeylayoutToKmnConverter {
       arrayOf_Rules: []
     };
 
-    // ToDo in a new PR: check tags  ( issue # 13599)
     if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
 
       data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');

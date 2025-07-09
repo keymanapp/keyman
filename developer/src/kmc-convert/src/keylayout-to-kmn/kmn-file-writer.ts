@@ -37,7 +37,7 @@ export class KmnFileWriter {
       this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
       return true;
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
       return false;
     }
   }
@@ -54,7 +54,7 @@ export class KmnFileWriter {
     try {
       return data;
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
       return null;
     }
   }
@@ -71,7 +71,7 @@ export class KmnFileWriter {
     try {
       return new TextEncoder().encode(data);
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
       return null;
     }
   }
