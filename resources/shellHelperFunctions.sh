@@ -12,13 +12,13 @@ verify_on_mac() {
   fi
 }
 
-# The list of valid projects that our build scripts ought expect.
-projects=("android" "ios" "linux" "lmlayer" "mac" "web" "windows")
+# The list of valid platforms that our build scripts ought expect.
+platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "win")
 
 # Used to validate a specified 'project' parameter.
-_verify_project() {
+_verify_platform() {
   match=false
-  for proj in "${projects[@]}"
+  for proj in "${platforms[@]}"
   do
     if [[ "${proj}" = "$1" ]]; then
       match=true
@@ -108,7 +108,7 @@ write_download_info() {
 
   local DATE HASH SIZE DOWNLOAD_INFO STAT_FLAGS
 
-  _verify_project "${PLATFORM}"
+  _verify_platform "${PLATFORM}"
 
   # shellcheck disable=SC2312
   if [[ "${BUILDER_OS}" == "mac" ]] && [[ $(command -v stat) == /usr/bin/stat ]]; then
