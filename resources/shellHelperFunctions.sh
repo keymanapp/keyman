@@ -6,7 +6,7 @@
 
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
-  if [[ "${OSTYPE}" != "darwin"* ]]; then
+  if ! builder_is_macos; then
     builder_die "This build script will only run in a Mac environment."
     exit 1
   fi
@@ -111,7 +111,7 @@ write_download_info() {
   _verify_project "${PLATFORM}"
 
   # shellcheck disable=SC2312
-  if [[ "${BUILDER_OS}" == "mac" ]] && [[ $(command -v stat) == /usr/bin/stat ]]; then
+  if builder_is_macos && [[ $(command -v stat) == /usr/bin/stat ]]; then
     # /usr/bin/stat on mac is BSD
     STAT_FLAGS="-f%z"
   else
@@ -271,24 +271,25 @@ verify_npm_setup() {
 }
 
 _print_expected_node_version() {
-"$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
+  "$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
 }
 
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
 _select_node_version_with_nvm() {
-  local REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
-  local CURRENT_NODE_VERSION
+  local REQUIRED_NODE_VERSION  CURRENT_NODE_VERSION
 
-  if [[ $BUILDER_OS != win ]]; then
-    # launch nvm in a sub process, see _builder_nvm.sh for details
-    "$KEYMAN_ROOT/resources/build/_builder_nvm.sh" "$REQUIRED_NODE_VERSION"
-  else
+  REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
+
+  if builder_is_windows; then
     CURRENT_NODE_VERSION="$(node --version)"
-    if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
-      start //wait //b nvm install "$REQUIRED_NODE_VERSION"
-      start //wait //b nvm use "$REQUIRED_NODE_VERSION"
+    if [[ "${CURRENT_NODE_VERSION}" != "v${REQUIRED_NODE_VERSION}" ]]; then
+      start //wait //b nvm install "${REQUIRED_NODE_VERSION}"
+      start //wait //b nvm use "${REQUIRED_NODE_VERSION}"
     fi
+  else
+    # launch nvm in a sub process, see _builder_nvm.sh for details
+    "${KEYMAN_ROOT}/resources/build/_builder_nvm.sh" "${REQUIRED_NODE_VERSION}"
   fi
 
   # Now, check that the node version is correct, on all systems

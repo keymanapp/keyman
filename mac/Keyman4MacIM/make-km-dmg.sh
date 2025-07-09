@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-if [[ "${OSTYPE}" != "darwin"* ]]; then
+if ! builder_is_macos; then
   echo "This build script will only run in a Mac environment."
   exit 1
 fi
