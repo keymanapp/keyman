@@ -1,4 +1,12 @@
-
+/*
+ * Keyman is 2025 copyright (C) SIL International. MIT License.
+ *
+ * Created by S. Schmitt on 2025-06-12
+ *
+ * The interfaces in this file are designed with reference to the mapped
+ * structures produced by xml2js when passed keylayout .xml file.
+ * The prefix KL is stands for 'Keylayout'
+ */
 
 export interface KeylayoutXMLSourceFile {
   /**
