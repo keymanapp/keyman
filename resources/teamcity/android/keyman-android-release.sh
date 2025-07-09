@@ -86,7 +86,7 @@ function _publish_to_downloads_keyman_com() {
 function _publish_to_playstore() {
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}" --ci
+  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
