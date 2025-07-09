@@ -50,7 +50,7 @@ describe('KeylayoutFileReader', function () {
     });
 
     it('read() should return empty array on typo in path', async function () {
-      const result = sut_r.read(makePathToFixture('../data|Test.keylayout'));
+      const result = sut_r.read(makePathToFixture('../' + 'data' + '|Test.keylayout'));
       assert.isNull(result);
     });
   });
