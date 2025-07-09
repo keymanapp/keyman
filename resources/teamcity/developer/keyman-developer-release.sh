@@ -23,21 +23,19 @@ builder_describe \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish release of Keyman Developer" \
-  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
-  "--rsync-user=RSYNC_USER            rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
-  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
+  "--rsync-path=RSYNC_PATH                    rsync path on remote server" \
+  "--rsync-user=RSYNC_USER                    rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST                    rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT                    rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
+  "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
+  "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
 
 builder_parse "$@"
 
 # shellcheck disable=SC2154
 cd "${KEYMAN_ROOT}/developer/src"
-
-# TODO: move to parameters (#14202)
-LOCAL_SYMBOLS_PATH="${KEYMAN_ROOT}/../symbols"
-REMOTE_SYMBOLS_PATH="windows/symbols"
-SYMBOLS_SUBDIR="000admin"
 
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
