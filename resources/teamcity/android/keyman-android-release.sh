@@ -48,7 +48,7 @@ function _publish_to_downloads_keyman_com() {
   local COMPRESS_CMD
 
   # shellcheck disable=SC2154
-  UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+  UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
   KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
   FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
@@ -60,22 +60,22 @@ function _publish_to_downloads_keyman_com() {
   mkdir -p "${UPLOAD_PATH}"
 
   (
-    cd KMAPro/kMAPro/libs
+    cd "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs"
     "${COMPRESS_CMD}" a -bd -bb0 "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples '-xr!build.sh'
   )
 
-  cp "KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
 
   write_download_info "${UPLOAD_PATH}" "${KEYMAN_ENGINE_ANDROID_ZIP}" "Keyman Engine for Android" zip android
   write_download_info "${UPLOAD_PATH}" "${KEYMAN_APK}" "Keyman for Android" apk android
 
-  if [[ -d "../oem/firstvoices/android/app/build/outputs/apk/release" ]]; then
-    cp "../oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
+  if [[ -d "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release" ]]; then
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
     write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_APK}" "FirstVoices Keyboards" apk android
   fi
 
   (
-    cd upload
+    cd "${KEYMAN_ROOT}/android/upload"
     # shellcheck disable=SC2154
     tc_rsync_upload "${KEYMAN_VERSION}" "android/${KEYMAN_TIER}"
   )
