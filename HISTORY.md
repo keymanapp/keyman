@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.80 alpha 2025-07-08
+
+* maint(common): remove include of deleted `tc-download-info.inc.sh` (#14311)
+* maint(resources): fix triggering of builds (#14314)
+
 ## 19.0.79 alpha 2025-07-07
 
 * maint(android): use `--release` for release builds (#14307)
