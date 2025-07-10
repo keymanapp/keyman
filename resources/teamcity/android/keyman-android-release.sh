@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
@@ -46,7 +47,6 @@ function _publish_to_downloads_keyman_com() {
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
   local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
-  local COMPRESS_CMD
 
   # shellcheck disable=SC2154
   UPLOAD_PATH="upload/${KEYMAN_VERSION}"
@@ -54,15 +54,12 @@ function _publish_to_downloads_keyman_com() {
   KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
   FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
 
-  # shellcheck disable=SC2154
-  COMPRESS_CMD="${SEVENZ_HOME}/7z"
-
   rm -rf "${UPLOAD_PATH}"
   mkdir -p "${UPLOAD_PATH}"
 
   (
     cd KMAPro/kMAPro/libs
-    "${COMPRESS_CMD}" a -bd -bb0 "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples '-xr!build.sh'
+    add_zip_files -q -xr!build.sh "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples
   )
 
   cp "KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
