@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.82 alpha 2025-07-10
+
+* maint(android): fix Android release build (#14329)
+* maint(mac): fix end of blocks (#14330)
+* maint(mac): don't run `build.sh publish` twice (#14331)
+
 ## 19.0.81 alpha 2025-07-09
 
 * docs(developer): explanation of the Description field added in Details section. (#14304)
