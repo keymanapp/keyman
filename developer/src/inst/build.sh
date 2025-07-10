@@ -242,25 +242,24 @@ function make-installer() {
   #
 }
 
-# TODO: rename this to keyman-developer-cli-$Version.zip
-KMC_ZIP="$DEVELOPER_ROOT/release/$KEYMAN_VERSION/kmcomp-$KEYMAN_VERSION.zip"
-
 function make-kmc-install-zip() {
   builder_heading make-kmc-install-zip
 
   copy-schemas
-  cd "$DEVELOPER_ROOT/bin"
+  cd "${DEVELOPER_ROOT}/bin"
 
-  wzzip -bd -bb0 "$KMC_ZIP" \
+  # TODO: rename this to keyman-developer-cli-$Version.zip
+  local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${KEYMAN_VERSION}.zip"
+
+  # shellcheck disable=SC2154
+  local COMPRESS_CMD="${SEVENZ_HOME}/7z"
+
+  "${COMPRESS_CMD}" a -bd -bb0 "${KMCOMP_ZIP}" \
     kmconvert.exe \
-    sentry.dll sentry.x64.dll \
-    kmdecomp.exe \
     keyboard_info.schema.json \
-    kmp.schema.json \
-    keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
     xml/layoutbuilder/*.keyman-touch-layout \
-    projects/* \
-    server/*
+    projects/ \
+    server/
 
   cd "$THIS_SCRIPT_PATH"
 }
