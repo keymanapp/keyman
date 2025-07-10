@@ -168,6 +168,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.selected = null;
     this.doRevert = false;
 
+    // By default, we assume we were triggered by the banner.
+    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
+    this.recentAcceptCause = 'banner';
+    this.recentRevert = false;
+    this.selected = null;
+
     this.revertAcceptancePromise = this.acceptInternal(suggestion);
     if(!this.revertAcceptancePromise) {
       // We get here either if suggestion acceptance fails or if it was a reversion.
@@ -186,11 +192,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         _this.revertSuggestion = suggestion;
       }
     });
-
-    // By default, we assume we were triggered by the banner.
-    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
-    this.recentAcceptCause = 'banner';
-    this.recentRevert = false;
 
     this.swallowPrediction = true;
 
@@ -211,6 +212,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
     const recentAcceptCause = this.recentAcceptCause;
 
+    // TODO:  rotating suggestions on the banner; should check if it's the same suggestion that was just applied or
+    // if we're replacing the prior one... I think?
     if(!recentAcceptCause && this.selected) {
       this.accept(this.selected);
       // If there is right-context, DO emit the space instead of swallowing it.
@@ -319,9 +322,14 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
     this.keepSuggestion = null;
+    this.revertSuggestion = null;
+    this.doRevert = false;
+
     for (const s of suggestions) {
       if(s.tag == 'keep') {
         this.keepSuggestion = s as Keep;
+      } else if(s.tag == 'revert') {
+        this.revertSuggestion = s as Reversion;
       }
 
       if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
@@ -329,7 +337,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    if(this.keepSuggestion) {
+    if(this.revertSuggestion) {
+      this._currentSuggestions.splice(this._currentSuggestions.indexOf(this.revertSuggestion), 1);
+    } else if(this.keepSuggestion) {
       this._currentSuggestions.splice(this._currentSuggestions.indexOf(this.keepSuggestion), 1);
     }
 
@@ -340,6 +350,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       this.recentRevert = false;
     } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
       this.swallowPrediction = false;
+    }
+
+    if(this.revertSuggestion) {
+      this.doRevert = true;
     }
 
     // The rest is the same, whether from input or from "self-updating" after a reversion to provide new suggestions.

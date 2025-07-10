@@ -3,6 +3,7 @@
  */
 
 import ModelCompositor from '#./model-compositor.js';
+import { ContextTracker } from '#./correction/context-tracker.js';
 import { toAnnotatedSuggestion } from '#./predict-helpers.js';
 import * as models from '#./models/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
@@ -15,6 +16,96 @@ var TrieModel = models.TrieModel;
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
+    it('allows reversion when reaching a previous suggestion via BKSP', async () => {
+      var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
+        {wordBreaker: wordBreakers.default}
+      );
+
+      let compositor = new ModelCompositor(plainModel, true);
+      let contextTracker = compositor.contextTracker;
+
+      let startContext = {
+        left: "app",
+        right: "",
+        startOfBuffer: true,
+        endOfBuffer: true
+      }
+      let startDistribution = [
+        {
+          sample: {
+            insert: 'l',
+            deleteLeft: 0
+          },
+          p: 0.7
+        }, {
+          sample: {
+            insert: 'e',
+            deleteLeft: 0
+          },
+          p: 0.2
+        }, {
+          sample: {
+            insert: 'a',
+            deleteLeft: 1
+          },
+          p: 0.1
+        }
+      ];
+      // Fully generate predictions from 'appl' + 'e'|'y'.
+      let originalPredictions = await compositor.predict(startDistribution, startContext);
+
+      // Setup validation:  the predict() call should have placed the generated predictions here.
+      let originalAppliedState = contextTracker.newest;
+
+      assert.isOk(originalAppliedState.tail.replacements);
+      assert.sameDeepMembers(
+        originalAppliedState.tail.replacements.map((obj) => obj.suggestion.transform),
+        originalPredictions.map((obj) => obj.transform)
+      );
+      // The suggestion has not yet been marked as applied.
+      assert.equal(originalAppliedState.tail.activeReplacementId, -1);
+
+      // Make sure it's marked as accepted!
+      let appliedSuggestion = originalPredictions.filter((entry) => entry.displayAs == 'applied')[0];
+      assert.isOk(appliedSuggestion);
+      compositor.acceptSuggestion(appliedSuggestion, startContext, startDistribution[0].sample);
+      // A new context state is tracked for the applied suggestion; we check against that.
+      assert.isAtLeast(contextTracker.newest.tail.activeReplacementId, 1);
+      assert.isOk(contextTracker.newest.tail.replacement);
+
+      let bkspContext = {
+        left: 'applied ',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+      let bkspTransform = {
+        insert: '',
+        deleteLeft: 1
+      };
+
+      // Now let's trigger a prediction that reaches the end of the predicted text (minus the backspace).
+      let reversionSuggestions = await compositor.predict(bkspTransform, bkspContext);
+      assert.isOk(reversionSuggestions);
+
+      // Separate instances, but otherwise the same deep members... aside from two details:
+      // 1. 'keep' -> 'revert'
+      // 2. deleteLeft will have changed.
+      assert.isOk(reversionSuggestions.find((entry) => entry.tag == 'revert'));
+
+      // index 0 of the suggestions is generally held by the 'keep' suggestion, which doesn't manipulate context!
+      // index 1+ will hold standard delete-left values.
+      reversionSuggestions.forEach((entry) => {
+        entry.transform.deleteLeft = originalPredictions[1].transform.deleteLeft;
+      });
+
+      const revertSuggestion = reversionSuggestions.find((entry) => entry.tag == 'revert');
+      revertSuggestion.tag = 'keep';
+      revertSuggestion.transform.deleteLeft = 3;  // starter context was 'app'.
+      revertSuggestion.transform.insert += ' '; // delayed reversions don't include post-token whitespace
+      assert.sameDeepOrderedMembers(reversionSuggestions, originalPredictions);
+    });
+
     describe('Basic suggestion generation', function() {
       var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
         {wordBreaker: wordBreakers.default}
@@ -1049,11 +1140,16 @@ describe('ModelCompositor', function() {
       // One for base state, before the transform...
       // one for after, since it makes an edit.
       assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.item(0).tail.activeReplacementId, -1);
+      assert.equal(compositor.contextTracker.item(1).tail.activeReplacementId, -1);
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
+
+      assert.equal(compositor.contextTracker.item(0).tail.activeReplacementId, -1);
+      assert.equal(compositor.contextTracker.item(1).tail.activeReplacementId, 1);
 
       // Accepting the suggestion adds an extra context state.
       assert.equal(compositor.contextTracker.count, 3);
