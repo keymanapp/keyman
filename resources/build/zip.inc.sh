@@ -2,9 +2,9 @@
 #
 # This script contains zip and unzip (TODO) utilities to function for all environments.
 # unzip is available in all environments
-# zip is not available by default on Windows, but can be manually installed.
-# If zip is not available, then fall back to 7z for zipping.
-# 7z requires env SEVENZ_HOME.
+# zip and 7z are not available by default on Windows, but can be manually installed.
+# If 7z is not available, then fall back to zip for zipping.
+# 7z on Windows requires env SEVENZ_HOME.
 #
 # TODO: refactor with /resources/build/win/zip.inc.sh
 
@@ -85,9 +85,9 @@ function add_zip_files() {
     esac
   done
 
-  local COMPRESS_CMD=zip
-  if ! command -v zip 2>&1 > /dev/null; then
-    # Fallback to 7z
+  local COMPRESS_CMD
+  if [[ ! -z "${SEVENZ_HOME:-}" ]] || command -v 7z > /dev/null 2>&1; then
+    # Use 7z if available
     if [[ -z "${SEVENZ+x}" ]]; then
       case "${OSTYPE}" in
         "cygwin"|"msys")
@@ -103,7 +103,8 @@ function add_zip_files() {
     COMPRESS_CMD="${SEVENZ}"
     ZIP_FLAGS=()
   else
-    # Using zip so clear 7z flags
+    # Assume zip is available, so clear 7z flags
+    COMPRESS_CMD=zip
     SEVENZ_FLAGS=()
   fi
 
