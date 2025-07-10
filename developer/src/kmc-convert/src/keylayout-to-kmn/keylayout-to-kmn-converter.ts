@@ -56,14 +56,14 @@ export class KeylayoutToKmnConverter {
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
 
-   /* try {
+    try {
       if (!KeylayoutReader.validate(jsonO)) {
         return null;
       }
     } catch (e) {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
-    }*/
+    }
 
     if (!jsonO) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
