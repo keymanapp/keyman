@@ -20,7 +20,7 @@ builder_parse "$@"
 if builder_is_child_build; then
   builder_die "FAIL: builder_is_child_build should return false but was $_builder_is_child for a dependency script"
 else
-  builder_echo "PASS: builder_is_child_build is false ($_builder_is_child) for the dependency script"
+  builder_echo green "  ✓ PASS: builder_is_child_build is false ($_builder_is_child) for the dependency script"
 fi
 
 function test_action() {
