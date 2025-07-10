@@ -61,7 +61,7 @@ function _publish_to_downloads_keyman_com() {
 
   (
     cd "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs"
-    "${COMPRESS_CMD}" a -bd -bb0 "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples '-xr!build.sh'
+    "${COMPRESS_CMD}" a -bd -bb0 "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar "${KEYMAN_ROOT}/android/Samples" '-xr!build.sh'
   )
 
   cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
