@@ -470,12 +470,11 @@ export function suggestFromPriorContext(
   const keepId = baseKeepSuggestion.suggestion.transformId;
   suggestions[suggestions.indexOf(baseKeepSuggestion)] = keepSuggestion;
 
-  // First up:  we can safely use the raw insert string as the needed length to erase.
-  // Also, we need to include whatever backspacing occured to reach that point, as the suggestion
-  // is applied to the context BEFORE the backspace takes effect.
-  suggestions.forEach((entry) => {
-    entry.suggestion.transformId = keepId;
-  });
+  if(keepId !== undefined) {
+    suggestions.forEach((entry) => {
+      entry.suggestion.transformId = keepId;
+    });
+  }
 
   // oh yeah, make sure we map the input's transform ID...
 

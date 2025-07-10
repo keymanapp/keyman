@@ -287,7 +287,7 @@ export class ModelCompositor {
 
     // Need to mark the 'accepted' aspect of this in some way...
     // We know which state it should match; all there is to do is actually do the bookkeeping.
-    const matchResults = this.contextTracker.analyzeState(
+    const matchResults = this.contextTracker.analyzeState( // why is this mangling the passed-in contextState?
       this.lexicalModel,
       context,
       [{
@@ -355,16 +355,22 @@ export class ModelCompositor {
   async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal
     // or because the context becomes outdated), we need a "fallback" strategy.
-    let compositor = this;
-    let fallbackSuggestions = async function() {
-      const suggestions = await compositor.predict(reversion.transform, context);
+    let fallbackSuggestions = async () => {
+      const revertedContext = models.applyTransform(reversion.transform, context);
+
+      const suggestions = this.contextTracker
+        // With context tracking, we want to consider the prior tracked context so that we can
+        // reuse its suggestions.
+        ? await this.predict(reversion.transform, context)
+        // Without it, we need to build a new suggestion set from the post-reversion context.
+        : await this.predict({insert: '', deleteLeft: 0}, revertedContext);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
         suggestion.transformId = -reversion.transformId;
         // Prevent auto-selection of any suggestion immediately after a reversion.
         // It's fine after at least one keystroke, but not before.
-        suggestion.autoAccept = false;
+        delete suggestion.autoAccept;
       });
 
       return suggestions;
@@ -407,7 +413,8 @@ export class ModelCompositor {
       // A reversion's transform ID is the additive inverse of its original suggestion;
       // we revert to the state of said original suggestion.
       suggestion.transformId = -reversion.transformId;
-      suggestion.autoAccept = false;
+      // We do not permit autocorrect immediately after a reversion.
+      delete suggestion.autoAccept;
     });
     return suggestions;
   }

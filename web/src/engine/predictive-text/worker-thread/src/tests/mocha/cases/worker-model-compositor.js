@@ -41,13 +41,13 @@ describe('ModelCompositor', function() {
           sample: {
             insert: 'e',
             deleteLeft: 0
-          }, 
+          },
           p: 0.2
         }, {
           sample: {
             insert: 'a',
             deleteLeft: 1
-          }, 
+          },
           p: 0.1
         }
       ];
@@ -59,7 +59,7 @@ describe('ModelCompositor', function() {
 
       assert.isOk(originalAppliedState.tail.replacements);
       assert.sameDeepMembers(
-        originalAppliedState.tail.replacements.map((obj) => obj.suggestion.transform), 
+        originalAppliedState.tail.replacements.map((obj) => obj.suggestion.transform),
         originalPredictions.map((obj) => obj.transform)
       );
       // The suggestion has not yet been marked as applied.
@@ -68,9 +68,10 @@ describe('ModelCompositor', function() {
       // Make sure it's marked as accepted!
       let appliedSuggestion = originalPredictions.filter((entry) => entry.displayAs == 'applied')[0];
       assert.isOk(appliedSuggestion);
-      // Is mutating the same token instance!!!
       compositor.acceptSuggestion(appliedSuggestion, startContext, startDistribution[0].sample);
-      assert.isAtLeast(originalAppliedState.tail.activeReplacementId, 0);
+      // A new context state is tracked for the applied suggestion; we check against that.
+      assert.isAtLeast(contextTracker.newest.tail.activeReplacementId, 1);
+      assert.isOk(contextTracker.newest.tail.replacement);
 
       let bkspContext = {
         left: 'applied ',
@@ -85,7 +86,7 @@ describe('ModelCompositor', function() {
 
       // Now let's trigger a prediction that reaches the end of the predicted text (minus the backspace).
       let reversionSuggestions = await compositor.predict(bkspTransform, bkspContext);
-      assert.isOk(reversionSuggestions);  
+      assert.isOk(reversionSuggestions);
 
       // Separate instances, but otherwise the same deep members... aside from two details:
       // 1. 'keep' -> 'revert'
@@ -94,7 +95,9 @@ describe('ModelCompositor', function() {
 
       // index 0 of the suggestions is generally held by the 'keep' suggestion, which doesn't manipulate context!
       // index 1+ will hold standard delete-left values.
-      reversionSuggestions.forEach((entry) => entry.transform.deleteLeft = originalPredictions[1].transform.deleteLeft);
+      reversionSuggestions.forEach((entry) => {
+        entry.transform.deleteLeft = originalPredictions[1].transform.deleteLeft;
+      });
 
       const revertSuggestion = reversionSuggestions.find((entry) => entry.tag == 'revert');
       revertSuggestion.tag = 'keep';
@@ -1137,11 +1140,16 @@ describe('ModelCompositor', function() {
       // One for base state, before the transform...
       // one for after, since it makes an edit.
       assert.equal(compositor.contextTracker.count, 2);
+      assert.equal(compositor.contextTracker.item(0).tail.activeReplacementId, -1);
+      assert.equal(compositor.contextTracker.item(1).tail.activeReplacementId, -1);
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
+
+      assert.equal(compositor.contextTracker.item(0).tail.activeReplacementId, -1);
+      assert.equal(compositor.contextTracker.item(1).tail.activeReplacementId, 1);
 
       // Accepting the suggestion adds an extra context state.
       assert.equal(compositor.contextTracker.count, 3);
