@@ -18,7 +18,7 @@ builder_describe "Keyman common Linux modules" \
 
 builder_parse "$@"
 
-if [[ $BUILDER_OS != linux ]]; then
+if ! builder_is_linux; then
   builder_echo grey "Platform is not linux; skipping common/linux"
   exit 0
 fi

@@ -92,7 +92,7 @@ function _publish_to_playstore() {
 }
 
 function do_publish() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # currently only tested on Windows, TODO: test cross-platform
     builder_echo error "This script is intended to be run on Windows only."
     return 1

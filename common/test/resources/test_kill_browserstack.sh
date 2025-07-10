@@ -12,7 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 
-if [[ $BUILDER_OS == win ]]; then
+if builder_is_windows; then
   # BrowserStackLocal may not exist, so always pass
   taskkill //f //im BrowserStackLocal.exe || true
 fi

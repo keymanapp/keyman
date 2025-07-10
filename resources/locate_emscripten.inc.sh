@@ -20,7 +20,7 @@
 #
 locate_emscripten() {
   local EMCC_EXECUTABLE
-  if [[ "${BUILDER_OS}" == "win" ]]; then
+  if builder_is_windows; then
     EMCC_EXECUTABLE="emcc.py"
   else
     EMCC_EXECUTABLE="emcc"

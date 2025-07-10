@@ -91,7 +91,7 @@ do_test() {
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
-    if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
+    if [[ $target == wasm ]] && builder_is_macos; then
       # 11794 -- parallel tests failing on some mac build agents; temporary
       # mitigation until we diagnose root cause
       meson test -j 1 -C "$MESON_PATH" $testparams
@@ -136,7 +136,7 @@ do_uninstall() {
 # ----------------------------------------------------------------------------
 
 build_meson_cross_file_for_wasm() {
-  if [ $BUILDER_OS == win ]; then
+  if builder_is_windows; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')

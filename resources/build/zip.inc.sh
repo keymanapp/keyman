@@ -51,14 +51,14 @@ function add_zip_files() {
         shift
         ;;
       -[0123456789])
-        # Compression level where 
+        # Compression level where
         # -0 indicates no compression
         # -1 indicates low compression (fastest)
         # -9 indicates ultra compression (slowest)
         ZIP_FLAGS+=($1)
         if [[ $1 =~ -([0-9]) ]]; then
           SEVENZ_FLAGS+=("-mx${BASH_REMATCH[1]}")
-        fi  
+        fi
         shift;
         ;;
 
@@ -80,14 +80,12 @@ function add_zip_files() {
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
-      case "${OSTYPE}" in
-        "cygwin"|"msys")
-          SEVENZ="${SEVENZ_HOME}"/7z.exe
-          ;;
-        *)
-          SEVENZ=7z
-          ;;
-      esac
+      if builder_is_windows; then
+        # shellcheck disable=2154
+        SEVENZ="${SEVENZ_HOME}/7z.exe"
+      else
+        SEVENZ=7z
+      fi
     fi
 
     # 7z command to add files so clear zip flags
