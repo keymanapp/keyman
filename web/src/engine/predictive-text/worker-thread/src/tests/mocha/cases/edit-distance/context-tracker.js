@@ -209,14 +209,14 @@ describe('ContextTracker', function() {
 
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left, 
-        baseContextMatch, 
+        newContext.left,
+        baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "an"}, [{sample: transform, p: 1}])
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0, deleteRight: 0});
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0});
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
@@ -242,14 +242,14 @@ describe('ContextTracker', function() {
 
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left, 
-        baseContextMatch, 
+        newContext.left,
+        baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc"}, [{sample: transform, p: 1}])
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0, deleteRight: 0 });
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
@@ -271,7 +271,7 @@ describe('ContextTracker', function() {
       let newContext = models.tokenize(defaultBreaker, {
         left: "text'\""
       });
-      // The reason it's a problem - current internal logic isn't prepared to shift 
+      // The reason it's a problem - current internal logic isn't prepared to shift
       // from 1 to 3 tokens in a single step.
       assert.equal(newContext.left.length, 3);
 
@@ -280,8 +280,8 @@ describe('ContextTracker', function() {
         deleteLeft: 0
       }
       let problemContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left, 
-        baseContextMatch, 
+        newContext.left,
+        baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "text'"}, [{sample: transform, p: 1}])
       );
       assert.isNull(problemContextMatch);
