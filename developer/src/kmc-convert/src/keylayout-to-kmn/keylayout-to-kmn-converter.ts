@@ -114,9 +114,6 @@ export class KeylayoutToKmnConverter {
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
 
-      // _S2 ToDo remove this console.log
-      console.log("RUN kmc convert - input file: ",data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
-
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
         const singleModifierSet: string[] = [];
