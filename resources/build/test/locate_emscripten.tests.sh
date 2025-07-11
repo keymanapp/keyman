@@ -127,6 +127,49 @@ function test_locate_emscripten__with_EMSCRIPTEN_BASE_not_executable() {
   assert-contains "${result}" "contains emcc but it is not executable" "result"
 }
 
+function test_locate_emscripten__with_EMSCRIPTEN_BASE_missing_emcc() {
+  # Setup
+  export EMSCRIPTEN_BASE="${BASE_DIR}/emsdk"
+  mkdir -p "${EMSCRIPTEN_BASE}"
+
+  # Execute
+  result=$(locate_emscripten 2>&1)
+
+  # Verify
+  assert-failed $?
+  assert-contains "${result}" "does not point to emcc's folder" "result"
+}
+
+function test_locate_emscripten__with_EMSCRIPTEN_BASE_missing_dir() {
+  # Setup
+  EMSCRIPTEN_BASE="${BASE_DIR}/emsdk/upstream"
+  mkdir -p "${EMSCRIPTEN_BASE}"
+  export EMSCRIPTEN_BASE="${EMSCRIPTEN_BASE}/emscripten"
+
+  # Execute
+  result=$(locate_emscripten 2>&1)
+
+  # Verify
+  assert-failed $?
+  assert-contains "${result}" "Variable EMSCRIPTEN_BASE (${EMSCRIPTEN_BASE}) points to a non-existent directory" "result"
+}
+
+function test_locate_emscripten__with_EMSCRIPTEN_BASE_nonexistent_but_emsdk_exists() {
+  # Setup
+  local EMSDK_DIR="${BASE_DIR}/emsdk"
+  mkdir -p "${EMSDK_DIR}/upstream"
+  export EMSCRIPTEN_BASE="${EMSDK_DIR}/upstream/emscripten"
+  touch "${EMSDK_DIR}/emsdk"
+  chmod +x "${EMSDK_DIR}/emsdk"
+
+  # Execute
+  result=$(locate_emscripten 2>&1)
+
+  # Verify
+  assert-succeeded $?
+  assert-equal "${result}" "verify_emscripten_version called"
+}
+
 run_tests 1 "${LINENO}"
 
 #------------------------------------------------------------------------------
@@ -208,5 +251,29 @@ function test_select_emscripten_version_with_emsdk__emsdk() {
   assert-contains "${result}" "git called"
   assert-contains "${result}" "npm called"
 }
+
+function test_select_emscripten_version_with_emsdk__EMSCRIPTEN_BASE_nonexistent_but_emsdk_exists() {
+  # Setup
+  local EMSDK_DIR="${BASE_DIR}/emsdk"
+  mkdir -p "${EMSDK_DIR}/upstream"
+  export EMSCRIPTEN_BASE="${EMSDK_DIR}/upstream/emscripten"
+  KEYMAN_MIN_VERSION_EMSCRIPTEN="4.0.10"
+  create_mock git
+  create_mock npm
+  echo -e '#!/bin/sh\nmkdir -p ${EMSCRIPTEN_BASE} ; echo "emsdk $* called"' > "${EMSDK_DIR}/emsdk"
+  chmod +x "${EMSDK_DIR}/emsdk"
+  _builder_offline=""
+
+  # Execute
+  result=$(_select_emscripten_version_with_emsdk)
+
+  # Verify
+  assert-succeeded $?
+  assert-contains "${result}" "emsdk install 4.0.10 called"
+  assert-contains "${result}" "git called"
+  assert-contains "${result}" "npm called"
+}
+
+# TODO: write test for offline branch
 
 run_tests "${NEW_START}" "${LINENO}"
