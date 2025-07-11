@@ -1,10 +1,10 @@
 /*
   Copyright:        Copyright (C) 2003-2018 SIL International.
-  Authors:          mcdurdin
+  Authors:          SabineSchmitt
 */
 
 #pragma once
 
-extern const int my_CODE__SIZE[];
+extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
 
