@@ -18,7 +18,6 @@
 #include <iterator>
 #include <string>
 #include "../../../src/kmx/kmx_xstring.h"
-#include "../../../common/cpp/kmx_file_codes.h"
 #include <kmx_file.h>
 #include <test_assert.h>
 
