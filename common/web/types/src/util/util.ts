@@ -9,6 +9,7 @@ export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
  * @param x Name of element to box
  */
 export function boxXmlArray(o: any, x: string): void {
+
   if (typeof o == 'object' && !Array.isArray(o[x])) {
     if (o[x] === null || o[x] === undefined) {
       o[x] = [];
@@ -272,7 +273,7 @@ export function convertToUnicodeCharacter(in_str: string): string {
     return decodeUniHexValue(in_str);
   }
 
-  else if ( [...new Intl.Segmenter().segment(in_str)].length <= 1) {
+  else if ([...new Intl.Segmenter().segment(in_str)].length <= 1) {
     return in_str;
   }
   else {

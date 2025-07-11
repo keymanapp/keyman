@@ -30,7 +30,6 @@ describe('KmnFileWriter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-
     // empty convert_object from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
@@ -169,7 +168,7 @@ describe('KmnFileWriter', function () {
     // empty convert_object from empty filename
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
-    const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty.replace(/\.keylayout$/, '.kmn'));
+    const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);
 
     const out_expected_first: string =
       "c ..................................................................................................................\n"

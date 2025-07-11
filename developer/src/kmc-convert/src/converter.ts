@@ -29,9 +29,6 @@ export interface ConverterResult extends KeymanCompilerResult {
  * relies on callbacks for all external IO.
  */
 
-// _S2 this is Base class of all converters
-// _S2 method init: uses Interface CompilerCallbacks( loadfile,...)
-// _S2 method run: uses Interface CompilerCallbacks( loadfile,...)
 export class Converter implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: CompilerOptions;
@@ -43,7 +40,6 @@ export class Converter implements KeymanCompiler {
    * @param options   - Compiler options
    * @returns           false if initialization fails
    */
-  // _S2 fills interface this.callbacks with array (holding our data), filesize ect
   async init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
     this.options = { ...options };
     this.callbacks = callbacks;
@@ -61,12 +57,6 @@ export class Converter implements KeymanCompiler {
    *                  {@link Converter.write}.
    * @returns         Source artifacts on success, null on failure.
    */
-  // _S2 check for ( file available,...) then
-  // _S2 finds converter e.g.keylayout->kmn  ( uses converter-class-factory)
-  // _S2 factory uses/instanciates child class ( ~ in C++ virtual function in base class <-> use fun of derived class)
-  // _S2 loads file
-  // _S2 creates a new converter (-object)
-  // _S2 runs conversion for this object ( run-method of this converter of keylayout-to-kmn-tonverter.ts  )
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
     const converterOptions: CompilerOptions = {
       ...defaultCompilerOptions,

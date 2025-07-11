@@ -1,0 +1,31 @@
+<!--
+Copyright © 1991-2024 Unicode, Inc.
+For terms of use, see http://www.unicode.org/copyright.html
+SPDX-License-Identifier: Unicode-3.0
+CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
+-->
+<!-- Important Note:
+
+This DTD describes a technical preview of Keyboard Test Data -->
+
+<!ELEMENT keyboard (layouts, modifierMap, keyMapSet ) >
+<!ATTLIST keyboard (group, id, name, maxout) #REQUIRED >
+
+<!ELEMENT layouts ( layout)* >
+<!ATTLIST layout (first, last, mapSet, modifiers) #REQUIRED >
+
+<!ELEMENT modifierMap (keyMapSelect)*>
+<!ATTLIST modifierMap (id, defaultIndex) #REQUIRED >
+
+<!ELEMENT keyMapSelect (modifier)*>
+<!ATTLIST keyMapSelect (mapIndex) #REQUIRED >
+<!ATTLIST modifier (keys) #REQUIRED >
+
+<!ELEMENT keyMapSet ( keyMap)* >
+<!ATTLIST keyMapSet (id) #REQUIRED >
+
+<!ELEMENT keyMap (key)* >
+<!ATTLIST keyMap (index) #REQUIRED >
+<!ATTLIST key (code, action, output) #REQUIRED >
+
+
