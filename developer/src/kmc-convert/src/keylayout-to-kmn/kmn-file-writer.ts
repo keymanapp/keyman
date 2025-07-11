@@ -23,7 +23,7 @@ export class KmnFileWriter {
    * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
    * @return true if data has been written; false if not
    */
-  public write(data_ukelele: convert_object): boolean {
+  public writeToFile(data_ukelele: convert_object): boolean {
 
     let data: string = "\n";
 
@@ -42,24 +42,7 @@ export class KmnFileWriter {
     }
   }
 
-  public writeToString(data_ukelele: convert_object): string {
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      return data;
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
-      return null;
-    }
-  }
-
-  public writeToUint8Array(data_ukelele: convert_object): Uint8Array {
+  public write(data_ukelele: convert_object): Uint8Array {
     let data: string = "\n";
 
     // add top part of kmn file: STORES

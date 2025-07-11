@@ -85,22 +85,21 @@ export class KeylayoutToKmnConverter {
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    // _S2 still write to file - may be removed later
-    const out_text_ok: boolean = kmnFileWriter.write(outArray);
+    // _S2 still write to file - will be removed later
+    const out_text_ok: boolean = kmnFileWriter.writeToFile(outArray);
     if (!out_text_ok) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
     }
 
     // write to object/ConverterToKmnResult
-    const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
+    const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
     const Result_toBeReturned: ConverterToKmnResult = {
       artifacts: {
         kmn: { data: out_Uint8, filename: outputFilename }
       }
     };
 
-    // _S2 does this still work?
     if (!out_Uint8) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
@@ -130,9 +129,6 @@ export class KeylayoutToKmnConverter {
       data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
-
-      // _S2 ToDo remove this console.log
-      console.log("RUN kmc convert - input file: ", data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
 
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
