@@ -3,7 +3,7 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
+import { ContextTracker, TrackedContextState, TrackedContextSuggestion } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -20,6 +20,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import SuggestionTag = LexicalModelTypes.SuggestionTag;
 import Transform = LexicalModelTypes.Transform;
+import { LexicalModelPunctuation } from '../../../../../../../common/web/types/src/lexical-model-types.js';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the
@@ -87,6 +88,52 @@ export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: Correctio
   return b.totalProb - a.totalProb;
 }
 
+export function isContextAtAcceptedSuggestionEdge(
+  postContextState: TrackedContextState
+): boolean {
+  if(!postContextState) {
+    return false;
+  }
+
+  if(postContextState.tail.raw == '') {
+    if(postContextState.tokens.length == 1) {
+      return false;
+    } else {
+      const penultimateToken = postContextState.tokens[postContextState.tokens.length - 2];
+      if(penultimateToken.activeReplacementId == -1) {
+        return false;
+      }
+
+      // Restore the empty tail token to the original application state, which
+      // has properties that clearly 'continue' the prior replaced token.
+      const tailToken = postContextState.tail;
+
+      tailToken.replacements = [...penultimateToken.replacements].map((entry) => {
+        return {
+          suggestion: {
+            ...entry.suggestion,
+          },
+          tokenWidth: entry.tokenWidth + 1
+        }
+      });
+      tailToken.activeReplacementId = penultimateToken.activeReplacementId;
+      tailToken.replacementTransformId = tailToken.replacementTransformId;
+      tailToken.replacement.tokenWidth = penultimateToken.replacement.tokenWidth + 1;
+    }
+  } else if(postContextState.tail.replacements?.length == 0) {
+    return false;
+  }
+
+  // Original suggestion set:  acquired.  But... they're based on a different context...
+  const appliedSuggestion = postContextState.tail.replacement;
+
+  if(appliedSuggestion?.suggestion?.id == -1) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * This method performs the correction-search and model-lookup operations for
  * prediction generation by using the user's context state and potential
@@ -102,6 +149,8 @@ export async function correctAndEnumerate(
   transformDistribution: Distribution<Transform>,
   context: Context
 ): Promise<{
+  preContextState: TrackedContextState; // TODO:  validate usefulness; remove if we can do without it.
+
   /**
    * For models that support correction-search caching, this provides the
    * cached object corresponding to this method's operation.
@@ -169,6 +218,7 @@ export async function correctAndEnumerate(
     }
 
     return {
+      preContextState: null,
       postContextState: null,
       rawPredictions: rawPredictions
     };
@@ -179,7 +229,7 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let { state: contextState } = contextTracker.analyzeState(
+  const { state: contextState } = contextTracker.analyzeState(
     lexicalModel,
     context,
     null
@@ -194,6 +244,15 @@ export async function correctAndEnumerate(
       : null
   );
   const postContextState = contextChangeAnalysis.state;
+
+  if(isContextAtAcceptedSuggestionEdge(postContextState)) {
+    return {
+      preContextState: contextState,
+      postContextState: postContextState,
+      // We're going to ignore whatever we'd generate, so just skip past this phase.
+      rawPredictions: []
+    };
+  }
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -279,6 +338,7 @@ export async function correctAndEnumerate(
 
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
+      preContextState: contextState,
       postContextState: postContextState,
       rawPredictions: predictions
     }
@@ -371,9 +431,77 @@ export async function correctAndEnumerate(
   // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
 
   return {
+    preContextState: contextState,
     postContextState: postContextState,
     rawPredictions: rawPredictions
   };
+}
+
+/**
+ * Given a previous context state to which a suggestion was applied, regenerate its
+ * suggestions based on the current state of the context, altering the 'keep' suggestion
+ * into a 'revert' suggestion that will restore the original input.
+ * @param postContextState
+ * @param inputTransform
+ * @param punctuation
+ * @returns
+ */
+export function suggestFromPriorContext(
+  postContextState: TrackedContextState,
+  // no priorContextState use?  Looks like it may be very useful for suggestion application layering...
+  // that is, applying an alternate suggestion on top of an applied one.
+  inputTransform: Transform,
+  punctuation: LexicalModelPunctuation
+) {
+  const currentToken = postContextState.tail;
+
+  // We added a partial, synthetic 'replacement' useful for tracking how much to revert.
+  // It should have a set, distinct ID corresponding to the check below.  This partial
+  // version was never a real suggestion; even if it were, the original is still within our list!
+  const suggestions = [...currentToken.replacements];
+
+  // TODO:  also hide the original suggestion matching the active 'replacement'.
+
+  const baseKeepSuggestion = suggestions.find((entry) => entry.suggestion.tag == 'keep');
+  const keepSuggestion: TrackedContextSuggestion = {
+    suggestion: {...baseKeepSuggestion.suggestion},
+    tokenWidth: baseKeepSuggestion.tokenWidth
+  };
+  const keepId = baseKeepSuggestion.suggestion.transformId;
+  suggestions[suggestions.indexOf(baseKeepSuggestion)] = keepSuggestion;
+
+  if(keepId !== undefined) {
+    suggestions.forEach((entry) => {
+      entry.suggestion.transformId = keepId;
+    });
+  }
+
+  // oh yeah, make sure we map the input's transform ID...
+
+  // Convert the original 'keep' suggestion into a REVERT suggestion; this will restore the
+  // original context.
+  keepSuggestion.suggestion.tag = 'revert';
+  if(currentToken.replacementTransformId) {
+    keepSuggestion.suggestion.transformId = -keepId;
+  }
+
+  // Remove any keep-added punctuation; we wish to place the caret immediately after the token,
+  // with no intervening whitespace or similar punctuation insertion.
+  const postSuggestionInsert = punctuation.insertAfterWord;
+  if(postSuggestionInsert) {
+    const keepTransform = keepSuggestion.suggestion.transform;
+    const keepText = keepTransform.insert;
+
+    // Validate that the punctuation matches first.
+    const punct = keepText.slice(keepText.length - postSuggestionInsert.length);
+    if(punct == postSuggestionInsert) {
+      // remove the whitespace-ish punctuation if it was added!
+      keepTransform.insert = keepText.slice(0, keepText.length - postSuggestionInsert.length);
+    }
+  }
+
+  // Bypass the rest of the correction-search; just use these!
+  return suggestions.map((entry) => entry.suggestion);
 }
 
 export function shouldStopSearchingEarly(
@@ -624,12 +752,12 @@ export function processSimilarity(
  * unexpected ways.  For example, when typing numbers in English, we don't expect
  * '5' to auto-correct to '5th' just because there are no pure-number entries in
  * the lexicon rooted on '5'.
- * @param correction 
- * @returns 
+ * @param correction
+ * @returns
  */
 export function correctionValidForAutoSelect(correction: string) {
   let chars = [...correction];
-  
+
   // If the _correction_ - the actual, existing text - does not include any letters,
   // then predictions built upon it should not be considered valid for auto-correction.
   for(let c of chars) {

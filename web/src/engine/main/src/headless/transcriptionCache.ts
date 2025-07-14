@@ -1,6 +1,6 @@
 import { Transcription } from "keyman/engine/js-processor";
 
-const TRANSCRIPTION_BUFFER_SIZE = 10;
+const TRANSCRIPTION_BUFFER_SIZE = 20;
 
 export class TranscriptionCache {
   private readonly map = new Map<number, Transcription>();

@@ -56,6 +56,7 @@ export class TrackedContextToken {
   transformDistributions: Distribution<Transform>[] = [];
   replacements: TrackedContextSuggestion[] = [];
   activeReplacementId: number = -1;
+  replacementTransformId: number = -1;
 
   constructor();
   constructor(instance: TrackedContextToken);
@@ -69,7 +70,10 @@ export class TrackedContextToken {
   }
 
   get currentText(): string {
-    if(this.replacementText === undefined || this.replacementText === null) {
+    const replacement = this.replacement;
+    if(replacement) {
+      return replacement.suggestion.displayAs;
+    } else if(this.replacementText === undefined || this.replacementText === null) {
       return this.raw;
     } else {
       return this.replacementText;
@@ -86,6 +90,7 @@ export class TrackedContextToken {
   clearReplacements() {
     this.activeReplacementId = -1;
     this.replacements = []
+    this.replacementTransformId = -1;
   }
 
   /**
@@ -349,7 +354,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
     tokenizedContext: Token[],
     matchState: TrackedContextState,
-    transformSequenceDistribution?: Distribution<Transform[]>
+    transformSequenceDistribution?: Distribution<Transform[]>,
+    preserveMatchState?: boolean
   ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: string[] = matchState.toRawTokenization();
@@ -387,6 +393,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // If mutations HAVE happened, we have work to do.
     let state = matchState;
+    if(preserveMatchState) {
+      state = new TrackedContextState(state);
+    }
 
     let priorEdit: typeof editPath[0];
     let poppedTokenCount = 0;
@@ -487,7 +496,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
             state = new TrackedContextState(state);
           }
 
-          const sourceToken = matchState.tokens[i];
+          const sourceToken = preserveMatchState ? new TrackedContextToken(matchState.tokens[i]) : matchState.tokens[i];
           state.tokens[i - poppedTokenCount] = sourceToken;
           const token = state.tokens[i - poppedTokenCount];
 
@@ -740,7 +749,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           continue;
         }
 
-        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution);
+        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution, preserveMatchState);
 
         if(result?.state) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
