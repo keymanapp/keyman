@@ -344,7 +344,7 @@ void test_decxstr() {
          // same way
          continue;
        }
-       auto size = CODE__SIZE_all[code];
+       auto size = CODE__SIZE[code];
        std::u16string str(u"abc" U_UC_SENTINEL);
        str.append(1, code);
        str.append(size < 0 ? 0 : size, u'\u0001');

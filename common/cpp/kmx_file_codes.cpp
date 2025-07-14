@@ -1,14 +1,14 @@
 /*
  * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
- * This definition of CODE__SIZE_all should be used instead of versions scattered all around the codebase
+ * This definition of CODE__SIZE should be used instead of versions scattered all around the codebase
  */
 
 #include <typeinfo>
 
 #include "kmx_file_codes.h"
 
-const int CODE__SIZE_all[] = {
+const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
@@ -36,4 +36,4 @@ const int CODE__SIZE_all[] = {
     2    // CODE_SETSYSTEMSTORE      0x18
 };
 
-static_assert(sizeof(CODE__SIZE_all) / sizeof(CODE__SIZE_all[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE_all not correct");
+static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");

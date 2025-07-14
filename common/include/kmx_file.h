@@ -377,8 +377,6 @@ typedef COMP_GROUP *PCOMP_GROUP;
 
 extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
-extern const int CODE__SIZE_all[];
-#define CODE__SIZE_MAX_all 5
 
 #define KEYBOARDFILEHEADER_SIZE 64
 #define KEYBOARDFILESTORE_SIZE  12
