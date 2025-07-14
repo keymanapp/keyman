@@ -1,7 +1,6 @@
 
 #include "pch.h"
 #include "xstring.h"
-#include "kmx_file_codes.h"
 // used to be  windows/src/global/vc/xstring.cpp
 /*
 * int xstrlen( PKMX_BYTE p );
@@ -33,11 +32,11 @@ PKMX_WCHAR incxstr(PKMX_WCHAR p) {
     return p + 1;
   }
 
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE_all[*(p + 1)] == -1) {
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
     return p + 1;
   }
 
-  int deltaptr = 2 + CODE__SIZE_all[*(p + 1)];
+  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
 
   // check for \0 between UC_SENTINEL(FFFF) and next printable character
   for (int i = 0; i < deltaptr; i++) {
@@ -80,9 +79,9 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   // note: If we are pointing to the middle of a UC_SENTINEL CODE_x, then we won't treat it as valid,
   //       and will just go back a single wchar
   q = p;
-  for (int i = 0; i < CODE__SIZE_all_MAX && q >= pStart; i++, q--) {
-    //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE_all && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE_all+1) has value i
-    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE_all[*(q + 1)] + 1 == i)
+  for (int i = 0; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
+    //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
+    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
       return q;
   }
 
@@ -112,8 +111,8 @@ int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
   for(i = 0; p < p1; p = incxstr(p), i++);
   return i;
 }
-/*
-const int CODE__SIZE_all[] = {
+
+const int CODE__SIZE[] = {
     -1,  // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
@@ -139,7 +138,7 @@ const int CODE__SIZE_all[] = {
     1,   // CODE_RESETOPT            0x16
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
-};*/
+};
 
 // Ensure that all CODE_### sizes are defined
-static_assert(sizeof(CODE__SIZE_all) / sizeof(CODE__SIZE_all[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE_all not correct");
+static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");
