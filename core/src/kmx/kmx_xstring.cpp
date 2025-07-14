@@ -7,7 +7,8 @@
 #include <locale>
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
-#include "../../../common/cpp/kmx_file_codes.h"
+#include <km_types.h>
+//#include "../../../common/cpp/kmx_file_codes.h"
 
 using namespace km::core;
 using namespace kmx;

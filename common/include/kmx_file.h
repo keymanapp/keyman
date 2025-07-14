@@ -6,7 +6,7 @@
 #pragma once
 
 #include <km_types.h>
-#include "../cpp/kmx_file_codes.h"
+//#include "../cpp/kmx_file_codes.h"
 
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
@@ -375,8 +375,8 @@ typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
-extern const int CODE__SIZE[];
-#define CODE__SIZE_MAX 5
+//extern const int CODE__SIZE[];
+//#define CODE__SIZE_MAX 5
 
 #define KEYBOARDFILEHEADER_SIZE 64
 #define KEYBOARDFILESTORE_SIZE  12
