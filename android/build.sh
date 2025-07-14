@@ -39,7 +39,7 @@ builder_describe \
   build \
   test \
   "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
-  "archive                                  Copy release artifacts to upload/ and rsync to downloads.keyman" \
+  "archive                                  Copy release artifacts to upload/ and create zip" \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
@@ -62,40 +62,46 @@ function do_test_help() {
 }
 
 function archive_artifacts() {
+  local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
+
   UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
   KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
   FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
-  ZIP_FILE="${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}"
-  ZIP_FLAGS=("-q" "-r") # quiet, recursive
 
+  rm -rf "${UPLOAD_PATH}"
   mkdir -p "${UPLOAD_PATH}"
 
   # Create Keyman Engine for Android archive
-  builder_echo "Copying Keyman Engine for Android into ${UPLOAD_PATH}..."
-  # shellcheck disable=SC2164
-  cd "${UPLOAD_PATH}"
-  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar" ./
-  add_zip_files "${ZIP_FILE}" "${ZIP_FLAGS[@]}" "keyman-engine.aar"
-  rm -f "keyman-engine.aar"
+  builder_echo "Adding Keyman Engine for Android to zip..."
+  (
+    # shellcheck disable=SC2164
+    cd "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs"
+    add_zip_files -q -r "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar
+  )
 
-  builder_echo "Copying Keyman Engine for Android Sample projects into ${UPLOAD_PATH}..."
-  cp -rf "${KEYMAN_ROOT}/android/Samples" ./
-  add_zip_files "${ZIP_FILE}" "-x@../../zip-excludes" "${ZIP_FLAGS[@]}" "Samples"
-  rm -rf "Samples"
+  builder_echo "Adding Keyman Engine for Android Sample projects to zip..."
+  (
+    # shellcheck disable=SC2164
+    cd "${KEYMAN_ROOT}/android"
+    add_zip_files -q -r -xr!build.sh "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" Samples
+  )
 
   # Copy release APK
-  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" ./
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
 
   # FirstVoices app
 
   if [[ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]]; then
-    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" ./
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
   fi
 
   #
   # Write download info files
   #
+  # shellcheck disable=SC2164
+  cd "${UPLOAD_PATH}"
+
   write_download_info "Keyman Engine for Android" "${KEYMAN_ENGINE_ANDROID_ZIP}" "${KEYMAN_VERSION}" "${KEYMAN_TIER}" "android"
   write_download_info "Keyman for Android" "${KEYMAN_APK}" "${KEYMAN_VERSION}" "${KEYMAN_TIER}" "android"
 
