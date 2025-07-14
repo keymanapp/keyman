@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.83 alpha 2025-07-14
+
+* maint(resources): add `build.sh` to run all `resource/build/test` tests (#14335)
+* maint(developer): consolidate creating KMC_ZIP file (#14309)
+
 ## 19.0.82 alpha 2025-07-10
 
 * maint(android): fix Android release build (#14329)
