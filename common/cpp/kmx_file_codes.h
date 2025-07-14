@@ -5,5 +5,6 @@
 
 #pragma once
 
-extern const int CODE__SIZE_all[];
+extern const int CODE__SIZE[];
 #define CODE__SIZE_MAX 5
+
