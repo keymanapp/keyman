@@ -17,6 +17,7 @@ cpp_files = files(
     'mcompile.cpp',
     'mc_kmxfile.cpp',
     'mc_import_rules.cpp',
+    '../../common/cpp/kmx_file_codes.cpp',
     '../../common/cpp/km_u16.cpp',
     )
 
