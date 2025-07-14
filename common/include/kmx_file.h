@@ -6,7 +6,7 @@
 #pragma once
 
 #include <km_types.h>
-#include "kmx_file_codes.h"
+#include "../cpp/kmx_file_codes.h"
 
 #ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
