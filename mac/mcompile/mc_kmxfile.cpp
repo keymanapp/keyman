@@ -6,12 +6,13 @@
 
 #include "mc_kmxfile.h"
 #include <typeinfo>
+#include "kmx_file_codes.h"
 
 #define CERR_None                                          0x00000000
 #define CERR_CannotAllocateMemory                          0x00008004
 #define CERR_UnableToWriteFully                            0x00008007
 #define CERR_SomewhereIGotItWrong                          0x00008009
-
+/*
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
@@ -39,7 +40,7 @@ const int CODE__SIZE[] = {
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
 };
-
+*/
 /** @brief check if the file has correct version */
 KMX_BOOL KMX_VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD file_size);
 
@@ -547,11 +548,11 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
     return p + 1;
   }
 
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE_all[*(p + 1)] == -1) {
     return p + 1;
   }
 
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
+  int deltaptr = 2 + CODE__SIZE_all[*(p + 1)];
 
   // check for \0 between UC_SENTINEL(FFFF) and next printable character
   for (int i = 0; i < deltaptr; i++) {
