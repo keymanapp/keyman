@@ -71,9 +71,6 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     ignoreAttributes: false, // We'd like attributes, please
     tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
-      // currently, the LDML spec doesn't have any element values, but this
-      // future-proofs us a little in that element values are allowed, just trimmed.
-      // if we do need elements in the future, we'd check the preserve-space attribute here.
       return tagValue?.trim();
     },
     trimValues: false, // preserve spaces, but see tagValueProcessor

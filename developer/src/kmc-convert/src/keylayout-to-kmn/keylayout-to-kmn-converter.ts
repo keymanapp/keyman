@@ -12,7 +12,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils"
 
 export interface convert_object {
   keylayout_filename: string,

@@ -12,7 +12,9 @@ import { XMLParser } from 'fast-xml-parser';
 import { util } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import { SchemaValidators } from '@keymanapp/common-types';
-import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+import { DeveloperUtilsMessages } from '@keymanapp/developer-utils';
+import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils"
+
 import boxXmlArray = util.boxXmlArray;
 
 export class KeylayoutFileReader {
@@ -27,7 +29,7 @@ export class KeylayoutFileReader {
 
     if (!SchemaValidators.default.keylayout(source)) {
       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
-        this.callbacks.reportMessage(ConverterMessages.Error_SchemaValidationError({
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
           message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options

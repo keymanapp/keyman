@@ -48,8 +48,4 @@ export class ConverterMessages {
   static Error_InvalidFile = (o: { errorText: string; }) => m(
     this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
 
-  static ERROR_SchemaValidationError = SevError | 0x009;
-  static Error_SchemaValidationError = (o: { instancePath: string, keyword: string, message: string, params: string; }) => m(
-    this.ERROR_SchemaValidationError, `Error validating Keylayout XML file: ${def(o.instancePath === "" ? "keyboard" : o.instancePath)} : ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
-
 }

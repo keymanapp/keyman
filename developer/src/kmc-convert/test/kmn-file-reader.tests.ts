@@ -11,7 +11,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-import { KeylayoutXMLSourceFile } from '../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils"
 
 describe('KeylayoutFileReader', function () {
 

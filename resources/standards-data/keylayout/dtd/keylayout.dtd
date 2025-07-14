@@ -1,14 +1,13 @@
 <!--
-Copyright © 1991-2024 Unicode, Inc.
-For terms of use, see http://www.unicode.org/copyright.html
-SPDX-License-Identifier: Unicode-3.0
-CLDR data files are interpreted according to the LDML specification (http://unicode.org/reports/tr35/)
--->
-<!-- Important Note:
+ * Keyman is 2025 copyright (C) SIL International. MIT License.
+ *
+ * Created by S. Schmitt on 2025-07-14
+ *
+ * This DTD describes a technical preview of Keylayout Data
+ -->
 
-This DTD describes a technical preview of Keyboard Test Data -->
-
-<!ELEMENT keyboard (layouts, modifierMap, keyMapSet ) >
+<!ELEMENT keyboard (layouts, keyMapSet) >
+<!ELEMENT keyboard (modifierMap)* >
 <!ATTLIST keyboard (group, id, name, maxout) #REQUIRED >
 
 <!ELEMENT layouts ( layout)* >
@@ -19,6 +18,7 @@ This DTD describes a technical preview of Keyboard Test Data -->
 
 <!ELEMENT keyMapSelect (modifier)*>
 <!ATTLIST keyMapSelect (mapIndex) #REQUIRED >
+
 <!ATTLIST modifier (keys) #REQUIRED >
 
 <!ELEMENT keyMapSet ( keyMap)* >
@@ -26,6 +26,7 @@ This DTD describes a technical preview of Keyboard Test Data -->
 
 <!ELEMENT keyMap (key)* >
 <!ATTLIST keyMap (index) #REQUIRED >
-<!ATTLIST key (code, action, output) #REQUIRED >
 
+<!ATTLIST key (code) #REQUIRED >
+<!ATTLIST key (action #REQUIRED output #IMPLIED | output #REQUIRED action #IMPLIED)>
 
