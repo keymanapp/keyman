@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe \
-  "Run unit tests for builder scripts" \
+  "Run unit tests (defined in *.test*.sh or test.sh) for builder scripts" \
   "test"
 
 builder_parse "$@"
