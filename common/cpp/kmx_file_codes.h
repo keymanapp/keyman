@@ -6,5 +6,5 @@
 #pragma once
 
 extern const int CODE__SIZE_all[];
-#define CODE__SIZE_MAX 5
+#define CODE__SIZE_MAX_all 5
 

@@ -20,6 +20,7 @@
 #include "../../../src/kmx/kmx_xstring.h"
 #include <kmx_file.h>
 #include <test_assert.h>
+#include "kmx_file_codes.h"
 
 using namespace km::core::kmx;
 using namespace std;
@@ -343,7 +344,7 @@ void test_decxstr() {
          // same way
          continue;
        }
-       auto size = CODE__SIZE[code];
+       auto size = CODE__SIZE_all[code];
        std::u16string str(u"abc" U_UC_SENTINEL);
        str.append(1, code);
        str.append(size < 0 ? 0 : size, u'\u0001');

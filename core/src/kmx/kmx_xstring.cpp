@@ -7,6 +7,7 @@
 #include <locale>
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
+#include "kmx_file_codes.h"
 
 using namespace km::core;
 using namespace kmx;
@@ -152,11 +153,11 @@ PKMX_WCHAR km::core::kmx::incxstr(PKMX_WCHAR p) {
     return p + 1;
   }
 
-  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE[*(p + 1)] == -1) {
+  if (*(p + 1) > CODE_LASTCODE || CODE__SIZE_all[*(p + 1)] == -1) {
     return p + 1;
   }
 
-  int deltaptr = 2 + CODE__SIZE[*(p + 1)];
+  int deltaptr = 2 + CODE__SIZE_all[*(p + 1)];
 
   // check for \0 between UC_SENTINEL(FFFF) and next printable character
   for (int i = 0; i < deltaptr; i++) {
@@ -201,9 +202,9 @@ PKMX_WCHAR km::core::kmx::decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   // note: If we are pointing to the middle of a UC_SENTINEL CODE_x, then we won't treat it as valid,
   //       and will just go back a single wchar
   q = p;
-  for (int i = 0; i < CODE__SIZE_MAX && q >= pStart; i++, q--) {
+  for (int i = 0; i < CODE__SIZE_MAX_all && q >= pStart; i++, q--) {
     //  *q == UC_SENTINEL &&  *(q + 1) is within CODE__SIZE && next CODE_ right of UC_SENTINEL ( looked up in CODE__SIZE+1) has value i
-    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE[*(q + 1)] + 1 == i)
+    if (*q == UC_SENTINEL &&  *(q + 1) <= CODE_LASTCODE     && CODE__SIZE_all[*(q + 1)] + 1 == i)
       return q;
   }
 
