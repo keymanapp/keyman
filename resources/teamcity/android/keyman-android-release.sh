@@ -42,38 +42,20 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/android"
 
+function _create_zip_archive() {
+  builder_echo start "archive" "Copying release artifacts to upload/ and creating zip"
+
+  "${KEYMAN_ROOT}/android/build.sh" archive
+
+  builder_echo end "archive" success "Finished copying release artifacts to upload/ and creating zip"
+}
+
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
-  local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
-
-  # shellcheck disable=SC2154
-  UPLOAD_PATH="upload/${KEYMAN_VERSION}"
-  KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
-  KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
-  FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
-
-  rm -rf "${UPLOAD_PATH}"
-  mkdir -p "${UPLOAD_PATH}"
-
   (
-    cd KMAPro/kMAPro/libs
-    add_zip_files -q -xr!build.sh "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples
-  )
-
-  cp "KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
-
-  write_download_info "${UPLOAD_PATH}" "${KEYMAN_ENGINE_ANDROID_ZIP}" "Keyman Engine for Android" zip android
-  write_download_info "${UPLOAD_PATH}" "${KEYMAN_APK}" "Keyman for Android" apk android
-
-  if [[ -d "../oem/firstvoices/android/app/build/outputs/apk/release" ]]; then
-    cp "../oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
-    write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_APK}" "FirstVoices Keyboards" apk android
-  fi
-
-  (
-    cd upload
+    cd "${KEYMAN_ROOT}/android/upload"
     # shellcheck disable=SC2154
     tc_rsync_upload "${KEYMAN_VERSION}" "android/${KEYMAN_TIER}"
   )
@@ -82,6 +64,7 @@ function _publish_to_downloads_keyman_com() {
 }
 
 function _publish_to_playstore() {
+  local PUBTARGETS="$1"
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
   "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}" --ci
@@ -90,6 +73,7 @@ function _publish_to_playstore() {
 }
 
 function do_publish() {
+  local PUBTARGETS
   if ! is_windows; then
     # currently only tested on Windows, TODO: test cross-platform
     builder_echo error "This script is intended to be run on Windows only."
@@ -101,18 +85,27 @@ function do_publish() {
   export RSYNC_HOST
   export RSYNC_ROOT
 
+  if builder_has_option --fv; then
+    PUBTARGETS="app,fv"
+    export RELEASE_OEM=true
+    export RELEASE_OEM_FIRSTVOICES=true
+  else
+    # shellcheck disable=SC2034
+    PUBTARGETS="app"
+    export RELEASE_OEM_FIRSTVOICES=false
+  fi
+
+  _create_zip_archive
   _publish_to_downloads_keyman_com
-  _publish_to_playstore
+  _publish_to_playstore "${PUBTARGETS}"
   upload_help "Keyman for Android" android
 }
 
 if builder_has_option --fv; then
   TARGETS="engine,app,fv"
-  PUBTARGETS="app,fv"
 else
   # shellcheck disable=SC2034
   TARGETS="engine,app"
-  PUBTARGETS="app"
 fi
 
 if builder_has_action all; then
