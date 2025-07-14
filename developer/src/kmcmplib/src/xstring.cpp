@@ -1,7 +1,7 @@
 
 #include "pch.h"
 #include "xstring.h"
-#include "../../../common/cpp/kmx_file_codes.h"
+#include "../../../../common/cpp/kmx_file_codes.h"
 // used to be  windows/src/global/vc/xstring.cpp
 /*
 * int xstrlen( PKMX_BYTE p );
