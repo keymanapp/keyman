@@ -4,6 +4,7 @@
 
 #include "../../common/include/km_types.h"
 #include "../../common/include/kmx_file.h"
+#include "../../common/cpp/kmx_file_codes.h"
 #include "mcompile.h"
 
 #ifndef _KMXFILE_H
