@@ -22,6 +22,79 @@ describe('ContextTracker', function() {
     }];
   }
 
+  describe('isSubstitutionAlignable', () => {
+    it(`returns true:  'ca' => 'can'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('can', 'ca'));
+    });
+
+    // Leading word in context window starts sliding out of said window.
+    it(`returns true:  'can' => 'an'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('an', 'can'));
+    });
+
+    // Same edits on both sides:  not valid.
+    it(`returns false: 'apple' => 'grapples'`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('grapples', 'apple'));
+    });
+
+    // Edits on one side:  valid.
+    it(`returns true: 'apple' => 'grapple'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('grapple', 'apple'));
+    });
+
+    // Edits on one side:  valid.
+    it(`returns true: 'apple' => 'grapple'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('apples', 'apple'));
+    });
+
+    // Same edits on both sides:  not valid.
+    it(`returns false: 'grapples' => 'apple'`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('apple', 'grapples'));
+    });
+
+    // Substitution:  not valid when not permitted via parameter.
+    it(`returns false:  'apple' => 'banana'`, () => {
+      // edit path:  'insert' ('b' of banana), 'match' (on leading a), rest are 'substitute'.
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('banana', 'apple'));
+    });
+
+    // Substitution:  not valid if too much is substituted, even if allowed via parameter.
+    it(`returns false:  'apple' => 'banana' (subs allowed)`, () => {
+      // edit path:  'insert' ('b' of banana), 'match' (on leading a), rest are 'substitute'.
+      // 1 match vs 4 substitute = no bueno.  It'd require too niche of a keyboard rule.
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('banana', 'apple', true));
+    });
+
+    it(`returns true: 'a' => 'à' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('à', 'a', true));
+    });
+
+    // Leading substitution:  valid if enough of the remaining word matches.
+    // Could totally happen from a legit Keyman keyboard rule.
+    it(`returns true: 'can' => 'van' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('van', 'can', true));
+    });
+
+    // Trailing substitution:  invalid if not allowed.
+    it(`returns false: 'can' => 'cap' (subs not allowed)`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('cap', 'can'));
+    });
+
+    // Trailing substitution:  valid.
+    it(`returns false: 'can' => 'cap' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('cap', 'can', true));
+    });
+
+    it(`returns true:  'clasts' => 'clasps' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('clasps', 'clasts', true));
+    });
+
+    // random deletion at the start + later substitution = still permitted
+    it(`returns false:  'clasts' => 'clasps' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('lasps', 'clasts', true));
+    });
+  });
+
   describe('attemptMatchContext', function() {
     it("properly matches and aligns when lead token is removed", function() {
       let existingContext = models.tokenize(defaultBreaker, {
