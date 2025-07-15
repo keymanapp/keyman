@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.84 alpha 2025-07-15
+
+* maint(common): add support for inline file exclusions to `add_zip_files` and unit tests (#14333)
+* maint(developer): use `add_zip_files` function (#14334)
+
 ## 19.0.83 alpha 2025-07-14
 
 * maint(resources): add `build.sh` to run all `resource/build/test` tests (#14335)
