@@ -1,7 +1,6 @@
 
 #include "pch.h"
 #include "xstring.h"
-#include "../../../../common/cpp/kmx_file_codes.h"
 // used to be  windows/src/global/vc/xstring.cpp
 /*
 * int xstrlen( PKMX_BYTE p );
@@ -113,7 +112,7 @@ int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
   return i;
 }
 
-/*const int CODE__SIZE[] = {
+const int CODE__SIZE[] = {
     -1,  // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
@@ -143,4 +142,3 @@ int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
 
 // Ensure that all CODE_### sizes are defined
 static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");
-*/

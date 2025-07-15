@@ -6,7 +6,6 @@
 
 #include <typeinfo>
 
-#include "kmx_file_codes.h"
 
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00

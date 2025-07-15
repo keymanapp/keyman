@@ -20,8 +20,6 @@
 #include "../../../src/kmx/kmx_xstring.h"
 #include <kmx_file.h>
 #include <test_assert.h>
-#include <km_types.h>
-//#include "../../../../common/cpp/kmx_file_codes.h"
 
 using namespace km::core::kmx;
 using namespace std;

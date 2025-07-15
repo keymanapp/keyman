@@ -5,7 +5,6 @@
  */
 
 #include "mc_kmxfile.h"
-#include "../../../common/cpp/kmx_file_codes.h"
 #include <typeinfo>
 
 #define CERR_None                                          0x00000000
@@ -14,7 +13,7 @@
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
 
-/*const int CODE__SIZE[] = {
+const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
     2,   // CODE_INDEX               0x02
@@ -40,7 +39,7 @@
     1,   // CODE_RESETOPT            0x16
     3,   // CODE_IFSYSTEMSTORE       0x17
     2    // CODE_SETSYSTEMSTORE      0x18
-};*/
+};
 
 /** @brief check if the file has correct version */
 KMX_BOOL KMX_VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD file_size);
