@@ -16,6 +16,7 @@
 #include "km_u16.h"
 #include <cassert>
 
+
 enum ShiftState {
   Base         = 0,                   // 0
   Shft         = 1,                   // 1
@@ -45,7 +46,7 @@ enum ShiftState {
 #define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
 #define VK_DIVIDE   0x6F
-#define VK_CANCEL   3
+#define VK_CANCEL   0x03
 #define VK_DECIMAL  0x2E
 
 #define VK_OEM_CLEAR      0xFE
