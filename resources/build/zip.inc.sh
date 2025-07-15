@@ -12,8 +12,10 @@
 # [zip filename]
 # [list of flags to pass to zip command] Flags start with a single-dash
 #   -x@filename for a file containing list of files to exclude from the archive
+#   -xr!name    to exclude files matching name from the archive
 #   -* all other flags
-#   Flags passed in are treated as zip parameters, and internally converterted to 7z flags as applicable
+#   Flags passed in are treated as zip parameters, and internally converterted
+#   to 7z flags as applicable
 # [list of files to include in zip]
 function add_zip_files() {
 
