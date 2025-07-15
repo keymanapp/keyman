@@ -31,6 +31,17 @@ function textToCharTransforms(text: string, transformId?: number) {
   return perCharTransforms;
 }
 
+/**
+ * Determines the proper 'last match' index for a tokenized sequence based on its edit path.
+ *
+ * In particular, this method is designed to handle the following case:
+ * ['to', 'apple', ' ', ''] => ['to', 'apply', ' ', 'n']
+ *
+ * The ' ' is unedited, but as it follows the edited 'apple' => 'apply', 'to' is the true
+ * "last edited" token.
+ * @param editPath
+ * @returns
+ */
 export function getEditPathLastMatch(editPath: EditOperation[]) {
   const editLength = editPath.length;
   // Special handling: appending whitespace to whitespace with the default wordbreaker.
@@ -488,6 +499,44 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     );
 
     let editPath = mapping.editPath();
+    // Special case:  new context bootstrapping - first token often substitutes.
+    // The text length is small enough that no words should be able to rotate out the start of the context.
+    // Special handling needed in case of no 'match'; the rest of the method assumes at least one 'match'.
+    if(editPath.length <= 3 && (editPath[0] == 'substitute' || editPath[0] == 'match')) {
+      let matchCount = 0;
+      let subCount = 0;
+      for(let i = 0; i < editPath.length; i++) {
+        if(editPath[i] == 'substitute') {
+          subCount++;
+          if(!this.isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
+            return {
+              canAlign: false
+            };
+          }
+        } else if(editPath[i] == 'match') {
+          // If a substitution is already recorded, treat the 'match' as a substitution.
+          if(subCount > 0) {
+            subCount++;
+          } else {
+            matchCount++;
+          }
+        }
+      }
+
+      const insertCount = editPath.filter((entry) => entry == 'insert').length;
+      const deleteCount = editPath.filter((entry) => entry == 'delete').length;
+
+      return {
+        canAlign: true,
+        matchLength: matchCount,
+        leadTokenShift: 0,
+        tailEditLength: subCount,
+        tailTokenShift: insertCount - deleteCount
+      }
+    }
+
+    // From here on assumes that at least one 'match' exists on the path.
+    // It all works great... once the context is long enough for at least one stable token.
     const firstMatch = editPath.indexOf('match');
     const lastMatch = getEditPathLastMatch(editPath);
     if(firstMatch == -1) {
@@ -640,283 +689,260 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
     tokenizedContext: Token[],
     matchState: TrackedContextState,
+    // the distribution should be tokenized already.
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: string[] = matchState.toRawTokenization();
 
-    // Inverted order, since 'match' existed before our new context.
-    let mapping = ClassicalDistanceCalculation.computeDistance(
-      matchContext.map(value => ({key: value})),
-      tokenizedContext.map(value => ({key: value.text})),
-      // Must be at least 2, as adding a single whitespace after a token tends
-      // to add two tokens: one for whitespace, one for the empty token to
-      // follow it.
-      3
-    );
+    const alignmentResults = this.attemptTokenizedAlignment(tokenizedContext.map((token) => token.text), matchContext);
 
-    let editPath = mapping.editPath();
-    const firstMatch = editPath.indexOf('match');
-    const lastMatch = getEditPathLastMatch(editPath);
-
-    // Assertion:  for a long context, the bulk of the edit path should be a
-    // continuous block of 'match' entries.  If there's anything else in
-    // the middle, we have a context mismatch.
-    if(firstMatch) {
-      for(let i = firstMatch+1; i < lastMatch; i++) {
-        if(editPath[i] != 'match') {
-          return null;
-        }
-      }
+    if(!alignmentResults.canAlign) {
+      return null;
     }
 
-    // If we have a perfect match with a pre-existing context, no mutations have
-    // happened; just re-use the old context state.
-    if(firstMatch == 0 && lastMatch == editPath.length - 1) {
-      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
-    }
-
-    // If mutations HAVE happened, we have work to do.
-    let state = matchState;
-
-    let priorEdit: typeof editPath[0];
-    let poppedTokenCount = 0;
-    for(let i = 0; i < firstMatch; i++) {
-      switch(editPath[i]) {
-        case 'delete':
-          if(priorEdit && priorEdit != 'delete') {
-            return null;
-          }
-          if(state == matchState) {
-            state = new TrackedContextState(state);
-          }
-          state.popHead();
-          poppedTokenCount++;
-          break;
-        case 'substitute':
-          // There's no major need to drop parts of a token being 'slid' out of the context window.
-          // We'll leave it intact.
-          break;
-        default:
-          // No 'insert' should exist on the leading edge of context when the
-          // context window slides.
-          //
-          // No 'transpose' edits should exist within this section, either.
-          return null;
-      }
-    }
+    const {
+      leadTokenShift,
+      matchLength,
+      tailEditLength,
+      tailTokenShift
+    } = alignmentResults;
 
     const hasDistribution = transformSequenceDistribution && Array.isArray(transformSequenceDistribution);
 
-    // Reset priorEdit for the end-of-context updating loop.
-    priorEdit = undefined;
-
-    // Used to construct and represent the part of the incoming transform that
-    // does not land as part of the final token in the resulting context.  This
-    // component should be preserved by any suggestions that get applied.
-    let preservationTransform: Transform;
-    let pushedTokenCount = 0;
-
-    // Now to update the end of the context window.
-    for(let i = lastMatch+1; i < editPath.length; i++) {
-      const isLastToken = i == editPath.length - 1;
-
+    // If we have a perfect match with a pre-existing context, no mutations have
+    // happened; just re-use the old context state.
+    if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
+      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
+    } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,
       // it should simply be rebuilt.
       if(!hasDistribution) {
         return null;
       }
-      const transformDistIndex = i - (lastMatch + 1);
-      const tokenDistribution = transformSequenceDistribution.map((entry) => {
-        const sample = entry.sample[transformDistIndex];
-        if(!sample) {
-          return null;
-        }
-        return {
-          sample,
-          p: entry.p
-        };
-      });
+    }
 
-      const incomingToken = tokenizedContext[i - poppedTokenCount];
+    // If mutations HAVE happened, we have work to do.
+    let state = matchState;
 
-      // If the tokenized part of the input is a completely empty transform,
-      // replace it with null.  This can happen with our default wordbreaker
-      // immediately after a whitespace.  We don't want to include this
-      // transform as part of the input when doing correction-search.
-      let primaryInput = hasDistribution ? tokenDistribution[0]?.sample : null;
-
-      // If the incoming token has text but we have no transform (or 'insert') to match
-      // it with, abort the matching attempt.  We can't match this case well yet.
-      if(editPath[i] != 'delete') {
-        if(!incomingToken) {
-          return null;
-        } else if(!(primaryInput || editPath[i] == 'insert' ) && incomingToken?.text != '') {
-          return null;
-        }
+    if(leadTokenShift < 0) {
+      state = new TrackedContextState(state);
+      for(let i = 0; i > leadTokenShift; i--) {
+        state.popHead();
       }
-
-      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
-        primaryInput = null;
-      }
-
-      // If this token's transform component is not part of the final token,
-      // it's something we'll want to preserve even when applying suggestions
-      // for the final token.
+    } else if(leadTokenShift > 0) {
+      // TODO:  insert token(s) at the start to match the text that's back within the
+      // sliding context window.
       //
-      // Note:  will need a either a different approach or more specialized
-      // handling if/when supporting phrase-level (multi-token) suggestions.
-      if(!isLastToken) {
-        preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
+      // (was not part of original `attemptContextMatch`)
+      return null;
+    }
+
+    // If no TAIL mutations have happened, we're safe to return now.
+    if(tailEditLength == 0 && tailTokenShift == 0) {
+      return {
+        state: state,
+        baseState: matchState,
+        headTokensRemoved: -leadTokenShift,
+        tailTokensAdded: tailTokenShift
       }
+    }
+
+    // ***
+
+    // first non-matched tail index within the incoming context
+    const incomingTailUpdateIndex = matchLength + (leadTokenShift > 0 ? leadTokenShift : 0);
+    // first non-matched tail index in `matchState`, the base context state.
+    const matchingTailUpdateIndex = matchLength - (leadTokenShift < 0 ? leadTokenShift : 0);
+
+    // The assumed input from the input distribution is always at index 0.
+    const tokenizedPrimaryInput = hasDistribution ? transformSequenceDistribution[0].sample : null;
+    // first index:  original sample's tokenization
+    // second index:  token index within original sample
+    const tokenDistribution = transformSequenceDistribution.map((entry) => {
+      return entry.sample.map((sample) => {
+        return {
+          sample: sample,
+          p: entry.p
+        }
+      });
+    });
+
+    // // Gets distribution of token index 1s as excerpted from the sequences' distribution.
+    // let a = tokenDistribution.map((sequence) => sequence[1]);
+
+    // Using these as base indices...
+
+    let tailIndex = 0;
+    // let lastTailIndex = tailEditLength + (tailTokenShift > 0 ? tailTokenShift : 0);
+
+    // Used to construct and represent the part of the incoming transform that
+    // does not land as part of the final token in the resulting context.  This
+    // component should be preserved by any suggestions that get applied.
+    let preservationTransform: Transform;
+
+    for(let i = 0; i < tailEditLength; i++) {
+      // do tail edits
+      const incomingIndex = i + incomingTailUpdateIndex;
+      const matchingIndex = i + matchingTailUpdateIndex;
+
+      const incomingToken = tokenizedContext[incomingIndex];
+      const matchedToken = matchState.tokens[matchingIndex];
+
+      let primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
       const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
 
-      switch(editPath[i]) {
-        case 'substitute':
-          if(isLastToken) {
-            state = new TrackedContextState(state);
-          }
+      const isLastToken = incomingIndex == tokenizedContext.length - 1;
 
-          const sourceToken = matchState.tokens[i];
-          state.tokens[i - poppedTokenCount] = sourceToken;
-          const token = state.tokens[i - poppedTokenCount];
+      if(isLastToken) {
+        state = new TrackedContextState(state);
+        // If this token's transform component is not part of the final token,
+        // it's something we'll want to preserve even when applying suggestions
+        // for the final token.
+        //
+        // Note:  will need a either a different approach or more specialized
+        // handling if/when supporting phrase-level (multi-token) suggestions.
+      } else {
+        preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
+      }
+      state.tokens[incomingIndex] = matchedToken;
+      const token = matchedToken;
 
-          // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
-          // on the tokens, rather than on the overall 'state'.
-          // - Reason:  phrase-level corrections / predictions would likely need a search-state
-          //   across per potentially-affected token.
-          // - Shifting the paradigm should be a separate work unit than the
-          //   context-tracker rework currently being done, though.
-          if(isBackspace) {
-            token.updateWithBackspace(incomingToken.text, primaryInput.id);
-            if(isLastToken) {
-              state.tokens.pop(); // pops `token`
-              // puts it back in, rebuilding a fresh search-space that uses the rebuilt
-              // keystroke distribution from updateWithBackspace.
-              state.pushTail(token);
-            }
-          } else {
-            token.update(
-              tokenDistribution,
-              incomingToken.text
-            );
+      // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
+      // on the tokens, rather than on the overall 'state'.
+      // - Reason:  phrase-level corrections / predictions would likely need a search-state
+      //   across per potentially-affected token.
+      // - Shifting the paradigm should be a separate work unit than the
+      //   context-tracker rework currently being done, though.
+      if(isBackspace) {
+        token.updateWithBackspace(incomingToken.text, primaryInput.id);
+        if(isLastToken) {
+          state.tokens.pop(); // pops `token`
+          // puts it back in, rebuilding a fresh search-space that uses the rebuilt
+          // keystroke distribution from updateWithBackspace.
+          state.pushTail(token);
+        }
+      } else {
+        token.update(
+          tokenDistribution.map((seq) => seq[tailIndex]),
+          incomingToken.text
+        );
 
-            if(isLastToken) {
-              // Search spaces may not exist during some unit tests; the state
-              // may not have an associated model during some.
-              state.searchSpace[0]?.addInput(tokenDistribution);
-            }
-          }
-
-          // For this case, we were _likely_ called by
-          // ModelCompositor.acceptSuggestion(), which would have marked the
-          // accepted suggestion.
-          //
-          // Upon inspection, this doesn't seem entirely ideal.  It works for
-          // the common case, but not for specially crafted keystroke
-          // transforms.  That said, it's also very low impact.  Best as I can
-          // see, this is only really used for debugging info?
-          if(state != matchState && !isLastToken) {
-            token.replacementText = incomingToken.text;
-          }
-
-          break;
-        case 'insert':
-          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match' && priorEdit != 'insert') {
-            return null;
-          }
-
-          if(!preservationTransform) {
-            // Allows for consistent handling of "insert" cases; even if there's no edit
-            // from a prior token, having a defined transform here indicates that
-            // a new token has been produced.  This serves as a useful conditional flag
-            // for prediction logic.
-            preservationTransform = { insert: '', deleteLeft: 0 };
-          }
-
-          if(state == matchState) {
-            state = new TrackedContextState(state);
-          }
-
-          let pushedToken = new TrackedContextToken();
-          pushedToken.raw = incomingToken.text;
-
-          // TODO:  assumes that there was no shift in wordbreaking from the
-          // prior context to the current one.  This may actually be a major
-          // issue for dictionary-based wordbreaking!
-          //
-          // If there was such a shift, then we may have extra transforms
-          // originally on a 'previous' token that got moved into this one!
-          //
-          // Suppose we're using a dictionary-based wordbreaker and have
-          // `butterfl` for our context, which could become butterfly.  If the
-          // next keystroke results in `butterfli`, this would likely be
-          // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
-          // we know to properly relocate the `f` and `l` transforms?
-          if(primaryInput) {
-            pushedToken.transformDistributions = tokenDistribution ? [tokenDistribution] : [];
-          } else if(incomingToken.text) {
-            // We have no transform data to match against an inserted token with text; abort!
-            // Refer to #12494 for an example case; we currently can't map previously-committed
-            // input transforms to a newly split-off token.
-            return null;
-          }
-          pushedToken.isWhitespace = incomingToken.isWhitespace;
-
-          // Auto-replaces the search space to correspond with the new token.
-          state.pushTail(pushedToken);
-          pushedTokenCount++;
-          break;
-        case 'match':
-          // The default (Unicode) wordbreaker returns an empty token after whitespace blocks.
-          // Adding new whitespace extends the whitespace block but preserves the empty token
-          // following it.
-          if(priorEdit == 'substitute' && tokenizedContext[tokenizedContext.length-1].text == '') {
-            // Keep the blank token as-is; no edit needed!
-            continue;
-          }
-          // else 'fallthrough' / return null
-        case 'delete':
-          // While we do keep a cache of recent contexts, logic constraints for handling
-          // multitaps makes it tricky to reliably use in all situations.
-          // It's best to handle `delete` cases directly for this reason.
-          for(let j = i + 1; j < editPath.length; j++) {
-            // If something _other_ than delete follows a 'delete' on the edit path,
-            // we probably have a context mismatch.
-            //
-            // It's possible to construct cases where this isn't true, but it's likely not
-            // worth trying to handle such rare cases.
-            if(editPath[j] != 'delete') {
-              return null;
-            }
-          }
-
-          // If ALL that remains are deletes, we're good to go.
-          //
-          // This may not be the token at the index, but since all that remains are deletes,
-          // we'll have deleted the correct total number from the end once all iterations
-          // are done.
-          if(state == matchState) {
-            state = new TrackedContextState(state);
-          }
-
-          state.tokens.pop();
-          break;
-        default:
-          // No 'transform' edits should exist within this section.
-          return null;
+        if(isLastToken) {
+          // Search spaces may not exist during some unit tests; the state
+          // may not have an associated model during some.
+          state.searchSpace[0]?.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
+        }
       }
 
-      priorEdit = editPath[i];
+      // For this case, we were _likely_ called by
+      // ModelCompositor.acceptSuggestion(), which would have marked the
+      // accepted suggestion.
+      //
+      // Upon inspection, this doesn't seem entirely ideal.  It works for
+      // the common case, but not for specially crafted keystroke
+      // transforms.  That said, it's also very low impact.  Best as I can
+      // see, this is only really used for debugging info?
+      if(state != matchState && !isLastToken) {
+        // TODO:  eliminate
+        token.replacementText = incomingToken.text;
+      }
+
+      tailIndex++;
+    }
+
+    if(tailTokenShift < 0) {
+      if(state == matchState) {
+        state = new TrackedContextState(state);
+      }
+
+      // delete tail tokens
+      for(let i = 0; i > tailTokenShift; i--) {
+        // If ALL that remains are deletes, we're good to go.
+        //
+        // This may not be the token at the index, but since all that remains are deletes,
+        // we'll have deleted the correct total number from the end once all iterations
+        // are done.
+        state.tokens.pop();
+      }
+    } else {
+      if(state == matchState) {
+        state = new TrackedContextState(state);
+      }
+
+      for(let i = tailEditLength; i < tailEditLength + tailTokenShift; i++) {
+        // create tail tokens
+        const incomingIndex = i + incomingTailUpdateIndex;
+        const incomingToken = tokenizedContext[incomingIndex];
+        // // Assertion:  there should be no matching token; this should be a newly-appended token.
+        // const matchingIndex = i + tailEditLength + matchingTailUpdateIndex;
+
+        const primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
+
+        if(!preservationTransform) {
+          // Allows for consistent handling of "insert" cases; even if there's no edit
+          // from a prior token, having a defined transform here indicates that
+          // a new token has been produced.  This serves as a useful conditional flag
+          // for prediction logic.
+          preservationTransform = { insert: '', deleteLeft: 0 };
+        }
+
+        const isLastToken = incomingIndex == tokenizedContext.length - 1;
+        if(!isLastToken) {
+          preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
+        }
+
+        if(state == matchState) {
+          state = new TrackedContextState(state);
+        }
+
+        let pushedToken = new TrackedContextToken();
+        pushedToken.raw = incomingToken.text;
+
+        // TODO:  assumes that there was no shift in wordbreaking from the
+        // prior context to the current one.  This may actually be a major
+        // issue for dictionary-based wordbreaking!
+        //
+        // If there was such a shift, then we may have extra transforms
+        // originally on a 'previous' token that got moved into this one!
+        //
+        // Suppose we're using a dictionary-based wordbreaker and have
+        // `butterfl` for our context, which could become butterfly.  If the
+        // next keystroke results in `butterfli`, this would likely be
+        // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
+        // we know to properly relocate the `f` and `l` transforms?
+        let tokenDistribComponent = tokenDistribution.map((seq) => {
+          const entry = seq[tailIndex];
+          if(!entry || TransformUtils.isEmpty(entry.sample)) {
+            return null;
+          } else {
+            return entry;
+          }
+        }).filter((entry) => !!entry);
+        if(primaryInput) {
+          pushedToken.transformDistributions = tokenDistribComponent.length > 0 ? [tokenDistribComponent] : [];
+        } else if(incomingToken.text) {
+          // We have no transform data to match against an inserted token with text; abort!
+          // Refer to #12494 for an example case; we currently can't map previously-committed
+          // input transforms to a newly split-off token.
+          return null;
+        }
+        pushedToken.isWhitespace = incomingToken.isWhitespace;
+
+        // Auto-replaces the search space to correspond with the new token.
+        state.pushTail(pushedToken);
+
+        tailIndex++;
+      }
     }
 
     return {
       state,
       baseState: matchState,
       preservationTransform,
-      headTokensRemoved: poppedTokenCount,
-      tailTokensAdded: pushedTokenCount
+      headTokensRemoved: alignmentResults.leadTokenShift < 0 ? -alignmentResults.leadTokenShift : 0,
+      tailTokensAdded: alignmentResults.tailTokenShift
     };
   }
 
@@ -997,6 +1023,15 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     if(inputTransform) {
       // These two methods apply transforms internally; do not mutate context here.
       // This particularly matters for the 'distribution' variant.
+
+      // What if a pre-whitespace token has a final substitution as PART of an edit?
+      // Say, ['apple', ' ', ''] => ['apply', ' ', 'n']
+      // For now... we can't really handle that case well - modeling the 'e' => 'y' part.
+      // Will likely require improvements to tokenizeTransform(), which doesn't yet handle
+      // deleteLeft tokenization for transforms spanning tokens & whitespace.
+      //
+      // See: #14361.
+      // There's a good shot attemptTokenizedAlignment would be useful for it.
       transformTokenLength = tokenizeTransform(tokenize, context, inputTransform.sample).length;
       tokenizedDistribution = tokenizeTransformDistribution(tokenize, context, transformDistribution);
 

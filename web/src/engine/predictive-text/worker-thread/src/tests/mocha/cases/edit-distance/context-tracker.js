@@ -518,7 +518,7 @@ describe('ContextTracker', function() {
 
       // The 'wordbreak' transform
       assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 0);
+      assert.equal(newContextMatch.tailTokensAdded, -2);
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
