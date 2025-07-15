@@ -23,6 +23,7 @@
 
 using namespace km::core::kmx;
 using namespace std;
+using namespace km_vk;
 
 #define U_1F609_WINKING_FACE u"\U0001F609"
 

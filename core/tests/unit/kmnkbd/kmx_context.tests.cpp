@@ -17,6 +17,7 @@
 
 using namespace km::core::kmx;
 using namespace std;
+using namespace km_vk;
 
 void
 test_CharIsDeadkey() {
