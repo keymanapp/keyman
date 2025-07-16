@@ -53,7 +53,7 @@ namespace km_vk {
 #define VK_EXECUTE          0x2B
 #define VK_SNAPSHOT         0x2C
 #define VK_INSERT           0x2D
-#define VK_DECIMAL          0x2E
+//#define VK_DECIMAL          0x2E
 
 #define VK_KEY_0            0x30
 #define VK_KEY_1            0x31
