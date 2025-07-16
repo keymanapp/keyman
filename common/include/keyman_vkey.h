@@ -150,4 +150,10 @@ namespace km_vk {
 
 #define VK_OEM_CLEAR        0xFE
 
+/*
+ * VK__MAX _S2 defines the highest virtual key code defined in the system = 0xFF.  Custom VK codes start at 256
+ */
+#define VK__MAX 255
+
+
 }  // namespace km_vk
