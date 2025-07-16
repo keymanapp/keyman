@@ -141,6 +141,8 @@ export class ASTNode {
 
   public toText(): string {
     let text: string = ""
+    // const sourceCodeNode: ASTNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+    // const lineNodes: ASTNode[] = sourceCodeNode.getChildrenOfType(NodeTypes.LINE);
     const lineNodes: ASTNode[] = this.getChildrenOfType(NodeTypes.LINE);
     for (let lineNode of lineNodes) {
       text = text.concat(lineNode.token.line.toString())

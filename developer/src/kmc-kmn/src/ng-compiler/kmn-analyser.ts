@@ -23,6 +23,22 @@ export class KmnTreeRule extends SingleChildRule {
     const line: Rule = new LineRule();
     this.rule = new ManyRule(line);
   }
+
+  public parse(node: ASTNode): boolean {
+    if (this.rule === null) {
+      return false;
+    }
+    const parseSuccess = this.rule.parse(node);
+    //this.gatherSourceCode(node);
+    return parseSuccess;
+  }
+
+  // private gatherSourceCode(node: ASTNode): void {
+  //   const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeTypes.LINE);
+  //   const sourceCodeNode: ASTNode = new ASTNode(NodeTypes.SOURCE_CODE);
+  //   sourceCodeNode.addChildren(lineNodes);
+  //   node.addChild(sourceCodeNode);
+  // }
 }
 
 export class LineRule extends SingleChildRule {

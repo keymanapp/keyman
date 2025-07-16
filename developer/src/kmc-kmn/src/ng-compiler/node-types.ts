@@ -100,6 +100,7 @@ export enum NodeTypes {
   SET                   = "SET",
   SHIFT                 = "SHIFT",
   SHIFTFREESCAPS        = "SHIFTFREESCAPS",
+  SOURCE_CODE           = "SOURCE_CODE",
   STORE                 = "STORE",
   STORENAME             = "STORENAME",
   STRING                = "STRING",
