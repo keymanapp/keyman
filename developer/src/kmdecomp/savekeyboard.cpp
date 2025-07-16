@@ -33,7 +33,7 @@
 #include "../../../common/windows/cpp/include/vkeys.h"
 #include "../../../common/include/keyman_vkey.h"
 
-using namespace km_vk
+using namespace km_vk;
 
 
 #define SSN__PREFIX		L"&"

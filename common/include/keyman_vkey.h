@@ -137,17 +137,20 @@ namespace km_vk {
 #define VK_OEM_3            0xC0
 #define VK_ACCENT           0xC0
 #define VK_GRAVE            0xC0
-
 #define VK_LEFT_BRACKET     0xDB
 #define VK_LBRKT            0xDB
+#define VK_OEM_4            0xDB
 #define VK_BACKSLASH        0xDC
 #define VK_BKSLASH          0xDC
+#define VK_OEM_5            0xDC
 #define VK_RIGHT_BRACKET    0xDD
 #define VK_RBRKT            0xDD
+#define VK_OEM_6            0xDD
 #define VK_QUOTE            0xDE
+#define VK_OEM_7            0xDE
 #define VK_xDF              0xDF
+#define VK_OEM_8            0xDF
 #define VK_OEM_102          0xE2
-
 #define VK_OEM_CLEAR        0xFE
 
 /*
