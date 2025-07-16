@@ -29,16 +29,16 @@ export class KmnTreeRule extends SingleChildRule {
       return false;
     }
     const parseSuccess = this.rule.parse(node);
-    //this.gatherSourceCode(node);
+    this.gatherSourceCode(node);
     return parseSuccess;
   }
 
-  // private gatherSourceCode(node: ASTNode): void {
-  //   const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeTypes.LINE);
-  //   const sourceCodeNode: ASTNode = new ASTNode(NodeTypes.SOURCE_CODE);
-  //   sourceCodeNode.addChildren(lineNodes);
-  //   node.addChild(sourceCodeNode);
-  // }
+  private gatherSourceCode(node: ASTNode): void {
+    const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeTypes.LINE);
+    const sourceCodeNode: ASTNode = new ASTNode(NodeTypes.SOURCE_CODE);
+    sourceCodeNode.addChildren(lineNodes);
+    node.addChild(sourceCodeNode);
+  }
 }
 
 export class LineRule extends SingleChildRule {

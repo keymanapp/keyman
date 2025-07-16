@@ -103,12 +103,13 @@ export class ASTNode {
 
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
     const list: ASTNode[] = [];
-    this.children.forEach((child, idx) => {
+    for (let idx = this.children.length; idx--;) {
+      const child = this.children[idx];
       if (child.nodeType === requiredType) {
-        list.push(child);
+        list.unshift(child);
         this.children.splice(idx, 1);
       }
-    });
+    }
     return list;
   }
 
@@ -141,9 +142,8 @@ export class ASTNode {
 
   public toText(): string {
     let text: string = ""
-    // const sourceCodeNode: ASTNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
-    // const lineNodes: ASTNode[] = sourceCodeNode.getChildrenOfType(NodeTypes.LINE);
-    const lineNodes: ASTNode[] = this.getChildrenOfType(NodeTypes.LINE);
+    const sourceCodeNode: ASTNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+    const lineNodes: ASTNode[]    = sourceCodeNode.getChildren();
     for (let lineNode of lineNodes) {
       text = text.concat(lineNode.token.line.toString())
     }

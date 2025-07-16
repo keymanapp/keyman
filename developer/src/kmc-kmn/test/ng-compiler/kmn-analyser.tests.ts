@@ -42,13 +42,12 @@ describe("KMN Analyser Tests", () => {
       const kmnTree: Rule = new KmnTreeRule();
       assert.isTrue(kmnTree.parse(root));
       const children = root.getChildren();
-      assert.equal(children.length, 6);
+      assert.equal(children.length, 4);
       assert.equal(children[0].nodeType, NodeTypes.VERSION);
-      assert.equal(children[1].nodeType, NodeTypes.LINE);
-      assert.equal(children[2].nodeType, NodeTypes.NAME);
-      assert.equal(children[3].nodeType, NodeTypes.LINE);
-      assert.equal(children[4].nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(children[5].nodeType, NodeTypes.LINE);
+      assert.equal(children[1].nodeType, NodeTypes.NAME);
+      assert.equal(children[2].nodeType, NodeTypes.COPYRIGHT);
+      assert.equal(children[3].nodeType, NodeTypes.SOURCE_CODE);
+      assert.equal(children[3].getChildrenOfType(NodeTypes.LINE).length, 3);
     });
   });
   describe("LineRule Tests", () => {
