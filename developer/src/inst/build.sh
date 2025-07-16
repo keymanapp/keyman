@@ -20,9 +20,10 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-. "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/environment.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/wix.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/zip.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 if [[ -z ${KEYMAN_TIER+x} ]]; then
@@ -242,27 +243,24 @@ function make-installer() {
   #
 }
 
-# TODO: rename this to keyman-developer-cli-$Version.zip
-KMC_ZIP="$DEVELOPER_ROOT/release/$KEYMAN_VERSION/kmcomp-$KEYMAN_VERSION.zip"
-
 function make-kmc-install-zip() {
   builder_heading make-kmc-install-zip
 
   copy-schemas
-  cd "$DEVELOPER_ROOT/bin"
+  (
+    # shellcheck disable=2164
+    cd "${DEVELOPER_ROOT}/bin"
 
-  wzzip -bd -bb0 "$KMC_ZIP" \
-    kmconvert.exe \
-    sentry.dll sentry.x64.dll \
-    kmdecomp.exe \
-    keyboard_info.schema.json \
-    kmp.schema.json \
-    keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
-    xml/layoutbuilder/*.keyman-touch-layout \
-    projects/* \
-    server/*
+    # TODO: rename this to keyman-developer-cli-$Version.zip
+    local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${KEYMAN_VERSION}.zip"
 
-  cd "$THIS_SCRIPT_PATH"
+    add_zip_files "${KMCOMP_ZIP}" -q -r \
+      kmconvert.exe \
+      keyboard_info.schema.json \
+      xml/layoutbuilder/*.keyman-touch-layout \
+      projects/ \
+      server/
+  )
 }
 
 # TODO: are these required?

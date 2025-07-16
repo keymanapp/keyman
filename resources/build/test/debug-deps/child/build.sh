@@ -12,10 +12,10 @@ builder_describe \
 function do_build() {
   # Test the debug flag
   builder_is_debug_build || builder_die "FAIL: child: expecting builder_is_debug_build to be true"
-  echo "PASS: child: builder_is_debug_build is true"
+  builder_echo green "  ✓ PASS: child: builder_is_debug_build is true"
 
   builder_has_option --debug || builder_die "FAIL: child: expecting builder_has_option --debug to be true"
-  echo "PASS: child: builder_has_option --debug is true"
+  builder_echo green "  ✓ PASS: child: builder_has_option --debug is true"
 }
 
 builder_parse "$@"
