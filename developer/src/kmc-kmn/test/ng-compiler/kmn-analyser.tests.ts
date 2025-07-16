@@ -31,6 +31,26 @@ describe("KMN Analyser Tests", () => {
   beforeEach(() => {
     root = new ASTNode(NodeTypes.TMP);
   });
+  describe("KmnTreeRule Tests", () => {
+    it("can construct a KmnTreeRule", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('');
+      const kmnTree: Rule = new KmnTreeRule();
+      assert.isNotNull(kmnTree);
+    });
+    it("can parse correctly (three lines)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('store(&VERSION) "10.0"\nstore(&NAME) "Khmer Angkor"\nstore(&COPYRIGHT) "© SIL Global"\n');
+      const kmnTree: Rule = new KmnTreeRule();
+      assert.isTrue(kmnTree.parse(root));
+      const children = root.getChildren();
+      assert.equal(children.length, 6);
+      assert.equal(children[0].nodeType, NodeTypes.VERSION);
+      assert.equal(children[1].nodeType, NodeTypes.LINE);
+      assert.equal(children[2].nodeType, NodeTypes.NAME);
+      assert.equal(children[3].nodeType, NodeTypes.LINE);
+      assert.equal(children[4].nodeType, NodeTypes.COPYRIGHT);
+      assert.equal(children[5].nodeType, NodeTypes.LINE);
+    });
+  });
   describe("LineRule Tests", () => {
     it("can construct a LineRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
