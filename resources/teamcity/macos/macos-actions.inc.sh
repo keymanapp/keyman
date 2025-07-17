@@ -10,5 +10,5 @@ macos_build_action() {
   builder_echo start "build" "Building Keyman for macOS"
   # shellcheck disable=SC2154
   "${KEYMAN_ROOT}/mac/build.sh" configure build test publish
-  builder_echo end success "build" "Finished building Keyman for macOS"
+  builder_echo end "build" success "Finished building Keyman for macOS"
 }

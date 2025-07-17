@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 19.0.84 alpha 2025-07-15
+
+* maint(common): add support for inline file exclusions to `add_zip_files` and unit tests (#14333)
+* maint(developer): use `add_zip_files` function (#14334)
+
+## 19.0.83 alpha 2025-07-14
+
+* maint(resources): add `build.sh` to run all `resource/build/test` tests (#14335)
+* maint(developer): consolidate creating KMC_ZIP file (#14309)
+
+## 19.0.82 alpha 2025-07-10
+
+* maint(android): fix Android release build (#14329)
+* maint(mac): fix end of blocks (#14330)
+* maint(mac): don't run `build.sh publish` twice (#14331)
+
 ## 19.0.81 alpha 2025-07-09
 
 * docs(developer): explanation of the Description field added in Details section. (#14304)
