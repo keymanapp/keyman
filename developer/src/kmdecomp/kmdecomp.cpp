@@ -24,10 +24,6 @@
 #include "../../../common/windows/cpp/include/keymanversion.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include "../../../common/include/keyman_vkey.h"
-
-using namespace km_vk;
-
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard, LPBYTE *lpBitmap, DWORD *cbBitmap);
 
