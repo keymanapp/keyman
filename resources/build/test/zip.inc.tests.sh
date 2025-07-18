@@ -247,6 +247,54 @@ function test_add_zip_files_with_7z_real() {
   setup
 }
 
+function mock_builder_die() {
+  LOG_MSG=""
+
+  if ! declare -F "ORIGINAL_BUILDER_DIE" >/dev/null 2>&1; then
+    eval "ORIGINAL_BUILDER_DIE() $(builtin declare -f "builder_die" | tail -n +2)"
+  fi
+
+  function builder_die() {
+    LOG_MSG="DIE: $*"
+  }
+}
+
+function unmock_builder_die() {
+  # unmock 'builder_die' function
+  eval "builder_die() $(builtin declare -f ORIGINAL_BUILDER_DIE | tail -n +2)"
+}
+
+function test_add_zip_files__die_if_relative_path() {
+  # Setup
+  local LOG_MSG
+  reset_zip_test_env
+  MOCK_ZIP_PRESENT=1
+  mock_builder_die
+
+  # Execute
+  add_zip_files "archive.zip" file1.txt ../file2.txt
+
+  # Verify
+  unmock_builder_die
+  assert-equal "${LOG_MSG}" "DIE: File ../file2.txt is not in the current directory"  "add_zip_files with relative path"
+}
+
+function test_add_zip_files__die_if_absolute_path() {
+  # Setup
+  local LOG_MSG
+  reset_zip_test_env
+  MOCK_ZIP_PRESENT=1
+  mock_builder_die
+
+  # Execute
+  add_zip_files "archive.zip" file1.txt /file2.txt
+
+  # Verify
+  unmock_builder_die
+
+  assert-equal "${LOG_MSG}" "DIE: File /file2.txt is not in the current directory" "add_zip_files with absolute path"
+}
+
 # Run all tests
 test_add_zip_files_with_zip_basic
 test_add_zip_files_with_zip_flags
@@ -257,3 +305,5 @@ test_add_zip_files_with_7z_flags
 test_add_zip_files_with_7z_exclude_flag
 test_add_zip_files_with_7z_on_windows
 test_add_zip_files_with_7z_real
+test_add_zip_files__die_if_relative_path
+test_add_zip_files__die_if_absolute_path
