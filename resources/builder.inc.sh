@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # shellcheck disable=SC2310
 
 # Note: these two lines can be uncommented for debugging and profiling build
@@ -33,6 +33,7 @@ SHLVL=0
 # _builder_init is called internally at the bottom of this file after we have
 # all function declarations in place.
 function _builder_init() {
+  _builder_get_operating_system
   _builder_findRepoRoot
   _builder_setBuildScriptIdentifiers
 
@@ -2090,27 +2091,14 @@ builder_describe_platform() {
 
   local builder_platforms=(linux mac win)
   local builder_tools=(android-studio delphi)
-
-  # --- Detect platform ---
-
-  # Default value, since it's the most general case/configuration to detect.
-  local builder_platform=linux
-
-  # This is copied from build-utils.sh to avoid creating a dependency on it
-  if [[ $OSTYPE == darwin* ]]; then
-    builder_platform=mac
-  elif [[ $OSTYPE == msys ]]; then
-    builder_platform=win
-  elif [[ $OSTYPE == cygwin ]]; then
-    builder_platform=win
-  fi
+  local builder_platform="${BUILDER_OS}"
 
   # --- Detect tools ---
 
   local builder_installed_tools=()
 
   # Detect delphi compiler (see also delphi_environment.inc.sh)
-  if [[ $builder_platform == win ]]; then
+  if builder_is_windows; then
     local ProgramFilesx86="$(cygpath -w -F 42)"
     if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\20.0\\bin\\dcc32.exe")" ]]; then
       builder_installed_tools+=(delphi)
@@ -2276,6 +2264,50 @@ builder_if_release_build_level() {
     return 0
   fi
   "$@"
+}
+
+# Returns 0 if we're running on Windows, i.e. if the environment variable
+# `OSTYPE` is set to "msys" or "cygwin".
+builder_is_windows() {
+  if [[ "${OSTYPE:-}" == "msys" ]] || [[ "${OSTYPE:-}" == "cygwin" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Returns 0 if we're running on macOS.
+builder_is_macos() {
+  if [[ "${OSTYPE:-}" == darwin* ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Returns 0 if we're running on Linux.
+builder_is_linux() {
+  if [[ "${OSTYPE:-}" == "linux-gnu" ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+# Sets the BUILDER_OS environment variable to linux|mac|win
+#
+_builder_get_operating_system() {
+  declare -g BUILDER_OS
+
+  if builder_is_macos; then
+    BUILDER_OS=mac
+  elif builder_is_windows; then
+    BUILDER_OS=win
+  else
+    BUILDER_OS=linux
+  fi
+
+  readonly BUILDER_OS
 }
 
 ################################################################################

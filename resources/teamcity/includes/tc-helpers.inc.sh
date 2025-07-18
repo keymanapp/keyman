@@ -1,36 +1,8 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
-# Returns 0 if we're running on Ubuntu.
-is_ubuntu() {
-  if [[ "${OSTYPE:-}" == "linux-gnu" ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Returns 0 if we're running on Windows, i.e. if the environment variable
-# `OSTYPE` is set to "msys" or "cygwin".
-is_windows() {
-  if [[ "${OSTYPE:-}" == "msys" ]] || [[ "${OSTYPE:-}" == "cygwin" ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Returns 0 if we're running on macOS.
-is_macos() {
-  if [[ "${OSTYPE:-}" == darwin* ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 install_nvm() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
     # on Windows and macOS build agents are configured manually
     return 0
   fi
@@ -55,7 +27,7 @@ set_variables_for_nvm() {
 }
 
 install_emscripten() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
     # on Windows and macOS build agents are configured manually
     return 0
   fi
@@ -92,7 +64,7 @@ _tc_rsync() {
     "--rsync-path=${RSYNC_PATH}"             # path on remote server
   )
 
-  if is_windows; then
+  if builder_is_windows; then
     rsync_args+=(
       '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
       "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
@@ -108,13 +80,13 @@ _tc_rsync() {
       "${DESTINATION}"
   )
 
-  if is_windows; then
+  if builder_is_windows; then
     local CYGPATH_RSYNC_HOME
     CYGPATH_RSYNC_HOME=$(cygpath -w "${RSYNC_HOME}")
     MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
   else
     local RSYNC=rsync
-    if is_macos; then
+    if builder_is_macos; then
       RSYNC=/usr/local/bin/rsync
       [[ -f /opt/homebrew/bin/rsync ]] && RSYNC=/opt/homebrew/bin/rsync
     fi

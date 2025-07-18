@@ -132,7 +132,7 @@ function build_developer_action() {
 }
 
 function publish_action() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # requires Powershell, so currently only supported on Windows
     builder_echo error "This script is intended to be run on Windows only."
     return 1

@@ -18,7 +18,7 @@ builder_describe "Keyman common mac modules" \
 
 builder_parse "$@"
 
-if [[ $BUILDER_OS != mac ]]; then
+if ! builder_is_macos; then
   builder_echo grey "Platform is not macOS; skipping common/mac"
   exit 0
 fi
