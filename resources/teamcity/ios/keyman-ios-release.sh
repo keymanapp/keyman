@@ -242,6 +242,13 @@ function do_build() {
 }
 
 function do_publish() {
+  if builder_has_option --fv; then
+    export RELEASE_OEM=true
+    export RELEASE_OEM_FIRSTVOICES=true
+  else
+    export RELEASE_OEM_FIRSTVOICES=false
+  fi
+
   _publish_to_downloads_keyman_com
   upload_help "Keyman for iOS" ios
 
