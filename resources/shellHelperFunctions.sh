@@ -68,26 +68,6 @@ assertValidPRVersionNbr()
   fi
 }
 
-dl_info_display_usage() {
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-  echo "Used to create a metadata file needed on the download site"
-  echo "for it to connect to the download.keyman.com API functions."
-  echo
-  echo "usage: write-download_info <name> <filepath> <version> <tier> <platform>"
-  echo
-  echo "  name           Specifies the user-friendly name of the product represented by the file."
-  echo "  filepath       Specifies the path and file in need of a .download_info metadata file."
-  echo "  version        Specifies the build version number, which should be in the"
-  echo "                   form Major.Minor.BuildCounter"
-  echo "  tier           Specifies tier (typically one of: alpha, beta, stable)."
-  echo "  platform       Specifies the target platforms for the file."
-  echo "                 (Should be one of: android, ios, mac, web, windows)"
-  echo
-  echo "The resulting .downloadinfo file will be automatically placed in the same directory"
-  echo "as the originally-specified file."
-  exit 1
-}
-
 #
 # Write ${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info file for the target
 # artifact
