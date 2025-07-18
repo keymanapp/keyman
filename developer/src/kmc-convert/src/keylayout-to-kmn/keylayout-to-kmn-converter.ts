@@ -12,7 +12,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-
+import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils"
 
 export interface convert_object {
   keylayout_filename: string,
@@ -54,7 +54,17 @@ export class KeylayoutToKmnConverter {
     }
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
-    const jsonO: object = KeylayoutReader.read(inputFilename);
+    const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
+
+    try {
+      if (!KeylayoutReader.validate(jsonO)) {
+        return null;
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
+
     if (!jsonO) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
       return null;
@@ -75,18 +85,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
     }
-
-    /*const out_Uint8: Uint8Array = kmnFileWriter.writeToUint8Array(outArray);
-    if (!out_Uint8) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
-      return null;
-    }*/
-
-    /*const out_str: string = kmnFileWriter.writeToString(outArray);
-     if (!out_str) {
-       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ inputFilename }));
-       return null;
-     }*/
 
     return null;
   }
@@ -115,9 +113,6 @@ export class KeylayoutToKmnConverter {
       data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
       data_object.arrayOf_Rules = rules;
-
-      // _S2 ToDo remove this console.log
-      console.log("RUN kmc convert - input file: ",data_object.keylayout_filename, " -->  output file: ", data_object.kmn_filename);
 
       // create an array of modifier combinations and store in data_object
       for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {

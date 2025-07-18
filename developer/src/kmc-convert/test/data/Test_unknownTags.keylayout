@@ -11,7 +11,10 @@
     <layouts>
         <layout first="0" last="0" mapSet="138" modifiers="30"/>
     </layouts>
-    <modifierMap id="30" defaultIndex="0">
+    
+    <!--Error here: unknown Tag 'unknown' -->
+
+    <unknownTag id="30" defaultIndex="0">
         <keyMapSelect mapIndex="0">
             <modifier keys=""/>
             <modifier keys="shift? caps? "/>
@@ -42,7 +45,7 @@
         <keyMapSelect mapIndex="7">
             <modifier keys="caps anyOption ?"/>
         </keyMapSelect>
-    </modifierMap>     
+    </unknownTag>     
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="0" action="A_9"/>
