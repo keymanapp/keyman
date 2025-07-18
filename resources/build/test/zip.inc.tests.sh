@@ -13,9 +13,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # Mock command -v to simulate presence/absence of zip
 function command() {
-  if [[ "$1" == "-v" && "$2" == "zip" ]]; then
-    if [[ "${MOCK_ZIP_PRESENT:-1}" == "1" ]]; then
-      echo "/usr/bin/zip"
+  if [[ "$1" == "-v" && "$2" == "7z" ]]; then
+    if [[ "${MOCK_ZIP_PRESENT:-0}" == "0" ]]; then
+      echo "/usr/bin/7z"
       return 0
     else
       return 1
