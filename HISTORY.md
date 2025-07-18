@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.85 alpha 2025-07-18
+
+* refactor(common): remove warnings (#14368)
+* refactor(developer): replace deprecated std::codecvt_utf8_utf16 (#14369)
+* refactor(linux): move defines to common header files (#14372)
+
 ## 19.0.84 alpha 2025-07-15
 
 * maint(common): add support for inline file exclusions to `add_zip_files` and unit tests (#14333)
