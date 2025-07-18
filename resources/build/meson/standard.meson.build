@@ -16,12 +16,11 @@
 cpp_compiler = meson.get_compiler('cpp')
 c_compiler = meson.get_compiler('c')
 
-# Once we can assume meson 0.60 we can delete this
-# (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
-if cpp_compiler.get_id() == 'msvc'
-  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
-  add_global_arguments('/execution-charset:utf-8', language: ['c', 'cpp'])
-endif
+# Unfortunately this outputs a warning: 'Consider using the built-in option
+# for language standard version instead of using "-std=c++17".'
+# But that is not possible to do after creating the project...
+# See also https://github.com/mesonbuild/meson/issues/10685
+add_project_arguments('-std=c++17', language: 'cpp')
 
 #
 # Standard informational messages for our builds
