@@ -13,13 +13,10 @@ multiple source files, which are all managed within this one editor.
 The following image shows the first tab of the editor, the Details tab,
 for a brand new keyboard, with those three initial tabs.
 
-![Keyboard Editor - New file, Details tab](../images/ui/frmKeymanWizard_New.png)
+<img src="../images/ui/frmKeymanWizard_New.png" style="width:100%" alt="Keyboard Editor - New file, Details tab"/>
 
-> ### Note
-Users of earlier versions of Keyman Developer may initially have trouble
-finding tabs such as the Icon tab or the On-Screen tab, as they are not
-initially visible. The Features grid on the Details tab allows you to
-add these extra features into the keyboard.
+> [!Note]
+> Users of earlier versions of Keyman Developer may initially have trouble finding tabs such as the Icon tab or the On-Screen tab, as they are not initially visible. The Features grid on the Details tab allows you to add these extra features into the keyboard.
 
 ## Keyboard component files
 
@@ -47,7 +44,7 @@ because that reflects both the Details and the Layout tab.
 
 ## Details tab
 
-![Keyboard Editor - Details tab](../images/ui/frmKeymanWizard_Details.png)
+<img src="../images/ui/frmKeymanWizard_Details.png" style="width:100%" alt="Keyboard Editor - Details tab"/>
 
 The Details tab grows as you add more options to a keyboard. The fields
 here are:
@@ -102,7 +99,7 @@ Features
 
 ## Layout tab
 
-![Keyboard Editor - Layout tab, Design view](../images/ui/frmKeymanWizard_Layout_Design.png)
+<img src="../images/ui/frmKeymanWizard_Layout_Design.png" style="width:100%" alt="Keyboard Editor - Layout tab, Design view"/>
 
 The Layout tab gives you a simple interface to quickly create a keyboard
 using a visual representation of a desktop/laptop computer keyboard. You
@@ -124,13 +121,11 @@ There are two ways to assign characters to the keys:
     onto the appropriate key. This will set the key to output that
     character.
 
->    ### Hint
-    To add the character to a key with existing characters, hold
-<kbd>Ctrl</kbd> while dropping it onto the key.
+> [!TIP]
+> To add the character to a key with existing characters, hold <kbd>Ctrl</kbd> while dropping it onto the key.
 
-<!-- Saperator -->
->   ### Note
-    Any key that does not have a character assigned to it will output what the selected Windows layout specifies.
+> [!Note]
+> Any key that does not have a character assigned to it will output what the selected Windows layout specifies.
 
 Distinguish between left and right Ctrl/Alt
 :   A Keyman keyboard can treat left and right Ctrl and Alt identically,
@@ -151,9 +146,7 @@ Display 102nd Key (as on European keyboards)
 You can press and release <kbd>Ctrl</kbd> to select
 another key on the keyboard using your keyboard.
 
-<br/>
-
-![Keyboard Editor - Layout tab, Code view](../images/ui/frmKeymanWizard_Layout_Code.png)
+<img src="../images/ui/frmKeymanWizard_Layout_Code.png" style="width:100%" alt="Keyboard Editor - Layout tab, Code view"/>
 
 The Code view shows the source code of the keyboard file. This is where
 all the information in the Details and Layout tab is stored, and
@@ -165,7 +158,7 @@ editor shown within this view.
 
 ## On-Screen tab
 
-![Keyboard Editor - On-Screen tab](../images/ui/OnScreenKeyboard.png)
+<img src="../images/ui/OnScreenKeyboard.png" style="width:100%" alt="Keyboard Editor - On-Screen tab"/>
 
 This tab allows you to edit the visual representation of your keyboard
 layout. The content on this tab is stored in the .kvks file associated
@@ -213,17 +206,28 @@ Distinguish between left and right Ctrl/Alt
 :   If checked, treats the left and right Ctrl/Alt as separate layers
 
 Display 102nd Key (as on European keyboards)
-:   European keyboards have one extra key that is not on US keyboards.
+:   European keyboards (ISO layout) have one extra key that is not on US keyboards (ANSI layout).
     This key is positioned to the right of the left shift key. Some
     other keyboards have additional keys; these are not shown on the
-    layout designer. If you have a European layout selected as your
+    layout designer. 
+    
+    If you have a European layout selected as your
     Windows layout, the 102nd key will always be visible in the
     designer; ensure you select this checkbox if you want the 102nd key
     to always be visible to end users of the layout, irrespective of
-    their selected base layout. When a European layout is selected as
+    their selected base layout. 
+    
+    When a European layout is selected as
     your Windows layout, the shape of the Enter key will also change to
     take two rows, and the backslash key will move down one row, but not
-    otherwise change in behaviour.
+    otherwise change in behaviour. 
+
+    <img src="../images/ui/OnScreenKeyboard_ISO.png" style="width:100%" alt="Keyboard Editor - On-Screen tab with ISO layout"/>
+    *See the difference between the two layouts in Keyman Developer.*
+
+    > [!NOTE]
+    > The "Display 102nd Key (as on European keyboards)" checkbox can be left unchecked. 
+    > To ensure compatibility, the extra key shouldn't be assigned since it won't be accessible on an ANSI physical keyboard.
 
 Auto-fill underlying layout
 :   When the Fill from layout button is clicked, if this option is
@@ -232,7 +236,7 @@ Auto-fill underlying layout
 
 ## Touch Layout tab
 
-![Keyboard Editor - Touch Layout tab, Design view](../images/ui/TouchLayout_Design.png)
+<img src="../images/ui/TouchLayout_Design.png" style="width:100%" alt="Keyboard Editor - Touch Layout tab, Design view"/>
 
 The Touch Layout tab is used to create the visible representation of the
 keyboard layout for touch devices. It works similarly to the On Screen
@@ -251,7 +255,7 @@ including iPhone and iPad, in different orientations, to allow you to
 visualize the keyboard layout before you load it onto a device. The
 following image shows all aspects of the touch design view.
 
-![Keyboard Editor - Touch Layout tab, Design view closeup](../images/ui/TouchLayout_Design_2.png)
+<img src="../images/ui/TouchLayout_Design_2.png" style="width:100%" alt="Keyboard Editor - Touch Layout tab, Design view closeup"/>
 
 ### Left sidebar controls
 
@@ -265,21 +269,21 @@ Template...
     current layout are not in the new template, their definitions will
     be lost. Therefore, selecting an appropriate template early in the
     development process is suggested.
-    
+
     - template-basic: has only a phone layout (4 rows of keys), with three layers: default (K_A through K_Z 
     plus some punctuation), shift (Shift K_A through Shift K_Z, plus some punctuation), numeric (K_0 through 
     K_9 unshifted and shifted, plus other non-alphanumerice keys).
-    
+
     - template-latin: has both phone and tablet layouts (which are identical except for some key spacing, 
     each with 4 rows of keys), with four layers: default, shift, numeric, symbol. The first three layers 
     are similar to those of template-basic, with the addition of longpress keys for accented characters. 
     The symbol layer has many symbols not usually seen on a physical keyboard.
-    
+
     - template-traditional: has both phone (4 rows of keys) and tablet (5 rows of keys) layouts. The phone 
     layout is similar to the template-basic layout. The tablet layout has eight layers: default, shift, ctrl, 
     shift-ctrl, alt, shift-alt, ctrl-alt, shift-ctrl-alt. The default layer has the keys from the default layer 
     of the desktop layout, the shift layer has the keys from the shift layer of the desktop layout, and so on.
-
+    
 Import from On Screen
 :   If you have an existing On-Screen Keyboard for your keyboard layout,
     importing the design from the On-Screen Keyboard can reduce the
@@ -468,7 +472,7 @@ dragged between the main keyboard area and the long press area. The bar
 below the long press area contains the corresponding controls for the
 long press keys.
 
-![Keyboard Editor - Touch Layout tab, Code view](../images/ui/frmKeymanWizard_TouchLayout_Code.png)
+<img src="../images/ui/frmKeymanWizard_TouchLayout_Code.png" style="width:100%" alt="Keyboard Editor - Touch Layout tab, Code view"/>
 
 The Code view allows you to edit the JSON source of the touch layout
 file. This makes certain operations simpler, such as batched rearranging
@@ -481,7 +485,7 @@ The format of the layout file is described in [Creating a touch keyboard layout 
 
 Underneath the keyboard area is the Long-press, Flicks, and Multitaps controls.
 
-![Long-press, Flicks, and Multitaps layout](../images/ui/LongPress_Flicks_Multitaps.png)
+<img src="../images/ui/LongPress_Flicks_Multitaps.png" style="width:100%" alt="Long-press, Flicks, and Multitaps layout"/>
 
 Red circle with an X
 :   This button to the top right of the key will delete the key from the
@@ -508,7 +512,7 @@ the selected key for different Gesture Type. The only difference between this co
 
 ## Icon tab
 
-![Keyboard Editor - Icon tab](../images/ui/frmKeymanWizard_Icon.png)
+<img src="../images/ui/frmKeymanWizard_Icon.png" style="width:100%" alt="Keyboard Editor - Icon tab"/>
 
 The icon tab allows you to edit the icon associated with the keyboard. An external icon editor will allow you to create more sophisticated icons with alpha transparency and multiple resolutions, but this will cover the standard 16x16 256 colour icon, which is all that many keyboards require. The controls at the top left are:
 
@@ -574,7 +578,7 @@ This tab allows you to edit the [named constants](/developer/language/guide/cons
 
 ## Build tab
 
-![Keyboard Editor - Build tab](../images/ui/BuildTab.png)
+<img src="../images/ui/BuildTab.png" style="width:100%" alt="Keyboard Editor - Build tab"/>
 
 A set of common controls is across the top of this tab:
 
