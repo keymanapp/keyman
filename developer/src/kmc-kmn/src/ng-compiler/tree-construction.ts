@@ -102,10 +102,17 @@ export class ASTNode {
   }
 
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
+    return this.removeChildrenOfTypes([requiredType]);
+  }
+
+  public removeChildrenOfTypes(requiredTypes: NodeTypes[]): ASTNode[] {
     const list: ASTNode[] = [];
+    if (!requiredTypes?.length) {
+      return list;
+    }
     for (let idx = this.children.length; idx--;) {
       const child = this.children[idx];
-      if (child.nodeType === requiredType) {
+      if (requiredTypes.includes(child.nodeType)) {
         list.unshift(child);
         this.children.splice(idx, 1);
       }
