@@ -13,7 +13,12 @@ import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 
-
+/**
+ * Object holding all important data for the conversion between
+ * input (*.keylayout) format and output (*.kmn) format.
+ * It contains input and output filenames, an array of all used modifiers
+ * and all preprocessed key rules for up to 3 key/modifier combinations.
+ */
 export interface convert_object {
   keylayout_filename: string,
   kmn_filename: string,
@@ -108,7 +113,6 @@ export class KeylayoutToKmnConverter {
       arrayOf_Rules: []
     };
 
-    // ToDo in a new PR: check tags  ( issue # 13599)
     if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
 
       data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');
