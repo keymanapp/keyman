@@ -86,20 +86,7 @@ export class KmnTreeRule extends SingleChildRule {
   }
 
   private gatherGroups(node: ASTNode): ASTNode[] {
-    const nodes: ASTNode[] = [];
-    let complete = false;
-    while (!complete) {
-      let blockNode: ASTNode = node.removeBlock(NodeTypes.GROUP, NodeTypes.PRODUCTION);
-      if (blockNode.nodeType === NodeTypes.GROUP) {
-        nodes.unshift(blockNode);
-      } else if (!blockNode.hasChild()) { // all groups processed
-        complete = true;
-      } else { // ungrouped production rules
-        nodes.unshift(...blockNode.getChildren());
-        complete = true;
-      }
-    }
-    return nodes;
+    return node.removeBlocks(NodeTypes.GROUP, NodeTypes.PRODUCTION);;
   }
 
   private gatherSourceCode(node: ASTNode): ASTNode {

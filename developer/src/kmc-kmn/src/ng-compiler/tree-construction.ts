@@ -116,39 +116,42 @@ export class ASTNode {
     if (!requiredTypes?.length) {
       return [];
     }
-    // for (let idx = this.children.length; idx--;) {
-    //   const child = this.children[idx];
-    //   if (requiredTypes.includes(child.nodeType)) {
-    //     list.unshift(child);
-    //     this.children.splice(idx, 1);
-    //   }
-    // }
-    const acc = this.children.reduce((acc, child) => {
-      acc[requiredTypes.includes(child.nodeType)? 0 : 1].push(child);
-      return acc;
-    },
-    [[],[]]);
-    this.children = acc[1];
-    return acc[0];
-  }
 
-  public removeBlock(parentType: NodeTypes, childType: NodeTypes): ASTNode {
-    let list: ASTNode[] = [];
-    for (let idx = this.children.length; idx--;) {
-      const child = this.children[idx];
-      if (child.nodeType === childType) {
-        list.unshift(child);
-        this.children.splice(idx, 1);
-      } else if (child.nodeType === parentType) {
-        this.children.splice(idx, 1);
-        child.addChildren(list);
-        return(child);
+    const list: ASTNode[]     = [];
+    const children: ASTNode[] = [];
+
+    for (const child of this.children) {
+      if (requiredTypes.includes(child.nodeType)) {
+        list.push(child);
+      } else {
+        children.push(child);
       }
     }
-    // parentType not found
-    const blockNode: ASTNode = new ASTNode(NodeTypes.TMP);
-    blockNode.addChildren(list);
-    return(blockNode);
+
+    this.children = children;
+    return list;
+  }
+
+  public removeBlocks(parentType: NodeTypes, childType: NodeTypes): ASTNode[] {
+    const blocks: ASTNode[]   = [];
+    const children: ASTNode[] = [];
+    let inParent: boolean     = false;
+    let parent: ASTNode       = null;
+
+    for (const child of this.children) {
+      if (child.nodeType === parentType) {
+        inParent = true;
+        parent   = child;
+        blocks.push(parent);
+      } else if (inParent && child.nodeType === childType) {
+        parent.addChild(child);
+      } else {
+        children.push(child);
+      }
+    }
+
+    this.children = children;
+    return blocks;
   }
 
   public get nodeType() { return this._nodeType; }
