@@ -14,7 +14,7 @@ if [[ -z "${JQ+x}" ]]; then
   ## END STANDARD BUILD SCRIPT INCLUDE
 
   if builder_is_windows; then
-    JQ=$(dirname "${JQ_THIS_SCRIPT}")/jq-win64.exe
+    JQ="$(dirname "${JQ_THIS_SCRIPT}")/jq-win64.exe"
   else
     JQ=jq
   fi

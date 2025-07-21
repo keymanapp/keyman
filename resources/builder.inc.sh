@@ -2285,12 +2285,13 @@ builder_is_macos() {
   fi
 }
 
-# Returns 0 if we're running on Linux.
+# Returns 0 if we're running on Linux (or rather if we're not running
+# on Windows or macOS).
 builder_is_linux() {
-  if [[ "${OSTYPE:-}" == "linux-gnu" ]]; then
-    return 0
-  else
+  if builder_is_windows || builder_is_macos; then
     return 1
+  else
+    return 0
   fi
 }
 
