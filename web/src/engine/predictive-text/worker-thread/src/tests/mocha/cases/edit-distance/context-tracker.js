@@ -90,7 +90,7 @@ describe('ContextTracker', function() {
     });
 
     // random deletion at the start + later substitution = still permitted
-    it(`returns false:  'clasts' => 'clasps' (subs allowed)`, () => {
+    it(`returns false:  'clasts' => 'lasps' (subs allowed)`, () => {
       assert.isTrue(ContextTracker.isSubstitutionAlignable('lasps', 'clasts', true));
     });
   });
