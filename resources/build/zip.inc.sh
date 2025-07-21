@@ -93,14 +93,12 @@ function add_zip_files() {
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
-      case "${OSTYPE}" in
-        "cygwin"|"msys")
-          SEVENZ="${SEVENZ_HOME}"/7z.exe
-          ;;
-        *)
-          SEVENZ=7z
-          ;;
-      esac
+      if builder_is_windows; then
+        # shellcheck disable=2154
+        SEVENZ="${SEVENZ_HOME}/7z.exe"
+      else
+        SEVENZ=7z
+      fi
     fi
 
     # 7z command to add files so clear zip flags

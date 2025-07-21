@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 #
 # Setup JQ environment variable according to the user's system
 #
@@ -13,22 +13,17 @@ if [[ -z "${JQ+x}" ]]; then
   # . "${THIS_SCRIPT%/*}/build-utils.sh"
   ## END STANDARD BUILD SCRIPT INCLUDE
 
-  case "${OSTYPE}" in
-    "cygwin")
-      JQ=$(dirname "$JQ_THIS_SCRIPT")/jq-win64.exe
-      ;;
-    "msys")
-      JQ=$(dirname "$JQ_THIS_SCRIPT")/jq-win64.exe
-      ;;
-    *)
-      JQ=jq
-      ;;
-  esac
+  if builder_is_windows; then
+    JQ="$(dirname "${JQ_THIS_SCRIPT}")/jq-win64.exe"
+  else
+    JQ=jq
+  fi
 
   readonly JQ
 
   # JQ with inplace file replacement
   function jqi() {
-    cat <<< "$($JQ -c "$1" < "$2")" > "$2"
+    # shellcheck disable=2312
+    cat <<< "$("${JQ}" -c "$1" < "$2")" > "$2"
   }
 fi
