@@ -12,8 +12,10 @@
 # [zip filename]
 # [list of flags to pass to zip command] Flags start with a single-dash
 #   -x@filename for a file containing list of files to exclude from the archive
+#   -xr!name    to exclude files matching name from the archive
 #   -* all other flags
-#   Flags passed in are treated as zip parameters, and internally converterted to 7z flags as applicable
+#   Flags passed in are treated as zip parameters, and internally converterted
+#   to 7z flags as applicable
 # [list of files to include in zip]
 function add_zip_files() {
 
@@ -85,7 +87,9 @@ function add_zip_files() {
     esac
   done
 
-  local COMPRESS_CMD
+  _verify_input "${INCLUDE[@]}"
+
+  local COMPRESS_CMD=zip
   if [[ ! -z "${SEVENZ_HOME:-}" ]] || command -v 7z > /dev/null 2>&1; then
     # Use 7z if available
     if [[ -z "${SEVENZ+x}" ]]; then
@@ -115,4 +119,21 @@ function add_zip_files() {
   if [[ -n "${EXCLUDE_FILE:-}" ]]; then
     rm "${EXCLUDE_FILE}"
   fi
+}
+
+_verify_input() {
+  local curdir file absfile
+  curdir="$(pwd)"
+
+  for file in "$@"; do
+    absfile=$(readlink --canonicalize-missing "${file}")
+    if [[ "${absfile}" != "${curdir}"* ]]; then
+      # 7z and zip behave differently if adding files that are not in the current
+      # directory. For files with relative paths, zip will add them relative to
+      # the current directory which is not what we want and can cause
+      # problems for the user. Therefore we disallow files that are not in the
+      # current directory.
+      builder_die "File ${file} is not in the current directory"
+    fi
+  done
 }

@@ -15,7 +15,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 . "${KEYMAN_ROOT}/resources/zip.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
 
@@ -49,7 +48,7 @@ function _publish_to_downloads_keyman_com() {
   local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
 
   # shellcheck disable=SC2154
-  UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+  UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
   KEYMAN_APK="keyman-${KEYMAN_VERSION}.apk"
   FIRSTVOICES_APK="firstvoices-${KEYMAN_VERSION}.apk"
@@ -58,22 +57,22 @@ function _publish_to_downloads_keyman_com() {
   mkdir -p "${UPLOAD_PATH}"
 
   (
-    cd KMAPro/kMAPro/libs
-    add_zip_files -q -xr!build.sh "../../../${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar ../../../Samples
+    cd "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs"
+    add_zip_files -q -xr!build.sh "${UPLOAD_PATH}/${KEYMAN_ENGINE_ANDROID_ZIP}" keyman-engine.aar "${KEYMAN_ROOT}/android/Samples"
   )
 
-  cp "KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
+  cp "${KEYMAN_ROOT}/android/KMAPro/kMAPro/build/outputs/apk/release/${KEYMAN_APK}" "${UPLOAD_PATH}"
 
   write_download_info "${UPLOAD_PATH}" "${KEYMAN_ENGINE_ANDROID_ZIP}" "Keyman Engine for Android" zip android
   write_download_info "${UPLOAD_PATH}" "${KEYMAN_APK}" "Keyman for Android" apk android
 
-  if [[ -d "../oem/firstvoices/android/app/build/outputs/apk/release" ]]; then
-    cp "../oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
+  if [[ -d "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release" ]]; then
+    cp "${KEYMAN_ROOT}/oem/firstvoices/android/app/build/outputs/apk/release/${FIRSTVOICES_APK}" "${UPLOAD_PATH}"
     write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_APK}" "FirstVoices Keyboards" apk android
   fi
 
   (
-    cd upload
+    cd "${KEYMAN_ROOT}/android/upload"
     # shellcheck disable=SC2154
     tc_rsync_upload "${KEYMAN_VERSION}" "android/${KEYMAN_TIER}"
   )
@@ -84,7 +83,7 @@ function _publish_to_downloads_keyman_com() {
 function _publish_to_playstore() {
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}" --ci
+  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
