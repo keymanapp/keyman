@@ -25,7 +25,12 @@ function mocked_builder_die() {
 # Setup/Teardown
 
 function setup_file() {
+  # create a temporary directory where we create simulated emsdk files/folders
   BASE_DIR=$(mktemp -d)
+
+  # start with clean environment
+  unset EMSCRIPTEN_BASE
+  unset EMCC
 }
 
 function setup() {
