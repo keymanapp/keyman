@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 19.0.86 alpha 2025-07-21
+
+* maint(common): fail build if adding relative file to zip (#14352)
+* maint(common): set C++17 in standard.meson.build (#14355)
+* fix(linux): add `python3-pkg-resources` as explicit dependency (#14356)
+* docs(developer): add ansi and iso context and image, change img tags, and polish for readability (#14243)
+* maint(mac): consolidate `write-download_info` (#14325)
+* maint(common): add simple unit testing framework for bash (#14345)
+* maint(common): consolidate functions to determine OS (#14324)
+* fix(android): use correct path to zip.inc.sh for CI (#14377)
+* test(common): add unit test for reporting test failures (#14379)
+
 ## 19.0.85 alpha 2025-07-18
 
 * refactor(common): remove warnings (#14368)
