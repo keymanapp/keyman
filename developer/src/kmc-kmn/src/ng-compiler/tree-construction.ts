@@ -28,9 +28,7 @@ export class ASTNode {
 
   public addChildren(children: ASTNode[]): ASTNode {
     if (children !== null) {
-      for (const child of children) {
-        this.addChild(child);
-      }
+      this.children.push(...children);
     }
     return this;
   }
@@ -57,8 +55,13 @@ export class ASTNode {
     return this.children.length > 0;
   }
 
-  public hasChildOfType(nodeType: NodeTypes): boolean  {
-    return this.getChildrenOfType(nodeType).length > 0;
+  public hasChildOfType(requiredType: NodeTypes): boolean  {
+    for (const child of this.children) {
+      if (child.nodeType === requiredType) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public getText(): String {
@@ -81,9 +84,7 @@ export class ASTNode {
   }
 
   public getChildren(): ASTNode[] {
-    const list: ASTNode[] = [];
-    list.push(...this.children);
-    return list;
+    return Array(...this.children);
   }
 
   public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
@@ -112,18 +113,23 @@ export class ASTNode {
   }
 
   public removeChildrenOfTypes(requiredTypes: NodeTypes[]): ASTNode[] {
-    const list: ASTNode[] = [];
     if (!requiredTypes?.length) {
-      return list;
+      return [];
     }
-    for (let idx = this.children.length; idx--;) {
-      const child = this.children[idx];
-      if (requiredTypes.includes(child.nodeType)) {
-        list.unshift(child);
-        this.children.splice(idx, 1);
-      }
-    }
-    return list;
+    // for (let idx = this.children.length; idx--;) {
+    //   const child = this.children[idx];
+    //   if (requiredTypes.includes(child.nodeType)) {
+    //     list.unshift(child);
+    //     this.children.splice(idx, 1);
+    //   }
+    // }
+    const acc = this.children.reduce((acc, child) => {
+      acc[requiredTypes.includes(child.nodeType)? 0 : 1].push(child);
+      return acc;
+    },
+    [[],[]]);
+    this.children = acc[1];
+    return acc[0];
   }
 
   public removeBlock(parentType: NodeTypes, childType: NodeTypes): ASTNode {
