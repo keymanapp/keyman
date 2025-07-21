@@ -126,6 +126,25 @@ export class ASTNode {
     return list;
   }
 
+  public removeBlock(parentType: NodeTypes, childType: NodeTypes): ASTNode {
+    let list: ASTNode[] = [];
+    for (let idx = this.children.length; idx--;) {
+      const child = this.children[idx];
+      if (child.nodeType === childType) {
+        list.unshift(child);
+        this.children.splice(idx, 1);
+      } else if (child.nodeType === parentType) {
+        this.children.splice(idx, 1);
+        child.addChildren(list);
+        return(child);
+      }
+    }
+    // parentType not found
+    const blockNode: ASTNode = new ASTNode(NodeTypes.TMP);
+    blockNode.addChildren(list);
+    return(blockNode);
+  }
+
   public get nodeType() { return this._nodeType; }
   public get token() { return this._token; }
 
