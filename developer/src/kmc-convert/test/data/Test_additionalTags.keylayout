@@ -10,7 +10,13 @@
 <keyboard group="126" id="-1272" name="Test" maxout="1">
     <layouts>
         <layout first="0" last="0" mapSet="138" modifiers="30"/>
-    </layouts>
+    </layouts>    
+
+    <!--Error here: additional tag 'additionalTag'-->
+    
+    <additionalTag>
+        <layout first="0" last="0" mapSet="138" modifiers="30"/>
+    </additionalTag>
     <modifierMap id="30" defaultIndex="0">
         <keyMapSelect mapIndex="0">
             <modifier keys=""/>

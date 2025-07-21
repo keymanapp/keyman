@@ -393,8 +393,8 @@ export class KmnFileWriter {
   }
 
   /**
-   * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings
-   *         definition of comparisons e.g. 1-1, 2-4, 6-6
+   * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings.
+   *         Definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
    * @param  rule : Rule[] - an array of all rules
    * @param  index the index of a rule in array[rule]

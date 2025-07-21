@@ -29,6 +29,15 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
+do_kmc_convert_test() {
+
+  builder_echo heading "Creating keylayout.schema.JSON"
+  "$KEYMAN_ROOT/resources/standards-data/keylayout/create_keylayout_schema.sh"
+
+  builder_echo heading "Creating keylayout.schema.validator"
+  "$KEYMAN_ROOT/common/web/types/build.sh" "configure"
+}
+
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure   verify_npm_setup
 builder_run_action build       tsc --build
@@ -45,5 +54,7 @@ do_test() {
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
+builder_run_action test        do_kmc_convert_test
 builder_run_action test        do_test
 builder_run_action publish     builder_publish_npm
+
