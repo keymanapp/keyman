@@ -41,13 +41,16 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer = stringToTokenBuffer('store(&VERSION) "10.0"\nstore(&NAME) "Khmer Angkor"\nstore(&COPYRIGHT) "© SIL Global"\n');
       const kmnTree: Rule = new KmnTreeRule();
       assert.isTrue(kmnTree.parse(root));
-      const children = root.getChildren();
-      assert.equal(children.length, 4);
+      const storesNode = root.getSoleChildOfType(NodeTypes.STORES);
+      assert.isNotNull(storesNode);
+      const children = storesNode.getChildren();
+      assert.equal(children.length, 3);
       assert.equal(children[0].nodeType, NodeTypes.VERSION);
       assert.equal(children[1].nodeType, NodeTypes.NAME);
       assert.equal(children[2].nodeType, NodeTypes.COPYRIGHT);
-      assert.equal(children[3].nodeType, NodeTypes.SOURCE_CODE);
-      assert.equal(children[3].getChildrenOfType(NodeTypes.LINE).length, 3);
+      const sourceCodeNode = root.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+      assert.isNotNull(sourceCodeNode);
+      assert.equal(sourceCodeNode.getChildrenOfType(NodeTypes.LINE).length, 3);
     });
   });
   describe("LineRule Tests", () => {
@@ -1589,21 +1592,23 @@ describe("KMN Analyser Tests", () => {
       Rule.tokenBuffer        = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.NAME));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.COPYRIGHT));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.MESSAGE));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.TARGETS));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.DISPLAYMAP));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.LAYOUTFILE));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.BITMAP));
-      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
+      const storesNode = root.getSoleChildOfType(NodeTypes.STORES);
+      assert.isNotNull(storesNode);
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.VERSION));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.NAME));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.COPYRIGHT));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.MESSAGE));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.TARGETS));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.DISPLAYMAP));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.LAYOUTFILE));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.KEYBOARDVERSION));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.isNotNull(storesNode.getSoleChildOfType(NodeTypes.VISUALKEYBOARD));
       const beginNodes = root.getChildrenOfType(NodeTypes.BEGIN);
       assert.equal(beginNodes.length, 2);
       assert.equal(beginNodes[0].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'main');
       assert.equal(beginNodes[1].getDescendents(NodeTypes.GROUPNAME)[0].getText(), 'PostKeystroke');
-      const storeNodes = root.getChildrenOfType(NodeTypes.STORE);
+      const storeNodes = storesNode.getChildrenOfType(NodeTypes.STORE);
       const storeNames = [
         'ShiftOutSingle', 'vCombo1', 'vCombo2', 'vCombo3', 'ShiftOutAll',
         'digit', 'number', 'whitespace', 'c_key', 'c_out',
@@ -1637,6 +1642,7 @@ describe("KMN Analyser Tests", () => {
       assert.isFalse(groupNodes[4].hasChildOfType(NodeTypes.READONLY));
       const productionNodes   = root.getChildrenOfType(NodeTypes.PRODUCTION);
       assert.equal(productionNodes.length, 268);
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.SOURCE_CODE));
       //assert.equal(root.toString(), '');
     });
     it("can parse Khmer Angkor correctly (round trip text)", () => {

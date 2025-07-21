@@ -96,6 +96,12 @@ export class ASTNode {
     return list;
   }
 
+  public removeChildren(): ASTNode[] {
+    const list: ASTNode[] = this.getChildren();
+    this.children = [];
+    return list;
+  }
+
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
     const children: ASTNode[] = this.removeChildrenOfType(requiredType);
     return (children.length == 1) ? children[0] : null;

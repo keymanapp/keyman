@@ -29,15 +29,65 @@ export class KmnTreeRule extends SingleChildRule {
       return false;
     }
     const parseSuccess = this.rule.parse(node);
-    this.gatherSourceCode(node);
+    let children: ASTNode[] = [];
+    const storesNode: ASTNode     = this.gatherStores(node);
+    const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
+    children.unshift(storesNode);
+    children.push(...node.removeChildren());
+    children.push(sourceCodeNode);
+    node.addChildren(children);
     return parseSuccess;
   }
 
-  private gatherSourceCode(node: ASTNode): void {
+  private static STORES_NODETYPES = [
+    NodeTypes.BITMAP,
+    NodeTypes.CASEDKEYS,
+    NodeTypes.COPYRIGHT,
+    NodeTypes.DISPLAYMAP,
+    NodeTypes.ETHNOLOGUECODE,
+    NodeTypes.HOTKEY,
+    NodeTypes.INCLUDECODES,
+    NodeTypes.KEYBOARDVERSION,
+    NodeTypes.KMW_EMBEDCSS,
+    NodeTypes.KMW_EMBEDJS,
+    NodeTypes.KMW_HELPFILE,
+    NodeTypes.KMW_HELPTEXT,
+    NodeTypes.KMW_RTL,
+    NodeTypes.LANGUAGE,
+    NodeTypes.LAYOUTFILE,
+    NodeTypes.MESSAGE,
+    NodeTypes.MNEMONICLAYOUT,
+    NodeTypes.NAME,
+    NodeTypes.TARGETS,
+    NodeTypes.VERSION,
+    NodeTypes.VISUALKEYBOARD,
+    NodeTypes.WINDOWSLANGUAGES,
+    NodeTypes.CAPSALWAYSOFF,
+    NodeTypes.CAPSONONLY,
+    NodeTypes.SHIFTFREESCAPS,
+    NodeTypes.BITMAP_HEADER,
+    NodeTypes.COPYRIGHT_HEADER,
+    NodeTypes.HOTKEY_HEADER,
+    NodeTypes.LANGUAGE_HEADER,
+    NodeTypes.LAYOUT_HEADER,
+    NodeTypes.MESSAGE_HEADER,
+    NodeTypes.NAME_HEADER,
+    NodeTypes.VERSION_HEADER,
+    NodeTypes.STORE,
+  ];
+
+  private gatherStores(node: ASTNode): ASTNode {
+    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRule.STORES_NODETYPES);
+    const storesNode: ASTNode   = new ASTNode(NodeTypes.STORES);
+    storesNode.addChildren(storeNodes);
+    return storesNode;
+  }
+
+  private gatherSourceCode(node: ASTNode): ASTNode {
     const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeTypes.LINE);
     const sourceCodeNode: ASTNode = new ASTNode(NodeTypes.SOURCE_CODE);
     sourceCodeNode.addChildren(lineNodes);
-    node.addChild(sourceCodeNode);
+    return sourceCodeNode;
   }
 }
 

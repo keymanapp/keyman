@@ -103,6 +103,7 @@ export enum NodeTypes {
   SOURCE_CODE           = "SOURCE_CODE",
   STORE                 = "STORE",
   STORENAME             = "STORENAME",
+  STORES                = "STORES",
   STRING                = "STRING",
   TARGETS               = "TARGETS",
   TMP                   = "TMP",
