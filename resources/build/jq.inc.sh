@@ -13,7 +13,9 @@ if [[ -z "${JQ+x}" ]]; then
   # . "${THIS_SCRIPT%/*}/build-utils.sh"
   ## END STANDARD BUILD SCRIPT INCLUDE
 
-  if builder_is_windows; then
+  # Don't use 'builder_is_windows' here, because this script is also
+  # used in git-hooks which don't source 'builder.inc.sh'.
+  if [[ "${OSTYPE}" == "cygwin" || "${OSTYPE}" == "msys" ]]; then
     JQ="$(dirname "${JQ_THIS_SCRIPT}")/jq-win64.exe"
   else
     JQ=jq
