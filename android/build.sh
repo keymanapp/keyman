@@ -96,11 +96,12 @@ function archive_artifacts() {
   #
   # Write download info files
   #
-  write_download_info "Keyman Engine for Android" "${KEYMAN_ENGINE_ANDROID_ZIP}" "${KEYMAN_VERSION}" "${KEYMAN_TIER}" "android"
-  write_download_info "Keyman for Android" "${KEYMAN_APK}" "${KEYMAN_VERSION}" "${KEYMAN_TIER}" "android"
+
+  write_download_info "${UPLOAD_PATH}" "${KEYMAN_ENGINE_ANDROID_ZIP}" "Keyman Engine for Android" zip android
+  write_download_info "${UPLOAD_PATH}" "${KEYMAN_APK}" "Keyman for Android" apk android
 
   if [[ "${RELEASE_OEM_FIRSTVOICES-false}" = true ]]; then
-    write_download_info "FirstVoices Keyboards" "${FIRSTVOICES_APK}" "${KEYMAN_VERSION}" "${KEYMAN_TIER}" "android"
+    write_download_info "${UPLOAD_PATH}" "${FIRSTVOICES_APK}" "FirstVoices Keyboards" apk android
   fi
 }
 

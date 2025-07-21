@@ -55,6 +55,10 @@ core_include_dirs = [
   include_directories('../../core/build/arch' / get_option('buildtype') / 'include'),
 ]
 
+linux_include_dirs = [
+  include_directories('../include')
+]
+
 subdir('icons')
 subdir('src')
 subdir('tests')
