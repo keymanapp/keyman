@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=2154
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
-. "${KEYMAN_ROOT}/resources/build/test/test-utils.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/test/testing-framework.inc.sh"
 
 # Mock command -v to simulate presence/absence of zip
 function command() {
@@ -60,7 +60,7 @@ function reset_zip_test_env() {
   export OSTYPE="linux"
 }
 
-function test_add_zip_files_with_zip_basic() {
+function test__add_zip_files__with_zip_basic() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=1
@@ -72,7 +72,7 @@ function test_add_zip_files_with_zip_basic() {
   assert-equal "${ZIP_CMD_LOG}" "zip archive.zip file1.txt file2.txt" "add_zip_files zip basic invocation"
 }
 
-function test_add_zip_files_with_zip_flags() {
+function test__add_zip_files__with_zip_flags() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=1
@@ -85,7 +85,7 @@ function test_add_zip_files_with_zip_flags() {
   assert-equal "${ZIP_CMD_LOG}" "zip -r -q -9 archive.zip file1.txt" "add_zip_files zip with flags"
 }
 
-function test_add_zip_files_with_zip_exclude_flag() {
+function test__add_zip_files__with_zip_exclude_flag() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=1
@@ -97,7 +97,7 @@ function test_add_zip_files_with_zip_exclude_flag() {
   assert-equal "${ZIP_CMD_LOG}" "zip -x@exclude.lst archive.zip file1.txt" "add_zip_files zip with exclude flag"
 }
 
-function test_add_zip_files_with_7z_basic() {
+function test__add_zip_files__with_7z_basic() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=0
@@ -109,7 +109,7 @@ function test_add_zip_files_with_7z_basic() {
   assert-equal "${ZIP_CMD_LOG}" "7z a archive.7z file1.txt file2.txt" "add_zip_files 7z basic invocation"
 }
 
-function test_add_zip_files_with_7z_flags() {
+function test__add_zip_files__with_7z_flags() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=0
@@ -122,7 +122,7 @@ function test_add_zip_files_with_7z_flags() {
   assert-equal "${ZIP_CMD_LOG}" "7z a -r -bd -bb0 -mx5 archive.7z file1.txt" "add_zip_files 7z with flags"
 }
 
-function test_add_zip_files_with_7z_exclude_flag() {
+function test__add_zip_files__with_7z_exclude_flag() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=0
@@ -134,7 +134,7 @@ function test_add_zip_files_with_7z_exclude_flag() {
   assert-equal "${ZIP_CMD_LOG}" "7z a -x@exclude.lst archive.7z file1.txt" "add_zip_files 7z with exclude flag"
 }
 
-function test_add_zip_files_with_7z_on_windows() {
+function test__add_zip_files__with_7z_on_windows() {
   # Setup
   reset_zip_test_env
   MOCK_ZIP_PRESENT=0
@@ -172,7 +172,7 @@ function _create_files() {
 ./file2.sh"
 }
 
-function test_add_zip_files_with_zip_real() {
+function test__add_zip_files__with_zip_real() {
   if ! builtin command -v zip >/dev/null 2>&1; then
     builder_echo warning "    IGNORE: add_zip_files zip with real data"
     return 0
@@ -209,7 +209,7 @@ function test_add_zip_files_with_zip_real() {
   setup
 }
 
-function test_add_zip_files_with_7z_real() {
+function test__add_zip_files__with_7z_real() {
   if ! builtin command -v 7z >/dev/null 2>&1; then
     builder_echo warning "    IGNORE: add_zip_files 7z with real data"
     return 0
@@ -264,7 +264,7 @@ function unmock_builder_die() {
   eval "builder_die() $(builtin declare -f ORIGINAL_BUILDER_DIE | tail -n +2)"
 }
 
-function test_add_zip_files__die_if_relative_path() {
+function test__add_zip_files__die_if_relative_path() {
   # Setup
   local LOG_MSG
   reset_zip_test_env
@@ -279,7 +279,7 @@ function test_add_zip_files__die_if_relative_path() {
   assert-equal "${LOG_MSG}" "DIE: File ../file2.txt is not in the current directory"  "add_zip_files with relative path"
 }
 
-function test_add_zip_files__die_if_absolute_path() {
+function test__add_zip_files__die_if_absolute_path() {
   # Setup
   local LOG_MSG
   reset_zip_test_env
@@ -295,15 +295,5 @@ function test_add_zip_files__die_if_absolute_path() {
   assert-equal "${LOG_MSG}" "DIE: File /file2.txt is not in the current directory" "add_zip_files with absolute path"
 }
 
-# Run all tests
-test_add_zip_files_with_zip_basic
-test_add_zip_files_with_zip_flags
-test_add_zip_files_with_zip_exclude_flag
-test_add_zip_files_with_zip_real
-test_add_zip_files_with_7z_basic
-test_add_zip_files_with_7z_flags
-test_add_zip_files_with_7z_exclude_flag
-test_add_zip_files_with_7z_on_windows
-test_add_zip_files_with_7z_real
-test_add_zip_files__die_if_relative_path
-test_add_zip_files__die_if_absolute_path
+# shellcheck disable=SC2119
+run_tests
