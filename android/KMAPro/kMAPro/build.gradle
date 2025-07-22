@@ -167,6 +167,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.activity:activity:1.10.1'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:7.8.0'

@@ -61,6 +61,7 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -85,7 +86,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.provider.Settings;
 import android.text.Html;
@@ -98,6 +104,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -138,6 +145,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
+    EdgeToEdge.enable(this);
+
     context = this;
 
     checkSendCrashReport();
@@ -169,6 +178,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
+
+    setupEdgeToEdge();
+    setupStatusBarColors();
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -415,6 +427,35 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     TextView _t = _rootView.findViewById(R.id.update_count_indicator);
     _t.setText(String.valueOf(anUpdateCount));
+  }
+
+  private void setupEdgeToEdge() {
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.topRelativeLayout),
+        (v, windowInsets) -> {
+          Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+          // Apply the insets as a margin to the view
+          v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+
+        // Return CONSUMED if you don't want the window insets to keep passing
+        // down to descendant views.
+        return WindowInsetsCompat.CONSUMED;
+    });
+  }
+
+  private void setupStatusBarColors() {
+    // Set status bar colors
+    // https://stackoverflow.com/a/71865988
+    Window window = getWindow();
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+      new WindowInsetsControllerCompat(window,
+        window.getDecorView()).setAppearanceLightStatusBars(true);
+      window.setStatusBarColor(getResources().getColor(android.R.color.white, null));
+    } else {
+      // VERSION.SDK_INT >= 21
+      window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+      window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    }
   }
 
   @Override
