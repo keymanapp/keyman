@@ -271,7 +271,7 @@ export class ModelCompositor {
       contextState.tail.activeReplacementId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
       if(suggestion.appendedTransform) {
-        acceptedContext = models.applyTransform(suggestion.appendedTransform, context);
+        acceptedContext = models.applyTransform(suggestion.appendedTransform, acceptedContext);
       }
       this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
