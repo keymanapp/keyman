@@ -17,7 +17,7 @@ assert-equal() {
                              Expected: '${expected}'
 
                           ")
-    ((test_result++))
+    ((test_failures++))
   fi
 }
 
@@ -35,7 +35,7 @@ assert-contains() {
                              Expected: '${expected}'
 
                           ")
-    ((test_result++))
+    ((test_failures++))
   fi
 }
 
@@ -53,7 +53,7 @@ assert-not-contains() {
                              Expected: '${expected}'
 
                           ")
-    ((test_result++))
+    ((test_failures++))
   fi
 }
 
@@ -63,7 +63,7 @@ assert-failed() {
   if [[ "${status}" == 0 ]]; then
     messages+=("- Expected test to fail but it succeeded
                           ")
-    ((test_result++))
+    ((test_failures++))
   fi
 }
 
@@ -73,7 +73,7 @@ assert-succeeded() {
   if [[ "${status}" != 0 ]]; then
     messages+=("- Expected test to succeed but it failed
                           ")
-    ((test_result++))
+    ((test_failures++))
   fi
 }
 
@@ -104,9 +104,10 @@ teardown_file() {
 # Discover and run all tests in the current script
 #
 # Parameters:
-#  [$1 $2] / [first last] - optional range of lines in the tests script to search for tests.
+#  [$1 [$2]] / [first [last]] - optional range of lines in the tests script to search for tests.
 #                           This helps to split a test file into several sections where
 #                           each section can have separate setup/teardown functions.
+#  [$3] / test_file         Name of the test file. Usually unset. Defaults to BASH_ARGV0.
 #
 # 'run_tests' looks for tests that follow the following pattern:
 #   function test_name() {
@@ -116,6 +117,7 @@ run_tests() {
   local test_count test_fail_count line func
   local first="${1:-1}"
   local last="${2:-$(wc -l < "${BASH_ARGV0}")}"
+  local file="${3:-${BASH_ARGV0}}"
 
   test_count=0
   test_fail_count=0
@@ -126,11 +128,13 @@ run_tests() {
   while read -r line; do
     func="$(_get_test_func "${line}")"
     _run_single_test "${func}"
-  done < <(sed -n "${first},${last}p" "${BASH_ARGV0}" | grep -e "^\s*function\s*test_")
+  done < <(sed -n "${first},${last}p" "${file}" | grep -e "^\s*function\s*test_")
 
   teardown_file
 
   builder_echo green "Total of ${test_count} tests run, $((test_count - test_fail_count)) passed, ${test_fail_count} failed"
+
+  return "${test_fail_count}"
 }
 
 # Replace $FUNC with $MOCK
@@ -148,7 +152,7 @@ create_mock() {
     _create_default_mock_func "${FUNC}" "${MOCK}"
   fi
 
-  if ! builtin declare -F "${original_func_var} ">/dev/null 2>&1; then
+  if ! builtin declare -F "${original_func_var}" >/dev/null 2>&1; then
     # Save the original function
     case "$(builtin type -t "${FUNC}")" in
       function)
@@ -219,11 +223,10 @@ _get_test_func() {
 _test_wrapper() {
   local func="$1"
   ${func}
-  return "${test_result}"
+  return "${test_failures}"
 }
 
 _run_single_test() {
-  local test_result
   local func="$1"
   declare -a messages=()
 
@@ -233,7 +236,7 @@ _run_single_test() {
   fi
 
   set +e
-  test_result=0
+  test_failures=0
   ((test_count++))
   setup
 

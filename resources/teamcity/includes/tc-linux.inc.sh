@@ -25,7 +25,7 @@ _is_package_installed() {
 # Parameters:
 #   $* - List of package names to check and install (e.g., "lcov jq")
 ba_linux_check_and_install_packages() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
     return 0
   fi
 
