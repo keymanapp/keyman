@@ -110,7 +110,11 @@ function copy-installer() {
   builder_if_release_build_level verify-installer-signatures
 
   # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
-  add_zip_files "${KEYMAN_ROOT}/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "${WINDOWS_PROGRAM_APP}/setup-redist.exe"
+  (
+    # shellcheck disable=SC2164
+    cd "${WINDOWS_PROGRAM_APP}"
+    add_zip_files "${KEYMAN_ROOT}/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "setup-redist.exe"
+  )
 }
 
 function verify-program-signatures() {
