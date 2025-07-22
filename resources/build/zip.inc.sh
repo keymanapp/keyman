@@ -20,12 +20,7 @@
 function add_zip_files() {
 
   # Parse parameters
-
-  # $1 for zip filename
-  local ZIP_FILE="$1"
-  shift
-
-  # Parse rest of parameters
+  local ZIP_FILE
   local ZIP_FLAGS=()
   local SEVENZ_FLAGS=('a') # 7z requires a command
   local INCLUDE=()
@@ -80,8 +75,12 @@ function add_zip_files() {
         ;;
 
       *)
-        # files to include in the archive
-        INCLUDE+=($1)
+        # files to include in the archive. First non-flag parameter is the zip file name.
+        if [[ -z "${ZIP_FILE:-}" ]]; then
+          ZIP_FILE="$1"
+        else
+          INCLUDE+=("$1")
+        fi
         shift
         ;;
     esac

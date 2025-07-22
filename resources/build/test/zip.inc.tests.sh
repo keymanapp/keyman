@@ -245,6 +245,19 @@ function mock_builder_die() {
   LOG_MSG+="DIE: $*"
 }
 
+function test__add_zip_files__ok_for_local_files() {
+  # Setup
+  MOCK_ZIP_PRESENT=1
+  create_mock  builder_die  mock_builder_die
+
+  # Execute
+  add_zip_files -q -r "/tmp/archive.zip" file1.txt a/file2.txt
+
+  # Verify
+  unmock builder_die
+  assert-not-contains "${LOG_MSG}" "DIE"
+}
+
 function test__add_zip_files__die_if_relative_path() {
   # Setup
   MOCK_ZIP_PRESENT=1
