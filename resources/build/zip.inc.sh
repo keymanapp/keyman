@@ -13,24 +13,30 @@
 #   and smaller artifacts
 # - if not set we rely on the default compression level
 
-# Add files to create a zip/7z archive with the following parameters (in order)
-# [zip filename]
-# [list of flags to pass to zip command] Flags start with a single-dash
+# Add files to create a zip/7z archive
+# Parameters:
+# - [zip filename]
+# - [list of files to include in zip]
+#
+# Optional flags:
 #   -x@filename for a file containing list of files to exclude from the archive
 #   -xr!name    to exclude files matching name from the archive
+#   -r          to recursively include files in subdirectories
+#   -q          to enable quiet mode (zip) or disable progress indicator
+#               and set output log level 0 (7z)
+#   -0 to -9    for compression level with -0 indicating no compression,
+#               -1 indicating low compression (fastest) and -9 indicating
+#               ultra compression (slowest)
 #   -* all other flags
-#   Flags passed in are treated as zip parameters, and internally converterted
-#   to 7z flags as applicable
-# [list of files to include in zip]
+# Flags start with a single-dash and get passed to zip command. They can come
+# before, after or in between the zip filename and the files to include.
+# Flags passed in are treated as zip parameters, and internally converterted
+# to 7z flags as applicable
+
 function add_zip_files() {
 
   # Parse parameters
-
-  # $1 for zip filename
-  local ZIP_FILE="$1"
-  shift
-
-  # Parse rest of parameters
+  local ZIP_FILE
   local ZIP_FLAGS=()
   local SEVENZ_FLAGS=('a') # 7z requires a command
   local INCLUDE=()
@@ -87,8 +93,12 @@ function add_zip_files() {
         ;;
 
       *)
-        # files to include in the archive
-        INCLUDE+=($1)
+        # files to include in the archive. First non-flag parameter is the zip file name.
+        if [[ -z "${ZIP_FILE:-}" ]]; then
+          ZIP_FILE="$1"
+        else
+          INCLUDE+=("$1")
+        fi
         shift
         ;;
     esac
@@ -112,14 +122,12 @@ function add_zip_files() {
   if ! command -v zip 2>&1 > /dev/null; then
     # Fallback to 7z
     if [[ -z "${SEVENZ+x}" ]]; then
-      case "${OSTYPE}" in
-        "cygwin"|"msys")
-          SEVENZ="${SEVENZ_HOME}"/7z.exe
-          ;;
-        *)
-          SEVENZ=7z
-          ;;
-      esac
+      if builder_is_windows; then
+        # shellcheck disable=2154
+        SEVENZ="${SEVENZ_HOME}/7z.exe"
+      else
+        SEVENZ=7z
+      fi
     fi
 
     # 7z command to add files so clear zip flags
