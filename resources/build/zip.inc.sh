@@ -6,17 +6,27 @@
 # If zip is not available, then fall back to 7z for zipping.
 # 7z requires env SEVENZ_HOME.
 #
-# TODO: refactor with /resources/build/win/zip.inc.sh
 
-# Add files to create a zip/7z archive with the following parameters (in order)
-# [zip filename]
-# [list of flags to pass to zip command] Flags start with a single-dash
+# Add files to create a zip/7z archive
+# Parameters:
+# - [zip filename]
+# - [list of files to include in zip]
+#
+# Optional flags:
 #   -x@filename for a file containing list of files to exclude from the archive
 #   -xr!name    to exclude files matching name from the archive
+#   -r          to recursively include files in subdirectories
+#   -q          to enable quiet mode (zip) or disable progress indicator
+#               and set output log level 0 (7z)
+#   -0 to -9    for compression level with -0 indicating no compression,
+#               -1 indicating low compression (fastest) and -9 indicating
+#               ultra compression (slowest)
 #   -* all other flags
-#   Flags passed in are treated as zip parameters, and internally converterted
-#   to 7z flags as applicable
-# [list of files to include in zip]
+# Flags start with a single-dash and get passed to zip command. They can come
+# before, after or in between the zip filename and the files to include.
+# Flags passed in are treated as zip parameters, and internally converterted
+# to 7z flags as applicable
+
 function add_zip_files() {
 
   # Parse parameters

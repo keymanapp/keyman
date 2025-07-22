@@ -245,17 +245,46 @@ function mock_builder_die() {
   LOG_MSG+="DIE: $*"
 }
 
-function test__add_zip_files__ok_for_local_files() {
+function test__add_zip_files__flags_before_zipfile() {
   # Setup
-  MOCK_ZIP_PRESENT=1
+  MOCK_ZIP_PRESENT=0
   create_mock  builder_die  mock_builder_die
 
   # Execute
-  add_zip_files -q -r "/tmp/archive.zip" file1.txt a/file2.txt
+  add_zip_files -r -q "/tmp/archive.zip" file1.txt a/file2.txt
 
   # Verify
   unmock builder_die
   assert-not-contains "${LOG_MSG}" "DIE"
+  assert-equal "${ZIP_CMD_LOG}" "7z a -r -bd -bb0 /tmp/archive.zip file1.txt a/file2.txt"
+}
+
+function test__add_zip_files__flags_between_files() {
+  # Setup
+  MOCK_ZIP_PRESENT=0
+  create_mock  builder_die  mock_builder_die
+
+  # Execute
+  add_zip_files "/tmp/archive.zip" -q file1.txt -r a/file2.txt
+
+  # Verify
+  unmock builder_die
+  assert-not-contains "${LOG_MSG}" "DIE"
+  assert-equal "${ZIP_CMD_LOG}" "7z a -bd -bb0 -r /tmp/archive.zip file1.txt a/file2.txt"
+}
+
+function test__add_zip_files__flags_at_end() {
+  # Setup
+  MOCK_ZIP_PRESENT=0
+  create_mock  builder_die  mock_builder_die
+
+  # Execute
+  add_zip_files "/tmp/archive.zip" file1.txt a/file2.txt -r -q
+
+  # Verify
+  unmock builder_die
+  assert-not-contains "${LOG_MSG}" "DIE"
+  assert-equal "${ZIP_CMD_LOG}" "7z a -r -bd -bb0 /tmp/archive.zip file1.txt a/file2.txt"
 }
 
 function test__add_zip_files__die_if_relative_path() {
