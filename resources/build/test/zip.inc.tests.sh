@@ -24,45 +24,48 @@ function command() {
   builtin command "$@"
 }
 
-function setup() {
-  # Mock zip and 7z commands to capture invocation
-  ZIP_CMD_LOG=""
-  function zip() {
-    ZIP_CMD_LOG="zip $*"
-    return 0
-  }
-  function 7z() {
-    ZIP_CMD_LOG="7z $*"
-    return 0
-  }
-  # Mock /custom/sevenz/7z.exe for Windows test
-  function /custom/sevenz/7z.exe() {
-    ZIP_CMD_LOG="/custom/sevenz/7z.exe $*"
-    return 0
-  }
-}
-
-function teardown() {
-  unset zip
-  unset 7z
-  unset /custom/sevenz/7z.exe
-  reset_zip_test_env
-}
-
-setup
-
 # Helper to reset log and env
 function reset_zip_test_env() {
-  ZIP_CMD_LOG=""
   unset SEVENZ
   unset SEVENZ_HOME
   MOCK_ZIP_PRESENT=1
   export OSTYPE="linux"
 }
 
+function mock_zip() {
+  ZIP_CMD_LOG="zip $*"
+  return 0
+}
+function mock_7z() {
+  ZIP_CMD_LOG="7z $*"
+  return 0
+}
+
+function setup() {
+  reset_zip_test_env
+  ZIP_CMD_LOG=""
+  LOG_MSG=""
+
+  # Mock zip and 7z commands to capture invocation
+  create_mock zip mock_zip
+  create_mock 7z mock_7z
+
+  # Mock /custom/sevenz/7z.exe for Windows test
+  function /custom/sevenz/7z.exe() {
+    # shellcheck disable=SC2317
+    ZIP_CMD_LOG="/custom/sevenz/7z.exe $*"
+  }
+}
+
+function teardown() {
+  unmock zip
+  unmock 7z
+  unset /custom/sevenz/7z.exe
+  reset_zip_test_env
+}
+
 function test__add_zip_files__with_zip_basic() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=1
 
   # Execute
@@ -74,7 +77,6 @@ function test__add_zip_files__with_zip_basic() {
 
 function test__add_zip_files__with_zip_flags() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=1
 
   # Execute
@@ -87,7 +89,6 @@ function test__add_zip_files__with_zip_flags() {
 
 function test__add_zip_files__with_zip_exclude_flag() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=1
 
   # Execute
@@ -99,7 +100,6 @@ function test__add_zip_files__with_zip_exclude_flag() {
 
 function test__add_zip_files__with_7z_basic() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=0
 
   # Execute
@@ -111,7 +111,6 @@ function test__add_zip_files__with_7z_basic() {
 
 function test__add_zip_files__with_7z_flags() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=0
 
   # Execute
@@ -124,7 +123,6 @@ function test__add_zip_files__with_7z_flags() {
 
 function test__add_zip_files__with_7z_exclude_flag() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=0
 
   # Execute
@@ -136,11 +134,9 @@ function test__add_zip_files__with_7z_exclude_flag() {
 
 function test__add_zip_files__with_7z_on_windows() {
   # Setup
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=0
   export OSTYPE="msys"
   export SEVENZ_HOME="/custom/sevenz"
-  unset SEVENZ
 
   # Execute
   add_zip_files "archive.7z" file1.txt
@@ -174,13 +170,13 @@ function _create_files() {
 
 function test__add_zip_files__with_zip_real() {
   if ! builtin command -v zip >/dev/null 2>&1; then
-    builder_echo warning "    IGNORE: add_zip_files zip with real data"
+    builder_echo warning "    IGNORE: add_zip_files zip with real data - requires zip installed"
     return 0
   fi
 
   # Setup
-  teardown
   MOCK_ZIP_PRESENT=1
+  unmock zip
 
   ARCHIVE=$(mktemp -u --suffix=.zip)
   FILEDIR=$(mktemp -d)
@@ -190,7 +186,7 @@ function test__add_zip_files__with_zip_real() {
   (
     # shellcheck disable=2164
     cd "${FILEDIR}"
-    add_zip_files "${ARCHIVE}" -r -q -xr!build.sh file1.sh file2.sh a/ # > /dev/null
+    add_zip_files "${ARCHIVE}" -r -q -xr!build.sh file1.sh file2.sh a/ > /dev/null
   )
 
   # Verify
@@ -205,19 +201,18 @@ function test__add_zip_files__with_zip_real() {
 
   rm -rf "${FILEDIR}"
   rm -rf "${NEWDIR}"
-  rm "${ARCHIVE}"
-  setup
+  rm -f "${ARCHIVE}"
 }
 
 function test__add_zip_files__with_7z_real() {
   if ! builtin command -v 7z >/dev/null 2>&1; then
-    builder_echo warning "    IGNORE: add_zip_files 7z with real data"
+    builder_echo warning "    IGNORE: add_zip_files 7z with real data - requires 7z installed"
     return 0
   fi
 
   # Setup
-  teardown
   MOCK_ZIP_PRESENT=0
+  unmock 7z
 
   ARCHIVE=$(mktemp -u --suffix=.zip)
   FILEDIR=$(mktemp -d)
@@ -228,7 +223,6 @@ function test__add_zip_files__with_7z_real() {
     # shellcheck disable=2164
     cd "${FILEDIR}"
     add_zip_files "${ARCHIVE}" -r -q -xr!build.sh file1.sh file2.sh a/ > /dev/null
-    # 7z a -bd -bb0 "${ARCHIVE}" file1.sh file2.sh a/ -xr!build.sh
   )
 
   # Verify
@@ -243,54 +237,37 @@ function test__add_zip_files__with_7z_real() {
 
   rm -rf "${FILEDIR}"
   rm -rf "${NEWDIR}"
-  rm "${ARCHIVE}"
-  setup
+  rm -f "${ARCHIVE}"
 }
 
+# shellcheck disable=SC2120
 function mock_builder_die() {
-  LOG_MSG=""
-
-  if ! declare -F "ORIGINAL_BUILDER_DIE" >/dev/null 2>&1; then
-    eval "ORIGINAL_BUILDER_DIE() $(builtin declare -f "builder_die" | tail -n +2)"
-  fi
-
-  function builder_die() {
-    LOG_MSG="DIE: $*"
-  }
-}
-
-function unmock_builder_die() {
-  # unmock 'builder_die' function
-  eval "builder_die() $(builtin declare -f ORIGINAL_BUILDER_DIE | tail -n +2)"
+  LOG_MSG+="DIE: $*"
 }
 
 function test__add_zip_files__die_if_relative_path() {
   # Setup
-  local LOG_MSG
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=1
-  mock_builder_die
+  create_mock  builder_die  mock_builder_die
 
   # Execute
-  add_zip_files "archive.zip" file1.txt ../file2.txt
+  add_zip_files "/tmp/archive.zip" file1.txt ../file2.txt
 
   # Verify
-  unmock_builder_die
+  unmock builder_die
   assert-equal "${LOG_MSG}" "DIE: File ../file2.txt is not in the current directory"  "add_zip_files with relative path"
 }
 
 function test__add_zip_files__die_if_absolute_path() {
   # Setup
-  local LOG_MSG
-  reset_zip_test_env
   MOCK_ZIP_PRESENT=1
-  mock_builder_die
+  create_mock  builder_die  mock_builder_die
 
   # Execute
-  add_zip_files "archive.zip" file1.txt /file2.txt
+  add_zip_files "/tmp/archive.zip" file1.txt /file2.txt
 
   # Verify
-  unmock_builder_die
+  unmock builder_die
 
   assert-equal "${LOG_MSG}" "DIE: File /file2.txt is not in the current directory" "add_zip_files with absolute path"
 }
