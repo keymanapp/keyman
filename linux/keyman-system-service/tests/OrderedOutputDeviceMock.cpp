@@ -4,13 +4,8 @@
 #else
 #include <basu/sd-bus.h>
 #endif
+#include <km_linux_test_common.h>
 #include "OrderedOutputDevice.h"
-
-// TODO: move these to a common header. Also defined in
-// ibus-keyman/tests/DBusTestHelper.cpp
-#define KEYMAN_TESTHELPER_BUS_NAME "com.keyman.TestService"
-#define KEYMAN_TESTHELPER_OBJECT_PATH "/com/keyman/TestService/TestHelper"
-#define KEYMAN_TESTHELPER_INTERFACE_NAME "com.keyman.TestService.TestHelper"
 
 #ifndef KEYMAN_TESTING
 #warning KEYMAN_TESTING should be defined when compiling tests

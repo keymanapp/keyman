@@ -24,6 +24,7 @@ KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, i
 bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
 KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
+bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int* sz16);
 
 namespace kmcmp {
     extern int nErrors;
@@ -2101,5 +2102,61 @@ TEST_F(CompilerTest, hasPreamble_test) {
     EXPECT_FALSE(hasPreamble(u"a\uFEFF"));
 }
 
-// bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
 // PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)
+
+// Helper to convert UTF-16 buffer to std::u16string
+static std::u16string buffer_to_u16string(const KMX_BYTE* buf, int sz16) {
+  std::u16string out;
+  for (int i = 0; i < sz16; i += 2) {
+    char16_t ch = buf[i] | (buf[i+1] << 8);
+    out.push_back(ch);
+  }
+  return out;
+}
+
+TEST(UTF16TempFromUTF8, HandlesValidUTF8WithoutBOM) {
+  const char* utf8 = "abc \xE2\x82\xAC"; // "abc €"
+  int sz = strlen(utf8);
+  KMX_BYTE* tempfile = nullptr;
+  int sz16 = 0;
+  ASSERT_TRUE(UTF16TempFromUTF8((KMX_BYTE*)utf8, sz, &tempfile, &sz16));
+  ASSERT_EQ(sz16, 10); // 5 UTF-16 code units * 2 bytes
+  std::u16string result = buffer_to_u16string(tempfile, sz16);
+  EXPECT_EQ(result, u"abc \u20AC");
+  delete[] tempfile;
+}
+
+TEST(UTF16TempFromUTF8, HandlesValidUTF8WithBOM) {
+  // UTF-8 BOM + "A"
+  const char utf8[] = { char(0xEF), char(0xBB), char(0xBF), 'A', 0 };
+  int sz = 4;
+  KMX_BYTE* tempfile = nullptr;
+  int sz16 = 0;
+  ASSERT_TRUE(UTF16TempFromUTF8((KMX_BYTE*)utf8, sz, &tempfile, &sz16));
+  ASSERT_EQ(sz16, 2); // Only 'A' (1 code unit) * 2 bytes
+  std::u16string result = buffer_to_u16string(tempfile, sz16);
+  EXPECT_EQ(result, u"A");
+  delete[] tempfile;
+}
+
+TEST(UTF16TempFromUTF8, HandlesInvalidUTF8FallbacksToCP1252) {
+  // 0x80 is invalid in UTF-8, should fallback to CP1252 (U+20AC)
+  const char invalid_utf8[] = { char(0x80), 0 };
+  int sz = 1;
+  KMX_BYTE* tempfile = nullptr;
+  int sz16 = 0;
+  ASSERT_TRUE(UTF16TempFromUTF8((KMX_BYTE*)invalid_utf8, sz, &tempfile, &sz16));
+  ASSERT_EQ(sz16, 2);
+  std::u16string result = buffer_to_u16string(tempfile, sz16);
+  EXPECT_EQ(result, u"\u20AC");
+  delete[] tempfile;
+}
+
+TEST(UTF16TempFromUTF8, HandlesEmptyInput) {
+  KMX_BYTE* tempfile = nullptr;
+  int sz16 = 0;
+  ASSERT_FALSE(UTF16TempFromUTF8(nullptr, 0, &tempfile, &sz16));
+  // tempfile should remain nullptr, sz16 should be 0
+  EXPECT_EQ(tempfile, nullptr);
+  EXPECT_EQ(sz16, 0);
+}
