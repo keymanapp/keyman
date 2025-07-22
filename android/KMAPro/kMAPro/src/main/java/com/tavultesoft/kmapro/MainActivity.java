@@ -433,7 +433,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.topRelativeLayout),
         (v, windowInsets) -> {
-          Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+          // Disregard displayCutout inset
+          Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() |
+            WindowInsetsCompat.Type.ime());
           // Apply the insets as a margin to the view
           v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
 
