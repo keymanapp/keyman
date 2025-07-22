@@ -87,12 +87,9 @@ function do_publish() {
 
   if builder_has_option --fv; then
     PUBTARGETS="app,fv"
-    export RELEASE_OEM=true
-    export RELEASE_OEM_FIRSTVOICES=true
   else
     # shellcheck disable=SC2034
     PUBTARGETS="app"
-    export RELEASE_OEM_FIRSTVOICES=false
   fi
 
   _create_zip_archive
