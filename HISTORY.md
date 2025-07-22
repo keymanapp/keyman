@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.87 alpha 2025-07-22
+
+* refactor(common): use test framework for zip tests (#14380)
+* maint(common): fix use of `jq.inc.sh` in git hooks (#14382)
+* test(common): improve zip tests (#14386)
+* maint(common): fix `add_zip_files` if flags come before zip filename (#14387)
+
 ## 19.0.86 alpha 2025-07-21
 
 * maint(common): fail build if adding relative file to zip (#14352)
