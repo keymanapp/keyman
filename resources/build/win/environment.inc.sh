@@ -113,11 +113,6 @@ clean_windows_project_files() {
 }
 
 wrap-signcode() {
-  if builder_is_ci_build && builder_is_ci_build_level_build; then
-    builder_echo "Skipping code signing - buildLevel=build: $@"
-    return 0
-  fi
-
   # CI will usually pass in a full path for signtool.exe; for local builds we
   # will hopefully find what we want on the path already
   if [[ -z "${SIGNTOOL+x}" ]]; then
