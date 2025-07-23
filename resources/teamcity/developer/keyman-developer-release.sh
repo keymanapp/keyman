@@ -13,7 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
@@ -24,21 +24,19 @@ builder_describe \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish release of Keyman Developer" \
-  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
-  "--rsync-user=RSYNC_USER            rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
-  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
+  "--rsync-path=RSYNC_PATH                    rsync path on remote server" \
+  "--rsync-user=RSYNC_USER                    rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST                    rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT                    rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
+  "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
+  "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
 
 builder_parse "$@"
 
 # shellcheck disable=SC2154
 cd "${KEYMAN_ROOT}/developer/src"
-
-# TODO: move to parameters (#14202)
-LOCAL_SYMBOLS_PATH="${KEYMAN_ROOT}/../symbols"
-REMOTE_SYMBOLS_PATH="windows/symbols"
-SYMBOLS_SUBDIR="000admin"
 
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
@@ -134,7 +132,7 @@ function build_developer_action() {
 }
 
 function publish_action() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # requires Powershell, so currently only supported on Windows
     builder_echo error "This script is intended to be run on Windows only."
     return 1

@@ -6,19 +6,19 @@
 
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
-  if [[ "${OSTYPE}" != "darwin"* ]]; then
+  if ! builder_is_macos; then
     builder_die "This build script will only run in a Mac environment."
     exit 1
   fi
 }
 
-# The list of valid projects that our build scripts ought expect.
-projects=("android" "ios" "linux" "lmlayer" "mac" "web" "windows")
+# The list of valid platforms that our build scripts ought expect.
+platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "win")
 
-# Used to validate a specified 'project' parameter.
-verify_project() {
+# Used to validate a specified 'platform' parameter.
+_verify_platform() {
   match=false
-  for proj in "${projects[@]}"
+  for proj in "${platforms[@]}"
   do
     if [[ "${proj}" = "$1" ]]; then
       match=true
@@ -68,99 +68,64 @@ assertValidPRVersionNbr()
   fi
 }
 
-dl_info_display_usage() {
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-  echo "Used to create a metadata file needed on the download site"
-  echo "for it to connect to the download.keyman.com API functions."
-  echo
-  echo "usage: write-download_info <name> <filepath> <version> <tier> <platform>"
-  echo
-  echo "  name           Specifies the user-friendly name of the product represented by the file."
-  echo "  filepath       Specifies the path and file in need of a .download_info metadata file."
-  echo "  version        Specifies the build version number, which should be in the"
-  echo "                   form Major.Minor.BuildCounter"
-  echo "  tier           Specifies tier (typically one of: alpha, beta, stable)."
-  echo "  platform       Specifies the target platforms for the file."
-  echo "                 (Should be one of: android, ios, mac, web, windows)"
-  echo
-  echo "The resulting .downloadinfo file will be automatically placed in the same directory"
-  echo "as the originally-specified file."
-  exit 1
-}
-
+#
+# Write ${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info file for the target
+# artifact
+#
+# Parameters:
+#   1: UPLOAD_DIR          Directory where artifact can be found
+#   2: ARTIFACT_FILENAME   Filename (without path) of artifact
+#   3: ARTIFACT_NAME       Descriptive name of artifact
+#   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.gz)
+#   5: PLATFORM            Target platform for artifact
+#
 write_download_info() {
-  #Process file & path information.
-  PRODUCT_NAME="$1"
-  BASE_PATH="$2"
-  KM_VERSION="$3"
-  KM_TIER="$4"
-  KM_PLATFORM="$5"
+  local UPLOAD_DIR="$1"
+  local ARTIFACT_FILENAME="$2"
+  local ARTFIACT_NAME="$3"
+  local ARTIFACT_TYPE="$4"
+  local PLATFORM="$5"
 
-  verify_project "$KM_PLATFORM"
+  local DATE HASH SIZE DOWNLOAD_INFO STAT_FLAGS
 
-  BASE_DIR=$(dirname "${BASE_PATH}")
-  BASE_FILE=$(basename "${BASE_PATH}");
+  _verify_platform "${PLATFORM}"
 
-  if ([ -h "${BASE_DIR}" ]) then
-    while([ -h "${BASE_DIR}" ]) do BASE_PATH=`readlink "${BASE_DIR}"`;
-    done
-  fi
-
-  assertFileExists "$2"
-
-  pushd . > /dev/null
-  cd `dirname ${BASE_DIR}` > /dev/null
-  BASE_PATH=`pwd`;
-  popd  > /dev/null
-
-  DEST_DIR="$BASE_DIR"
-
-  #Process version parameter.
-  assertValidVersionNbr "$3"
-  KM_BLD_COUNTER="$((${KM_VERSION##*.}))"
-
-  if [ "$KM_VERSION" = "" ]; then
-    builder_die "Required -version parameter not specified!"
-  fi
-
-  if [ "$KM_TIER" = "" ]; then
-    builder_die "Required -tier parameter not specified!"
-  fi
-
-  DOWNLOAD_INFO_FILEPATH="${BASE_PATH}/${BASE_FILE}.download_info"
-  if [[ ! -f "${BASE_PATH}/${BASE_FILE}" ]]; then
-    builder_die "Cannot compute file size or MD5 for non-existent DMG file: ${BASE_PATH}/${BASE_FILE}"
-  fi
-
-  FILE_EXTENSION="${BASE_FILE##*.}"
-
-  # stat flags to get filesize in bytes
-  if [ "$BUILDER_OS" == "mac" ] && [[ $(which stat) == /usr/bin/stat ]]; then
+  # shellcheck disable=SC2312
+  if builder_is_macos && [[ $(command -v stat) == /usr/bin/stat ]]; then
     # /usr/bin/stat on mac is BSD
     STAT_FLAGS="-f%z"
   else
     # GNU (coreutils)
-    STAT_FLAGS="-c%s"
-  fi
-  FILE_SIZE=$(stat ${STAT_FLAGS} "${BASE_PATH}/${BASE_FILE}")
-  MD5_HASH=$(md5sum "${BASE_PATH}/${BASE_FILE}" | cut -d" " -f 1 -) # hash is the first element returned
-
-  if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
-    builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
+    STAT_FLAGS="--print=%s"
   fi
 
-  echo { > "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"name\": \"${PRODUCT_NAME}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"version\": \"${KM_VERSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"date\": \"$(date "+%Y-%m-%d")\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"platform\": \"${KM_PLATFORM}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"stability\": \"${KM_TIER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"file\": \"${BASE_FILE}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"md5\": \"${MD5_HASH}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"type\": \"${FILE_EXTENSION}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"build\": \"${KM_BLD_COUNTER}\"," >> "$DOWNLOAD_INFO_FILEPATH"
-  echo "  \"size\": \"${FILE_SIZE}\"" >> "$DOWNLOAD_INFO_FILEPATH"
-  echo } >> "$DOWNLOAD_INFO_FILEPATH"
+  # Construct .download_info
+  DATE=$(date +%F)
+  # shellcheck disable=SC2312
+  HASH=$(md5sum "${UPLOAD_DIR}/${ARTIFACT_FILENAME}" | cut -d ' ' -f 1)
+  # shellcheck disable=SC2248
+  SIZE=$(stat ${STAT_FLAGS} "${UPLOAD_DIR}/${ARTIFACT_FILENAME}")
+
+  # shellcheck disable=SC2016,SC2154
+  DOWNLOAD_INFO=$(
+    "${JQ}" -n \
+    --arg NAME "${ARTFIACT_NAME}" \
+    --arg BUILD_NUMBER "${KEYMAN_VERSION}" \
+    --arg DATE "${DATE}" \
+    --arg PLATFORM "${PLATFORM}" \
+    --arg KEYMAN_TIER "${KEYMAN_TIER}" \
+    --arg FILENAME "${ARTIFACT_FILENAME}" \
+    --arg ARTIFACT_TYPE "${ARTIFACT_TYPE}" \
+    --arg HASH "${HASH}" \
+    --arg BUILD_COUNTER "${KEYMAN_VERSION_PATCH}" \
+    --arg SIZE "${SIZE}" \
+    '{
+      name: $NAME, version: $BUILD_NUMBER, date: $DATE, platform: $PLATFORM,
+      stability: $KEYMAN_TIER, file: $FILENAME, md5: $HASH, type: $ARTIFACT_TYPE,
+      build: $BUILD_COUNTER, size: $SIZE
+    }'
+  )
+  echo "${DOWNLOAD_INFO}" | "${JQ}" . >> "${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info"
 }
 
 # set_version sets the file version on mac/ios projects
@@ -286,24 +251,25 @@ verify_npm_setup() {
 }
 
 _print_expected_node_version() {
-"$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
+  "$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
 }
 
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
 _select_node_version_with_nvm() {
-  local REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
-  local CURRENT_NODE_VERSION
+  local REQUIRED_NODE_VERSION  CURRENT_NODE_VERSION
 
-  if [[ $BUILDER_OS != win ]]; then
-    # launch nvm in a sub process, see _builder_nvm.sh for details
-    "$KEYMAN_ROOT/resources/build/_builder_nvm.sh" "$REQUIRED_NODE_VERSION"
-  else
+  REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
+
+  if builder_is_windows; then
     CURRENT_NODE_VERSION="$(node --version)"
-    if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
-      start //wait //b nvm install "$REQUIRED_NODE_VERSION"
-      start //wait //b nvm use "$REQUIRED_NODE_VERSION"
+    if [[ "${CURRENT_NODE_VERSION}" != "v${REQUIRED_NODE_VERSION}" ]]; then
+      start //wait //b nvm install "${REQUIRED_NODE_VERSION}"
+      start //wait //b nvm use "${REQUIRED_NODE_VERSION}"
     fi
+  else
+    # launch nvm in a sub process, see _builder_nvm.sh for details
+    "${KEYMAN_ROOT}/resources/build/_builder_nvm.sh" "${REQUIRED_NODE_VERSION}"
   fi
 
   # Now, check that the node version is correct, on all systems

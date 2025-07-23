@@ -14,7 +14,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
@@ -27,25 +26,23 @@ builder_describe \
   "build          build Keyman for Windows Windows" \
   "test           run Keyman for Windows tests" \
   "publish        publish release" \
-  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
-  "--rsync-user=RSYNC_USER            rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
-  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
+  "--rsync-path=RSYNC_PATH                    rsync path on remote server" \
+  "--rsync-user=RSYNC_USER                    rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST                    rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT                    rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
+  "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
+  "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
 
 builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/windows/src"
 
-if ! is_windows; then
+if ! builder_is_windows; then
   builder_echo error "This script is intended to be run on Windows only."
   exit 1
 fi
-
-# TODO: move to parameters (#14202)
-LOCAL_SYMBOLS_PATH="${KEYMAN_ROOT}/../symbols"
-REMOTE_SYMBOLS_PATH="windows/symbols"
-SYMBOLS_SUBDIR="000admin"
 
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com

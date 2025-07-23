@@ -123,6 +123,13 @@ package.json (`npm run <script>`).
   passed in, or `release` otherwise, which corresponds to the output folder
   names for many projects.
 
+* `BUILDER_OS` will be set to `linux`, `mac`, or `win`, depending on the platform
+  the builder script is currently running on.
+
+  **NOTE:** Only use `BUILDER_OS` in a `case` statement. Use one of the
+  `builder_is_macos`, `builder_is_windows`, or `builder_is_linux` functions
+  to check if the script is running on a particular platform.
+
 Other environment variables and paths will probably be added over time.
 
 ## Split
@@ -1238,6 +1245,20 @@ builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
 
 * **coverage_threshold** optional, minimum coverage for c8 to pass tests,
   defaults to 90 (percent)
+
+--------------------------------------------------------------------------------
+
+## `builder_is_windows`, `builder_is_macos`, and `builder_is_linux` functions
+
+Returns 0 (true) if building on the particular platform.
+
+### Usage
+
+```bash
+if builder_is_windows; then
+  builder_echo "We're building on a Windows machine"
+fi
+```
 
 --------------------------------------------------------------------------------
 

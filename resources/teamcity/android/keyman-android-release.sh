@@ -14,8 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/zip.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
 
@@ -67,14 +66,14 @@ function _publish_to_playstore() {
   local PUBTARGETS="$1"
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}" --ci
+  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
 
 function do_publish() {
   local PUBTARGETS
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # currently only tested on Windows, TODO: test cross-platform
     builder_echo error "This script is intended to be run on Windows only."
     return 1
