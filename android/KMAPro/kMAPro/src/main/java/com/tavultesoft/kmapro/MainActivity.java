@@ -864,6 +864,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void displayUpdateChrome() {
     // TextView's default string is to update Chrome
+    TextView textView = (TextView)findViewById(R.id.kmWebViewChromeTextView);
+    textView.setText(String.format(getString(R.string.text_require_chrome_version),
+      WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
 
     Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.button_update_chrome));
