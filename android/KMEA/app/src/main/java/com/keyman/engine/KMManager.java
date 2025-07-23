@@ -697,9 +697,11 @@ public final class KMManager {
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
+    int navigationBarHeight = getNavigationBarHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+    //params.addRule(RelativeLayout.ABOVE, appContext.getResources().)
    return params;
   }
 
@@ -2287,6 +2289,18 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context) {
     int orientation = getOrientation(context);
     return getKeyboardHeight(context, orientation);
+  }
+
+  /**
+   * Returns the navigation bar height in dp for the current device orientation
+   */
+  public static int getNavigationBarHeight(Context context) {
+    int navigationBarHeight = 0;
+    int resourceId = context.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      navigationBarHeight = context.getResources().getDimensionPixelSize(resourceId);
+    }
+    return navigationBarHeight;
   }
 
   /**

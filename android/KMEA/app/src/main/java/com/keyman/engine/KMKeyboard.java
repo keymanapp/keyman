@@ -374,6 +374,7 @@ final class KMKeyboard extends WebView {
     String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
 
+    /*
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       // Add insets
       ViewCompat.setOnApplyWindowInsetsListener(this,
@@ -404,6 +405,7 @@ final class KMKeyboard extends WebView {
           return WindowInsetsCompat.CONSUMED;
         });
     }
+     */
     setBackgroundColor(0);
   }
 
@@ -812,10 +814,12 @@ final class KMKeyboard extends WebView {
 
   }
 
+  /*
   // Convert pixel to dp
   private int pxToDp(int px, DisplayMetrics displayMetrics) {
     return Math.round(px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
   }
+   */
 
   // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
   // Also sends a message to Sentry (not localized)

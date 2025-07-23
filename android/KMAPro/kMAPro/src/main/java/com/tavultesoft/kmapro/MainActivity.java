@@ -109,6 +109,7 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -125,6 +126,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private static final String TAG = "MainActivity";
 
+  private RelativeLayout topRelativeLayout;
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -191,7 +193,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
+    topRelativeLayout = (RelativeLayout) findViewById(R.id.topRelativeLayout);
     textView = (KMTextView) findViewById(R.id.kmTextView);
+
     textView.setText(prefs.getString(userTextKey, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
     textView.setTextSize((float) textSize);
@@ -665,10 +669,23 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
+    // Navigation bar height
+    int navigationBarHeight = 0;
+    resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      navigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+    }
+
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
+    textView.setHeight(screenHeight - bannerHeight - keyboardHeight);
+    topRelativeLayout.getLayoutParams().height = screenHeight - navigationBarHeight;
+
+    // Align in app keyboard
+    RelativeLayout.LayoutParams layoutParams = KMManager.getKeyboardLayoutParams();
+    layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.topRelativeLayout);
+    //KMManager.getKMKeyboard(KeyboardType.KEYBOARD_TYPE_INAPP).setLayoutParams(layoutParams);
   }
 
   private void showInfo() {
