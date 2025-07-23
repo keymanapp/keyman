@@ -26,6 +26,41 @@ export interface convert_object {
   arrayOf_Modifiers: string[][],
   arrayOf_Rules: Rule[],
 };
+//_S2 do I need search???
+export interface ActionIdOutputBehaviourKeyModi_object {
+  search: string,
+  actionId: string,
+  outchar: string,
+  behaviour: string,
+  key: string,
+  modifier: string,
+};
+
+
+
+export interface ActionIdKeyModiOutput_object {
+  actionId: string,
+  keyCode: string,
+  key: string,
+  modifier: string,
+  outchar: string;
+};
+export interface modifierKey_object {
+  key: string;  // _S2 todo change everywhere!!!
+  modifier: number,
+};
+export interface modifier_object {
+  modifier: string,
+};
+export interface behaviourKey_object {
+  behaviour: string,
+  key: string,
+};
+export interface idStateOutput_object {
+  id: string,
+  state: string,
+  output: string,
+};
 
 export class KeylayoutToKmnConverter {
 
@@ -206,15 +241,15 @@ export class KeylayoutToKmnConverter {
 
           for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
 
-            if ((this.get_Output__From__ActionId_None(jsonObj, action_id) !== undefined)
-              && (this.get_Output__From__ActionId_None(jsonObj, action_id) !== "")) {
+            if ((this.get_4_Output__From__ActionId_None(jsonObj, action_id) !== undefined)
+              && (this.get_4_Output__From__ActionId_None(jsonObj, action_id) !== "")) {
 
-              const outputchar: string = this.get_Output__From__ActionId_None(jsonObj, action_id);
-              const b1_modifierKey_arr: string[][] =
-                this.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused);
+              const outputchar: string = this.get_4_Output__From__ActionId_None(jsonObj, action_id);
 
-              for (let m = 0; m < b1_modifierKey_arr.length; m++) {
+              const b1_modifierKey_obj: ActionIdOutputBehaviourKeyModi_object[] =
+                this.get_8_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused);
 
+              for (let m = 0; m < b1_modifierKey_obj.length; m++) {
                 rule_obj = new Rule(
                   /*   rule_type */               "C1",
 
@@ -228,8 +263,8 @@ export class KeylayoutToKmnConverter {
                   /*   dk for C2*/                0,
                   /*   unique B */                0,
 
-                  /*   modifier_key*/             b1_modifierKey_arr[m][5],
-                  /*   key */                     b1_modifierKey_arr[m][4],
+                  /*   modifier_key*/             b1_modifierKey_obj[m].modifier,
+                  /*   key */                     b1_modifierKey_obj[m].key,
                   /*   output */                  new TextEncoder().encode(outputchar)
                 );
                 if ((outputchar !== undefined) && (outputchar !== "undefined") && (outputchar !== "")) {
@@ -247,7 +282,7 @@ export class KeylayoutToKmnConverter {
             // https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd   .........
             // ...............................................................................................................................
 
-            const b1_actionIndex: number = this.get_ActionIndex__From__ActionId(jsonObj, action_id);
+            const b1_actionIndex: number = this.get_1_ActionIndex__From__ActionId(jsonObj, action_id);
 
             // with action_id from above loop all 'action' and search for a state(none)-next-pair ............................................................................................................
             // e.g. in Block 5: find <when state="none" next="1"/> for action id a18 ......................................................................................................................
@@ -264,27 +299,38 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 .....................................................................................................................................................................
               // with present action_id (a18) find all keycode-behaviour-pairs that use this action (a18) => (keymapIndex 0/keycode 24 and keymapIndex 3/keycode 24) ....................................
               // from these create an array of modifier combinations  e.g. [['','caps?'], ['Caps']] .....................................................................................................
-              /* eg: [['24', 0], ['24', 3]] */        const b4_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
-              /* e.g. [['','caps?'], ['Caps']]*/      const b4_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);
+              /* eg: [['24', 0], ['24', 3]] */        // const b4_deadkey_arr: number[][] = this.get_9o_KeyModifier_array__From__ActionID_oldArrayType(jsonObj, action_id);  //_S2 remove&replace
+              /* eg: [['24', 0], ['24', 3]] */        const b4_deadkey_obj: modifierKey_object[] = this.get_9_KeyModifier_array__From__ActionID(jsonObj, action_id);
+              /* e.g. [['','caps?'], ['Caps']]*/      //const b4_deadkeyModifier_arr: string[] = this.get_3o_Modifier_array__From__KeyModifier_array_oldArrayType(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);//_S2 remove&replace
+              /* e.g. [['','caps?'], ['Caps']]*/      const b4_deadkeyModifier_obj: string[] = this.get_3_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_obj);
               // ........................................................................................................................................................................................
 
 
               // Data of Block Nr 6 .....................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5_value_next (e.g. use 1 in  <when state="1" output="â"/> ) ......................................
-              /*  eg: [ 'a9','1','â'] */              const b6_actionId_arr: string[][] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
+              /*  eg: [ 'a9','1','â'] */              //const b6_actionId_arr: string[][] = this.get_6o_ActionStateOutput_array__From__ActionState_oldArrayType(jsonObj, b5_value_next);//_S2 remove&replace
+              /*  eg: [ 'a9','1','â'] */                const b6_actionId_obj: idStateOutput_object[] = this.get_6_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
               // ........................................................................................................................................................................................
 
 
               // Data of Block Nr 1  ....................................................................................................................................................................
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] ......................................................................
-              /*  eg: ['0','K_A','a9','0','â'] */     const b1_keycode_arr: string[][] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_arr);
-              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);
+              /*  eg: ['0','K_A','a9','0','â'] */     //const b1_keycode_arr: string[][] = this.get_5o_KeyActionOutput_array__From__ActionStateOutput_array_oldArrayType(jsonObj, b6_actionId_arr);//_S2 remove&replace
+              /*  eg: ['0','K_A','a9','0','â'] */     const b1_keycode_obj: ActionIdKeyModiOutput_object[] = this.get_5_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_obj);
+
+              /*  eg: ['K_A','a9','0','NCAPS','â']*/ // const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array_arr(jsonObj, b1_keycode_arr, isCapsused);//_S2 remove&replace
+              /*  eg: ['K_A','a9','0','NCAPS','â']*/  //const b1_modifierKey_obj: ActionIdOutputBehaviourKeyModi_object[] = this.get_7o_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);//_S2 remove&replace
+              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1_modifierKey_obj: ActionIdOutputBehaviourKeyModi_object[] = this.get_7_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_obj, isCapsused);//_S2 remove&replace          
                 // .......................................................................................................................................................................................
 
-                for (let n1 = 0; n1 < b4_deadkeyModifier_arr.length; n1++) {
-                  for (let n2 = 0; n2 < b4_deadkeyModifier_arr[n1].length; n2++) {
-                    for (let n3 = 0; n3 < b4_deadkey_arr.length; n3++) {
-                      for (let n4 = 0; n4 < b1_modifierKey_arr.length; n4++) {
+                //for (let n1 = 0; n1 < b4_deadkeyModifier_arr.length; n1++) {
+                for (let n1 = 0; n1 < b4_deadkeyModifier_obj.length; n1++) {
+                  //for (let n2 = 0; n2 < b4_deadkeyModifier_arr[n1].length; n2++) {
+                  for (let n2 = 0; n2 < b4_deadkeyModifier_obj[n1].length; n2++) {
+                    // for (let n3 = 0; n3 < b4_deadkey_arr.length; n3++) {
+                    for (let n3 = 0; n3 < b4_deadkey_obj.length; n3++) {
+                      //for (let n4 = 0; n4 < b1_modifierKey_arr.length; n4++) {//_S2 remove&replace
+                      for (let n4 = 0; n4 < b1_modifierKey_obj.length; n4++) {
 
                         rule_obj = new Rule(
                         /*   rule_type */             "C2",
@@ -294,18 +340,30 @@ export class KeylayoutToKmnConverter {
                         /*   id_prev_deadkey */       0,
                         /*   unique A */              0,
 
-                        /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_arr[n1][n2], isCapsused),
-                        /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n3][0])),
+                        /*   modifier_deadkey */     //this.create_kmn_modifier(b4_deadkeyModifier_arr[n1][n2], isCapsused),
+                        /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_obj[n1][n2], isCapsused),
+                        /*   deadkey */               //this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n3][0])),
+                        /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_obj[n3].key)),
                         /*   dk for C2*/              dk_counter_C2++,
                         /*   unique B */              0,
 
-                        /*   modifier_key*/           b1_modifierKey_arr[n4][3],
-                        /*   key */                   b1_modifierKey_arr[n4][0],
-                        /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n4][4]),
+                        /*   modifier_key*/          // b1_modifierKey_arr[n4][3],//_S2 remove&replace
+                        /*   key */                   //b1_modifierKey_arr[n4][0],
+                        /*   output */               // new TextEncoder().encode(b1_modifierKey_arr[n4][4]),
+
+                        /*   modifier_key*/           b1_modifierKey_obj[n4].modifier,
+                        /*   key */                   b1_modifierKey_obj[n4].key,
+                        /*   output */                new TextEncoder().encode(b1_modifierKey_obj[n4].outchar),
                         );
-                        if ((b1_modifierKey_arr[n4][4] !== undefined)
-                          && (b1_modifierKey_arr[n4][4] !== "undefined")
-                          && (b1_modifierKey_arr[n4][4] !== "")) {
+                        /* if ((b1_modifierKey_arr[n4][4] !== undefined)//_S2 remove&replace
+                           && (b1_modifierKey_arr[n4][4] !== "undefined")
+                           && (b1_modifierKey_arr[n4][4] !== "")) {
+                           object_array.push(rule_obj);
+                         }*/
+
+                        if ((b1_modifierKey_obj[n4].outchar !== undefined)
+                          && (b1_modifierKey_obj[n4].outchar !== "undefined")
+                          && (b1_modifierKey_obj[n4].outchar !== "")) {
                           object_array.push(rule_obj);
                         }
                       }
@@ -341,60 +399,94 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 ........................................................................................................................................................................
               // with present action_id (a16) find all keycode-behaviour-pairs that use this action (a16) => (keymapIndex 3/keycode 32) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* e.g. [['32', 3]] */                      const b4_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
-              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);
+              /* e.g. [['32', 3]] */                     // const b4_deadkey_arr: number[][] = this.get_9o_KeyModifier_array__From__ActionID_oldArrayType(jsonObj, action_id);//_S2 remove&replace
+              /* e.g. [['32', 3]] */                      const b4_deadkey_obj: modifierKey_object[] = this.get_9_KeyModifier_array__From__ActionID(jsonObj, action_id);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/      // const b4_deadkeyModifier_arr: string[] = this.get_3o_Modifier_array__From__KeyModifier_array_oldArrayType(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4_deadkeyModifier_obj: string[] = this.get_3_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_obj);
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 3 ........................................................................................................................................................................
               // get an action id from a state-output-pair that use state = b5_value_state (e.g. use 3 in  <when state="none" next="3"/> ) .................................................................
-              /* e.g. actioniD = a17  */                  const b3_actionId: string = this.get_ActionID__From__ActionNext(jsonObj, b5_value_state);
+              /* e.g. actioniD = a17  */                  const b3_actionId: string = this.get_2_ActionID__From__ActionNext(jsonObj, b5_value_state);
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 2  .......................................................................................................................................................................
               // with present action_id (a17) find all key names and behaviours that use this action (a17) => (keymapIndex 3/keycode 28) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* eg: index=3 */                           const b2_prev_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, String(b3_actionId));   // conversion not necessary
-              /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2_prev_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_arr);
+                       
+          
+             
+              /* eg: index=3 */                           //const b2_prev_deadkey_arr: number[][] = this.get_9o_KeyModifier_array__From__ActionID_oldArrayType(jsonObj, b3_actionId);   // conversion not necessary //_S2 remove&replace
+              /* eg: index=3 */                           const b2_prev_deadkey_obj: modifierKey_object[] = this.get_9_KeyModifier_array__From__ActionID(jsonObj, b3_actionId);   // conversion not necessary //_S2 remove&replace
+              /* e.g. [ [ 'anyOption', 'Caps' ] ] */     // const b2_prev_deadkeyModifier_arr: string[] = this.get_3o_Modifier_array__From__KeyModifier_array_oldArrayType(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_arr);
+             /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2_prev_deadkeyModifier_obj: string[] = this.get_3_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_obj);
               // ...........................................................................................................................................................................................
               // Data of Block Nr 6 ........................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5_value_next (e.g. use 1 in  <when state="1" output="â"/> ) .........................................
-              /*  eg:[ [ 'a9','1','â'] ]*/                const b6_actionId_arr: string[][] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
+              /*  eg:[ [ 'a9','1','â'] ]*/               // const b6_actionId_arr: string[][] = this.get_6o_ActionStateOutput_array__From__ActionState_oldArrayType(jsonObj, b5_value_next);
+              /*  eg:[ [ 'a9','1','â'] ]*/                const b6_actionId_obj: idStateOutput_object[] = this.get_6_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next); /*  eg:[ [ 'a9','1','â'] ]*/
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 1  .......................................................................................................................................................................
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] .........................................................................
-              /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1_keycode_arr: string[][] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_arr);
-              /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);
+              /*  eg: ['49','K_SPACE','a0','0','Â'] */    //const b1_keycode_arr: string[][] = this.get_5o_KeyActionOutput_array__From__ActionStateOutput_array_oldArrayType(jsonObj, b6_actionId_arr);
+               /*  eg: ['0','K_A','a9','0','â'] */        const b1_keycode_obj: ActionIdKeyModiOutput_object[] = this.get_5_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_obj);
+                // console.log("b1_keycode_obj ", b1_keycode_obj);
+                //this.compareBoth(b1_keycode_arr, b1_keycode_obj);
+
+                /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ //const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array_arr(jsonObj, b1_keycode_arr, isCapsused);//_S2 remove&replace
+                /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ //const b1_modifierKey_obj: ActionIdOutputBehaviourKeyModi_object[] = this.get_7o_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);
+                const b1_modifierKey_obj: ActionIdOutputBehaviourKeyModi_object[] = this.get_7_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_obj, isCapsused);//_S2 remove&replace         
                 // ...........................................................................................................................................................................................
 
-                for (let n1 = 0; n1 < b2_prev_deadkeyModifier_arr.length; n1++) {
-                  for (let n2 = 0; n2 < b2_prev_deadkeyModifier_arr[n1].length; n2++) {
-                    for (let n3 = 0; n3 < b2_prev_deadkey_arr.length; n3++) {
-                      for (let n4 = 0; n4 < b4_deadkeyModifier_arr.length; n4++) {
-                        for (let n5 = 0; n5 < b4_deadkeyModifier_arr[n4].length; n5++) {
-                          for (let n6 = 0; n6 < b4_deadkey_arr.length; n6++) {
-                            for (let n7 = 0; n7 < b1_modifierKey_arr.length; n7++) {
+                //for (let n1 = 0; n1 < b2_prev_deadkeyModifier_arr.length; n1++) {
+                for (let n1 = 0; n1 < b2_prev_deadkeyModifier_obj.length; n1++) {
+                  //for (let n2 = 0; n2 < b2_prev_deadkeyModifier_arr[n1].length; n2++) {
+                  for (let n2 = 0; n2 < b2_prev_deadkeyModifier_obj[n1].length; n2++) {
+                    //for (let n3 = 0; n3 < b2_prev_deadkey_arr.length; n3++) {
+                    for (let n3 = 0; n3 < b2_prev_deadkey_obj.length; n3++) {
+                      //for (let n4 = 0; n4 < b4_deadkeyModifier_arr.length; n4++) {
+                      for (let n4 = 0; n4 < b4_deadkeyModifier_obj.length; n4++) {
+                       // for (let n5 = 0; n5 < b4_deadkeyModifier_arr[n4].length; n5++) {
+                        for (let n5 = 0; n5 < b4_deadkeyModifier_obj[n4].length; n5++) {
+                          //for (let n6 = 0; n6 < b4_deadkey_arr.length; n6++) {
+                          for (let n6 = 0; n6 < b4_deadkey_obj.length; n6++) {
+                            // for (let n7 = 0; n7 < b1_modifierKey_arr.length; n7++) {//_S2 remove&replace
+                            for (let n7 = 0; n7 < b1_modifierKey_obj.length; n7++) {
 
                               rule_obj = new Rule(
                               /*   rule_type */             "C3",
-                              /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_arr[n1][n2], isCapsused),
-                              /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_arr[n3][0])),
+                              /*   modifier_prev_deadkey*/  //this.create_kmn_modifier(b2_prev_deadkeyModifier_arr[n1][n2], isCapsused),
+                              /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_obj[n1][n2], isCapsused),
+                              /*   prev_deadkey */          //this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_arr[n3][0])),
+                              /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_obj[n3].key)),
                               /*   id_prev_deadkey */        dk_counter_C3++,
                               /*   unique A */              0,
 
-                              /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_arr[n4][n5], isCapsused),
-                              /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n6][0])),
+                              /*   modifier_deadkey */     // this.create_kmn_modifier(b4_deadkeyModifier_arr[n4][n5], isCapsused),
+                              /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_obj[n4][n5], isCapsused),
+                              /*   deadkey */              // this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n6][0])),
+                              /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_obj[n6].key)),
                               /*   dk for C2*/              0,
                               /*   unique B */              0,
 
-                              /*   modifier_key*/           b1_modifierKey_arr[n7][3],
-                              /*   key */                   b1_modifierKey_arr[n7][0],
-                              /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n7][4]),
+                              /*   modifier_key*/           //b1_modifierKey_arr[n7][3],//_S2 remove&replace
+                              /*   key */                   //b1_modifierKey_arr[n7][0],
+                              /*   output */                //new TextEncoder().encode(b1_modifierKey_arr[n7][4]),
+
+                              /*   modifier_key*/           b1_modifierKey_obj[n7].modifier,
+                              /*   key */                   b1_modifierKey_obj[n7].key,
+                              /*   output */                new TextEncoder().encode(b1_modifierKey_obj[n7].outchar),
                               );
 
-                              if ((b1_modifierKey_arr[n7][4] !== undefined)
-                                && (b1_modifierKey_arr[n7][4] !== "undefined")
-                                && (b1_modifierKey_arr[n7][4] !== "")) {
+                              /* if ((b1_modifierKey_arr[n7][4] !== undefined)//_S2 remove&replace
+                                 && (b1_modifierKey_arr[n7][4] !== "undefined")
+                                 && (b1_modifierKey_arr[n7][4] !== "")) {
+                                 object_array.push(rule_obj);
+                               }*/
+                              if ((b1_modifierKey_obj[n7].outchar !== undefined)
+                                && (b1_modifierKey_obj[n7].outchar !== "undefined")
+                                && (b1_modifierKey_obj[n7].outchar !== "")) {
                                 object_array.push(rule_obj);
                               }
                             }
@@ -735,7 +827,8 @@ export class KeylayoutToKmnConverter {
     * @param  search :string - value 'id' to be found
     * @return a number specifying the index of an actionId
     */
-  public get_ActionIndex__From__ActionId(data: any, search: string): number {
+  // _S2 get 1 OK
+  public get_1_ActionIndex__From__ActionId(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
         return i;
@@ -743,14 +836,14 @@ export class KeylayoutToKmnConverter {
     }
     return 0;
   }
-
   /**
   * @brief  member function to  find the actionID of a certain state-next pair
   * @param  data   :any an object containing all data read from a .keylayout file
   * @param  search :string value 'next' to be found
   * @return a string containing the actionId of a certain state-next pair
   */
-  public get_ActionID__From__ActionNext(data: any, search: string): string {
+  // _S2 get 2 OK
+  public get_2_ActionID__From__ActionNext(data: any, search: string): string {
     if (search !== "none") {
       for (let i = 0; i < data.keyboard.actions.action.length; i++) {
         for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
@@ -769,13 +862,40 @@ export class KeylayoutToKmnConverter {
    * @param  search  : (string | number)[][] - an array[keycode,modifier]  to be found
    * @return an array: string[] containing modifiers
    */
-  public get_Modifier_array__From__KeyModifier_array(data: any, search: (string | number)[][]): string[] {
+  // _S2 get 3 OK
+  public get_3o_Modifier_array__From__KeyModifier_array_oldArrayType(data: any, search: (string | number)[][]): string[] {
     const mapIndexArray_2D: string[] = [];
+
+    //console.log("Xsearch old ",search);
     for (let i = 0; i < search.length; i++) {
       mapIndexArray_2D.push(data[search[i][1]]);
     }
     return mapIndexArray_2D;
   }
+
+  public get_3_Modifier_array__From__KeyModifier_array_retObj(data: any, search: modifierKey_object[]): modifier_object[] {
+    const returnObjarray1D = [];
+    // console.log("Xsearch 3",search);
+
+    let returnObject: modifier_object;
+    for (let i = 0; i < search.length; i++) {
+      returnObject = {
+        modifier: (data[search[i].modifier])
+      };
+      returnObjarray1D.push(returnObject);
+    }
+    return returnObjarray1D;
+  }
+
+
+  public get_3_Modifier_array__From__KeyModifier_array(data: any, search: modifierKey_object[]): string[] {
+    const returnString1D: string[] = [];
+    for (let i = 0; i < search.length; i++) {
+      returnString1D.push(data[search[i].modifier]);
+    }
+    return returnString1D;
+  }
+
 
   /**
    * @brief  member function to find the output for a certain actionID for state 'none'
@@ -783,7 +903,8 @@ export class KeylayoutToKmnConverter {
    * @param  search :string an actionId to be found
    * @return a string containing the output character
    */
-  public get_Output__From__ActionId_None(data: any, search: string): string {
+  // _S2 get 4 OK
+  public get_4_Output__From__ActionId_None(data: any, search: string): string {
     let OutputValue: string = "";
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
@@ -804,10 +925,12 @@ export class KeylayoutToKmnConverter {
   * @param  search :string[][] - array of [ actionID,state,output]
   * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
   */
-  public get_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: string[][]): string[][] {
+  // _S2 get 5 OK
+  public get_5o_KeyActionOutput_array__From__ActionStateOutput_array_oldArrayType(data: any, search: string[][]): string[][] {
 
     if ((search === undefined) || (search === null))
       return [];
+
 
     const returnarray2D: string[][] = [];
     for (let k = 0; k < search.length; k++) {
@@ -828,6 +951,35 @@ export class KeylayoutToKmnConverter {
     }
     return returnarray2D;
   }
+  // _S2 get 5 OK
+  public get_5_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: idStateOutput_object[]): ActionIdKeyModiOutput_object[] {
+
+    if ((search === undefined) || (search === null))
+      return [];
+
+    const returnObjarray1D = [];
+    let returnObject: ActionIdKeyModiOutput_object;
+
+    for (let k = 0; k < search.length; k++) {
+      for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+        for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USED_KEYS_COUNT) {
+
+            returnObject = {
+              keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              key: this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              modifier: data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              outchar: search[k].output
+            };
+            returnObjarray1D.push(returnObject);
+          }
+        }
+      }
+    }
+    return returnObjarray1D;
+  }
 
   /**
    * @brief  member function to get an array of all actionId-output pairs for a certain state
@@ -835,7 +987,8 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string a 'state' to be found
    * @return an array: string[][] containing all [actionId, state, output] for a certain state
    */
-  public get_ActionStateOutput_array__From__ActionState(data: any, search: string): string[][] {
+  // _S2 get 6 OK
+  public get_6o_ActionStateOutput_array__From__ActionState_oldArrayType(data: any, search: string): string[][] {
     const returnarray2D: string[][] = [];
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
@@ -851,6 +1004,26 @@ export class KeylayoutToKmnConverter {
     }
     return returnarray2D;
   }
+  // _S2 get 6 OK
+  public get_6_ActionStateOutput_array__From__ActionState(data: any, search: string): idStateOutput_object[] {
+    const returnObjarray1D: idStateOutput_object[] = [];
+    let returnObject: idStateOutput_object;
+
+    for (let i = 0; i < data.keyboard.actions.action.length; i++) {
+      for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
+        if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
+
+          returnObject = {
+            id: data.keyboard.actions.action[i]['@_id'],
+            state: data.keyboard.actions.action[i].when[j]['@_state'],
+            output: data.keyboard.actions.action[i].when[j]['@_output']
+          };
+          returnObjarray1D.push(returnObject);
+        }
+      }
+    }
+    return returnObjarray1D;
+  }
 
   /**
    * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
@@ -859,7 +1032,8 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
    * @return an array: string[][] containing [KeyName,actionId,behaviour,modifier,output]
    */
-  public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
+  // _S2 get 7 OK --> tests not OK 
+  public get_7o_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array_oldArrayType(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
     const returnarray: string[][] = [];
 
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
@@ -894,6 +1068,97 @@ export class KeylayoutToKmnConverter {
     );
     return unique_returnarray;
   }
+  public get_7o_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: ((boolean | string)[])[], isCAPSused: boolean): ActionIdOutputBehaviourKeyModi_object[] {
+    const returnarray: string[][] = [];
+    const returnObjarray1D = [];
+    let returnObject: ActionIdOutputBehaviourKeyModi_object;
+
+
+    if (!((search === undefined) || (search === null) || (search.length === 0))) {
+      for (let i = 0; i < search.length; i++) {
+        const behaviour: number = Number(search[i][3]);
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
+
+          returnarray.push([
+            // KeyName
+            String(search[i][1]),
+            // actionId
+            String(search[i][2]),
+            // behaviour
+            String(search[i][3]),
+            // modifier
+            String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
+            // output
+            String(search[i][4])
+          ]);
+
+          returnObject = {
+            search: "",
+            actionId: String(search[i][2]),
+            behaviour: String(search[i][3]),
+            modifier: String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
+            key: String(search[i][1]),
+            outchar: String(search[i][4]),
+          };
+          returnObjarray1D.push(returnObject);
+        }
+      }
+    }
+    // remove duplicates
+    const unique_Objarray = returnObjarray1D.reduce((unique, o) => {
+      if (!unique.some(obj =>
+        obj.actionId === o.actionId &&
+        obj.behaviour === o.behaviour &&
+        obj.modifier === o.modifier &&
+        obj.key === o.key &&
+        obj.outchar === o.outchar
+      )) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    return unique_Objarray;
+  }
+  public get_7_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: ActionIdKeyModiOutput_object[], isCAPSused: boolean): ActionIdOutputBehaviourKeyModi_object[] {
+
+    const returnObjarray1D = [];
+    let returnObject: ActionIdOutputBehaviourKeyModi_object;
+
+
+    if (!((search === undefined) || (search === null) || (search.length === 0))) {
+      for (let i = 0; i < search.length; i++) {
+        const behaviour: number = Number(search[i].modifier);
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
+
+          returnObject = {
+            search: "",
+            actionId: String(search[i].actionId),
+            behaviour: String(search[i].modifier),
+            modifier: String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
+            key: String(search[i].key),
+            outchar: String(search[i].outchar),
+          };
+          returnObjarray1D.push(returnObject);
+        }
+      }
+    }
+    // remove duplicates
+    const unique_Objarray = returnObjarray1D.reduce((unique, o) => {
+      if (!unique.some(obj =>
+        obj.actionId === o.actionId &&
+        obj.behaviour === o.behaviour &&
+        obj.modifier === o.modifier &&
+        obj.key === o.key &&
+        obj.outchar === o.outchar
+      )) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    return unique_Objarray;
+  }
 
   /**
    * @brief  member function to create an array of [actionID, output, behaviour,keyname,modifier] for a given actionId
@@ -904,45 +1169,53 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
    * @return an array: string[][] containing [actionID,output,actionID, behaviour,keyname,modifier]
    */
-  public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): string[][] {
-    const returnarray2D: string[][] = [];
+  // _S2 get 8 OK
+  public get_8_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): ActionIdOutputBehaviourKeyModi_object[] {
+    const returnObjarray1D = [];
+    let returnObject: ActionIdOutputBehaviourKeyModi_object;
 
     if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
       return [];
     }
-
-    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
+    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
             const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
-            const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
-            const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
-            returnarray2D.push([
-              search,
-              outchar,
-              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
-              behaviour,
-              keyName,
-              modifierkmn]);
+
+            returnObject = {
+              search: search,
+              outchar: outchar,
+              actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              key: this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              modifier: this.create_kmn_modifier(modi[behaviour][k], isCapsused),
+            };
+            returnObjarray1D.push(returnObject);
           }
         }
       }
     }
-    // remove duplicates
-    const [unique_returnarray] = returnarray2D.reduce((acc, curr) => {
-      const [uniq, set] = acc;
-      if (!set.has(curr.join(','))) {
-        set.add(curr.join(','));
-        uniq.push(curr);
-      }
-      return acc;
-    },
-      [[], new Set()],
-    );
 
-    return unique_returnarray;
+    //.............................................................................
+
+    // remove duplicates
+    const unique_Objarray = returnObjarray1D.reduce((unique, o) => {
+      if (!unique.some(obj =>
+        obj.actionId === o.actionId &&
+        obj.outchar === o.outchar &&
+        obj.search === o.search &&
+        obj.behaviour === o.behaviour &&
+        obj.key === o.key &&
+        obj.modifier === o.modifier
+      )) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    return unique_Objarray;
   }
 
   /**
@@ -951,22 +1224,149 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string - an actionId to be found
    * @return an array: number[][] containing [keycode,behaviour]
    */
-  public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
+  // _S2 get 9  OK  //_S2 remove&replace
+  public get_9o_KeyModifier_array__From__ActionID_oldArrayType(data: any, search: string): number[][] {
     const mapIndexArray_2D: number[][] = [];
+    let returnObject: modifierKey_object;
+    const mapIndexObject1D: modifierKey_object[] = [];
+
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+
           mapIndexArray_2D.push([data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], i]);
+
+          returnObject = {
+            key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+            modifier: i
+          };
+          mapIndexObject1D.push(returnObject);
         }
       }
     }
     return mapIndexArray_2D;
+  }
+  public get_9_KeyModifier_array__From__ActionID(data: any, search: string): modifierKey_object[] {
+    const mapIndexArray_2D: number[][] = [];
+    let returnObject: modifierKey_object;
+    const mapIndexObject1D: modifierKey_object[] = [];
+
+    for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
+      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
+
+          mapIndexArray_2D.push([data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], i]);
+
+          returnObject = {
+            key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+            modifier: i
+          };
+          mapIndexObject1D.push(returnObject);
+        }
+      }
+    }
+    return mapIndexObject1D;
   }
 
   /** @internal */
   public convert_bound = {
     convert: this.convert.bind(this),
   };
+
+
+
+  public dummy(into: any) {
+  }
+  public compareBoth(arr: any, obj: any,) {
+
+    // compare:-----------------------------------
+    for (let k = 0; k < obj.length; k++) {
+      /*console.log("k ", k);
+
+      console.log(" arr", typeof (arr), arr, "----", typeof (arr[k]), arr[k]);
+      console.log("-------------------- ",);
+      console.log(" obj", typeof (obj), obj, "----", typeof (obj[k]), obj[k]);
+
+      console.log("arr[k  ", arr[k]);
+      console.log("obj[k].modifier ", obj[k].modifier);*/
+      if (
+        (arr.length === obj.length) &&
+
+
+        (arr[k] === obj[k].modifier)
+        // (arr[k][1] === obj[k].key) 
+
+        /*(arr[k][0] === obj[k].key) &&
+        (arr[k][1] === obj[k].actionId) &&
+        (arr[k][2] === obj[k].behaviour) &&
+        (arr[k][3] === obj[k].modifier) &&
+        (arr[k][4] === obj[k].outchar)*/
+
+      ) {
+        console.log("IS_EQUAL ",);
+      }
+      else console.log("NONONO not_EQUAL \n",
+        (arr.length === obj.length), obj.length, "<->", arr.length, "\n",
+
+        (arr[k] === obj[k].modifier), obj[k].modifier, "<->", arr[k], "\n",
+        // (arr[k][1] === obj[k].key), obj[k].key, "<->", arr[k][1], "\n",
+
+
+        /* (arr[k][0] === obj[k].key), obj[k].key, "<->", arr[k][0], "\n",
+         (arr[k][1] === obj[k].actionId), obj[k].actionId, "<->", arr[k][1], "\n",
+         (arr[k][2] === obj[k].behaviour), obj[k].behaviour, "<->", arr[k][2], "\n",
+         (arr[k][3] === obj[k].modifier), obj[k].modifier, "<->", arr[k][3], "\n",
+         (arr[k][4] === obj[k].outchar), obj[k].outchar, "<->", arr[k][4]*/
+      );
+    }
+  }
+  public compareSameType(arr1: any, arr2: any,) {
+
+
+    // compare:-----------------------------------
+    for (let k = 0; k < arr1.length; k++) {
+      /*console.log("k ", k);
+
+      console.log(" arr1", typeof (arr1), arr1, "----", typeof (arr1[k]), arr1[k]);
+      console.log("-------------------- ",);
+      console.log(" arr2", typeof (arr2), arr2, "----", typeof (arr2[k]), arr2[k]);
+
+      console.log("arr1[k  ", arr1[k]);
+      console.log("arr2[k].modifier ", arr2[k].modifier);*/
+      if (
+        (arr1.length === arr2.length) &&
+
+        (arr1[k].search === arr2[k].search) &&
+        (arr1[k].actionId === arr2[k].actionId) &&
+        (arr1[k].behaviour === arr2[k].behaviour) &&
+        (arr1[k].modifier === arr2[k].modifier) &&
+        (arr1[k].key === arr2[k].key) &&
+        (arr1[k].outchar === arr2[k].outchar)
+
+      ) {
+        console.log("compareSameType: IS_EQUAL ",);
+      }
+      else console.log("compareSameType: NONONO not_EQUAL \n",
+        (arr1.length === arr2.length), arr2.length, "<->", arr1.length, "\n",
+
+        (arr1[k] === arr2[k].modifier), arr2[k].modifier, "<->", arr1[k], "\n",
+        // (arr1[k][1] === arr2[k].key), arr2[k].key, "<->", arr1[k][1], "\n",
+
+
+        /* (arr1[k][0] === arr2[k].key), arr2[k].key, "<->", arr1[k][0], "\n",
+         (arr1[k][1] === arr2[k].actionId), arr2[k].actionId, "<->", arr1[k][1], "\n",
+         (arr1[k][2] === arr2[k].behaviour), arr2[k].behaviour, "<->", arr1[k][2], "\n",
+         (arr1[k][3] === arr2[k].modifier), arr2[k].modifier, "<->", arr1[k][3], "\n",
+         (arr1[k][4] === arr2[k].outchar), arr2[k].outchar, "<->", arr1[k][4]*/
+      );
+    }
+  }
+
+
+
+
+
+
 }
 
 /**
