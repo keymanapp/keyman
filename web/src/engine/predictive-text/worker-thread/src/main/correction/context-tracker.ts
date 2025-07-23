@@ -37,8 +37,12 @@ function textToCharTransforms(text: string, transformId?: number) {
  * In particular, this method is designed to handle the following case:
  * ['to', 'apple', ' ', ''] => ['to', 'apply', ' ', 'n']
  *
- * The ' ' is unedited, but as it follows the edited 'apple' => 'apply', 'to' is the true
- * "last edited" token.
+ * Edit path for this example case:
+ * ['match', 'substitute', 'match', 'substitute']
+ *
+ * In cases such as these, the whitespace match should be considered 'edited'. Whil the ' '
+ * is unedited, it follows the edited 'apple' => 'apply', so it must have been deleted and
+ * then re-inserted.  As a result, 'to' is the true "last matched" token.
  * @param editPath
  * @returns
  */
