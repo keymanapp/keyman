@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.88 alpha 2025-07-23
+
+* maint(windows): consider `GO_FAST` env variable in `add_zip_files` (#14338)
+* maint(common): add unit tests for `locate_emscripten.inc.sh` (#14346)
+* refactor(android): create functions for actions (#14351)
+* maint(linux): fix `locate_emscripten` if `$EMSCRIPTEN_BASE` dir missing (#14347)
+* maint(android): consolidate creating zip file (#14353)
+
 ## 19.0.87 alpha 2025-07-22
 
 * refactor(common): use test framework for zip tests (#14380)
