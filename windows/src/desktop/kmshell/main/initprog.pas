@@ -675,9 +675,10 @@ begin
   // after updates where checked and downloaded. The user should
   // not be prompted for an update in this case and the update should
   // abort.
-  if BUpdateSM.GetAutomaticUpdates and ReadyToInstall then
+  if not BUpdateSM.GetAutomaticUpdates and ReadyToInstall then
   begin
     BUpdateSM.HandleAbort;
+    Exit(False);
   end;
 
   if not FSilent and ReadyToInstall and
