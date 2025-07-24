@@ -17,7 +17,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 
 ################################ Main script ################################
 
@@ -74,7 +73,7 @@ function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
 
   # TODO: refactor to allow to run on Linux/macOS as well
-  if ! is_windows; then
+  if ! builder_is_windows; then
     builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
     return 1
   fi

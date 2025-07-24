@@ -62,15 +62,7 @@ function _publish_to_downloads_keyman_com() {
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
 }
 
-function _build_publish() {
-  builder_echo start "publish" "Publishing Keyman for macOS"
-  # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/mac/build.sh" publish
-  builder_echo end success "publish" "Finished publishing Keyman for macOS"
-}
-
 function do_publish() {
-  _build_publish
   _publish_to_downloads_keyman_com
   tc_upload_help "Keyman for macOS" mac
 }

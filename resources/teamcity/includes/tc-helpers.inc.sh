@@ -1,49 +1,6 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
-# Returns 0 if we're running on Ubuntu.
-is_ubuntu() {
-  if [[ "${OSTYPE:-}" == "linux-gnu" ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Returns 0 if we're running on Windows, i.e. if the environment variable
-# `OSTYPE` is set to "msys" or "cygwin".
-is_windows() {
-  if [[ "${OSTYPE:-}" == "msys" ]] || [[ "${OSTYPE:-}" == "cygwin" ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Returns 0 if we're running on macOS.
-is_macos() {
-  if [[ "${OSTYPE:-}" == darwin* ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Returns 0 if the OS version is greater than or equal to the specified version.
-# Parameter:
-#   $1 - OS version to compare against (e.g., "20.04")
-ba_linux_is_os_version_or_higher() {
-  if ! is_ubuntu; then
-     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
-  fi
-
-  local OS_VERSION=$1
-
-  # we use `dpkg --compare-versions` to compare the current Ubuntu version
-  # shellcheck disable=SC2312
-  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
-}
-
 # Set the environment variables required to use node/nvm and set the
 # `KEYMAN_USE_NVM` variable so that the build can automatically install
 # the required node version.
@@ -91,7 +48,7 @@ _tc_rsync() {
     "--rsync-path=${RSYNC_PATH}"             # path on remote server
   )
 
-  if is_windows; then
+  if builder_is_windows; then
     rsync_args+=(
       '--chmod=Dug=rwx,Do=rx,Fug=rw,Fo=r'      # map Windows security to host security
       "--rsh=${RSYNC_HOME}\ssh -i ${USERPROFILE}\.ssh\id_rsa -o UserKnownHostsFile=${USERPROFILE}\.ssh\known_hosts"                  # use ssh
@@ -107,13 +64,13 @@ _tc_rsync() {
       "${DESTINATION}"
   )
 
-  if is_windows; then
+  if builder_is_windows; then
     local CYGPATH_RSYNC_HOME
     CYGPATH_RSYNC_HOME=$(cygpath -w "${RSYNC_HOME}")
     MSYS_NO_PATHCONV=1 "${CYGPATH_RSYNC_HOME}\\rsync.exe" "${rsync_args[@]}"
   else
     local RSYNC=rsync
-    if is_macos; then
+    if builder_is_macos; then
       RSYNC=/usr/local/bin/rsync
       [[ -f /opt/homebrew/bin/rsync ]] && RSYNC=/opt/homebrew/bin/rsync
     fi
