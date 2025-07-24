@@ -624,12 +624,12 @@ export function processSimilarity(
  * unexpected ways.  For example, when typing numbers in English, we don't expect
  * '5' to auto-correct to '5th' just because there are no pure-number entries in
  * the lexicon rooted on '5'.
- * @param correction 
- * @returns 
+ * @param correction
+ * @returns
  */
 export function correctionValidForAutoSelect(correction: string) {
   let chars = [...correction];
-  
+
   // If the _correction_ - the actual, existing text - does not include any letters,
   // then predictions built upon it should not be considered valid for auto-correction.
   for(let c of chars) {
@@ -790,32 +790,42 @@ export function finalizeSuggestions(
     }
   });
 
-  // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
-  // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-  suggestions.forEach((suggestion) => {
-    // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
-    // for such cases.
+  if(punctuation.insertAfterWord !== "") {
+    // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
+    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    suggestions.forEach((suggestion) => {
+      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
+      // for such cases.
 
-    // If we're mid-word, delete its original post-caret text.
-    const tokenization = tokenize(context);
-    if(tokenization && tokenization.caretSplitsToken) {
-      // While we wait on the ability to provide a more 'ideal' solution, let's at least
-      // go with a more stable, if slightly less ideal, solution for now.
-      //
-      // A predictive text default (on iOS, at least) - immediately wordbreak
-      // on suggestions accepted mid-word.
-      suggestion.transform.insert += punctuation.insertAfterWord;
+      // If we're mid-word, delete its original post-caret text.
+      const tokenization = tokenize(context);
+      if(tokenization && tokenization.caretSplitsToken) {
+        // While we wait on the ability to provide a more 'ideal' solution, let's at least
+        // go with a more stable, if slightly less ideal, solution for now.
+        //
+        // A predictive text default (on iOS, at least) - immediately wordbreak
+        // on suggestions accepted mid-word.
+        suggestion.appendedTransform = {
+          insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+        };
 
-      // Do we need to manipulate the suggestion's transform based on the current state of the context?
-    } else if(!context.right) {
-      suggestion.transform.insert += punctuation.insertAfterWord;
-    } else if(punctuation.insertAfterWord != '') {
-      if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
-        suggestion.transform.insert += punctuation.insertAfterWord;
+        // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      } else if(!context.right) {
+        suggestion.appendedTransform = {
+          insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+        };
+      } else if(punctuation.insertAfterWord != '') {
+        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
+          suggestion.appendedTransform = {
+            insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+          };
+        }
       }
-    }
-
-  });
+    });
+  };
 
   return suggestions;
 }
@@ -859,6 +869,10 @@ export function toAnnotatedSuggestion(
     tag: annotationType,
     p: suggestion.p
   };
+
+  if(suggestion.appendedTransform) {
+    result.appendedTransform = suggestion.appendedTransform;
+  }
 
   if(suggestion.transformId !== undefined) {
     result.transformId = suggestion.transformId;

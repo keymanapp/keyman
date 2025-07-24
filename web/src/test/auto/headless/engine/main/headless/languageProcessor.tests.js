@@ -117,9 +117,11 @@ describe('LanguageProcessor', function() {
           languageProcessor.predict(transcription).then(function(suggestions) {
             assert.isOk(suggestions);
             assert.equal(suggestions[0].displayAs, '«li»');
-            assert.equal(suggestions[0].transform.insert, 'li ');
+            assert.equal(suggestions[0].transform.insert, 'li');
+            assert.equal(suggestions[0].appendedTransform.insert, ' ');
             assert.equal(suggestions[1].displayAs, 'like');
-            assert.equal(suggestions[1].transform.insert, 'like ');
+            assert.equal(suggestions[1].transform.insert, 'like');
+            assert.equal(suggestions[1].appendedTransform.insert, ' ');
             done();
           }).catch(done);
         }).catch(function() {
@@ -154,7 +156,8 @@ describe('LanguageProcessor', function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'like');
-                assert.equal(suggestions[1].transform.insert, 'like ');
+                assert.equal(suggestions[1].transform.insert, 'like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -172,7 +175,8 @@ describe('LanguageProcessor', function() {
                 // The source suggestion is simply 'like'.
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'like');
-                assert.equal(suggestions[1].transform.insert, 'like ');
+                assert.equal(suggestions[1].transform.insert, 'like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -189,7 +193,8 @@ describe('LanguageProcessor', function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'I');
-                assert.equal(suggestions[1].transform.insert, 'I ');
+                assert.equal(suggestions[1].transform.insert, 'I');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -209,7 +214,8 @@ describe('LanguageProcessor', function() {
                 // The source suggestion is simply 'like'.
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'LIKE');
-                assert.equal(suggestions[1].transform.insert, 'LIKE ');
+                assert.equal(suggestions[1].transform.insert, 'LIKE');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -226,7 +232,8 @@ describe('LanguageProcessor', function() {
               languageProcessor.predict(transcription).then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[0].displayAs, 'I');
-                assert.equal(suggestions[0].transform.insert, 'I ');
+                assert.equal(suggestions[0].transform.insert, 'I');
+                assert.equal(suggestions[0].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -247,7 +254,8 @@ describe('LanguageProcessor', function() {
                   // The source suggestion is simply 'like'.
                   assert.isOk(suggestions);
                   assert.equal(suggestions[1].displayAs, 'Like');
-                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  assert.equal(suggestions[1].transform.insert, 'Like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                   done();
                 }).catch(done);
               }).catch(function() {
@@ -267,7 +275,8 @@ describe('LanguageProcessor', function() {
                   // The source suggestion is simply 'like'.
                   assert.isOk(suggestions);
                   assert.equal(suggestions[1].displayAs, 'Like');
-                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  assert.equal(suggestions[1].transform.insert, 'Like');
+                  assert.equal(suggestions[1].appendedTransform.insert, ' ');
                   done();
                 }).catch(done);
               }).catch(function() {
