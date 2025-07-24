@@ -120,7 +120,7 @@ ba_linux_stop_xvfb() {
 # Parameter:
 #   $1 - OS version to compare against (e.g., "20.04")
 ba_linux_is_os_version_or_higher() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
      builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
   fi
 
