@@ -18,7 +18,7 @@ android {
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
         versionCode KEYMAN_VERSION_CODE as Integer
