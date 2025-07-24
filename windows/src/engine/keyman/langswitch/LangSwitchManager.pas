@@ -231,6 +231,18 @@ type
     FLanguageToggle: string;
     FLayoutToggle: string;
     procedure LoadCurrentHotkey;
+    (**
+     * Ensures that the specified registry value has a valid string data type.
+     * If the registry value exists but is not of type `rdString` or `rdExpandString`,
+     * the function deletes the existing value and writes a default string value
+     * of `'3'`.
+     *
+     * @param    RegistryKey   The registry key object wrapper used to access the registry.
+     * @param    ValueName     The name of the registry value to check and correct.
+     *
+     * @returns  True if the data type was incorrect and the value was reset;
+     *           False if the value did not exist or was already a valid string type.
+     *)
     function  FixRegistryDataType(RegistryKey: TRegistryErrorControlled; const ValueName: string): Boolean;
     procedure DisableWindowsHotkey;
     procedure RestoreWindowsHotkey;
@@ -1052,7 +1064,7 @@ begin
       FReset := True;
     end;
   finally
-    Free;
+    KeyboardToggleReg.Free;
   end;
 
   if FReset then SystemParametersInfo(SPI_SETLANGTOGGLE, 0, nil, 0);
