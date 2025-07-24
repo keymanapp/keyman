@@ -61,12 +61,14 @@ import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -86,6 +88,11 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.provider.Settings;
 import android.text.Html;
@@ -98,6 +105,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -118,6 +126,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private static final String TAG = "MainActivity";
 
+  private ConstraintLayout constraintLayout;
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -138,6 +147,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
+    EdgeToEdge.enable(this);
     context = this;
 
     checkSendCrashReport();
@@ -170,6 +180,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     setContentView(R.layout.activity_main);
 
+    setupEdgeToEdge();
+    setupStatusBarColors();
+
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
@@ -179,6 +192,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setDisplayShowTitleEnabled(false);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
+    constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
     textView = (KMTextView) findViewById(R.id.kmTextView);
     textView.setText(prefs.getString(userTextKey, ""));
     textSize = prefs.getInt(userTextSizeKey, minTextSize);
@@ -417,6 +431,43 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     _t.setText(String.valueOf(anUpdateCount));
   }
 
+  private void setupEdgeToEdge() {
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.constraintLayout),
+      (view, windowInsets) -> {
+        // Disregard displayCutout inset
+        Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() |
+          WindowInsetsCompat.Type.ime());
+        // Apply the insets as a margin to the view
+        view.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+
+        // Return CONSUMED if you don't want the window insets to keep passing
+        // down to descendant views.
+        return WindowInsetsCompat.CONSUMED;
+      });
+  }
+
+  private void setupStatusBarColors() {
+    // Set status bar colors
+    // https://stackoverflow.com/a/79706054
+    Window window = getWindow();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+      WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(window, window.getDecorView());
+      controller.setAppearanceLightStatusBars(true);
+
+      ViewCompat.setOnApplyWindowInsetsListener(window.getDecorView(),
+          (view, windowInsets) -> {
+        int statusBarHeight = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+        view.setPadding(0, statusBarHeight, 0, 0);
+        view.setBackgroundColor(getColor(android.R.color.white));
+        return WindowInsetsCompat.CONSUMED;
+      });
+
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      window.setStatusBarColor(getColor(android.R.color.white));
+    }
+  }
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
@@ -622,10 +673,20 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
+    // Navigation bar height
+    int navigationBarHeight = 0;
+    resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      navigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+    }
+
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
+    textView.setHeight(screenHeight - bannerHeight - keyboardHeight);
+    //constraintLayout.getLayoutParams().height = screenHeight - navigationBarHeight;
+
+    // Align in app keyboard?
   }
 
   private void showInfo() {
