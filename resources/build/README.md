@@ -22,3 +22,5 @@ jq resp. jq-win64.exe is used by various builds for json query.
 
 Official source: <https://stedolan.github.io/jq/>.
 [License](jq-license.txt)
+
+Don't merge this change!
