@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.89 alpha 2025-07-24
+
+* docs(common): Document minimum version of Chrome 95.0 for Android (#14385)
+* refactor(android): Update minimum target Chrome version to 95.0 and refactor to use constants (#14391)
+
 ## 19.0.88 alpha 2025-07-23
 
 * maint(windows): consider `GO_FAST` env variable in `add_zip_files` (#14338)
