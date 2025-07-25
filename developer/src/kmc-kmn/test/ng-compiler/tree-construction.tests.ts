@@ -175,5 +175,19 @@ describe("Tree Construction Tests", () => {
       assert.isNull(root.getSoleChildOfType(NodeTypes.VERSION));
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT],[VERSION,[VERSION,1]],[VERSION,[VERSION,2]]}]');
     });
+    it("getChildren(), get children (no child)", () => {
+      assert.deepEqual(root.getChildren(), []);
+      assert.equal(root.toString(), '[TMP]');
+    });
+    it("getChildren(), get children (one child)", () => {
+      root.addChild(bitmap);
+      assert.deepEqual(root.getChildren(), [bitmap]);
+      assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+    });
+    it("getChildren(), get children (two children)", () => {
+      root.addChildren([bitmap, copyright]);
+      assert.deepEqual(root.getChildren(), [bitmap, copyright]);
+      assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+    });
   });
 });
