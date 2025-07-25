@@ -3874,7 +3874,7 @@ bool isValidUtf8(KMX_BYTE* str, int sz) {
       // 2-byte sequence
       if (remaining < 2 ||
           (str[i + 1] & 0xC0) != 0x80 ||
-          str[i] == 0xC0 ||
+          str[i] == 0xC0 || // C0 and C1 are illegal values
           str[i] == 0xC1) {
         return false;
       }
