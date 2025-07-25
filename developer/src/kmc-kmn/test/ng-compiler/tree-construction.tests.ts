@@ -47,5 +47,34 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright]);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
+    it("can get descendents (no children)", () => {
+      const root = new ASTNode(NodeTypes.TMP);
+      assert.deepEqual(root.getDescendents(NodeTypes.BITMAP), []);
+    });
+    it("can get descendents (no matching children)", () => {
+      const root = new ASTNode(NodeTypes.TMP);
+      const bitmap    = new ASTNode(NodeTypes.BITMAP);
+      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      root.addChildren([bitmap, copyright]);
+      assert.deepEqual(root.getDescendents(NodeTypes.VERSION), []);
+    });
+    it("can get descendents (one matching child)", () => {
+      const root = new ASTNode(NodeTypes.TMP);
+      const bitmap    = new ASTNode(NodeTypes.BITMAP);
+      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      const version   = new ASTNode(NodeTypes.VERSION);
+      root.addChildren([bitmap, copyright, version]);
+      assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version]);
+    });
+    it("can get descendents (two matching children)", () => {
+      const root = new ASTNode(NodeTypes.TMP);
+      const bitmap    = new ASTNode(NodeTypes.BITMAP);
+      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      const version1  = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+      const version2  = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+      bitmap.addChild(version1);
+      root.addChildren([bitmap, copyright, version2]);
+      assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version1, version2]);
+    });
   });
 });
