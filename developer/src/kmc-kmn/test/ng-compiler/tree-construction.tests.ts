@@ -50,6 +50,15 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright]);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
+    it("can handle adding empty list of children", () => {
+      root.addChildren([]);
+      assert.equal(root.toString(), '[TMP]');
+    });
+    it("can construct and add a child with a token (addToken)", () => {
+      const token = new Token(TokenTypes.BITMAP, 'bitmap');
+      root.addToken(NodeTypes.BITMAP, token);
+      assert.equal(root.toString(), '[TMP,{[BITMAP,[BITMAP,bitmap]]}]');
+    });
     it("can get descendents (no children)", () => {
       assert.deepEqual(root.getDescendents(NodeTypes.BITMAP), []);
     });
@@ -67,6 +76,17 @@ describe("Tree Construction Tests", () => {
       bitmap.addChild(version1);
       root.addChildren([bitmap, copyright, version2]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version1, version2]);
+    });
+    it("can check if there is at least one child (no children)", () => {
+      assert.isFalse(root.hasChild());
+    });
+    it("can check if there is at least one child (one child)", () => {
+      root.addChild(bitmap);
+      assert.isTrue(root.hasChild());
+    });
+    it("can check if there is at least one child (two children)", () => {
+      root.addChildren([bitmap, copyright]);
+      assert.isTrue(root.hasChild());
     });
   });
 });
