@@ -70,7 +70,7 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright, version]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version]);
     });
-    it("can get descendents (two matching children)", () => {
+    it("can get descendents (two matching descendents)", () => {
       const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
       const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
       bitmap.addChild(version1);
@@ -97,6 +97,16 @@ describe("Tree Construction Tests", () => {
     it("can check if there is at least one child of a given type (no match)", () => {
       root.addChildren([copyright, version]);
       assert.isFalse(root.hasChildOfType(NodeTypes.BITMAP));
+    });
+    it("can check if there is at least one child of a given type (one match)", () => {
+      root.addChildren([bitmap, copyright, version]);
+      assert.isTrue(root.hasChildOfType(NodeTypes.BITMAP));
+    });
+    it("can check if there is at least one child of a given type (two matching children)", () => {
+      const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+      const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+      root.addChildren([bitmap, copyright, version1, version2]);
+      assert.isTrue(root.hasChildOfType(NodeTypes.VERSION));
     });
   });
 });
