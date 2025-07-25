@@ -17,12 +17,10 @@
 #else
 #include <basu/sd-bus.h>
 #endif
+#include <km_linux_common.h>
 #include "KeymanSystemService.h"
 #include "KeyboardDevice.h"
 
-#define KEYMAN_BUS_NAME "com.keyman.SystemService1"
-#define KEYMAN_INTERFACE_NAME "com.keyman.SystemService1.System"
-#define KEYMAN_OBJECT_PATH "/com/keyman/SystemService1/System"
 
 using namespace std;
 
