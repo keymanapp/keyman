@@ -66,6 +66,11 @@ class KeymanWebViewController: UIViewController {
 
   private var currentText: String = ""
   private var currentCursorRange: NSRange? = nil
+  
+  // Constraints dependent upon the device's current rotation state.
+  // For now, should be mostly upon keymanWeb.view.heightAnchor.
+  var portraitConstraint: NSLayoutConstraint?
+  var landscapeConstraint: NSLayoutConstraint?
 
   init(storage: Storage) {
     self.storage = storage
@@ -81,6 +86,67 @@ class KeymanWebViewController: UIViewController {
   @objc func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
+  }
+  
+  func setConstraints() {
+    os_log("KeymanWebViewController setConstraints", log: KeymanEngineLogger.ui, type: .info)
+    let innerView = self.view!
+    let guide = self.parent!.view.safeAreaLayoutGuide
+
+    // Fallback on earlier versions
+    innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
+    innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
+
+    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+
+    // Allow these to be broken if/as necessary to resolve layout issues.
+    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+
+    kbdWidthConstraint.priority = .defaultHigh
+    kbdWidthConstraint.isActive = true
+
+    self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
+  }
+
+  /**
+   * Due to new custom keyboard height as chosen by the user.
+   * The value for the new keyboard height originates from KeyboardHeightViewController.
+   */
+  func keyboardHeightChanged() {
+    os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .info)
+
+    // deactivate constraints for both orientations (though one should already be inactive)
+    landscapeConstraint?.isActive = false
+    portraitConstraint?.isActive = false
+
+    // rebuild both portrait and landscape constraints
+    self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
+
+    // activate constraints for the current orientation
+    if InputViewController.isPortrait {
+      portraitConstraint?.isActive = true
+    } else {
+      landscapeConstraint?.isActive = true
+    }
+  }
+
+  private func buildKeyboardHeightConstraints(bannerHeight: CGFloat) {
+    os_log("CustomInputView buildKeyboardHeightConstraints", log: KeymanEngineLogger.ui, type: .info)
+    let innerView = self.view!
+
+    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
+    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  self.readKeyboardHeight(isPortrait: true)!)
+    portraitHeightConstraint.identifier = "Height constraint for portrait mode"
+    portraitHeightConstraint.priority = .defaultHigh
+
+    let landscapeHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + self.readKeyboardHeight(isPortrait: false)!)
+    landscapeHeightConstraint.identifier = "Height constraint for landscape mode"
+    landscapeHeightConstraint.priority = .defaultHigh
+
+    portraitConstraint = portraitHeightConstraint
+    landscapeConstraint = landscapeHeightConstraint
+    // .isActive will be set according to the current portrait/landscape perspective.
   }
 
   override func viewWillLayoutSubviews() {
