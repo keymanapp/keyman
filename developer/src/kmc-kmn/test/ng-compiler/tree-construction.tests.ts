@@ -54,7 +54,7 @@ describe("Tree Construction Tests", () => {
       root.addChildren([]);
       assert.equal(root.toString(), '[TMP]');
     });
-    it("addToken(), can construct and add a child with a token", () => {
+    it("addNewChildWithToken(), can construct and add a child with a token", () => {
       const token = new Token(TokenTypes.BITMAP, 'bitmap');
       root.addNewChildWithToken(NodeTypes.BITMAP, token);
       assert.equal(root.toString(), '[TMP,{[BITMAP,[BITMAP,bitmap]]}]');
@@ -153,6 +153,27 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright]);
       assert.isNull(root.getSoleChild());
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+    });
+    it("getSoleChildOfType(), get sole child of type (no child)", () => {
+      assert.isNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.equal(root.toString(), '[TMP]');
+    });
+    it("getSoleChildOfType(), get sole child of type (no matching child)", () => {
+      root.addChildren([copyright, version]); // extra children
+      assert.isNull(root.getSoleChildOfType(NodeTypes.BITMAP));
+      assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+    });
+    it("getSoleChildOfType(), get sole child of type (one matching child)", () => {
+      root.addChildren([bitmap, copyright, version]); // extra children
+      assert.equal(root.getSoleChildOfType(NodeTypes.VERSION), version);
+      assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT],[VERSION]}]');
+    });
+    it("getSoleChildOfType(), get sole child of type (two matching children)", () => {
+      const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+      const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+      root.addChildren([bitmap, copyright, version1, version2]); // including extra children
+      assert.isNull(root.getSoleChildOfType(NodeTypes.VERSION));
+      assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT],[VERSION,[VERSION,1]],[VERSION,[VERSION,2]]}]');
     });
   });
 });
