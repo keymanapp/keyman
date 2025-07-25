@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.90 alpha 2025-07-25
+
+* maint(common): fix standalone use of `resources/builder.inc.sh` (#14399)
+* maint(resources): use `tc_` prefix for all `tc-*.inc.sh` functions (#14267)
+
 ## 19.0.89 alpha 2025-07-24
 
 * docs(common): Document minimum version of Chrome 95.0 for Android (#14385)
