@@ -37,72 +37,72 @@ describe("Tree Construction Tests", () => {
       assert.isNotNull(root);
       assert.equal(root.toString(), '[TMP,[BITMAP,bitmap]]');
     });
-    it("can add child", () => {
+    it("addChild(), can add child", () => {
       root.addChild(bitmap);
       assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
     });
-    it("can add two children (addChild)", () => {
+    it("addChild(), can add two children", () => {
       root.addChild(bitmap);
       root.addChild(copyright);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
-    it("can add two children (addChildren)", () => {
+    it("addChildren(), can add two children", () => {
       root.addChildren([bitmap, copyright]);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
-    it("can handle adding empty list of children", () => {
+    it("addChildren(), can handle adding empty list of children", () => {
       root.addChildren([]);
       assert.equal(root.toString(), '[TMP]');
     });
-    it("can construct and add a child with a token (addToken)", () => {
+    it("addToken(), can construct and add a child with a token", () => {
       const token = new Token(TokenTypes.BITMAP, 'bitmap');
       root.addToken(NodeTypes.BITMAP, token);
       assert.equal(root.toString(), '[TMP,{[BITMAP,[BITMAP,bitmap]]}]');
     });
-    it("can get descendents (no children)", () => {
+    it("getDescendents(), can get descendents (no children)", () => {
       assert.deepEqual(root.getDescendents(NodeTypes.BITMAP), []);
     });
-    it("can get descendents (no matching children)", () => {
+    it("getDescendents(), can get descendents (no matching children)", () => {
       root.addChildren([bitmap, copyright]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), []);
     });
-    it("can get descendents (one matching child)", () => {
+    it("getDescendents(), can get descendents (one matching child)", () => {
       root.addChildren([bitmap, copyright, version]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version]);
     });
-    it("can get descendents (two matching descendents)", () => {
+    it("getDescendents(), can get descendents (two matching descendents)", () => {
       const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
       const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
       bitmap.addChild(version1);
       root.addChildren([bitmap, copyright, version2]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version1, version2]);
     });
-    it("can check if there is at least one child (no children)", () => {
+    it("hasChild(), can check if there is at least one child (no children)", () => {
       assert.isFalse(root.hasChild());
     });
-    it("can check if there is at least one child (one child)", () => {
+    it("hasChild(), can check if there is at least one child (one child)", () => {
       root.addChild(bitmap);
       assert.isTrue(root.hasChild());
     });
-    it("can check if there is at least one child (two children)", () => {
+    it("hasChild(), can check if there is at least one child (two children)", () => {
       root.addChildren([bitmap, copyright]);
       assert.isTrue(root.hasChild());
     });
-    it("can handle checking if there is at least one child of a given type (null)", () => {
+    it("hasChildOfType(), can handle checking if there is at least one child of a given type (null)", () => {
       assert.isFalse(root.hasChildOfType(null));
     });
-    it("can check if there is at least one child of a given type (no children)", () => {
+    it("hasChildOfType(), can check if there is at least one child of a given type (no children)", () => {
       assert.isFalse(root.hasChildOfType(NodeTypes.BITMAP));
     });
-    it("can check if there is at least one child of a given type (no match)", () => {
+    it("hasChildOfType(), can check if there is at least one child of a given type (no match)", () => {
       root.addChildren([copyright, version]);
       assert.isFalse(root.hasChildOfType(NodeTypes.BITMAP));
     });
-    it("can check if there is at least one child of a given type (one match)", () => {
+    it("hasChildOfType(), can check if there is at least one child of a given type (one match)", () => {
       root.addChildren([bitmap, copyright, version]);
       assert.isTrue(root.hasChildOfType(NodeTypes.BITMAP));
     });
-    it("can check if there is at least one child of a given type (two matching children)", () => {
+    it("hasChildOfType(), can check if there is at least one child of a given type (two matching children)", () => {
       const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
       const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
       root.addChildren([bitmap, copyright, version1, version2]);
