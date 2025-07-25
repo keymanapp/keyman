@@ -28,6 +28,7 @@ function command() {
 function reset_zip_test_env() {
   unset SEVENZ
   unset SEVENZ_HOME
+  unset GO_FAST
   MOCK_ZIP_PRESENT=1
   export OSTYPE="linux"
 }
@@ -98,6 +99,18 @@ function test__add_zip_files__with_zip_exclude_flag() {
   assert-equal "${ZIP_CMD_LOG}" "zip -x@exclude.lst archive.zip file1.txt" "add_zip_files zip with exclude flag"
 }
 
+function test__add_zip_files__with_zip_fast() {
+  # Setup
+  MOCK_ZIP_PRESENT=1
+  GO_FAST=1
+
+  # Execute
+  add_zip_files "archive.zip" file1.txt file2.txt
+
+  # Verify
+  assert-equal "${ZIP_CMD_LOG}" "zip -1 archive.zip file1.txt file2.txt" "add_zip_files zip GO_FAST"
+}
+
 function test__add_zip_files__with_7z_basic() {
   # Setup
   MOCK_ZIP_PRESENT=0
@@ -143,6 +156,18 @@ function test__add_zip_files__with_7z_on_windows() {
 
   # Verify
   assert-equal "${ZIP_CMD_LOG}" "/custom/sevenz/7z.exe a archive.7z file1.txt" "add_zip_files 7z on windows"
+}
+
+function test_add_zip_files_with_7z_fast() {
+  # Setup
+  MOCK_ZIP_PRESENT=0
+  GO_FAST=0
+
+  # Execute
+  add_zip_files "archive.zip" file1.txt file2.txt
+
+  # Verify
+  assert-equal "${ZIP_CMD_LOG}" "7z a -mx9 archive.zip file1.txt file2.txt" "add_zip_files 7z GO_FAST"
 }
 
 function _create_files() {

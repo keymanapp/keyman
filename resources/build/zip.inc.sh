@@ -6,6 +6,12 @@
 # If zip is not available, then fall back to 7z for zipping.
 # 7z requires env SEVENZ_HOME.
 #
+# The script considers the GO_FAST env variable:
+# - if set to 1 we use a lower compression level, resulting in faster builds
+#   and bigger artifacts
+# - if set to 0 we use a higher compression level, resulting in slower builds
+#   and smaller artifacts
+# - if not set we rely on the default compression level
 
 # Add files to create a zip/7z archive
 # Parameters:
@@ -35,6 +41,7 @@ function add_zip_files() {
   local SEVENZ_FLAGS=('a') # 7z requires a command
   local INCLUDE=()
   local EXCLUDE_FILE
+  local HAS_COMPRESSION=false
   while [[ $# -gt 0 ]] ; do
     case "$1" in
       -r)
@@ -71,6 +78,7 @@ function add_zip_files() {
         # -0 indicates no compression
         # -1 indicates low compression (fastest)
         # -9 indicates ultra compression (slowest)
+        HAS_COMPRESSION=true
         ZIP_FLAGS+=($1)
         if [[ $1 =~ -([0-9]) ]]; then
           SEVENZ_FLAGS+=("-mx${BASH_REMATCH[1]}")
@@ -95,6 +103,18 @@ function add_zip_files() {
         ;;
     esac
   done
+
+  # If GO_FAST is set, we use either fast or slow compression level.
+  # Otherwise we use the defaults.
+  if ! ${HAS_COMPRESSION}; then
+    if [[ "${GO_FAST:-}" == "1" ]]; then
+      SEVENZ_FLAGS+=("-mx1")
+      ZIP_FLAGS+=("-1")
+    elif [[ "${GO_FAST:-}" == "0" ]]; then
+      SEVENZ_FLAGS+=("-mx9")
+      ZIP_FLAGS+=("-9")
+    fi
+  fi
 
   _verify_input "${INCLUDE[@]}"
 
