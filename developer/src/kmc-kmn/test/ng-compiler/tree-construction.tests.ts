@@ -16,15 +16,36 @@ import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 describe("Tree Construction Tests", () => {
   describe("ASTNode Tests", () => {
     it("can construct an ASTNode", () => {
-      const ast = new ASTNode(NodeTypes.TMP);
-      assert.isNotNull(ast);
-      assert.equal(ast.toString(), '[TMP]');
+      const root = new ASTNode(NodeTypes.TMP);
+      assert.isNotNull(root);
+      assert.equal(root.toString(), '[TMP]');
     });
     it("can construct an ASTNode (with Token)", () => {
       const token = new Token(TokenTypes.BITMAP, 'bitmap');
-      const ast   = new ASTNode(NodeTypes.TMP, token);
-      assert.isNotNull(ast);
-      assert.equal(ast.toString(), '[TMP,[BITMAP,bitmap]]');
+      const root  = new ASTNode(NodeTypes.TMP, token);
+      assert.isNotNull(root);
+      assert.equal(root.toString(), '[TMP,[BITMAP,bitmap]]');
+    });
+    it("can add child", () => {
+      const root   = new ASTNode(NodeTypes.TMP);
+      const bitmap = new ASTNode(NodeTypes.BITMAP);
+      root.addChild(bitmap);
+      assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+    });
+    it("can add two children (addChild)", () => {
+      const root      = new ASTNode(NodeTypes.TMP);
+      const bitmap    = new ASTNode(NodeTypes.BITMAP);
+      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      root.addChild(bitmap);
+      root.addChild(copyright);
+      assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+    });
+    it("can add two children (addChildren)", () => {
+      const root      = new ASTNode(NodeTypes.TMP);
+      const bitmap    = new ASTNode(NodeTypes.BITMAP);
+      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      root.addChildren([bitmap, copyright]);
+      assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
   });
 });
