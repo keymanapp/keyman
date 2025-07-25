@@ -1,8 +1,13 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
+#
+# Shared functions for any builds that run on Windows agents
 
-download_symbol_server_index() {
-  # Download symbol server index from symbol server
+ba_win_download_symbol_server_index() {
+  if ! is_windows; then
+    builder_die "ba_win_download_symbol_server_index should only be run on Windows agents"
+  fi
+
   builder_echo start "download symbol server index" "Downloading symbol server index"
   (
     # shellcheck disable=SC2154
@@ -18,8 +23,11 @@ download_symbol_server_index() {
   builder_echo end "download symbol server index" success "Finished downloading symbol server index"
 }
 
-publish_new_symbols() {
-  # Publish new symbols to symbol server
+ba_win_publish_new_symbols() {
+  if ! is_windows; then
+    builder_die "ba_win_publish_new_symbols should only be run on Windows agents"
+  fi
+
   builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
   (
     # shellcheck disable=SC2164

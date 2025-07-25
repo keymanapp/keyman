@@ -94,7 +94,7 @@ function do_publish() {
   _create_zip_archive
   _publish_to_downloads_keyman_com
   _publish_to_playstore "${PUBTARGETS}"
-  upload_help "Keyman for Android" android
+  tc_upload_help "Keyman for Android" android
 }
 
 if builder_has_option --fv; then

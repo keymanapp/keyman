@@ -1,18 +1,10 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
-install_nvm() {
-  if ! builder_is_linux; then
-    # on Windows and macOS build agents are configured manually
-    return 0
-  fi
-  ba_linux_install_nvm
-}
-
 # Set the environment variables required to use node/nvm and set the
 # `KEYMAN_USE_NVM` variable so that the build can automatically install
 # the required node version.
-set_variables_for_nvm() {
+tc_set_variables_for_nvm() {
   if [[ -f "${HOME}/.nvm/nvm.sh" ]] && [[ -d "${HOME}/.keyman/node" ]]; then
     # nvm.sh uses some variables that might not be initialized, so we
     # disable the "unbound variable" check temporarily
@@ -26,20 +18,12 @@ set_variables_for_nvm() {
   fi
 }
 
-install_emscripten() {
-  if ! builder_is_linux; then
-    # on Windows and macOS build agents are configured manually
-    return 0
-  fi
-  ba_linux_install_emscripten
-}
-
-set_variables_for_emscripten() {
+tc_set_variables_for_emscripten() {
   export EMSCRIPTEN_BASE="${EMSCRIPTEN_BASE:-${HOME}/emsdk/upstream/emscripten}"
   export KEYMAN_USE_EMSDK=1
 }
 
-upload_help() {
+tc_upload_help() {
   local PRODUCT=$1
   local PRODUCT_PATH=$2
   builder_echo start "upload help" "Uploading new ${PRODUCT} help to help.keyman.com"
