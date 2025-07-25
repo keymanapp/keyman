@@ -71,6 +71,8 @@ class KeymanWebViewController: UIViewController {
   // For now, should be mostly upon keymanWeb.view.heightAnchor.
   var portraitConstraint: NSLayoutConstraint?
   var landscapeConstraint: NSLayoutConstraint?
+  
+  var deathPoller: Timer?
 
   init(storage: Storage) {
     self.storage = storage
@@ -211,6 +213,9 @@ class KeymanWebViewController: UIViewController {
     webView!.scrollView.contentInsetAdjustmentBehavior = .never
 
     view = webView
+    
+    self.deathPoller?.invalidate()
+    self.deathPoller = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(checkForWebviewDeath), userInfo: nil, repeats: true)
 
     reloadKeyboard()
   }
@@ -654,9 +659,15 @@ extension KeymanWebViewController: WKNavigationDelegate {
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
   }
+  
+  @objc func checkForWebviewDeath() {
+    if self.webView?.title?.isEmpty ?? false {
+      self.webViewWebContentProcessDidTerminate(self.webView!)
+    }
+  }
 
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-    reloadKeyboard()
+    reloadHostPage()
   }
 }
 
@@ -926,6 +937,21 @@ extension KeymanWebViewController {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
       SentryManager.breadcrumb(message)
       _ = Manager.shared.setKeyboard(Defaults.keyboard)
+    }
+  }
+  
+  private func reloadHostPage() {
+    let oldView = self.view!
+    oldView.constraints.forEach { constraint in
+      constraint.isActive = false
+    }
+    
+    let hadParent = oldView.superview != nil
+    oldView.removeFromSuperview()
+    self.loadView()
+    
+    if hadParent {
+      setConstraints()
     }
   }
 
