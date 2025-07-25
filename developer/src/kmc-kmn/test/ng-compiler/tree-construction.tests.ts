@@ -88,5 +88,15 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright]);
       assert.isTrue(root.hasChild());
     });
+    it("can handle checking if there is at least one child of a given type (null)", () => {
+      assert.isFalse(root.hasChildOfType(null));
+    });
+    it("can check if there is at least one child of a given type (no children)", () => {
+      assert.isFalse(root.hasChildOfType(NodeTypes.BITMAP));
+    });
+    it("can check if there is at least one child of a given type (no match)", () => {
+      root.addChildren([copyright, version]);
+      assert.isFalse(root.hasChildOfType(NodeTypes.BITMAP));
+    });
   });
 });
