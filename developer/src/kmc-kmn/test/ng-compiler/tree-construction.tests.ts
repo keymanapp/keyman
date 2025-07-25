@@ -116,5 +116,29 @@ describe("Tree Construction Tests", () => {
       root = new ASTNode(NodeTypes.BITMAP, token);
       assert.equal(root.getText(), 'bitmap');
     });
+    it("getTextOfType(), get token text of sole child (no child)", () => {
+      assert.equal(root.getTextOfType(NodeTypes.BITMAP), '');
+    });
+    it("getTextOfType(), get token text of sole child (non-matching child)", () => {
+      root.addChildren([copyright, version]);
+      assert.equal(root.getTextOfType(NodeTypes.BITMAP), '');
+    });
+    it("getTextOfType(), get token text of sole child (matching child without token)", () => {
+      root.addChildren([copyright, version]); // extra children
+      root.addChild(bitmap);
+      assert.equal(root.getTextOfType(NodeTypes.BITMAP), '');
+    });
+    it("getTextOfType(), get token text of sole child (matching child with token)", () => {
+      root.addChildren([copyright, version]); // extra children
+      const token = new Token(TokenTypes.BITMAP, 'bitmap');
+      root.addToken(NodeTypes.BITMAP, token);
+      assert.equal(root.getTextOfType(NodeTypes.BITMAP), 'bitmap');
+    });
+    it("getTextOfType(), get token text of sole child (two matching children)", () => {
+      const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+      const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+      root.addChildren([bitmap, copyright, version1, version2]); // including extra children
+      assert.equal(root.getTextOfType(NodeTypes.VERSION), '');
+    });
   });
 });
