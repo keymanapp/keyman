@@ -36,7 +36,6 @@ describe('KmnFileWriter', function () {
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
     it('write() should return true (no error) if written', async function () {
-
       const result = sut_w.write(converted);
       assert.isTrue(result);
     });
