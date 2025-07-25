@@ -396,7 +396,7 @@ export class GroupNameRule extends SingleChildRule {
     if (parseSuccess) {
       const children = tmp.getChildren();
       if (children.length === 1) {
-        node.addToken(NodeTypes.GROUPNAME, children[0].token);
+        node.addNewChildWithToken(NodeTypes.GROUPNAME, children[0].token);
       } else {
         const groupNameNode = new ASTNode(NodeTypes.GROUPNAME);
         groupNameNode.addChildren(children);

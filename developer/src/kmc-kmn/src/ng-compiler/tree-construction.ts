@@ -33,7 +33,7 @@ export class ASTNode {
     return this;
   }
 
-  public addToken(nodeType: NodeTypes, token: Token): ASTNode {
+  public addNewChildWithToken(nodeType: NodeTypes, token: Token): ASTNode {
     this.addChild(new ASTNode(nodeType, token));
     return this;
   }

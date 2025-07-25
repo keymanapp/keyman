@@ -145,7 +145,7 @@ export class NormalStoreNameRule extends SingleChildRule {
     if (parseSuccess) {
       const children = tmp.getChildren();
       if (children.length === 1) {
-        node.addToken(NodeTypes.STORENAME, children[0].token);
+        node.addNewChildWithToken(NodeTypes.STORENAME, children[0].token);
       } else {
         const normalStoreNameNode = new ASTNode(NodeTypes.STORENAME);
         normalStoreNameNode.addChildren(children);
@@ -287,7 +287,7 @@ abstract class CapsLockStatementRule extends SingleChildRule {
     if (parseSuccess) {
       // TODO: warning deprecated
       const token: Token = new Token(this.tokenType, '1');
-      node.addToken(this.nodeType, token);
+      node.addNewChildWithToken(this.nodeType, token);
     }
     return parseSuccess;
   }

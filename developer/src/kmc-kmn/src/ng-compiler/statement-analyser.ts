@@ -330,7 +330,7 @@ export class OffsetRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const child = tmp.getSoleChild();
-      node.addToken(NodeTypes.OFFSET, child.token);
+      node.addNewChildWithToken(NodeTypes.OFFSET, child.token);
     }
     return parseSuccess;
   };

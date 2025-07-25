@@ -56,7 +56,7 @@ describe("Tree Construction Tests", () => {
     });
     it("addToken(), can construct and add a child with a token", () => {
       const token = new Token(TokenTypes.BITMAP, 'bitmap');
-      root.addToken(NodeTypes.BITMAP, token);
+      root.addNewChildWithToken(NodeTypes.BITMAP, token);
       assert.equal(root.toString(), '[TMP,{[BITMAP,[BITMAP,bitmap]]}]');
     });
     it("getDescendents(), can get descendents (no children)", () => {
@@ -131,7 +131,7 @@ describe("Tree Construction Tests", () => {
     it("getTextOfType(), get token text of sole child (matching child with token)", () => {
       root.addChildren([copyright, version]); // extra children
       const token = new Token(TokenTypes.BITMAP, 'bitmap');
-      root.addToken(NodeTypes.BITMAP, token);
+      root.addNewChildWithToken(NodeTypes.BITMAP, token);
       assert.equal(root.getTextOfType(NodeTypes.BITMAP), 'bitmap');
     });
     it("getTextOfType(), get token text of sole child (two matching children)", () => {
