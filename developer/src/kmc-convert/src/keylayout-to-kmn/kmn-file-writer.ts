@@ -149,7 +149,7 @@ export class KmnFileWriter {
 
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
-        for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        for (let j = 0; j <= KeylayoutToKmnConverter.USE_KEY_COUNT; j++) {
           if (keylayoutKmnConverter.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
             keyNr = j;
             break;
