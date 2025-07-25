@@ -27,6 +27,12 @@ export class ParsedLengthStyle implements LengthStyle {
 
     if(isNaN(parsed.val)) {
       console.error("NaN appeared while trying to calculate style scaling effects");
+      const sentryManager = (window as typeof window & { KeymanSentryManager?: any }).KeymanSentryManager;
+      if (sentryManager) {
+        // Add additional data to help debug #13908
+        sentryManager.setExtraData('parsed.val', parsed.val);
+        sentryManager.setExtraData('style', style);
+      }
       parsed = fallback
     }
 
