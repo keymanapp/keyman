@@ -946,11 +946,12 @@ extension KeymanWebViewController {
       constraint.isActive = false
     }
     
-    let hadParent = oldView.superview != nil
-    oldView.removeFromSuperview()
     self.loadView()
     
-    if hadParent {
+    let parent = oldView.superview
+    oldView.removeFromSuperview()
+    if parent != nil {
+      parent!.addSubview(self.view)
       setConstraints()
     }
   }
