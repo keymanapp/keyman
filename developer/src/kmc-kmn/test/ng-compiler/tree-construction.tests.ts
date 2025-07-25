@@ -13,8 +13,19 @@ import { NodeTypes } from '../../src/ng-compiler/node-types.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 
+let root: ASTNode      = null;
+let bitmap: ASTNode    = null;
+let copyright: ASTNode = null;
+let version: ASTNode   = null;
+
 describe("Tree Construction Tests", () => {
   describe("ASTNode Tests", () => {
+    beforeEach(() => {
+      root      = new ASTNode(NodeTypes.TMP);
+      bitmap    = new ASTNode(NodeTypes.BITMAP);
+      copyright = new ASTNode(NodeTypes.COPYRIGHT);
+      version   = new ASTNode(NodeTypes.VERSION);
+    });
     it("can construct an ASTNode", () => {
       const root = new ASTNode(NodeTypes.TMP);
       assert.isNotNull(root);
@@ -27,51 +38,32 @@ describe("Tree Construction Tests", () => {
       assert.equal(root.toString(), '[TMP,[BITMAP,bitmap]]');
     });
     it("can add child", () => {
-      const root   = new ASTNode(NodeTypes.TMP);
-      const bitmap = new ASTNode(NodeTypes.BITMAP);
       root.addChild(bitmap);
       assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
     });
     it("can add two children (addChild)", () => {
-      const root      = new ASTNode(NodeTypes.TMP);
-      const bitmap    = new ASTNode(NodeTypes.BITMAP);
-      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
       root.addChild(bitmap);
       root.addChild(copyright);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
     it("can add two children (addChildren)", () => {
-      const root      = new ASTNode(NodeTypes.TMP);
-      const bitmap    = new ASTNode(NodeTypes.BITMAP);
-      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
       root.addChildren([bitmap, copyright]);
       assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
     });
     it("can get descendents (no children)", () => {
-      const root = new ASTNode(NodeTypes.TMP);
       assert.deepEqual(root.getDescendents(NodeTypes.BITMAP), []);
     });
     it("can get descendents (no matching children)", () => {
-      const root = new ASTNode(NodeTypes.TMP);
-      const bitmap    = new ASTNode(NodeTypes.BITMAP);
-      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
       root.addChildren([bitmap, copyright]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), []);
     });
     it("can get descendents (one matching child)", () => {
-      const root = new ASTNode(NodeTypes.TMP);
-      const bitmap    = new ASTNode(NodeTypes.BITMAP);
-      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
-      const version   = new ASTNode(NodeTypes.VERSION);
       root.addChildren([bitmap, copyright, version]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version]);
     });
     it("can get descendents (two matching children)", () => {
-      const root = new ASTNode(NodeTypes.TMP);
-      const bitmap    = new ASTNode(NodeTypes.BITMAP);
-      const copyright = new ASTNode(NodeTypes.COPYRIGHT);
-      const version1  = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
-      const version2  = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+      const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+      const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
       bitmap.addChild(version1);
       root.addChildren([bitmap, copyright, version2]);
       assert.deepEqual(root.getDescendents(NodeTypes.VERSION), [version1, version2]);
