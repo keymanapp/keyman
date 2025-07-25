@@ -108,5 +108,13 @@ describe("Tree Construction Tests", () => {
       root.addChildren([bitmap, copyright, version1, version2]);
       assert.isTrue(root.hasChildOfType(NodeTypes.VERSION));
     });
+    it("getText(), get token text (no token)", () => {
+      assert.equal(root.getText(), '');
+    });
+    it("getText(), get token text", () => {
+      const token = new Token(TokenTypes.BITMAP, 'bitmap');
+      root = new ASTNode(NodeTypes.BITMAP, token);
+      assert.equal(root.getText(), 'bitmap');
+    });
   });
 });
