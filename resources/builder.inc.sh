@@ -1542,7 +1542,7 @@ _builder_parse_expanded_parameters() {
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
-    if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+    if [[ ${KEYMAN_VERSION_ENVIRONMENT:-} == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
       builder_echo grey "Local build environment detected:  setting --debug"
       _params+=(--debug)
       _builder_chosen_options+=(--debug)
@@ -2208,7 +2208,7 @@ builder_is_ci_build() {
 # Returns 0 if current build is running as a release build in CI
 #
 builder_is_ci_release_build() {
-  if [[ "$KEYMAN_VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" =~ ^alpha|beta|stable$ ]]; then
     return 0
   fi
   return 1
@@ -2219,7 +2219,7 @@ builder_is_ci_release_build() {
 # mainline branch test
 #
 builder_is_ci_test_build() {
-  if [[ "$KEYMAN_VERSION_ENVIRONMENT" == test ]]; then
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" == test ]]; then
     return 0
   fi
   return 1
@@ -2233,7 +2233,7 @@ builder_is_ci_build_level_release() {
   if builder_is_ci_release_build; then
     return 0
   fi
-  if [[ "$KEYMAN_BUILD_LEVEL" == release ]]; then
+  if [[ "${KEYMAN_BUILD_LEVEL:-}" == release ]]; then
     return 0
   fi
   return 1
