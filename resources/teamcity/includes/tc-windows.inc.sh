@@ -4,7 +4,7 @@
 # Shared functions for any builds that run on Windows agents
 
 ba_win_download_symbol_server_index() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     builder_die "ba_win_download_symbol_server_index should only be run on Windows agents"
   fi
 
@@ -24,7 +24,7 @@ ba_win_download_symbol_server_index() {
 }
 
 ba_win_publish_new_symbols() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     builder_die "ba_win_publish_new_symbols should only be run on Windows agents"
   fi
 
