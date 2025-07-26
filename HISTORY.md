@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.91 alpha 2025-07-26
+
+* maint(windows): fix calls of renamed functions (#14413)
+
 ## 19.0.90 alpha 2025-07-25
 
 * maint(common): fix standalone use of `resources/builder.inc.sh` (#14399)
