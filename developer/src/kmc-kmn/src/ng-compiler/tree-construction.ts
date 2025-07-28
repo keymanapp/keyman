@@ -192,9 +192,6 @@ export class ASTNode {
       buf = buf.concat(child.toString());
       if (idx < (this.children.length-1)) {
         buf = buf.concat(',');
-        if (child._nodeType === NodeTypes.LINE) {
-          buf = buf.concat('\n');
-        }
       }
     });
     if (this.children.length > 0) {
