@@ -8,6 +8,8 @@ if "%1"=="" goto help
 if "%1"=="all" goto all
 if "%1"=="x86" goto build
 if "%1"=="x64" goto build
+if "%1"=="ARM64" goto build
+
 
 echo "Invalid parameter."
 goto help
@@ -15,9 +17,9 @@ goto help
 rem ----------------------------------
 
 :help
-echo Usage: %0 x86^|x64^|all debug^|release [configure] [build] [test] [additional params for meson/ninja]
+echo Usage: %0 x86^|x64^|ARM64^|all debug^|release [configure] [build] [test] [additional params for meson/ninja]
 echo   or
-echo Usage: %0 x86^|x64 -c
+echo Usage: %0 x86^|x64^|ARM64^ -c
 echo -c will leave your environment configured for Visual Studio for selected platform.
 echo.
 echo Otherwise, %0 is intended to be used by build.sh, not directly.
@@ -34,6 +36,10 @@ cmd /c build.bat x86 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 cd %KEYMAN_ROOT%\core
 cmd /c build.bat x64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+
+cd %KEYMAN_ROOT%\core
+echo cmd /c build.bat ARM64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
+cmd /c build.bat ARM64 %2 %3 %4 %5 %6 %7 %8 %9 || exit !errorlevel!
 
 goto :eof
 
