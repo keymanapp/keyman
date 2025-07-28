@@ -212,25 +212,25 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.MATCH, 'match');
     });
     it("can recognise a MATCH token (empty brackets)", () => {
-      const lexer    = new Lexer(new String('match()'));
+      const lexer    = new Lexer('match()');
       const actual   = lexer.parse({addEOF:false, emitAll:false});
       const expected = [new Token(TokenTypes.MATCH, 'match')];
       assert.deepEqual(actual, expected);
     });
     it("can recognise a MATCH token (space before empty brackets)", () => {
-      const lexer    = new Lexer(new String('match ()'));
+      const lexer    = new Lexer('match ()');
       const actual   = lexer.parse({addEOF:false, emitAll:false});
       const expected = [new Token(TokenTypes.MATCH, 'match')];
       assert.deepEqual(actual, expected);
     });
     it("can recognise a MATCH token (space after empty brackets)", () => {
-      const lexer    = new Lexer(new String('match() '));
+      const lexer    = new Lexer('match() ');
       const actual   = lexer.parse({addEOF:false, emitAll:false});
       const expected = [new Token(TokenTypes.MATCH, 'match')];
       assert.deepEqual(actual, expected);
     });
     it("can recognise a MATCH token (space in empty brackets)", () => {
-      const lexer    = new Lexer(new String('match( )'));
+      const lexer    = new Lexer('match( )');
       const actual   = lexer.parse({addEOF:false, emitAll:false});
       const expected = [new Token(TokenTypes.MATCH, 'match')];
       assert.deepEqual(actual, expected);
@@ -445,7 +445,7 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenTypes.COMMENT, 'c This tells Keyman which keys should have casing behavior applied');
     });
     it("can recognise a COMMENT token (emitAll:false)", () => {
-      const comment: String = 'c This tells Keyman which keys should have casing behavior applied';
+      const comment: string = 'c This tells Keyman which keys should have casing behavior applied';
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
@@ -455,7 +455,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a COMMENT token (followed by LF)", () => {
-      const comment: String = 'c This tells Keyman which keys should have casing behavior applied';
+      const comment: string = 'c This tells Keyman which keys should have casing behavior applied';
       recogniseTokens(
         'c This tells Keyman which keys should have casing behavior applied\n',
         [
@@ -465,7 +465,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a COMMENT token (immediately followed by LF)", () => {
-      const comment: String = 'c';
+      const comment: string = 'c';
       recogniseTokens(
         'c\n',
         [
@@ -475,7 +475,7 @@ describe("Lexer Tests", () => {
       );
     });
     it("can recognise a COMMENT token (immediately followed by LF)", () => {
-      const comment: String = 'c';
+      const comment: string = 'c';
       recogniseTokens(
         'c\n',
         [
@@ -1067,21 +1067,21 @@ describe("Lexer Tests", () => {
   });
 });
 
-function recogniseToken(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
-  const lexer    = new Lexer(new String(text));
+function recogniseToken(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+  const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   const line     = (type === TokenTypes.NEWLINE) ? text : null;
   const expected = [new Token(type, text, 1, 1, line)];
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokens(text: String, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
-  const lexer    = new Lexer(new String(text));
+function recogniseTokens(text: string, expected: Token[], {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+  const lexer    = new Lexer(text);
   const actual   = lexer.parse({addEOF, emitAll, handleContinuation});
   assert.deepEqual(actual, expected);
 }
 
-function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedBySpace(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   recogniseTokens(
     `${text} `,
     [
@@ -1092,7 +1092,7 @@ function recogniseTokenFollowedBySpace(type: TokenTypes, text: String, {addEOF=f
   );
 }
 
-function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   recogniseTokens(
     `${text}(`,
     [
@@ -1103,7 +1103,7 @@ function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: String, {ad
   );
 }
 
-function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
   recogniseTokens(
     `${text}]`,
     [
@@ -1114,7 +1114,7 @@ function recogniseTokenFollowedByRightSquare(type: TokenTypes, text: String, {ad
   );
 }
 
-function recogniseSystemStoreWithString(type: TokenTypes, text: String, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+function recogniseSystemStoreWithString(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
   const value = TokenTypes[type].toLowerCase();
   recogniseTokens(
     `store(&${value}) '${text}'`,
