@@ -277,5 +277,24 @@ describe("Tree Construction Tests", () => {
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT],[VERSION,[VERSION,1]],[VERSION,[VERSION,2]]}]');
       });
     });
+    describe("ASTNode.removeChildren()", () => {
+      beforeEach(() => {
+        init_variables();
+      });
+      it("can handle when there are no children", () => {
+        assert.deepEqual(root.removeChildren(), []);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can remove children when there is only one child", () => {
+        root.addChild(bitmap);
+        assert.deepEqual(root.removeChildren(), [bitmap]);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can removet children when there are two", () => {
+        root.addChildren([bitmap, copyright]);
+        assert.deepEqual(root.removeChildren(), [bitmap, copyright]);
+        assert.equal(root.toString(), '[TMP]');
+      });
+    });
   });
 });
