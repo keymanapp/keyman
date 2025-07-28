@@ -20,14 +20,14 @@ export class ASTNode {
   }
 
   public addChild(child: ASTNode): ASTNode {
-    if (child !== null) {
+    if (child != null) {
       this.children.push(child);
     }
     return this;
   }
 
   public addChildren(children: ASTNode[]): ASTNode {
-    if (children !== null) {
+    if (children != null) {
       this.children.push(...children);
     }
     return this;
@@ -40,7 +40,9 @@ export class ASTNode {
 
   public getDescendents(requiredType: NodeTypes) {
     const result: ASTNode[] = [];
-    this.collectDescendents(result, requiredType);
+    if (requiredType != null) {
+      this.collectDescendents(result, requiredType);
+    }
     return result;
   }
 
@@ -56,31 +58,36 @@ export class ASTNode {
   }
 
   public hasChildOfType(requiredType: NodeTypes): boolean  {
-    for (const child of this.children) {
-      if (child.nodeType === requiredType) {
-        return true;
+    if (requiredType != null) {
+      for (const child of this.children) {
+        if (child.nodeType === requiredType) {
+          return true;
+        }
       }
     }
+
     return false;
   }
 
   public hasSoleChildOfType(requiredType: NodeTypes): boolean  {
     let count = 0;
-    for (const child of this.children) {
-      if (child.nodeType === requiredType) {
-        count += 1;
+    if (requiredType != null) {
+      for (const child of this.children) {
+        if (child.nodeType === requiredType) {
+          count += 1;
+        }
       }
     }
     return count === 1;
   }
 
   public getText(): String {
-    return (this._token !== null) ? this._token.text : '';
+    return (this._token != null) ? this._token.text : '';
   }
 
-  public getTextOfType(nodeType: NodeTypes): String  {
-    const child: ASTNode = this.getSoleChildOfType(nodeType);
-    return (child !== null) ? child.getText() : '';
+  public getTextOfType(requiredType: NodeTypes): String  {
+    const child: ASTNode = this.getSoleChildOfType(requiredType);
+    return (child != null) ? child.getText() : '';
   }
 
   public getSoleChild(): ASTNode {
@@ -99,9 +106,11 @@ export class ASTNode {
 
   public getChildrenOfType(requiredType: NodeTypes): ASTNode[] {
     const list: ASTNode[] = [];
-    for (const child of this.children) {
-      if (child.nodeType === requiredType) {
-        list.push(child);
+    if (requiredType != null) {
+      for (const child of this.children) {
+        if (child.nodeType === requiredType) {
+          list.push(child);
+        }
       }
     }
     return list;
@@ -114,10 +123,8 @@ export class ASTNode {
   }
 
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
-    if (!this.hasSoleChildOfType(requiredType)) {
-      return null;
-    }
-    return this.removeChildrenOfType(requiredType)[0];
+    return this.hasSoleChildOfType(requiredType) ?
+      this.removeChildrenOfType(requiredType)[0] : null;
   }
 
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
@@ -150,6 +157,10 @@ export class ASTNode {
     let inParent: boolean     = false;
     let parent: ASTNode       = null;
 
+    if (parentType == null || childType == null) {
+      return [];
+    }
+
     for (const child of this.children) {
       if (child.nodeType === parentType) {
         inParent = true;
@@ -171,7 +182,7 @@ export class ASTNode {
 
   public toString(): string {
     let buf: string = `[${this._nodeType}`;
-    if (this._token !== null) {
+    if (this._token != null) {
       buf = buf.concat(`,${this._token}`);
     }
     if (this.children.length > 0) {

@@ -53,6 +53,10 @@ describe("Tree Construction Tests", () => {
         root.addChild(copyright);
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
+      it("can handle adding a null", () => {
+        root.addChild(null);
+        assert.equal(root.getChildren().length, 0);
+      });
     });
     describe("ASTNode.addChildren()", () => {
       beforeEach(() => {
@@ -68,7 +72,7 @@ describe("Tree Construction Tests", () => {
       });
       it("can handle adding a null", () => {
         root.addChildren(null);
-        assert.equal(root.toString(), '[TMP]');
+        assert.equal(root.getChildren().length, 0);
       });
     });
     describe("ASTNode.addNewChildWithToken()", () => {
@@ -80,10 +84,18 @@ describe("Tree Construction Tests", () => {
         root.addNewChildWithToken(NodeTypes.BITMAP, token);
         assert.equal(root.toString(), '[TMP,{[BITMAP,[BITMAP,bitmap]]}]');
       });
+       it("can handle adding a child with a null token", () => {
+        root.addNewChildWithToken(NodeTypes.BITMAP, null);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+      });
     });
     describe("ASTNode.getDescendents()", () => {
       beforeEach(() => {
         init_variables();
+      });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.deepEqual(root.getDescendents(null), []);
       });
       it("can handle when there are no children", () => {
         assert.deepEqual(root.getDescendents(NodeTypes.BITMAP), []);
@@ -125,6 +137,7 @@ describe("Tree Construction Tests", () => {
         init_variables();
       });
       it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
         assert.isFalse(root.hasChildOfType(null));
       });
       it("can handle if there are no children", () => {
@@ -150,6 +163,7 @@ describe("Tree Construction Tests", () => {
         init_variables();
       });
       it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
         assert.isFalse(root.hasSoleChildOfType(null));
       });
       it("can handle if there are no children", () => {
@@ -186,6 +200,10 @@ describe("Tree Construction Tests", () => {
     describe("ASTNode.getTextOfType()", () => {
       beforeEach(() => {
         init_variables();
+      });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.equal(root.getTextOfType(null), '');
       });
       it("can handle when there are no children", () => {
         assert.equal(root.getTextOfType(NodeTypes.BITMAP), '');
@@ -235,6 +253,11 @@ describe("Tree Construction Tests", () => {
       beforeEach(() => {
         init_variables();
       });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.isNull(root.getSoleChildOfType(null));
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
       it("can handle when there are no children", () => {
         assert.isNull(root.getSoleChildOfType(NodeTypes.BITMAP));
         assert.equal(root.toString(), '[TMP]');
@@ -279,6 +302,11 @@ describe("Tree Construction Tests", () => {
     describe("ASTNode.getChildrenOfType()", () => {
       beforeEach(() => {
         init_variables();
+      });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.deepEqual(root.getChildrenOfType(null), []);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
       });
       it("can handle when there are no children", () => {
         assert.deepEqual(root.getChildrenOfType(NodeTypes.BITMAP), []);
@@ -325,6 +353,11 @@ describe("Tree Construction Tests", () => {
       beforeEach(() => {
         init_variables();
       });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.deepEqual(root.removeSoleChildOfType(null), null);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
       it("can handle when there are no children", () => {
         assert.isNull(root.removeSoleChildOfType(NodeTypes.BITMAP));
         assert.equal(root.toString(), '[TMP]');
@@ -350,6 +383,11 @@ describe("Tree Construction Tests", () => {
     describe("ASTNode.removeChildrenOfType()", () => {
       beforeEach(() => {
         init_variables();
+      });
+      it("can handle a null type", () => {
+        root.addChildren([copyright, version]);
+        assert.deepEqual(root.removeChildrenOfType(null), []);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
       });
       it("can handle when there are no children", () => {
         assert.deepEqual(root.removeChildrenOfType(NodeTypes.BITMAP), []);
