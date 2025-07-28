@@ -64,7 +64,7 @@ export class ASTNode {
     return false;
   }
 
-  public hasSoloChildOfType(requiredType: NodeTypes): boolean  {
+  public hasSoleChildOfType(requiredType: NodeTypes): boolean  {
     let count = 0;
     for (const child of this.children) {
       if (child.nodeType === requiredType) {
@@ -114,8 +114,10 @@ export class ASTNode {
   }
 
   public removeSoleChildOfType(requiredType: NodeTypes): ASTNode {
-    const children: ASTNode[] = this.removeChildrenOfType(requiredType);
-    return (children.length == 1) ? children[0] : null;
+    if (!this.hasSoleChildOfType(requiredType)) {
+      return null;
+    }
+    return this.removeChildrenOfType(requiredType)[0];
   }
 
   public removeChildrenOfType(requiredType: NodeTypes): ASTNode[] {
