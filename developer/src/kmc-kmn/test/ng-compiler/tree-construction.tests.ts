@@ -540,5 +540,22 @@ describe("Tree Construction Tests", () => {
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
     });
+    describe("ASTNode.toText()", () => {
+      beforeEach(() => {
+        init_variables();
+      });
+      it("can handle a node without a SOURCE_CODE child", () => {
+        assert.equal(root.toText(), '');
+      });
+      it("can extract source code", () => {
+        const line1  = new ASTNode(NodeTypes.LINE, new Token(TokenTypes.NEWLINE, '\n', 1, 1, 'line1\n'));
+        const line2  = new ASTNode(NodeTypes.LINE, new Token(TokenTypes.NEWLINE, '\n', 2, 1, 'line2\n'));
+        const line3  = new ASTNode(NodeTypes.LINE, new Token(TokenTypes.NEWLINE, '\n', 3, 1, 'line3\n'));
+        const source = new ASTNode(NodeTypes.SOURCE_CODE);
+        source.addChildren([line1, line2, line3]);
+        root.addChild(source);
+        assert.equal(root.toText(), 'line1\nline2\nline3\n');
+      });
+    });
   });
 });

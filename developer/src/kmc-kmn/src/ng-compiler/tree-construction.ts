@@ -202,11 +202,12 @@ export class ASTNode {
   }
 
   public toText(): string {
-    let text: string = ""
-    const sourceCodeNode: ASTNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
-    const lineNodes: ASTNode[]    = sourceCodeNode.getChildren();
-    for (let lineNode of lineNodes) {
-      text = text.concat(lineNode.token.line.toString())
+    let text: string = '';
+    if (this.hasSoleChildOfType(NodeTypes.SOURCE_CODE)) {
+      const sourceCodeNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
+      for (let lineNode of sourceCodeNode.getChildren()) {
+        text = text.concat(lineNode.token.line.toString())
+      }
     }
     return text;
   }
