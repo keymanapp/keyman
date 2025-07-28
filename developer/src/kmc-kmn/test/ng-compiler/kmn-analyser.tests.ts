@@ -1588,7 +1588,7 @@ describe("KMN Analyser Tests", () => {
   });
   describe("Analyser Tests", () => {
     it("can parse Khmer Angkor correctly", () => {
-      const buffer: String    = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      const buffer: string    = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       Rule.tokenBuffer        = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
@@ -1649,11 +1649,11 @@ describe("KMN Analyser Tests", () => {
       //assert.equal(root.toString(), '');
     });
     it("can parse Khmer Angkor correctly (round trip text)", () => {
-      const buffer: String = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       Rule.tokenBuffer = stringToTokenBuffer(buffer);
       const kmnTreeRule: Rule = new KmnTreeRule();
       assert.isTrue(kmnTreeRule.parse(root));
-      assert.deepEqual(root.toText(), buffer.toString());
+      assert.equal(root.toText(), buffer);
     });
     it("can provide round trip text for baseline keyboards", () => {
       [
@@ -1709,12 +1709,12 @@ describe("KMN Analyser Tests", () => {
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString());
+        assert.equal(root.toText(), buffer);
       });
     });
     it("can provide round trip text for repository keyboards (0-99)", () => {
@@ -1811,12 +1811,12 @@ describe("KMN Analyser Tests", () => {
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (100-199)", () => {
@@ -1922,12 +1922,12 @@ describe("KMN Analyser Tests", () => {
         'release/basic/basic_kbdintam/source/basic_kbdintam',
         'release/basic/basic_kbdintel/source/basic_kbdintel',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (200-299)", () => {
@@ -2033,12 +2033,12 @@ describe("KMN Analyser Tests", () => {
         'release/basic/basic_kbdyba/source/basic_kbdyba',
         'release/basic/basic_kbdycc/source/basic_kbdycc',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (300-399)", () => {
@@ -2144,12 +2144,12 @@ describe("KMN Analyser Tests", () => {
         'release/fv/fv_hulquminum/source/fv_hulquminum',
         'release/fv/fv_hulquminum_combine/source/fv_hulquminum_combine',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (400-499)", () => {
@@ -2254,12 +2254,12 @@ describe("KMN Analyser Tests", () => {
         'release/gff/gff_blin/source/gff_blin',
         'release/gff/gff_ethiopic/source/gff_ethiopic',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (500-599)", () => {
@@ -2363,12 +2363,12 @@ describe("KMN Analyser Tests", () => {
         'release/m/meroitic_cursive/source/meroitic_cursive',
         'release/m/meroitic_hieroglyphs/source/meroitic_hieroglyphs',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
@@ -2474,12 +2474,12 @@ describe("KMN Analyser Tests", () => {
         'release/rac/rac_gawar_bati/source/rac_gawar_bati',
         'release/rac/rac_gawri/source/rac_gawri',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (700-799)", () => {
@@ -2585,12 +2585,12 @@ describe("KMN Analyser Tests", () => {
         'release/sil/sil_kayah_mymr/source/sil_kayah_mymr',
         'release/sil/sil_kcho/source/sil_kcho',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (800-899)", () => {
@@ -2696,12 +2696,12 @@ describe("KMN Analyser Tests", () => {
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
@@ -2735,18 +2735,18 @@ describe("KMN Analyser Tests", () => {
         'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
         'release/z/zanabazar_square/source/zanabazar_square',
       ].forEach((name) => {
-        const buffer: String = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         Rule.tokenBuffer = stringToTokenBuffer(buffer);
         const kmnTreeRule: Rule = new KmnTreeRule();
         root = new ASTNode(NodeTypes.TMP);
         assert.isTrue(kmnTreeRule.parse(root));
-        assert.deepEqual(root.toText(), buffer.toString(), `${name}.kmn`);
+        assert.equal(root.toText(), buffer, `${name}.kmn`);
       });
     }).timeout(50000);
   });
 });
 
-export function stringToTokenBuffer(buffer: String): TokenBuffer {
+export function stringToTokenBuffer(buffer: string): TokenBuffer {
   const lexer = new Lexer(buffer);
   const tokens: Token[] = lexer.parse();
   return new TokenBuffer(tokens);

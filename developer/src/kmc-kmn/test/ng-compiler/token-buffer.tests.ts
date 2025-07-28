@@ -161,12 +161,12 @@ describe("TokenBuffer Tests", () => {
   });
   describe("TokenBuffer toText()", () => {
     it("can provide round trip text for khmer_angkor.kmn", () => {
-      const buffer: String  = new String(readFileSync('test/fixtures/keyboards/khmer_angkor.kmn'));
+      const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       const lexer = new Lexer(buffer);
       const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
       const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-      const output: String = tokenBuffer.toText();
-      assert.deepEqual(output.toString(), buffer.toString());
+      const output: string = tokenBuffer.toText();
+      assert.equal(output, buffer);
     });
     it("can provide round trip text for baseline keyboards", () => {
       [
@@ -222,12 +222,12 @@ describe("TokenBuffer Tests", () => {
         'k_054___nul_and_contextex',
         'k_055___deadkey_cancelled_by_arrow',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../common/test/keyboards/baseline/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     });
    it("can provide round trip text for repository keyboards (0-99)", () => {
@@ -324,12 +324,12 @@ describe("TokenBuffer Tests", () => {
         'release/b/banne/source/banne',
         'release/b/bassa_vah/source/bassa_vah',
           ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (100-199)", () => {
@@ -435,12 +435,12 @@ describe("TokenBuffer Tests", () => {
         'release/basic/basic_kbdintam/source/basic_kbdintam',
         'release/basic/basic_kbdintel/source/basic_kbdintel',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (200-299)", () => {
@@ -546,12 +546,12 @@ describe("TokenBuffer Tests", () => {
         'release/basic/basic_kbdyba/source/basic_kbdyba',
         'release/basic/basic_kbdycc/source/basic_kbdycc',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (300-399)", () => {
@@ -657,12 +657,12 @@ describe("TokenBuffer Tests", () => {
         'release/fv/fv_hulquminum/source/fv_hulquminum',
         'release/fv/fv_hulquminum_combine/source/fv_hulquminum_combine',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (400-499)", () => {
@@ -767,12 +767,12 @@ describe("TokenBuffer Tests", () => {
         'release/gff/gff_blin/source/gff_blin',
         'release/gff/gff_ethiopic/source/gff_ethiopic',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (500-599)", () => {
@@ -876,12 +876,12 @@ describe("TokenBuffer Tests", () => {
         'release/m/meroitic_cursive/source/meroitic_cursive',
         'release/m/meroitic_hieroglyphs/source/meroitic_hieroglyphs',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (600-699)", () => {
@@ -987,12 +987,12 @@ describe("TokenBuffer Tests", () => {
         'release/rac/rac_gawar_bati/source/rac_gawar_bati',
         'release/rac/rac_gawri/source/rac_gawri',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (700-799)", () => {
@@ -1098,12 +1098,12 @@ describe("TokenBuffer Tests", () => {
         'release/sil/sil_kayah_mymr/source/sil_kayah_mymr',
         'release/sil/sil_kcho/source/sil_kcho',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (800-899)", () => {
@@ -1209,12 +1209,12 @@ describe("TokenBuffer Tests", () => {
         'release/t/triqui_itunyoso/source/triqui_itunyoso',
         'release/t/tuareg_tifinagh/source/tuareg_tifinagh',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
     it("can provide round trip text for repository keyboards (900-end)", () => {
@@ -1248,12 +1248,12 @@ describe("TokenBuffer Tests", () => {
         'release/y/younger_futhark_short_twig/source/younger_futhark_short_twig',
         'release/z/zanabazar_square/source/zanabazar_square',
       ].forEach((name) => {
-        const buffer: String  = new String(readFileSync(`../../../../keyboards/${name}.kmn`));
+        const buffer: string = readFileSync(`../../../../keyboards/${name}.kmn`).toString();
         const lexer = new Lexer(buffer);
         const tokens: Token[] = lexer.parse({addEOF:true, emitAll:true, handleContinuation:false});
         const tokenBuffer: TokenBuffer = new TokenBuffer(tokens);
-        const output: String = tokenBuffer.toText();
-        assert.deepEqual(output.toString(), buffer.toString(), `${name}.kmn`);
+        const output: string = tokenBuffer.toText();
+        assert.equal(output, buffer, `${name}.kmn`);
       });
     }).timeout(50000);
   });

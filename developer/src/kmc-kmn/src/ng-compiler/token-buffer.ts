@@ -33,10 +33,10 @@ export class TokenBuffer {
     this._currentPosition = Math.min(Math.max(0, save), this.list.length);
   }
 
-  public toText(): String {
-    let text: String = "";
+  public toText(): string {
+    let text: string = '';
     for (let token of this.list) {
-      text = text.concat(token.text.toString())
+      text = text.concat(token.text)
     }
     return text;
   }
