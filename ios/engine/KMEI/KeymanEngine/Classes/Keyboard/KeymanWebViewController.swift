@@ -544,7 +544,9 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       return
     }
 
-    if fragment.hasPrefix("#insertText-") {
+    if fragment.hasPrefix("#ping-") {
+      os_log("Ping from host-page setInterval", log: KeymanEngineLogger.ui, type: .info)
+    } else if fragment.hasPrefix("#insertText-") {
       let dnRange = fragment.range(of: "+dn=")!
       let sRange = fragment.range(of: "+s=")!
       let drRange = fragment.range(of: "+dr=")!

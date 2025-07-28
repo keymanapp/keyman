@@ -66,6 +66,14 @@ function init() {
         bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
       }
     });
+  
+  window.setInterval(function () {
+    fragmentToggle = (fragmentToggle + 1) % 100;
+    var insertHash = 'ping-0';
+    if (typeof(window.webkit) != 'undefined')
+        window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
+
+  }, 2500);
 }
 
 function verifyLoaded() {
