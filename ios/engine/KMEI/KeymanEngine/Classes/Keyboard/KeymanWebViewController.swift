@@ -662,11 +662,18 @@ extension KeymanWebViewController: WKNavigationDelegate {
   
   @objc func checkForWebviewDeath() {
     if self.webView?.title?.isEmpty ?? false {
+      let message = "WebView is believed to be dead based on host-page title"
       self.webViewWebContentProcessDidTerminate(self.webView!)
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+    } else {
+      let message = "WebView is alive:  current title is \"\(self.webView?.title ?? "(nil, somehow)")\""
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     }
   }
 
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    let message = "WebView process crashed - replacing & restarting"
+    os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     reloadHostPage()
   }
 }
@@ -942,13 +949,13 @@ extension KeymanWebViewController {
   
   private func reloadHostPage() {
     let oldView = self.view!
+    let parent = oldView.superview
+    
     oldView.constraints.forEach { constraint in
       constraint.isActive = false
     }
     
     self.loadView()
-    
-    let parent = oldView.superview
     oldView.removeFromSuperview()
     if parent != nil {
       parent!.addSubview(self.view)
