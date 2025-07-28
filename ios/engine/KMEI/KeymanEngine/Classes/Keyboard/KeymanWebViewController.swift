@@ -233,6 +233,8 @@ class KeymanWebViewController: UIViewController {
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
     fixLayout()
+    
+    os_log("KeymanWebViewController.viewDidAppear()", log: KeymanEngineLogger.engine, type: .info)
 
     // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
     // keyboard's width will be set at this stage, but not in viewWillAppear.
@@ -241,6 +243,7 @@ class KeymanWebViewController: UIViewController {
 
   override func viewWillDisappear(_ animated: Bool) {
     self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
+    os_log("KeymanWebViewController.viewWillDisappear()", log: KeymanEngineLogger.engine, type: .info)
   }
 }
 
@@ -966,6 +969,8 @@ extension KeymanWebViewController {
     if parent != nil {
       parent!.addSubview(self.view)
       setConstraints()
+      parent!.setNeedsLayout()
+      parent!.layoutIfNeeded()
     }
   }
 
