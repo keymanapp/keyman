@@ -165,6 +165,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     inputView?.removeFromSuperview()
     (inputView as? CustomInputView)?.destroy()
     inputView = nil
+    keymanWeb.clearDeathPoller()
   }
 
   open override func updateViewConstraints() {

@@ -219,6 +219,10 @@ class KeymanWebViewController: UIViewController {
 
     reloadKeyboard()
   }
+  
+  func clearDeathPoller() {
+    self.deathPoller?.invalidate()
+  }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
