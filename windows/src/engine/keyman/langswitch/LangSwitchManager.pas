@@ -1021,7 +1021,7 @@ procedure TLangSwitchConfiguration.DisableWindowsHotkey;
 var
   MatchValue: string;
   KeyboardToggleReg: TRegistryErrorControlled;
-  FReset, FFixed: Boolean;
+  FReset: Boolean;
   const CHotkeyNotAssigned = '3';
 begin
   if FCurrentHotkey = (HK_ALT or HK_SHIFT) then MatchValue := '1'
@@ -1031,7 +1031,6 @@ begin
   FLanguageToggle := CHotkeyNotAssigned;
   FLayoutToggle := CHotkeyNotAssigned;
 
-  //FFixed := False;
   FReset := False;
 
   KeyboardToggleReg := TRegistryErrorControlled.Create; // I2890
