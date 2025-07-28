@@ -64,6 +64,16 @@ export class ASTNode {
     return false;
   }
 
+  public hasSoloChildOfType(requiredType: NodeTypes): boolean  {
+    let count = 0;
+    for (const child of this.children) {
+      if (child.nodeType === requiredType) {
+        count += 1;
+      }
+    }
+    return count === 1;
+  }
+
   public getText(): String {
     return (this._token !== null) ? this._token.text : '';
   }

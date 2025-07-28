@@ -145,6 +145,31 @@ describe("Tree Construction Tests", () => {
         assert.isTrue(root.hasChildOfType(NodeTypes.VERSION));
       });
     });
+    describe("ASTNode.hasSoloChildOfType()", () => {
+      beforeEach(() => {
+        init_variables();
+      });
+      it("can handle a null type", () => {
+        assert.isFalse(root.hasSoloChildOfType(null));
+      });
+      it("can handle if there are no children", () => {
+        assert.isFalse(root.hasSoloChildOfType(NodeTypes.BITMAP));
+      });
+      it("can handle if there are non-matching children", () => {
+        root.addChildren([copyright, version]);
+        assert.isFalse(root.hasSoloChildOfType(NodeTypes.BITMAP));
+      });
+      it("can check if there is one child of a given type", () => {
+        root.addChildren([bitmap, copyright, version]);
+        assert.isTrue(root.hasSoloChildOfType(NodeTypes.BITMAP));
+      });
+      it("can handle if there are two children of a given type", () => {
+        const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+        const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+        root.addChildren([bitmap, copyright, version1, version2]);
+        assert.isFalse(root.hasSoloChildOfType(NodeTypes.VERSION));
+      });
+    });
     describe("ASTNode.getText()", () => {
       beforeEach(() => {
         init_variables();
