@@ -2212,7 +2212,7 @@ TEST(IsValidUtf8Test, Invalid2ByteBadSecondByte) {
   EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
 }
 
-TEST(IsValidUtf8Test, Invalid2ByteBadSecondByteToHigh) {
+TEST(IsValidUtf8Test, Invalid2ByteBadSecondByteTooHigh) {
   std::vector<KMX_BYTE> v = {0xD2, 0xC8};
   EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
 }
