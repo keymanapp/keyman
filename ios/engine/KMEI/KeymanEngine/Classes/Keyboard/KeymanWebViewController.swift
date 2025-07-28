@@ -73,9 +73,14 @@ class KeymanWebViewController: UIViewController {
   var landscapeConstraint: NSLayoutConstraint?
   
   var deathPoller: Timer?
+  
+  private static var idSeed: Int = 0
+  private var id: Int
 
   init(storage: Storage) {
     self.storage = storage
+    self.id = KeymanWebViewController.idSeed
+    KeymanWebViewController.idSeed += 1
     super.init(nibName: nil, bundle: nil)
 
     _ = view
@@ -671,17 +676,17 @@ extension KeymanWebViewController: WKNavigationDelegate {
   
   @objc func checkForWebviewDeath() {
     if self.webView?.title?.isEmpty ?? false {
-      let message = "WebView is believed to be dead based on host-page title"
+      let message = "WebView (id \(self.id)) is believed to be dead based on host-page title"
       self.webViewWebContentProcessDidTerminate(self.webView!)
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     } else {
-      let message = "WebView is alive:  current title is \"\(self.webView?.title ?? "(nil, somehow)")\""
+      let message = "WebView (id \(self.id)) is alive:  current title is \"\(self.webView?.title ?? "(nil, somehow)")\""
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     }
   }
 
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-    let message = "WebView process crashed - replacing & restarting"
+    let message = "WebView (id \(self.id)) process crashed - replacing & restarting"
     os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
     reloadHostPage()
   }
