@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.92 alpha 2025-07-28
+
+* build(deps): bump multer from 2.0.1 to 2.0.2 (#14373)
+* refactor(linux): remove shellcheck warnings (#14409)
+* refactor(linux): move dbus defines to common include (#14407)
+* docs(linux): update readme for test service (#14408)
+* fix(windows): add check a fix for registry datatypes (#14358)
+
 ## 19.0.91 alpha 2025-07-26
 
 * maint(windows): fix calls of renamed functions (#14413)
