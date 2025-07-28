@@ -19,21 +19,21 @@ export class ScanRecogniser {
     this.emit      = emit;
   }
 
-  public toString(): String {
+  public toString(): string {
     return `[${this.tokenType},${this.regExp},${this.emit}]`;
   }
 }
 
 export class Lexer {
   private static patternMatchers: Map<TokenTypes, ScanRecogniser>;
-  private buffer: String;
+  private buffer: string;
   private lineNum: number;
   private charNum: number;
-  private line: String;
+  private line: string;
   private tokenList: Token[];
   private seenContinuation: boolean;
 
-  public constructor(buffer: String) {
+  public constructor(buffer: string) {
     this.buffer           = buffer;
     this.lineNum          = 1;
     this.charNum          = 1;
@@ -184,7 +184,7 @@ export class Lexer {
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
-        let line: String = null;
+        let line: string = null;
         if (handleContinuation) {
           // if handleContinuation is true, no CONTINUATIONs will be emitted,
           // nor will NEWLINEs that follow CONTINUATIONs be emitted
@@ -247,12 +247,12 @@ export class Lexer {
 
 export class Token {
   readonly tokenType: TokenTypes;
-  private _text: String;
+  private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
-  private _line: String; // only used by NEWLINE and EOF
+  private _line: string; // only used by NEWLINE and EOF
 
-  public constructor(tokenType: TokenTypes, text: String, lineNum: number=1, charNum: number=1, line: String=null) {
+  public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null) {
     this.tokenType = tokenType;
     this._text     = text;
     this._lineNum  = lineNum;
@@ -264,13 +264,13 @@ export class Token {
     return this.tokenType === tokenType;
   }
 
-  public get text(): String { return this._text; }
-  public set text(text: String) { this._text = text; }
+  public get text(): string { return this._text; }
+  public set text(text: string) { this._text = text; }
   public get lineNum(): number { return this._lineNum; }
   public set lineNum(lineNum: number) { this._lineNum = lineNum; }
   public get charNum(): number { return this._charNum; }
   public set charNum(charNum: number) { this._charNum = charNum; }
-  public get line(): String { return this._line; }
+  public get line(): string { return this._line; }
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`
