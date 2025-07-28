@@ -373,5 +373,55 @@ describe("Tree Construction Tests", () => {
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
       });
     });
+    describe("ASTNode.removeChildrenOfTypes()", () => {
+      beforeEach(() => {
+        init_variables();
+      });
+      it("can handle null type array", () => {
+        root.addChildren([copyright, version]); // extra children
+        assert.deepEqual(root.removeChildrenOfTypes(null), []);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+      it("can handle empty type array", () => {
+        root.addChildren([copyright, version]); // extra children
+        assert.deepEqual(root.removeChildrenOfTypes([]), []);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+      it("can handle when there are no children", () => {
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.BITMAP]), []);
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can handle when there is no matching child", () => {
+        root.addChildren([copyright, version]); // extra children
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.BITMAP]), []);
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+      it("can get children of type when there is one matching child", () => {
+        root.addChildren([bitmap, version, copyright]); // extra children
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.VERSION]), [version]);
+        assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+      });
+      it("can get children of type when there are two matching children (of one type)", () => {
+        const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+        const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+        root.addChildren([bitmap, version1, copyright, version2]); // including extra children
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.VERSION]), [version1, version2]);
+        assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+      });
+      it("can get children of types when there are two matching children (of different type)", () => {
+        root.addChildren([bitmap, version, copyright]); // including extra children
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.VERSION,NodeTypes.COPYRIGHT]), [version, copyright]);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+      });
+      it("can get children of types when there are two matching children of each of two different type", () => {
+        const version1   = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+        const version2   = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+        const copyright1 = new ASTNode(NodeTypes.COPYRIGHT, new Token(TokenTypes.COPYRIGHT, '1'));
+        const copyright2 = new ASTNode(NodeTypes.COPYRIGHT, new Token(TokenTypes.COPYRIGHT, '2'));
+        root.addChildren([version1, copyright1, bitmap, copyright2, version2]); // including extra children
+        assert.deepEqual(root.removeChildrenOfTypes([NodeTypes.VERSION,NodeTypes.COPYRIGHT]), [version1, copyright1, copyright2, version2]);
+        assert.equal(root.toString(), '[TMP,{[BITMAP]}]');
+      });
+    });
   });
 });
