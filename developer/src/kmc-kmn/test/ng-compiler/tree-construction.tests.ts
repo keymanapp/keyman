@@ -321,5 +321,31 @@ describe("Tree Construction Tests", () => {
         assert.equal(root.toString(), '[TMP]');
       });
     });
+    describe("ASTNode.removeSoleChildOfType()", () => {
+      beforeEach(() => {
+        init_variables();
+      });
+      it("can handle when there are no children", () => {
+        assert.isNull(root.removeSoleChildOfType(NodeTypes.BITMAP));
+        assert.equal(root.toString(), '[TMP]');
+      });
+      it("can handle when there is no matching child", () => {
+        root.addChildren([copyright, version]); // extra children
+        assert.isNull(root.removeSoleChildOfType(NodeTypes.BITMAP));
+        assert.equal(root.toString(), '[TMP,{[COPYRIGHT],[VERSION]}]');
+      });
+      it("can get sole child of type when there is one matching child", () => {
+        root.addChildren([bitmap, version, copyright]); // extra children
+        assert.equal(root.removeSoleChildOfType(NodeTypes.VERSION), version);
+        assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT]}]');
+      });
+      it("can handle when there are two matching children", () => {
+        const version1 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '1'));
+        const version2 = new ASTNode(NodeTypes.VERSION, new Token(TokenTypes.VERSION, '2'));
+        root.addChildren([bitmap, version1, copyright, version2]); // including extra children
+        assert.isNull(root.removeSoleChildOfType(NodeTypes.VERSION));
+        assert.equal(root.toString(), '[TMP,{[BITMAP],[VERSION,[VERSION,1]],[COPYRIGHT],[VERSION,[VERSION,2]]}]');
+      });
+    });
   });
 });
