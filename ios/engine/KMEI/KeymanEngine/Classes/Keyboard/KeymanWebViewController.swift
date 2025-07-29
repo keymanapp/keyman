@@ -74,6 +74,10 @@ class KeymanWebViewController: UIViewController {
   
   var deathPoller: Timer?
   
+  // Used to prevent auto-resetting the system keyboard on its first load
+  // while attempting to work around #14393.
+  var firstLoad = true
+  
   private static var idSeed: Int = 0
   private var id: Int
 
@@ -204,7 +208,7 @@ class KeymanWebViewController: UIViewController {
     webView!.scrollView.isScrollEnabled = false
 
     if #available(iOSApplicationExtension 16.4, *) {
-      if(Version.current.tier != .stable) {
+      if(Version.currentTagged.tier != .stable) {
         webView!.isInspectable = true
       }
     }
@@ -232,6 +236,15 @@ class KeymanWebViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.userContentController.removeAllScriptMessageHandlers()
+
+//    // Work around for #14163.
+//    if let ivc = self.parent as? InputViewController,
+//        ivc.isSystemKeyboard,
+//        !ivc.hasFullAccess,
+//        !firstLoad {
+//      webViewWebContentProcessDidTerminate(webView!)
+//    }
+    firstLoad = false
     self.userContentController.add(self, name: keymanWebViewName)
   }
 
