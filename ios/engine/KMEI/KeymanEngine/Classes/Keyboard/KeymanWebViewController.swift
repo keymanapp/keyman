@@ -238,12 +238,16 @@ class KeymanWebViewController: UIViewController {
     self.userContentController.removeAllScriptMessageHandlers()
 
     // Work around for #14163.
-    if let ivc = self.parent as? InputViewController,
-        ivc.isSystemKeyboard,
-        !ivc.hasFullAccess,
-        !firstLoad {
-      webViewWebContentProcessDidTerminate(webView!)
+    if !firstLoad {
+      if let ivc = self.parent as? InputViewController,
+          ivc.isSystemKeyboard,
+          !ivc.hasFullAccess {
+        // Prevent looping WebView resets!
+        firstLoad = true
+        webViewWebContentProcessDidTerminate(webView!)
+      }
     }
+
     firstLoad = false
     self.userContentController.add(self, name: keymanWebViewName)
   }
