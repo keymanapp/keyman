@@ -7,7 +7,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
-import { DeviceSpec, JSKeyboard, Keyboard } from "keyman/engine/keyboard";
+import { DeviceSpec, JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -443,7 +443,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       kbd = this.core.activeKeyboard;
     }
 
-    // TODO-web-core: implement for KMX keyboards if needed
+    // We only support isCJK on legacy .js keyboards; see #7928
     return kbd && kbd instanceof JSKeyboard && kbd.isCJK;
   }
 
@@ -692,7 +692,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     }
 
     PKbd = PKbd || this.core.activeKeyboard;
-    if (!(PKbd instanceof JSKeyboard)) {
+    if (PKbd instanceof KMXKeyboard) {
       // TODO-web-core: implement for KMX keyboards if needed
       return null;
     }
