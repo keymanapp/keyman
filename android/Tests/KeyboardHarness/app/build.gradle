@@ -6,7 +6,7 @@ ext.rootPath = '../../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.keyman.android.tests.keyboardHarness"
 
     // Don't compress kmp files so they can be copied via AssetManager

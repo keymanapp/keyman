@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.keyman.kmsample2"
 
     // Don't compress kmp files so they can be copied via AssetManager
