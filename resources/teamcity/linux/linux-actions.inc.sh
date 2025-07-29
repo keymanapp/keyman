@@ -1,16 +1,11 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
-
-# Run the clean action in the `linux` directory.`
-linux_clean_action() {
-  builder_heading "Cleaning up"
-  # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/linux/build.sh" clean
-}
 
 # Install required dependencies for building Keyman on Linux.
 linux_install_dependencies_action() {
   builder_echo start "install dependencies" "Installing dependencies"
+
+  # shellcheck disable=SC2154
   . "${KEYMAN_ROOT}/linux/scripts/package-build.inc.sh"
   checkAndInstallRequirements
   builder_echo end "install dependencies" success "Finished installing dependencies"
@@ -21,20 +16,20 @@ linux_additional_test_dependencies_action() {
   builder_echo start additional_dependencies "Installing additional dependencies"
   local TOINSTALL="lcov libdatetime-perl gcovr python3-venv jq"
 
-  if is_os_version_or_higher 24.04; then
+  if ba_linux_is_os_version_or_higher 24.04; then
     TOINSTALL="${TOINSTALL} libgirepository-2.0-dev python3-coverage"
   fi
 
   # shellcheck disable=SC2086
-  linux_check_and_install_packages ${TOINSTALL}
+  ba_linux_check_and_install_packages ${TOINSTALL}
 
-  if ! is_os_version_or_higher 24.04; then
+  if ! ba_linux_is_os_version_or_higher 24.04; then
     builder_heading "Installing python3-coverage from pip"
     pip3 install --user coverage
   fi
 
-  linux_install_nvm
-  linux_install_dependencies_for_tests
+  ba_linux_install_nvm
+  ba_linux_install_dependencies_for_tests
 
   builder_echo end additional_dependencies success "Finished installing additional dependencies"
 }

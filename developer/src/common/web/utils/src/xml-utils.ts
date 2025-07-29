@@ -360,3 +360,40 @@ export class KeymanXMLWriter {
   }
 }
 
+/**
+ * traverse an AJV instancePath and map to an object if possible
+ * @param source object tree root (contains the root object)
+ * @param path ajv split instancePath, such as '/keyboard3/layers/0'.split('/')
+ * @returns undefined if the path was not present, null if path went to something that wasn't an object, otherwise the compileContext object is returned.
+ */
+export function findInstanceObject(source: any, path: string[]) : any {
+  if(!path || !source || path.length == 0) {
+    return source;
+  } else if(path[0] == '') {
+    return findInstanceObject(source, path.slice(1));
+  } else if(Array.isArray(source) || typeof source == 'object') {
+    const child = source[path[0]];
+    if (child == undefined) return child; // nothing here
+    if (!child || typeof child == 'string') {
+      return source; // return the *parent* object if the child is empty (could be a property)
+    }
+    return findInstanceObject(child, path.slice(1));
+  } else {
+    return null;
+  }
+}
+
+/**
+ * Return an object simulating an XML object with an offset number
+ * For use in calling message functions
+ * @param c number for the offset setting
+ * @param x if set, this object will be used as the base object instead of {}
+ */
+export function withOffset(c: number, compileContext?: any) : KeymanXMLMetadata {
+  // set metadata on an empty object
+  const o = Object.assign({}, compileContext);
+  KeymanXMLReader.setMetaData(o, {
+    startIndex: c
+  });
+  return o;
+}

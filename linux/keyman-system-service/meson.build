@@ -19,6 +19,10 @@ endif
 configure_file(output : 'config.h',
                configuration : conf)
 
+linux_include_dirs = [
+  include_directories('../include')
+]
+
 subdir('resources')
 subdir('src')
 subdir('tests')
