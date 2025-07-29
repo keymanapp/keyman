@@ -208,7 +208,7 @@ class KeymanWebViewController: UIViewController {
     webView!.scrollView.isScrollEnabled = false
 
     if #available(iOSApplicationExtension 16.4, *) {
-      if(Version.currentTagged.tier != .stable) {
+      if(Version.current.tier != .stable) {
         webView!.isInspectable = true
       }
     }
