@@ -553,7 +553,10 @@ extension KeymanWebViewController: WKScriptMessageHandler {
     }
 
     if fragment.hasPrefix("#ping-") {
-      os_log("Ping from host-page setInterval", log: KeymanEngineLogger.ui, type: .info)
+      let prefixRange = fragment.range(of: "+msg=")!
+      let pingMsg = fragment[prefixRange.upperBound..<fragment.endIndex]
+      let msg = "Ping from host-page setInterval: \"\(pingMsg)\""
+      os_log("%{public}s", log: KeymanEngineLogger.ui, type: .info, msg)
     } else if fragment.hasPrefix("#insertText-") {
       let dnRange = fragment.range(of: "+dn=")!
       let sRange = fragment.range(of: "+s=")!

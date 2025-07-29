@@ -69,7 +69,13 @@ function init() {
   
   window.setInterval(function () {
     fragmentToggle = (fragmentToggle + 1) % 100;
-    var insertHash = 'ping-0';
+    var _Box = keyman && keyman.osk && keyman.osk._Box;
+    var msg = `keyman.osk._Box exists: ${!!_Box}`;
+    if(!!_Box) {
+      var bs = getComputedStyle(_Box);
+      msg += `; visibility: ${bs.visibility}, display: ${bs.display}`
+    }
+    var insertHash = "ping-0+msg=" + msg;
     if (typeof(window.webkit) != 'undefined')
         window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
 
