@@ -31,27 +31,23 @@ The following are all examples of valid BCP 47 tags:
 * `km-Khmr-KH`: Khmer, written in the Khmer script, in Cambodia
 * `km-fonipa`: Khmer, transcribed in IPA
 * `und-cpmn`: Undetermined (Cypro-Minoan)
-* `tok-Zzzz-AA`: Toki Pona (Unknown Script)
+* `tok-Zzzz`: Toki Pona (Unknown Script)
 
 > [!NOTE]
 > `Zzzz` is an uncoded script of IOS 15924 and one of the Special codes of the Script subtag.
-> `AA` is a Private Use Code.
 
 ### The language subtag
 
 The only required option is the Language subtag, which is an [ISO 639-1][2] or
-[ISO 639-3][3] code.
-
-- ISO 639-1 tags are a two-letter code. 
-- ISO 639-3 tags are a three-letter code.
+[ISO 639-3][3] code. Essentially, it is an [ISO-639][4] that uses two-letter and three-letter codes.
 
 First, try to find your language on the list of two-letter ISO 639-1 codes.
-[This Wikipedia page][4] lists all of the two-letter codes.
+[This Wikipedia page][5] lists all of the two-letter codes. If the two-letter code is available, it is used instead of the three-letter code.
 
 If you can't find a two-letter code, you'll need to find the closest
-three-letter code. You can use [Glottolog][5] to search for your language, and
+three-letter code. You can use [Glottolog][6] to search for your language, and
 it will give you an appropriate code. In this example, I searched Glottolog for
-“[Saanich][6]” (name of the First Nations that speak SENĆOŦEN) and found `str`
+“[Saanich][7]” (name of the First Nations that speak SENĆOŦEN) and found `str`
 as the code for all Straits Salish languages.
 
 > [!IMPORTANT] 
@@ -67,7 +63,7 @@ model or keyboard. If your language only uses one writing system, omit the
 Script subtag.
 
 Otherwise, in cases where a language can be written in many different writing
-systems, you can choose the four letter [ISO 15924][7] script tag that your
+systems, you can choose the four letter [ISO 15924][8] script tag that your
 keyboard or lexical model produces.
 
 For example, Plains Cree can either be written in _standard Roman orthography_,
@@ -97,11 +93,11 @@ Latin America. Additionally, regions may have vocabulary that doesn't exist in
 the other regions where the language is spoken.
 
 If I were working with a language specific to one country, I would use the [ISO
-3166-1 alpha-2][8] country code for the region subtag. For example, `ES` for
+3166-1 alpha-2][9] country code for the region subtag. For example, `ES` for
 Spain or `MX` for Mexico.
 
 However, if I were working with Latin American Spanish (a group of countries), I
-would need to specify Latin America's [UN M49][9] region code. For Latin
+would need to specify Latin America's [UN M49][10] region code. For Latin
 America, its code is `419`. My lexical model would not suggest words that are
 common in Spain, but vulgar in Latin America, however it would predict words
 like "pupupsas" and "chuchitos", which are words that are uncommon in both Spain
@@ -115,9 +111,10 @@ Another common UN M49 region code is `001` for the whole world.
 [1]: https://en.wikipedia.org/wiki/IETF_language_tag
 [2]: https://en.wikipedia.org/wiki/ISO_639-1
 [3]: https://en.wikipedia.org/wiki/ISO_639-3
-[4]: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
-[5]: https://glottolog.org/glottolog/language
-[6]: https://glottolog.org/resource/languoid/id/saan1246
-[7]: https://en.wikipedia.org/wiki/ISO_15924
-[8]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-[9]: https://en.wikipedia.org/wiki/UN_M49
+[4]: https://en.wikipedia.org/wiki/ISO_639
+[5]: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+[6]: https://glottolog.org/glottolog/language
+[7]: https://glottolog.org/resource/languoid/id/saan1246
+[8]: https://en.wikipedia.org/wiki/ISO_15924
+[9]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+[10]: https://en.wikipedia.org/wiki/UN_M49
