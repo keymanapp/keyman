@@ -66,6 +66,20 @@ function init() {
         bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
       }
     });
+  
+  window.setInterval(function () {
+    fragmentToggle = (fragmentToggle + 1) % 100;
+    var _Box = keyman && keyman.osk && keyman.osk._Box;
+    var msg = `keyman.osk._Box exists: ${!!_Box}`;
+    if(!!_Box) {
+      var bs = getComputedStyle(_Box);
+      msg += `; visibility: ${bs.visibility}, display: ${bs.display}`
+    }
+    var insertHash = "ping-0+msg=" + msg;
+    if (typeof(window.webkit) != 'undefined')
+        window.webkit.messageHandlers.keyman.postMessage('#' + insertHash);
+
+  }, 2500);
 }
 
 function verifyLoaded() {

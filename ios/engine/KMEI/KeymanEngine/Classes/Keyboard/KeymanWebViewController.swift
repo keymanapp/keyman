@@ -66,9 +66,25 @@ class KeymanWebViewController: UIViewController {
 
   private var currentText: String = ""
   private var currentCursorRange: NSRange? = nil
+  
+  // Constraints dependent upon the device's current rotation state.
+  // For now, should be mostly upon keymanWeb.view.heightAnchor.
+  var portraitConstraint: NSLayoutConstraint?
+  var landscapeConstraint: NSLayoutConstraint?
+  
+  var deathPoller: Timer?
+  
+  // Used to prevent auto-resetting the system keyboard on its first load
+  // while attempting to work around #14393.
+  var firstLoad = true
+  
+  private static var idSeed: Int = 0
+  private var id: Int
 
   init(storage: Storage) {
     self.storage = storage
+    self.id = KeymanWebViewController.idSeed
+    KeymanWebViewController.idSeed += 1
     super.init(nibName: nil, bundle: nil)
 
     _ = view
@@ -81,6 +97,67 @@ class KeymanWebViewController: UIViewController {
   @objc func fixLayout() {
     view.setNeedsLayout()
     view.layoutIfNeeded()
+  }
+  
+  func setConstraints() {
+    os_log("KeymanWebViewController setConstraints", log: KeymanEngineLogger.ui, type: .info)
+    let innerView = self.view!
+    let guide = self.parent!.view.safeAreaLayoutGuide
+
+    // Fallback on earlier versions
+    innerView.topAnchor.constraint(equalTo:    guide.topAnchor).isActive = true
+    innerView.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true
+
+    innerView.leftAnchor.constraint(equalTo:   guide.leftAnchor).isActive = true
+    innerView.rightAnchor.constraint(equalTo:  guide.rightAnchor).isActive = true
+
+    // Allow these to be broken if/as necessary to resolve layout issues.
+    let kbdWidthConstraint = innerView.widthAnchor.constraint(equalTo: guide.widthAnchor)
+
+    kbdWidthConstraint.priority = .defaultHigh
+    kbdWidthConstraint.isActive = true
+
+    self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
+  }
+
+  /**
+   * Due to new custom keyboard height as chosen by the user.
+   * The value for the new keyboard height originates from KeyboardHeightViewController.
+   */
+  func keyboardHeightChanged() {
+    os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .info)
+
+    // deactivate constraints for both orientations (though one should already be inactive)
+    landscapeConstraint?.isActive = false
+    portraitConstraint?.isActive = false
+
+    // rebuild both portrait and landscape constraints
+    self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
+
+    // activate constraints for the current orientation
+    if InputViewController.isPortrait {
+      portraitConstraint?.isActive = true
+    } else {
+      landscapeConstraint?.isActive = true
+    }
+  }
+
+  private func buildKeyboardHeightConstraints(bannerHeight: CGFloat) {
+    os_log("CustomInputView buildKeyboardHeightConstraints", log: KeymanEngineLogger.ui, type: .info)
+    let innerView = self.view!
+
+    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
+    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  self.readKeyboardHeight(isPortrait: true)!)
+    portraitHeightConstraint.identifier = "Height constraint for portrait mode"
+    portraitHeightConstraint.priority = .defaultHigh
+
+    let landscapeHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + self.readKeyboardHeight(isPortrait: false)!)
+    landscapeHeightConstraint.identifier = "Height constraint for landscape mode"
+    landscapeHeightConstraint.priority = .defaultHigh
+
+    portraitConstraint = portraitHeightConstraint
+    landscapeConstraint = landscapeHeightConstraint
+    // .isActive will be set according to the current portrait/landscape perspective.
   }
 
   override func viewWillLayoutSubviews() {
@@ -145,19 +222,41 @@ class KeymanWebViewController: UIViewController {
     webView!.scrollView.contentInsetAdjustmentBehavior = .never
 
     view = webView
+    
+    self.deathPoller?.invalidate()
+    self.deathPoller = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(checkForWebviewDeath), userInfo: nil, repeats: true)
 
     reloadKeyboard()
+  }
+  
+  func clearDeathPoller() {
+    self.deathPoller?.invalidate()
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     self.userContentController.removeAllScriptMessageHandlers()
+
+    // Work around for #14163.
+    if !firstLoad {
+      if let ivc = self.parent as? InputViewController,
+          ivc.isSystemKeyboard,
+          !ivc.hasFullAccess {
+        // Prevent looping WebView resets!
+        firstLoad = true
+        webViewWebContentProcessDidTerminate(webView!)
+      }
+    }
+
+    firstLoad = false
     self.userContentController.add(self, name: keymanWebViewName)
   }
 
   // Very useful for immediately adjusting the WebView's properties upon loading.
   override func viewDidAppear(_ animated: Bool) {
     fixLayout()
+    
+    os_log("KeymanWebViewController.viewDidAppear()", log: KeymanEngineLogger.engine, type: .info)
 
     // Initialize the keyboard's size/scale.  In iOS 13 (at least), the system
     // keyboard's width will be set at this stage, but not in viewWillAppear.
@@ -166,6 +265,7 @@ class KeymanWebViewController: UIViewController {
 
   override func viewWillDisappear(_ animated: Bool) {
     self.userContentController.removeScriptMessageHandler(forName: keymanWebViewName)
+    os_log("KeymanWebViewController.viewWillDisappear()", log: KeymanEngineLogger.engine, type: .info)
   }
 }
 
@@ -469,7 +569,12 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       return
     }
 
-    if fragment.hasPrefix("#insertText-") {
+    if fragment.hasPrefix("#ping-") {
+      let prefixRange = fragment.range(of: "+msg=")!
+      let pingMsg = fragment[prefixRange.upperBound..<fragment.endIndex]
+      let msg = "Ping from host-page setInterval: \"\(pingMsg)\""
+      os_log("%{public}s", log: KeymanEngineLogger.ui, type: .info, msg)
+    } else if fragment.hasPrefix("#insertText-") {
       let dnRange = fragment.range(of: "+dn=")!
       let sRange = fragment.range(of: "+s=")!
       let drRange = fragment.range(of: "+dr=")!
@@ -588,9 +693,22 @@ extension KeymanWebViewController: WKNavigationDelegate {
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
   }
+  
+  @objc func checkForWebviewDeath() {
+    if self.webView?.title?.isEmpty ?? false {
+      let message = "WebView (id \(self.id)) is believed to be dead based on host-page title"
+      self.webViewWebContentProcessDidTerminate(self.webView!)
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+    } else {
+      let message = "WebView (id \(self.id)) is alive:  current title is \"\(self.webView?.title ?? "(nil, somehow)")\""
+      os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+    }
+  }
 
   func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-    reloadKeyboard()
+    let message = "WebView (id \(self.id)) process crashed - replacing & restarting"
+    os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
+    reloadHostPage()
   }
 }
 
@@ -860,6 +978,24 @@ extension KeymanWebViewController {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, message)
       SentryManager.breadcrumb(message)
       _ = Manager.shared.setKeyboard(Defaults.keyboard)
+    }
+  }
+  
+  private func reloadHostPage() {
+    let oldView = self.view!
+    let parent = oldView.superview
+    
+    oldView.constraints.forEach { constraint in
+      constraint.isActive = false
+    }
+    
+    self.loadView()
+    oldView.removeFromSuperview()
+    if parent != nil {
+      parent!.addSubview(self.view)
+      setConstraints()
+      parent!.setNeedsLayout()
+      parent!.layoutIfNeeded()
     }
   }
 
