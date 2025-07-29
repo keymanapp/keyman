@@ -31,7 +31,7 @@ The following are all examples of valid BCP 47 tags:
 * `km-Khmr-KH`: Khmer, written in the Khmer script, in Cambodia
 * `km-fonipa`: Khmer, transcribed in IPA
 * `und-cpmn`: Undetermined (Cypro-Minoan)
-* `tok-Zzzz`: Toki Pona (Unknown Script)
+* `tok-Zzzz`: Toki Pona (Code for uncoded script)
 
 > [!NOTE]
 > `Zzzz` is an uncoded script of IOS 15924 and one of the Special codes of the Script subtag.
