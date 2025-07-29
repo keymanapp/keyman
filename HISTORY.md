@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.93 alpha 2025-07-29
+
+* test(developer): add unit tests for `isValidUtf8` (#14381)
+* maint(linux): fix stopping of test server (#14403)
+
 ## 19.0.92 alpha 2025-07-28
 
 * build(deps): bump multer from 2.0.1 to 2.0.2 (#14373)
