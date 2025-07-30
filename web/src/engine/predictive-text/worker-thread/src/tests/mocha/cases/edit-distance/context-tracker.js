@@ -429,7 +429,7 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 1);
       assert.equal(newContextMatch.tailTokensAdded, 0);
     });
@@ -449,7 +449,7 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 2);
       assert.equal(newContextMatch.tailTokensAdded, 0);
     });
@@ -470,7 +470,7 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 0);
       assert.equal(newContextMatch.tailTokensAdded, 0);
     });
@@ -492,14 +492,14 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch?.state;
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
       assert.equal(newContextMatch.headTokensRemoved, 0);
       assert.equal(newContextMatch.tailTokensAdded, 2);
     });
@@ -520,7 +520,7 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isOk(newContextMatch?.state);
-      assert.deepEqual(newContextMatch?.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch?.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
       // The 'wordbreak' transform
       assert.equal(newContextMatch.headTokensRemoved, 0);
@@ -543,13 +543,13 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].searchSpace.inputSequence);
-      assert.isNotEmpty(state.tokens[state.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
       assert.equal(newContextMatch.headTokensRemoved, 0);
       assert.equal(newContextMatch.tailTokensAdded, 1);
@@ -572,14 +572,14 @@ describe('ContextTracker', function() {
       let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
       assert.equal(newContextMatch.headTokensRemoved, 2);
       assert.equal(newContextMatch.tailTokensAdded, 2);
@@ -605,14 +605,14 @@ describe('ContextTracker', function() {
         tokenizeTransformDistribution(tokenizer, {left: "an"}, [{sample: transform, p: 1}])
       );
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0});
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
       assert.equal(newContextMatch.headTokensRemoved, 0);
       assert.equal(newContextMatch.tailTokensAdded, 2);
@@ -638,14 +638,14 @@ describe('ContextTracker', function() {
         tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc"}, [{sample: transform, p: 1}])
       );
       assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
-      assert.isNotEmpty(state.tokens[state.tokens.length - 2].searchSpace.inputSequence);
-      assert.isEmpty(state.tokens[state.tokens.length - 1].searchSpace.inputSequence);
+      assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
+      assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
       assert.equal(newContextMatch.headTokensRemoved, 0);
       assert.equal(newContextMatch.tailTokensAdded, 2);
@@ -690,7 +690,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let state = ContextTracker.modelContextState(tokenized, plainModel);
-      assert.deepEqual(state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
 
     it('models with final wordbreak', function() {
@@ -703,7 +703,7 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let state = ContextTracker.modelContextState(tokenized, plainModel);
-      assert.deepEqual(state.tokens.map(token => token.exampleInput), rawTokens);
+      assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
   });
 
@@ -745,7 +745,7 @@ describe('ContextTracker', function() {
       let compositor = new ModelCompositor(model);
       let baseContextMatch = compositor.contextTracker.analyzeState(model, baseContext);
 
-      baseContextMatch.state.tail.replacements = [{
+      baseContextMatch.state.tokenization.tail.replacements = [{
         suggestion: baseSuggestion,
         tokenWidth: 1
       }];
@@ -753,7 +753,7 @@ describe('ContextTracker', function() {
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
 
       // Actual test assertion - was the replacement tracked?
-      assert.equal(baseContextMatch.state.tail.appliedSuggestionId, baseSuggestion.id);
+      assert.equal(baseContextMatch.state.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Next step - on the followup context, is the replacement still active?
@@ -761,10 +761,10 @@ describe('ContextTracker', function() {
       let postContextMatch = compositor.contextTracker.analyzeState(model, postContext);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
-      assert.equal(postContextMatch.state.tokens[postContextMatch.state.tokens.length - 2].exampleInput, ' ');
+      assert.equal(postContextMatch.state.tokenization.tokens[postContextMatch.state.tokenization.tokens.length - 2].exampleInput, ' ');
 
       // Final token is empty (follows a wordbreak)
-      assert.equal(postContextMatch.state.tail.exampleInput, '');
+      assert.equal(postContextMatch.state.tokenization.tail.exampleInput, '');
     });
   });
 });
