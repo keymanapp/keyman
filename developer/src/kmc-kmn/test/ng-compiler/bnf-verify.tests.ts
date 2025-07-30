@@ -18,11 +18,13 @@ describe("Verify Parser Against BNF Tests", () => {
   it("matches the BNF grammar rules", () => {
     const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
     const bnfRules: Dictionary = getBnfRules(bnfBuffer);
-    const sourceBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-analyser.ts').toString();
+    const sourceBuffer: string = [
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyser.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyser.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyser.ts',
+    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
-    assert.equal(sourceRules, {});
-    assert.equal(bnfRules, {});
-    assert.isTrue(true);
+    assert.deepEqual(bnfRules, sourceRules);
   });
 });
 
@@ -34,7 +36,7 @@ function getBnfRules(buffer:string): Dictionary {
   lines.forEach((line) => {
     const match = line.match(/(.*)\s*:\s*(.*)/)
     if (match) {
-      rules[match[1]] = match[2];
+      rules[match[1]] = replaceElementNames(match[2]);
     }
   });
   return rules;
@@ -48,11 +50,25 @@ function wrapLines(buffer:string): string {
   return buffer.replaceAll(/[^\S\r\n]*(\r\n|\n|\r)[^\S\r\n]+/g, '');
 }
 
+function replaceElementNames(str: string): string {
+  if (str != null) {
+    str = str.replaceAll(/\b([A-Z_]+)\b/g,
+      (match, p1, offset, string, groups) => { return p1.toLowerCase(); });
+    str = str.replaceAll(/\bleft_br\b/g, 'leftBracket');
+    str = str.replaceAll(/\bright_br\b/g, 'rightBracket');
+    str = str.replaceAll(/\bleft_sq\b/g, 'leftSquare');
+    str = str.replaceAll(/\bright_sq\b/g, 'rightSquare');
+    str = str.replaceAll(/\bstring\b/g, 'stringRule');
+    str = str.replaceAll(/\breturn\b/g, 'returnRule');
+  }
+  return str;
+}
+
 function getSourceRules(buffer:string): Dictionary {
     const rules: Dictionary = {};
     const matches = buffer.matchAll(/export class (\S+)Rule.*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
     for (let match of matches) {
-      const name = lowerCaseFirstLetter(match[1]);
+      const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
       rules[name] = replaceSequenceRule(rules[name]);
       rules[name] = replaceAlternateRule(rules[name]);
