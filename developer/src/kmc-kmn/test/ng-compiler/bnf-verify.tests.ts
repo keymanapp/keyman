@@ -19,15 +19,18 @@ describe("Verify Parser Against BNF Tests", () => {
   });
   describe("Parser Tests", () => {
     it("contains all the BNF grammar rules", () => {
-      const buffer: string  = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
-      const rules: Dictionary = bnfRules(buffer);
-      assert.equal(rules, {});
+      const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString();
+      const bnfRules: Dictionary = getBnfRules(bnfBuffer);
+      const sourceBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-analyser.ts').toString();
+      const sourceRules: Dictionary = getSourceRules(sourceBuffer);
+      assert.equal(sourceRules, {});
+      assert.equal(bnfRules, {});
       assert.isTrue(true);
     });
   });
 });
 
-function bnfRules(buffer:string): Dictionary {
+function getBnfRules(buffer:string): Dictionary {
   const rules: Dictionary = {};
   buffer = removeComments(buffer);
   buffer = wrapLines(buffer);
@@ -47,4 +50,13 @@ function removeComments(buffer:string): string {
 
 function wrapLines(buffer:string): string {
   return buffer.replaceAll(/[^\S\r\n]*(\r\n|\n|\r)[^\S\r\n]+/g, '');
+}
+
+function getSourceRules(buffer:string): Dictionary {
+    const rules: Dictionary = {};
+    const matches = buffer.matchAll(/export class (\S+)Rule/g);
+    for (let match of matches) {
+      rules[match[1]] = 'tbd';
+    }
+    return rules;
 }
