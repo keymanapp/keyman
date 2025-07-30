@@ -22,7 +22,7 @@ describe('ContextToken', function() {
       assert.isEmpty(token.exampleInput);
       assert.isFalse(token.isWhitespace);
       assert.isEmpty(token.suggestions);
-      assert.equal(token.appliedSuggestionId, -1);
+      assert.isUndefined(token.appliedSuggestionId);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
       let searchIterator = token.searchSpace.getBestMatches(new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
@@ -52,7 +52,7 @@ describe('ContextToken', function() {
 
       // Is only set with a different value later, outside the constructor.
       assert.isEmpty(token.suggestions);
-      assert.equal(token.appliedSuggestionId, -1);
+      assert.isUndefined(token.appliedSuggestionId);
     });
 
     it("(token: ContextToken", () => {

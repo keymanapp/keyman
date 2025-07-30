@@ -32,9 +32,9 @@ export class ContextToken {
   /**
    * The ID of the suggestion applied to the current token, if any.
    *
-   * Is set to -1 when no such suggestion exists.
+   * Should be set to undefined when no such suggestion exists.
    */
-  appliedSuggestionId: number = -1;
+  appliedSuggestionId?: number;
 
   /**
    * Constructs a new, empty instance for use with the specified LexicalModel.

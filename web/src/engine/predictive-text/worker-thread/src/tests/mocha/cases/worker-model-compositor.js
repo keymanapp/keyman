@@ -1074,7 +1074,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.item(1), suggestionContextState);
 
       // The replacement should no longer be marked for the context-tracking token.
-      assert.equal(suggestionContextState.tail.appliedSuggestionId, -1);
+      assert.equal(suggestionContextState.tail.appliedSuggestionId);
     });
   });
 });

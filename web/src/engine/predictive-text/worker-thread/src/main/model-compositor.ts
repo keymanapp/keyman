@@ -317,7 +317,7 @@ export class ModelCompositor {
       this.contextTracker.popNewest();
     }
 
-    this.contextTracker.newest.tail.appliedSuggestionId = -1;
+    this.contextTracker.newest.tail.appliedSuggestionId = undefined;
 
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
