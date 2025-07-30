@@ -10,7 +10,9 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/list_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bar_accent">
 
         <TextView
             android:id="@+id/bar_title"
@@ -28,10 +30,12 @@
 
     <!-- optional accent -->
     <View
-        android:id="@+id/bar_accent"
+        android:id="@id/bar_accent"
         style="@style/AppTheme.Divider"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_alignParentBottom="true"/>
+        app:layout_constraintTop_toBottomOf="@id/list_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </com.google.android.material.appbar.AppBarLayout>
