@@ -2,7 +2,6 @@ import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-t
 import { KMWString } from '@keymanapp/web-utils';
 
 import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
-import { SearchSpace } from './distance-modeler.js';
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeTransform, tokenizeTransformDistribution } from './transform-tokenization.js';
@@ -12,8 +11,9 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { ContextToken } from './context-token.js';
 
-function textToCharTransforms(text: string, transformId?: number) {
+export function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
   for(let i=0; i < KMWString.length(text); i++) {
@@ -21,9 +21,12 @@ function textToCharTransforms(text: string, transformId?: number) {
 
     let transform: Transform = {
       insert: char,
-      deleteLeft: 0,
-      id: transformId
+      deleteLeft: 0
     };
+
+    if(transformId) {
+      transform.id = transformId
+    }
 
     perCharTransforms.push(transform);
   }
@@ -63,102 +66,18 @@ export class TrackedContextSuggestion {
   tokenWidth: number;
 }
 
-export class TrackedContextToken {
-  raw: string;
-  replacementText: string;
-  isWhitespace?: boolean;
-
-  transformDistributions: Distribution<Transform>[] = [];
-  replacements: TrackedContextSuggestion[] = [];
-  activeReplacementId: number = -1;
-
-  constructor();
-  constructor(instance: TrackedContextToken);
-  constructor(instance?: TrackedContextToken) {
-    if(instance) {
-      Object.assign(this, instance);
-      // We don't alter the values in replacements, but we do wish to prevent aliasing
-      // of the array containing them.
-      this.replacements = instance.replacements.slice();
-    }
-  }
-
-  get currentText(): string {
-    if(this.replacementText === undefined || this.replacementText === null) {
-      return this.raw;
-    } else {
-      return this.replacementText;
-    }
-  }
-
-  get replacement(): TrackedContextSuggestion {
-    let replacementId = this.activeReplacementId;
-    return this.replacements.find(function(replacement) {
-      return replacement.suggestion.id == replacementId;
-    });
-  }
-
-  clearReplacements() {
-    this.activeReplacementId = -1;
-    this.replacements = []
-  }
-
-  /**
-   * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
-   * entries because of limitations with direct use of backspace transforms.
-   * @param tokenText
-   * @param transformId
-   */
-  updateWithBackspace(tokenText: string, transformId: number) {
-    // It's a backspace transform; time for special handling!
-    //
-    // For now, with 14.0, we simply compress all remaining Transforms for the token into
-    // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex,
-    // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
-    //
-    // Note that we cannot just use a single, monolithic transform at this point b/c
-    // of our current edit-distance optimization strategy; diagonalization is currently...
-    // not very compatible with that.
-    let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
-      return [{sample: transform, p: 1.0}];
-    });
-
-    this.raw = tokenText;
-    this.transformDistributions = backspacedTokenContext;
-    this.clearReplacements();
-  }
-
-  update(transformDistribution: Distribution<Transform>, tokenText?: string) {
-    // Preserve existing text if new text isn't specified.
-    tokenText = tokenText || (tokenText === '' ? '' : this.raw);
-
-    if(transformDistribution?.length > 0) {
-      this.transformDistributions.push(transformDistribution);
-    }
-
-    // Replace old token's raw-text with new token's raw-text.
-    this.raw = tokenText;
-    this.clearReplacements();
-  }
-}
-
 export class TrackedContextState {
   // Stores the post-transform Context.  Useful as a debugging reference, but also used to
   // pre-validate context state matches in case of discarded changes from multitaps.
   taggedContext: Context;
   model: LexicalModel;
 
-  tokens: TrackedContextToken[];
+  tokens: ContextToken[];
   /**
    * How many tokens were removed from the start of the best-matching ancestor.
    * Useful for restoring older states, e.g., when the user moves the caret backwards, we can recover the context at that position.
    */
   indexOffset: number;
-
-  // Tracks all search spaces starting at the current token.
-  // In the lm-layer's current form, this should only ever have one entry.
-  // Leaves 'design space' for if/when we add support for phrase-level corrections/predictions.
-  searchSpace: SearchSpace[] = [];
 
   constructor(source: TrackedContextState);
   constructor(model: LexicalModel);
@@ -166,43 +85,29 @@ export class TrackedContextState {
     if(obj instanceof TrackedContextState) {
       let source = obj;
       // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
-      this.tokens = source.tokens.map(function(token) {
-        let copy = new TrackedContextToken();
-        Object.assign(copy, token);
-        copy.replacements = copy.replacements.slice();
-        copy.transformDistributions = copy.transformDistributions.slice();
-        return copy;
-      });
+      this.tokens = source.tokens.map((token) => new ContextToken(token));
 
       this.indexOffset = 0;
-      const lexicalModel = this.model = obj.model;
+      this.model = obj.model;
       this.taggedContext = obj.taggedContext;
-
-      if(lexicalModel?.traverseFromRoot) {
-        // We need to construct a separate search space from other ContextStates.
-        //
-        // In case we are unable to perfectly track context (say, due to multitaps)
-        // we need to ensure that only fully-utilized keystrokes are considered.
-        this.searchSpace = obj.searchSpace.map((space) => new SearchSpace(space));
-      }
     } else {
       let lexicalModel = obj;
       this.tokens = [];
       this.indexOffset = Number.MIN_SAFE_INTEGER;
       this.model = lexicalModel;
-
-      if(lexicalModel && lexicalModel.traverseFromRoot) {
-        this.searchSpace = [new SearchSpace(lexicalModel)];
-      }
     }
   }
 
-  get head(): TrackedContextToken {
+  get head(): ContextToken {
     return this.tokens[0];
   }
 
-  get tail(): TrackedContextToken {
+  get tail(): ContextToken {
     return this.tokens[this.tokens.length - 1];
+  }
+
+  set tail(token: ContextToken) {
+    this.tokens[this.tokens.length - 1] = token;
   }
 
   popHead() {
@@ -210,18 +115,8 @@ export class TrackedContextState {
     this.indexOffset -= 1;
   }
 
-  pushTail(token: TrackedContextToken) {
-    if(this.model && this.model.traverseFromRoot) {
-      this.searchSpace = [new SearchSpace(this.model)]; // yeah, need to update SearchSpace for compatibility
-    } else {
-      this.searchSpace = [];
-    }
+  pushTail(token: ContextToken) {
     this.tokens.push(token);
-
-    let state = this;
-    if(state.searchSpace.length > 0) {
-      token.transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
-    }
   }
 
   toRawTokenization() {
@@ -229,8 +124,8 @@ export class TrackedContextState {
 
     for(let token of this.tokens) {
       // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      if(token.currentText !== null) {
-        sequence.push(token.currentText);
+      if(token.exampleInput !== null) {
+        sequence.push(token.exampleInput);
       }
     }
 
@@ -810,49 +705,17 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       } else {
         preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
       }
-      state.tokens[incomingIndex] = matchedToken;
-      const token = matchedToken;
+      let token: ContextToken;
 
-      // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
-      // on the tokens, rather than on the overall 'state'.
-      // - Reason:  phrase-level corrections / predictions would likely need a search-state
-      //   across per potentially-affected token.
-      // - Shifting the paradigm should be a separate work unit than the
-      //   context-tracker rework currently being done, though.
       if(isBackspace) {
-        token.updateWithBackspace(incomingToken.text, primaryInput.id);
-        if(isLastToken) {
-          state.tokens.pop(); // pops `token`
-          // puts it back in, rebuilding a fresh search-space that uses the rebuilt
-          // keystroke distribution from updateWithBackspace.
-          state.pushTail(token);
-        }
+        token = new ContextToken(matchState.model, incomingToken.text);
+        token.searchSpace.inputSequence.forEach((entry) => entry[0].sample.id = primaryInput.id);
       } else {
-        token.update(
-          tokenDistribution.map((seq) => seq[tailIndex]),
-          incomingToken.text
-        );
-
-        if(isLastToken) {
-          // Search spaces may not exist during some unit tests; the state
-          // may not have an associated model during some.
-          state.searchSpace[0]?.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
-        }
+        token = new ContextToken(matchedToken);
+        token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
       }
 
-      // For this case, we were _likely_ called by
-      // ModelCompositor.acceptSuggestion(), which would have marked the
-      // accepted suggestion.
-      //
-      // Upon inspection, this doesn't seem entirely ideal.  It works for
-      // the common case, but not for specially crafted keystroke
-      // transforms.  That said, it's also very low impact.  Best as I can
-      // see, this is only really used for debugging info?
-      if(state != matchState && !isLastToken) {
-        // TODO:  eliminate
-        token.replacementText = incomingToken.text;
-      }
-
+      state.tokens[incomingIndex] = token;
       tailIndex++;
     }
 
@@ -901,8 +764,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           state = new TrackedContextState(state);
         }
 
-        let pushedToken = new TrackedContextToken();
-        pushedToken.raw = incomingToken.text;
+        let pushedToken = new ContextToken(state.model);
 
         // TODO:  assumes that there was no shift in wordbreaking from the
         // prior context to the current one.  This may actually be a major
@@ -925,7 +787,10 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           }
         }).filter((entry) => !!entry);
         if(primaryInput) {
-          pushedToken.transformDistributions = tokenDistribComponent.length > 0 ? [tokenDistribComponent] : [];
+          let transformDistribution = tokenDistribComponent.length > 0 ? tokenDistribComponent : null;
+          if(transformDistribution) {
+            pushedToken.searchSpace.addInput(transformDistribution);
+          }
         } else if(incomingToken.text) {
           // We have no transform data to match against an inserted token with text; abort!
           // Refer to #12494 for an example case; we currently can't map previously-committed
@@ -955,20 +820,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     lexicalModel: LexicalModel
   ): TrackedContextState {
     let baseTokens = tokenizedContext.map(function(entry) {
-      let token = new TrackedContextToken();
-      token.raw = entry.text;
+      let token = new ContextToken(lexicalModel, entry.text);
+
       if(entry.isWhitespace) {
         token.isWhitespace = true;
       }
 
-      if(token.raw) {
-        token.transformDistributions = textToCharTransforms(token.raw).map(function(transform) {
-          return [{sample: transform, p: 1.0}];
-        });
-      } else {
-        // Helps model context-final wordbreaks.
-        token.transformDistributions = [];
-      }
       return token;
     });
 
@@ -976,18 +833,11 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     let state = new TrackedContextState(lexicalModel);
 
     while(baseTokens.length > 0) {
-      // We don't have a pre-existing distribution for this token, so we'll build one as
-      // if we'd just produced the token from a backspace.
-      if(baseTokens.length == 1) {
-        baseTokens[0].updateWithBackspace(baseTokens[0].raw, null);
-      }
       state.pushTail(baseTokens.splice(0, 1)[0]);
     }
 
     if(state.tokens.length == 0) {
-      let token = new TrackedContextToken();
-      token.raw = '';
-
+      let token = new ContextToken(lexicalModel);
       state.pushTail(token);
     }
 

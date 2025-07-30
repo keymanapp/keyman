@@ -202,7 +202,7 @@ export async function correctAndEnumerate(
   // let's just note that right now, there will only ever be one.
   //
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  let searchSpace = postContextState.searchSpace[0];
+  const searchSpace = postContextState.tail.searchSpace;
 
   // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
   // same amount of text.  We can handle this before the big 'prediction root' loop.
@@ -250,11 +250,11 @@ export async function correctAndEnumerate(
 
   // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
   // preserve that by preventing corrections from triggering left-deletion.
-  if(tailToken.raw == '') {
+  if(tailToken.exampleInput == '') {
     deleteLeft = 0;
   }
 
-  const isTokenStart = tailToken.transformDistributions.length <= 1;
+  const isTokenStart = tailToken.searchSpace.inputSequence.length <= 1;
 
   // TODO:  whitespace, backspace filtering.  Do it here.
   //        Whitespace is probably fine, actually.  Less sure about backspace.
