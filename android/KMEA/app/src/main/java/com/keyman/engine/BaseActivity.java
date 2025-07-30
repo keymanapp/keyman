@@ -9,10 +9,18 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.LocaleList;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
-
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.keyman.engine.util.ContextUtils;
@@ -66,6 +74,51 @@ public class BaseActivity extends AppCompatActivity {
     // Shouldn't be here
     KMLog.LogError(TAG, "context null for getString()");
     return "";
+  }
+
+  /**
+   * Setup the activity for edge-to-edge
+   * https://developer.android.com/develop/ui/views/layout/edge-to-edge-manually
+   * https://stackoverflow.com/questions/57293449/go-edge-to-edge-on-android-correctly-with-windowinsets
+   * @param layoutID - Top level ID of the view
+   */
+  public void setupEdgeToEdge(int layoutID) {
+    EdgeToEdge.enable(this);
+
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(layoutID),
+      (view, windowInsets) -> {
+        // Allocate insets for system bars and display cutout (notch)
+        Insets insets = windowInsets.getInsets(
+          WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
+        mlp.topMargin = insets.top;
+        mlp.bottomMargin = insets.left;
+        mlp.leftMargin = insets.left;
+        mlp.rightMargin = insets.right;
+        view.setLayoutParams(mlp);
+        return windowInsets;
+      });
+  }
+
+  /**
+   * Apply colors to the status bar (If Android API < 35) and navigation bar
+   * @param statusBarcolor - int value of the color to use on the status bar.
+   * @param navigationBarColor - int value of the color to use on the navigation bar.
+   */
+  public void setupStatusBarColors(int statusBarColor, int navigationBarColor) {
+    // Set status bar colors
+    // https://stackoverflow.com/a/79706054
+    Window window = getWindow();
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+    WindowInsetsControllerCompat windowInsetsController =
+      WindowCompat.getInsetsController(window, window.getDecorView());
+    windowInsetsController.setAppearanceLightStatusBars(true);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+      window.setStatusBarColor(getColor(statusBarColor));
+    }
+    window.setNavigationBarColor(getColor(navigationBarColor));
   }
 
   @Override
