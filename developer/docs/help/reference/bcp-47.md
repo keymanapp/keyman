@@ -34,7 +34,7 @@ The following are all examples of valid BCP 47 tags:
 * `tok-Zzzz`: Toki Pona (Code for uncoded script)
 
 > [!NOTE]
-> `Zzzz` is an uncoded script of IOS 15924 and one of the Special codes of the Script subtag.
+> `Zzzz` is an uncoded script of ISO 15924 and one of the Special codes of the Script subtag.
 
 ### The language subtag
 
