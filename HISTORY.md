@@ -1,5 +1,65 @@
 # Keyman Version History
 
+## 19.0.93 alpha 2025-07-29
+
+* test(developer): add unit tests for `isValidUtf8` (#14381)
+* maint(linux): fix stopping of test server (#14403)
+
+## 19.0.92 alpha 2025-07-28
+
+* build(deps): bump multer from 2.0.1 to 2.0.2 (#14373)
+* refactor(linux): remove shellcheck warnings (#14409)
+* refactor(linux): move dbus defines to common include (#14407)
+* docs(linux): update readme for test service (#14408)
+* fix(windows): add check a fix for registry datatypes (#14358)
+
+## 19.0.91 alpha 2025-07-26
+
+* maint(windows): fix calls of renamed functions (#14413)
+
+## 19.0.90 alpha 2025-07-25
+
+* maint(common): fix standalone use of `resources/builder.inc.sh` (#14399)
+* maint(resources): use `tc_` prefix for all `tc-*.inc.sh` functions (#14267)
+
+## 19.0.89 alpha 2025-07-24
+
+* docs(common): Document minimum version of Chrome 95.0 for Android (#14385)
+* refactor(android): Update minimum target Chrome version to 95.0 and refactor to use constants (#14391)
+
+## 19.0.88 alpha 2025-07-23
+
+* maint(windows): consider `GO_FAST` env variable in `add_zip_files` (#14338)
+* maint(common): add unit tests for `locate_emscripten.inc.sh` (#14346)
+* refactor(android): create functions for actions (#14351)
+* maint(linux): fix `locate_emscripten` if `$EMSCRIPTEN_BASE` dir missing (#14347)
+* maint(android): consolidate creating zip file (#14353)
+
+## 19.0.87 alpha 2025-07-22
+
+* refactor(common): use test framework for zip tests (#14380)
+* maint(common): fix use of `jq.inc.sh` in git hooks (#14382)
+* test(common): improve zip tests (#14386)
+* maint(common): fix `add_zip_files` if flags come before zip filename (#14387)
+
+## 19.0.86 alpha 2025-07-21
+
+* maint(common): fail build if adding relative file to zip (#14352)
+* maint(common): set C++17 in standard.meson.build (#14355)
+* fix(linux): add `python3-pkg-resources` as explicit dependency (#14356)
+* docs(developer): add ansi and iso context and image, change img tags, and polish for readability (#14243)
+* maint(mac): consolidate `write-download_info` (#14325)
+* maint(common): add simple unit testing framework for bash (#14345)
+* maint(common): consolidate functions to determine OS (#14324)
+* fix(android): use correct path to zip.inc.sh for CI (#14377)
+* test(common): add unit test for reporting test failures (#14379)
+
+## 19.0.85 alpha 2025-07-18
+
+* refactor(common): remove warnings (#14368)
+* refactor(developer): replace deprecated std::codecvt_utf8_utf16 (#14369)
+* refactor(linux): move defines to common header files (#14372)
+
 ## 19.0.84 alpha 2025-07-15
 
 * maint(common): add support for inline file exclusions to `add_zip_files` and unit tests (#14333)

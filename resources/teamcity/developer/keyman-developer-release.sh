@@ -62,30 +62,6 @@ function _publish_sentry() {
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 
-function _download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-  (
-    mkdir -p "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-    cd "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/lastid.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/history.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/server.txt" "."
-  )
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-function _publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-  (
-    cd "${LOCAL_SYMBOLS_PATH}"
-    tc_rsync_upload "." "${REMOTE_SYMBOLS_PATH}"
-  )
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
-}
-
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
@@ -132,7 +108,7 @@ function build_developer_action() {
 }
 
 function publish_action() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # requires Powershell, so currently only supported on Windows
     builder_echo error "This script is intended to be run on Windows only."
     return 1
@@ -144,10 +120,10 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  download_symbol_server_index
-  publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  upload_help "api documentation" developer
+  tc_upload_help "api documentation" developer
 }
 
 if builder_has_action all; then

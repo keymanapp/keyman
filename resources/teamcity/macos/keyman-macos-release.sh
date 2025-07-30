@@ -64,7 +64,7 @@ function _publish_to_downloads_keyman_com() {
 
 function do_publish() {
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for macOS" mac
+  tc_upload_help "Keyman for macOS" mac
 }
 
 ba_mac_unlock_keychain

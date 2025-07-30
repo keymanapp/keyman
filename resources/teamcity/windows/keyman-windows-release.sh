@@ -39,7 +39,7 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/windows/src"
 
-if ! is_windows; then
+if ! builder_is_windows; then
   builder_echo error "This script is intended to be run on Windows only."
   exit 1
 fi
@@ -104,10 +104,10 @@ function windows_publish_action() {
 
   "${KEYMAN_ROOT}/windows/build.sh" publish
   windows_upload_symbols_to_sentry
-  download_symbol_server_index
-  publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for Windows" windows
+  tc_upload_help "Keyman for Windows" windows
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"
 }
 

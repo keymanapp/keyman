@@ -26,7 +26,6 @@ comon_include_dir = [
 
 mcompile = executable(
     'mcompile',
-    cpp_args: ['-std=c++17'], # this should be defined from resources/standard.meson.build
     sources: [cpp_files],
     dependencies: deps,
     include_directories : comon_include_dir
