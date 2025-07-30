@@ -29,6 +29,7 @@ describe("Verify Parser Against BNF Tests", () => {
 
 function bnfRules(buffer:string): Dictionary {
   const rules: Dictionary = {};
+  buffer = removeComments(buffer);
   buffer = wrapLines(buffer);
   const lines: string[] = buffer.split(/\r\n|\n|\r/g);
   lines.forEach((line) => {
@@ -38,6 +39,10 @@ function bnfRules(buffer:string): Dictionary {
     }
   });
   return rules;
+}
+
+function removeComments(buffer:string): string {
+  return buffer.replaceAll(/#(.*)(\r\n|\n|\r)/g, '');
 }
 
 function wrapLines(buffer:string): string {
