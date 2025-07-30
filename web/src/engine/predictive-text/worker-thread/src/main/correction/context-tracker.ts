@@ -1,5 +1,4 @@
 import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
 
 import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
 import TransformUtils from '../transformUtils.js';
@@ -12,27 +11,6 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
-
-export function textToCharTransforms(text: string, transformId?: number) {
-  let perCharTransforms: Transform[] = [];
-
-  for(let i=0; i < KMWString.length(text); i++) {
-    let char = KMWString.charAt(text, i); // is SMP-aware
-
-    let transform: Transform = {
-      insert: char,
-      deleteLeft: 0
-    };
-
-    if(transformId) {
-      transform.id = transformId
-    }
-
-    perCharTransforms.push(transform);
-  }
-
-  return perCharTransforms;
-}
 
 /**
  * Determines the proper 'last match' index for a tokenized sequence based on its edit path.

@@ -1,12 +1,33 @@
 import { buildMergedTransform } from "@keymanapp/models-templates";
-import { textToCharTransforms } from "./context-tracker.js";
 import { SearchSpace } from "./distance-modeler.js";
+import { KMWString } from "@keymanapp/web-utils";
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+
+function textToCharTransforms(text: string, transformId?: number) {
+  let perCharTransforms: Transform[] = [];
+
+  for(let i=0; i < KMWString.length(text); i++) {
+    let char = KMWString.charAt(text, i); // is SMP-aware
+
+    let transform: Transform = {
+      insert: char,
+      deleteLeft: 0
+    };
+
+    if(transformId) {
+      transform.id = transformId
+    }
+
+    perCharTransforms.push(transform);
+  }
+
+  return perCharTransforms;
+}
 
 export class ContextToken {
   /**
