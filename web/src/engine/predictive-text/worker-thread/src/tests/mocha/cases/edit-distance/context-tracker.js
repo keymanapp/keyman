@@ -30,19 +30,20 @@ describe('ContextTracker', function() {
 
   describe('attemptMatchContext', function() {
     it("properly matches and aligns when lead token is removed", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let transform = {
         insert: '',
         deleteLeft: 0
-      }
-      let newContext = deepCopy(existingContext);
-      newContext.left.splice(0, 1);
+      };
+      let newContext = {
+        left: " apple a day keeps the doctor"
+      };
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 1);
@@ -50,19 +51,20 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when lead token + following whitespace are removed", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let transform = {
         insert: '',
         deleteLeft: 0
-      }
-      let newContext = deepCopy(existingContext);
-      newContext.left.splice(0, 2);
+      };
+      let newContext = {
+        left: "apple a day keeps the doctor"
+      };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 2);
@@ -70,20 +72,20 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when final token is edited", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the docto"
-      });
+      };
       let transform = {
         insert: 'r',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 0);
@@ -92,20 +94,20 @@ describe('ContextTracker', function() {
 
     // Needs improved context-state management (due to 2x tokens)
     it("properly matches and aligns when a 'wordbreak' is added", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let transform = {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "an apple a day keeps the doctor "
-      });
+      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -120,20 +122,20 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the doctor "
-      });
+      };
       let transform = {
         insert: '',
         deleteLeft: 1
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isOk(newContextMatch?.state);
       assert.deepEqual(newContextMatch?.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -143,20 +145,20 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "'"
-      });
+      };
       let transform = {
         insert: 'a',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "'a"
-      });
+      };
       let rawTokens = ["'", "a"];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
@@ -172,20 +174,20 @@ describe('ContextTracker', function() {
 
     // Needs improved context-state management (due to 2x tokens)
     it("properly matches and aligns when lead token is removed AND a 'wordbreak' is added'", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an apple a day keeps the doctor"
-      });
+      };
       let transform = {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "apple a day keeps the doctor "
-      });
+      };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext.left, baseContextMatch, toWrapperDistribution(transform));
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
+      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseContextMatch, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -201,21 +203,22 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when initial token is modified AND a 'wordbreak' is added'", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "an"
-      });
+      };
       let transform = {
         insert: 'd ',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "and "
-      });
+      };
       let rawTokens = ["and", " ", ""];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left,
+        newContext,
+        plainModel,
         baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "an"}, [{sample: transform, p: 1}])
       );
@@ -234,21 +237,22 @@ describe('ContextTracker', function() {
     });
 
     it("properly matches and aligns when tail token is modified AND a 'wordbreak' is added'", function() {
-      let existingContext = models.tokenize(defaultBreaker, {
+      let existingContext = {
         left: "apple a day keeps the doc"
-      });
+      };
       let transform = {
         insert: 'tor ',
         deleteLeft: 0
       }
-      let newContext = models.tokenize(defaultBreaker, {
+      let newContext = {
         left: "apple a day keeps the doctor "
-      });
+      };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
-      let baseContextMatch = ContextTracker.modelContextState(existingContext.left, plainModel);
+      let baseContextMatch = ContextTracker.modelContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left,
+        newContext,
+        plainModel,
         baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc"}, [{sample: transform, p: 1}])
       );
@@ -271,7 +275,7 @@ describe('ContextTracker', function() {
         left: "text'"
       });
       assert.equal(baseContext.left.length, 1);
-      let baseContextMatch = ContextTracker.modelContextState(baseContext.left, plainModel);
+      let baseContextMatch = ContextTracker.modelContextState({left: "text'"}, plainModel);
 
       // Now the actual check.
       let newContext = models.tokenize(defaultBreaker, {
@@ -286,7 +290,8 @@ describe('ContextTracker', function() {
         deleteLeft: 0
       }
       let problemContextMatch = ContextTracker.attemptMatchContext(
-        newContext.left,
+        {left: "text'\""},
+        plainModel,
         baseContextMatch,
         tokenizeTransformDistribution(tokenizer, {left: "text'"}, [{sample: transform, p: 1}])
       );
@@ -296,28 +301,18 @@ describe('ContextTracker', function() {
 
   describe('modelContextState', function() {
     it('models without final wordbreak', function() {
-      let tokenized = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"].map((entry) => {
-        return {
-          text: entry,
-          isWhitespace: entry == " "
-        };
-      });
+      let context = { left: "an apple a day keeps the doctor" };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
-      let state = ContextTracker.modelContextState(tokenized, plainModel);
+      let state = ContextTracker.modelContextState(context, plainModel);
       assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
 
     it('models with final wordbreak', function() {
-      let tokenized = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""].map((entry) => {
-        return {
-          text: entry,
-          isWhitespace: entry == " "
-        };
-      });
+      let context = { left: "an apple a day keeps the doctor " };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
-      let state = ContextTracker.modelContextState(tokenized, plainModel);
+      let state = ContextTracker.modelContextState(context, plainModel);
       assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
   });
