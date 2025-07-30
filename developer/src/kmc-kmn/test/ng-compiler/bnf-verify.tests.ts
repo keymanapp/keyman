@@ -58,8 +58,19 @@ function replaceElementNames(str: string): string {
     str = str.replaceAll(/\bright_br\b/g, 'rightBracket');
     str = str.replaceAll(/\bleft_sq\b/g, 'leftSquare');
     str = str.replaceAll(/\bright_sq\b/g, 'rightSquare');
+    str = str.replaceAll(/\bif\b/g, 'ifRule');
     str = str.replaceAll(/\bstring\b/g, 'stringRule');
     str = str.replaceAll(/\breturn\b/g, 'returnRule');
+    str = str.replaceAll(/\bkey_code\b/g, 'keyCode');
+    str = str.replaceAll(/\bnot_equal\b/g, 'notEqual');
+    str = str.replaceAll(/\bu_char\b/g, 'uChar');
+    str = str.replaceAll(/\bnamed_constant\b/g, 'namedConstant');
+    str = str.replaceAll(/\bbaselayout_shortcut\b/g, 'baselayout');
+    str = str.replaceAll(/\blayer_shortcut\b/g, 'layer');
+    str = str.replaceAll(/\bplatform_shortcut\b/g, 'platform');
+    str = str.replaceAll(/\bdeadkey\b/g, 'deadKey');
+    str = str.replaceAll(/\bnomatch\b/g, 'noMatch');
+    str = str.replaceAll(/\bnotany\b/g, 'notAny');
   }
   return str;
 }
@@ -74,6 +85,7 @@ function getSourceRules(buffer:string): Dictionary {
       rules[name] = replaceAlternateRule(rules[name]);
       rules[name] = replaceOneOrManyRule(rules[name]);
       rules[name] = replaceManyRule(rules[name]);
+      rules[name] = replaceThisOnElements(rules[name]);
       rules[name] = replaceOptElements(rules[name]);
       rules[name] = replaceOneOrManyElements(rules[name]);
       rules[name] = replaceManyElements(rules[name]);
@@ -122,6 +134,13 @@ function replaceManyRule(str: string): string {
     str = str.replace(/ManyRule\(/, '');
     str = str.replace(/\)$/, '');
     str = str + '*';
+  }
+  return str;
+}
+
+function replaceThisOnElements(str: string): string {
+  if (str != null && str.includes('this.')) {
+    str = str.replaceAll(/(?:this\.)(\S*)/g, '$1')
   }
   return str;
 }

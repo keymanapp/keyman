@@ -262,12 +262,12 @@ export class ComparisonRule extends SingleChildRule {
 export class ContextStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const index: Rule         = new TokenRule(TokenTypes.CONTEXT, true);
+    const context: Rule       = new TokenRule(TokenTypes.CONTEXT, true);
     const leftBracket: Rule   = new TokenRule(TokenTypes.LEFT_BR);
     const offset: Rule        = new OffsetRule();
     const rightBracket: Rule  = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
-      index,
+      context,
       leftBracket,
       offset,
       rightBracket,
