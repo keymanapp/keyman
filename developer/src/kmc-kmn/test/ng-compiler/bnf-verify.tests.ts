@@ -54,9 +54,19 @@ function wrapLines(buffer:string): string {
 
 function getSourceRules(buffer:string): Dictionary {
     const rules: Dictionary = {};
-    const matches = buffer.matchAll(/export class (\S+)Rule/g);
+    const matches = buffer.matchAll(/export class (\S+)Rule.*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
     for (let match of matches) {
-      rules[match[1]] = 'tbd';
+      const name = lowerCaseFirstLetter(match[1]);
+      rules[name] = removeWhiteSpace(match[2]);
     }
     return rules;
+}
+
+function lowerCaseFirstLetter(str: string): string {
+  return (str == null || str.length < 1) ? str :
+    str.charAt(0).toLowerCase() + str.slice(1);
+}
+
+function removeWhiteSpace(str: string): string {
+  return str.replaceAll(/\s/g, '');
 }
