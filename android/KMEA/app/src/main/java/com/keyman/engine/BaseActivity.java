@@ -9,10 +9,18 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.LocaleList;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
-
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.preference.PreferenceManager;
 
 import com.keyman.engine.util.ContextUtils;
@@ -21,7 +29,16 @@ import com.keyman.engine.util.KMLog;
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
+  public enum NavigationBarLocationType {
+    // Default navigation bar location
+    NAVIGATION_BAR_BOTTOM,
+    NAVIGATION_BAR_LEFT,  // Landscape orientation
+    NAVIGATION_BAR_RIGHT, // Landscape orientation
+  }
+
   private static final String TAG = "BaseActivity";
+  private static NavigationBarLocationType navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
+
   static ContextWrapper localeUpdatedContext;
 
   /**
@@ -66,6 +83,70 @@ public class BaseActivity extends AppCompatActivity {
     // Shouldn't be here
     KMLog.LogError(TAG, "context null for getString()");
     return "";
+  }
+
+  /**
+   * Return the navigation bar location
+   * @return NavigationBarLocationType
+   */
+  public static NavigationBarLocationType getNavigationBarLocation() {
+    return navigationBarLocation;
+  }
+
+  /**
+   * Setup the activity for edge-to-edge
+   * https://developer.android.com/develop/ui/views/layout/edge-to-edge-manually
+   * https://stackoverflow.com/questions/57293449/go-edge-to-edge-on-android-correctly-with-windowinsets
+   * @param layoutID - Top level ID of the view
+   */
+  public void setupEdgeToEdge(int layoutID) {
+    EdgeToEdge.enable(this);
+
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(layoutID),
+      (view, windowInsets) -> {
+        // Allocate insets for system bars and display cutout (notch)
+        Insets insets = windowInsets.getInsets(
+          WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
+        mlp.topMargin = insets.top;
+        mlp.bottomMargin = insets.bottom;
+        mlp.leftMargin = insets.left;
+        mlp.rightMargin = insets.right;
+        view.setLayoutParams(mlp);
+
+        // Update Navigation Bar location
+        if (insets.left > 0) {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_LEFT;
+        } else if (insets.right > 0) {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_RIGHT;
+        } else {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
+        }
+
+        return windowInsets;
+      });
+  }
+
+  /**
+   * If Android API < 35, apply colors to the status bar and navigation bar
+   * @param statusBarcolor - int value of the color to use on the status bar.
+   * @param navigationBarColor - int value of the color to use on the navigation bar.
+   */
+  public void setupStatusBarColors(int statusBarColor, int navigationBarColor) {
+    // Set status bar colors
+    // https://stackoverflow.com/a/79706054
+    Window window = getWindow();
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+    WindowInsetsControllerCompat windowInsetsController =
+      WindowCompat.getInsetsController(window, window.getDecorView());
+    windowInsetsController.setAppearanceLightStatusBars(true);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      window.setStatusBarColor(getColor(statusBarColor));
+      window.setNavigationBarColor(getColor(navigationBarColor));
+    }
   }
 
   @Override

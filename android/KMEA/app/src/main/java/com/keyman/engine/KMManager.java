@@ -57,6 +57,7 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
+import com.keyman.engine.BaseActivity.NavigationBarLocationType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 import com.keyman.engine.cloud.CloudDownloadMgr;
@@ -692,14 +693,37 @@ public final class KMManager {
   /**
    * Adjust the keyboard dimensions. If the suggestion banner is active, use the
    * combined banner height and keyboard height
+   *
+   * Android API 35+ enforces edge-to-edge so we need to determine the navigation bar height (if visible)
+   * so the keyboard isn't covered up by the navigation bar.
+   * In portrait orientation, this affects the keyboard bottom margin.
+   * On phones in landscape orientation, this affects the left/right side of the keyboard
    * @return RelativeLayout.LayoutParams
    */
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
+    int navigationHeight = getNavigationBarHeight(appContext);
+    int orientation = getOrientation(appContext);
+    FormFactor formFactor = getFormFactor();
+
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+
+    // Add margins to account for edge-to-edge where system bars cover up the keyboard
+    if (orientation == Configuration.ORIENTATION_PORTRAIT ||
+        formFactor == FormFactor.TABLET) {
+      params.bottomMargin = navigationHeight;
+    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE && formFactor == FormFactor.PHONE) {
+      // Apply to left and right to handle navigation bar
+      NavigationBarLocationType navigationBarLocation = BaseActivity.getNavigationBarLocation();
+      if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_LEFT) {
+        params.leftMargin = navigationHeight;
+      } else if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_RIGHT) {
+        params.rightMargin = navigationHeight;
+      }
+    }
    return params;
   }
 
@@ -2419,6 +2443,36 @@ public final class KMManager {
     newContext = context.createConfigurationContext(newConfig);
     newResources = newContext.getResources();
     KeyboardHeight_Context_Landscape_Default = (int) newResources.getDimension(R.dimen.keyboard_height);
+  }
+
+  // Get the navigation bar height (if visible) in pixels
+  private static int getNavigationBarHeight(Context context) {
+    // Determine if navigation bar is visible
+    int resourceId = context.getResources().getIdentifier(
+      "config_showNavigationBar", "bool", "android");
+    if (resourceId <= 0) {
+      return 0;
+    }
+
+    // Navigation bar visible so get the height
+    resourceId = context.getResources().getIdentifier(
+      "navigation_bar_height", "dimen", "android");
+    return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+  }
+
+  /**
+   * If device is landscape orientation, return if navigation bar is on left (1) or right (2). Otherwise 0
+   * @param Context - context
+   * @return int
+   */
+  private static int getNavigationBarLocation(Context context) {
+    int orientation = getOrientation(context);
+    if (orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return 0;
+    }
+
+    return 1;
+    //View rootView = context.getApplicationContext().getWindow().getDecorView();
   }
 
   /**
