@@ -141,8 +141,8 @@
     <TargetName>keyman64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\ARM64\$(Configuration);$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\include;$(IncludePath)</IncludePath>
     <TargetName>keyman64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,8 +156,8 @@
     <TargetName>keyman64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\ARM64\$(Configuration);$(VC_LibraryPath_ARM64);$(WindowsSDK_LibraryPath_ARM64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\ARM64\$(Configuration)\include;$(IncludePath)</IncludePath>
     <TargetName>keyman64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -260,7 +260,7 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <BaseAddress>0x1c100000</BaseAddress>
+      <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ImportLibrary>..\..\..\lib\keyman64.lib</ImportLibrary>
@@ -316,7 +316,7 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <BaseAddress>0x1c100000</BaseAddress>
+      <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ImportLibrary>..\..\..\lib\keyman64.lib</ImportLibrary>
@@ -420,7 +420,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
-      <BaseAddress>0x1C100000</BaseAddress>
+      <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ImportLibrary>..\..\..\lib\keyman64.lib</ImportLibrary>
@@ -471,7 +471,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
-      <BaseAddress>0x1C100000</BaseAddress>
+      <BaseAddress>0x140000000</BaseAddress>
       <UACUIAccess>true</UACUIAccess>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ImportLibrary>..\..\..\lib\keyman64.lib</ImportLibrary>
