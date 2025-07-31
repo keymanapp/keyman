@@ -135,12 +135,14 @@ interface ContextMatchResult {
 }
 
 export class ContextTracker extends CircularArray<ContextState> {
+  // Aim:  relocate to ContextTransition in some form?
+  // Or can we split it up in some manner across the different types?
   static attemptMatchContext(
     context: Context,
     lexicalModel: LexicalModel,
     matchState: ContextState,
     // the distribution should be tokenized already.
-    transformSequenceDistribution?: Distribution<Transform[]>
+    transformSequenceDistribution?: Distribution<Transform[]> // transform distribution is needed here.
   ): ContextMatchResult {
     const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
 
@@ -356,40 +358,6 @@ export class ContextTracker extends CircularArray<ContextState> {
     };
   }
 
-  // Aim:  relocate to ContextState in some form.
-  private static modelContextState(
-    context: Context,
-    lexicalModel: LexicalModel
-  ): ContextState {
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
-
-    let baseTokens = tokenizedContext.map(function(entry) {
-      let token = new ContextToken(lexicalModel, entry.text);
-
-      if(entry.isWhitespace) {
-        token.isWhitespace = true;
-      }
-
-      return token;
-    });
-
-    // And now build the final context state object, which includes whitespace 'tokens'.
-    let state = new ContextState(context, lexicalModel);
-    const tokenization: ContextToken[] = [];
-
-    while(baseTokens.length > 0) {
-      tokenization.push(baseTokens.splice(0, 1)[0]);
-    }
-
-    if(tokenization.length == 0) {
-      let token = new ContextToken(lexicalModel);
-      tokenization.push(token);
-    }
-
-    state.tokenization = new ContextTokenization(tokenization);
-    return state;
-  }
-
   // Aim:  relocate to ContextState in some form... or ContextTransition?
   /**
    * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
@@ -481,7 +449,6 @@ export class ContextTracker extends CircularArray<ContextState> {
             this.enqueue(priorMatchState);
           }
 
-          result.state.context = context;
           if(result.state != this.item(i)) {
             this.enqueue(result.state);
           }
@@ -495,8 +462,8 @@ export class ContextTracker extends CircularArray<ContextState> {
     //
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-    let state = ContextTracker.modelContextState(context, model);
-    state.context = context;
+    let state = new ContextState(context, model);
+    state.initFromReset();
     this.enqueue(state);
     return { state, baseState: null, headTokensRemoved: 0, tailTokensAdded: 0 };
   }
