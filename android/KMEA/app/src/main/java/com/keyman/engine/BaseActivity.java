@@ -92,7 +92,7 @@ public class BaseActivity extends AppCompatActivity {
           WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
         ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
         mlp.topMargin = insets.top;
-        mlp.bottomMargin = insets.left;
+        mlp.bottomMargin = insets.bottom;
         mlp.leftMargin = insets.left;
         mlp.rightMargin = insets.right;
         view.setLayoutParams(mlp);
@@ -101,7 +101,7 @@ public class BaseActivity extends AppCompatActivity {
   }
 
   /**
-   * Apply colors to the status bar (If Android API < 35) and navigation bar
+   * If Android API < 35, apply colors to the status bar and navigation bar
    * @param statusBarcolor - int value of the color to use on the status bar.
    * @param navigationBarColor - int value of the color to use on the navigation bar.
    */
