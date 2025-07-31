@@ -167,8 +167,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    // To use constraintlayout in compose
-    implementation 'androidx.constraintlayout:constraintlayout-compose:1.1.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
