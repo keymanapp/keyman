@@ -29,7 +29,16 @@ import com.keyman.engine.util.KMLog;
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
+  public enum NavigationBarLocationType {
+    // Default navigation bar location
+    NAVIGATION_BAR_BOTTOM,
+    NAVIGATION_BAR_LEFT,  // Landscape orientation
+    NAVIGATION_BAR_RIGHT, // Landscape orientation
+  }
+
   private static final String TAG = "BaseActivity";
+  private static NavigationBarLocationType navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
+
   static ContextWrapper localeUpdatedContext;
 
   /**
@@ -77,6 +86,14 @@ public class BaseActivity extends AppCompatActivity {
   }
 
   /**
+   * Return the navigation bar location
+   * @return NavigationBarLocationType
+   */
+  public static NavigationBarLocationType getNavigationBarLocation() {
+    return navigationBarLocation;
+  }
+
+  /**
    * Setup the activity for edge-to-edge
    * https://developer.android.com/develop/ui/views/layout/edge-to-edge-manually
    * https://stackoverflow.com/questions/57293449/go-edge-to-edge-on-android-correctly-with-windowinsets
@@ -96,6 +113,16 @@ public class BaseActivity extends AppCompatActivity {
         mlp.leftMargin = insets.left;
         mlp.rightMargin = insets.right;
         view.setLayoutParams(mlp);
+
+        // Update Navigation Bar location
+        if (insets.left > 0) {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_LEFT;
+        } else if (insets.right > 0) {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_RIGHT;
+        } else {
+          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
+        }
+
         return windowInsets;
       });
   }

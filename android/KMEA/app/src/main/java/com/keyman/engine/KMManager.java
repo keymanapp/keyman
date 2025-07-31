@@ -57,6 +57,7 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
+import com.keyman.engine.BaseActivity.NavigationBarLocationType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 import com.keyman.engine.cloud.CloudDownloadMgr;
@@ -716,9 +717,12 @@ public final class KMManager {
       params.bottomMargin = navigationHeight;
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE && formFactor == FormFactor.PHONE) {
       // Apply to left and right to handle navigation bar
-      // Keeps the keyboard symmetrical and also accounts for notch if visible
-      params.leftMargin = navigationHeight;
-      params.rightMargin = navigationHeight;
+      NavigationBarLocationType navigationBarLocation = BaseActivity.getNavigationBarLocation();
+      if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_LEFT) {
+        params.leftMargin = navigationHeight;
+      } else if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_RIGHT) {
+        params.rightMargin = navigationHeight;
+      }
     }
    return params;
   }
@@ -2454,6 +2458,21 @@ public final class KMManager {
     resourceId = context.getResources().getIdentifier(
       "navigation_bar_height", "dimen", "android");
     return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+  }
+
+  /**
+   * If device is landscape orientation, return if navigation bar is on left (1) or right (2). Otherwise 0
+   * @param Context - context
+   * @return int
+   */
+  private static int getNavigationBarLocation(Context context) {
+    int orientation = getOrientation(context);
+    if (orientation != Configuration.ORIENTATION_LANDSCAPE) {
+      return 0;
+    }
+
+    return 1;
+    //View rootView = context.getApplicationContext().getWindow().getDecorView();
   }
 
   /**
