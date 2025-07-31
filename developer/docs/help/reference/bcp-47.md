@@ -38,8 +38,7 @@ The following are all examples of valid BCP 47 tags:
 
 ### The language subtag
 
-The only required option is the Language subtag, which is an [ISO 639-1][2] or
-[ISO 639-3][3] code. Essentially, it is an [ISO-639][4] that uses two-letter and three-letter codes.
+The only required option is the Language subtag, which is an [ISO 639][4] code. If a two-letter code[ISO 639-1][2] is available, it is used instead of the three-letter code [ISO 639-3][3].   
 
 First, try to find your language on the list of two-letter ISO 639-1 codes.
 [This Wikipedia page][5] lists all of the two-letter codes. If the two-letter code is available, it is used instead of the three-letter code.
