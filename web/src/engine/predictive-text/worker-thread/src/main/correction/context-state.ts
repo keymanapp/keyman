@@ -6,6 +6,8 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { ContextToken } from './context-token.js';
+import { determineModelTokenizer } from '#./model-helpers.js';
 
 /**
  * Represents a state of the active context at some point in time along with the
@@ -16,12 +18,12 @@ export class ContextState {
    * The context window in view for the represented Context state,
    * as passed between the predictive-text worker and its host.
    */
-  context: Context;
+  private _context: Context;
 
   /**
    * The active lexical model operating upon the Context.
    */
-  model: LexicalModel;
+  readonly model: LexicalModel;
 
   /**
    * Denotes the most likely tokenization for the represented Context.
@@ -72,7 +74,7 @@ export class ContextState {
   constructor(param1: Context | ContextState, model?: LexicalModel) {
     if(!(param1 instanceof ContextState)) {
       const context = param1;
-      this.context = context;
+      this._context = context;
       this.model = model;
     } else {
       const stateToClone = param1;
@@ -85,5 +87,49 @@ export class ContextState {
       // not aliasing the array itself.
       this.suggestions = [].concat(stateToClone.suggestions);
     }
+  }
+
+  /**
+   * The context window in view for the represented Context state,
+   * as passed between the predictive-text worker and its host.
+   */
+  get context(): Context {
+    return this._context;
+  }
+
+  /**
+   * Initializes the ContextState instance for use when no valid prior
+   * information is available - typically, immediately after engine
+   * initialization or a context reset.
+   */
+  initFromReset() {
+    const context = this.context;
+    const lexicalModel = this.model;
+
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+
+    let baseTokens = tokenizedContext.map(function(entry) {
+      let token = new ContextToken(lexicalModel, entry.text);
+
+      if(entry.isWhitespace) {
+        token.isWhitespace = true;
+      }
+
+      return token;
+    });
+
+    // And now build the final context state object, which includes whitespace 'tokens'.);
+    const tokenization: ContextToken[] = [];
+
+    while(baseTokens.length > 0) {
+      tokenization.push(baseTokens.splice(0, 1)[0]);
+    }
+
+    if(tokenization.length == 0) {
+      let token = new ContextToken(lexicalModel);
+      tokenization.push(token);
+    }
+
+    this.tokenization = new ContextTokenization(tokenization);
   }
 }
