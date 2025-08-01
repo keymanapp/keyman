@@ -19,7 +19,7 @@
 # * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
 # * Note: the running script is the top-level script that includes either
-#   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
+#   builder.inc.sh directly, or, just in the Keyman repo, via builder-basic.inc.sh.
 #
 
 # Exit on command failure and when using unset variables:

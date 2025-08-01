@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script is included by each sample build.sh.  Accordingly, it inherits build-utils.sh, etc
+# This script is included by each sample build.sh.  Accordingly, it inherits builder-basic.inc.sh, etc
 # from the including script.
 
 function do_build() {
