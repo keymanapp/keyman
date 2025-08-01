@@ -6,6 +6,15 @@
  * Tests for KMC KMN Next Generation Parser (Recursive Descent/Verify against BNF)
  */
 
+/*
+ * This test is somewhat brittle as it depends on the local variable names used
+ * in the Rule assigned to this.rule in each of the implemented source code rules.
+ * These are processed and then checked against the processed non-terminals and
+ * terminals in the BNF grammar rules for equality. A more thorough test would
+ * check the actual classes of each source code variable, but would require much
+ * more parsing of the TypeScript source code.
+ */
+
 import 'mocha';
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
@@ -52,27 +61,18 @@ function wrapLines(buffer:string): string {
 
 function replaceElementNames(str: string): string {
   if (str != null) {
-    str = str.replaceAll(/\b([A-Z_]+)\b/g,
-      (match, p1, offset, string, groups) => { return p1.toLowerCase(); });
-    str = str.replaceAll(/\bleft_br\b/g, 'leftBracket');
-    str = str.replaceAll(/\bright_br\b/g, 'rightBracket');
-    str = str.replaceAll(/\bleft_sq\b/g, 'leftSquare');
-    str = str.replaceAll(/\bright_sq\b/g, 'rightSquare');
-    str = str.replaceAll(/\bif\b/g, 'ifRule');
-    str = str.replaceAll(/\bstring\b/g, 'stringRule');
-    str = str.replaceAll(/\breturn\b/g, 'returnRule');
-    str = str.replaceAll(/\bkey_code\b/g, 'keyCode');
-    str = str.replaceAll(/\bnot_equal\b/g, 'notEqual');
-    str = str.replaceAll(/\bu_char\b/g, 'uChar');
-    str = str.replaceAll(/\bnamed_constant\b/g, 'namedConstant');
-    str = str.replaceAll(/\bbaselayout_shortcut\b/g, 'baselayout');
-    str = str.replaceAll(/\blayer_shortcut\b/g, 'layer');
-    str = str.replaceAll(/\bplatform_shortcut\b/g, 'platform');
-    str = str.replaceAll(/\bdeadkey\b/g, 'deadKey');
-    str = str.replaceAll(/\bnewlayer\b/g, 'newLayer');
-    str = str.replaceAll(/\bnomatch\b/g, 'noMatch');
-    str = str.replaceAll(/\bnotany\b/g, 'notAny');
-    str = str.replaceAll(/\boldlayer\b/g, 'oldLayer');
+    str = str.replaceAll(/\b([a-zA-Z]+)_([a-zA-Z])([a-zA-Z]*)\b/g,
+      (match, p1, p2, p3, offset, string, groups) =>
+        { return p1.toLowerCase() + p2.toUpperCase() + p3.toLowerCase(); });
+    str = str.replaceAll(/\b([A-Z]+)\b/g,
+      (match, p1, offset, string, groups) => { return p1.toLowerCase(); })
+    str = str.replaceAll(/\b(if|string|return)\b/g,
+      (match, p1, offset, string, groups) => { return p1 + 'Rule'; })
+    str = str.replaceAll(/\b(baselayout|layer|platform)Shortcut\b/g, '$1');
+    str = str.replaceAll(/\bleftBr\b/g, 'leftBracket');
+    str = str.replaceAll(/\brightBr\b/g, 'rightBracket');
+    str = str.replaceAll(/\bleftSq\b/g, 'leftSquare');
+    str = str.replaceAll(/\brightSq\b/g, 'rightSquare');
   }
   return str;
 }

@@ -63,24 +63,24 @@ export class CallStatementRule extends AbstractBracketedStoreNameStatementRule {
   }
 }
 
-export class DeadKeyStatementRule extends AbstractBracketedStoreNameStatementRule {
+export class DeadkeyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const deadKey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
+    const deadkey: Rule = new TokenRule(TokenTypes.DEADKEY, true);
     this.cmdNodeType = NodeTypes.DEADKEY;
     this.rule = new SequenceRule([
-      deadKey, this.leftBracket, this.normalStoreName, this.rightBracket
+      deadkey, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
   }
 }
 
-export class NotAnyStatementRule extends AbstractBracketedStoreNameStatementRule {
+export class NotanyStatementRule extends AbstractBracketedStoreNameStatementRule {
   public constructor() {
     super();
-    const notAny: Rule = new TokenRule(TokenTypes.NOTANY, true);
+    const notany: Rule = new TokenRule(TokenTypes.NOTANY, true);
     this.cmdNodeType   = NodeTypes.NOTANY;
     this.rule = new SequenceRule([
-      notAny, this.leftBracket, this.normalStoreName, this.rightBracket
+      notany, this.leftBracket, this.normalStoreName, this.rightBracket
     ]);
   }
 }
@@ -236,15 +236,15 @@ export class SystemStoreNameForIfRule extends SingleChildRule {
     const systemStoreName: Rule = new SystemStoreNameRule();
     const baselayout: Rule      = new TokenRule(TokenTypes.BASELAYOUT, true);
     const layer: Rule           = new TokenRule(TokenTypes.LAYER, true);
-    const newLayer: Rule        = new TokenRule(TokenTypes.NEWLAYER, true);
-    const oldLayer: Rule        = new TokenRule(TokenTypes.OLDLAYER, true);
+    const newlayer: Rule        = new TokenRule(TokenTypes.NEWLAYER, true);
+    const oldlayer: Rule        = new TokenRule(TokenTypes.OLDLAYER, true);
     const platform: Rule        = new TokenRule(TokenTypes.PLATFORM, true);
     this.rule = new AlternateRule([
       systemStoreName,
       baselayout,
       layer,
-      newLayer,
-      oldLayer,
+      newlayer,
+      oldlayer,
       platform,
     ]);
   }

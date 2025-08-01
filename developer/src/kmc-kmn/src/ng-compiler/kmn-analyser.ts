@@ -11,7 +11,7 @@
 import { TokenTypes } from "./token-types.js";
 import { AlternateRule, TokenRule, OptionalRule, Rule, SequenceRule, AlternateTokenRule } from "./recursive-descent.js";
 import { SingleChildRule, OneOrManyRule, ManyRule } from "./recursive-descent.js";
-import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
+import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule as DeadkeyStatementRule, IfLikeStatementRule, IndexStatementRule, LayerStatementRule, NotanyStatementRule as NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyser.js";
 import { CapsAlwaysOffRule, CapsOnOnlyRule, ResetStoreRule, SetSystemStoreRule, SetNormalStoreRule, ShiftFreesCapsRule, HeaderAssignRule } from "./store-analyser.js";
 import { SystemStoreAssignRule, NormalStoreAssignRule } from "./store-analyser.js";
 import { NodeTypes } from "./node-types.js";
@@ -175,7 +175,7 @@ export class SimpleTextRule extends SingleChildRule {
     const hexadecimal: Rule      = new TokenRule(TokenTypes.HEXADECIMAL, true);
     const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
     const nul: Rule              = new TokenRule(TokenTypes.NUL, true);
-    const deadKeyStatement: Rule = new DeadKeyStatementRule();
+    const deadkeyStatement: Rule = new DeadkeyStatementRule();
     const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
       stringRule,
@@ -187,7 +187,7 @@ export class SimpleTextRule extends SingleChildRule {
       hexadecimal,
       octal,
       nul,
-      deadKeyStatement,
+      deadkeyStatement,
       beep,
     ]);
   }
@@ -514,9 +514,9 @@ export class LhsBlockRule extends SingleChildRule {
   public constructor() {
     super();
     const match: Rule      = new TokenRule(TokenTypes.MATCH, true);
-    const noMatch: Rule    = new TokenRule(TokenTypes.NOMATCH, true);
+    const nomatch: Rule    = new TokenRule(TokenTypes.NOMATCH, true);
     const inputBlock: Rule = new InputBlockRule();
-    this.rule = new AlternateRule([match, noMatch,inputBlock]);
+    this.rule = new AlternateRule([match, nomatch,inputBlock]);
   }
 
   public parse(node: ASTNode): boolean {
@@ -571,13 +571,13 @@ export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
     const anyStatement: Rule     = new AnyStatementRule();
-    const notAnyStatement: Rule  = new NotAnyStatementRule();
+    const notanyStatement: Rule  = new NotanyStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const text: Rule             = new TextRule();
     this.rule = new AlternateRule([
       anyStatement,
-      notAnyStatement,
+      notanyStatement,
       contextStatement,
       indexStatement,
       text

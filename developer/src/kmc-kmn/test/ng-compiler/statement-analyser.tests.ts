@@ -14,7 +14,7 @@ import { NodeTypes } from "../../src/ng-compiler/node-types.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { stringToTokenBuffer } from './kmn-analyser.tests.js';
 import { Rule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule, DeadKeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule, IndexStatementRule, LayerStatementRule, NotAnyStatementRule, OutsStatementRule, PlatformStatementRule, SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyser.js';
+import { AnyStatementRule, BaselayoutStatementRule, CallStatementRule, ComparisonRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule, IfNormalStoreStatementRule, IfStatementRule, IfSystemStoreStatementRule, IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, PlatformStatementRule, SaveStatementRule, SystemStoreNameForIfRule } from '../../src/ng-compiler/statement-analyser.js';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 
 let root: ASTNode = null;
@@ -53,30 +53,30 @@ describe("KMN Statement Analyser Tests", () => {
       assert.isNotNull(callNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
-  describe("DeadKeyStatementRule Tests", () => {
-    it("can construct an DeadKeyStatementRule", () => {
+  describe("DeadkeyStatementRule Tests", () => {
+    it("can construct an DeadkeyStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const deadKeyStatement: Rule = new DeadKeyStatementRule();
+      const deadKeyStatement: Rule = new DeadkeyStatementRule();
       assert.isNotNull(deadKeyStatement);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('dk(storeName)');
-      const deadKeyStatement: Rule = new DeadKeyStatementRule();
+      const deadKeyStatement: Rule = new DeadkeyStatementRule();
       assert.isTrue(deadKeyStatement.parse(root));
       const deadKeyNode = root.getSoleChildOfType(NodeTypes.DEADKEY);
       assert.isNotNull(deadKeyNode);
       assert.isNotNull(deadKeyNode.getSoleChildOfType(NodeTypes.STORENAME));
     });
   });
-  describe("NotAnyStatementRule Tests", () => {
-    it("can construct an NotAnyStatementRule", () => {
+  describe("NotanyStatementRule Tests", () => {
+    it("can construct an NotanyStatementRule", () => {
       Rule.tokenBuffer = stringToTokenBuffer('');
-      const notAnyStatement: Rule = new NotAnyStatementRule();
+      const notAnyStatement: Rule = new NotanyStatementRule();
       assert.isNotNull(notAnyStatement);
     });
     it("can parse correctly", () => {
       Rule.tokenBuffer = stringToTokenBuffer('notany(digit)');
-      const notAnyStatement: Rule = new NotAnyStatementRule();
+      const notAnyStatement: Rule = new NotanyStatementRule();
       assert.isTrue(notAnyStatement.parse(root));
       const notAnyNode = root.getSoleChildOfType(NodeTypes.NOTANY);
       assert.isNotNull(notAnyNode);
