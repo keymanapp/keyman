@@ -80,7 +80,7 @@ function replaceElementNames(str: string): string {
 function getSourceRules(buffer:string): Dictionary {
     const rules: Dictionary = {};
     // Rules that extend AlternateTokenRule
-    let matches = buffer.matchAll(/export class (\S+)Rule extends AlternateTokenRule.*?super\(\[([^\]]*)/sg);
+    let matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+AlternateTokenRule.+?super\(\[([^\]]+)/sg);
     for (let match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
@@ -89,7 +89,7 @@ function getSourceRules(buffer:string): Dictionary {
       rules[name] = replaceElementNames(rules[name]);
     }
     // Other Rules
-    matches = buffer.matchAll(/export class (\S+)Rule extends (?!AlternateTokenRule).*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
+    matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+(?!AlternateTokenRule).+?constructor\(\)\s*\{[^}]+this.rule\s*=\s*new([^;}]+)[^}]+\}/sg);
     for (let match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
