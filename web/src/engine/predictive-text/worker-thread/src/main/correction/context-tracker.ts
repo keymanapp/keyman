@@ -2,7 +2,7 @@ import { applyTransform, buildMergedTransform } from '@keymanapp/models-template
 
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
-import { tokenizeTransform, tokenizeTransformDistribution } from './transform-tokenization.js';
+import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -142,9 +142,10 @@ export class ContextTracker extends CircularArray<ContextState> {
     lexicalModel: LexicalModel,
     matchState: ContextState,
     // the distribution should be tokenized already.
-    transformSequenceDistribution?: Distribution<Transform[]> // transform distribution is needed here.
+    transformDistribution?: Distribution<Transform> // transform distribution is needed here.
   ): ContextMatchResult {
     const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+    const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
 
     const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text));
 
@@ -164,7 +165,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
+      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };;
     } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,
@@ -381,37 +382,17 @@ export class ContextTracker extends CircularArray<ContextState> {
       throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
     }
 
-    let tokenize = determineModelTokenizer(model);
-
     if(transformDistribution?.length == 0) {
       transformDistribution = null;
     }
     const inputTransform = transformDistribution?.[0];
-    let transformTokenLength = 0;
-    let tokenizedDistribution: Distribution<Transform[]> = null;
     if(inputTransform) {
       // These two methods apply transforms internally; do not mutate context here.
       // This particularly matters for the 'distribution' variant.
-
-      // What if a pre-whitespace token has a final substitution as PART of an edit?
-      // Say, ['apple', ' ', ''] => ['apply', ' ', 'n']
-      // For now... we can't really handle that case well - modeling the 'e' => 'y' part.
-      // Will likely require improvements to tokenizeTransform(), which doesn't yet handle
-      // deleteLeft tokenization for transforms spanning tokens & whitespace.
-      //
-      // See: #14361.
-      // There's a good shot attemptTokenizedAlignment would be useful for it.
-      transformTokenLength = tokenizeTransform(tokenize, context, inputTransform.sample).length;
-      tokenizedDistribution = tokenizeTransformDistribution(tokenize, context, transformDistribution);
-
-      // Now we update the context used for context-state management based upon our input.
       context = applyTransform(inputTransform.sample, context);
-
-      // While we lack phrase-based / phrase-oriented prediction support, we'll just extract the
-      // set that matches the token length that results from our input.
-      tokenizedDistribution = tokenizedDistribution.filter((entry) => entry.sample.length == transformTokenLength);
     }
 
+    const tokenize = determineModelTokenizer(model);
     const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
@@ -438,7 +419,7 @@ export class ContextTracker extends CircularArray<ContextState> {
           continue;
         }
 
-        let result = ContextTracker.attemptMatchContext(context, model, this.item(i), tokenizedDistribution);
+        let result = ContextTracker.attemptMatchContext(context, model, this.item(i), transformDistribution);
 
         if(result?.state) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
