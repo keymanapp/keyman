@@ -14,7 +14,6 @@ import { SearchSpace } from "./distance-modeler.js";
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
-import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
 /**
@@ -50,22 +49,6 @@ export class ContextToken {
    */
   readonly searchSpace: SearchSpace;
 
-  /* The next two fields will **not land here** in the final version for
-     epic/autocorrect / 19.0-beta!  That said, their future location has
-     not yet been reworked, so we'll keep them here for now. */
-
-  /**
-   * The set of suggestions generated for the current token
-   */
-  suggestions: Suggestion[];
-
-  /**
-   * The ID of the suggestion applied to the current token, if any.
-   *
-   * Should be set to undefined when no such suggestion exists.
-   */
-  appliedSuggestionId?: number;
-
   /**
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
@@ -92,12 +75,6 @@ export class ContextToken {
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
       this.searchSpace = new SearchSpace(priorToken.searchSpace);
-      this.suggestions = priorToken.suggestions.slice();
-
-      // because of unit tests.
-      if(priorToken.appliedSuggestionId !== undefined) {
-        this.appliedSuggestionId = priorToken.appliedSuggestionId;
-      }
     } else {
       const model = param;
 
@@ -112,8 +89,6 @@ export class ContextToken {
         return [{sample: transform, p: 1.0}];
       });
       rawTransformDistributions.forEach((entry) => this.searchSpace.addInput(entry));
-
-      this.suggestions = [];
     }
   }
 

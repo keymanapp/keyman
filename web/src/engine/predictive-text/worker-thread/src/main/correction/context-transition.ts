@@ -12,7 +12,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { ContextState } from './context-state.js';
 
 import Distribution = LexicalModelTypes.Distribution;
+import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { buildMergedTransform } from '@keymanapp/models-templates';
+import { ContextTracker } from './context-tracker.js';
 
 /**
  * Represents the transition between two context states as triggered
@@ -111,5 +114,45 @@ export class ContextTransition {
     // in the refactoring process.
     this._transitionId = inputDistribution?.find((entry) => entry.sample.id !== undefined)?.sample.id;
     this.preservationTransform = preservationTransform;
+  }
+
+  /**
+   * Applies a suggestion generated from this context transition on top of the transition itself,
+   * replacing its final context state.  This does _not_, however, replace the original fat-finger
+   * distribution or other intermediate data regarding associated keystrokes.
+   * @param suggestion
+   * @returns
+   */
+  applySuggestion(suggestion: Suggestion) {
+    const fullTransform = suggestion.appendedTransform
+      ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
+      : suggestion.transform;
+
+    // An applied suggestion should replace the original Transition's effects, though keeping
+    // the original input around.
+    const appliedState = ContextTracker.attemptMatchContext(
+      this.base.context,
+      this.base.model,
+      this.base,
+      [{sample: fullTransform, p: 1}]
+    ).final;
+
+    const preAppliedState = this.final;
+    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
+      throw new Error("Could not find matching suggestion to apply");
+    }
+
+    // Start from a deep copy, then replace as needed to overwrite with the context
+    // state resulting from the suggestion while preserving suggestion + primary
+    // keystroke data.
+    const resultTransition = new ContextTransition(this);
+    resultTransition._final = appliedState;
+    resultTransition._transitionId = suggestion.transformId;
+
+    appliedState.appliedSuggestionId = suggestion.id;
+    appliedState.appliedInput = preAppliedState.appliedInput;
+    appliedState.suggestions = preAppliedState.suggestions;
+
+    return resultTransition;
   }
 }

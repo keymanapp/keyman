@@ -42,7 +42,6 @@ describe('ContextTokenization', function() {
       assert.isNotOk(tokenization.alignment);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
-      assert.isUndefined(tokenization.tail.appliedSuggestionId);
     });
 
     it("constructs from a token array + alignment data", () => {
@@ -63,7 +62,6 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.alignment, alignment);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
-      assert.isUndefined(tokenization.tail.appliedSuggestionId);
     });
 
     it('clones', () => {
