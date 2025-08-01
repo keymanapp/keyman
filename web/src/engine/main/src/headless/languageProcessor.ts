@@ -211,6 +211,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       console.warn("Could not apply the Suggestion!");
       return null;
     } else {
+      this.recentTranscriptions.rewindTo(suggestion.transformId);
       // Apply the Suggestion!
 
       // Step 1:  determine the final output text
@@ -287,6 +288,8 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return Promise.resolve([] as Suggestion[]);
     }
 
+    this.recentTranscriptions.rewindTo(-reversion.transformId);
+
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
@@ -330,11 +333,13 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
+    // We record the current context state before any prediction requests...
     const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
+    // ... even those triggered by context-resets.
     if(resetContext) {
-      this.lmEngine.resetContext(context);
+      this.lmEngine.resetContext(context, transcription.token);
     }
 
     let alternates = transcription.alternates;
@@ -367,11 +372,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    * Retrieves the context and output state of KMW immediately before the prediction with
    * token `id` was generated.  Must correspond to a 'recent' one, as only so many are stored
    * in `ModelManager`'s history buffer.
+   *
    * @param id A unique identifier corresponding to a recent `Transcription`.
    * @returns The matching `Transcription`, or `null` none is found.
    */
   public getPredictionState(id: number): Transcription {
-    return this.recentTranscriptions.get(id);
+    return this.recentTranscriptions.peek(id);
   }
 
   public shutdown() {
