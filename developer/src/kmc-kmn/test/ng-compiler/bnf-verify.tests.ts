@@ -69,8 +69,10 @@ function replaceElementNames(str: string): string {
     str = str.replaceAll(/\blayer_shortcut\b/g, 'layer');
     str = str.replaceAll(/\bplatform_shortcut\b/g, 'platform');
     str = str.replaceAll(/\bdeadkey\b/g, 'deadKey');
+    str = str.replaceAll(/\bnewlayer\b/g, 'newLayer');
     str = str.replaceAll(/\bnomatch\b/g, 'noMatch');
     str = str.replaceAll(/\bnotany\b/g, 'notAny');
+    str = str.replaceAll(/\boldlayer\b/g, 'oldLayer');
   }
   return str;
 }

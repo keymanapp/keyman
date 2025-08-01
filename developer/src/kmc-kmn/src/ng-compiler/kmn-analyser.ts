@@ -166,17 +166,17 @@ export class PlainTextRule extends SingleChildRule {
 export class SimpleTextRule extends SingleChildRule {
   public constructor() {
     super();
-    const stringRule: Rule    = new TokenRule(TokenTypes.STRING, true);
-    const virtualKey: Rule    = new VirtualKeyRule();
-    const uChar: Rule         = new TokenRule(TokenTypes.U_CHAR, true);
-    const namedConstant: Rule = new TokenRule(TokenTypes.NAMED_CONSTANT, true);
-    const hangul: Rule        = new TokenRule(TokenTypes.HANGUL, true);
-    const decimal: Rule       = new TokenRule(TokenTypes.DECIMAL, true);
-    const hexadecimal: Rule   = new TokenRule(TokenTypes.HEXADECIMAL, true);
-    const octal: Rule         = new TokenRule(TokenTypes.OCTAL, true);
-    const nul: Rule           = new TokenRule(TokenTypes.NUL, true);
-    const deadKey: Rule       = new DeadKeyStatementRule();
-    const beep: Rule          = new TokenRule(TokenTypes.BEEP, true);
+    const stringRule: Rule       = new TokenRule(TokenTypes.STRING, true);
+    const virtualKey: Rule       = new VirtualKeyRule();
+    const uChar: Rule            = new TokenRule(TokenTypes.U_CHAR, true);
+    const namedConstant: Rule    = new TokenRule(TokenTypes.NAMED_CONSTANT, true);
+    const hangul: Rule           = new TokenRule(TokenTypes.HANGUL, true);
+    const decimal: Rule          = new TokenRule(TokenTypes.DECIMAL, true);
+    const hexadecimal: Rule      = new TokenRule(TokenTypes.HEXADECIMAL, true);
+    const octal: Rule            = new TokenRule(TokenTypes.OCTAL, true);
+    const nul: Rule              = new TokenRule(TokenTypes.NUL, true);
+    const deadKeyStatement: Rule = new DeadKeyStatementRule();
+    const beep: Rule             = new TokenRule(TokenTypes.BEEP, true);
     this.rule = new AlternateRule([
       stringRule,
       virtualKey,
@@ -187,7 +187,7 @@ export class SimpleTextRule extends SingleChildRule {
       hexadecimal,
       octal,
       nul,
-      deadKey,
+      deadKeyStatement,
       beep,
     ]);
   }
