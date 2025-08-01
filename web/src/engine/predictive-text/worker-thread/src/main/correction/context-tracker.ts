@@ -655,6 +655,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         token = new ContextToken(matchState.model, incomingToken.text);
         token.searchSpace.inputSequence.forEach((entry) => entry[0].sample.id = primaryInput.id);
       } else {
+        // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
+        // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
         token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
       }

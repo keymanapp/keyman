@@ -1,13 +1,22 @@
-import { TrackedContextStateAlignment } from './context-tracker.js';
 import { ContextToken } from './context-token.js';
+import { TrackedContextStateAlignment } from './context-tracker.js';
 
 export class ContextTokenization {
   readonly tokens: ContextToken[];
   readonly alignment?: TrackedContextStateAlignment;
 
-  constructor(tokens: ContextToken[], alignment?: TrackedContextStateAlignment) {
-    this.tokens = [].concat(tokens);
-    this.alignment = alignment;
+  constructor(priorToClone: ContextTokenization);
+  constructor(tokens: ContextToken[], alignment?: TrackedContextStateAlignment);
+  constructor(param1: ContextToken[] | ContextTokenization, alignment?: TrackedContextStateAlignment) {
+    if(!(param1 instanceof ContextTokenization)) {
+      const tokens = param1;
+      this.tokens = [].concat(tokens);
+      this.alignment = alignment;
+    } else {
+      const priorToClone = param1;
+      this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
+      this.alignment = {...priorToClone.alignment};
+    }
   }
 
   get tail(): ContextToken {
