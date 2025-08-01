@@ -86,6 +86,7 @@ function getSourceRules(buffer:string): Dictionary {
       rules[name] = removeWhiteSpace(match[2]);
       rules[name] = replaceCommas(rules[name]);
       rules[name] = replaceTokenElements(rules[name]);
+      rules[name] = replaceElementNames(rules[name]);
     }
     // Other Rules
     matches = buffer.matchAll(/export class (\S+)Rule extends (?!AlternateTokenRule).*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
@@ -100,6 +101,7 @@ function getSourceRules(buffer:string): Dictionary {
       rules[name] = replaceOptElements(rules[name]);
       rules[name] = replaceOneOrManyElements(rules[name]);
       rules[name] = replaceManyElements(rules[name]);
+      rules[name] = replaceElementNames(rules[name]);
     }
     return rules;
 }
