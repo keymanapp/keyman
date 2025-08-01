@@ -21,10 +21,9 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: wordBreakers.default});
 
 describe('ContextTracker', function() {
-  function toWrapperDistribution(transforms) {
-    transforms = Array.isArray(transforms) ? transforms : [transforms];
+  function toWrapperDistribution(transform) {
     return [{
-      sample: transforms,
+      sample: transform,
       p: 1.0
     }];
   }
@@ -229,7 +228,7 @@ describe('ContextTracker', function() {
         newContext,
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "an"}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -264,7 +263,7 @@ describe('ContextTracker', function() {
         newContext,
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc"}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -305,7 +304,7 @@ describe('ContextTracker', function() {
         {left: "text'\""},
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "text'"}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNull(problemContextMatch);
     });
