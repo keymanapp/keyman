@@ -353,11 +353,11 @@ export class HeaderAssignRule extends SingleChildRule {
 export class HeaderValueRule extends SingleChildRule {
   public constructor() {
     super();
-    const text: Rule         = new TextRule();
-    const manyText: Rule     = new ManyRule(text);
-    const parameter: Rule    = new TokenRule(TokenTypes.PARAMETER, true);
-    const optParameter: Rule = new OptionalRule(parameter);
-    this.rule = new SequenceRule([manyText, optParameter]);
+    const text: Rule          = new TextRule();
+    const oneOrManyText: Rule = new OneOrManyRule(text);
+    const parameter: Rule     = new TokenRule(TokenTypes.PARAMETER, true);
+    const optParameter: Rule  = new OptionalRule(parameter);
+    this.rule = new AlternateRule([oneOrManyText, optParameter]);
   }
 }
 

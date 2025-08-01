@@ -499,13 +499,19 @@ describe("KMN Store Analyser Tests", () => {
         const headerNode = root.getSoleChildOfType(testCase.nodeType);
         assert.equal(headerNode.getSoleChildOfType(NodeTypes.STRING).getText(), '"value"');
       });
-      it("can parse correctly (version with value as float)", () => {
-        Rule.tokenBuffer = stringToTokenBuffer('VERSION 10.0');
-        const headerName: Rule = new HeaderAssignRule();
-        assert.isTrue(headerName.parse(root));
-        const versionNode = root.getSoleChildOfType(NodeTypes.VERSION_HEADER);
-        assert.equal(versionNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), '10.0')
-      });
+    });
+    it("can parse correctly (version with value as float)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('VERSION 10.0');
+      const headerName: Rule = new HeaderAssignRule();
+      assert.isTrue(headerName.parse(root));
+      const versionNode = root.getSoleChildOfType(NodeTypes.VERSION_HEADER);
+      assert.equal(versionNode.getSoleChildOfType(NodeTypes.PARAMETER).getText(), '10.0')
+    });
+    it.skip("can parse correctly (no value)", () => {
+      Rule.tokenBuffer = stringToTokenBuffer('VERSION');
+      const headerName: Rule = new HeaderAssignRule();
+      assert.isTrue(headerName.parse(root));
+      assert.isNotNull(root.getSoleChildOfType(NodeTypes.VERSION_HEADER));
     });
   });
   describe("HeaderNameRule Tests", () => {

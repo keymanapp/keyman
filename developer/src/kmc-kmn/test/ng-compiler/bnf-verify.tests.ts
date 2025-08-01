@@ -142,14 +142,14 @@ function replaceManyRule(str: string): string {
 
 function replaceThisOnElements(str: string): string {
   if (str != null && str.includes('this.')) {
-    str = str.replaceAll(/(?:this\.)(\S*)/g, '$1')
+    str = str.replaceAll(/(?:this\.)([^|\s]*)/g, '$1')
   }
   return str;
 }
 
 function replaceOptElements(str: string): string {
   if (str != null && str.includes('opt')) {
-    str = str.replaceAll(/(?:opt)(\S)(\S*)/g,
+    str = str.replaceAll(/(?:opt)(\S)([^|\s]*)/g,
       (match, p1, p2, offset, string, groups) =>
         { return p1.toLowerCase()+p2+'?'; });
   }
@@ -158,7 +158,7 @@ function replaceOptElements(str: string): string {
 
 function replaceOneOrManyElements(str: string): string {
   if (str != null && str.includes('oneOrMany')) {
-    str = str.replaceAll(/(?:oneOrMany)(\S)(\S*)/g,
+    str = str.replaceAll(/(?:oneOrMany)(\S)([^|\s]*)/g,
       (match, p1, p2, offset, string, groups) =>
         { return p1.toLowerCase()+p2+'+'; });
   }
@@ -167,7 +167,7 @@ function replaceOneOrManyElements(str: string): string {
 
 function replaceManyElements(str: string): string {
   if (str != null && str.includes('many')) {
-    str = str.replaceAll(/(?:many)(\S)(\S*)/g,
+    str = str.replaceAll(/(?:many)(\S)([^|\s]*)/g,
       (match, p1, p2, offset, string, groups) =>
         { return p1.toLowerCase()+p2+'*'; });
   }
