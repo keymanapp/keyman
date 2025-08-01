@@ -2,6 +2,7 @@ import { ContextState } from './context-state.js';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
+import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
 export class ContextTransition {
@@ -86,5 +87,18 @@ export class ContextTransition {
     // in the refactoring process.
     this._transitionId = inputDistribution?.find((entry) => entry.sample.id !== undefined)?.sample.id;
     this.preservationTransform = preservationTransform;
+  }
+
+  applySuggestion(appliedState: ContextState, suggestion: Suggestion) {
+    const preAppliedState = this.final;
+    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
+      throw new Error("Could not find matching suggestion to apply");
+    }
+    this.states[this.finalIndex] = appliedState;
+    appliedState.appliedSuggestionId = suggestion.id;
+    appliedState.appliedInput = preAppliedState.appliedInput;
+    appliedState.suggestions = preAppliedState.suggestions;
+
+    this._transitionId = suggestion.transformId;
   }
 }

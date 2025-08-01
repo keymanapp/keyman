@@ -300,12 +300,19 @@ export class ContextTracker {
         let result = ContextTracker.attemptMatchContext(context, model, priorMatchState.final, transformDistribution);
 
         if(result?.final) {
+          if(priorMatchState.transitionId !== undefined) {
+            // Already has a taggedContext.
+            this.cache.get(priorMatchState.transitionId);
+          }
+
           if(transitionId !== undefined) {
-            if(priorMatchState.transitionId != transitionId) {
-              // Already has a taggedContext.
-              this.cache.get(transformDistribution.find((entry) => entry.sample.id !== undefined).sample.id);
+            // Special case:  if base and final match, we should use the old Transition instance.
+            // This is currently used in some unit tests.
+            if(result.final != result.base) {
+              this.cache.add(transitionId, result);
+            } else {
+              return this.cache.peek(priorMatchState.transitionId);
             }
-            this.cache.add(transitionId, result);
           }
 
           return result;

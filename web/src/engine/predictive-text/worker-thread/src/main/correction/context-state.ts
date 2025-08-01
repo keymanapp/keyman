@@ -104,7 +104,9 @@ export class ContextState {
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
-      this.suggestions = [].concat(stateToClone.suggestions);
+      if(stateToClone.suggestions?.length > 0) {
+        this.suggestions = [].concat(stateToClone.suggestions);
+      }
     }
   }
 

@@ -15,6 +15,7 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { ContextTransition } from './correction/context-transition.js';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -181,7 +182,7 @@ export class ModelCompositor {
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
-      postContextState.tokenization.tail.suggestions = suggestions;
+      postContextState.suggestions = suggestions;
     }
 
     return suggestions;
@@ -258,17 +259,27 @@ export class ModelCompositor {
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      let contextState = this.contextTracker.newest.final;
-      if(!contextState) {
-        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).final;
+      let originalTransition = this.contextTracker.newest;
+      if(!originalTransition) {
+        originalTransition = this.contextTracker.analyzeState(this.lexicalModel, context);
       }
 
-      contextState.tokenization.tail.appliedSuggestionId = suggestion.id;
-      let acceptedContext = models.applyTransform(suggestion.transform, context);
-      if(suggestion.appendedTransform) {
-        acceptedContext = models.applyTransform(suggestion.appendedTransform, acceptedContext);
-      }
-      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
+      const fullTransform = suggestion.appendedTransform
+        ? models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
+        : suggestion.transform;
+
+      // An applied suggestion should replace the original Transition's effects, though keeping
+      // the original input around.
+      const applicationState = correction.ContextTracker.attemptMatchContext(
+        context,
+        this.lexicalModel,
+        originalTransition.base,
+        [{sample: fullTransform, p: 1}]
+      ).final;
+
+      const appliedTransition = new ContextTransition(originalTransition);
+      appliedTransition.applySuggestion(applicationState, suggestion);
+      this.contextTracker.cache.add(suggestion.transformId, appliedTransition);
     }
 
     return reversion;
@@ -278,6 +289,7 @@ export class ModelCompositor {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
+    let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
       const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
@@ -298,27 +310,42 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let contextMatchFound = this.contextTracker.cache.peek(-reversion.transformId);
+    let originalTransition = this.contextTracker.cache.peek(-reversion.transformId);
 
-    if(!contextMatchFound) {
-      return fallbackSuggestions();
+    if(!originalTransition) {
+      suggestions = fallbackSuggestions();
     }
 
     // Remove all contexts more recent than the one we're reverting to.
     this.contextTracker.cache.rewindTo(-reversion.transformId);
-    this.contextTracker.newest.final.tokenization.tail.appliedSuggestionId = undefined;
 
-    // Will need to be modified a bit if/when phrase-level suggestions are implemented.
-    // Those will be tracked on the first token of the phrase, which won't be the tail
-    // if they cover multiple tokens.
-    let suggestions = this.contextTracker.newest.final.tokenization.tail.suggestions;
+    if(!suggestions) {
+      // Will need to be modified a bit if/when phrase-level suggestions are implemented.
+      // Those will be tracked on the first token of the phrase, which won't be the tail
+      // if they cover multiple tokens.
+      let suggests = this.contextTracker.newest.final.suggestions;
 
-    suggestions.forEach(function(suggestion) {
-      // A reversion's transform ID is the additive inverse of its original suggestion;
-      // we revert to the state of said original suggestion.
-      suggestion.transformId = -reversion.transformId;
-      suggestion.autoAccept = false;
-    });
+      suggests.forEach(function(suggestion) {
+        // A reversion's transform ID is the additive inverse of its original suggestion;
+        // we revert to the state of said original suggestion.
+        suggestion.transformId = -reversion.transformId;
+        suggestion.autoAccept = false;
+      });
+
+      suggestions = Promise.resolve(suggests);
+    }
+
+    // An applied reversion should replace the original Transition's effects.
+    const revertedTransition = correction.ContextTracker.attemptMatchContext(
+      models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
+      this.lexicalModel,
+      originalTransition.base,
+      originalTransition.inputDistribution
+    );
+
+    revertedTransition.final.suggestions = await suggestions;
+    this.contextTracker.cache.add(-reversion.transformId, revertedTransition);
+
     return suggestions;
   }
 

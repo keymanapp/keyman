@@ -12,6 +12,7 @@ import { assert } from 'chai';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 var TrieModel = models.TrieModel;
+var emptyInput = (id) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
 
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
@@ -1010,7 +1011,7 @@ describe('ModelCompositor', function() {
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
 
-      let initialSuggestions = await compositor.predict(postTransform, baseContext, [{sample: {insert: '', deleteLeft: 0, id: 0}, p: 1}]);
+      let initialSuggestions = await compositor.predict(postTransform, baseContext);
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
@@ -1045,6 +1046,8 @@ describe('ModelCompositor', function() {
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
 
+      compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
+
       let initialSuggestions = await compositor.predict(postTransform, baseContext);
       const suggestionContextState = compositor.contextTracker.newest;
 
@@ -1056,26 +1059,28 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.cache.size, 2);
 
       let contextIds = compositor.contextTracker.cache.keys();
-      let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key));
+      let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key));
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.cache.count, 2);
-      assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
-      assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key)), transitionInstances);
+      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, context));
+      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(13));
 
-      // The replacement should be marked on the context-tracking token.
-      assert.isAtLeast(suggestionContextState.final.tokenization.tail.appliedSuggestionId, 0);
+      // Accepting the suggestion rewrites the latest context transition.
+      assert.equal(compositor.contextTracker.cache.size, 2);
+      assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
+      assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key)), transitionInstances);
+
+      // The replacement should be marked on the context-tracking token for the applied version of the results.
+      assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
+      assert.isAtLeast(appliedContextState.final.appliedSuggestionId, 0);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      compositor.applyReversion(reversion, appliedContext);
-
-      // The replacement should no longer be marked for the context-tracking token.
-      assert.equal(suggestionContextState.final.tokenization.tail.appliedSuggestionId, undefined);
+      await compositor.applyReversion(reversion, appliedContext);
+      assert.isUndefined(compositor.contextTracker.cache.peek(13).final.appliedSuggestionId);
     });
   });
 });
