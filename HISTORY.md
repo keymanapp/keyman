@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.94 alpha 2025-08-01
+
+* maint(common): use `cpp_std=c++17` in meson project default_options (#14433)
+
 ## 19.0.93 alpha 2025-07-29
 
 * test(developer): add unit tests for `isValidUtf8` (#14381)
