@@ -1,5 +1,6 @@
 project('ibus-keyman', 'c', 'cpp',
         version: files('../../VERSION.md'),
+        default_options: ['cpp_std=c++17'],
         license: 'GPL-2+',
         meson_version: '>=1.0')
 
