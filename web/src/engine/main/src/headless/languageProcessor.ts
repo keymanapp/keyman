@@ -330,11 +330,13 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
+    // We record the current context state before any prediction requests...
     const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
+    // ... even those triggered by context-resets.
     if(resetContext) {
-      this.lmEngine.resetContext(context);
+      this.lmEngine.resetContext(context, transcription.token);
     }
 
     let alternates = transcription.alternates;
