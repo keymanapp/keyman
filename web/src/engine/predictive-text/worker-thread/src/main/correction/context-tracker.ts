@@ -11,6 +11,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
+import { ContextTokenization } from './context-tokenization.js';
 
 /**
  * Determines the proper 'last match' index for a tokenized sequence based on its edit path.
@@ -50,7 +51,8 @@ export class TrackedContextState {
   taggedContext: Context;
   model: LexicalModel;
 
-  tokens: ContextToken[];
+  tokenization: ContextTokenization;
+
   /**
    * How many tokens were removed from the start of the best-matching ancestor.
    * Useful for restoring older states, e.g., when the user moves the caret backwards, we can recover the context at that position.
@@ -63,51 +65,17 @@ export class TrackedContextState {
     if(obj instanceof TrackedContextState) {
       let source = obj;
       // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
-      this.tokens = source.tokens.map((token) => new ContextToken(token));
+      this.tokenization = new ContextTokenization(source.tokenization.tokens.map((token) => new ContextToken(token)));
 
       this.indexOffset = 0;
       this.model = obj.model;
       this.taggedContext = obj.taggedContext;
     } else {
       let lexicalModel = obj;
-      this.tokens = [];
+      this.tokenization = null;
       this.indexOffset = Number.MIN_SAFE_INTEGER;
       this.model = lexicalModel;
     }
-  }
-
-  get head(): ContextToken {
-    return this.tokens[0];
-  }
-
-  get tail(): ContextToken {
-    return this.tokens[this.tokens.length - 1];
-  }
-
-  set tail(token: ContextToken) {
-    this.tokens[this.tokens.length - 1] = token;
-  }
-
-  popHead() {
-    this.tokens.splice(0, 1);
-    this.indexOffset -= 1;
-  }
-
-  pushTail(token: ContextToken) {
-    this.tokens.push(token);
-  }
-
-  toRawTokenization() {
-    let sequence: string[] = [];
-
-    for(let token of this.tokens) {
-      // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      if(token.exampleInput !== null) {
-        sequence.push(token.exampleInput);
-      }
-    }
-
-    return sequence;
   }
 }
 
@@ -237,7 +205,7 @@ interface ContextMatchResult {
  * Represents token-count values resulting from an alignment attempt between two
  * different modeled context states.
  */
-type TrackedContextStateAlignment = {
+export type TrackedContextStateAlignment = {
   /**
    * Denotes whether or not alignment is possible between two contexts.
    */
@@ -570,7 +538,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
-    let matchContext: string[] = matchState.toRawTokenization();
+    let matchContext: string[] = matchState.tokenization.exampleInput;
 
     const alignmentResults = this.attemptTokenizedAlignment(tokenizedContext.map((token) => token.text), matchContext);
 
@@ -601,13 +569,10 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     }
 
     // If mutations HAVE happened, we have work to do.
-    let state = matchState;
+    const tokenization = matchState.tokenization.tokens.map((token) => new ContextToken(token));
 
     if(leadTokenShift < 0) {
-      state = new TrackedContextState(state);
-      for(let i = 0; i > leadTokenShift; i--) {
-        state.popHead();
-      }
+      tokenization.splice(0, -leadTokenShift);
     } else if(leadTokenShift > 0) {
       // TODO:  insert token(s) at the start to match the text that's back within the
       // sliding context window.
@@ -618,6 +583,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // If no TAIL mutations have happened, we're safe to return now.
     if(tailEditLength == 0 && tailTokenShift == 0) {
+      const state = new TrackedContextState(matchState);
+      state.tokenization = new ContextTokenization(tokenization, alignmentResults);
       return {
         state: state,
         baseState: matchState,
@@ -665,7 +632,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       const matchingIndex = i + matchingTailUpdateIndex;
 
       const incomingToken = tokenizedContext[incomingIndex];
-      const matchedToken = matchState.tokens[matchingIndex];
+      const matchedToken = matchState.tokenization.tokens[matchingIndex];
 
       let primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
       const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
@@ -673,7 +640,6 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       const isLastToken = incomingIndex == tokenizedContext.length - 1;
 
       if(isLastToken) {
-        state = new TrackedContextState(state);
         // If this token's transform component is not part of the final token,
         // it's something we'll want to preserve even when applying suggestions
         // for the final token.
@@ -689,19 +655,17 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         token = new ContextToken(matchState.model, incomingToken.text);
         token.searchSpace.inputSequence.forEach((entry) => entry[0].sample.id = primaryInput.id);
       } else {
+        // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
+        // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
         token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
       }
 
-      state.tokens[incomingIndex] = token;
+      tokenization[incomingIndex] = token;
       tailIndex++;
     }
 
     if(tailTokenShift < 0) {
-      if(state == matchState) {
-        state = new TrackedContextState(state);
-      }
-
       // delete tail tokens
       for(let i = 0; i > tailTokenShift; i--) {
         // If ALL that remains are deletes, we're good to go.
@@ -709,13 +673,9 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         // This may not be the token at the index, but since all that remains are deletes,
         // we'll have deleted the correct total number from the end once all iterations
         // are done.
-        state.tokens.pop();
+        tokenization.pop();
       }
     } else {
-      if(state == matchState) {
-        state = new TrackedContextState(state);
-      }
-
       for(let i = tailEditLength; i < tailEditLength + tailTokenShift; i++) {
         // create tail tokens
         const incomingIndex = i + incomingTailUpdateIndex;
@@ -738,11 +698,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
         }
 
-        if(state == matchState) {
-          state = new TrackedContextState(state);
-        }
-
-        let pushedToken = new ContextToken(state.model);
+        let pushedToken = new ContextToken(matchState.model);
 
         // TODO:  assumes that there was no shift in wordbreaking from the
         // prior context to the current one.  This may actually be a major
@@ -778,11 +734,14 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         pushedToken.isWhitespace = incomingToken.isWhitespace;
 
         // Auto-replaces the search space to correspond with the new token.
-        state.pushTail(pushedToken);
+        tokenization.push(pushedToken);
 
         tailIndex++;
       }
     }
+
+    const state = new TrackedContextState(matchState);
+    state.tokenization = new ContextTokenization(tokenization, alignmentResults);
 
     return {
       state,
@@ -809,16 +768,18 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // And now build the final context state object, which includes whitespace 'tokens'.
     let state = new TrackedContextState(lexicalModel);
+    const tokenization: ContextToken[] = [];
 
     while(baseTokens.length > 0) {
-      state.pushTail(baseTokens.splice(0, 1)[0]);
+      tokenization.push(baseTokens.splice(0, 1)[0]);
     }
 
-    if(state.tokens.length == 0) {
+    if(tokenization.length == 0) {
       let token = new ContextToken(lexicalModel);
-      state.pushTail(token);
+      tokenization.push(token);
     }
 
+    state.tokenization = new ContextTokenization(tokenization);
     return state;
   }
 
