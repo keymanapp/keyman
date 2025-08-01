@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # This script runs from its own folder
 cd "$THIS_SCRIPT_PATH"

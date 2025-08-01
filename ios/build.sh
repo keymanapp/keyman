@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices - iPhone and iPad." \
   "@/resources/tools/check-markdown  test:help" \

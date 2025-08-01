@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # ################################ Main script ################################
@@ -109,8 +109,9 @@ function do_build() {
             KEYMAN_VERSION=$KEYMAN_VERSION \
             KEYMAN_VERSION_WITH_TAG=$KEYMAN_VERSION_WITH_TAG
 
-    assertDirExists "$ARCHIVE_PATH"
-
+    if ! [[ -d "${ARCHIVE_PATH}" ]]; then
+      builder_die "Build failed: directory '${ARCHIVE_PATH}' missing"
+    fi
 
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.

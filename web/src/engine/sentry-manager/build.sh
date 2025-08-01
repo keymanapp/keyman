@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \

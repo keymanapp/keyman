@@ -10,7 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 SUBPROJECT_NAME=tools/testing/bulk_rendering
 . "$KEYMAN_ROOT/web/common.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 
