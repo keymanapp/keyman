@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/meson-utils.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-#. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+#. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 

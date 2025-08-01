@@ -12,62 +12,6 @@ verify_on_mac() {
   fi
 }
 
-# The list of valid platforms that our build scripts ought expect.
-platforms=("android" "ios" "linux" "lmlayer" "mac" "web" "win")
-
-# Used to validate a specified 'platform' parameter.
-_verify_platform() {
-  match=false
-  for proj in "${platforms[@]}"
-  do
-    if [[ "${proj}" = "$1" ]]; then
-      match=true
-    fi
-  done
-
-  if [[ ${match} = false ]]; then
-    builder_die "Invalid project specified!"
-  fi
-}
-
-displayInfo() {
-  # TODO: can we replace this function with builder_debug?
-  if [[ "${QUIET}" != true ]]; then
-    while [[ $# -gt 0 ]] ; do
-      echo "$1"
-      shift # past argument
-    done
-  fi
-}
-
-assertFileExists() {
-  if ! [[ -f $1 ]]; then
-    builder_die "Build failed:  missing $1"
-  fi
-}
-
-assertDirExists() {
-  if ! [[ -d $1 ]]; then
-    builder_die "Build failed:  missing $1"
-  fi
-}
-
-assertValidVersionNbr()
-{
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-  if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.BuildCounter"
-  fi
-}
-
-assertValidPRVersionNbr()
-{
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-  if [[ "$1" == "" || ! "$1" =~ ^[0-9]+\.[0-9]+\.pull\.[0-9]+$ ]]; then
-    builder_die "Specified version not valid: '$1'. Version should be in the form Major.Minor.pull.BuildCounter"
-  fi
-}
-
 #
 # Write ${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info file for the target
 # artifact
@@ -88,7 +32,9 @@ write_download_info() {
 
   local DATE HASH SIZE DOWNLOAD_INFO STAT_FLAGS
 
-  _verify_platform "${PLATFORM}"
+  if [[ ! "${PLATFORM}" =~ ^(android|ios|linux|mac|web|win)$ ]]; then
+    builder_die "Invalid project ${PLATFORM}"
+  fi
 
   # shellcheck disable=SC2312
   if builder_is_macos && [[ $(command -v stat) == /usr/bin/stat ]]; then
@@ -126,40 +72,6 @@ write_download_info() {
     }'
   )
   echo "${DOWNLOAD_INFO}" | "${JQ}" . >> "${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info"
-}
-
-# set_version sets the file version on mac/ios projects
-set_version ( ) {
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-  PRODUCT_PATH=$1
-
-  if [ $KEYMAN_VERSION ]; then
-    if [ $2 ]; then  # $2 = product name.
-      echo "Setting version numbers in $2 to $KEYMAN_VERSION."
-    fi
-    /usr/libexec/Plistbuddy -c "Set CFBundleVersion $KEYMAN_VERSION" "$PRODUCT_PATH/Info.plist"
-    /usr/libexec/Plistbuddy -c "Set CFBundleShortVersionString $KEYMAN_VERSION" "$PRODUCT_PATH/Info.plist"
-  fi
-}
-
-
-# Uses npm to set the current package version (package.json).
-#
-# This sets the version according to the current KEYMAN_VERSION_WITH_TAG.
-#
-# Usage:
-#
-#   set_npm_version
-#
-set_npm_version () {
-  # REVIEW: this function doesn't seem to be used anywhere in the codebase.
-
-  # We use --no-git-tag-version because our CI system controls version numbering and
-  # already tags releases. We also want to have the version of this match the
-  # release of Keyman Developer -- these two versions should be in sync. Because this
-  # is a large repo with multiple projects and build systems, it's better for us that
-  # individual build systems don't take too much ownership of git tagging. :)
-  npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$KEYMAN_VERSION_WITH_TAG"
 }
 
 #
@@ -214,6 +126,7 @@ _try_multiple_times ( ) {
 # Verifies that node is installed, and installs npm packages, but only once per
 # build invocation
 #
+# TODO: rename to builder_node_select_version_and_npm_ci, move to builder.node.inc.sh
 verify_npm_setup() {
   # We'll piggy-back on the builder module dependency build state to determine
   # if npm ci has been called in the current script invocation. Adding the
@@ -250,16 +163,22 @@ verify_npm_setup() {
   popd > /dev/null
 }
 
+# TODO: rename to _node_print_expected_version, move to builder.node.inc.sh
 _print_expected_node_version() {
   "$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
 }
 
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
+#
+# TODO: rename to _node_select_version_with_nvm, move to builder.node.inc.sh
 _select_node_version_with_nvm() {
   local REQUIRED_NODE_VERSION  CURRENT_NODE_VERSION
 
   REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
+  if [[ -z "$REQUIRED_NODE_VERSION" ]]; then
+    builder_die "Could not find expected Node.js version in $KEYMAN_ROOT/package.json"
+  fi
 
   if builder_is_windows; then
     CURRENT_NODE_VERSION="$(node --version)"
@@ -284,6 +203,15 @@ _select_node_version_with_nvm() {
   fi
 }
 
+#
+# Wrapper for check-markdown tool to verify links within and validity of all .md
+# files in a folder and its sub-folders
+#
+# Usage:
+#   check-markdown path_root
+# Parameters:
+#   1: path_root    path to base folder containing .md files to be checked
+#
 check-markdown() {
   node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
 }
@@ -297,9 +225,8 @@ check-markdown() {
 #   1: coverage_threshold   optional, minimum coverage for c8 to pass tests,
 #                           defaults to 90 (percent)
 #
-# Todo:
-#   Move to builder.typescript.inc.sh when this is established
-#
+# TODO: move to builder.typescript.inc.sh when this is established, rename to
+#       builder_typescript_do_tests
 builder_do_typescript_tests() {
   local MOCHA_FLAGS=
 

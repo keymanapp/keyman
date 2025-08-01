@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
