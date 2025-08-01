@@ -1,24 +1,21 @@
 import { assert } from 'chai';
 
 import { ContextTracker } from '#./correction/context-tracker.js';
-import { tokenizeTransformDistribution } from '#./correction/transform-tokenization.js';
 import ModelCompositor from '#./model-compositor.js';
 import * as models from '#./models/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { determineModelTokenizer } from '#./model-helpers.js';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { ContextState } from '#./correction/context-state.js';
-
-const tokenizer = determineModelTokenizer(new models.DummyModel({wordbreaker: defaultBreaker}));
 
 var TrieModel = models.TrieModel;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: wordBreakers.default});
+
+var emptyInput = (id) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
 
 describe('ContextTracker', function() {
   function toWrapperDistribution(transform) {
@@ -340,11 +337,15 @@ describe('ContextTracker', function() {
     it('tracks an accepted suggestion', function() {
       let baseSuggestion = {
         transform: {
-          insert: 'world ',
+          insert: 'world',
           deleteLeft: 3,
-          id: 1
+          id: 2
         },
-        transformId: 0,
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0
+        },
+        transformId: 2,
         id: 1,
         displayAs: 'world'
       };
@@ -367,23 +368,18 @@ describe('ContextTracker', function() {
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), options);
       let compositor = new ModelCompositor(model);
-      let baseContextMatch = compositor.contextTracker.analyzeState(model, baseContext, [{sample: {insert: '', deleteLeft: 0, id: 0}, p: 1}]);
-
-      baseContextMatch.final.tokenization.tail.replacements = [{
-        suggestion: baseSuggestion,
-        tokenWidth: 1
-      }];
-
+      let preAppliedState = compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
 
       // Actual test assertion - was the replacement tracked?
-      assert.equal(baseContextMatch.final.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
+      assert.isUndefined(preAppliedState.final.appliedSuggestionId);
       assert.equal(reversion.id, -baseSuggestion.id);
       compositor.contextTracker.cache.keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
-      let postContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      let postContextMatch = compositor.contextTracker.analyzeState(model, postContext);
+      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
+      let postContextMatch = compositor.contextTracker.analyzeState(model, postContext, emptyInput(2));
+      assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
       assert.equal(postContextMatch.final.tokenization.tokens[postContextMatch.final.tokenization.tokens.length - 2].exampleInput, ' ');
