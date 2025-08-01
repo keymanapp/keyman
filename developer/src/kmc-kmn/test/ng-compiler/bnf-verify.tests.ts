@@ -79,7 +79,16 @@ function replaceElementNames(str: string): string {
 
 function getSourceRules(buffer:string): Dictionary {
     const rules: Dictionary = {};
-    const matches = buffer.matchAll(/export class (\S+)Rule.*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
+    // Rules that extend AlternateTokenRule
+    let matches = buffer.matchAll(/export class (\S+)Rule extends AlternateTokenRule.*?super\(\[([^\]]*)/sg);
+    for (let match of matches) {
+      const name  = lowerCaseFirstLetter(match[1]);
+      rules[name] = removeWhiteSpace(match[2]);
+      rules[name] = replaceCommas(rules[name]);
+      rules[name] = replaceTokenElements(rules[name]);
+    }
+    // Other Rules
+    matches = buffer.matchAll(/export class (\S+)Rule extends (?!AlternateTokenRule).*?constructor\(\)\s*\{[^}]*this.rule\s*=\s*new([^;}]*)[^}]*\}/sg);
     for (let match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
@@ -102,6 +111,14 @@ function lowerCaseFirstLetter(str: string): string {
 
 function removeWhiteSpace(str: string): string {
   return str.replaceAll(/\s/g, '');
+}
+
+function replaceCommas(str: string): string {
+  if (str != null) {
+    str = str.replace(/,$/, '');
+    str = str.replaceAll(/,/g, '|');
+  }
+  return str;
 }
 
 function replaceSequenceRule(str: string): string {
@@ -170,6 +187,15 @@ function replaceManyElements(str: string): string {
     str = str.replaceAll(/(?:many)(\S)([^|\s]*)/g,
       (match, p1, p2, offset, string, groups) =>
         { return p1.toLowerCase()+p2+'*'; });
+  }
+  return str;
+}
+
+function replaceTokenElements(str: string): string {
+  if (str != null && str.includes('TokenTypes.')) {
+    str = str.replaceAll(/(?:TokenTypes\.)([^|\s]*)/g,
+      (match, p1, offset, string, groups) =>
+        { return p1.toLowerCase(); });
   }
   return str;
 }
