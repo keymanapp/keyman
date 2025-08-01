@@ -570,14 +570,14 @@ export class InputContextRule extends SingleChildRule {
 export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const any: Rule              = new AnyStatementRule();
-    const notAny: Rule           = new NotAnyStatementRule();
+    const anyStatement: Rule     = new AnyStatementRule();
+    const notAnyStatement: Rule  = new NotAnyStatementRule();
     const contextStatement: Rule = new ContextStatementRule();
     const indexStatement: Rule   = new IndexStatementRule();
     const text: Rule             = new TextRule();
     this.rule = new AlternateRule([
-      any,
-      notAny,
+      anyStatement,
+      notAnyStatement,
       contextStatement,
       indexStatement,
       text
