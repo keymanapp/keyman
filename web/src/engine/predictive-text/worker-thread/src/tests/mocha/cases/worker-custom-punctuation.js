@@ -89,7 +89,7 @@ describe('Custom Punctuation', function () {
 
       // Check that it has been changed:
       for (var i = 0; i < dummySuggestions.length; i++) {
-        assert.isTrue(suggestions[i].transform.insert.endsWith(' '));
+        assert.isTrue(suggestions[i].appendedTransform.insert == ' ');
       }
     });
   })
