@@ -10,6 +10,7 @@ SUBPROJECT_NAME=engine/osk/gesture-processor
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
@@ -38,7 +39,7 @@ builder_parse "$@"
 # TODO: configure if npm has not been run, and build is specified
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 }
 
 function do_build_module() {

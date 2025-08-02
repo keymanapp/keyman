@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # Setup JQ environment variable according to the user's system
 #

@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 ################################ Main script ################################
 
@@ -26,6 +27,6 @@ builder_parse "$@"
 
 ### CONFIGURE ACTIONS
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action clean      rm -rf ../../../../build/tools/building/sourcemap-root
 builder_run_action build      tsc --build tsconfig.json
