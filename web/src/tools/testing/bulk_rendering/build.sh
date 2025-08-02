@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 SUBPROJECT_NAME=tools/testing/bulk_rendering
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 ################################ Main script ################################
 
@@ -39,6 +40,6 @@ function do_build ( ) {
      "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/zip.min.js"
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action clean      rm -rf ../../../../build/$SUBPROJECT_NAME
 builder_run_action build      do_build

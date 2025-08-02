@@ -627,7 +627,7 @@ builder_has_action() {
 #   }
 #
 #   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-#   builder_run_action configure    verify_npm_setup
+#   builder_run_action configure    node_select_version_and_npm_ci
 #   builder_run_action build        do_build
 # ```
 #

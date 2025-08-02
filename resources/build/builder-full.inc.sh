@@ -1,4 +1,5 @@
-# builder.inc.sh
+# shellcheck shell=bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # Wrapper for Builder scripts. Do not confuse this with
 # /resources/builder.inc.sh which has the full implementation of builder scripts

@@ -6,6 +6,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+
 builder_describe "Builds a debug-host page simulating Keyman Android's WebView setup for KMW use" \
   "@/common/web/keyman-version" \
   "@/web/src/app/webview" \
@@ -28,7 +30,7 @@ fi
 ### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
-  verify_npm_setup
+  node_select_version_and_npm_ci
   builder_finish_action success configure
 fi
 

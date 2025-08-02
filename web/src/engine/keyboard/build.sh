@@ -12,6 +12,7 @@ SUBPROJECT_NAME=engine/keyboard
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 ################################ Main script ################################
 
@@ -34,7 +35,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   # Configure Web browser-engine testing environments.  As is, this should only
   # make changes when we update the dependency, even on our CI build agents.

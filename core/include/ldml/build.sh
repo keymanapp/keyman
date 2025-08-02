@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Keyman ldml-keyboard-constants package" \
@@ -30,7 +31,7 @@ builder_parse "$@"
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean      rm -rf ./build/
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      tsc --build
 # builder_run_action test       # no tests at this time
 builder_run_action publish    builder_publish_npm

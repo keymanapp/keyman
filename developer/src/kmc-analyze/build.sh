@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Keyman Developer Compiler Analysis Tools" \
@@ -26,7 +27,7 @@ builder_parse "$@"
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean      rm -rf ./build/
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
 builder_run_action test       builder_do_typescript_tests 70
