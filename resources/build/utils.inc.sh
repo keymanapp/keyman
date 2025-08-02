@@ -7,6 +7,7 @@
 _utils_inc_sh=1
 
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
+# TODO: move to resources/build/mac/<something.inc.sh>
 verify_on_mac() {
   if ! builder_is_macos; then
     builder_die "This build script will only run in a Mac environment."
@@ -25,6 +26,7 @@ verify_on_mac() {
 #   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.gz)
 #   5: PLATFORM            Target platform for artifact
 #
+# TODO: Move to CI include?
 write_download_info() {
   local UPLOAD_DIR="$1"
   local ARTIFACT_FILENAME="$2"
@@ -137,46 +139,3 @@ check-markdown() {
   node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
 }
 
-#
-# Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
-#
-# Usage:
-#   builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
-# Parameters:
-#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests,
-#                           defaults to 90 (percent)
-#
-# TODO: move to builder.typescript.inc.sh when this is established, rename to
-#       builder_typescript_do_tests
-builder_do_typescript_tests() {
-  local MOCHA_FLAGS=
-
-  if builder_is_running_on_teamcity; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
-  eslint .
-  tsc --build test/
-
-  local THRESHOLD_PARAMS=
-  local C8_THRESHOLD=
-  if [[ $# -gt 0 ]]; then
-    C8_THRESHOLD=$1
-    THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
-  else
-    # Seems like a bug in TeamCity reporter if we don't list default thresholds,
-    # see #13418.
-    #
-    # Making branch and function thresholds slightly lower, because the default
-    # for c8 is 0 for these anyway.
-    THRESHOLD_PARAMS="--lines 90 --statements 90 --branches 80 --functions 80"
-  fi
-
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
-
-  if [[ ! -z "$C8_THRESHOLD" ]]; then
-    builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-    builder_echo warning "Please increase threshold in build.sh as test coverage improves."
-  fi
-}
