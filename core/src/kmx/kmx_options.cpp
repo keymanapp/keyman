@@ -8,6 +8,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km_vk;
 
 int KMX_Options::_GetIndex(std::u16string const &key) const {
   auto i = 0U;
