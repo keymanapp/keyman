@@ -137,7 +137,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      baseTransition.replaceFinal(new ContextState(matchState), transformDistribution);
+      baseTransition.replaceFinal(matchState, transformDistribution);
       return baseTransition;
     } else {
       // If we didn't get any input, we really should perfectly match
