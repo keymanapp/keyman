@@ -8,6 +8,8 @@
  * TokenTypes for the Lexer
  */
 
+/* These have been placed in alphabetical order for ease of access */
+
 export enum TokenTypes {
   ALWAYS              = "ALWAYS",
   AMPERSAND           = "AMPERSAND",
@@ -48,12 +50,12 @@ export enum TokenTypes {
   IF                  = "IF",
   INCLUDECODES        = "INCLUDECODES",
   INDEX               = "INDEX",
-  KEY_CODE            = "KEY_CODE",
   KEYBOARDVERSION     = "KEYBOARDVERSION",
   KEYMAN              = "KEYMAN",
   KEYMANONLY          = "KEYMANONLY",
   KEYMANWEB           = "KEYMANWEB",
   KEYS                = "KEYS",
+  KEY_CODE            = "KEY_CODE",
   KMFL                = "KMFL",
   KMW_EMBEDCSS        = "KMW_EMBEDCSS",
   KMW_EMBEDJS         = "KMW_EMBEDJS",
@@ -64,8 +66,8 @@ export enum TokenTypes {
   LANGUAGE_HEADER     = "LANGUAGE_HEADER",
   LAYER               = "LAYER",
   LAYER_SHORTCUT      = "LAYER_SHORTCUT",
-  LAYOUT_HEADER       = "LAYOUT_HEADER",
   LAYOUTFILE          = "LAYOUTFILE",
+  LAYOUT_HEADER       = "LAYOUT_HEADER",
   LEFT_BR             = "LEFT_BR",
   LEFT_SQ             = "LEFT_SQ",
   MATCH               = "MATCH",
@@ -74,8 +76,8 @@ export enum TokenTypes {
   MNEMONICLAYOUT      = "MNEMONICLAYOUT",
   MODIFIER            = "MODIFIER",
   NAME                = "NAME",
-  NAME_HEADER         = "NAME_HEADER",
   NAMED_CONSTANT      = "NAMED_CONSTANT",
+  NAME_HEADER         = "NAME_HEADER",
   NOMATCH             = "NOMATCH",
   NOT_EQUAL           = "NOT_EQUAL",
   NOTANY              = "NOTANY",
@@ -108,8 +110,8 @@ export enum TokenTypes {
   STORE               = "STORE",
   STRING              = "STRING",
   TARGETS             = "TARGETS",
-  U_CHAR              = "U_CHAR",
   UNICODE             = "UNICODE",
+  U_CHAR              = "U_CHAR",
   USE                 = "USE",
   USING               = "USING",
   VERSION             = "VERSION",
