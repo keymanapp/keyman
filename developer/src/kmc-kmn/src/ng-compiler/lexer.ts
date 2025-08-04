@@ -255,9 +255,9 @@ export class Token {
   public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null) {
     this.tokenType = tokenType;
     this._text     = text;
-    this._lineNum  = lineNum;
-    this._charNum  = charNum;
-    this._line     = line;
+    this._lineNum  = (lineNum < 1 )? 1 : lineNum;
+    this._charNum  = (charNum < 1 )? 1 : charNum;
+    this._line     = (tokenType === TokenTypes.NEWLINE || tokenType === TokenTypes.EOF) ? line : null;
   }
 
   public isTokenType(tokenType: TokenTypes): boolean {
@@ -267,14 +267,16 @@ export class Token {
   public get text(): string { return this._text; }
   public set text(text: string) { this._text = text; }
   public get lineNum(): number { return this._lineNum; }
-  public set lineNum(lineNum: number) { this._lineNum = lineNum; }
+  public set lineNum(lineNum: number) { this._lineNum = (lineNum < 1 )? 1 : lineNum; }
   public get charNum(): number { return this._charNum; }
-  public set charNum(charNum: number) { this._charNum = charNum; }
+  public set charNum(charNum: number) { this._charNum = (charNum < 1 )? 1 : charNum; }
   public get line(): string { return this._line; }
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`
-    if (this.tokenType !== TokenTypes.NEWLINE && this.tokenType !== TokenTypes.WHITESPACE) {
+    if (this.tokenType !== TokenTypes.NEWLINE &&
+      this.tokenType !== TokenTypes.EOF &&
+      this.tokenType !== TokenTypes.WHITESPACE) {
       buf = buf.concat(`,${this._text}`);
     }
     buf = buf.concat(']');

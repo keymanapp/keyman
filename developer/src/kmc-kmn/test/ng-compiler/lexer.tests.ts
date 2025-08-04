@@ -18,12 +18,6 @@ describe("Lexer Tests", () => {
       assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
     });
   });
-  describe("Token", () => {
-    it("can construct a Token", () => {
-      const token = new Token(TokenTypes.STORE, 'store');
-      assert.deepEqual(token.toString(), '[STORE,store]');
-    });
-  });
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
@@ -1063,6 +1057,71 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
         ]
       assert.deepEqual(actual, expected);
+    });
+  });
+  describe("Token", () => {
+    it("can construct a Token", () => {
+      const token = new Token(TokenTypes.STORE, 'store');
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 1);
+      assert.isNull(token.line);
+    });
+    it("can construct a Token with line and char numbers", () => {
+      const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 2);
+      assert.equal(token.charNum, 3);
+      assert.isNull(token.line);
+    });
+    it("can handle a negative line number", () => {
+      const token = new Token(TokenTypes.STORE, 'store', -2, 3);
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 3);
+      assert.isNull(token.line);
+    });
+    it("can handle a negative char number", () => {
+      const token = new Token(TokenTypes.STORE, 'store', 2, -3);
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 2);
+      assert.equal(token.charNum, 1);
+      assert.isNull(token.line);
+    });
+    it("can handle a zero line number", () => {
+      const token = new Token(TokenTypes.STORE, 'store', 0, 3);
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 3);
+      assert.isNull(token.line);
+    });
+    it("can handle a zero char number", () => {
+      const token = new Token(TokenTypes.STORE, 'store', 2, 0);
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 2);
+      assert.equal(token.charNum, 1);
+      assert.isNull(token.line);
+    });
+    it("can construct a Token with a line (NEWLINE)", () => {
+      const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+      assert.deepEqual(token.toString(), '[NEWLINE]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 19);
+      assert.equal(token.line, 'store(one) "value"\n');
+    });
+    it("can construct a Token with a line (EOF)", () => {
+      const token = new Token(TokenTypes.EOF, '', 1, 18, 'store(one) "value"');
+      assert.deepEqual(token.toString(), '[EOF]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 18);
+      assert.equal(token.line, 'store(one) "value"');
+    });
+    it("can handle invalid line in constructor", () => {
+      const token = new Token(TokenTypes.STORE, 'store', 1, 1, 'store(one) "value"\n');
+      assert.deepEqual(token.toString(), '[STORE,store]');
+      assert.equal(token.lineNum, 1);
+      assert.equal(token.charNum, 1);
+      assert.isNull(token.line);
     });
   });
 });
