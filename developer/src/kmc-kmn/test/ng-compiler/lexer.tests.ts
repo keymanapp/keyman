@@ -139,6 +139,50 @@ describe("Lexer Tests", () => {
     it("can recognise a CLEARCONTEXT token", () => {
       recogniseToken(TokenTypes.CLEARCONTEXT, 'clearcontext');
     });
+    it("can handle an invalid system store token", () => {
+      [
+        '&baselayout',
+        '&bitmap',
+        '&casedkeys',
+        '&copyright',
+        '&displaymap',
+        '&ethnologuecode',
+        '&hotkey',
+        '&includecodes',
+        '&keyboardversion',
+        '&kmw_embedcss',
+        '&kmw_embedjs',
+        '&kmw_helpfile',
+        '&kmw_helptext',
+        '&kmw_rtl',
+        '&language',
+        '&layer',
+        '&layoutfile',
+        '&message',
+        '&mnemoniclayout',
+        '&name',
+        '&newlayer',
+        '&oldcharposmatching',
+        '&oldlayer',
+        '&platform',
+        '&targets',
+        '&version',
+        '&visualkeyboard',
+        '&windowslanguages',
+        '&capsalwaysoff',
+        '&capsononly',
+        '&shiftfreescaps',
+        'caps',
+        'always',
+        'off',
+        'on',
+        'only',
+        'shift',
+        'frees',
+        'fix',
+        'clearcontext',
+      ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
+    });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenTypes.BITMAP_HEADER, 'bitmap');
     });
@@ -1264,4 +1308,15 @@ function recogniseSystemStoreWithString(type: TokenTypes, text: string, {addEOF=
     ],
     {addEOF, emitAll, handleContinuation}
   );
+}
+
+function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+  ['a', '_a', '.a', '-a'].forEach((suffix) => {
+    const textWithSuffix = `${text}${suffix}`;
+    recogniseTokens(
+      textWithSuffix,
+      [new Token(TokenTypes.PARAMETER, textWithSuffix)],
+      {addEOF, emitAll, handleContinuation}
+    );
+  });
 }
