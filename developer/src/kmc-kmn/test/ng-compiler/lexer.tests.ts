@@ -1194,6 +1194,12 @@ describe("Lexer Tests", () => {
         assert.equal(token.charNum, 1);
       });
     });
+    describe("Token.line", () => {
+      it("can get line", () => {
+        const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+        assert.equal(token.line, 'store(one) "value"\n');
+      });
+    });
   });
 });
 
