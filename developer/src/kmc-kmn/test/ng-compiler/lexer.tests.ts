@@ -139,50 +139,6 @@ describe("Lexer Tests", () => {
     it("can recognise a CLEARCONTEXT token", () => {
       recogniseToken(TokenTypes.CLEARCONTEXT, 'clearcontext');
     });
-    it("can handle an invalid system store token", () => {
-      [
-        '&baselayout',
-        '&bitmap',
-        '&casedkeys',
-        '&copyright',
-        '&displaymap',
-        '&ethnologuecode',
-        '&hotkey',
-        '&includecodes',
-        '&keyboardversion',
-        '&kmw_embedcss',
-        '&kmw_embedjs',
-        '&kmw_helpfile',
-        '&kmw_helptext',
-        '&kmw_rtl',
-        '&language',
-        '&layer',
-        '&layoutfile',
-        '&message',
-        '&mnemoniclayout',
-        '&name',
-        '&newlayer',
-        '&oldcharposmatching',
-        '&oldlayer',
-        '&platform',
-        '&targets',
-        '&version',
-        '&visualkeyboard',
-        '&windowslanguages',
-        '&capsalwaysoff',
-        '&capsononly',
-        '&shiftfreescaps',
-        'caps',
-        'always',
-        'off',
-        'on',
-        'only',
-        'shift',
-        'frees',
-        'fix',
-        'clearcontext',
-      ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
-    });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenTypes.BITMAP_HEADER, 'bitmap');
     });
@@ -1101,6 +1057,50 @@ describe("Lexer Tests", () => {
           new Token(TokenTypes.NEWLINE, '\n', 4, 78, `${line1}${line2}${line3}${line4}`),
         ]
       assert.deepEqual(actual, expected);
+    });
+    it("can handle an invalid system store token", () => {
+      [
+        '&baselayout',
+        '&bitmap',
+        '&casedkeys',
+        '&copyright',
+        '&displaymap',
+        '&ethnologuecode',
+        '&hotkey',
+        '&includecodes',
+        '&keyboardversion',
+        '&kmw_embedcss',
+        '&kmw_embedjs',
+        '&kmw_helpfile',
+        '&kmw_helptext',
+        '&kmw_rtl',
+        '&language',
+        '&layer',
+        '&layoutfile',
+        '&message',
+        '&mnemoniclayout',
+        '&name',
+        '&newlayer',
+        '&oldcharposmatching',
+        '&oldlayer',
+        '&platform',
+        '&targets',
+        '&version',
+        '&visualkeyboard',
+        '&windowslanguages',
+        '&capsalwaysoff',
+        '&capsononly',
+        '&shiftfreescaps',
+        'caps',
+        'always',
+        'off',
+        'on',
+        'only',
+        'shift',
+        'frees',
+        'fix',
+        'clearcontext',
+      ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
     });
   });
   describe("Token", () => {
