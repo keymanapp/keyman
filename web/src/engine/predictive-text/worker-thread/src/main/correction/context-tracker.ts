@@ -51,6 +51,8 @@ export class ContextTracker {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
+      // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
+      // TODO:  Fix - this is intended to be temporary during refactor work.
       baseTransition.replaceFinal(matchState, transformDistribution);
       return baseTransition;
     } else {
@@ -232,6 +234,7 @@ export class ContextTracker {
 
     const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
+    state.appliedInput = transformDistribution?.[0].sample;
     baseTransition.replaceFinal(state, transformDistribution, preservationTransform);
     return baseTransition;
   }
@@ -297,11 +300,13 @@ export class ContextTracker {
         let result = ContextTracker.attemptMatchContext(context, model, priorMatchState.final, transformDistribution);
 
         if(result?.final) {
-          if(priorMatchState.transitionId != transitionId) {
-            // Already has a taggedContext.
-            this.cache.get(transformDistribution.find((entry) => entry.sample.id !== undefined).sample.id);
+          if(transitionId !== undefined) {
+            if(priorMatchState.transitionId != transitionId) {
+              // Already has a taggedContext.
+              this.cache.get(transformDistribution.find((entry) => entry.sample.id !== undefined).sample.id);
+            }
+            this.cache.add(transitionId, result);
           }
-          this.cache.add(transitionId, result);
 
           return result;
         }

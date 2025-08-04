@@ -1053,7 +1053,7 @@ describe('ModelCompositor', function() {
 
       // One for base state, before the transform...
       // one for after, since it makes an edit.
-      assert.equal(compositor.contextTracker.cache.count, 2);
+      assert.equal(compositor.contextTracker.cache.size, 2);
 
       let contextIds = compositor.contextTracker.cache.keys();
       let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key));
