@@ -1,7 +1,6 @@
 import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 import { RewindableCache } from '@keymanapp/web-utils';
 
-import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -9,240 +8,101 @@ import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { ContextToken } from './context-token.js';
-import { ContextTokenization } from './context-tokenization.js';
 import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
   readonly cache = new RewindableCache<number, ContextTransition>(5);
 
-  // Aim:  relocate to ContextTransition in some form?
-  // Or can we split it up in some manner across the different types?
+  /**
+   * As written, this method attempts to match an incoming context with a candidate
+   * prior ContextState analyzed by the context tracking engine.  Upon success,
+   * this method will determine the ContextState properties that best leverage
+   * reuse of prior correction-search data based upon the prior state and return
+   * the overall results as a ContextTransition.
+   *
+   * If the two versions of Context match poorly, this method will return null.
+   *
+   * @param context
+   * @param lexicalModel
+   * @param matchState
+   * @param transformDistribution
+   * @param isApplyingSuggestion
+   * @returns
+   */
   static attemptMatchContext(
+    // Matching the context expected for the transition's base state
     context: Context,
     lexicalModel: LexicalModel,
+    // As currently written, is a POTENTIAL base state
     matchState: ContextState,
     // the distribution should be tokenized already.
     transformDistribution?: Distribution<Transform>, // transform distribution is needed here.
+    // overrides checks for token substitution that can fail for large applied suggestions.
     isApplyingSuggestion?: boolean
-  ): ContextTransition {
-    const baseTransition = new ContextTransition(matchState, matchState.appliedInput?.id);
+  ): ContextTransition /* returns null if matchState is NOT a valid base state */ {
+    // Apply all transforms to the base context state
     const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
 
     if(transformDistribution?.[0]) {
       context = applyTransform(transformDistribution[0].sample, context);
     }
+    // Note for future:  the next line's pattern asserts that there is only one true tokenization.
+    // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
     const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+    // In which case we could try need to align for each of them, starting from the most likely.
     const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
 
     if(!alignmentResults.canAlign) {
       return null;
     }
 
-    const {
-      leadTokenShift,
-      matchLength,
-      tailEditLength,
-      tailTokenShift
-    } = alignmentResults;
+    const resultTokenization = matchState.tokenization.transitionTo(
+      determineModelTokenizer(lexicalModel)(context).left,
+      alignmentResults,
+      lexicalModel,
+      transformSequenceDistribution
+    );
 
-    const hasDistribution = transformSequenceDistribution && Array.isArray(transformSequenceDistribution);
-
-    // If we have a perfect match with a pre-existing context, no mutations have
-    // happened; just re-use the old context state.
-    if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
-      // TODO:  Fix - this is intended to be temporary during refactor work.
-      baseTransition.finalize(matchState, transformDistribution);
-      return baseTransition;
-    } else {
-      // If we didn't get any input, we really should perfectly match
-      // a previous context state.  If such a state is out of our cache,
-      // it should simply be rebuilt.
-      if(!hasDistribution) {
-        return null;
-      }
-    }
-
-    // If mutations HAVE happened, we have work to do.
-    const tokenization = matchState.tokenization.tokens.map((token) => new ContextToken(token));
-
-    if(leadTokenShift < 0) {
-      tokenization.splice(0, -leadTokenShift);
-    } else if(leadTokenShift > 0) {
-      // TODO:  insert token(s) at the start to match the text that's back within the
-      // sliding context window.
-      //
-      // (was not part of original `attemptContextMatch`)
+    if(!resultTokenization) {
       return null;
     }
 
-    // If no TAIL mutations have happened, we're safe to return now.
-    if(tailEditLength == 0 && tailTokenShift == 0) {
-      const state = new ContextState(context, lexicalModel);
-      state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-      baseTransition.finalize(state, transformDistribution);
-      return baseTransition;
+    const transition = new ContextTransition(matchState, matchState.appliedInput?.id);
+    if(resultTokenization == matchState.tokenization) {
+      // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
+      // TODO:  Fix - this is intended to be temporary during refactor work.
+      transition.finalize(matchState, transformDistribution);
+      return transition;
     }
-
-    // ***
-
-    // first non-matched tail index within the incoming context
-    const incomingTailUpdateIndex = matchLength + (leadTokenShift > 0 ? leadTokenShift : 0);
-    // first non-matched tail index in `matchState`, the base context state.
-    const matchingTailUpdateIndex = matchLength - (leadTokenShift < 0 ? leadTokenShift : 0);
-
-    // The assumed input from the input distribution is always at index 0.
-    const tokenizedPrimaryInput = hasDistribution ? transformSequenceDistribution[0].sample : null;
-    // first index:  original sample's tokenization
-    // second index:  token index within original sample
-    const tokenDistribution = transformSequenceDistribution.map((entry) => {
-      return entry.sample.map((sample) => {
-        return {
-          sample: sample,
-          p: entry.p
-        }
-      });
-    });
-
-    // // Gets distribution of token index 1s as excerpted from the sequences' distribution.
-    // let a = tokenDistribution.map((sequence) => sequence[1]);
-
-    // Using these as base indices...
-
-    let tailIndex = 0;
-    // let lastTailIndex = tailEditLength + (tailTokenShift > 0 ? tailTokenShift : 0);
 
     // Used to construct and represent the part of the incoming transform that
     // does not land as part of the final token in the resulting context.  This
     // component should be preserved by any suggestions that get applied.
     let preservationTransform: Transform;
 
-    for(let i = 0; i < tailEditLength; i++) {
-      // do tail edits
-      const incomingIndex = i + incomingTailUpdateIndex;
-      const matchingIndex = i + matchingTailUpdateIndex;
-
-      const incomingToken = tokenizedContext[incomingIndex];
-      const matchedToken = matchState.tokenization.tokens[matchingIndex];
-
-      let primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
-      const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
-
-      const isLastToken = incomingIndex == tokenizedContext.length - 1;
-
-      if(isLastToken) {
-        // If this token's transform component is not part of the final token,
-        // it's something we'll want to preserve even when applying suggestions
-        // for the final token.
-        //
-        // Note:  will need a either a different approach or more specialized
-        // handling if/when supporting phrase-level (multi-token) suggestions.
-      } else {
-        preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
-      }
-      let token: ContextToken;
-
-      if(isBackspace) {
-        token = new ContextToken(lexicalModel, incomingToken.text);
-        token.searchSpace.inputSequence.forEach((entry) => entry[0].sample.id = primaryInput.id);
-      } else {
-        // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
-        // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
-        token = new ContextToken(matchedToken);
-        // Erase any applied-suggestion transition ID; it is no longer valid.
-        token.appliedTransitionId = undefined;
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
-      }
-
-      tokenization[incomingIndex] = token;
-      tailIndex++;
+    // Handling for non-whitespace word boundaries - for example,
+    // `the '` => `the 'a` - a fun word boundary shift!
+    // We expect such cases to have SOMETHING for a preservation transform here;
+    // we need to ensure that any suggestions for the new token believe that
+    // the token is starting fresh, without any prior text.
+    if(alignmentResults.tailTokenShift > 0) {
+      preservationTransform = { insert: '', deleteLeft: 0 };
     }
 
-    if(tailTokenShift < 0) {
-      // delete tail tokens
-      for(let i = 0; i > tailTokenShift; i--) {
-        // If ALL that remains are deletes, we're good to go.
-        //
-        // This may not be the token at the index, but since all that remains are deletes,
-        // we'll have deleted the correct total number from the end once all iterations
-        // are done.
-        tokenization.pop();
-      }
-    } else {
-      for(let i = tailEditLength; i < tailEditLength + tailTokenShift; i++) {
-        // create tail tokens
-        const incomingIndex = i + incomingTailUpdateIndex;
-        const incomingToken = tokenizedContext[incomingIndex];
-        // // Assertion:  there should be no matching token; this should be a newly-appended token.
-        // const matchingIndex = i + tailEditLength + matchingTailUpdateIndex;
-
-        const primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
-
-        if(!preservationTransform) {
-          // Allows for consistent handling of "insert" cases; even if there's no edit
-          // from a prior token, having a defined transform here indicates that
-          // a new token has been produced.  This serves as a useful conditional flag
-          // for prediction logic.
-          preservationTransform = { insert: '', deleteLeft: 0 };
-        }
-
-        const isLastToken = incomingIndex == tokenizedContext.length - 1;
-        if(!isLastToken) {
-          preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
-        }
-
-        let pushedToken = new ContextToken(lexicalModel);
-
-        // TODO:  assumes that there was no shift in wordbreaking from the
-        // prior context to the current one.  This may actually be a major
-        // issue for dictionary-based wordbreaking!
-        //
-        // If there was such a shift, then we may have extra transforms
-        // originally on a 'previous' token that got moved into this one!
-        //
-        // Suppose we're using a dictionary-based wordbreaker and have
-        // `butterfl` for our context, which could become butterfly.  If the
-        // next keystroke results in `butterfli`, this would likely be
-        // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
-        // we know to properly relocate the `f` and `l` transforms?
-        let tokenDistribComponent = tokenDistribution.map((seq) => {
-          const entry = seq[tailIndex];
-          if(!entry || TransformUtils.isEmpty(entry.sample)) {
-            return null;
-          } else {
-            return entry;
-          }
-        }).filter((entry) => !!entry);
-        if(primaryInput) {
-          let transformDistribution = tokenDistribComponent.length > 0 ? tokenDistribComponent : null;
-          if(transformDistribution) {
-            pushedToken.searchSpace.addInput(transformDistribution);
-          }
-        } else if(incomingToken.text) {
-          // We have no transform data to match against an inserted token with text; abort!
-          // Refer to #12494 for an example case; we currently can't map previously-committed
-          // input transforms to a newly split-off token.
-          return null;
-        }
-        pushedToken.isWhitespace = incomingToken.isWhitespace;
-
-        // Auto-replaces the search space to correspond with the new token.
-        tokenization.push(pushedToken);
-
-        tailIndex++;
-      }
+    // Leave out the final entry!
+    for(let i = 0; i < transformSequenceDistribution?.[0].sample.length - 1; i++) {
+      const primaryInput = transformSequenceDistribution[0].sample[i];
+      preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
     }
 
     const state = new ContextState(context, lexicalModel);
-    state.tokenization = new ContextTokenization(tokenization, alignmentResults);
+    state.tokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
-    baseTransition.finalize(state, transformDistribution, preservationTransform);
-    return baseTransition;
+    transition.finalize(state, transformDistribution, preservationTransform);
+    return transition;
   }
 
-  // Aim:  relocate to ContextState in some form... or ContextTransition?
   /**
    * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
    * the most information-rich `TrackedContextState` possible.  If a match is found, the state will be annotated with the
