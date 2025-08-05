@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \
@@ -31,7 +32,7 @@ fi
 ### CONFIGURE ACTIONS
 
 if builder_start_action configure; then
-  verify_npm_setup
+  node_select_version_and_npm_ci
   builder_finish_action success configure
 fi
 

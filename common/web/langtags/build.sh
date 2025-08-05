@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Build Keyman langtags.js common module" \
@@ -32,7 +33,7 @@ function compile_langtags() {
 }
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
   compile_langtags
 }
 

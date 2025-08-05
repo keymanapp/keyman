@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 SUBPROJECT_NAME=app/webview
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
@@ -80,6 +81,6 @@ compile_and_copy() {
   "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
 }
 
-builder_run_action configure verify_npm_setup
+builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build compile_and_copy

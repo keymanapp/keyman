@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/developer/src/packages.inc.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
@@ -107,7 +108,7 @@ function do_bundle() {
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      do_build
 builder_run_action test       do_test
 builder_run_action api        do_api

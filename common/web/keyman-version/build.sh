@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
@@ -53,6 +54,6 @@ export default KEYMAN_VERSION;
 }
 
 builder_run_action clean        rm -rf version.inc.ts keyman-version.mts build/
-builder_run_action configure    verify_npm_setup
+builder_run_action configure    node_select_version_and_npm_ci
 builder_run_action build        do_build
 builder_run_action publish      builder_publish_npm
