@@ -19,21 +19,16 @@ describe('ContextState', () => {
 
     assert.equal(state.context, context);
     assert.equal(state.model, plainModel);
-    assert.isNotOk(state.tokenization);
+    assert.isOk(state.tokenization);
     assert.isUndefined(state.isManuallyApplied);
     assert.isNotOk(state.suggestions);
     assert.isNotOk(state.appliedSuggestionId);
   });
 
-  describe('initFromReset', () => {
+  describe('initializing without prior tokenization', () => {
     it('<empty context>', () => {
       let context = { left: '', right: '' };
       let state = new ContextState(context, plainModel);
-
-      assert.isNotOk(state.tokenization);
-      assert.equal(state.context, context);
-
-      state.initFromReset();
       assert.isOk(state.tokenization);
       assert.equal(state.tokenization.tokens.length, 1);
       assert.equal(state.tokenization.tail.exampleInput, '');
@@ -42,11 +37,6 @@ describe('ContextState', () => {
     it('with initial text (without ending whitespace', () => {
       let context = { left: 'the quick brown fox', right: '' };
       let state = new ContextState(context, plainModel);
-
-      assert.isNotOk(state.tokenization);
-      assert.equal(state.context, context);
-
-      state.initFromReset();
       assert.isOk(state.tokenization);
       assert.equal(state.tokenization.tokens.length, 7);
       assert.deepEqual(state.tokenization.exampleInput, ['the', ' ', 'quick', ' ', 'brown', ' ', 'fox']);
@@ -55,11 +45,6 @@ describe('ContextState', () => {
     it('with initial text (with ending whitespace', () => {
       let context = { left: 'the quick brown fox ', right: '' };
       let state = new ContextState(context, plainModel);
-
-      assert.isNotOk(state.tokenization);
-      assert.equal(state.context, context);
-
-      state.initFromReset();
       assert.isOk(state.tokenization);
       assert.equal(state.tokenization.tokens.length, 9);
       assert.deepEqual(state.tokenization.exampleInput, ['the', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', '']);

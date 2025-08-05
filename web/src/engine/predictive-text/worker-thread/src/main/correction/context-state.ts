@@ -69,13 +69,32 @@ export class ContextState {
    */
   isManuallyApplied?: boolean;
 
+  /**
+   * Deep-copies a prior instance.
+   * @param stateToClone
+   */
   constructor(stateToClone: ContextState);
-  constructor(context: Context, model: LexicalModel);
-  constructor(param1: Context | ContextState, model?: LexicalModel) {
+  /**
+   * Initializes a new ContextState instance based on the active model and context.
+   *
+   * If a precomputed tokenization of the context (with prior correction-search
+   * calculation data) is not available, it will be spun up from scratch.
+   *
+   * @param context
+   * @param model
+   * @param tokenization
+   */
+  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
+  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
     if(!(param1 instanceof ContextState)) {
       const context = param1;
       this._context = context;
       this.model = model;
+      if(tokenization) {
+        this.tokenization = tokenization;
+      } else {
+        this.initFromReset();
+      }
     } else {
       const stateToClone = param1;
 
@@ -102,7 +121,7 @@ export class ContextState {
    * information is available - typically, immediately after engine
    * initialization or a context reset.
    */
-  initFromReset() {
+  private initFromReset() {
     const context = this.context;
     const lexicalModel = this.model;
 
