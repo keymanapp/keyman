@@ -114,11 +114,13 @@ export class ContextTracker extends CircularArray<ContextState> {
     // the distribution should be tokenized already.
     transformDistribution?: Distribution<Transform> // transform distribution is needed here.
   ): ContextTransition {
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
     const baseTransition = new ContextTransition(matchState, matchState.appliedInput?.id);
-
     const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
 
+    if(transformDistribution?.[0]) {
+      context = applyTransform(transformDistribution[0].sample, context);
+    }
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
     const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text));
 
     if(!alignmentResults.canAlign) {
@@ -350,16 +352,12 @@ export class ContextTracker extends CircularArray<ContextState> {
     }
 
     const inputTransform = transformDistribution?.[0];
-    if(inputTransform) {
-      // These two methods apply transforms internally; do not mutate context here.
-      // This particularly matters for the 'distribution' variant.
-      context = applyTransform(inputTransform.sample, context);
-    }
+    const postContext = inputTransform ? applyTransform(inputTransform.sample, context) : context;
 
     const tokenize = determineModelTokenizer(model);
-    const tokenizedContext = tokenize(context);
+    const tokenizedPostContext = tokenize(postContext)
 
-    if(tokenizedContext.left.length > 0) {
+    if(tokenizedPostContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
         const priorMatchState = this.item(i);
 
@@ -376,10 +374,10 @@ export class ContextTracker extends CircularArray<ContextState> {
           //
           // `priorTaggedContext` must not be `null`!
           const doublecheckContext = applyTransform(transformDistribution[0].sample, priorTaggedContext);
-          if(doublecheckContext.left != context.left) {
+          if(doublecheckContext.left != postContext.left) {
             continue;
           }
-        } else if(priorTaggedContext?.left != context.left) {
+        } else if(priorTaggedContext?.left != postContext.left) {
           continue;
         }
 
