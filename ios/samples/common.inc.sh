@@ -5,7 +5,7 @@
 # builder-full.inc.sh from the including script.
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-. "$KEYMAN_ROOT/resources/build/mac.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
 function do_build() {
   # Copy resources.
