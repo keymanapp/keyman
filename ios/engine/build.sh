@@ -6,12 +6,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
@@ -22,6 +19,8 @@ builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad.
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
+
+verify_on_mac
 
 CONFIG="Release"
 if builder_is_debug_build; then

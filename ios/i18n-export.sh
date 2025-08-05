@@ -6,17 +6,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
 # This script runs from its own folder
 cd "$(dirname "$THIS_SCRIPT")"
 
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
-
-## END STANDARD BUILD SCRIPT INCLUDE
-
 
 #xcodebuild -exportLocalizations -project "engine/KMEI/KeymanEngine.xcodeproj"
 #xcodebuild -exportLocalizations -project "keyman/Keyman/Keyman.xcodeproj"

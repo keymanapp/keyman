@@ -6,15 +6,6 @@
 
 _utils_inc_sh=1
 
-# Allows for a quick macOS check for those scripts requiring a macOS environment.
-# TODO: move to resources/build/mac/<something.inc.sh>
-verify_on_mac() {
-  if ! builder_is_macos; then
-    builder_die "This build script will only run in a Mac environment."
-    exit 1
-  fi
-}
-
 #
 # Write ${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info file for the target
 # artifact

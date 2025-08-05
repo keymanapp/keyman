@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
 # This script will automatically have Xcode's build environment (and variables),
 # so there's no need to do anything extra to fetch them.
@@ -163,7 +164,7 @@ function phaseSentryDsymUpload() {
 }
 
 #
-# All calls to xcode-utils.sh scripts will have their output redirected to
+# All calls to xcode-utils.inc.sh scripts will have their output redirected to
 # $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
 # to this log file. See the corresponding printXCodeBuildScriptLogs function in
 # builder-basic.inc.sh to print the log after xcodebuild returns.

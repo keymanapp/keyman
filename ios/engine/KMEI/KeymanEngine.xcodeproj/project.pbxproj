@@ -1363,7 +1363,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-tagged.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/mac/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/mac/set-bundle-versions-tagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CEC0C66F2410B005003E1BCD /* Run Script - upload dsyms to Sentry */ = {
@@ -1383,7 +1383,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. \"$KEYMAN_ROOT/resources/build/mac/xcode-utils.inc.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
