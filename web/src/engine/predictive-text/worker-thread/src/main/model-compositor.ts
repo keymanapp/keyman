@@ -274,7 +274,8 @@ export class ModelCompositor {
         context,
         this.lexicalModel,
         originalTransition.base,
-        [{sample: fullTransform, p: 1}]
+        [{sample: fullTransform, p: 1}],
+        true
       ).final;
 
       const appliedTransition = new ContextTransition(originalTransition);
