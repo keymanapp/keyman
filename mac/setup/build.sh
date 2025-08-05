@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
 cd "${THIS_SCRIPT_PATH}"

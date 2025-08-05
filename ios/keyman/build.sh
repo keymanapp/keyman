@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
