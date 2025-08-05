@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
@@ -109,7 +109,7 @@ builder_parse_test() {
 }
 
 builder_describe \
-  "Tests the build-utils.sh builder functions. This is merely an example." \
+  "Tests the builder-basic.inc.sh builder functions. This is merely an example." \
   "clean        Cleans up any build artifacts" \
   "build        Do some building" \
   "test         Does some test stuff" \

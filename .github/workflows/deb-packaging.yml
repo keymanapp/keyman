@@ -86,7 +86,9 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+        [[ -f "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh" ]] && . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+        # TODO: remove following line post v19 release (file was renamed in v19 alpha)
+        [[ -f "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh" ]] && . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
         echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter

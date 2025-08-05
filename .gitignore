@@ -164,7 +164,7 @@ tsconfig.tsbuildinfo
 # Windows system files
 Thumbs.db
 
-# Temporary file for logging scripts in xcode runs, see build-utils.sh for
+# Temporary file for logging scripts in xcode runs, see builder-basic.inc.sh for
 # details
 /xcodebuild-scripts.log
 
