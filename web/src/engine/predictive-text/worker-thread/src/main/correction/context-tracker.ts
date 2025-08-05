@@ -406,7 +406,6 @@ export class ContextTracker extends CircularArray<ContextState> {
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
     let state = new ContextState(context, model);
-    state.initFromReset();
     this.enqueue(state);
     const transition = new ContextTransition(state, /* TODO:  we need a clear value here in the future! */ null);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can

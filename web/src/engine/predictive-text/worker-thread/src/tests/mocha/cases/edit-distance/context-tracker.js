@@ -38,7 +38,6 @@ describe('ContextTracker', function() {
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -60,7 +59,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -79,7 +77,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -99,7 +96,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -125,7 +121,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isOk(newContextMatch?.final);
       assert.deepEqual(newContextMatch?.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -146,7 +141,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["'", "a"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -176,7 +170,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -203,7 +196,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["and", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(
         existingContext,
         plainModel,
@@ -235,7 +227,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      baseState.initFromReset();
       let newContextMatch = ContextTracker.attemptMatchContext(
         existingContext,
         plainModel,
@@ -263,7 +254,6 @@ describe('ContextTracker', function() {
       assert.equal(baseContext.left.length, 1);
 
       let baseState = new ContextState({ left: "text'" }, plainModel);
-      baseState.initFromReset();
 
       // Now the actual check.
       let newContext = models.tokenize(defaultBreaker, {
@@ -293,7 +283,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let state = new ContextState(context, plainModel);
-      state.initFromReset();
       assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
 
@@ -302,7 +291,6 @@ describe('ContextTracker', function() {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let state = new ContextState(context, plainModel);
-      state.initFromReset();
       assert.deepEqual(state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
   });
