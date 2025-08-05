@@ -1,4 +1,6 @@
 
+# TODO: merge with resources/build/mac/mac.inc.sh
+
 if [ -z "${DEVELOPMENT_TEAM+x}" ]; then
     DEVELOPMENT_TEAM=3YE4W86L3G
 fi

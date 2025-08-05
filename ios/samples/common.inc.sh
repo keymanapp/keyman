@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
-# This script is included by each sample build.sh.  Accordingly, it inherits builder-basic.inc.sh, etc
-# from the including script.
+# This script is included by each sample build.sh.  Accordingly, it inherits
+# builder-full.inc.sh from the including script.
+
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac.inc.sh"
 
 function do_build() {
   # Copy resources.
@@ -31,6 +35,8 @@ function execute_sample_build() {
     "--sim-artifact+  Unused by this build at present"
 
   builder_parse "$@"
+
+  verify_on_mac
 
   local CONFIG=Release
   if builder_is_debug_build; then

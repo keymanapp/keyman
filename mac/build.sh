@@ -6,8 +6,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
-. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
 builder_describe "Builds Keyman for macOS." \
   "@/core:mac" \
@@ -26,6 +26,8 @@ builder_describe "Builds Keyman for macOS." \
   "--quick,-q  Bypasses notarization for $(builder_term install)"
 
 builder_parse "$@"
+
+verify_on_mac
 
 # Default is release build of Engine and (code-signed) Input Method
 if builder_is_debug_build; then

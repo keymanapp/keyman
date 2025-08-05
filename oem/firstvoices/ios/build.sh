@@ -7,14 +7,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # ################################ Main script ################################
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 export TARGET=FirstVoices
 
@@ -26,6 +23,8 @@ builder_describe "Builds the $TARGET app for use on iOS devices - iPhone and iPa
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
+
+verify_on_mac
 
 KMEI_BUILD_DIR="$KEYMAN_ROOT/ios/build"
 DERIVED_DATA="$THIS_SCRIPT_PATH/build"
