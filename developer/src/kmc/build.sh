@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 . "$KEYMAN_ROOT/developer/src/packages.inc.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
@@ -55,7 +56,7 @@ function do_build() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_test() {
-  builder_do_typescript_tests 50
+  typescript_run_eslint_mocha_tests 50
   ./test/command-line-tests.sh test
 }
 

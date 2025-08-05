@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 builder_describe "Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
@@ -88,7 +89,7 @@ builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            builder_do_typescript_tests  90
+builder_run_action test            typescript_run_eslint_mocha_tests  90
 
 #-------------------------------------------------------------------------------------------------------------------
 

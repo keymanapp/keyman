@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
@@ -64,7 +65,7 @@ function do_build() {
 
 function do_test() {
   copy_deps
-  builder_do_typescript_tests 80
+  typescript_run_eslint_mocha_tests 80
 }
 
 builder_run_action build      do_build

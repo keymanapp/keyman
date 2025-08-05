@@ -1228,7 +1228,7 @@ fi
 
 --------------------------------------------------------------------------------
 
-## `builder_do_typescript_tests` function
+## `typescript_run_eslint_mocha_tests` function
 
 Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
 
@@ -1238,7 +1238,7 @@ be moved to builder.typescript.inc.sh in the future.
 ### Usage
 
 ```bash
-builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+builder_run_action  test    typescript_run_eslint_mocha_tests [coverage_threshold]
 ```
 
 ### Parameters

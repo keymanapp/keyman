@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Build Keyman Developer web utility module" \
@@ -50,5 +51,5 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   node_select_version_and_npm_ci
 builder_run_action build       do_build
-builder_run_action test        builder_do_typescript_tests 45
+builder_run_action test        typescript_run_eslint_mocha_tests 45
 builder_run_action publish     builder_publish_npm
