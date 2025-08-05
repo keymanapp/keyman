@@ -134,7 +134,8 @@ export class ContextTransition {
       this.base.context,
       this.base.model,
       this.base,
-      [{sample: fullTransform, p: 1}]
+      [{sample: fullTransform, p: 1}],
+      true
     ).final;
 
     const preAppliedState = this.final;

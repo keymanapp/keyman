@@ -98,7 +98,7 @@ export class ContextTokenization {
    * @returns Alignment data that details if and how the incoming tokenization aligns with
    * the tokenization modeled by this instance.
    */
-  computeAlignment(incomingTokenization: string[]): ContextStateAlignment {
+  computeAlignment(incomingTokenization: string[], noSubVerify?: boolean): ContextStateAlignment {
     // Map the tokenized state to an edit-distance friendly version.
     const tokenizationToMatch = this.exampleInput;
 
@@ -122,7 +122,7 @@ export class ContextTokenization {
       for(let i = 0; i < editPath.length; i++) {
         if(editPath[i] == 'substitute') {
           subCount++;
-          if(!isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
+          if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
             return {
               canAlign: false
             };
@@ -255,7 +255,7 @@ export class ContextTokenization {
           const matchingSub = tokenizationToMatch[i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0)];
 
           // Double-check the word - does the 'substituted' word itself align?
-          if(!isSubstitutionAlignable(incomingSub, matchingSub)) {
+          if(!noSubVerify && !isSubstitutionAlignable(incomingSub, matchingSub)) {
             return {
               canAlign: false
             };

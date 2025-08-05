@@ -119,6 +119,47 @@ describe('ContextTokenization', function() {
       });
     });
 
+    it("properly matches and aligns with applied-suggestion contexts", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'o'
+      ];
+      const newContext = [...baseContext];
+      newContext[4] = 'over';
+
+      const baseTokenization = buildBaseTokenization(baseContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext);
+
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 4,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns with applied-suggestion at start of context", () => {
+      const baseContext = [
+        'te'
+      ];
+      const newContext = [
+        'testing',
+        ' ',
+        ''
+      ];
+
+      const baseTokenization = buildBaseTokenization(baseContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, true);
+
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 0,
+        tailEditLength: 1,
+        tailTokenShift: 2
+      });
+    });
+
     it("detects unalignable contexts - no matching tokens", () => {
       const baseContext = [
         'swift', 'tan', 'wolf', 'leaped', 'across'

@@ -24,7 +24,8 @@ export class ContextTracker {
     lexicalModel: LexicalModel,
     matchState: ContextState,
     // the distribution should be tokenized already.
-    transformDistribution?: Distribution<Transform> // transform distribution is needed here.
+    transformDistribution?: Distribution<Transform>, // transform distribution is needed here.
+    isApplyingSuggestion?: boolean
   ): ContextTransition {
     const baseTransition = new ContextTransition(matchState, matchState.appliedInput?.id);
     const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
@@ -33,7 +34,7 @@ export class ContextTracker {
       context = applyTransform(transformDistribution[0].sample, context);
     }
     const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
-    const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text));
+    const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
 
     if(!alignmentResults.canAlign) {
       return null;
