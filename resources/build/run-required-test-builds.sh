@@ -12,9 +12,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
-. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
-. "${THIS_SCRIPT%/*}/trigger-build-bot.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/trigger-build-bot.inc.sh"
 . "${THIS_SCRIPT%/*}/jq.inc.sh"
 
 builder_describe "Run test builds for the given pull request/primary branch" \
