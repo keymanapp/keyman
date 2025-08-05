@@ -27,13 +27,7 @@ tc_upload_help() {
   local PRODUCT=$1
   local PRODUCT_PATH=$2
   builder_echo start "upload help" "Uploading new ${PRODUCT} help to help.keyman.com"
-
-  (
-    # shellcheck disable=SC2164,SC2154
-    cd "${KEYMAN_ROOT}/resources/build"
-    "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" "${PRODUCT_PATH}"
-  )
-
+  "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" "${PRODUCT_PATH}"
   builder_echo end "upload help" success "Finished uploading new ${PRODUCT} help to help.keyman.com"
 }
 

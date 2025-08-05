@@ -16,7 +16,7 @@ SIZE_THRESHOLD=1024
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder-basic.inc.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-. "$KEYMAN_ROOT/resources/build/github.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/github.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage() {

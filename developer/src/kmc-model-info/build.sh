@@ -37,6 +37,6 @@ builder_run_action test         typescript_run_eslint_mocha_tests 55
 
 #-------------------------------------------------------------------------------------------------------------------
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
-builder_run_action publish     builder_publish_npm
+builder_run_action publish     ci_publish_npm

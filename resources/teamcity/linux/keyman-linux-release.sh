@@ -120,8 +120,7 @@ function _publish_linux_help() {
     cd "${KEYMAN_ROOT}/../help.keyman.com" || exit 1
     # shellcheck disable=SC2016
     git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER}"; echo "password=${GITHUB_TOKEN}"; }; f'
-    cd "${KEYMAN_ROOT}/resources/build"
-    ./help-keyman-com.sh linux
+    "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" linux
   )
 
   builder_echo end "upload linux help" success "Upload new Keyman Linux help to help.keyman.com"

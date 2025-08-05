@@ -22,9 +22,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
-. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
-. "${THIS_SCRIPT%/*}/sentry-control.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/ci/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 

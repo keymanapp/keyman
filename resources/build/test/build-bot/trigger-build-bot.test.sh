@@ -6,8 +6,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
-. "${THIS_SCRIPT_PATH}/../../trigger-definitions.inc.sh"
-. "${THIS_SCRIPT_PATH}/../../trigger-build-bot.inc.sh"
+. "${THIS_SCRIPT_PATH}/../../ci/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT_PATH}/../../ci/trigger-build-bot.inc.sh"
 . "${THIS_SCRIPT_PATH}/../test-utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/jq.inc.sh"
 

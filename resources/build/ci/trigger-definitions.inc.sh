@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # This file maps specific paths to build triggers
 #

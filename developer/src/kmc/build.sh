@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
@@ -114,4 +114,4 @@ builder_run_action build      do_build
 builder_run_action test       do_test
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
-builder_run_action publish    builder_publish_npm
+builder_run_action publish    ci_publish_npm

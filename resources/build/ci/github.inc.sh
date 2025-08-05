@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
 ##
 ## Writes a status check message to GitHub against the reported SHA

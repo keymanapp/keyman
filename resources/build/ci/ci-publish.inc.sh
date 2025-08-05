@@ -9,60 +9,6 @@
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 #
-# Returns 0 if current build is in CI and triggered from a pull request. If it
-# returns 0, then a call is made to GitHub to get pull request details, and the
-# PR details are added to $builder_pull_title, $builder_pull_number, and
-# the $builder_pull_labels array.
-#
-# Note that the GitHub REST call is made with credentials if $GITHUB_TOKEN is
-# available; without credentials it will be subject to IP-based rate limits.
-#
-builder_pull_get_details() {
-  builder_pull_title=
-  builder_pull_number=
-  builder_pull_labels=()
-  if [[ ! ${TEAMCITY_PR_NUMBER-} =~ ^[0-9]+$ ]]; then
-    return 1
-  fi
-
-  if [ -z "${GITHUB_TOKEN-}" ]; then
-    local pull_data=`curl -s https://api.github.com/repos/keymanapp/keyman/pulls/$TEAMCITY_PR_NUMBER`
-  else
-    local pull_data=`curl -H "Authorization: Bearer $GITHUB_TOKEN" -s https://api.github.com/repos/keymanapp/keyman/pulls/$TEAMCITY_PR_NUMBER`
-  fi
-
-  builder_pull_title=`echo $pull_data | $JQ .title`
-
-  # Simple poor bash test if data returned from API is valid
-  if [[ -z builder_pull_title ]]; then
-    return 1
-  fi
-
-  builder_pull_number=$TEAMCITY_PR_NUMBER
-  builder_pull_labels=(`echo $pull_data | $JQ -jr '.labels[].name|.," "'`)
-
-  return 0
-}
-
-
-#
-# Returns 0 if the current PR has a particular label. Requires
-# builder_pull_get_details to have successfully run first
-#
-# Usage:
-#   builder_pull_has_label "label-name"
-# Parameters
-#   1: $label       label to test
-#
-function builder_pull_has_label() {
-  local label="$1"
-  if [[ " ${builder_pull_labels[*]} " =~ " $label " ]]; then
-    return 0
-  fi
-  return 1
-}
-
-#
 # Publishes the package in `cwd` to npm
 #
 # If the `--dry-run` option is available and specified as a command-line
@@ -73,27 +19,27 @@ function builder_pull_has_label() {
 # modified. This change should not be committed to the repository.
 #
 # If --npm-publish is set:
-#  * then builder_publish_npm publishes to the public registry
-#  * else builder_publish_npm creates a local tarball which can be used to test
+#  * then ci_publish_npm publishes to the public registry
+#  * else ci_publish_npm creates a local tarball which can be used to test
 #
 # Usage:
 # ```bash
-#   builder_publish_npm
+#   ci_publish_npm
 # ```
 #
-function builder_publish_npm() {
+function ci_publish_npm() {
   if builder_has_option --npm-publish; then
     # Require --dry-run if local or test to avoid accidentally clobbering npm packages
     if [[ $KEYMAN_VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
       builder_die "publish --npm-publish must use --dry-run flag for local or test builds"
     fi
-    _builder_publish_npm_package publish
+    _ci_publish_npm_package publish
   else
-    _builder_publish_npm_package pack
+    _ci_publish_npm_package pack
   fi
 }
 
-function _builder_publish_npm_package() {
+function _ci_publish_npm_package() {
   local action=$1
   local dist_tag=$KEYMAN_TIER dry_run=
 
@@ -105,9 +51,9 @@ function _builder_publish_npm_package() {
     dry_run=--dry-run
   fi
 
-  _builder_publish_cache_package_json
-  _builder_write_npm_version
-  _builder_prepublish
+  _ci_publish_cache_package_json
+  _ci_write_npm_version
+  _ci_prepublish
 
   # Note: In either case, npm publish MUST be given --access public to publish a
   # package in the @keymanapp scope on the public npm package index.
@@ -124,7 +70,7 @@ function _builder_publish_npm_package() {
   fi
 }
 
-function _builder_write_npm_version() {
+function _ci_write_npm_version() {
   # We use --no-git-tag-version because our CI system controls version numbering
   # and already tags releases. We also want to have the version of this match
   # the release of Keyman Developer -- these two versions should be in sync.
@@ -160,7 +106,7 @@ function _builder_write_npm_version() {
 # the target's package.json in its node_modules folder. Must run from
 # the target's folder.
 #
-function _builder_prepublish() {
+function _ci_prepublish() {
   mkdir -p node_modules/@keymanapp
   local packages=($(cat package.json | "$JQ" --raw-output '.bundleDependencies | join(" ")'))
   local package
@@ -198,7 +144,7 @@ function _builder_prepublish() {
 # dependencies easily. Part of the https://github.com/npm/cli/issues/3466
 # workaround.
 #
-function _builder_publish_cache_package_json() {
+function _ci_publish_cache_package_json() {
   if [[ -f "$KEYMAN_ROOT/builder_package_publish.json" ]]; then
     return 0
   fi
@@ -210,6 +156,6 @@ function _builder_publish_cache_package_json() {
   cp  "$KEYMAN_ROOT/package.json" "$KEYMAN_ROOT/builder_package_publish.json"
 }
 
-function builder_publish_cleanup() {
+function ci_publish_cleanup() {
   rm -f "$KEYMAN_ROOT/builder_package_publish.json"
 }

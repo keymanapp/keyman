@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 #
 
-# Needed for builder_is_ci_build check.
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-
 BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 # Compiles all build products corresponding to the specified target.
