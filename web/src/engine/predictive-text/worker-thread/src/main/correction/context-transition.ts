@@ -137,7 +137,7 @@ export class ContextTransition {
    */
   applySuggestion(suggestion: Suggestion) {
     const preAppliedState = this.final;
-    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
+    if(!preAppliedState.suggestions?.find((s) => s.id == suggestion?.id)) {
       throw new Error("Could not find matching suggestion to apply");
     }
 

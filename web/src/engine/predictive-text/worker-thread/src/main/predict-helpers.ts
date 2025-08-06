@@ -5,6 +5,7 @@ import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbre
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { isSubstitutionAlignable } from './correction/alignment-helpers.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState } from './correction/context-state.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
@@ -241,11 +242,41 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let contextState = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    null
-  ).final;
+  // Note:  not long-term viable - context is a sliding window, after all!
+  // What we actually need is a sliding-window comparison.
+  //
+  // Note that the "final" context from the last operation will not substitute any
+  // characters - only insert (if context window was shortened) or delete (if
+  // lengthened).  No substitutions possible, as no rules will have occurred - the
+  // ONLY change is the amount of known text vs the context window's range.
+  const lengthThreshold = contextTracker.configuration?.leftContextCodePoints ?? Number.POSITIVE_INFINITY;
+  const contextsMatch = (a: Context, b: Context) => {
+    // If either context's window is equal to or greater than the threshold length, there's a good
+    // chance something slid into or out of range.
+    if(a.left.length >= lengthThreshold || b.left.length >= lengthThreshold) {
+      return isSubstitutionAlignable(a.left, b.left);
+    } else {
+      // If both are smaller than the threshold, the text should match exactly.
+      return a.left == b.left;
+    }
+
+  };
+
+  const lastTransition = contextTracker.latest;
+  let contextState: ContextState;
+  if(contextsMatch(lastTransition.final.context, context)) {
+    contextState = lastTransition.final;
+  } else if(contextsMatch(lastTransition.base.context, context)) {
+    // Multitap case:  if we reverted back to the original underlying context,
+    // rather than using the previous output context.
+    contextState = lastTransition.base;
+  }
+
+  if(!contextState){
+    console.warn("Unexpected context state occurred as prediction base context");
+    contextTracker.reset(context, inputTransform.id);
+    contextState = contextTracker.latest.base;
+  }
 
   // Corrections and predictions are based upon the post-context state, though.
   let transition = contextState.analyzeTransition(context, transformDistribution);
@@ -254,7 +285,7 @@ export async function correctAndEnumerate(
     // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
     transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
   }
-  contextTracker.cache.add(transition.transitionId, transition);
+  contextTracker.latest = transition;
   const postContextState = transition.final;
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
