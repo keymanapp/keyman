@@ -18,12 +18,6 @@ describe("Lexer Tests", () => {
       assert.deepEqual(sr.toString(), '[STORE,/^store/,true]');
     });
   });
-  describe("Token", () => {
-    it("can construct a Token", () => {
-      const token = new Token(TokenTypes.STORE, 'store');
-      assert.deepEqual(token.toString(), '[STORE,store]');
-    });
-  });
   describe("Lexer", () => {
     it("can recognise a BASELAYOUT token", () => {
       recogniseToken(TokenTypes.BASELAYOUT, '&baselayout');
@@ -1064,6 +1058,206 @@ describe("Lexer Tests", () => {
         ]
       assert.deepEqual(actual, expected);
     });
+    it("can handle an invalid system store or keyword token", () => {
+      [
+        '&baselayout',
+        '&bitmap',
+        '&casedkeys',
+        '&copyright',
+        '&displaymap',
+        '&ethnologuecode',
+        '&hotkey',
+        '&includecodes',
+        '&keyboardversion',
+        '&kmw_embedcss',
+        '&kmw_embedjs',
+        '&kmw_helpfile',
+        '&kmw_helptext',
+        '&kmw_rtl',
+        '&language',
+        '&layer',
+        '&layoutfile',
+        '&message',
+        '&mnemoniclayout',
+        '&name',
+        '&newlayer',
+        '&oldcharposmatching',
+        '&oldlayer',
+        '&platform',
+        '&targets',
+        '&version',
+        '&visualkeyboard',
+        '&windowslanguages',
+        '&capsalwaysoff',
+        '&capsononly',
+        '&shiftfreescaps',
+        'caps',
+        'always',
+        'off',
+        'on',
+        'only',
+        'shift',
+        'frees',
+        'fix',
+        'clearcontext',
+        'beep',
+        'begin',
+        'context',
+        'match',
+        'nomatch',
+        'nul',
+        'return',
+        'unicode',
+        'newcontext',
+        'postkeystroke',
+        'ansi',
+        'readonly',
+        'using',
+        'keys',
+      ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
+    });
+  });
+  describe("Token", () => {
+    describe("Token.constructor()", () => {
+      it("can construct a Token", () => {
+        const token = new Token(TokenTypes.STORE, 'store');
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 1);
+        assert.isNull(token.line);
+      });
+      it("can construct a Token with line and char numbers", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 2);
+        assert.equal(token.charNum, 3);
+        assert.isNull(token.line);
+      });
+      it("can handle a negative line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', -2, 3);
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 3);
+        assert.isNull(token.line);
+      });
+      it("can handle a negative char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, -3);
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 2);
+        assert.equal(token.charNum, 1);
+        assert.isNull(token.line);
+      });
+      it("can handle a zero line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 0, 3);
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 3);
+        assert.isNull(token.line);
+      });
+      it("can handle a zero char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 0);
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 2);
+        assert.equal(token.charNum, 1);
+        assert.isNull(token.line);
+      });
+      it("can construct a Token with a line (NEWLINE)", () => {
+        const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+        assert.deepEqual(token.toString(), '[NEWLINE]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 19);
+        assert.equal(token.line, 'store(one) "value"\n');
+      });
+      it("can construct a Token with a line (EOF)", () => {
+        const token = new Token(TokenTypes.EOF, '', 1, 18, 'store(one) "value"');
+        assert.deepEqual(token.toString(), '[EOF]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 18);
+        assert.equal(token.line, 'store(one) "value"');
+      });
+      it("can handle invalid line in constructor", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 1, 1, 'store(one) "value"\n');
+        assert.deepEqual(token.toString(), '[STORE,store]');
+        assert.equal(token.lineNum, 1);
+        assert.equal(token.charNum, 1);
+        assert.isNull(token.line);
+      });
+    });
+    describe("Token.isTokenType()", () => {
+      it("can report match", () => {
+        const token = new Token(TokenTypes.STORE, 'store');
+        assert.isTrue(token.isTokenType(TokenTypes.STORE));
+      });
+      it("can report non-match", () => {
+        const token = new Token(TokenTypes.STORE, 'store');
+        assert.isFalse(token.isTokenType(TokenTypes.BITMAP));
+      });
+    });
+    describe("Token.text", () => {
+      it("can get text", () => {
+        const token = new Token(TokenTypes.STORE, 'store');
+        assert.equal(token.text, 'store');
+      });
+      it("can set text", () => {
+        const token = new Token(TokenTypes.STORE, 'store');
+        token.text = 'bitmap';
+        assert.equal(token.text, 'bitmap');
+      });
+    });
+    describe("Token.lineNum", () => {
+      it("can get line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.lineNum, 2);
+      });
+      it("can set line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.lineNum, 2);
+        token.lineNum = 4;
+        assert.equal(token.lineNum, 4);
+      });
+      it("can handle a negative line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.lineNum, 2);
+        token.lineNum = -2;
+        assert.equal(token.lineNum, 1);
+      });
+      it("can handle a zero line number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.lineNum, 2);
+        token.lineNum = 0;
+        assert.equal(token.lineNum, 1);
+      });
+    });
+    describe("Token.charNum", () => {
+      it("can get char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.charNum, 3);
+      });
+      it("can set char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.charNum, 3);
+        token.charNum = 4;
+        assert.equal(token.charNum, 4);
+      });
+      it("can handle a negative char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.charNum, 3);
+        token.charNum = -3;
+        assert.equal(token.charNum, 1);
+      });
+      it("can handle a zero char number", () => {
+        const token = new Token(TokenTypes.STORE, 'store', 2, 3);
+        assert.equal(token.charNum, 3);
+        token.charNum = 0;
+        assert.equal(token.charNum, 1);
+      });
+    });
+    describe("Token.line", () => {
+      it("can get line", () => {
+        const token = new Token(TokenTypes.NEWLINE, '\n', 1, 19, 'store(one) "value"\n');
+        assert.equal(token.line, 'store(one) "value"\n');
+      });
+    });
   });
 });
 
@@ -1128,4 +1322,15 @@ function recogniseSystemStoreWithString(type: TokenTypes, text: string, {addEOF=
     ],
     {addEOF, emitAll, handleContinuation}
   );
+}
+
+function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+  ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
+    const textWithSuffix = `${text}${suffix}`;
+    recogniseTokens(
+      textWithSuffix,
+      [new Token(TokenTypes.PARAMETER, textWithSuffix)],
+      {addEOF, emitAll, handleContinuation}
+    );
+  });
 }
