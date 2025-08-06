@@ -3,6 +3,7 @@ import { KMWString } from '@keymanapp/web-utils';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { isSubstitutionAlignable } from './correction/alignment-helpers.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState } from './correction/context-state.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
@@ -180,21 +181,51 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let contextState = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    null
-  ).final;
+  // Note:  not long-term viable - context is a sliding window, after all!
+  // What we actually need is a sliding-window comparison.
+  //
+  // Note that the "final" context from the last operation will not substitute any
+  // characters - only insert (if context window was shortened) or delete (if
+  // lengthened).  No substitutions possible, as no rules will have occurred - the
+  // ONLY change is the amount of known text vs the context window's range.
+  const lengthThreshold = contextTracker.configuration?.leftContextCodePoints ?? Number.POSITIVE_INFINITY;
+  const contextsMatch = (a: Context, b: Context) => {
+    // If either context's window is equal to or greater than the threshold length, there's a good
+    // chance something slid into or out of range.
+    if(a.left.length >= lengthThreshold || b.left.length >= lengthThreshold) {
+      return isSubstitutionAlignable(a.left, b.left);
+    } else {
+      // If both are smaller than the threshold, the text should match exactly.
+      return a.left == b.left;
+    }
+
+  };
+
+  const lastTransition = contextTracker.latest;
+  let contextState: ContextState;
+  if(contextsMatch(lastTransition.final.context, context)) {
+    contextState = lastTransition.final;
+  } else if(contextsMatch(lastTransition.base.context, context)) {
+    // Multitap case:  if we reverted back to the original underlying context,
+    // rather than using the previous output context.
+    contextState = lastTransition.base;
+  }
+
+  if(!contextState){
+    console.warn("Unexpected context state occurred as prediction base context");
+    contextTracker.reset(context, inputTransform.id);
+    contextState = contextTracker.latest.base;
+  }
 
   // Corrections and predictions are based upon the post-context state, though.
-  const contextChangeAnalysis = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    !TransformUtils.isEmpty(inputTransform)
-      ? transformDistribution
-      : null
-  );
-  const postContextState = contextChangeAnalysis.final;
+  let transition = ContextTracker.attemptMatchContext(context, lexicalModel, contextState, transformDistribution);
+  if(!transition) {
+    console.warn("Unexpected failure when computing context-state transition");
+    // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
+    transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+  }
+  contextTracker.latest = transition;
+  const postContextState = transition.final;
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -215,7 +246,7 @@ export async function correctAndEnumerate(
   // Only use of `contextState`.
   let contextLengthDelta = postContextTokens.length - contextState.tokenization.tokens.length;
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(contextChangeAnalysis.preservationTransform) {
+  if(transition.preservationTransform) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
@@ -224,7 +255,7 @@ export async function correctAndEnumerate(
     // likely imply a tokenization boundary, infer 'new word' mode.
     // Apply any part of the context change that is not considered
     // to be up for correction.
-    context = models.applyTransform(contextChangeAnalysis.preservationTransform, context);
+    context = models.applyTransform(transition.preservationTransform, context);
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
   } else if (contextLengthDelta < 0) {
     /* Ooh, we've dropped context here.  Almost certainly from a backspace.
@@ -276,7 +307,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
 
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
@@ -346,7 +377,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {

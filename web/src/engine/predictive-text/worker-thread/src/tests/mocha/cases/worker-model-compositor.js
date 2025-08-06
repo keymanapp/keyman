@@ -112,11 +112,11 @@ describe('ModelCompositor', function() {
         // The 'weights' involved imply that we have an edge-case fat finger on the bottom of
         // the 'q' key, slightly in its favor.
         let inputDistribution = [
-          {sample: {insert: 'q', deleteLeft: 0}, p: 0.5},  // 'quite' (679) and 'question' (644) are included!
-          {sample: {insert: 'a', deleteLeft: 0}, p: 0.4}   // but at lower weight than 'and' (998).
+          {sample: {insert: 'q', deleteLeft: 0, id: 1}, p: 0.5},  // 'quite' (679) and 'question' (644) are included!
+          {sample: {insert: 'a', deleteLeft: 0, id: 1}, p: 0.4}   // but at lower weight than 'and' (998).
         ];
 
-        await compositor.predict({insert: '', deleteLeft: 0}, context); // Initialize context tracking first!
+        await compositor.predict({insert: '', deleteLeft: 0, id: 0}, context); // Initialize context tracking first!
         let suggestions = await compositor.predict(inputDistribution, context);
 
         // remove the keep suggestion; we're not testing that here.
@@ -1045,20 +1045,16 @@ describe('ModelCompositor', function() {
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
-
-      compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
+      compositor.initContextTracker(baseContext, 0);
 
       let initialSuggestions = await compositor.predict(postTransform, baseContext);
-      const suggestionContextState = compositor.contextTracker.newest;
+      const suggestionContextState = compositor.contextTracker.latest;
 
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
-      // One for base state, before the transform...
-      // one for after, since it makes an edit.
-      assert.equal(compositor.contextTracker.cache.size, 2);
-
-      let contextIds = compositor.contextTracker.cache.keys();
+      // We haven't actually recorded any suggestions, so there's no need to cache a rewind state just yet.
+      assert.equal(compositor.contextTracker.cache.size, 0);
       let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key));
 
       let baseSuggestion = initialSuggestions[1];
@@ -1070,8 +1066,8 @@ describe('ModelCompositor', function() {
       const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(13));
 
       // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.cache.size, 2);
-      assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
+      assert.equal(compositor.contextTracker.cache.size, 1);
+      assert.sameMembers(compositor.contextTracker.cache.keys(), [baseSuggestion.transformId]);
       assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key)), transitionInstances);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
