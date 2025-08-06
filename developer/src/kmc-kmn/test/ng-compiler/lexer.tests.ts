@@ -1114,7 +1114,43 @@ describe("Lexer Tests", () => {
         'readonly',
         'using',
         'keys',
-      ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
+        'bitmap',
+        'copyright',
+        'hotkey',
+        'language',
+        'layout',
+        'message',
+        'name',
+        'version',
+        'ctrl',
+        'lctrl',
+        'rctrl',
+        'alt',
+        'lalt',
+        'ralt',
+        'ncaps',
+      ].forEach((text) => { handleInvalidKeyword(text); });
+    });
+    it("can handle an invalid command tokens", () => {
+      [
+        'baselayout',
+        'layer',
+        'platform',
+        'any',
+        'call',
+        'deadkey',
+        'dk',
+        'group',
+        'if',
+        'index',
+        'notany',
+        'outs',
+        'reset',
+        'save',
+        'set',
+        'store',
+        'use',
+      ].forEach((text) => { handleInvalidCommand(text); });
     });
   });
   describe("Token", () => {
@@ -1330,6 +1366,29 @@ function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleC
     recogniseTokens(
       textWithSuffix,
       [new Token(TokenTypes.PARAMETER, textWithSuffix)],
+      {addEOF, emitAll, handleContinuation}
+    );
+  });
+}
+
+function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+  ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
+    const textWithSuffix = `${text}${suffix}`;
+    recogniseTokens(
+      `${textWithSuffix}(`,
+      [new Token(TokenTypes.PARAMETER, `${textWithSuffix}(`)],
+      {addEOF, emitAll, handleContinuation}
+    );
+  });
+  ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
+    const textWithSuffix = `${text}${suffix}`;
+    recogniseTokens(
+      `${textWithSuffix} (`,
+      [
+        new Token(TokenTypes.PARAMETER, textWithSuffix),
+        new Token(TokenTypes.WHITESPACE, ' ', 1, 1+textWithSuffix.length),
+        new Token(TokenTypes.LEFT_BR, '(', 1, 2+textWithSuffix.length),
+      ],
       {addEOF, emitAll, handleContinuation}
     );
   });
