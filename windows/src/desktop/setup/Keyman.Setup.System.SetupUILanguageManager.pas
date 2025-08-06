@@ -20,6 +20,7 @@ type
     FActiveLocale: string;
     FLocales: TSetupLocales;
     FIndexMapping: TDictionary<Integer,Integer>;
+    FHasChanged: Boolean;
     FSortedValues: TList< TPair<string,string>>;
   private
     class procedure CreateStatic;
@@ -55,6 +56,11 @@ end;
 
 class function TSetupUILanguageManager.Locales: TSetupLocales;
 begin
+  if FHasChanged then
+  begin
+    Reorder;
+    FHasChanged := False;
+  end;
   Result := FLocales;
 end;
 
@@ -62,9 +68,14 @@ class function TSetupUILanguageManager.IndexMapping: TDictionary<Integer,Integer
 begin
   Result := FIndexMapping;
 end;
-    
+
 class function TSetupUILanguageManager.SortedValues: TList< TPair<string,string>>;
 begin
+  if FHasChanged then
+  begin
+    Reorder;
+    FHasChanged := False;
+  end;
   Result := FSortedValues;
 end;
 
@@ -72,6 +83,8 @@ class procedure TSetupUILanguageManager.DestroyStatic;
 begin
   FreeAndNil(FStrings);
   FreeAndNil(FLocales);
+  FreeAndNil(FIndexMapping);
+  FreeAndNil(FSortedValues);
 end;
 
 /// Sets the Setup UI language to the first matching user preferred UI language, if any found.
@@ -118,6 +131,7 @@ begin
     FActiveLocale := tag;
   FStrings.Add(tag, locale);
   FLocales.Add(tag, locale[ssLanguageName]);
+  FHasChanged := True;
 end;
 
 class procedure TSetupUILanguageManager.Reorder;
@@ -125,12 +139,10 @@ var
   item: TPair<string,string>;
   i: integer;
   j: integer;
-  sortedKeys: TArray<string>;
   sortedPairA: TList< TPair<string,string>>;
 begin
   sortedPairA := TList< TPair<string,string>>.Create();
-  i := 0;
-  for item in TSetupUILanguageManager.Locales do
+  for item in FLocales do
   begin
     sortedPairA.Add(item);
   end;
@@ -144,10 +156,8 @@ begin
     )
   );
   FSortedValues := sortedPairA;
-  sortedKeys := FLocales.Values.ToArray;
-  TArray.Sort<string>(sortedKeys);
   i := 0;
-  for item in TSetupUILanguageManager.Locales do
+  for item in FLocales do
   begin
      j := sortedPairA.IndexOf(item) ;
      FIndexMapping.Add(j,i);

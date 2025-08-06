@@ -587,7 +587,6 @@ var
   item: TPair<string,string>;
   n: Integer;
 begin
-  TSetupUILanguageManager.Reorder;
   for item in TSetupUILanguageManager.SortedValues do
   begin
     n := cbLanguage.Items.Add(item.Value);
@@ -961,8 +960,7 @@ procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
 var
   n :  Integer;
 begin
-  n := cbLanguage.ItemIndex;
-  n := TSetupUILanguageManager.IndexMapping[n];
+  n := TSetupUILanguageManager.IndexMapping[cbLanguage.ItemIndex];
   TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[n];
   FillStrings;
 end;
