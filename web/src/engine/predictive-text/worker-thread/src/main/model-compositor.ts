@@ -289,10 +289,8 @@ export class ModelCompositor {
 
       // An applied suggestion should replace the original Transition's effects, though keeping
       // the original input around.
-      const applicationState = correction.ContextTracker.attemptMatchContext(
+      const applicationState = originalTransition.base.analyzeTransition(
         context,
-        this.lexicalModel,
-        originalTransition.base,
         [{sample: fullTransform, p: 1}],
         true
       ).final;
@@ -355,10 +353,8 @@ export class ModelCompositor {
     }
 
     // An applied reversion should replace the original Transition's effects.
-    const revertedTransition = correction.ContextTracker.attemptMatchContext(
+    const revertedTransition = originalTransition.base.analyzeTransition(
       models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
-      this.lexicalModel,
-      originalTransition.base,
       originalTransition.inputDistribution
     );
 
