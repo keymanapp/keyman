@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.95 alpha 2025-08-06
+
+* fix(web): use actual legacy model for legacy-model support unit tests (#14460)
+
 ## 19.0.94 alpha 2025-08-01
 
 * maint(common): use `cpp_std=c++17` in meson project default_options (#14433)
