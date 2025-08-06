@@ -103,8 +103,8 @@ function _upload_to_testflight_pr_area_fv() {
 function do_build() {
   ios_build
   ios_capture_build_artifacts
-  _upload_to_testflight_pr_area
-  _upload_to_testflight_pr_area_fv
+  builder_if_release_build_level _upload_to_testflight_pr_area
+  builder_if_release_build_level _upload_to_testflight_pr_area_fv
 }
 
 ba_mac_unlock_keychain
