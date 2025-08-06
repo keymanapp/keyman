@@ -16,9 +16,9 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
@@ -33,7 +33,7 @@ import java.util.List;
  * Keyman Settings --> KeymanInstallActivity --> SelectPackageActivity
  * Displays a list of installed package ID / keyboard IDs so the user can select a language from the kmp.json
  */
-public final class SelectPackageActivity extends AppCompatActivity {
+public final class SelectPackageActivity extends BaseActivity {
   private static final String TAG = "SelectPackageActivity";
   private static ArrayList<HashMap<String, String>> list = null;
   private static Typeface titleFont = null;
@@ -49,6 +49,8 @@ public final class SelectPackageActivity extends AppCompatActivity {
     context = this;
 
     setContentView(R.layout.activity_list_layout);
+    setupEdgeToEdge(R.id.activity_list_layout);
+
     final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
