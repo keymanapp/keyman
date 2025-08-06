@@ -1325,7 +1325,7 @@ function recogniseSystemStoreWithString(type: TokenTypes, text: string, {addEOF=
 }
 
 function handleInvalidKeyword(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
-  ['a', '_a', '.a', '-a'].forEach((suffix) => {
+  ['a', '_a', '.a', '-a', '1'].forEach((suffix) => {
     const textWithSuffix = `${text}${suffix}`;
     recogniseTokens(
       textWithSuffix,
