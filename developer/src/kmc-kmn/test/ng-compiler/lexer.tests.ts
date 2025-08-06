@@ -1058,7 +1058,7 @@ describe("Lexer Tests", () => {
         ]
       assert.deepEqual(actual, expected);
     });
-    it("can handle an invalid system store token", () => {
+    it("can handle an invalid system store or keyword token", () => {
       [
         '&baselayout',
         '&bitmap',
@@ -1100,6 +1100,20 @@ describe("Lexer Tests", () => {
         'frees',
         'fix',
         'clearcontext',
+        'beep',
+        'begin',
+        'context',
+        'match',
+        'nomatch',
+        'nul',
+        'return',
+        'unicode',
+        'newcontext',
+        'postkeystroke',
+        'ansi',
+        'readonly',
+        'using',
+        'keys',
       ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
     });
   });
