@@ -9,6 +9,7 @@ import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.LocaleList;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,15 +30,7 @@ import com.keyman.engine.util.KMLog;
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
-  public enum NavigationBarLocationType {
-    // Default navigation bar location
-    NAVIGATION_BAR_BOTTOM,
-    NAVIGATION_BAR_LEFT,  // Landscape orientation
-    NAVIGATION_BAR_RIGHT, // Landscape orientation
-  }
-
   private static final String TAG = "BaseActivity";
-  private static NavigationBarLocationType navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
 
   static ContextWrapper localeUpdatedContext;
 
@@ -85,13 +78,6 @@ public class BaseActivity extends AppCompatActivity {
     return "";
   }
 
-  /**
-   * Return the navigation bar location
-   * @return NavigationBarLocationType
-   */
-  public static NavigationBarLocationType getNavigationBarLocation() {
-    return navigationBarLocation;
-  }
 
   /**
    * Setup the activity for edge-to-edge
@@ -101,8 +87,8 @@ public class BaseActivity extends AppCompatActivity {
    */
   public void setupEdgeToEdge(int layoutID) {
     EdgeToEdge.enable(this);
-
-    ViewCompat.setOnApplyWindowInsetsListener(findViewById(layoutID),
+    View anchor = findViewById(layoutID);
+    ViewCompat.setOnApplyWindowInsetsListener(anchor,
       (view, windowInsets) -> {
         // Allocate insets for system bars and display cutout (notch)
         Insets insets = windowInsets.getInsets(
@@ -114,17 +100,12 @@ public class BaseActivity extends AppCompatActivity {
         mlp.rightMargin = insets.right;
         view.setLayoutParams(mlp);
 
-        // Update Navigation Bar location
-        if (insets.left > 0) {
-          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_LEFT;
-        } else if (insets.right > 0) {
-          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_RIGHT;
-        } else {
-          navigationBarLocation = NavigationBarLocationType.NAVIGATION_BAR_BOTTOM;
-        }
-
+        KMManager.applyInsetsToKeyboard(insets.left, insets.right, insets.bottom);
         return windowInsets;
       });
+
+    // Trigger an initial pass
+    ViewCompat.requestApplyInsets(anchor);
   }
 
   /**

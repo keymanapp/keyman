@@ -57,7 +57,6 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
-import com.keyman.engine.BaseActivity.NavigationBarLocationType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 import com.keyman.engine.cloud.CloudDownloadMgr;
@@ -710,21 +709,51 @@ public final class KMManager {
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
       RelativeLayout.LayoutParams.MATCH_PARENT, bannerHeight + kbHeight);
     params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+	return params;
+   }
 
-    // Add margins to account for edge-to-edge where system bars cover up the keyboard
-    if (orientation == Configuration.ORIENTATION_PORTRAIT ||
-        formFactor == FormFactor.TABLET) {
-      params.bottomMargin = navigationHeight;
-    } else if (orientation == Configuration.ORIENTATION_LANDSCAPE && formFactor == FormFactor.PHONE) {
-      // Apply to left and right to handle navigation bar
-      NavigationBarLocationType navigationBarLocation = BaseActivity.getNavigationBarLocation();
-      if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_LEFT) {
-        params.leftMargin = navigationHeight;
-      } else if (navigationBarLocation == NavigationBarLocationType.NAVIGATION_BAR_RIGHT) {
-        params.rightMargin = navigationHeight;
-      }
+  /**
+   * Applies padding to the keyboard so it's not covered by system insets
+   * @param left int padding to account for notch/navigation bar on left side of screen
+   * @param right int padding to account for notch/navigation bar on right side of screen
+   * @param bottom int padding to account for navigation bar on bottom of screen
+   */
+  public static void applyInsetsToKeyboard(int left, int right, int bottom) {
+    // System keyboard
+    if (SystemKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(SystemKeyboard, left, right, bottom);
     }
-   return params;
+
+    // In-App Keyboard
+    if (InAppKeyboard != null) {
+      applyInsetsPaddingToKeyboardView(InAppKeyboard, left, right, bottom);
+    }
+  }
+
+  private static void applyInsetsPaddingToKeyboardView(KMKeyboard keyboard, int left, int right, int bottom) {
+    View parent = (View) keyboard.getParent();
+
+    if (parent != null) {
+      // Keep existing top padding, add bottom padding for the inset
+      parent.setPadding(
+        left,
+        parent.getPaddingTop(),
+        right,
+        bottom
+      );
+      // No need to change WebView margins; keep height as-is
+      parent.requestLayout();
+    }
+    else {
+      // Fallback: apply on the WebView itself
+      keyboard.setPadding(
+        left,
+        keyboard.getPaddingTop(),
+        right,
+        bottom
+      );
+      keyboard.requestLayout();
+    }
   }
 
   private static void initKeyboard(Context appContext, KeyboardType keyboardType) {
@@ -2458,21 +2487,6 @@ public final class KMManager {
     resourceId = context.getResources().getIdentifier(
       "navigation_bar_height", "dimen", "android");
     return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
-  }
-
-  /**
-   * If device is landscape orientation, return if navigation bar is on left (1) or right (2). Otherwise 0
-   * @param Context - context
-   * @return int
-   */
-  private static int getNavigationBarLocation(Context context) {
-    int orientation = getOrientation(context);
-    if (orientation != Configuration.ORIENTATION_LANDSCAPE) {
-      return 0;
-    }
-
-    return 1;
-    //View rootView = context.getApplicationContext().getWindow().getDecorView();
   }
 
   /**
