@@ -891,12 +891,14 @@ describe('ModelCompositor', function() {
 
       // One for base state, before the transform...
       // one for after, since it makes an edit.
-      assert.equal(compositor.contextTracker.cache.size, 2);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
 
-      let contextIds = compositor.contextTracker.cache.keys();
+      let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
@@ -904,8 +906,8 @@ describe('ModelCompositor', function() {
       const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(15));
 
       // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.cache.size, 3);
-      assert.sameMembers(compositor.contextTracker.cache.keys(), [15, ...contextIds]);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 3);
+      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [15, ...contextIds]);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
       assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
@@ -913,8 +915,8 @@ describe('ModelCompositor', function() {
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       await compositor.applyReversion(reversion, appliedContext);
-      assert.equal(compositor.contextTracker.cache.size, 2);
-      assert.isUndefined(compositor.contextTracker.cache.peek(13).final.appliedSuggestionId);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      assert.isUndefined(compositor.contextTracker.unitTestEndPoints.cache().peek(13).final.appliedSuggestionId);
     });
   });
 });

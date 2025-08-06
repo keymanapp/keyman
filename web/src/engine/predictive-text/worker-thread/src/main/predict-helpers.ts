@@ -248,14 +248,14 @@ export async function correctAndEnumerate(
   ).final;
 
   // Corrections and predictions are based upon the post-context state, though.
-  const contextChangeAnalysis = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    !TransformUtils.isEmpty(inputTransform)
-      ? transformDistribution
-      : null
-  );
-  const postContextState = contextChangeAnalysis.final;
+  let transition = contextState.analyzeTransition(context, transformDistribution);
+  if(!transition) {
+    console.warn("Unexpected failure when computing context-state transition");
+    // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
+    transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
+  }
+  contextTracker.cache.add(transition.transitionId, transition);
+  const postContextState = transition.final;
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -276,7 +276,7 @@ export async function correctAndEnumerate(
   // Only use of `contextState`.
   let contextLengthDelta = postContextTokens.length - contextState.tokenization.tokens.length;
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(contextChangeAnalysis.preservationTransform) {
+  if(transition.preservationTransform) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
     // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
@@ -285,7 +285,7 @@ export async function correctAndEnumerate(
     // likely imply a tokenization boundary, infer 'new word' mode.
     // Apply any part of the context change that is not considered
     // to be up for correction.
-    context = models.applyTransform(contextChangeAnalysis.preservationTransform, context);
+    context = models.applyTransform(transition.preservationTransform, context);
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
   } else if (contextLengthDelta < 0) {
     /* Ooh, we've dropped context here.  Almost certainly from a backspace.
@@ -337,7 +337,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
 
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
@@ -407,7 +407,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+    predictions.forEach((entry) => entry.preservationTransform = transition.preservationTransform);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
