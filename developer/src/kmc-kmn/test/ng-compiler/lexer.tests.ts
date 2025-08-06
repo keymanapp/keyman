@@ -1114,6 +1114,21 @@ describe("Lexer Tests", () => {
         'readonly',
         'using',
         'keys',
+        'bitmap',
+        'copyright',
+        'hotkey',
+        'language',
+        'layout',
+        'message',
+        'name',
+        'version',
+        'ctrl',
+        'lctrl',
+        'rctrl',
+        'alt',
+        'lalt',
+        'ralt',
+        'ncaps',
       ].forEach((text) => { handleInvalidKeyword('&baselayout'); });
     });
   });
