@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-# . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+# . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 # . "$KEYMAN_ROOT/developer/src/packages.inc.sh"
 
 builder_describe "Test Keyman Keyboard Compiler kmc command line e2e" \

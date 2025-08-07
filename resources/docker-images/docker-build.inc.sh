@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # no hashbang for .inc.sh
 
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 
 _add_build_args() {
   local var=$1

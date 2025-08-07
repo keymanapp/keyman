@@ -27,7 +27,7 @@ fi
 
 #Include script dependency
 . $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
-#. ../resources/shellHelperFunctions.sh
+#. ../resources/build/utils.inc.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`
 KEYMAN_TIER=`cat ../TIER.md`
@@ -50,12 +50,10 @@ mkdir -p "${UPLOAD_DIR}"
 echo "Writing changelog to $CHANGELOG_PATH"
 get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
-assertFileExists "${CHANGELOG_PATH}"
 
 # Strip emoji as App Store does not allow emoji in changelogs
 node "$KEYMAN_ROOT/resources/tools/strip-emoji" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
 mv -f "$CHANGELOG_PATH.1" "$CHANGELOG_PATH"
-assertFileExists "${CHANGELOG_PATH}"
 
 #
 # Keyman Engine

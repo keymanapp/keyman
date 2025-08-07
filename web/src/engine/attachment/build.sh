@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/attachment
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################

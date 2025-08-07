@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
@@ -133,7 +133,9 @@ function build_engine() {
             KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
             UPLOAD_SENTRY=$UPLOAD_SENTRY
 
-  assertDirExists "$KEYMAN_XCFRAMEWORK"
+  if ! [[ -d "${KEYMAN_XCFRAMEWORK}" ]]; then
+    builder_die "Build failed: directory '${KEYMAN_XCFRAMEWORK}' missing"
+  fi
 }
 
 builder_run_action clean         do_clean

@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
@@ -102,7 +102,7 @@ execBuildCommand() {
     shift
     declare -r cmnd="$*"
 
-    displayInfo "Building $component:" "$cmnd"
+    builder_echo heading "Building $component:" "$cmnd"
     set +e
     local ret_code=0
     eval "$cmnd" || ret_code=$?
@@ -276,7 +276,7 @@ do_install() {
 
   builder_heading "Attempting local deployment with command:"
   KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-  displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
+  builder_echo info "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
   "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
 }
 
