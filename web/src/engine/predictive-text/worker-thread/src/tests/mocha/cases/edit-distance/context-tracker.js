@@ -7,6 +7,8 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { ContextTransition } from '#./correction/context-transition.js';
+import { ContextState } from '#./correction/context-state.js';
 
 var TrieModel = models.TrieModel;
 
@@ -82,5 +84,39 @@ describe('ContextTracker', function() {
       // Final token is empty (follows a wordbreak)
       assert.equal(postContextMatch.final.tokenization.tail.exampleInput, '');
     });
+
+    // analyzeState
   });
+
+  describe('findCachedMatch', () => {
+    it('finds transitions with an exact match', () => {
+
+      const baseSuggestion = {
+        transform: {
+          insert: 'world',
+          deleteLeft: 3,
+          id: 2
+        },
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0
+        },
+        transformId: 2,
+        id: 1,
+        displayAs: 'world'
+      };
+
+      const baseContext = {
+        left: 'hello wor', startOfBuffer: true, endOfBuffer: true
+      };
+
+      const tracker = new ContextTracker(plainModel, baseContext);
+      let applied = tracker.base.applySuggestion(baseSuggestion);
+
+    });
+  });
+
+  // new cache-based functions
+
+  // finding a cached match (for use with delayed reversions)
 });

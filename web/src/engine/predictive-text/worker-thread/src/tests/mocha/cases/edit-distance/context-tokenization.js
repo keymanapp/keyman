@@ -101,6 +101,20 @@ describe('isSubstitutionAlignable', () => {
     // The double-p adds a fun complication once the first gets dropped.
     assert.isTrue(isSubstitutionAlignable('applesauce', 'plesauce'));
   });
+
+  it(`returns true for left-contexts across sliding window transitions (1)`, () => {
+    const start = "applesauce and orange juice don't seem like they'd make for the be";
+    const final = "plesauce and orange juice don't seem like they'd make for the be";
+    // The double-p adds a fun complication once the first gets dropped.
+    assert.isTrue(isSubstitutionAlignable(start, final, {maxDiagonal: Math.abs(start.length - final.length)}));
+  });
+
+  it(`returns true for left-contexts across sliding window transitions (2)`, () => {
+    const start = "e and orange juice don't seem like they'd make for the best break";
+    const final = " and orange juice don't seem like they'd make for the best break";
+    // The double-p adds a fun complication once the first gets dropped.
+    assert.isTrue(isSubstitutionAlignable(start, final, {maxDiagonal: Math.abs(start.length - final.length)}));
+  });
 });
 
 describe('ContextTokenization', function() {

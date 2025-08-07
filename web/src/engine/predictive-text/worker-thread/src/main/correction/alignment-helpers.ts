@@ -39,15 +39,20 @@ export function getEditPathLastMatch(editPath: EditOperation[]) {
 export function isSubstitutionAlignable(
   incomingToken: string,
   matchingToken: string,
-  forNearCaret?: boolean
+  options?: {
+    forNearCaret?: boolean
+    maxDiagonal?: number
+  }
 ): boolean {
+  const { forNearCaret, maxDiagonal } = options || {};
+
   // 1 - Determine the edit path for the word.
   let subEditPath = ClassicalDistanceCalculation.computeDistance(
     [...matchingToken].map(value => ({key: value})),
     [...incomingToken].map(value => ({key: value})),
     // Use max length in case the word is actually already partly out of
     // the sliding context window.
-    Math.max(incomingToken.length, matchingToken.length)
+    Math.min(maxDiagonal ?? Number.POSITIVE_INFINITY, Math.max(incomingToken.length, matchingToken.length))
   ).editPath();
 
   const firstInsert = subEditPath.indexOf('insert');

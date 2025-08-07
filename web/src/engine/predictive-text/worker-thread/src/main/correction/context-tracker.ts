@@ -10,6 +10,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
+import { isSubstitutionAlignable } from './alignment-helpers.js';
 
 export class ContextTracker {
   private readonly cache = new RewindableCache<number, ContextTransition>(5);
@@ -57,7 +58,7 @@ export class ContextTracker {
     }
 
     if(transformDistribution?.length == 0) {
-      transformDistribution = null;
+      transformDistribution = [{sample: { insert: '', deleteLeft: 0 }, p: 1}];
     }
 
     const inputTransform = transformDistribution?.[0];
@@ -146,6 +147,35 @@ export class ContextTracker {
       },
       p: 0
     }]);
+  }
+
+  /**
+   * Given an incoming Context, attempts to find a cached transition with a matching
+   * final context state.
+   * @param context
+   * @returns
+   */
+  findCachedMatch(context: Context): number | undefined {
+    for(let id of this.cache.keys()) {
+      const transition = this.cache.peek(id);
+
+      const leftA = transition.final.context.left;
+      const leftB = context.left;
+      // No substitutions allowed:  only _either_ insertions or deletions
+      //
+      // In the common use case, both A and B are sourced from a transform applied
+      // to an actual context window, and the range of text affected by the transform(s)
+      // for A and B may vary and not match.
+      if(Math.max(leftA.length, leftB.length) >= this.configuration.leftContextCodePoints) {
+        if(isSubstitutionAlignable(leftA, leftB, { maxDiagonal: Math.abs(leftA.length - leftB.length) })) {
+          return transition.transitionId;
+        }
+      } else if(leftA == leftB) {
+        return transition.transitionId;
+      }
+    }
+
+    return undefined;
   }
 
   findAndRevert(id: number) {

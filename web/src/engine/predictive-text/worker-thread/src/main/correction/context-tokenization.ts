@@ -117,7 +117,7 @@ export class ContextTokenization {
       for(let i = 0; i < editPath.length; i++) {
         if(editPath[i] == 'substitute') {
           subCount++;
-          if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
+          if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], { forNearCaret: true })) {
             return {
               canAlign: false
             };
