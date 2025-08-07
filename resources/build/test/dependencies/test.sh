@@ -43,4 +43,4 @@ echo ------------------------------------------------------------------
     fi
   ) || exit $?
 
-echo "PASS: all dependency tests ran as expected"
+builder_echo green "  ✓ PASS: all dependency tests ran as expected"

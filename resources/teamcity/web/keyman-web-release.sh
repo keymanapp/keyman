@@ -17,7 +17,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-download-info.inc.sh"
 
 ################################ Main script ################################
 
@@ -74,7 +73,7 @@ function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
 
   # TODO: refactor to allow to run on Linux/macOS as well
-  if ! is_windows; then
+  if ! builder_is_windows; then
     builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
     return 1
   fi
@@ -89,7 +88,7 @@ function publish_web_action() {
   _push_release_to_skeymancom
 
   _zip_and_upload_artifacts
-  upload_help "Keyman for Web" web
+  tc_upload_help "Keyman for Web" web
 
   builder_echo end publish success "Finished publishing KeymanWeb release"
 }
@@ -97,14 +96,14 @@ function publish_web_action() {
 if builder_has_action all; then
   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   web_build_action
   publish_web_action
 else
   builder_run_action  configure   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       web_build_action
   builder_run_action  publish     publish_web_action
