@@ -1,5 +1,5 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
-import { KeyboardProcessor } from 'keyman/engine/js-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, JSKeyboard } from 'keyman/engine/keyboard';
+import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboardBase, processForMnemonicsAndLegacy } from 'keyman/engine/main';
@@ -10,7 +10,7 @@ import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachm
 import ContextManager from './contextManager.js';
 
 type KeyboardState = {
-  activeKeyboard: Keyboard,
+  activeKeyboard: JSKeyboard,
   modStateFlags: number,
   baseLayout: string
 }
@@ -38,15 +38,23 @@ export function _GetEventKeyCode(e: KeyboardEvent) {
 // Keeping this as a separate function affords us the opportunity to unit-test the method more simply.
 
 /**
- * Function     _GetKeyEventProperties
- * Scope        Private
- * @param       {Event}       e         Event object
- * @return      {Object.<string,*>}     KMW keyboard event object:
- * Description  Get object with target element, key code, shift state, virtual key state
- *                Lcode=keyCode
- *                Lmodifiers=shiftState
- *                LisVirtualKeyCode e.g. ctrl/alt key
- *                LisVirtualKey     e.g. Virtual key or non-keypress event
+ * Translate a browser KeyboardEvent into a KeymanWeb KeyEvent
+ *
+ * The function calculates the true state of the keyboard's modifiers, taking
+ * into account chiral modifiers where applicable.
+ * Special handling is included for AltGr emulation and browser quirks, particularly
+ * for Firefox, which may use different key codes for certain keys. The code remaps
+ * these as needed for consistency. It adds the OS meta key if pressed, ensuring
+ * that system shortcuts can bypass Keyman processing. Adjustments are made for
+ * mnemonic and legacy keyboards, before finally returning a KeyEvent object
+ * with the computed key code, modifiers and state.
+ *
+ * @param  {KeyboardEvent}  e              Event object
+ * @param  {KeyboardState}  keyboardState  Keyboard state object
+ * @param  {DeviceSpec}     device         Device object
+ * @return {KeyEvent}                      KeymanWeb KeyEvent object, or null
+ *                                         for duplicate/spurious events or if
+ *                                         there is no key code.
  */
 export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: KeyboardState, device: DeviceSpec): KeyEvent {
   if(e.cancelBubble === true) {
@@ -60,7 +68,6 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   // Stage 1 - track the true state of the keyboard's modifiers.
   const prevModState = keyboardState.modStateFlags;
-  let curModState = 0x0000;
   let ctrlEvent = false, altEvent = false;
 
   const keyCodes = Codes.keyCodes;
@@ -97,17 +104,18 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
    * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
    */
 
+  let curModState = 0x0000;
   curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
   if(e.getModifierState("Control")) {
     curModState |= ((e.location != 0 && ctrlEvent) ?
       (e.location == 1 ? ModifierKeyConstants.LCTRLFLAG : ModifierKeyConstants.RCTRLFLAG) : // Condition 1
-      prevModState & 0x0003);                                                       // Condition 2
+      prevModState & 0x0003 /* LCTRLFLAG | RCTRLFLAG */);                                   // Condition 2
   }
   if(e.getModifierState("Alt")) {
     curModState |= ((e.location != 0 && altEvent) ?
       (e.location == 1 ? ModifierKeyConstants.LALTFLAG : ModifierKeyConstants.RALTFLAG) :   // Condition 1
-      prevModState & 0x000C);                                                       // Condition 2
+      prevModState & 0x000C /* LALTFLAG | RALTFLAG */);                                     // Condition 2
   }
 
   // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
@@ -122,7 +130,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   curModState |= Lstates;
 
   // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
-  const LmodifierChange = keyboardState.modStateFlags != curModState;
+  const LmodifierChanged = keyboardState.modStateFlags != curModState;
 
   // KeyboardState update:  save our known modifier/state analysis bits.
   // Note:  `keyboardState` is typically the full-fledged KeyboardProcessor instance.  As a result,
@@ -140,8 +148,8 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     curModState &= ~ModifierKeyConstants.LCTRLFLAG;
   }
 
-  const modifierBitmasks = Codes.modifierBitmasks;
   // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
+  const modifierBitmasks = Codes.modifierBitmasks;
   const activeKeyboard = keyboardState.activeKeyboard;
   let Lmodifiers: number;
   if(activeKeyboard && activeKeyboard.isChiral) {
@@ -187,7 +195,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     Lcode: Lcode,
     Lmodifiers: Lmodifiers,
     Lstates: Lstates,
-    LmodifierChange: LmodifierChange,
+    LmodifierChange: LmodifierChanged,
     // This is based on a KeyboardEvent, so it's not considered 'synthetic' within web-core.
     isSynthetic: false
   });
@@ -210,13 +218,13 @@ export default class HardwareEventKeyboard extends HardKeyboardBase {
   // - `modStateFlags`
   // - `baseLayout`
   // - `doModifierPress()` - for modifier updates on key-up.
-  private readonly processor: KeyboardProcessor;
+  private readonly processor: JSKeyboardProcessor;
   private readonly contextManager: ContextManager;
   private domEventTracker = new DomEventTracker();
 
   private swallowKeypress: boolean = false;
 
-  constructor(hardDevice: DeviceSpec, processor: KeyboardProcessor, contextManager: ContextManager) {
+  constructor(hardDevice: DeviceSpec, processor: JSKeyboardProcessor, contextManager: ContextManager) {
     super();
     this.hardDevice = hardDevice;
     this.contextManager = contextManager;

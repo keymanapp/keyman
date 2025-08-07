@@ -115,6 +115,10 @@ export default class KeyboardRequisitioner {
     });
   }
 
+  shutdown(): void{
+    this.cache.shutdown();
+  }
+
   addKeyboardArray(x: (string|RawKeyboardMetadata)[]): Promise<(KeyboardStub | ErrorStub)[]> {
     const completeStubs: KeyboardStub[] = [];
     const incompleteStubs: KeyboardStub[] = [];
