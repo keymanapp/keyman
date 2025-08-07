@@ -326,7 +326,7 @@ export class ModelCompositor {
         // Will need to be modified a bit if/when phrase-level suggestions are implemented.
         // Those will be tracked on the first token of the phrase, which won't be the tail
         // if they cover multiple tokens.
-        let suggests = this.contextTracker.latest.final.suggestions;
+        let suggests = originalTransition.final.suggestions;
 
         suggests.forEach(function(suggestion) {
           // A reversion's transform ID is the additive inverse of its original suggestion;
