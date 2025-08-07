@@ -341,7 +341,7 @@ export class ModelCompositor {
 
     // An applied reversion should replace the original Transition's effects.
     const revertedTransition = correction.ContextTracker.attemptMatchContext(
-      models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
+      originalTransition.base.context,
       this.lexicalModel,
       originalTransition.base,
       originalTransition.inputDistribution
