@@ -32,6 +32,8 @@
 #include <keyman/keyman_core_api.h>
 #include <keyman/keyman_core_api_consts.h>
 
+#include <km_linux_common.h>
+
 #include "config.h"
 #include "keymanutil.h"
 #include "keyman-service.h"
@@ -50,10 +52,6 @@
 #define KEYMAN_LALT   56 // 0x38
 #define KEYMAN_RCTRL  97 // 0x61
 #define KEYMAN_RALT  100 // 0x64
-
-// TODO: Move to a common header file. Also defined in tests/testfixture.h
-// and keyman-system-service/src/OrderedOutputDevice.cpp
-#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL 194  // 0xC2
 
 typedef struct _IBusKeymanEngine IBusKeymanEngine;
 typedef struct _IBusKeymanEngineClass IBusKeymanEngineClass;
