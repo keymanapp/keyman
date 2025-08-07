@@ -10,17 +10,15 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-
-import { ContextTokenization } from './context-tokenization.js';
-
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
-import { determineModelTokenizer } from '#./model-helpers.js';
+import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
+import { determineModelTokenizer } from '#./model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
 import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 
@@ -168,7 +166,7 @@ export class ContextState {
    *
    * May also contain a single entry for applying Suggestions or when correction behavior
    * is disabled.
-   * @param isApplyingSuggestion Indicates if this is being used to apply a Suggestion.
+   * @param isApplyingSuggestion When true, alters behavior to better model application of suggestions.
    * @returns
    */
   analyzeTransition(
@@ -192,11 +190,14 @@ export class ContextState {
       tokenizedContext.push({text: ''});
     }
     // In which case we could try need to align for each of them, starting from the most likely.
-    //
+
+    // If we're not at the start of the buffer, we're probably a sliding context.
+    const isSliding = !this.context.startOfBuffer;
+
     // It's possible the tokenization will remember more of the initial token than is
     // actually present in the sliding context window, which imposes a need for a wide-band
     // computeDistance 'radius' in the called function.
-    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
+    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
 
     if(!alignmentResults.canAlign) {
       return null;

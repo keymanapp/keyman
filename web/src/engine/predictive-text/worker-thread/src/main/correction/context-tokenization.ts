@@ -102,12 +102,13 @@ export class ContextTokenization {
    * Determines the alignment between a new, incoming tokenization source and the
    * tokenization modeled by the current instance.
    * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
+   * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
    * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
    * wholesale replacement of the original token.
    * @returns Alignment data that details if and how the incoming tokenization aligns with
    * the tokenization modeled by this instance.
    */
-  computeAlignment(incomingTokenization: string[], noSubVerify?: boolean): ContextStateAlignment {
+  computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
     // Map the tokenized state to an edit-distance friendly version.
     const tokenizationToMatch = this.exampleInput;
 
@@ -260,11 +261,18 @@ export class ContextTokenization {
           }
 
           // Find the word before and after substitution.
-          const incomingSub = incomingTokenization[i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0)];
-          const matchingSub = tokenizationToMatch[i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0)];
+          const incomingIndex = i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0);
+          const matchingIndex = i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0);
+          const incomingSub = incomingTokenization[incomingIndex];
+          const matchingSub = tokenizationToMatch[matchingIndex];
+
+          const atSlidePoint = isSliding && (incomingIndex == 0 || matchingIndex == 0);
 
           // Double-check the word - does the 'substituted' word itself align?
-          if(!noSubVerify && !isSubstitutionAlignable(incomingSub, matchingSub)) {
+          //
+          // Exception: if the word is at the start of the context window and the
+          // context window is likely sliding, don't check it.
+          if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
             return {
               canAlign: false
             };
@@ -325,7 +333,8 @@ export class ContextTokenization {
     tokenizedContext: Token[],
     alignment: ContextStateAlignment,
     lexicalModel: LexicalModel,
-    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions.
+    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions
+    // in case word boundaries shift back and forth.
     alignedTransformDistribution: Distribution<Transform[]>
   ): ContextTokenization {
     if(!alignment.canAlign) {

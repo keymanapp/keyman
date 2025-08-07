@@ -108,7 +108,7 @@ describe('ContextTokenization', function() {
       const newContext = [...baseContext];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -127,7 +127,7 @@ describe('ContextTokenization', function() {
       newContext[4] = 'over';
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -149,7 +149,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext, true);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false, true);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -169,7 +169,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -183,7 +183,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -197,7 +197,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -211,7 +211,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -225,7 +225,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -245,7 +245,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -265,7 +265,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -285,7 +285,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -305,7 +305,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -325,7 +325,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -345,7 +345,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -365,7 +365,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -385,7 +385,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -405,7 +405,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -425,7 +425,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {
         canAlign: true,
@@ -445,7 +445,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -459,7 +459,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -473,7 +473,7 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
@@ -487,9 +487,95 @@ describe('ContextTokenization', function() {
       ];
 
       const baseTokenization = buildBaseTokenization(baseContext);
-      const computedAlignment = baseTokenization.computeAlignment(newContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
       assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("handles sliding context-window scenarios", () => {
+      // // Explicitly-defined window, though it's not needed directly by the method.
+      // const config = {
+      //   leftContextCodePoints: 64,
+      //   rightContextCodePoints: 64
+      // };
+
+      const baseContext1 = [
+        // "ap" prefix not in actual view, but preserved by prior tokenization rounds.
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "be"
+      ];
+
+      const incomingContext1 = [
+        "plesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "bes"
+      ];
+
+      // 66 chars above, vs a sliding window of length 64.
+      assert.equal(baseContext1.reduce((accum, curr) => accum + curr.length, 0), 66);
+      // Actual window + one newly-typed character
+      assert.equal(incomingContext1.reduce((accum, curr) => accum + curr.length, 0), 65);
+
+      const tokenization1 = new ContextTokenization(buildBaseTokenization(baseContext1));
+
+      assert.deepEqual(tokenization1.computeAlignment(incomingContext1, true), {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 22,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+
+      // Our tokenization scheme remembers the full original word before any of it slid out of
+      // the context window.
+      const baseContext2 = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        //                                                                 +2    +1     +4
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
+      ];
+
+      const incomingContext2 = [
+        // "plesauce" => "e":  -7 chars.
+        "e", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
+      ];
+
+      // 73 chars above, vs a sliding window of length 64.
+      assert.equal(baseContext2.reduce((accum, curr) => accum + curr.length, 0), 73);
+      // Actual window + one newly-typed character
+      assert.equal(incomingContext2.reduce((accum, curr) => accum + curr.length, 0), 65);
+
+      const tokenization2 = new ContextTokenization(buildBaseTokenization(baseContext2));
+      assert.deepEqual(tokenization2.computeAlignment(incomingContext2, true), {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 24,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+
+      const baseContext3 = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ", "like", " ",
+        "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
+      ];
+
+      const incomingContext3 = [
+        " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ", "like", " ",
+        "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "breakf"
+      ];
+
+      // 73 chars above, vs a sliding window of length 64.
+      assert.equal(baseContext3.reduce((accum, curr) => accum + curr.length, 0), 74);
+      // Actual window + one newly-typed character
+      assert.equal(incomingContext3.reduce((accum, curr) => accum + curr.length, 0), 65);
+
+      const tokenization3 = new ContextTokenization(buildBaseTokenization(baseContext3));
+      assert.deepEqual(tokenization3.computeAlignment(incomingContext3, true), {
+        canAlign: true,
+        leadTokenShift: -1,
+        matchLength: 23,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
     });
   });
 
@@ -577,6 +663,47 @@ describe('ContextTokenization', function() {
       assert.deepEqual(tokenization.tokens.map(
         (t, i) => ({
           text: i == 0 ? 'pplesauce' : t.exampleInput,
+          isWhitespace: t.isWhitespace
+        })),
+        targetTokens
+      );
+    });
+
+    it('context-window slide deletes majority of word', () => {
+      // string length: 64
+      const baseTexts = [
+        "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
+      ];
+      assert.equal(baseTexts.join('').length, 73);
+
+      assert.equal(baseTexts.length, 25);
+      const baseTokenization = new ContextTokenization(baseTexts.map(t => toToken(t)), null);
+
+      const targetTexts = [
+        "e", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
+        "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
+      ];
+      const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const tokenization = baseTokenization.transitionTo(
+        targetTokens, {
+          canAlign: true,
+          leadTokenShift: 0,
+          matchLength: 24,
+          tailEditLength: 1,
+          tailTokenShift: 0
+        },
+        plainModel,
+        [{ sample: [{ insert: 'k', deleteLeft: 0 }], p: 1}]
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      // The full original token should be preserved.
+      assert.equal(tokenization.tokens[0].exampleInput, 'applesauce');
+      assert.deepEqual(tokenization.tokens.map(
+        (t, i) => ({
+          text: i == 0 ? 'e' : t.exampleInput,
           isWhitespace: t.isWhitespace
         })),
         targetTokens
