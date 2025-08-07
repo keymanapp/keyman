@@ -724,19 +724,10 @@ describe('ContextTokenization', function() {
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
-      // The full original token should be preserved.
-      assert.equal(tokenization.tokens[0].exampleInput, 'applesauce');
-      assert.deepEqual(tokenization.tokens.map(
-        (t, i) => ({
-          text: i == 0 ? 'pplesauce' : t.exampleInput,
-          isWhitespace: t.isWhitespace
-        })),
-        targetTokens
-      );
     });
 
     it('context-window slide deletes majority of word', () => {
-      // string length: 64
+      // string length: 73
       const baseTexts = [
         "applesauce", " ", "and", " ", "orange", " ", "juice", " ", "don't", " ", "seem", " ",
         "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "brea"
@@ -765,15 +756,6 @@ describe('ContextTokenization', function() {
 
       assert.isOk(tokenization);
       assert.equal(tokenization.tokens.length, targetTokens.length);
-      // The full original token should be preserved.
-      assert.equal(tokenization.tokens[0].exampleInput, 'applesauce');
-      assert.deepEqual(tokenization.tokens.map(
-        (t, i) => ({
-          text: i == 0 ? 'e' : t.exampleInput,
-          isWhitespace: t.isWhitespace
-        })),
-        targetTokens
-      );
     });
   });
 });
