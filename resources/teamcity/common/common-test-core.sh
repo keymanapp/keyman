@@ -22,11 +22,11 @@ builder_describe \
 
 builder_parse "$@"
 
-if is_ubuntu; then
+if builder_is_linux; then
   ARCH=arch
-elif is_windows; then
+elif builder_is_windows; then
   ARCH=win
-elif is_macos; then
+elif builder_is_macos; then
   ARCH=mac
 else
   builder_echo error "Unknown architecture"

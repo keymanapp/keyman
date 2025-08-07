@@ -19,7 +19,7 @@ exe = executable(
   c_args: test_c_args,
   cpp_args: test_c_args,
   dependencies: deps,
-  include_directories: [ '..', '../src' ]
+  include_directories: [ linux_include_dirs, '..', '../src' ]
 )
 
 # we currently don't have any real unit tests for keyman-system-service.

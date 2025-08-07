@@ -3863,17 +3863,68 @@ bool hasPreamble(std::u16string result) {
   return result.size() > 0 && result[0] == 0xFEFF;
 }
 
+bool isValidUtf8(KMX_BYTE* str, int sz) {
+  int i = 0;
+  while (i < sz) {
+    int remaining = sz - i;
+    if (str[i] <= 0x7F) {
+      // ASCII
+      i++;
+    } else if ((str[i] & 0xE0) == 0xC0) {
+      // 2-byte sequence
+      if (remaining < 2 ||
+          (str[i + 1] & 0xC0) != 0x80 ||
+          str[i] == 0xC0 || // C0 and C1 are illegal values
+          str[i] == 0xC1) {
+        return false;
+      }
+      i += 2;
+    } else if ((str[i] & 0xF0) == 0xE0) {
+      // 3-byte sequence
+      if (remaining < 3 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xE0 && (str[i + 1] & 0xE0) == 0x80) {
+        return false;
+      }
+      if (str[i] == 0xED && (str[i + 1] & 0xE0) == 0xA0) {
+        return false;
+      }
+      i += 3;
+    } else if ((str[i] & 0xF8) == 0xF0) {
+      // 4-byte sequence
+      if (remaining < 4 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80 ||
+          (str[i+3] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xF0 && (str[i + 1] & 0xF0) == 0x80) {
+        return false;
+      }
+      if (str[i] > 0xF4 || (str[i] == 0xF4 && str[i + 1] > 0x8F)) {
+        return false;
+      }
+      i += 4;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
   if(sz == 0) {
     return FALSE;
   }
 
   std::u16string result;
-
-  try {
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-    result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error& e) {
+  if (isValidUtf8(infile, sz)) {
+    std::string infileStr(reinterpret_cast<const char*>(infile), sz);
+    result = u16string_from_string(infileStr);
+  } else {
     ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {
