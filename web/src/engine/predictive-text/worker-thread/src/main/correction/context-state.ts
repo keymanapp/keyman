@@ -217,9 +217,10 @@ export class ContextState {
 
     const transition = new ContextTransition(this, this.appliedInput?.id);
     if(resultTokenization == this.tokenization) {
-      // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
-      // TODO:  Fix - this is intended to be temporary during refactor work.
-      transition.replaceFinal(this, transformDistribution);
+      // If the tokenizations match, clone the ContextState; we want to preserve a post-application
+      // context separately from pre-application contexts for predictions based on empty roots.
+      const state = new ContextState(this);
+      transition.replaceFinal(state, transformDistribution);
       return transition;
     }
 
