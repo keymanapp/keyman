@@ -382,10 +382,20 @@ export class ContextTokenization {
 
     // ***
 
+    const incomingOffset = (leadTokenShift > 0 ? leadTokenShift : 0);
+    const matchingOffset = (leadTokenShift < 0 ? -leadTokenShift : 0);
+
+    // If a word is being slid out of context-window range, start trimming it - we should
+    // no longer need to worry about reusing its original correction-search results.
+    if(matchLength > 0 && this.tokens[matchingOffset].exampleInput != tokenizedContext[incomingOffset].text) {
+      //this.tokens[matchingOffset]'s clone is at tokenization[0] after the splice call in a previous block.
+      tokenization[0] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset].text);
+    }
+
     // first non-matched tail index within the incoming context
-    const incomingTailUpdateIndex = matchLength + (leadTokenShift > 0 ? leadTokenShift : 0);
+    const incomingTailUpdateIndex = matchLength + incomingOffset;
     // first non-matched tail index in `matchState`, the base context state.
-    const matchingTailUpdateIndex = matchLength - (leadTokenShift < 0 ? leadTokenShift : 0);
+    const matchingTailUpdateIndex = matchLength + matchingOffset;
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
