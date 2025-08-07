@@ -91,7 +91,7 @@ export class ContextTracker {
           continue;
         }
 
-        let result = priorMatchState.final.analyzeTransition(context, transformDistribution);
+        let result = priorMatchState.final.analyzeTransition(this.configuration, context, transformDistribution);
 
         if(result?.final) {
           if(priorMatchState.transitionId !== undefined) {

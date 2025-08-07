@@ -1,6 +1,7 @@
 import { ContextTokenization } from './context-tokenization.js';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -166,12 +167,15 @@ export class ContextState {
    *
    * If the two versions of Context match poorly, this method will return null.
    *
-   * @param context
-   * @param transformDistribution
-   * @param isApplyingSuggestion
+   * @param configuration The configuration of the model & the sliding context window
+   * @param context The current context actually in view within the sliding context window
+   * @param transformDistribution The incoming distribution of possible input transforms
+   * @param isApplyingSuggestion When true, alters behavior to better model application of suggestions
    * @returns
    */
   analyzeTransition(
+    /** The configuration of the model & the sliding context window */
+    configuration: Configuration,
     // Matching the context expected for the transition's base state
     context: Context,
     // the distribution should be tokenized already.
@@ -194,11 +198,21 @@ export class ContextState {
       tokenizedContext.push({text: ''});
     }
     // In which case we could try need to align for each of them, starting from the most likely.
+
+    // Check incoming context lengths.
+    const incomingLength = this.context.left.length;
+    const matchingLength = context.left.length;
+    // If either context is AT LEAST as long as the configured sliding window allotment,
+    // we probably have a sliding context.  (Regardless of whatever tokenization(s)
+    // are being considered.)
     //
+    // configuration may be empty for some unit tests.
+    const isSliding = configuration && (incomingLength > configuration.leftContextCodePoints || matchingLength > configuration.leftContextCodePoints);
+
     // It's possible the tokenization will remember more of the initial token than is
     // actually present in the sliding context window, which imposes a need for a wide-band
     // computeDistance 'radius' in the called function.
-    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
+    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
 
     if(!alignmentResults.canAlign) {
       return null;

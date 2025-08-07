@@ -218,7 +218,7 @@ export async function correctAndEnumerate(
   }
 
   // Corrections and predictions are based upon the post-context state, though.
-  let transition = contextState.analyzeTransition(context, transformDistribution);
+  let transition = contextState.analyzeTransition(contextTracker.configuration, context, transformDistribution);
   if(!transition) {
     console.warn("Unexpected failure when computing context-state transition");
     // Only known remaining use of `analyzeState` currently - and it's as a failsafe!

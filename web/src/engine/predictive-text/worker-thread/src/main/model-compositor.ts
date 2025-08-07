@@ -290,6 +290,7 @@ export class ModelCompositor {
       // An applied suggestion should replace the original Transition's effects, though keeping
       // the original input around.
       const applicationState = originalTransition.base.analyzeTransition(
+        this.configuration,
         context,
         [{sample: fullTransform, p: 1}],
         true
@@ -354,6 +355,7 @@ export class ModelCompositor {
 
     // An applied reversion should replace the original Transition's effects.
     const revertedTransition = originalTransition.base.analyzeTransition(
+      this.configuration,
       models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
       originalTransition.inputDistribution
     );
