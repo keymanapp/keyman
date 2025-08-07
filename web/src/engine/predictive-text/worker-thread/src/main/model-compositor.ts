@@ -16,8 +16,8 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+
 import { ContextTracker } from './correction/context-tracker.js';
-import { ContextTransition } from './correction/context-transition.js';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -283,22 +283,7 @@ export class ModelCompositor {
         originalTransition = this.contextTracker.latest;
       }
 
-      const fullTransform = suggestion.appendedTransform
-        ? models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
-        : suggestion.transform;
-
-      // An applied suggestion should replace the original Transition's effects, though keeping
-      // the original input around.
-      const applicationState = correction.ContextTracker.attemptMatchContext(
-        context,
-        this.lexicalModel,
-        originalTransition.base,
-        [{sample: fullTransform, p: 1}],
-        true
-      ).final;
-
-      const appliedTransition = new ContextTransition(originalTransition);
-      appliedTransition.applySuggestion(applicationState, suggestion);
+      const appliedTransition = originalTransition.applySuggestion(suggestion);
       this.contextTracker.latest = appliedTransition;
       this.contextTracker.saveLatest();
     }
