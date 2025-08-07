@@ -4,6 +4,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { buildMergedTransform } from '@keymanapp/models-templates';
 
 export class ContextTransition {
   private states: [ContextState, ContextState];
@@ -89,16 +90,32 @@ export class ContextTransition {
     this.preservationTransform = preservationTransform;
   }
 
-  applySuggestion(appliedState: ContextState, suggestion: Suggestion) {
+  applySuggestion(suggestion: Suggestion) {
+    const fullTransform = suggestion.appendedTransform
+      ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
+      : suggestion.transform;
+
+    // An applied suggestion should replace the original Transition's effects, though keeping
+    // the original input around.
+    const appliedState = this.base.analyzeTransition(
+      this.base.context,
+      [{sample: fullTransform, p: 1}],
+      true
+    ).final;
+
     const preAppliedState = this.final;
     if(!preAppliedState.suggestions?.find((s) => s.id == suggestion?.id)) {
       throw new Error("Could not find matching suggestion to apply");
     }
-    this.states[this.finalIndex] = appliedState;
+
+    const resultTransition = new ContextTransition(this);
+    resultTransition.states[this.finalIndex] = appliedState;
+    resultTransition._transitionId = suggestion.transformId;
+
     appliedState.appliedSuggestionId = suggestion.id;
     appliedState.appliedInput = preAppliedState.appliedInput;
     appliedState.suggestions = preAppliedState.suggestions;
 
-    this._transitionId = suggestion.transformId;
+    return resultTransition;
   }
 }
