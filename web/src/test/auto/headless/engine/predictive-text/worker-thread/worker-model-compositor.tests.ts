@@ -809,7 +809,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let suggestions = await compositor.applyReversion(reversion, appliedContext);
+      let suggestions = await compositor.applyReversion(reversion, models.applyTransform(postTransform, baseContext));
 
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.

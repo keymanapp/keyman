@@ -156,4 +156,26 @@ export class ContextTransition {
 
     return resultTransition;
   }
+
+  /**
+   * Recreates the original context transition and its effects from before
+   * any application of suggestions based on the transition was applied.
+   * @returns
+   */
+  reproduceOriginal() {
+    // By keeping the original keystroke data and effects around even after
+    // applying the suggestion, we can easily reconstruct the original .final.
+    const original = ContextTracker.attemptMatchContext(
+      this.base.context,
+      this.base.model,
+      this.base,
+      this.inputDistribution
+    );
+
+    if(this.final.suggestions) {
+      original.final.suggestions = this.final.suggestions;
+    }
+
+    return original;
+  }
 }

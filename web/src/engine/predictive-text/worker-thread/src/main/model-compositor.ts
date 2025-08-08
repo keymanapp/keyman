@@ -17,6 +17,8 @@ import Outcome = LexicalModelTypes.Outcome;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { ContextTransition } from './correction/context-transition.js';
+import { ContextState } from './correction/context-state.js';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -265,14 +267,20 @@ export class ModelCompositor {
     return reversion;
   }
 
+  /**
+   * Reverts a recently applied suggestion.
+   * @param reversion The reversion to be applied
+   * @param context The original context when the reverted suggestion was applied, including
+   * the original keystroke's effects.
+   * @returns
+   */
   async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
     let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
-      let revertedContext = models.applyTransform(reversion.transform, context);
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, context);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
@@ -293,22 +301,27 @@ export class ModelCompositor {
     let originalTransition = this.contextTracker.cache.peek(-reversion.transformId);
 
     if(!originalTransition) {
+      // We forgot the original base state... and what suggestions we gave.  We can make
+      // decent guesses for those, though.
       suggestions = fallbackSuggestions();
+      // Create a base transition from scratch to replace the lost original transition data.
+      originalTransition = new ContextTransition(new ContextState(context, this.lexicalModel), -reversion.transformId);
+      this.contextTracker.clearCache();
+    } else {
+      // Remove all contexts more recent than the one we're reverting to.
+      this.contextTracker.cache.rewindTo(-reversion.transformId);
     }
 
-    // Remove all contexts more recent than the one we're reverting to.
-    this.contextTracker.cache.rewindTo(-reversion.transformId);
-
+    // If we did actually have the original transition object...
     if(!suggestions) {
       // Will need to be modified a bit if/when phrase-level suggestions are implemented.
       // Those will be tracked on the first token of the phrase, which won't be the tail
       // if they cover multiple tokens.
-      let suggests = this.contextTracker.newest.final.suggestions;
+      let suggests = originalTransition.final.suggestions;
 
       suggests.forEach(function(suggestion) {
-        // A reversion's transform ID is the additive inverse of its original suggestion;
-        // we revert to the state of said original suggestion.
-        suggestion.transformId = -reversion.transformId;
+        // No need to muck around with the original associated transition ids here.
+        // But, we should clear any auto-acceptance flags.
         suggestion.autoAccept = false;
       });
 
@@ -316,16 +329,11 @@ export class ModelCompositor {
     }
 
     // An applied reversion should replace the original Transition's effects.
-    const revertedTransition = correction.ContextTracker.attemptMatchContext(
-      models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
-      this.lexicalModel,
-      originalTransition.base,
-      originalTransition.inputDistribution
-    );
-
-    revertedTransition.final.suggestions = await suggestions;
+    const revertedTransition = originalTransition.reproduceOriginal();
     this.contextTracker.cache.add(-reversion.transformId, revertedTransition);
 
+    // In case we needed the fallback strategy.
+    revertedTransition.final.suggestions = await suggestions;
     return suggestions;
   }
 
