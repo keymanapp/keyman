@@ -101,7 +101,7 @@ export class ContextTracker {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(matchState);
-      transition.replaceFinal(state, transformDistribution);
+      transition.finalize(state, transformDistribution);
       return transition;
     }
 
@@ -128,7 +128,7 @@ export class ContextTracker {
     const state = new ContextState(context, lexicalModel);
     state.tokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
-    transition.replaceFinal(state, transformDistribution, preservationTransform);
+    transition.finalize(state, transformDistribution, preservationTransform);
     return transition;
   }
 
@@ -228,7 +228,7 @@ export class ContextTracker {
     const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
-    transition.replaceFinal(state, transformDistribution);
+    transition.finalize(state, transformDistribution);
     this.cache.add(transitionId, transition);
     return transition;
   }
@@ -236,7 +236,7 @@ export class ContextTracker {
   reset(context: Context, transitionId: number) {
     this.cache.clear();
     this.latest = new ContextTransition(new ContextState(context, this.model), transitionId)
-    this.latest.replaceFinal(this.latest.base, [{
+    this.latest.finalize(this.latest.base, [{
       sample: {
         insert: '',
         deleteLeft: 0,
