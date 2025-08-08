@@ -19,6 +19,11 @@ function toWrapperDistribution(transform) {
   }];
 }
 
+var config = {
+  leftContextCodePoints: 64,
+  rightContextCodePoints: 64
+}
+
 describe('ContextState', () => {
   it('<constructor>', () => {
     let context = { left: '', right: '' };
@@ -85,7 +90,7 @@ describe('ContextState', () => {
       let rawTokens = [" ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
@@ -106,7 +111,7 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
@@ -124,7 +129,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
@@ -143,7 +148,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -168,7 +173,7 @@ describe('ContextState', () => {
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, toWrapperDistribution(transform));
       assert.isOk(newContextMatch?.final);
       assert.deepEqual(newContextMatch?.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -188,7 +193,7 @@ describe('ContextState', () => {
       let rawTokens = ["'", "a"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
@@ -217,7 +222,7 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
+      let newContextMatch = baseState.analyzeTransition(config, newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -243,7 +248,7 @@ describe('ContextState', () => {
       let rawTokens = ["and", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, [{sample: transform, p: 1}]);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
@@ -269,7 +274,7 @@ describe('ContextState', () => {
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = baseState.analyzeTransition(existingContext, [{sample: transform, p: 1}]);
+      let newContextMatch = baseState.analyzeTransition(config, existingContext, [{sample: transform, p: 1}]);
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
@@ -304,7 +309,7 @@ describe('ContextState', () => {
         insert: '\"',
         deleteLeft: 0
       }
-      let problemContextMatch = baseState.analyzeTransition({left: "text'"}, [{sample: transform, p: 1}]);
+      let problemContextMatch = baseState.analyzeTransition(config, {left: "text'"}, [{sample: transform, p: 1}]);
       assert.isNull(problemContextMatch);
     });
   });

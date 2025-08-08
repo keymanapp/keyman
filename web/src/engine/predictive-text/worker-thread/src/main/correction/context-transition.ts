@@ -1,6 +1,7 @@
 import { ContextState } from './context-state.js';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import Configuration = LexicalModelTypes.Configuration;
 import Distribution = LexicalModelTypes.Distribution;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
@@ -112,7 +113,7 @@ export class ContextTransition {
    * @param suggestion
    * @returns
    */
-  applySuggestion(suggestion: Suggestion) {
+  applySuggestion(suggestion: Suggestion, configuration: Configuration) {
     const fullTransform = suggestion.appendedTransform
       ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
       : suggestion.transform;
@@ -120,6 +121,7 @@ export class ContextTransition {
     // An applied suggestion should replace the original Transition's effects, though keeping
     // the original input around.
     const appliedState = this.base.analyzeTransition(
+      configuration,
       this.base.context,
       [{sample: fullTransform, p: 1}],
       true
@@ -158,10 +160,11 @@ export class ContextTransition {
    * any application of suggestions based on the transition was applied.
    * @returns
    */
-  reproduceOriginal() {
+  reproduceOriginal(configuration: Configuration) {
     // By keeping the original keystroke data and effects around even after
     // applying the suggestion, we can easily reconstruct the original .final.
     const original = this.base.analyzeTransition(
+      configuration,
       this.base.context,
       this.inputDistribution
     );

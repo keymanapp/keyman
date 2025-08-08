@@ -283,7 +283,7 @@ export class ModelCompositor {
         originalTransition = this.contextTracker.latest;
       }
 
-      const appliedTransition = originalTransition.applySuggestion(suggestion);
+      const appliedTransition = originalTransition.applySuggestion(suggestion, this.configuration);
       this.contextTracker.latest = appliedTransition;
       this.contextTracker.saveLatest();
     }
@@ -346,7 +346,7 @@ export class ModelCompositor {
     }
 
     // An applied reversion should replace the original Transition's effects.
-    const revertedTransition = originalTransition.reproduceOriginal();
+    const revertedTransition = originalTransition.reproduceOriginal(this.configuration);
 
     this.contextTracker.latest = revertedTransition;
     this.contextTracker.saveLatest();

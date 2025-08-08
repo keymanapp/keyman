@@ -99,10 +99,12 @@ export class ContextTokenization {
    * Determines the alignment between a new, incoming tokenization source and the
    * tokenization modeled by the current instance.
    * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
+   * @param isSliding Notes if the context window is full (and sliding-alignment is particularly needed)
+   * @param noSubVerify Avoids verifying substituted tokens
    * @returns Alignment data that details if and how the incoming tokenization aligns with
    * the tokenization modeled by this instance.
    */
-  computeAlignment(incomingTokenization: string[], noSubVerify?: boolean): ContextStateAlignment {
+  computeAlignment(incomingTokenization: string[], isSliding: boolean, noSubVerify?: boolean): ContextStateAlignment {
     // Map the tokenized state to an edit-distance friendly version.
     const tokenizationToMatch = this.exampleInput;
 
@@ -255,11 +257,18 @@ export class ContextTokenization {
           }
 
           // Find the word before and after substitution.
-          const incomingSub = incomingTokenization[i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0)];
-          const matchingSub = tokenizationToMatch[i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0)];
+          const incomingIndex = i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0);
+          const matchingIndex = i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0);
+          const incomingSub = incomingTokenization[incomingIndex];
+          const matchingSub = tokenizationToMatch[matchingIndex];
+
+          const atSlidePoint = isSliding && (incomingIndex == 0 || matchingIndex == 0);
 
           // Double-check the word - does the 'substituted' word itself align?
-          if(!noSubVerify && !isSubstitutionAlignable(incomingSub, matchingSub)) {
+          //
+          // Exception: if the word is at the start of the context window and the
+          // context window is likely sliding, don't check it.
+          if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
             return {
               canAlign: false
             };
@@ -320,7 +329,8 @@ export class ContextTokenization {
     tokenizedContext: Token[],
     alignment: ContextStateAlignment,
     lexicalModel: LexicalModel,
-    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions.
+    // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions
+    // in case word boundaries shift back and forth.
     alignedTransformDistribution: Distribution<Transform[]>
   ): ContextTokenization {
     if(!alignment.canAlign) {
@@ -368,10 +378,20 @@ export class ContextTokenization {
 
     // ***
 
+    const incomingOffset = (leadTokenShift > 0 ? leadTokenShift : 0);
+    const matchingOffset = (leadTokenShift < 0 ? -leadTokenShift : 0);
+
+    // If a word is being slid out of context-window range, start trimming it - we should
+    // no longer need to worry about reusing its original correction-search results.
+    if(matchLength > 0 && this.tokens[matchingOffset].exampleInput != tokenizedContext[incomingOffset].text) {
+      //this.tokens[matchingOffset]'s clone is at tokenization[0] after the splice call in a previous block.
+      tokenization[0] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset].text);
+    }
+
     // first non-matched tail index within the incoming context
-    const incomingTailUpdateIndex = matchLength + (leadTokenShift > 0 ? leadTokenShift : 0);
+    const incomingTailUpdateIndex = matchLength + incomingOffset;
     // first non-matched tail index in `matchState`, the base context state.
-    const matchingTailUpdateIndex = matchLength - (leadTokenShift < 0 ? leadTokenShift : 0);
+    const matchingTailUpdateIndex = matchLength + matchingOffset;
 
     // The assumed input from the input distribution is always at index 0.
     const tokenizedPrimaryInput = hasDistribution ? alignedTransformDistribution[0].sample : null;
