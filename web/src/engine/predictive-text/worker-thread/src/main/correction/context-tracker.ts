@@ -168,7 +168,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };;
+      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
     } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,
