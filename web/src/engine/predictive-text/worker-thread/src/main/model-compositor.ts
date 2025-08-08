@@ -272,14 +272,19 @@ export class ModelCompositor {
     return reversion;
   }
 
+  /**
+   * Reverts a recently applied suggestion.
+   * @param reversion The reversion to be applied
+   * @param context The _original_ context to which the reverted suggestion was applied.
+   * @returns
+   */
   async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
     let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
-      let revertedContext = models.applyTransform(reversion.transform, context);
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, context);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
@@ -304,7 +309,7 @@ export class ModelCompositor {
       // decent guesses for those, though.
       suggestions = fallbackSuggestions();
       // Create a base transition from scratch to replace the lost original transition data.
-      originalTransition = new ContextTransition(new ContextState(models.applyTransform(reversion.transform, context), this.lexicalModel), -reversion.transformId);
+      originalTransition = new ContextTransition(new ContextState(context, this.lexicalModel), -reversion.transformId);
       this.contextTracker.clearCache();
     } else {
       // Remove all contexts more recent than the one we're reverting to.
