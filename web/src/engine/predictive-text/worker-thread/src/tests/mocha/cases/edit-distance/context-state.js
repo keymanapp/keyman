@@ -38,7 +38,7 @@ describe('ContextState', () => {
   });
 
   describe('initializing without prior tokenization', () => {
-    it('<empty context>', () => {
+    it('creates one empty token for an empty context', () => {
       let context = { left: '', right: '' };
       let state = new ContextState(context, plainModel);
       assert.isOk(state.tokenization);
@@ -46,7 +46,7 @@ describe('ContextState', () => {
       assert.equal(state.tokenization.tail.exampleInput, '');
     });
 
-    it('with initial text (without ending whitespace)', () => {
+    it('creates tokens for initial text (without ending whitespace)', () => {
       let context = { left: 'the quick brown fox', right: '' };
       let state = new ContextState(context, plainModel);
       assert.isOk(state.tokenization);
@@ -59,7 +59,7 @@ describe('ContextState', () => {
       assert.deepEqual(state2.tokenization.tokens.map(token => token.exampleInput), rawTokens);
     });
 
-    it('with initial text (with ending whitespace', () => {
+    it('creates tokens for initial text (with extra empty token for ending whitespace)', () => {
       let context = { left: 'the quick brown fox ', right: '' };
       let state = new ContextState(context, plainModel);
       assert.isOk(state.tokenization);
