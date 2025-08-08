@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import { isSubstitutionAlignable } from "#./correction/alignment-helpers.js";
 
 import { ContextToken } from '#./correction/context-token.js';
 import { ContextTokenization } from '#./correction/context-tokenization.js';
