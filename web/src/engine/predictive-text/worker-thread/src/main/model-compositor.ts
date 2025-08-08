@@ -16,8 +16,8 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+
 import { ContextTracker } from './correction/context-tracker.js';
-import { ContextTransition } from './correction/context-transition.js';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -283,21 +283,7 @@ export class ModelCompositor {
         originalTransition = this.contextTracker.latest;
       }
 
-      const fullTransform = suggestion.appendedTransform
-        ? models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
-        : suggestion.transform;
-
-      // An applied suggestion should replace the original Transition's effects, though keeping
-      // the original input around.
-      const applicationState = originalTransition.base.analyzeTransition(
-        this.configuration,
-        context,
-        [{sample: fullTransform, p: 1}],
-        true
-      ).final;
-
-      const appliedTransition = new ContextTransition(originalTransition);
-      appliedTransition.applySuggestion(applicationState, suggestion);
+      const appliedTransition = originalTransition.applySuggestion(suggestion, this.configuration);
       this.contextTracker.latest = appliedTransition;
       this.contextTracker.saveLatest();
     }
@@ -340,7 +326,7 @@ export class ModelCompositor {
         // Will need to be modified a bit if/when phrase-level suggestions are implemented.
         // Those will be tracked on the first token of the phrase, which won't be the tail
         // if they cover multiple tokens.
-        let suggests = this.contextTracker.latest.final.suggestions;
+        let suggests = originalTransition.final.suggestions;
 
         suggests.forEach(function(suggestion) {
           // A reversion's transform ID is the additive inverse of its original suggestion;
@@ -356,7 +342,7 @@ export class ModelCompositor {
     // An applied reversion should replace the original Transition's effects.
     const revertedTransition = originalTransition.base.analyzeTransition(
       this.configuration,
-      models.applyTransform(originalTransition.inputDistribution[0].sample, originalTransition.base.context),
+      originalTransition.base.context,
       originalTransition.inputDistribution
     );
 
