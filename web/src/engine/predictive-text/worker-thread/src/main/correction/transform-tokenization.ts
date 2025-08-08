@@ -1,8 +1,10 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 import { applyTransform, type Tokenization } from "@keymanapp/models-templates";
+import { determineModelTokenizer } from '#./model-helpers.js';
 
 /**
  * Determines a tokenization-aware sequence of (`Transform`) edits, one per
@@ -85,4 +87,54 @@ export function tokenizeTransformDistribution(
       p: transform.p
     };
   });
+}
+
+/**
+ * Given an incoming distribution of Transforms, this method applies
+ * `tokenizeTransform` for each, mapping each transform to its tokenized form in
+ * the returned distribution.
+ *
+ * It then filters out all incoming Transforms that do not result in the same
+ * number of tokens as the "primary input" when applied, as the context-tracker
+ * and predictive-text engine cannot handle word-breaking divergence well at
+ * this time.
+ * @param context
+ * @param model
+ * @param transformDistribution
+ * @returns
+ */
+export function tokenizeAndFilterDistribution(
+  context: Context,
+  model: LexicalModel,
+  transformDistribution?: Distribution<Transform>
+) {
+  let tokenize = determineModelTokenizer(model);
+  const inputTransform = transformDistribution?.[0];
+
+  let transformTokenLength = 0;
+  let tokenizedDistribution: Distribution<Transform[]> = null;
+  if(inputTransform) {
+    // These two methods apply transforms internally; do not mutate context here.
+    // This particularly matters for the 'distribution' variant.
+
+    // What if a pre-whitespace token has a final substitution as PART of an edit?
+    // Say, ['apple', ' ', ''] => ['apply', ' ', 'n']
+    // For now... we can't really handle that case well - modeling the 'e' => 'y' part.
+    // Will likely require improvements to tokenizeTransform(), which doesn't yet handle
+    // deleteLeft tokenization for transforms spanning tokens & whitespace.
+    //
+    // See: #14361.
+    // There's a good shot attemptTokenizedAlignment would be useful for it.
+    transformTokenLength = tokenizeTransform(tokenize, context, inputTransform.sample).length;
+    tokenizedDistribution = tokenizeTransformDistribution(tokenize, context, transformDistribution);
+
+    // Now we update the context used for context-state management based upon our input.
+    context = applyTransform(inputTransform.sample, context);
+
+    // While we lack phrase-based / phrase-oriented prediction support, we'll just extract the
+    // set that matches the token length that results from our input.
+    tokenizedDistribution = tokenizedDistribution.filter((entry) => entry.sample.length == transformTokenLength);
+  }
+
+  return tokenizedDistribution;
 }
