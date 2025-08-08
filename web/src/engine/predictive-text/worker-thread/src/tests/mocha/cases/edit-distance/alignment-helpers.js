@@ -1,6 +1,25 @@
 import { assert } from 'chai';
 import { getEditPathLastMatch, isSubstitutionAlignable } from '#./correction/alignment-helpers.js';
 
+describe('getEditPathLastMatch', () => {
+  it('returns the last match when no substitutions exist', () => {
+    const path = ['delete', 'delete', 'match', 'match', 'match', 'match', 'insert'];
+    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match'));
+  });
+
+  it('returns the last match when no substitutions exist left of a "match"', () => {
+    const path = ['delete', 'delete', 'match', 'match', 'match', 'match', 'substitute', 'insert'];
+    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match'));
+  });
+
+  // is intended to handle application of suggestions.
+  it('returns the second-to-last match when a substitution exists before final "match"', () => {
+    // limitation:  if there is _anything_ after that last match, the first assertion will fail.
+    const path = ['delete', 'delete', 'match', 'match', 'match', 'substitute', 'match'];
+    assert.notEqual(getEditPathLastMatch(path), path.lastIndexOf('match'));
+    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.lastIndexOf('match')-1));
+  });
+});
 
 describe('isSubstitutionAlignable', () => {
   it(`returns true:  'ca' => 'can'`, () => {
