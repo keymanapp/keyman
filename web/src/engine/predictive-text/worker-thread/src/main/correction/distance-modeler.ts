@@ -366,7 +366,7 @@ export class SearchSpace {
 
   private tierOrdering: SearchSpaceTier[] = [];
   private selectionQueue: PriorityQueue<SearchSpaceTier>;
-  private inputSequence: Distribution<Transform>[] = [];
+  inputSequence: Distribution<Transform>[] = [];
   private minInputCost: number[] = [];
   private rootNode: SearchNode;
 
@@ -411,9 +411,9 @@ export class SearchSpace {
 
     const model = arg1;
     if(!model) {
-      throw "The LexicalModel parameter must not be null / undefined.";
+      throw new Error("The LexicalModel parameter must not be null / undefined.");
     } else if(!model.traverseFromRoot) {
-      throw "The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.";
+      throw new Error("The provided model does not implement the `traverseFromRoot` function, which is needed to support robust correction searching.");
     }
 
     this.selectionQueue = new PriorityQueue<SearchSpaceTier>(this.QUEUE_SPACE_COMPARATOR);
