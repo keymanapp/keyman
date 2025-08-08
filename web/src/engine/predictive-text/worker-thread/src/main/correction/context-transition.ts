@@ -128,6 +128,15 @@ export class ContextTransition {
       true
     ).final;
 
+    // Mark affected tokens with the applied-suggestion transition ID
+    // for easy future reference.
+    const alignment = appliedState.tokenization.alignment
+    const appliedTokenCount = (alignment.canAlign && true) && (alignment.tailEditLength + Math.max(alignment.tailTokenShift, 0));
+    const tokens = appliedState.tokenization.tokens;
+    for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
+      tokens[i].appliedTransitionId = suggestion.transformId;
+    }
+
     const preAppliedState = this.final;
     if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
       throw new Error("Could not find matching suggestion to apply");
@@ -145,5 +154,27 @@ export class ContextTransition {
     appliedState.suggestions = preAppliedState.suggestions;
 
     return resultTransition;
+  }
+
+  /**
+   * Recreates the original context transition and its effects from before
+   * any application of suggestions based on the transition was applied.
+   * @returns
+   */
+  reproduceOriginal() {
+    // By keeping the original keystroke data and effects around even after
+    // applying the suggestion, we can easily reconstruct the original .final.
+    const original = ContextTracker.attemptMatchContext(
+      this.base.context,
+      this.base.model,
+      this.base,
+      this.inputDistribution
+    );
+
+    if(this.final.suggestions) {
+      original.final.suggestions = this.final.suggestions;
+    }
+
+    return original;
   }
 }
