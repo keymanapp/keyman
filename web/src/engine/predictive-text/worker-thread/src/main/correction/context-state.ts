@@ -80,9 +80,10 @@ export class ContextState {
    * If a precomputed tokenization of the context (with prior correction-search
    * calculation data) is not available, it will be spun up from scratch.
    *
-   * @param context
-   * @param model
-   * @param tokenization
+   * @param context The context available within the current sliding context-window
+   * @param model The active lexical model.
+   * @param tokenization Precomputed tokenization for the context, leveraging previous
+   * correction-search progress and results
    */
   constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
   constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
@@ -104,7 +105,9 @@ export class ContextState {
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
-      this.suggestions = [].concat(stateToClone.suggestions);
+      if(stateToClone.suggestions?.length ?? 0 > 0) {
+        this.suggestions = [].concat(stateToClone.suggestions);
+      }
     }
   }
 
