@@ -54,7 +54,7 @@ export class ContextTracker {
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
       // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
       // TODO:  Fix - this is intended to be temporary during refactor work.
-      baseTransition.replaceFinal(matchState, transformDistribution);
+      baseTransition.finalize(matchState, transformDistribution);
       return baseTransition;
     } else {
       // If we didn't get any input, we really should perfectly match
@@ -82,7 +82,7 @@ export class ContextTracker {
     if(tailEditLength == 0 && tailTokenShift == 0) {
       const state = new ContextState(context, lexicalModel);
       state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-      baseTransition.replaceFinal(state, transformDistribution);
+      baseTransition.finalize(state, transformDistribution);
       return baseTransition;
     }
 
@@ -236,7 +236,7 @@ export class ContextTracker {
     const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
     state.appliedInput = transformDistribution?.[0].sample;
-    baseTransition.replaceFinal(state, transformDistribution, preservationTransform);
+    baseTransition.finalize(state, transformDistribution, preservationTransform);
     return baseTransition;
   }
 
@@ -330,7 +330,7 @@ export class ContextTracker {
     const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
-    transition.replaceFinal(state, transformDistribution);
+    transition.finalize(state, transformDistribution);
     this.cache.add(transitionId, transition);
     return transition;
   }
