@@ -18,7 +18,7 @@ export class ContextState {
    * The context window in view for the represented Context state,
    * as passed between the predictive-text worker and its host.
    */
-  private _context: Context;
+  readonly context: Context;
 
   /**
    * The active lexical model operating upon the Context.
@@ -88,8 +88,7 @@ export class ContextState {
   constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
   constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
     if(!(param1 instanceof ContextState)) {
-      const context = param1;
-      this._context = context;
+      this.context = param1;
       this.model = model;
       if(tokenization) {
         this.tokenization = tokenization;
@@ -109,14 +108,6 @@ export class ContextState {
         this.suggestions = [].concat(stateToClone.suggestions);
       }
     }
-  }
-
-  /**
-   * The context window in view for the represented Context state,
-   * as passed between the predictive-text worker and its host.
-   */
-  get context(): Context {
-    return this._context;
   }
 
   /**
