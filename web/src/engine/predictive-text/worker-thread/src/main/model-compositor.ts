@@ -275,7 +275,8 @@ export class ModelCompositor {
   /**
    * Reverts a recently applied suggestion.
    * @param reversion The reversion to be applied
-   * @param context The _original_ context to which the reverted suggestion was applied.
+   * @param context The original context when the reverted suggestion was applied, including
+   * the original keystroke's effects.
    * @returns
    */
   async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
