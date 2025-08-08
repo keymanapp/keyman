@@ -106,6 +106,13 @@ export class ContextTransition {
     this.preservationTransform = preservationTransform;
   }
 
+  /**
+   * Applies a suggestion generated from this context transition on top of the transition itself,
+   * replacing its final context state.  This does _not_, however, replace the original fat-finger
+   * distribution or other intermediate data regarding associated keystrokes.
+   * @param suggestion
+   * @returns
+   */
   applySuggestion(suggestion: Suggestion) {
     const fullTransform = suggestion.appendedTransform
       ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
@@ -126,6 +133,9 @@ export class ContextTransition {
       throw new Error("Could not find matching suggestion to apply");
     }
 
+    // Start from a deep copy, then replace as needed to overwrite with the context
+    // state resulting from the suggestion while preserving suggestion + primary
+    // keystroke data.
     const resultTransition = new ContextTransition(this);
     resultTransition._final = appliedState;
     resultTransition._transitionId = suggestion.transformId;
