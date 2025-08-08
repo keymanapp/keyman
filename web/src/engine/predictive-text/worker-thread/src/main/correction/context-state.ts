@@ -67,7 +67,16 @@ export class ContextState {
    */
   isManuallyApplied?: boolean;
 
+  /**
+   * Deep-copies a previously-constructed instance.
+   * @param stateToClone
+   */
   constructor(stateToClone: ContextState);
+  /**
+   * Constructs a new instance based on the current context.
+   * @param context The context available within the current sliding context-window
+   * @param model The active lexical model.
+   */
   constructor(context: Context, model: LexicalModel);
   constructor(param1: Context | ContextState, model?: LexicalModel) {
     if(!(param1 instanceof ContextState)) {
@@ -83,7 +92,9 @@ export class ContextState {
 
       // A shallow copy of the array is fine, but we'd be best off
       // not aliasing the array itself.
-      this.suggestions = [].concat(stateToClone.suggestions);
+      if(stateToClone.suggestions?.length ?? 0 > 0) {
+        this.suggestions = [].concat(stateToClone.suggestions);
+      }
     }
   }
 }
