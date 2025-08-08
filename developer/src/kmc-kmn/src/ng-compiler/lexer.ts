@@ -32,7 +32,6 @@ export class ScanRecogniser {
 }
 
 export class Lexer {
-  private static patternMatchers: Map<TokenTypes, ScanRecogniser>;
   private buffer: string;
   private lineNum: number;           // the current line number
   private charNum: number;           // the current character number
@@ -166,14 +165,6 @@ export class Lexer {
     new ScanRecogniser(TokenTypes.PARAMETER,           /^[^=,\)\s]+/,                                           true),
   ];
 
-  static {
-    // build a map of scanrecognisers keyed by token type
-    Lexer.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
-    for (const scanRecogniser of Lexer.scanRecognisers) {
-      Lexer.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
-    }
-  }
-
   /**
    * Identify all tokens in the buffer
    *
@@ -196,7 +187,7 @@ export class Lexer {
    * @return                   whether a matching token was found
    */
   private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): boolean {
-    let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
+    let patternIterator: Iterator<ScanRecogniser> = Lexer.scanRecognisers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
     let match: RegExpExecArray | null;
