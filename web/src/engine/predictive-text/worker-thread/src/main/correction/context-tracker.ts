@@ -4,6 +4,7 @@ import { RewindableCache } from '@keymanapp/web-utils';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
@@ -12,7 +13,27 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  readonly cache = new RewindableCache<number, ContextTransition>(5);
+  private readonly cache = new RewindableCache<number, ContextTransition>(5);
+  /**
+   * Tracks the most recent transition handled by the context-tracking engine.
+   */
+  latest: ContextTransition;
+
+  /**
+   * Notes the current configuration of the model and of the sliding context window.
+   */
+  configuration: Configuration;
+
+  /**
+   * The active lexical model.
+   */
+  readonly model: LexicalModel;
+
+  constructor(model: LexicalModel, context: Context, transitionId: number, config: Configuration) {
+    this.model = model;
+    this.configuration = config;
+    this.reset(context, transitionId);
+  }
 
   /**
    * As written, this method attempts to match an incoming context with a candidate
@@ -50,7 +71,14 @@ export class ContextTracker {
     // Note for future:  the next line's pattern asserts that there is only one true tokenization.
     // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
     const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+    if(tokenizedContext.length == 0) {
+      tokenizedContext.push({text: ''});
+    }
     // In which case we could try need to align for each of them, starting from the most likely.
+    //
+    // It's possible the tokenization will remember more of the initial token than is
+    // actually present in the sliding context window, which imposes a need for a wide-band
+    // computeDistance 'radius' in the called function.
     const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
 
     if(!alignmentResults.canAlign) {
@@ -138,7 +166,7 @@ export class ContextTracker {
     const transitionId = inputTransform?.sample.id;
 
     if(tokenizedPostContext.left.length > 0) {
-      for(const id of this.cache.keys()) {
+      for(const id of [...this.cache.keys()]) {
         const priorMatchState = this.cache.peek(id);
 
         // Skip intermediate multitap-produced contexts.
@@ -189,7 +217,14 @@ export class ContextTracker {
     //
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
+    //
+    // If we couldn't find a good match, we need to directly apply the final transform first.
+    if(transformDistribution) {
+      context = applyTransform(transformDistribution[0].sample, context);
+    }
+
     let state = new ContextState(context, model);
+
     const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
@@ -198,16 +233,29 @@ export class ContextTracker {
     return transition;
   }
 
-  get newest() {
-    let key = this.cache.keys()[0];
-    if(key === undefined) {
-      return undefined;
-    } else {
-      return this.cache.peek(key);
-    }
+  reset(context: Context, transitionId: number) {
+    this.cache.clear();
+    this.latest = new ContextTransition(new ContextState(context, this.model), transitionId)
+    this.latest.finalize(this.latest.base, [{
+      sample: {
+        insert: '',
+        deleteLeft: 0,
+        id: transitionId
+      },
+      p: 0
+    }]);
   }
 
-  clearCache() {
-    this.cache.clear();
+  findAndRevert(id: number) {
+    const transition = this.cache.peek(id);
+    if(transition) {
+      this.cache.rewindTo(id);
+      this.cache.get(id);
+    }
+    return transition;
+  }
+
+  saveLatest() {
+    this.cache.add(this.latest.transitionId, this.latest);
   }
 }
