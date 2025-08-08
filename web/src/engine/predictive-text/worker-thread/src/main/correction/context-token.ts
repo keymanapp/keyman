@@ -7,6 +7,17 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
+/**
+ * Breaks apart a raw text string into individual, single-codepoint
+ * transforms, all set with the specified transform ID.
+ *
+ * This is designed for use when initializing a new ContextToken without
+ * any prior cached data or for rewriting its probabilities after
+ * receiving backspace input.
+ * @param text
+ * @param transformId
+ * @returns
+ */
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
 
@@ -28,6 +39,10 @@ function textToCharTransforms(text: string, transformId?: number) {
   return perCharTransforms;
 }
 
+/**
+ * Represents cached data about one token (either a word or a unit of whitespace)
+ * in the context and associated correction-search progress and results.
+ */
 export class ContextToken {
   /**
    * Indicates whether or not the token is considered whitespace.
@@ -39,6 +54,15 @@ export class ContextToken {
    * corrections for this ContextToken instance.
    */
   readonly searchSpace: SearchSpace;
+
+  /**
+   * Tokens affected by applied suggestions will indicate the transition ID of
+   * the applied suggestion here.
+   *
+   * Is `undefined` if no suggestion was applied to the context portion
+   * represented by this token.
+   */
+  appliedTransitionId?: number;
 
   /**
    * Constructs a new, empty instance for use with the specified LexicalModel.

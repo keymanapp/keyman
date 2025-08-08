@@ -130,7 +130,7 @@ export class ContextTracker {
     const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
-    transition.replaceFinal(state, transformDistribution);
+    transition.finalize(state, transformDistribution);
     this.cache.add(transitionId, transition);
     return transition;
   }
@@ -138,7 +138,7 @@ export class ContextTracker {
   reset(context: Context, transitionId: number) {
     this.cache.clear();
     this.latest = new ContextTransition(new ContextState(context, this.model), transitionId)
-    this.latest.replaceFinal(this.latest.base, [{
+    this.latest.finalize(this.latest.base, [{
       sample: {
         insert: '',
         deleteLeft: 0,

@@ -49,6 +49,10 @@ export type ContextStateAlignment = {
   tailTokenShift: number
 };
 
+/**
+ * This class represents the sequence of tokens (words and whitespace blocks)
+ * held within the active sliding context-window at a single point in time.
+ */
 export class ContextTokenization {
   readonly tokens: ContextToken[];
   readonly alignment?: ContextStateAlignment;
@@ -67,10 +71,17 @@ export class ContextTokenization {
     }
   }
 
+  /**
+   * Returns the token adjacent to the text insertion point.
+   */
   get tail(): ContextToken {
     return this.tokens[this.tokens.length - 1];
   }
 
+  /**
+   * Returns a plain-text string representing the most probable representation for all
+   * tokens represented by this tokenization instance.
+   */
   get exampleInput(): string[] {
     const sequence: string[] = [];
 
@@ -396,6 +407,8 @@ export class ContextTokenization {
         // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
         // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
+        // Erase any applied-suggestion transition ID; it is no longer valid.
+        token.appliedTransitionId = undefined;
         token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
       }
 
