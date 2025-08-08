@@ -7,8 +7,6 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import { TrieModel } from '#./models/index.js';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 
-// TODO:  consider mocking out the need for SearchSpace stuff?
-
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
@@ -29,7 +27,6 @@ describe('ContextTokenization', function() {
     it("constructs from just a token array", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
-
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
       assert.isNotOk(tokenization.alignment);
@@ -73,10 +70,15 @@ describe('ContextTokenization', function() {
       let cloned = new ContextTokenization(baseTokenization);
 
       assert.notDeepEqual(cloned, baseTokenization);
-      assert.notDeepEqual(cloned.tokens, baseTokenization.tokens);
       assert.deepEqual(cloned.tokens.map((token) => token.searchSpace.inputSequence),
         baseTokenization.tokens.map((token) => token.searchSpace.inputSequence));
-      assert.deepEqual(cloned.alignment, baseTokenization.alignment);
+
+      // The `.searchSpace` instances will not be deep-equal; there are class properties
+      // that hold functions with closures, configured at runtime.
+      baseTokenization.tokens.forEach((token) => delete token.searchSpace);
+      cloned.tokens.forEach((token) => delete token.searchSpace);
+
+      assert.deepEqual(cloned, baseTokenization);
     });
   });
 
