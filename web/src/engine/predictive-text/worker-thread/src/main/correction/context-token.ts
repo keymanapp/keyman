@@ -50,6 +50,15 @@ export class ContextToken {
   readonly searchSpace: SearchSpace;
 
   /**
+   * Tokens affected by applied suggestions will indicate the transition ID of
+   * the applied suggestion here.
+   *
+   * Is `undefined` if no suggestion was applied to the context portion
+   * represented by this token.
+   */
+  appliedTransitionId?: number;
+
+  /**
    * Constructs a new, empty instance for use with the specified LexicalModel.
    * @param model
    */

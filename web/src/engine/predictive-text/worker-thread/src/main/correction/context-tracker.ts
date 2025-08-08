@@ -151,6 +151,8 @@ export class ContextTracker {
         // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
         // (May not be valid with epic/dict-breaker or with complex, word-boundary crossing transforms)
         token = new ContextToken(matchedToken);
+        // Erase any applied-suggestion transition ID; it is no longer valid.
+        token.appliedTransitionId = undefined;
         token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
       }
 
