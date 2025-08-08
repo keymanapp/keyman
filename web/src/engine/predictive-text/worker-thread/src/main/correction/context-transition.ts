@@ -79,7 +79,9 @@ export class ContextTransition {
 
       // These need to be deep-copied.
       this.base = new ContextState(baseTransition.base);
-      this._final = new ContextState(baseTransition._final);
+      if(baseTransition._final) {
+        this._final = new ContextState(baseTransition._final);
+      }
     }
   }
 
@@ -124,6 +126,11 @@ export class ContextTransition {
    * @returns
    */
   applySuggestion(suggestion: Suggestion) {
+    const preAppliedState = this.final;
+    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
+      throw new Error("Could not find matching suggestion to apply");
+    }
+
     const fullTransform = suggestion.appendedTransform
       ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
       : suggestion.transform;
@@ -145,11 +152,6 @@ export class ContextTransition {
     const tokens = appliedState.tokenization.tokens;
     for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
       tokens[i].appliedTransitionId = suggestion.transformId;
-    }
-
-    const preAppliedState = this.final;
-    if(!preAppliedState.suggestions.find((s) => s.id == suggestion?.id)) {
-      throw new Error("Could not find matching suggestion to apply");
     }
 
     // Start from a deep copy, then replace as needed to overwrite with the context
