@@ -5,7 +5,6 @@ import Distribution = LexicalModelTypes.Distribution;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { buildMergedTransform } from '@keymanapp/models-templates';
-import { ContextTracker } from './context-tracker.js';
 
 /**
  * Represents the transition between two context states as triggered
@@ -127,10 +126,8 @@ export class ContextTransition {
 
     // An applied suggestion should replace the original Transition's effects, though keeping
     // the original input around.
-    const appliedState = ContextTracker.attemptMatchContext(
+    const appliedState = this.base.analyzeTransition(
       this.base.context,
-      this.base.model,
-      this.base,
       [{sample: fullTransform, p: 1}],
       true
     ).final;
@@ -166,10 +163,8 @@ export class ContextTransition {
   reproduceOriginal() {
     // By keeping the original keystroke data and effects around even after
     // applying the suggestion, we can easily reconstruct the original .final.
-    const original = ContextTracker.attemptMatchContext(
+    const original = this.base.analyzeTransition(
       this.base.context,
-      this.base.model,
-      this.base,
       this.inputDistribution
     );
 

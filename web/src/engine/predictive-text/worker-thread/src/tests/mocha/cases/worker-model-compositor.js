@@ -1061,6 +1061,7 @@ describe('ModelCompositor', function() {
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(compositor.contextTracker.cache.size, 1);
       let contextIds = compositor.contextTracker.cache.keys();
+
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
