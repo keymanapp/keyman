@@ -125,13 +125,9 @@ export class ContextState {
    * initialization or a context reset.
    */
   private initFromReset() {
-    const context = this.context;
-    const lexicalModel = this.model;
-
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
-
-    let baseTokens = tokenizedContext.map(function(entry) {
-      let token = new ContextToken(lexicalModel, entry.text);
+    const tokenizedContext = determineModelTokenizer(this.model)(this.context).left;
+    const baseTokens = tokenizedContext.map((entry) => {
+      const token = new ContextToken(this.model, entry.text);
 
       if(entry.isWhitespace) {
         token.isWhitespace = true;
@@ -141,17 +137,9 @@ export class ContextState {
     });
 
     // And now build the final context state object, which includes whitespace 'tokens'.);
-    const tokenization: ContextToken[] = [];
-
-    while(baseTokens.length > 0) {
-      tokenization.push(baseTokens.splice(0, 1)[0]);
+    if(baseTokens.length == 0) {
+      baseTokens.push(new ContextToken(this.model));
     }
-
-    if(tokenization.length == 0) {
-      let token = new ContextToken(lexicalModel);
-      tokenization.push(token);
-    }
-
-    this.tokenization = new ContextTokenization(tokenization);
+    this.tokenization = new ContextTokenization(baseTokens);
   }
 }
