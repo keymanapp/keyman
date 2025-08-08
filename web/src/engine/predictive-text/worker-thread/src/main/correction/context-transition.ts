@@ -4,11 +4,23 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 
+/**
+ * Represents the transition between two context states as triggered
+ * by input keystrokes or applied suggestions.
+ */
 export class ContextTransition {
-  private states: [ContextState, ContextState];
-  private baseIndex = 0;
+  /**
+   * Represents the state of the context before the transition event occurred.
+   */
+  readonly base: ContextState;
+  private _final: ContextState;
 
+  /**
+   * Indicates the fat-finger distribution for the incoming keystroke related to
+   * the context transition event.
+   */
   inputDistribution?: Distribution<Transform>;
+
   // The transform ID in play.
   private _transitionId?: number;
 
@@ -27,60 +39,63 @@ export class ContextTransition {
    */
   preservationTransform?: Transform;
 
+  /**
+   * Constructs a partial context transition object for use during the process
+   * of analyzing context transitions or for representing the base state of a
+   * reset context.
+   * @param context  The base state for the represented context transition
+   * @param transitionId  The unique ID corresponding to the transition event
+   * or context state.
+   */
   constructor(context: ContextState, transitionId: number);
+  /**
+   * Deep-copies a ContextTransition instance.
+   * @param baseTransition
+   */
   constructor(baseTransition: ContextTransition);
   constructor(param: ContextState | ContextTransition, transitionId?: number) {
     if(!(param instanceof ContextTransition)) {
       const contextState = param;
       // We're initializing a ContextTransition from a blank or reset context.
-      const baseState = contextState;
-      this.states = [baseState, null];
+      this.base = contextState;
+      this._final = null;
       this._transitionId = transitionId;
     } else {
       const baseTransition = param;
       Object.assign(this, baseTransition);
 
       // These need to be deep-copied.
-      this.states = baseTransition.states.map((entry) => new ContextState(entry)) as [ContextState, ContextState];
+      this.base = new ContextState(baseTransition.base);
+      this._final = new ContextState(baseTransition._final);
     }
   }
 
-  get base(): ContextState {
-    return this.states[this.baseIndex];
-  }
-
+  /**
+   * Gets the context state resulting from the context transition event,
+   * including any generated suggestions and data regarding potential
+   * application thereof.
+   */
   get final(): ContextState {
-    return this.states[this.finalIndex]
+    return this._final;
   }
 
-  private get finalIndex(): number {
-    return (this.baseIndex + 1) % 2;
-  }
-
+  /**
+   * The unique ID corresponding to the transition event or context state.
+   */
   get transitionId(): number {
     return this._transitionId;
   }
 
-  commitTransition(): ContextTransition {
-    // Preserve a deep-copy of the current object before proceeding.
-    const cloned = new ContextTransition(this);
-
-    // Commit 'final' and make it the new 'base'.
-    const finalIndex = this.baseIndex;
-    this.baseIndex = this.finalIndex;
-
-    // The old 'base' does not make a valid new 'final' - drop it.
-    this.states[finalIndex] = null;
-
-    // And drop the old transition data while we're at it.
-    this.inputDistribution = null;
-    this._transitionId = null;
-
-    return cloned;
-  }
-
-  replaceFinal(state: ContextState, inputDistribution: Distribution<Transform>, preservationTransform?: Transform) {
-    this.states[this.finalIndex] = state;
+  /**
+   * Records the context state resulting from the context transition generated
+   * by a keystroke.
+   * @param state  The context state to record as the result of the transition
+   * @param inputDistribution Fat-finger data corresponding to the triggering keystroke
+   * @param preservationTransform Portions of the most likely input that do not contribute to the final token
+   * in the final context's tokenization.
+   */
+  finalize(state: ContextState, inputDistribution: Distribution<Transform>, preservationTransform?: Transform) {
+    this._final = state;
     this.inputDistribution = inputDistribution;
     // Long-term, this should never be null... but we need to allow it at this point
     // in the refactoring process.
