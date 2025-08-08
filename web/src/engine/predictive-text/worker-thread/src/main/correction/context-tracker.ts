@@ -139,7 +139,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      baseTransition.replaceFinal(matchState, transformDistribution);
+      baseTransition.finalize(matchState, transformDistribution);
       return baseTransition;
     } else {
       // If we didn't get any input, we really should perfectly match
@@ -167,7 +167,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     if(tailEditLength == 0 && tailTokenShift == 0) {
       const state = new ContextState(context, lexicalModel);
       state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-      baseTransition.replaceFinal(state, transformDistribution);
+      baseTransition.finalize(state, transformDistribution);
       return baseTransition;
     }
 
@@ -320,7 +320,7 @@ export class ContextTracker extends CircularArray<ContextState> {
 
     const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-    baseTransition.replaceFinal(state, transformDistribution, preservationTransform);
+    baseTransition.finalize(state, transformDistribution, preservationTransform);
     return baseTransition;
   }
 
@@ -410,7 +410,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     const transition = new ContextTransition(state, /* TODO:  we need a clear value here in the future! */ null);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
-    transition.replaceFinal(state, []);
+    transition.finalize(state, []);
     return transition;
   }
 
