@@ -13,6 +13,13 @@ export class ScanRecogniser {
   regExp: RegExp;
   emit: boolean;
 
+  /**
+   * Construct a ScanRecogniser
+   *
+   * @param tokenType the token type to return if matched
+   * @param regExp    the regex to identify the token
+   * @param emit      whether to emit the token or not
+   */
   public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
     this.tokenType = tokenType;
     this.regExp    = regExp;
@@ -27,12 +34,17 @@ export class ScanRecogniser {
 export class Lexer {
   private static patternMatchers: Map<TokenTypes, ScanRecogniser>;
   private buffer: string;
-  private lineNum: number;
-  private charNum: number;
-  private line: string;
-  private tokenList: Token[];
-  private seenContinuation: boolean;
+  private lineNum: number;           // the current line number
+  private charNum: number;           // the current character number
+  private line: string;              // the line seen so far
+  private tokenList: Token[];        // the accumulating tokens
+  private seenContinuation: boolean; // have we just seen a continuation line
 
+  /**
+   * Construct a Lexer
+   *
+   * @param buffer the string to search for tokens
+   */
   public constructor(buffer: string) {
     this.buffer           = buffer;
     this.lineNum          = 1;
@@ -41,6 +53,8 @@ export class Lexer {
     this.tokenList        = [];
     this.seenContinuation = false;
   }
+
+  // the ordering of ScanRecognisers is important, with more specific regexs appearing first
 
   private static scanRecognisers = [
     new ScanRecogniser(TokenTypes.BASELAYOUT,          /^&baselayout(?![a-z0-9_\.-])/i,                         true),
@@ -153,18 +167,35 @@ export class Lexer {
   ];
 
   static {
+    // build a map of scanrecognisers keyed by token type
     Lexer.patternMatchers = new Map<TokenTypes, ScanRecogniser>();
     for (const scanRecogniser of Lexer.scanRecognisers) {
       Lexer.patternMatchers.set(scanRecogniser.tokenType, scanRecogniser);
     }
   }
 
+  /**
+   * Identify all tokens in the buffer
+   *
+   * @param addEOF             add an end-of-file token if required
+   * @param emitAll            emit all tokens found
+   * @param handleContinuation combine continuation lines into a single line
+   * @return                   an array of all emitted tokens
+   */
   public parse({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): Token[]  {
     while (this.matchToken({addEOF, emitAll, handleContinuation}));
     return this.tokenList;
   }
 
-  private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}) {
+  /**
+   * Match a single token, pushing it onto the lexer tokenList if it is to be emitted
+   *
+   * @param addEOF             add an end-of-file token if required
+   * @param emitAll            whether to emit all tokens found
+   * @param handleContinuation whether to combine continuation lines into a single line
+   * @return                   whether a matching token was found
+   */
+  private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): boolean {
     let patternIterator: Iterator<ScanRecogniser> = Lexer.patternMatchers.values();
     let iterResult: IteratorResult<ScanRecogniser, any>;
     let recogniser: ScanRecogniser;
@@ -178,9 +209,10 @@ export class Lexer {
       handleContinuation = false;
     }
 
+    // loop over all ScanRecognisers looking for a match at the start of the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       recogniser = iterResult.value;
-      match      = recogniser.regExp.exec(this.buffer.toString());
+      match      = recogniser.regExp.exec(this.buffer);
 
       if (match) {
         this.line = this.line.concat(match[0].toString());
@@ -216,7 +248,7 @@ export class Lexer {
           }
         }
         tokenMatch  = true;
-        this.buffer = this.buffer.substring(match[0].length);
+        this.buffer = this.buffer.substring(match[0].length); // advance the buffer past the matched token
         if (recogniser.tokenType === TokenTypes.NEWLINE) {
           this.lineNum += 1;
           this.charNum  = 1;
@@ -234,10 +266,12 @@ export class Lexer {
       this.tokenList.pop();
     }
 
+    // add an end-of-file token if required
     if (this.buffer.length === 0 && addEOF) {
       this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line));
     }
 
+    // return false if there was no match or the buffer is empty
     if (!tokenMatch || this.buffer.length === 0)
       parseInProgress = false;
 
@@ -250,8 +284,17 @@ export class Token {
   private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
-  private _line: string; // only used by NEWLINE and EOF
+  private _line: string;
 
+  /**
+   * Construct a Token
+   *
+   * @param tokenType the token type
+   * @param text      the matched text
+   * @param lineNum   the line number of the matched text
+   * @param charNum   the character number of the matched text
+   * @param line      the line of the matched next (NEWLINE/EOF) or null
+   */
   public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null) {
     this.tokenType = tokenType;
     this._text     = text;
