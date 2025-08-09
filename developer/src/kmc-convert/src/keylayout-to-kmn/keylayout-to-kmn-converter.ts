@@ -117,7 +117,7 @@ export class KeylayoutToKmnConverter {
     outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
-    if (!outArray) {
+    if (outArray.arrayOf_Rules.length === 0) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
       return null;
     }
@@ -625,7 +625,7 @@ export class KeylayoutToKmnConverter {
       else if (!isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) {
         add_modifier = "";
       }
-      else if (modifier_state[i].toUpperCase().includes('CAPS')) {
+      else if ((modifier_state[i].toUpperCase().includes('CAPS') && (!(modifier_state[i].toUpperCase().includes('NCAPS'))))) {
         add_modifier = "CAPS ";
       }
       else if (isCAPSused && (modifier_state[i].toUpperCase().includes('NCAPS'))) {
