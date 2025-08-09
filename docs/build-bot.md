@@ -26,7 +26,7 @@ Build-bot: skip
 Or you may want to ensure that an artifact is built for Windows:
 
 ```
-Build-bot: release windows
+Build-bot: release:windows
 ```
 
 ## The Build-bot command
@@ -36,15 +36,16 @@ into commit trailers or the PR body (not PR comments). The format of the command
 is:
 
 ```
-Build-bot: <BuildLevel> [Platforms]
+Build-bot: <BuildLevel>:[Platforms] ...
 ```
 
 * `BuildLevel` can be `skip`, `build`, or `release`. See [Build Level] for more
   details.
-* `Platforms` can be omitted, in which case the command applies to all platforms
-  (equivalent to specifying `all`). If specified, it must be a comma-separated
-  list, with or without spaces, of one or more of the following platform
-  identifiers:
+* `Platforms` can be omitted, in which case the command applies to all
+  previously-specified platforms (which is not equivalent to specifying `all` --
+  if no platform is specified, it will only update platforms that were already
+  in the build set). If specified, it must be a comma-separated list, without
+  spaces, of one or more of the following platform identifiers:
 
   * `all`: apply to all platforms listed below
   * `android`
@@ -161,14 +162,14 @@ Say we have a PR that touches `/android/build.sh`. The default build set will be
 The PR body has a User Testing section: `# User Testing`. The build set is
 upgraded to: `(android:release)`.
 
-The first commit includes a Build-bot command: `Build-bot: build ios`. The build
+The first commit includes a Build-bot command: `Build-bot: build:ios`. The build
 set is now `(android:release ios:build)`.
 
 In a subsequent commit, the PR author decides that nothing needs to be built,
 after all: `Build-bot: skip`. The build set is now `(android:skip ios:skip)`.
 Note that other platforms are still 'skip' but not included in the build set.
 
-Finally, the PR author pushes another commit, with `Build-bot: release windows`.
+Finally, the PR author pushes another commit, with `Build-bot: release:windows`.
 The build set is now: `(android:skip ios:skip windows:release)`.
 
 # FAQ
@@ -176,7 +177,7 @@ The build set is now: `(android:skip ios:skip windows:release)`.
 * How do I specify commands for multiple platforms, e.g. building on Windows and Linux?
 
 ```
-Build-bot: build windows,linux
+Build-bot: build:windows,linux
 ```
 
 * If I modify a file that would cause a build on all platforms, does `Build-bot:
@@ -187,7 +188,7 @@ The commands are additive. To skip all others, you would do:
 
 ```
 Build-bot: skip
-Build-bot: build android
+Build-bot: build:android
 ```
 
 * What happens in the following scenario: I have a PR that I only want to build
@@ -202,7 +203,7 @@ build on Android:
 
 ```
 Build-bot: skip
-Build-bot: build android
+Build-bot: build:android
 ```
 
 Then, the build bot scans all the commits in the PR, and additively builds the
