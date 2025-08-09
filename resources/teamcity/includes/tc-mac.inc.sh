@@ -1,5 +1,7 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
+#
+# Shared functions for any builds that run on Mac agents
 
 ba_mac_unlock_keychain() {
   if [[ -z "${MAC_BUILDAGENT_PASSWORD}" ]]; then
@@ -18,7 +20,7 @@ ba_mac_clean_xcode_derived_data() {
 ba_mac_unmount_volumes_keyman() {
   builder_echo start "unmount" "Unmounting Keyman volumes"
   if [[ -d /Volumes/Keyman ]]; then
-    hdiutil detach /Volumes/Keyman;
+    hdiutil detach /Volumes/Keyman
   fi
-  builder_echo end success "unmount" "Finished unmounting Keyman volumes"
+  builder_echo end "unmount" success "Finished unmounting Keyman volumes"
 }

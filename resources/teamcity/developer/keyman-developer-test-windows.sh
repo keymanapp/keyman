@@ -25,7 +25,7 @@ builder_describe \
 
 builder_parse "$@"
 
-if ! is_windows; then
+if ! builder_is_windows; then
   builder_echo error "This script is intended to be run on Windows only."
   exit 1
 fi
