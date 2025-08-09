@@ -12,7 +12,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+import { KeylayoutXMLSourceFile } from '@keymanapp/developer-utils';
 
 /**
  * Object holding all important data for the conversion between
@@ -205,24 +205,15 @@ export class KeylayoutToKmnConverter {
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
 
-        const KeyIndex_j = j;
-        const BehavIndex_i = i;
-        const maxKey = jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length;
-        const maxBeh = jsonObj.keyboard.keyMapSet[0].keyMap.length;
-       
-        const isItAvailable = (((KeyIndex_j < maxKey) && (BehavIndex_i < maxBeh)));
-
+        // if index of keys and behaviours exist
+        const isItAvailable = ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length) && (i < jsonObj.keyboard.keyMapSet[0].keyMap.length));
         if (!isItAvailable) {
           continue;
         }
 
-
         let rule_obj: Rule;
-        //if (i < maxkey) {
-        if ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length)) {
 
-          //if (i < maxBeh) {
-          // if (i < jsonObj.keyboard.keyMapSet[0].keyMap.length) {
+        if ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length)) {
           // ...............................................................................................................................
           // case C0: output ...............................................................................................................
           // C0 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
@@ -475,22 +466,13 @@ export class KeylayoutToKmnConverter {
               }
             }
           } else {
-
-            /* QUESTION
-            // _S2 why does this not work here? Correct data in this.callback.messages is available !?!?!
-             this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-                 inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
-                 keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
-                 output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
-                 key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']
-               }));
-             return null;*/
-
-            console.log("           ERROR : some output characters can not be used in Keyman \"",
-              (jsonObj.keyboard['@_name'] + ".keylayout\""),
-              "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
-              jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
-            continue;
+            this.callbacks.reportMessage(ConverterMessages.Info_UnsupportedCharactersDetected({
+              inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
+              keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
+              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+            }));
           }
         }
       }
@@ -864,7 +846,9 @@ export class KeylayoutToKmnConverter {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
         for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
           if (data.keyboard.actions.action[i].when[j]['@_state'] === "none") {
-            OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
+            if (data.keyboard.actions.action[i].when[j]['@_output'] !== undefined) {
+              OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
+            }
           }
         }
       }
@@ -890,8 +874,7 @@ export class KeylayoutToKmnConverter {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
           if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USE_KEY_COUNT) {
-
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
             returnObject = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
               key: this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
@@ -920,17 +903,18 @@ export class KeylayoutToKmnConverter {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
-
-          returnObject = {
-            id: data.keyboard.actions.action[i]['@_id'],
-            state: data.keyboard.actions.action[i].when[j]['@_state'],
-            output: data.keyboard.actions.action[i].when[j]['@_output']
-          };
-          returnObjarray1D.push(returnObject);
+          if (data.keyboard.actions.action[i].when[j]['@_output'] !== undefined) {
+            returnObject = {
+              id: data.keyboard.actions.action[i]['@_id'],
+              state: data.keyboard.actions.action[i].when[j]['@_state'],
+              output: data.keyboard.actions.action[i].when[j]['@_output']
+            };
+            returnObjarray1D.push(returnObject);
+          }
         }
       }
     }
-    return returnObjarray1D;   // _S2 ToDo rewrite/change all functio  comments to new datatypes!!!
+    return returnObjarray1D;
   }
 
   /**
@@ -994,8 +978,7 @@ export class KeylayoutToKmnConverter {
     }
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-
-      for (let j = 0; j <= KeylayoutToKmnConverter.USE_KEY_COUNT; j++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
             const behaviour_idx: number = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
@@ -1037,14 +1020,11 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string - an actionId to be found
    * @return an array: allArrayContents_object[] containing [{keycode,behaviour}]
    */
-  // _S2 check if all array2d types ate deleted
-  // _S2 check if action/search is available in all get_ func
   public get_KeyModifier_array__From__ActionID(data: any, search: string): allArrayContents_object[] {
     let returnObject: allArrayContents_object;
     const mapIndexObject1D: allArrayContents_object[] = [];
-
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j <= KeylayoutToKmnConverter.USE_KEY_COUNT; j++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           returnObject = {
             key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],

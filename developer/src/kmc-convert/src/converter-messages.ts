@@ -6,7 +6,7 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from '@keymanapp/developer-utils';
 
 const Namespace = CompilerErrorNamespace.Converter;
-// const SevInfo = CompilerErrorSeverity.Info | Namespace;
+ const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
 // const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
@@ -52,14 +52,13 @@ export class ConverterMessages {
     ' could not be written.`
   );
 
-  static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string, output: string; }) => m(
-    this.ERROR_UnsupportedCharactersDetected, `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key (${def(o.key)}) at keyMap index ${def(o.keymap_index)}`
-  );
-
   static ERROR_InvalidFile = SevError | 0x0008;
   static Error_InvalidFile = (o: { errorText: string; }) => m(
     this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`
   );
 
+  static INFO_UnsupportedCharactersDetected = SevInfo | 0x0007;
+  static Info_UnsupportedCharactersDetected = (o: { inputFilename: string, keymap_index: string, key: string,KeyName:string, output: string; }) => m(
+    this.INFO_UnsupportedCharactersDetected, `INFO: Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymap_index)}  on Keycode ${def(o.key)} (${def(o.KeyName)})`
+  );
 }

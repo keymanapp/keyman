@@ -26,14 +26,10 @@ export class KeylayoutFileReader {
    */
 
   public validate(source: KeylayoutXMLSourceFile): boolean {
-
     if (!SchemaValidators.default.keylayout(source)) {
-      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
-        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
-          instancePath: err.instancePath,
-          keyword: err.keyword,
-          message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
-          params: Object.entries(err.params || {}).sort().map(([k, v]) => `${k}="${v}"`).join(' '),
+       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
+          e: err.instancePath
         }));
       }
       return false;

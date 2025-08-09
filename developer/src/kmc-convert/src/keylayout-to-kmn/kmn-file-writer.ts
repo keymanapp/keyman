@@ -149,7 +149,7 @@ export class KmnFileWriter {
 
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
-        for (let j = 0; j <= KeylayoutToKmnConverter.USE_KEY_COUNT; j++) {
+        for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
           if (keylayoutKmnConverter.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
             keyNr = j;
             break;
@@ -207,12 +207,22 @@ export class KmnFileWriter {
           }
 
           if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "+ ["
-              + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
-              + `]  > \'`
-              + version_output_character
-              + '\'\n';
+            if (version_output_character === "'") {
+              data += warningTextToWrite
+                + "+ ["
+                + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+                + `]  >  \"`
+                + version_output_character
+                + '\"\n';
+            }
+            else {
+              data += warningTextToWrite
+                + "+ ["
+                + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+                + `]  >  \'`
+                + version_output_character
+                + '\'\n';
+            }
           }
         }
       }
@@ -235,7 +245,6 @@ export class KmnFileWriter {
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
           if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-
             version_output_character = output_Unicode_CodePoint;
             if (output_Unicode_Character.length > 1) {
               if (warn_text[2] == "") {
@@ -245,7 +254,6 @@ export class KmnFileWriter {
                 warn_text[2] = warn_text[2] + "; Use of a control character ";
               }
             }
-
           } else {
             version_output_character = output_Unicode_Character;
           }
@@ -278,14 +286,28 @@ export class KmnFileWriter {
           }
 
           if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "dk(A"
-              + (String(unique_data_Rules[k].id_deadkey) + ") + ["
-                + unique_data_Rules[k].modifier_key).trim()
-              + " "
-              + unique_data_Rules[k].key + "]  >  \'"
-              + version_output_character
-              + "\'\n";
+            if (version_output_character === "'") {
+              data += warningTextToWrite
+                + "dk(A"
+                + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+                  + unique_data_Rules[k].modifier_key).trim()
+                + " "
+                + unique_data_Rules[k].key + ']  >  \"'
+                + version_output_character
+                + '\"\n';
+            }
+            else {
+              data += warningTextToWrite
+                + "dk(A"
+                + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+                  + unique_data_Rules[k].modifier_key).trim()
+                + " "
+                + unique_data_Rules[k].key + "]  >  \'"
+                + version_output_character
+                + "\'\n";
+            }
+
+
           }
           data += "\n";
         }
@@ -508,7 +530,7 @@ export class KmnFileWriter {
 
       if (amb_4_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 4-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_4_1[0].modifier_prev_deadkey
             + " "
             + amb_4_1[0].prev_deadkey
@@ -519,7 +541,7 @@ export class KmnFileWriter {
 
       if (amb_2_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 2-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_2_1[0].modifier_deadkey
             + " "
             + amb_2_1[0].deadkey
