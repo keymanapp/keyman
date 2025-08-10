@@ -21,6 +21,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# TODO: remove unused `--pr-number` option. Unfortunately, the mechanism we
+# designed to skip this, `--builder-ignore-unknown-options`, does not work for
+# options with values. We need another one, for example, something like
+# `--builder-ignore-unknown-value-options=pr-number[,...]`, so for now I will
+# leave it alone. The option ultimately needs to be removed from the TC build
+# configuration also. (Unused as of #14466)
+
 builder_describe \
   "Build KeymanEngine and Keyman for iOS" \
   "all            run all actions" \
