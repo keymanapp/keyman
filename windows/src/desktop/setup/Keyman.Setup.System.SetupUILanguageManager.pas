@@ -64,11 +64,22 @@ begin
   Result := FLocales;
 end;
 
+(*
+  Returns the mapping between sorted index positions and original index positions.
+  The mapping is regenerated in Reorder.
+  @returns A dictionary mapping sorted index (key) to original index (value)
+*)
 class function TSetupUILanguageManager.IndexMapping: TDictionary<Integer,Integer>;
 begin
   Result := FIndexMapping;
 end;
 
+(*
+
+  Returns the list of locale key-value pairs sorted by their locale names (i.e. value).
+  This list is regenerated in Reorder.
+  @returns A list of sorted locale pairs (Key = xxxxx, Value = yyyyy)
+*)
 class function TSetupUILanguageManager.SortedValues: TList< TPair<string,string>>;
 begin
   if FHasChanged then
@@ -154,9 +165,11 @@ begin
         Result := CompareText(Left.Value, Right.Value);
       end
     )
-  );
+                  );
+  FreeAndNil(FSortedValues);
   FSortedValues := sortedPairA;
   i := 0;
+  FIndexMapping.Clear;
   for item in FLocales do
   begin
      j := sortedPairA.IndexOf(item) ;
