@@ -25,6 +25,7 @@ function __builder_find_keyman_root() {
     KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
     KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
     readonly KEYMAN_ROOT
+    export KEYMAN_ROOT
   fi
 }
 

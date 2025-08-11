@@ -1,4 +1,4 @@
-import OutputTarget from './outputTarget.js';
+import { OutputTargetElementWrapper } from './outputTargetElementWrapper.js';
 import { KMWString } from '@keymanapp/web-utils';
 
 class SelectionCaret {
@@ -32,7 +32,7 @@ class StyleCommand {
   }
 }
 
-export default class DesignIFrame extends OutputTarget<{}> {
+export class DesignIFrame extends OutputTargetElementWrapper<{}> {
   root: HTMLIFrameElement;
   doc: Document;
   docRoot: HTMLElement;
