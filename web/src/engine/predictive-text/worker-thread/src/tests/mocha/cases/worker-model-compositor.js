@@ -605,9 +605,23 @@ describe('ModelCompositor', function() {
 
   describe('Prediction with legacy Models (12.0 / 13.0)', function() {
     it('should compose suggestions from a fat-fingered keypress (no keying needed)', async function () {
-      var model = new TrieModel(
-        jsonFixture('models/tries/english-1000')
-      );
+      var model = new models.DummyModel({
+        futureSuggestions: [
+          [], [{
+            transform: { insert: 'e', deleteLeft: 0 },
+            appendedTransform: { insert: ' ', deleteLeft: 0},
+            displayAs: "the",
+            id: 1,
+            p: 0.7
+          }], [{
+            transform: { insert: 'ree', deleteLeft: 0},
+            appendedTransform: { insert: ' ', deleteLeft: 0},
+            displayAs: "three",
+            id: 2,
+            p: 0.3
+          }]
+        ]
+      });
       let compositor = new ModelCompositor(model, true);
 
       // Initialize context
@@ -634,38 +648,8 @@ describe('ModelCompositor', function() {
       assert.isAbove(theSuggestion.p, thrSuggestion.p);
     });
 
-    it('should compose suggestions from a fat-fingered keypress (keying needed)', async function () {
-      var model = new TrieModel(
-        jsonFixture('models/tries/english-1000')
-      );
-      let compositor = new ModelCompositor(model, true);
-
-      // Initialize context
-      let context = {
-        left: 'Th', startOfBuffer: false, endOfBuffer: true,
-      };
-      await compositor.predict({insert: '', deleteLeft: 0}, context);
-
-      // Pretend to fat finger "the" as "thr"
-      var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
-      var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-      var suggestions = await compositor.predict([thr, the], context);
-
-      // Get the top suggest for 'the' and 'thr*'.
-      // As of 15.0+, because of #5429, the keep suggestion `"The"` will not be merged
-      // with the model's suggestion of `the`.
-      var capTheSuggestion = suggestions.filter(function (s) { return s.displayAs === '“The”'; })[0];
-      var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the'})[0];
-      var thrSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('thr'); })[0];
-
-      // Sanity check: do we have actual real-valued probabilities?
-      assert.isAbove(thrSuggestion.p, 0.0);
-      assert.isBelow(thrSuggestion.p, 1.0);
-      assert.isAbove(theSuggestion.p, 0.0);
-      assert.isBelow(theSuggestion.p, 1.0);
-      assert.equal(capTheSuggestion.tag, 'keep'); // The keep suggestion
-      // 'the' should be the intended the result here.
-      assert.isAbove(theSuggestion.p, thrSuggestion.p);
+    it.skip('should compose suggestions from a fat-fingered keypress (keying needed)', async function () {
+      // No known 12.0 / 13.0 model is available that can leverage keying to run this test properly.
     });
   });
 
