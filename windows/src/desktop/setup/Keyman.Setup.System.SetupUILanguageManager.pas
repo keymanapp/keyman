@@ -168,8 +168,6 @@ begin
                   );
   FreeAndNil(FSortedValues);
   FSortedValues := sortedPairA;
-  FIndexMapping.Clear;
-  
   i := 0;
   FIndexMapping.Clear;
   for item in FLocales do
