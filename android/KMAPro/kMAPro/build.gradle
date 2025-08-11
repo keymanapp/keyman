@@ -11,6 +11,12 @@ apply from: "$rootPath/version.gradle"
 
 String tier = new File('../../TIER.md').getText('UTF-8').trim();
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
     compileSdk 34
     namespace="com.tavultesoft.kmapro"
@@ -22,11 +28,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {
