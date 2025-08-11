@@ -12,6 +12,8 @@ title: Developing Keyboards
 
 [Creating a touch keyboard layout for Amharic - part 2](creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty)
 
+[Write a keyboard help documentation](write-keyboard-help-documentation)
+
 [Input Method Extensions (IMX)](imx)
 
 ------------------------------------------------------------------------
