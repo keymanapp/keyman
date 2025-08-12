@@ -25,6 +25,7 @@ test_env = [
 
 test_include_dirs = [
   core_include_dirs,
+  linux_include_dirs,
   include_directories('../../../core/tests/kmx_test_source'),
   include_directories('../src'),
   include_directories('..'),
