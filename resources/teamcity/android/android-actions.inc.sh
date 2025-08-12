@@ -17,3 +17,12 @@ android_build_action() {
   "${KEYMAN_ROOT}/android/build.sh" configure build,test:"${TARGETS}" ${ARGS}
   builder_echo end "build" success "Finished building Keyman for Android"
 }
+
+android_publish_symbols() {
+  local PUBTARGETS="$1"
+  builder_echo start "publish to Sentry" "Publishing release to Sentry"
+
+  "${KEYMAN_ROOT}/android/build.sh" "publish-symbols:${PUBTARGETS}"
+
+  builder_echo end "publish to Sentry" success "Finished publishing release to Sentry"
+}
