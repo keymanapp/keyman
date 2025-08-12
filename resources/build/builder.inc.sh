@@ -44,7 +44,7 @@ __builder_find_keyman_root
 trap __builder_not_a_builder_script exit
 
 # This will also import /resources/builder.inc.sh
-# TODO: rename build-utils.sh to utils.sh
+# TODO: merge build-utils.sh with utils.inc.sh
 . "$KEYMAN_ROOT/resources/build/build-utils.sh"
 
 # All builder scripts start in their own folder

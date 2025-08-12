@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 ################################ Main script ################################
@@ -23,7 +23,7 @@ builder_describe "Build KeyboardHarness test app for Android." \
   "configure" \
   "build" \
   "test" \
-  ":app                   KeyboardHarness" 
+  ":app                   KeyboardHarness"
 
 # parse before describe outputs to check debug flags
 builder_parse "$@"
