@@ -3,6 +3,7 @@
 # This is a list of minimum, maximum, and specific versions of any external
 # components or dependencies found in Keyman.
 #
+# Original (outdated) reference 
 # https://docs.google.com/document/d/1Uy3U2YXeA4rCEbUbT7O6QzUGJDZBeViFecL8fjUOLkE/edit?usp=sharing
 
 # NOTE: After changing any values, you should run publish-minimum-versions.sh.
@@ -15,7 +16,7 @@ KEYMAN_MIN_TARGET_VERSION_IOS=15.6            # iOS 15.6
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
 KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
 KEYMAN_MIN_TARGET_VERSION_UBUNTU=22.04        # Ubuntu 22.04 Jammy
-KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME=53.0 # min version of Chrome for Keyman for Android
+KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME=95.0 # min version of Chrome for Keyman for Android
 
 # Target web browsers for KeymanWeb -- we do not have polyfills for
 # earlier versions, YMMV

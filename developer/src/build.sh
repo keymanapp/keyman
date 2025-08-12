@@ -67,7 +67,7 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if [[ $BUILDER_OS == win ]]; then
+if builder_is_windows; then
   source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 fi
 

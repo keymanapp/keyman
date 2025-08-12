@@ -153,6 +153,7 @@ class KeyboardScaleMap {
     scalings[KeyboardScaleMap.hashKey(for: Device.iPad8)] = Scaling(portrait: KeyboardSize(w: 810, h: 265, b: 55), landscape: KeyboardSize(w: 1080, h: 353, b: 55))
     scalings[KeyboardScaleMap.hashKey(for: Device.iPad9)] = Scaling(portrait: KeyboardSize(w: 810, h: 265, b: 55), landscape: KeyboardSize(w: 1080, h: 353, b: 55))
     scalings[KeyboardScaleMap.hashKey(for: Device.iPad10)] = Scaling(portrait: KeyboardSize(w: 820, h: 262-5, b: 55), landscape: KeyboardSize(w: 1180, h: 347-5, b: 55)) // has negative 'system inset' (-5), which causes a mismatch in final height balanced by the subtraction
+    scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir2)] = Scaling(portrait: KeyboardSize(w: 768, h: 258, b: 55), landscape: KeyboardSize(w: 1024, h: 343, b: 55)) // Banner always shows; merges copy ctrls with pred-banner.
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir3)] = Scaling(portrait: KeyboardSize(w: 834, h: 265, b: 55), landscape: KeyboardSize(w: 1112, h: 353, b: 55))
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir4)] = Scaling(portrait: KeyboardSize(w: 820, h: 262-5, b: 55), landscape: KeyboardSize(w: 1180, h: 347-5, b: 55))
     scalings[KeyboardScaleMap.hashKey(for: Device.iPadAir5)] = Scaling(portrait: KeyboardSize(w: 820, h: 262-5, b: 55), landscape: KeyboardSize(w: 1180, h: 347-5, b: 55))
