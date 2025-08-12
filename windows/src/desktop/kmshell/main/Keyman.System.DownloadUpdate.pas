@@ -159,7 +159,7 @@ begin
     else
     begin
       ErrorLogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
-      TKeymanSentryClient.Breadcrumb('error', 'Download failded for keyboard: '+  Params.InstallURL, 'cli.download');
+      TKeymanSentryClient.Breadcrumb('error', 'Download failded for Keyman Update: '+  Params.InstallURL, 'cli.download');
     end;
   end
   else

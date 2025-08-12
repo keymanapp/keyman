@@ -32,6 +32,13 @@ public final class WebViewUtils {
     FULL;          // WebView installed and enabled
   }
 
+  // Min version of Chrome for Keyman for Android for EngineWebViewVersionStatus.DEGRADED
+  public static final String KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME = "37.0";
+
+  // Min version of Chrome for Keyman for Android (EngineWebViewVersionStatus.FULL)
+  // TODO: Keep this version in sync with resources/build/minimum-versions.inc.sh
+  public static final String KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME = "95.0";
+
   private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
 
@@ -52,9 +59,11 @@ public final class WebViewUtils {
       chromeVersion = getChromeVersion(context, webView);
     }
 
-    if (FileUtils.compareVersions("37.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DISABLED;
-    } else if (FileUtils.compareVersions("57.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    } else if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DEGRADED;
     }
 

@@ -10,9 +10,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/linux/linux-actions.inc.sh"
 
 ################################ Main script ################################
 
@@ -30,7 +30,6 @@ builder_describe \
   "--rsync-user=RSYNC_USER  rsync user on remote server" \
   "--rsync-host=RSYNC_HOST  rsync host on remote server" \
   "--rsync-root=RSYNC_ROOT  rsync root on remote server"
-
 
 builder_parse "$@"
 
@@ -84,58 +83,20 @@ function _sign_source_tarball() {
 function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
-  local DATE UPLOAD_BASE UPLOAD_FOLDER UPLOAD_DIR
-  local ARTIFACTS NAMES
-  local TAR_GZ HASH SIZE DOWNLOAD_INFO
+  local UPLOAD_DIR KEYMAN_TGZ
 
-  DATE=$(date +%F)
-
-  UPLOAD_BASE="upload"
-  UPLOAD_FOLDER="${KEYMAN_VERSION}"
-  UPLOAD_DIR="${UPLOAD_BASE}/${UPLOAD_FOLDER}"
+  UPLOAD_DIR="upload/${KEYMAN_VERSION}"
+  KEYMAN_TGZ="keyman-${KEYMAN_VERSION}.tar.gz"
 
   # Set permissions as required on download site
   builder_echo "Setting upload file permissions for downloads.keyman.com"
+  chmod g+w  "${UPLOAD_DIR}"
   chmod a+rx "${UPLOAD_DIR}"
-  chmod g+w "${UPLOAD_DIR}"
-
-  chmod g+rw "${UPLOAD_DIR}"/*
+  chmod g+w  "${UPLOAD_DIR}"/*
   chmod a+r  "${UPLOAD_DIR}"/*
 
-  ARTIFACTS=("keyman-${KEYMAN_VERSION}.tar.gz")
-  NAMES=("Keyman for Linux")
-
-  for i in "${!ARTIFACTS[@]}"; do
-      TAR_GZ=${ARTIFACTS[${i}]}
-      # Construct .download_info
-      HASH=$(md5sum "${UPLOAD_DIR}/${TAR_GZ}" | cut -d ' ' -f 1)
-      SIZE=$(stat --print="%s" "${UPLOAD_DIR}/${TAR_GZ}")
-      # TODO: Truncate NAME
-      DOWNLOAD_INFO=$( jq -n \
-      --arg NAME "${NAMES[${i}]}" \
-      --arg BUILD_NUMBER "${KEYMAN_VERSION}" \
-      --arg DATE "${DATE}" \
-      --arg KEYMAN_TIER "${KEYMAN_TIER}" \
-      --arg FILENAME "${TAR_GZ}" \
-      --arg HASH "${HASH}" \
-      --arg BUILD_COUNTER "${KEYMAN_VERSION_PATCH}" \
-      --arg SIZE "${SIZE}" \
-      '{name: $NAME, version: $BUILD_NUMBER, date: $DATE, platform: "linux", stability: $KEYMAN_TIER, file: $FILENAME, md5: $HASH, type: "tar.gz", build: $BUILD_COUNTER, size: $SIZE}' )
-      echo "${DOWNLOAD_INFO}" | jq . >> "${UPLOAD_DIR}/${TAR_GZ}.download_info"
-  done
-
-  # Expanded, documented form of the arguments
-  # ==========================================
-  # "-vrzltp "   # verbose, recurse, zip, copy symlinks, preserve times, permissions
-  # "--perms "   # perfectly matches existing file permissions on the build agent
-  # "--stats "   # show statistics for log
-  # "--rsync-path=\"sudo -u vu2009 rsync\" # path on remote server
-  # "--rsh=ssh " # use ssh
-
-  # The actual rsync call.
-  # We run into weird quote-based issues if we don't do a monolithic call as seen below, at least at present.
-  builder_echo "Performing rsync call"
-  rsync -vrzltp --perms --stats --rsync-path="${RSYNC_PATH}" --rsh=ssh "${UPLOAD_DIR}" "${RSYNC_USER}@${RSYNC_HOST}:${RSYNC_ROOT}/linux/${KEYMAN_TIER}"
+  write_download_info "${UPLOAD_DIR}" "${KEYMAN_TGZ}" "Keyman for Linux" tar.gz linux
+  tc_rsync_upload "${UPLOAD_DIR}" "linux/${KEYMAN_TIER}"
 
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
 }
@@ -179,7 +140,7 @@ if builder_has_action all; then
   linux_install_dependencies_action
   _install_additional_dependencies
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   linux_build_action
   linux_unit_tests_action --no-integration
@@ -188,7 +149,7 @@ else
   builder_run_action  configure   linux_install_dependencies_action
   builder_run_action  configure   _install_additional_dependencies
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       linux_build_action
   builder_run_action  test        linux_unit_tests_action --no-integration
