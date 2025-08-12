@@ -244,9 +244,9 @@ export class KmnFileWriter {
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+          if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
             version_output_character = output_Unicode_CodePoint;
-            if (output_Unicode_Character.length > 1) {
+            if (output_Unicode_CodePoint.length > 1) {
               if (warn_text[2] == "") {
                 warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
               }
@@ -330,11 +330,11 @@ export class KmnFileWriter {
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+          if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
             version_output_character = output_Unicode_CodePoint;
 
-            if (output_Unicode_Character.length > 1) {
+            if (output_Unicode_CodePoint.length > 1) {
               if (warn_text[2] == "") {
                 warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
               }

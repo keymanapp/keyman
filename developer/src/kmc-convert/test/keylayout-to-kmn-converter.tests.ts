@@ -55,6 +55,7 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_C0_C1_C2_C3.keylayout')],
       [makePathToFixture('../data/Test_maxKeyCode.keylayout')],
       [makePathToFixture('../data/Test_messages.keylayout')],
+      [makePathToFixture('../data/Test_messages_controlCharacter.keylayout')],
       [makePathToFixture('../data/Test_messages_superior_C2.keylayout')],
       [makePathToFixture('../data/Test_messages_superior_C3.keylayout')],
       [makePathToFixture('../data/Test_duplicate_missing_keycode.keylayout')],

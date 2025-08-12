@@ -23,33 +23,33 @@
     </modifierMap>
     <keyMapSet id="ANSI">
         <keyMap index="0">
-            <key code="0" output="A"/>
-            <key code="1" action="a1"/>
-            <key code="2" action="a0"/>
-            <key code="32" action="a4"/>
+            <key code="0" output="A"/>      <!-- C0-> keyman rule part 1 -->
+            <key code="1" action="a1"/>     <!-- C1-> keyman rule part 1 -->
+            <key code="2" action="a0"/>     <!-- C2-> keyman rule part 6 -->
+            <key code="32" action="a4"/>    <!-- C1-> keyman rule part 1 -->
         </keyMap>
         <keyMap index="1">
-            <key code="24" action="a3"/>
-            <key code="28" action="a2"/>
-            <key code="32" action="a1"/>
+            <key code="24" action="a3"/>    <!-- C2-> keyman rule part 3 -->
+            <key code="28" action="a2"/>    <!-- C2-> keyman rule part 3 -->
+            <key code="32" action="a1"/>    <!-- C1-> keyman rule part 1 --> <!-- C3-> keyman rule part 6 -->
         </keyMap>
     </keyMapSet>
     <actions>
         <action id="a0">
-            <when state="1" output="Â"/>
+            <when state="1" output="Â"/>      <!-- C3-> keyman rule part 6 -->
         </action>
         <action id="a1">
-            <when state="none" output="S"/>
-            <when state="3" next="1"/>
+            <when state="none" output="S"/>   <!-- C1-> keyman rule part 1-->
+            <when state="3" next="1"/>        <!-- C3-> keyman rule part 5 -->
         </action>
         <action id="a2">
-            <when state="none" next="3"/>
+            <when state="none" next="3"/>     <!-- C3-> keyman rule part 4 -->
         </action>
         <action id="a3">
-            <when state="none" next="1"/>
+            <when state="none" next="1"/>     <!-- C2-> keyman rule part 3 -->
         </action>
         <action id="a4">
-            <when state="none" output="U"/>
+            <when state="none" output="U"/>   <!-- C1-> keyman rule part 1 -->
         </action>
     </actions>
     <terminators>
