@@ -5,7 +5,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
@@ -16,7 +16,7 @@ CHECK="${COLOR_GREEN}✔${COLOR_RESET}" # ✔
 CROSS="${COLOR_RED}❌${COLOR_RESET}" # ❌
 
 builder_describe \
-  "Provides actions useful for build-utils.sh trap-functionality unit testing.\nOnly one action may be set at a time." \
+  "Provides actions useful for builder-basic.inc.sh trap-functionality unit testing.\nOnly one action may be set at a time." \
   "error" \
   "error-in-function" \
   "incomplete"

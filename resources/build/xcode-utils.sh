@@ -24,7 +24,7 @@ function importEnvironment() {
     buildError "KEYMAN_ROOT is not defined.  Recommendation:  define it as a project-wide \"user-defined\" Build Setting for the \"$PROJECT_NAME\" project."
     exit 1
   else
-    # As defined within build-utils.sh, which this script does NOT call.  (It was already called externally.)
+    # As defined within builder-basic.inc.sh, which this script does NOT call.  (It was already called externally.)
     ENVIRONMENT_SH="$KEYMAN_ROOT/resources/environment.sh"
     . "$ENVIRONMENT_SH"
   fi
@@ -45,13 +45,13 @@ function phaseSetBundleVersions() {
   # For command-line builds, KEYMAN_VERSION and KEYMAN_VERSION_WITH_TAG) are forwarded through xcodebuild.
   if [ -z "${KEYMAN_VERSION:-}" ]; then
     # This is likely not a command-line build at the top level; it's been triggered through Xcode.
-    # The $KEYMAN_VERSION-loading code is in build-utils.sh, but we need $THIS_SCRIPT to be set
+    # The $KEYMAN_VERSION-loading code is in builder-basic.inc.sh, but we need $THIS_SCRIPT to be set
     # (in similar manner to the "standard build header") in order to avoid script errors therein.
     THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
+    . "$KEYMAN_ROOT/resources/build/builder-basic.inc.sh"
     echo "phaseSetBundleVersions: UI build - fetching version from repository:"
     echo "  Plain:  $KEYMAN_VERSION"
     echo "  Tagged: $KEYMAN_VERSION_WITH_TAG"
@@ -102,10 +102,10 @@ function phaseSetBundleVersions() {
 function setSettingsBundleVersion() {
   # For command-line builds, KEYMAN_VERSION and KEYMAN_VERSION_WITH_TAG) are forwarded through xcodebuild.
   if [ -z "${KEYMAN_VERSION:-}" ]; then
-    # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
+    # We're not a command-line build... so we'll need to retrieve these values ourselves with ./builder-basic.inc.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
-    . "$KEYMAN_ROOT/resources/build/build-utils.sh"
+    . "$KEYMAN_ROOT/resources/build/builder-basic.inc.sh"
     echo "setSettingsBundleVersion: UI build - fetching version from repository:"
     echo "  Plain:  $KEYMAN_VERSION"
     echo "  Tagged: $KEYMAN_VERSION_WITH_TAG"
@@ -166,9 +166,9 @@ function phaseSentryDsymUpload() {
 # All calls to xcode-utils.sh scripts will have their output redirected to
 # $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
 # to this log file. See the corresponding printXCodeBuildScriptLogs function in
-# build-utils.sh to print the log after xcodebuild returns.
+# builder-basic.inc.sh to print the log after xcodebuild returns.
 #
-# More information in the build-utils.sh.
+# More information in the builder-basic.inc.sh.
 #
 function logScriptsToFile() {
   local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
