@@ -460,13 +460,6 @@ export class KmnFileWriter {
           + "]  >  dk(A"
           + rule[index].id_prev_deadkey
           + ") ) : ";
-
-        warningTextArray[2] = "unavailable superior rule ( ["
-          + rule[index].modifier_deadkey + " "
-          + rule[index].deadkey
-          + "]  >  dk(A"
-          + rule[index].id_deadkey
-          + ") ) : ";
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
@@ -474,7 +467,7 @@ export class KmnFileWriter {
         warningTextArray[2] = "unavailable superior rule ( ["
           + rule[index].modifier_deadkey + " "
           + rule[index].deadkey
-          + "]  >  dk(A"
+          + "]  >  dk(B"
           + rule[index].id_deadkey
           + ") ) : ";
       }
@@ -500,7 +493,6 @@ export class KmnFileWriter {
         && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
         && idx < index
       );
-
       // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'N'
       const dup_1_1 = rule.filter((curr, idx) =>
         (curr.rule_type === "C0" || curr.rule_type === "C1")
@@ -730,23 +722,27 @@ export class KmnFileWriter {
       );
 
       // 5-5  dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C3)
-      const amb_5_5 = rule.filter((curr, idx) =>
+      const amb_5_5 = rule.filter((curr, idx) => (
         (curr.rule_type === "C3")
-        && curr.modifier_key === rule[index].modifier_key
-        && curr.key === rule[index].key
-        && curr.id_deadkey === rule[index].id_deadkey
-        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_deadkey === rule[index].modifier_deadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.id_deadkey === rule[index].id_deadkey)
         && idx < index
+        && (rule[index].unique_deadkey !== 0 || rule[index].unique_prev_deadkey !== 0)
       );
 
       // 5-5 dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C2)
       const dup_5_5 = rule.filter((curr, idx) =>
         (curr.rule_type === "C3")
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
+        && curr.prev_deadkey === rule[index].prev_deadkey
         && curr.modifier_deadkey === rule[index].modifier_deadkey
         && curr.deadkey === rule[index].deadkey
-        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
         && curr.id_deadkey === rule[index].id_deadkey
         && rule[index].unique_deadkey === 0
+        && idx < index
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
@@ -760,14 +756,15 @@ export class KmnFileWriter {
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
-      const dup_6_6 = rule.filter((curr, idx) =>
-        (curr.rule_type === "C3")
-        && curr.id_deadkey === rule[index].id_deadkey
-        && curr.modifier_key === rule[index].modifier_key
-        && curr.key === rule[index].key
-        && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
-        && idx < index
-      );
+      const dup_6_6 =
+        rule.filter((curr, idx) =>
+          (curr.rule_type === "C3")
+          && curr.id_deadkey === rule[index].id_deadkey
+          && curr.modifier_key === rule[index].modifier_key
+          && curr.key === rule[index].key
+          && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
+          && idx < index
+        );
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
@@ -880,7 +877,13 @@ export class KmnFileWriter {
             + "\' ");
       }
     }
-    // In rare cases a rule might not be written out therefore we need to inform the user
+    // In rare cases a rule might not be written out therefore we need to inform the user:
+    // usually we write the first occurance of an ambiguous C0/C1 rule and comment out the later
+    //    assuming that if several C0/C1 rules are ambiguous the user prefers to use the first C0/C1 rule
+    // for C2/C3 rules we write the last occurance of an ambiguous rule and comment out the earlier
+    //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
+    // if both happens, nothing would be written, therefore this messsage
+
     const extra_warning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
 
     if (warningTextArray[0] !== "") {

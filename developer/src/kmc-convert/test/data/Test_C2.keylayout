@@ -18,12 +18,12 @@
             <modifier keys=""/>
         </keyMapSelect>
         <keyMapSelect mapIndex="1">
-            <modifier keys="shift"/>
+            <modifier keys="caps"/>
         </keyMapSelect>
     </modifierMap>
     <keyMapSet id="ANSI">
         <keyMap index="0">
-            <key code="24" action="a1"/>
+            <key code="32" action="a1"/>
         </keyMap>
         <keyMap index="1">
             <key code="0" action="a2"/>

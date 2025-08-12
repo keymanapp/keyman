@@ -12,43 +12,41 @@
     <layouts>
         <layout first="0" last="0" mapSet="138" modifiers="30"/>
     </layouts>
+
     <modifierMap id="30" defaultIndex="0">
         <keyMapSelect mapIndex="0">
+            <modifier keys="caps"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="1">
             <modifier keys=""/>
         </keyMapSelect>
         <keyMapSelect mapIndex="2">
-            <modifier keys="caps"/>
-        </keyMapSelect>
-        <keyMapSelect mapIndex="3">
-            <modifier keys="anyOption"/>
+            <modifier keys="shift"/>
         </keyMapSelect>
     </modifierMap>
     <keyMapSet id="ANSI">
         <keyMap index="0">
-            <key code="0" action="A6"/>
+            <key code="0" action="a2"/>
+        </keyMap>
+        <keyMap index="1">
+            <key code="32" action="a1"/>
         </keyMap>
         <keyMap index="2">
-            <key code="32" action="A5"/>
-        </keyMap>
-        <keyMap index="3">
-            <key code="28" action="A4"/>
-            <key code="32" action="A3"/>
+            <key code="2" action="a0"/>
         </keyMap>
     </keyMapSet>
     <actions>
-        <action id="A3">
+        <action id="a0">
+            <when state="none" next="3"/>
+        </action>
+        <action id="a1">
             <when state="3" next="1"/>
         </action>
-        <action id="A4">
-            <when state="none" next="3"/>
-        </action>
-        <action id="A5">
-            <when state="none" next="3"/>
-        </action>
-        <action id="A6">
-            <when state="1" output="â"/>
+        <action id="a2">
+            <when state="1" output="Â"/>
         </action>
     </actions>
+
     <terminators>
         <when state="1" output="ˆ"/>
     </terminators>

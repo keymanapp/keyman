@@ -24,6 +24,7 @@
             <key code="1" output="s"/>
             <key code="49" output="Y"/>
             <key code="50" output="Z"/>
+            <key code="555" output="x"/>
         </keyMap>
     </keyMapSet>
     <actions>
