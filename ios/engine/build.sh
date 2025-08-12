@@ -50,7 +50,7 @@ XCODEFLAGS="-quiet -configuration $CONFIG"
 XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath \"$DERIVED_DATA\" -workspace ../keymanios.xcworkspace"
 
 CODE_SIGN=
-if builder_is_debug_build; then
+if builder_is_debug_build || ( builder_is_ci_build && ! builder_is_ci_build_level_release ); then
   CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
 fi
 
