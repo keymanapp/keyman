@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 . "${THIS_SCRIPT_PATH}/../../trigger-definitions.inc.sh"
@@ -31,6 +31,8 @@ test_build_bot_check_messages() {
 
   # test another sequence of commands
   _do_test_build_bot_check_messages_inline 8 "[windows]=release" '[common]="release" [windows]="skip" [developer]="build"' '{ "body": "Build-bot: skip windows\nBuild-bot: build developer\nBuild-bot: release common" }' '[]'
+  _do_test_build_bot_check_messages_inline 9 "[windows]=release" '[common]="release" [windows]="skip" [developer]="build"' '{ "body": "Build-bot: skip:windows build:developer release:common" }' '[]'
+  _do_test_build_bot_check_messages_inline 10 "[windows]=release" '[common]="release" [windows]="build"' '{ "body": "Build-bot: skip:windows build release:common" }' '[]'
 
   # Test some bad inputs
   _do_test_build_bot_check_messages_inline 1 "[windows]=release" '[windows]="release"' '{}' '[{ "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
@@ -63,10 +65,10 @@ _do_test_build_bot_check_messages_file() {
   build_bot_check_messages $prnum "$(cat ${THIS_SCRIPT_PATH}/pr-$prnum-data.txt)" "$(cat ${THIS_SCRIPT_PATH}/pr-$prnum-commits.txt)"
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
   done
 }
 
@@ -90,10 +92,10 @@ _do_test_build_bot_check_messages_inline() {
   build_bot_check_messages $prnum "$prinfo" "$prcommits"
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
   done
 }
 
@@ -103,13 +105,21 @@ _do_test_build_bot_check_messages_inline() {
 
 test_build_bot_update_commands() {
   builder_echo start test_build_bot_update_commands 'START TEST: build_bot_update_commands'
+  _do_test_build_bot_update_commands '[windows]="release"' "skip:windows" '[windows]="skip"'
   _do_test_build_bot_update_commands '[windows]="release"' "skip windows" '[windows]="skip"'
+  _do_test_build_bot_update_commands '[windows]="release"' "skip:windows,developer" '[windows]="skip" [developer]="skip"'
   _do_test_build_bot_update_commands '[windows]="release"' "skip windows,developer" '[windows]="skip" [developer]="skip"'
+  _do_test_build_bot_update_commands '[windows]="release"' "build:developer" '[windows]="release" [developer]="build"'
   _do_test_build_bot_update_commands '[windows]="release"' "build developer" '[windows]="release" [developer]="build"'
+  _do_test_build_bot_update_commands '[windows]="release"' "skip:windows" '[windows]="skip"'
   _do_test_build_bot_update_commands '[windows]="release"' "skip windows" '[windows]="skip"'
-  _do_test_build_bot_update_commands '[windows]="release"' "access foo" '[windows]="release"'
-  _do_test_build_bot_update_commands '[windows]="release"' "build foo" '[windows]="release"'
+  _do_test_build_bot_update_commands '[windows]="release"' "access:foo" '[windows]="release"'
+  # not testing invalid legacy command: _do_test_build_bot_update_commands '[windows]="release"' "access foo" '[windows]="release"'
+  _do_test_build_bot_update_commands '[windows]="release"' "build:foo" '[windows]="release"'
+  # not testing invalid legacy command: _do_test_build_bot_update_commands '[windows]="release"' "build foo" '[windows]="release"'
+  _do_test_build_bot_update_commands '[windows]="release"' "build:common" '[common]="build" [windows]="release"'
   _do_test_build_bot_update_commands '[windows]="release"' "build common" '[common]="build" [windows]="release"'
+  _do_test_build_bot_update_commands '[windows]="release"' "build:all" "$ALL_BUILD_PLATFORMS_BUILD_EXPECTED"
   _do_test_build_bot_update_commands '[windows]="release"' "build all" "$ALL_BUILD_PLATFORMS_BUILD_EXPECTED"
   builder_echo end test_build_bot_update_commands success 'SUCCESS: build_bot_update_commands'
 }

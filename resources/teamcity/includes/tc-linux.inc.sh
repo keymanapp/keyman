@@ -1,16 +1,8 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
-
-# Returns 0 if the OS version is greater than or equal to the specified version.
-# Parameter:
-#   $1 - OS version to compare against (e.g., "20.04")
-is_os_version_or_higher() {
-  local OS_VERSION=$1
-
-  # we use `dpkg --compare-versions` to compare the current Ubuntu version
-  # shellcheck disable=SC2312
-  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
-}
+#
+# Shared functions for any builds that run on Linux agents,
+# e.g. linux, android, web, ...
 
 # Returns 0 if the specified package is installed.
 # Parameter:
@@ -59,7 +51,7 @@ ba_linux_install_nvm() {
     NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2)
     # shellcheck disable=SC2312
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
-    set_variables_for_nvm
+    tc_set_variables_for_nvm
     nvm install --lts --default --save
     nvm use --lts
   fi
@@ -85,7 +77,7 @@ ba_linux_install_emscripten() {
     ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
   fi
-  set_variables_for_emscripten
+  tc_set_variables_for_emscripten
   builder_echo end "install emscripten" success "Finished checking and installing emscripten"
 }
 
@@ -122,4 +114,19 @@ ba_linux_stop_xvfb() {
     bash "${PID_FILE}"
     rm -f "${PID_FILE}"
   fi
+}
+
+# Returns 0 if the OS version is greater than or equal to the specified version.
+# Parameter:
+#   $1 - OS version to compare against (e.g., "20.04")
+ba_linux_is_os_version_or_higher() {
+  if ! builder_is_linux; then
+     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
+  fi
+
+  local OS_VERSION=$1
+
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  # shellcheck disable=SC2312
+  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
 }

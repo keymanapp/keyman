@@ -19,7 +19,7 @@
 # * _builder_ functions and variables are internal use only for builder.inc.sh, and
 #   subject to change at any time. Do not use them in other scripts.
 # * Note: the running script is the top-level script that includes either
-#   builder.inc.sh directly, or, just in the Keyman repo, via build-utils.sh.
+#   builder.inc.sh directly, or, just in the Keyman repo, via builder-basic.inc.sh.
 #
 
 # Exit on command failure and when using unset variables:
@@ -627,7 +627,7 @@ builder_has_action() {
 #   }
 #
 #   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-#   builder_run_action configure    verify_npm_setup
+#   builder_run_action configure    node_select_version_and_npm_ci
 #   builder_run_action build        do_build
 # ```
 #
@@ -1542,7 +1542,7 @@ _builder_parse_expanded_parameters() {
 
     # Per #11106, local builds use --debug by default.
     # Second condition prevents the block (and message) from executing when --debug is already specified explicitly.
-    if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
+    if [[ ${KEYMAN_VERSION_ENVIRONMENT:-} == "local" ]] && [[ $builder_debug != --debug ]] && ! $is_release; then
       builder_echo grey "Local build environment detected:  setting --debug"
       _params+=(--debug)
       _builder_chosen_options+=(--debug)
@@ -2208,7 +2208,7 @@ builder_is_ci_build() {
 # Returns 0 if current build is running as a release build in CI
 #
 builder_is_ci_release_build() {
-  if [[ "$KEYMAN_VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" =~ ^alpha|beta|stable$ ]]; then
     return 0
   fi
   return 1
@@ -2219,7 +2219,7 @@ builder_is_ci_release_build() {
 # mainline branch test
 #
 builder_is_ci_test_build() {
-  if [[ "$KEYMAN_VERSION_ENVIRONMENT" == test ]]; then
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT:-}" == test ]]; then
     return 0
   fi
   return 1
@@ -2233,7 +2233,7 @@ builder_is_ci_build_level_release() {
   if builder_is_ci_release_build; then
     return 0
   fi
-  if [[ "$KEYMAN_BUILD_LEVEL" == release ]]; then
+  if [[ "${KEYMAN_BUILD_LEVEL:-}" == release ]]; then
     return 0
   fi
   return 1

@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
@@ -88,7 +88,7 @@ function publish_web_action() {
   _push_release_to_skeymancom
 
   _zip_and_upload_artifacts
-  upload_help "Keyman for Web" web
+  tc_upload_help "Keyman for Web" web
 
   builder_echo end publish success "Finished publishing KeymanWeb release"
 }
@@ -96,14 +96,14 @@ function publish_web_action() {
 if builder_has_action all; then
   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   web_build_action
   publish_web_action
 else
   builder_run_action  configure   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       web_build_action
   builder_run_action  publish     publish_web_action

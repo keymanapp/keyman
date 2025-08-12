@@ -11,11 +11,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-mac.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/ios/ios-actions.inc.sh"
@@ -243,7 +243,7 @@ function do_build() {
 
 function do_publish() {
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for iOS" ios
+  tc_upload_help "Keyman for iOS" ios
 
   if [[ "${KEYMAN_TIER}" == "stable" ]]; then
     _publish_to_appstore

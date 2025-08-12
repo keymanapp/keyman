@@ -10,11 +10,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/build-utils-ci.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
@@ -108,8 +108,18 @@ function archive_artifacts() {
   fi
 }
 
-# Override JAVA_HOME to OpenJDK 11
-set_java_home
+
+# For CI compatibility of building Keyman for Android 18.0 with OpenJDK 11,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 21.
+android_set_java_home() {
+  if [[ ! -z ${JAVA_HOME_21+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_21 (${JAVA_HOME_21})"
+    export JAVA_HOME="${JAVA_HOME_21}"
+  fi
+}
+
+# Override JAVA_HOME
+android_set_java_home
 
 # This script also responsible for cleaning up /android/upload
 builder_run_child_actions clean
