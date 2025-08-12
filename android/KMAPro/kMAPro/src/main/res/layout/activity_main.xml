@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -9,27 +11,32 @@
     android:background="@color/yellow_background"
     tools:context=".MainActivity">
 
-    <include layout="@layout/titlebar" />
+    <include layout="@layout/titlebar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <include layout="@layout/check_chrome_webview_layout"
-      android:visibility="gone"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_below="@id/titlebar"/>
+    <include
+        layout="@layout/check_chrome_webview_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titlebar"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/titlebar" />
 
     <com.keyman.engine.KMTextView
         android:id="@+id/kmTextView"
-        android:background="@drawable/textview_bg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/checkWebViewChromeLayout"
+        android:background="@drawable/textview_bg"
         android:ems="10"
-        android:inputType="textMultiLine|textNoSuggestions"
-        android:hint="@string/textview_hint"
         android:gravity="top"
-        android:scrollbars="vertical">
+        android:hint="@string/textview_hint"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toBottomOf="@id/checkWebViewChromeLayout">
 
         <requestFocus />
     </com.keyman.engine.KMTextView>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -67,6 +67,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -85,7 +86,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.provider.Settings;
 import android.text.Html;
@@ -98,8 +98,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -118,6 +116,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private static final String TAG = "MainActivity";
 
+  private ConstraintLayout constraintLayout;
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -169,6 +168,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
+
+    constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
+    setupEdgeToEdge(R.id.constraintLayout);
+    setupStatusBarColors(android.R.color.white, R.color.neutral_2);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -622,10 +625,18 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
+    // Navigation bar height
+    int navigationBarHeight = 0;
+    resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      navigationBarHeight = getResources().getDimensionPixelSize(resourceId);
+    }
+
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
+    textView.setHeight(
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
 
   private void showInfo() {
