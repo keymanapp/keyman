@@ -1,16 +1,17 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
- * 
+ *
  * Created by jahorton on 2025-07-30
- * 
+ *
  * Represents cached data about one token (either a word or a unit of whitespace)
  * in the context and associated correction-search progress and results.
  */
-import { buildMergedTransform } from "@keymanapp/models-templates";
-import { SearchSpace } from "./distance-modeler.js";
-import { KMWString } from "@keymanapp/web-utils";
 
+import { buildMergedTransform } from "@keymanapp/models-templates";
 import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { SearchSpace } from "./distance-modeler.js";
+
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
@@ -31,7 +32,7 @@ function textToCharTransforms(text: string, transformId?: number): Transform[] {
   return transformId ?
     [...text].map(insert => ({insert, deleteLeft: 0, id: transformId})) :
     [...text].map(insert => ({insert, deleteLeft: 0}));
-}  
+}
 
 /**
  * Represents cached data about one token (either a word or a unit of whitespace)
