@@ -179,7 +179,7 @@ function _builder_prepublish() {
 
         builder_echo "Manually linking $link_source -> $link_target (see https://github.com/npm/cli/issues/3466)"
         rm -rf $link_source
-        if [[ $BUILDER_OS == win ]]; then
+        if builder_is_windows; then
           link_source="$(cygpath -w "$link_source")"
           link_target="$(cygpath -w "$link_target")"
           cmd //c mklink //j "$link_source" "$link_target"

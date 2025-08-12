@@ -14,7 +14,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/teamcity/developer/developer-actions.inc.sh"
-. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
 
@@ -38,7 +37,7 @@ function build_developer_action() {
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }
 
-if is_windows; then
+if builder_is_windows; then
   builder_echo error "This script is intended to be run on Linux or macOS only."
   exit 1
 fi
@@ -46,15 +45,15 @@ fi
 if builder_has_action all; then
   developer_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
-  set_variables_for_emscripten
+  tc_set_variables_for_nvm
+  tc_set_variables_for_emscripten
 
   build_developer_action
 else
   builder_run_action  configure   developer_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
-  set_variables_for_emscripten
+  tc_set_variables_for_nvm
+  tc_set_variables_for_emscripten
 
   builder_run_action  build       build_developer_action
 fi
