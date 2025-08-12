@@ -11,20 +11,21 @@ A keyboard help documentation (PHP help file) is a structured help web page abou
 
 The help documentation acts as an online help documentation on help.keyman.com, not to be confused with [welcome.htm and readme.htm](../distribute/tutorial/step-2). However, the help file can be a descriptive version of the `welcome.htm` file; see [here](https://help.keyman.com/developer/keyboards/phphelpfile).
 
-After planning and developing a keyboard in Keyman Developer, consider following the project's [folder and file structure](../../reference/file-layout), ideally the help file should be stored in an independent folder within the source folder. Therefore, create a folder called "**help**":
+After planning and developing a keyboard in Keyman Developer, consider following the project's [folder and file structure](../../reference/file-layout). The help file should be stored in an independent folder within the source folder called "**help**". The file must have the same name as the keyboard folder name:
 
 ```
-project
+my_keyboard
 |
 |
 |____source
 |    |      files
 |    |______help
 |           |
-|           |____keyboardname.php
+|           |____my_keyboard.php
 |
 |____other folders
 ```
+It would end up in this location: `m/my_keyboard/source/help/my_keyboard.php`. This allows the Keyman online help file to deploy correctly.
 
 In the `.php` file, include the main code:
 
@@ -58,7 +59,7 @@ Please feel free to adjust the `data-states` according to the keyboard layers; [
 
 * Some readers are visual learners, and they might be pleased to find a documentation that has more to the eyes than plain text. Check [Khmer (SIL) Keyboard Help](https://help.keyman.com/keyboard/sil_khmer/) for minimal design of keys (`<kbd>`) and one of the many methods to showcase key combinations.
 
-* Please avoid using this:
+* Since the PHP file is already using the `id` and `data-states` attributes (above), and to avoid unnecessary duplication, please do not use the following HTML tags:
 
   ```html
   <h3>Desktop Default</h3>
