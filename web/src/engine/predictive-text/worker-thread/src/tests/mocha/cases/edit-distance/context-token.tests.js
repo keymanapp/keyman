@@ -1,14 +1,21 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * This file contains low-level unit tests designed to validate the behavior
+ * of the ContextToken class.
+ */
+
 import { assert } from 'chai';
+
+// Aliased due to JS keyword.
+import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
+import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 import { ContextToken } from '#./correction/context-token.js';
 import { ExecutionTimer } from '#./correction/execution-timer.js';
-import * as models from '#./models/index.js';
-
-import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
-
-import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-
-var TrieModel = models.TrieModel;
+import { TrieModel } from '#./models/index.js';
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
