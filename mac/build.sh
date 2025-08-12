@@ -263,7 +263,9 @@ do_sentry() {
 }
 
 do_install() {
-  if builder_is_ci_build_level_release && ! builder_has_option --quick; then
+  if builder_is_ci_build; then
+    builder_die "build.sh install should not be run on CI"
+  elif ! builder_has_option --quick; then
     do_notarize
   else
     if [ "$(spctl --status)" == "assessments enabled" ]; then
