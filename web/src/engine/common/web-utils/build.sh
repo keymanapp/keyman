@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 SUBPROJECT_NAME=engine/common/web-utils
 BUILD_DIR="/web/src/engine/common/web-utils/build"
@@ -56,7 +57,7 @@ function do_test() {
   c8 mocha --recursive $FLAGS ./src/tests/
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
 builder_run_action test       do_test

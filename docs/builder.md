@@ -266,7 +266,7 @@ for example:
 
 ```bash
 if builder_start_action configure; then
-  verify_npm_setup
+  node_select_version_and_npm_ci
   builder_finish_action success configure
 fi
 
@@ -1089,7 +1089,7 @@ longhand form.
   }
 
   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_run_action configure    verify_npm_setup
+  builder_run_action configure    node_select_version_and_npm_ci
   builder_run_action build        do_build
 ```
 
