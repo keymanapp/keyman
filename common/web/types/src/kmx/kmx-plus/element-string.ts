@@ -81,11 +81,11 @@ export class ElementString extends Array<ElemElement> {
           // error. So we can just exit here.
           return null; // UnicodeSet error
         }
-        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges, options?.x);
+        const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges, options?.compileContext);
         if (!uset) {
           return null; // UnicodeSet error already added to callback
         }
-        elem.uset = sections.uset.allocUset(uset, sections, options?.x);
+        elem.uset = sections.uset.allocUset(uset, sections, options?.compileContext);
         elem.value = sections.strs.allocString('', {...options, singleOk: true}); // no string
       } else if (item.type === ElementType.codepoint || item.type === ElementType.escaped || item.type === ElementType.string) {
         // some kind of a string

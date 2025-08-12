@@ -38,17 +38,23 @@ ago) used the <kbd>/</kbd> key as the deadkey.
 <kbd>/</kbd><kbd>d</kbd> gave ɗ, and so on.
 
 It would be possible to use that desktop keyboard logic on touch
-screens.  But your mobile device users will find these rules annoying.
+screens. But your mobile device users will find these rules annoying.
+
 Instead of two keys they would probably have to press four, since the
 standard alphabetical keyboard on most touch devices does not have the
 slash key. So they would have to press the key to switch to the numeric
-keyboard, then press slash, then press the key to go back to the
-alphabetical keyboard, then the letter. What touch screen users would
+keyboard, then press slash, then press the key to switch back to the
+alphabetical keyboard, and then the letter. What touch screen users would
 appreciate is something that uses the great feature of touch screens,
 the long press or press and hold on a letter, to see analogous letters.
-So we’ll set up a touch screen keyboard that lets you press and hold ‘d’
-to see the two hooked d characters, press and hold ‘b’ to see the hooked
-b characters, and so on.
+
+So we’ll set up a touch screen keyboard that lets you
+* press and hold ‘d’ to see the two hooked d characters
+* press and hold ‘b’ to see the hooked b characters, and so on.
 
 [Next: Making, testing and distributing the touch
 keyboard](making-touch-keyboard)
+
+## See also
+
+* Tips for using [gestures](gestures) in Keyman Developer
