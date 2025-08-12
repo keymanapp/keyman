@@ -3,11 +3,15 @@
  */
 
 import { assert } from 'chai';
+
 import * as models from "@keymanapp/models-templates";
 import * as wordBreakers from "@keymanapp/models-wordbreakers";
-import { customWordBreakerFormer, customWordBreakerProper } from './custom-breakers.def.js';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
-function asProcessedToken(text) {
+import { customWordBreakerFormer, customWordBreakerProper } from './custom-breakers.def.js';
+import { BreakerContext } from '@keymanapp/models-wordbreakers';
+
+function asProcessedToken(text: string) {
   // default wordbreaker emits these at the end of each context half if ending with whitespace.
   // Indicates a new spot for non-whitespace text.
   if(text == '') {
@@ -179,7 +183,7 @@ describe('Tokenization functions', function() {
 
       let tokenization = models.tokenize(wordBreakers.default, context);
 
-      let expectedResult = {
+      let expectedResult: models.Tokenization = {
         left: [],
         right: [],
         caretSplitsToken: false
@@ -192,7 +196,7 @@ describe('Tokenization functions', function() {
       // Wordbreaking on a empty space => no word.
       let tokenization = models.tokenize(wordBreakers.default, null);
 
-      let expectedResult = {
+      let expectedResult: models.Tokenization = {
         left: [],
         right: [],
         caretSplitsToken: false
@@ -210,7 +214,7 @@ describe('Tokenization functions', function() {
 
       let tokenization = models.tokenize(wordBreakers.default, context);
 
-      let expectedResult = {
+      let expectedResult: models.Tokenization = {
         left: [' ', ''].map(asProcessedToken),
         right: [],
         caretSplitsToken: false
@@ -231,7 +235,7 @@ describe('Tokenization functions', function() {
 
       // Technically, we're editing the start of the first token on the right
       // when in this context.
-      let expectedResult = {
+      let expectedResult: models.Tokenization = {
         left: ['I', ' ', 'can\''].map(asProcessedToken),
         right: [].map(asProcessedToken),
         caretSplitsToken: false
@@ -300,7 +304,7 @@ describe('Tokenization functions', function() {
 
     // For the next few tests:  a mocked wordbreaker for Khmer, a language
     // without whitespace between words.
-    let mockedKhmerBreaker = function(text) {
+    let mockedKhmerBreaker = function(text: string) {
       // Step 1:  Build constants for spans that a real wordbreaker would return.
       let srok = { // Khmer romanization of 'ស្រុក'
         text: 'ស្រុក',
@@ -331,7 +335,7 @@ describe('Tokenization functions', function() {
       }
 
       // Step 2: Allow shifting a defined 'constant' span without mutating the definition.
-      let shiftSpan = function(span, delta) {
+      let shiftSpan = function(span: LexicalModelTypes.Span, delta: number) {
         // Avoid mutating the parameter!
         let shiftedSpan = {
           text: span.text,
@@ -413,10 +417,10 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
-    let midLetterNonbreaker = (text) => {
+    let midLetterNonbreaker = (text: string) => {
       let customization = {
         rules: [{
-          match: (context) => {
+          match: (context: BreakerContext) => {
             if(context.propertyMatch(null, ["ALetter"], ["MidLetter"], ["eot"])) {
               return true;
             } else {
@@ -425,7 +429,7 @@ describe('Tokenization functions', function() {
           },
           breakIfMatch: false
         }],
-        propertyMapping: (char) => {
+        propertyMapping: (char: string) => {
           let hyphens = ['\u002d', '\u2010', '\u058a', '\u30a0'];
           if(hyphens.includes(char)) {
               return "MidLetter";

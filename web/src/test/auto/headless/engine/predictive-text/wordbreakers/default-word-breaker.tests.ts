@@ -3,7 +3,7 @@
  */
 
 import { assert } from 'chai';
-import { default as breakWords } from '@keymanapp/models-wordbreakers';
+import { default as breakWords, type BreakerContext } from '@keymanapp/models-wordbreakers';
 
 const SHY = '\u00AD'; // Other, Format.  The "Soft HYphen" - usually invisible unless needed for word-wrapping.
 
@@ -203,7 +203,7 @@ describe('The default word breaker', function () {
     it('custom prop, rule:  do not break on letter-adjacent hyphens', function() {
       let customization = {
         rules: [{
-          match: (context) => {
+          match: (context: BreakerContext) => {
             if(context.propertyMatch(null, ["ALetter"], ["Hyphen"], ["ALetter"])) {
               return true;
             } else if(context.propertyMatch(["ALetter"], ["Hyphen"], ["ALetter"], null)) {
@@ -214,7 +214,7 @@ describe('The default word breaker', function () {
           },
           breakIfMatch: false
         }],
-        propertyMapping: (char) => {
+        propertyMapping: (char: string) => {
           const validHyphenCodes = [
             '\u002d', '\u2010', '\u058a', '\u30a0'
           ];
@@ -235,7 +235,7 @@ describe('The default word breaker', function () {
 
     it('mid-word hyphen via reassignment to MidLetter', function() {
       let customization = {
-        propertyMapping: (char) => {
+        propertyMapping: (char: string) => {
           const validHyphenCodes = [
             '\u002d', '\u2010', '\u058a', '\u30a0'
           ];
@@ -256,7 +256,7 @@ describe('The default word breaker', function () {
     // Useful for some regional minority languages that prefer word-breaking spaces.
     it('character reassignment:  Khmer letters as ALetter', function() {
       let customization = {
-        propertyMapping: (char) => {
+        propertyMapping: (char: string) => {
           if(char >= '\u1780' && char <= '\u17b3') {
             return "ALetter";
           } else {
@@ -279,7 +279,7 @@ describe('The default word breaker', function () {
         rules: [
           // WB5, but with differentiated consonants (ALetter) and vowels (AVowel)
           {
-            match: (context) => {
+            match: (context: BreakerContext) => {
               if(context.propertyMatch(null, ["ALetter", "AVowel"], ["ALetter", "AVowel"], null)) {
                 return true;
               } else {
@@ -290,7 +290,7 @@ describe('The default word breaker', function () {
           },
           // Proposed WB5a
           {
-            match: (context) => {
+            match: (context: BreakerContext) => {
               if(context.propertyMatch(null, ["Single_Quote"], ["AVowel"], null)) {
                 return true;
               } else {
@@ -301,7 +301,7 @@ describe('The default word breaker', function () {
           },
           // WB6, 7
           {
-            match: (context) => {
+            match: (context: BreakerContext) => {
               if(context.propertyMatch(null,
                                        ["ALetter", "AVowel"],
                                        ["MidLetter", "MidNumLet", "Single_Quote"],
@@ -321,7 +321,7 @@ describe('The default word breaker', function () {
           // Similar extensions to WB9, 10, 13a, and 13b would also be needed for robustness.
           // And I kind of left the Hebrew_Letter out of the WB5, 6, and 7 rewrites.
         ],
-        propertyMapping: (char) => {
+        propertyMapping: (char: string) => {
           const vowels = ['a', 'e', 'i', 'o', 'u'];
           if(vowels.includes(char)) {
             return "AVowel";

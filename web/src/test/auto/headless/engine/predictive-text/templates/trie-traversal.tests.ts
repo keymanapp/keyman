@@ -4,9 +4,10 @@
 
 import { assert } from 'chai';
 import { TrieModel } from '@keymanapp/models-templates';
+import { jsonFixture } from './helpers.js';
 
 // Useful for tests related to strings with supplementary pairs.
-var smpForUnicode = function(code){
+var smpForUnicode = function(code: number){
   var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
   var L = (code - 0x10000) % 0x400 + 0xDC00;
 
@@ -336,9 +337,6 @@ describe('Trie traversal abstractions', function() {
 
     // Just to be sure our utility function is working right.
     assert.equal(smpA + smpP + 'pl' + smpE, "𝖺𝗉pl𝖾");
-
-    let pKeys = ['p', smpP];
-    let leafChildSequence = ['l', smpE];
 
     const aNode = rootTraversal.child(smpA);
     assert.isOk(aNode);

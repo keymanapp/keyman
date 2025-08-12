@@ -3,7 +3,11 @@
  */
 
 import { assert } from 'chai';
+
 import { TrieModel } from '@keymanapp/models-templates';
+
+import { emptyContext, jsonFixture, zeroTransform } from './helpers.js';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('LMLayerWorker trie model for word lists', function() {
   describe('instantiation', function () {
@@ -171,8 +175,8 @@ describe('LMLayerWorker trie model for word lists', function() {
 
       // the SAME results should be suggested (made the same query)
       assert.deepEqual(
-        otherResults.map(s => s.displayAs),
-        firstResults.map(s => s.displayAs)
+        otherResults.map(s => s.sample.displayAs),
+        firstResults.map(s => s.sample.displayAs)
       );
     });
   });
@@ -231,7 +235,7 @@ describe('LMLayerWorker trie model for word lists', function() {
       assert.strictEqual(newBuffer, 'the');
   });
 
-  function applyTransform(context, transform) {
+  function applyTransform(context: LexicalModelTypes.Context, transform: LexicalModelTypes.Transform) {
     assert.isTrue(context.endOfBuffer, "cannot only apply transform to end of buffer");
     var buffer = context.left;
     buffer = buffer.substr(0, buffer.length - transform.deleteLeft) + transform.insert;
@@ -242,7 +246,7 @@ describe('LMLayerWorker trie model for word lists', function() {
    * For use in predict().map(FUNC) to get the underlying suggestion.
    * @param {ProbabilityMass<T>} pm
    */
-  function getSample(pm) {
-    return pm.sample
+  function getSample<T>(pm: LexicalModelTypes.ProbabilityMass<T>) {
+    return pm.sample;
   }
 });

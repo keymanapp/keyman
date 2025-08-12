@@ -3,7 +3,7 @@
  * https://github.com/keymanapp/lexical-models/pull/265.
  * @type {WordBreakingFunction}
  * */
-export function customWordBreakerProper(str) {
+export function customWordBreakerProper(str: string) {
   const whitespaceRegex = /\s|\u200b|\n|\r/;
   const tokens = str.split(whitespaceRegex);
 
@@ -74,7 +74,7 @@ export function customWordBreakerProper(str) {
  * triggered #12200.
  * @type {WordBreakingFunction}
  * */
-export function customWordBreakerFormer (str) {
+export function customWordBreakerFormer (str: string) {
   const tokens = str.split(/\s|\u200b/);
 
   for(let i=0; i < tokens.length; i++) {
@@ -122,7 +122,8 @@ export function customWordBreakerFormer (str) {
       start: str.indexOf(token),
       right: str.indexOf(token) + token.length,
       end: str.indexOf(token) + token.length,
-      text: token
+      text: token,
+      length: token.length
     }
   });
 }

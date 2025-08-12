@@ -1,7 +1,8 @@
-import path from 'path';
-import { assert } from 'chai';
+import path from 'node:path';
+import { createRequire } from "node:module";
+import { fileURLToPath } from 'node:url';
 
-var _ = global;
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 // TODO: move this to its own package; e.g., @keymanapp/models-test-helpers
 // TODO: then mocha invocation is as follows:
@@ -12,20 +13,18 @@ import { KMWString } from '@keymanapp/web-utils';
 // The predictive-text engine always keeps these enabled.
 KMWString.enableSupplementaryPlane(true);
 
-import { createRequire } from "module";
-import { fileURLToPath } from 'url';
-
 /**
  * Load JSON fixtures from a well-known place.
  */
-_.jsonFixture = function (name) {
+export function jsonFixture(name: string): any {
   // The most straight-forward way... is to use CommonJS-style require to load JSON.
   // Fortunately, Node provides the tools needed to recreate it.
   const require = createRequire(import.meta.url);
 
   // ES-module mode also leaves out `__dirname`, so we rebuild that too.
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
+  const __dirname = fileURLToPath(import.meta.url + '../../../../../../../../src/test/auto/resources/');
+
+  // Lands in /web/build/test/headless/engine/predictive-text/templates.
   return require(path.join(__dirname, 'fixtures', `${name}.json`));
 }
 
@@ -35,7 +34,7 @@ _.jsonFixture = function (name) {
  *
  * @returns {Context}
  */
-_.emptyContext = function emptyContext() {
+export function emptyContext(): LexicalModelTypes.Context {
   return {
     left: '',
     startOfBuffer: true,
@@ -48,7 +47,7 @@ _.emptyContext = function emptyContext() {
  *
  * @returns {Transform}
  */
-_.zeroTransform = function zeroTransform() {
+export function zeroTransform(): LexicalModelTypes.Transform {
   return {
     insert: '',
     deleteLeft: 0,
