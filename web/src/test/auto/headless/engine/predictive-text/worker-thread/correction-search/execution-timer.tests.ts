@@ -1,11 +1,12 @@
 import { assert } from 'chai';
-import { useFakeTimers } from 'sinon';
+import { useFakeTimers, type SinonFakeTimers } from 'sinon';
 
-import { ExecutionBucket, ExecutionTimer } from '#./correction/index.js';
+import { correction } from '@keymanapp/lm-worker/test-index';
+import ExecutionBucket = correction.ExecutionBucket;
+import ExecutionTimer = correction.ExecutionTimer;
 
 describe('ExecutionTimer', () => {
-  /** @type {import('sinon').SinonFakeTimers} */
-  let timeControl;
+  let timeControl: SinonFakeTimers;
 
   beforeEach(() => {
     timeControl = useFakeTimers();
@@ -92,7 +93,7 @@ describe('ExecutionTimer', () => {
   it('defer() - alternate setup', async () => {
     const timer = new ExecutionTimer(50, 100);
 
-    const delaySetup = new Promise(async (resolve) => {
+    const delaySetup = new Promise<void>(async (resolve) => {
       // The passed-in function does not delay by default; this will wait for
       // one microtask delay before proceeding.
       //

@@ -1,7 +1,9 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation } from '#./correction/classical-calculation.js';
+import { ClassicalDistanceCalculation } from '@keymanapp/lm-worker/test-index';
 
-function prettyPrintMatrix(matrix) {
+// Very useful for diagnosing unit test issues when path inspection is needed.
+// Not currently used ('cause that's noisy during test runs).
+export function prettyPrintMatrix(matrix: number[][]) {
   for(let r = 0; r < matrix.length; r++) {
     console.log(JSON.stringify(matrix[r], function(key, value) {
       if(value == Number.MAX_VALUE) {
@@ -15,7 +17,7 @@ function prettyPrintMatrix(matrix) {
   }
 }
 
-function compute(input, match, mode, bandSize) {
+function compute(input: string, match: string, mode?: string, bandSize?: number) {
   let buffer = new ClassicalDistanceCalculation();
 
   /* SUPPORTED MODES:

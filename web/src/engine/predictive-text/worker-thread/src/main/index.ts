@@ -72,7 +72,11 @@ export default class LMLayerWorker {
    * handleMessage() can transition to a different state, if
    * necessary.
    */
-  private state: LMLayerWorkerState;
+  private _state: LMLayerWorkerState;
+
+  public get state(): LMLayerWorkerState {
+    return this._state;
+  }
 
   /**
    * By default, it's self.postMessage(), but can be overridden
@@ -100,8 +104,8 @@ export default class LMLayerWorker {
   private _currentModelSource: ModelSourceSpec;
 
   constructor(options: {
-    importScripts: typeof importScripts,
-    postMessage: typeof postMessage
+    importScripts: (...urls: string[]) => void,
+    postMessage: (message: any, extra?: any) => void
   } = {
     importScripts: null,
     postMessage: null
@@ -172,7 +176,7 @@ export default class LMLayerWorker {
     }
 
     // We got a message! Delegate to the current state.
-    this.state.handleMessage(im);
+    this._state.handleMessage(im);
   }
 
   /**
@@ -267,7 +271,7 @@ export default class LMLayerWorker {
    * the config data from the host platform.
    */
   private setupConfigState() {
-    this.state = {
+    this._state = {
       name: 'unconfigured',
       handleMessage: (payload) => {
         // ... that message must have been 'config'!
@@ -291,7 +295,7 @@ export default class LMLayerWorker {
    */
   private transitionToLoadingState() {
     let _this = this;
-    this.state = {
+    this._state = {
       name: 'modelless',
       handleMessage: (payload) => {
         // ...that message must have been 'load'!
@@ -327,7 +331,7 @@ export default class LMLayerWorker {
    */
   private transitionToReadyState(model: LexicalModel): ModelCompositor {
     let compositor = new ModelCompositor(model, this._testMode);
-    this.state = {
+    this._state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {
@@ -403,7 +407,7 @@ export default class LMLayerWorker {
    *
    * @param scope A global scope to install upon.
    */
-  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+  static install(scope: any /*DedicatedWorkerGlobalScope*/): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
     worker.self = scope;

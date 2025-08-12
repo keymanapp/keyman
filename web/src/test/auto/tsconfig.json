@@ -14,5 +14,11 @@
     "integrated/**/*.ts",
     "resources/**/*.ts",
     "predictive-text/**/*.ts"
+  ],
+  "exclude": [
+    "engine/predictive-text/worker-thread/worker-*.tests.ts"
+  ],
+  "references": [
+    { "path": "./tsconfig.worker.json" }
   ]
 }

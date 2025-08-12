@@ -59,10 +59,10 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
 }
 
 export type CorrectionPredictionTuple = {
-  prediction: ProbabilityMass<Suggestion>,
+  prediction: ProbabilityMass<Outcome<Suggestion | Keep>>,
   correction: ProbabilityMass<string>,
   totalProb: number;
-  matchLevel: SuggestionSimilarity;
+  matchLevel?: SuggestionSimilarity;
   preservationTransform?: Transform;
 };
 
@@ -75,7 +75,7 @@ export enum SuggestionSimilarity {
 
 export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
   // Similarity distance
-  const simDist = b.matchLevel - a.matchLevel;
+  const simDist = b.matchLevel ?? 0 - a.matchLevel ?? 0;
   if(simDist != 0) {
     return simDist;
   }

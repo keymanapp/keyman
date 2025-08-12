@@ -1,6 +1,6 @@
-import { AUTOSELECT_PROPORTION_THRESHOLD, SuggestionSimilarity, predictionAutoSelect, tupleDisplayOrderSort } from "#./predict-helpers.js";
 import { assert } from 'chai';
 
+import { AUTOSELECT_PROPORTION_THRESHOLD, CorrectionPredictionTuple, predictionAutoSelect, SuggestionSimilarity, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
 /*
   * Preconditions:
   * - there should always be a 'keep' option.  Now, whether or not that option
@@ -9,10 +9,7 @@ import { assert } from 'chai';
   */
 describe('predictionAutoSelect', () => {
   it(`does not throw when no suggestions are available`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [];
+    const predictions: CorrectionPredictionTuple[] = [];
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
 
@@ -20,10 +17,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects solitary 'keep' suggestion that does match the model`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       {
         correction: {
           sample: 'apple', // can be null / "mocked out"
@@ -36,7 +30,8 @@ describe('predictionAutoSelect', () => {
               insert: 'e',
               deleteLeft: 0
             },
-            matchesModel: true
+            matchesModel: true,
+            displayAs: 'apple'
           },
           p: 1
         },
@@ -53,10 +48,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select solitary 'keep' suggestion that doesn't match the model`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       {
         correction: {
           sample: 'appl', // can be null / "mocked out"
@@ -69,7 +61,8 @@ describe('predictionAutoSelect', () => {
               insert: 'l',
               deleteLeft: 0
             },
-            matchesModel: false
+            matchesModel: false,
+            displayAs: ''
           },
           p: 1
         },
@@ -86,10 +79,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects 'keep' suggestion that does match the model over any alternatives`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -101,14 +91,15 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
-          matchesModel: true
+          matchesModel: true,
+          displayAs: ''
         },
         p: .05
       },
       totalProb: .04
     }
 
-    const highestNonKeepSuggestion = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -119,16 +110,14 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .55
       },
       totalProb: .44
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -142,6 +131,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: .4
         },
@@ -158,6 +148,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: 1
         },
@@ -176,10 +167,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects solitary non-'keep' suggestion when 'keep' does not match model`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -191,6 +179,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
+          displayAs: '',
           matchesModel: false
         },
         p: .05
@@ -202,7 +191,7 @@ describe('predictionAutoSelect', () => {
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const onlyNonKeepSuggestion = {
+    const onlyNonKeepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -213,16 +202,14 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .01
       },
       totalProb: .008
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       onlyNonKeepSuggestion
     ];
@@ -241,10 +228,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select non-'keep' without sufficient winning probability`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -256,6 +240,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
+          displayAs: '',
           matchesModel: false
         },
         p: .05
@@ -267,7 +252,7 @@ describe('predictionAutoSelect', () => {
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const highestNonKeepSuggestion = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -278,16 +263,14 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .55
       },
       totalProb: .44
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -301,6 +284,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: .4
         },
@@ -317,6 +301,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: 1
         },
@@ -338,10 +323,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does select non-'keep' with sufficient winning probability`, () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .8
@@ -353,6 +335,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
+          displayAs: '',
           matchesModel: false
         },
         p: .05
@@ -360,7 +343,7 @@ describe('predictionAutoSelect', () => {
       totalProb: .04
     }
 
-    const highestNonKeepSuggestion = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin', // can be null / "mocked out"
         p: .9
@@ -371,16 +354,14 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .75
       },
       totalProb: .675
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -394,6 +375,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: .2
         },
@@ -410,6 +392,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: 1
         },
@@ -420,10 +403,13 @@ describe('predictionAutoSelect', () => {
     const totalProb = predictions.reduce((accum, current) => accum + current.totalProb, 0);
     assert.isAbove(highestNonKeepSuggestion.totalProb, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
+
+    // Sort after - we need the 'keep' to remain in the first position.
+    predictions.sort(tupleDisplayOrderSort);
+    originalPredictions.sort(tupleDisplayOrderSort);
+
     assert.sameDeepOrderedMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
@@ -431,10 +417,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it('ignores non key-matched suggestions when key-matched suggestions exist', () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'cant', // can be null / "mocked out"
         p: 1
@@ -446,6 +429,7 @@ describe('predictionAutoSelect', () => {
             insert: 't',
             deleteLeft: 0
           },
+          displayAs: '',
           matchesModel: false
         },
         p: 1
@@ -454,7 +438,7 @@ describe('predictionAutoSelect', () => {
       matchLevel: SuggestionSimilarity.exact
     }
 
-    const expectedSuggestion = {
+    const expectedSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'cant', // can be null / "mocked out"
         p: 1
@@ -465,6 +449,7 @@ describe('predictionAutoSelect', () => {
             insert: '\'t',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .2
       },
@@ -472,10 +457,7 @@ describe('predictionAutoSelect', () => {
       matchLevel: SuggestionSimilarity.sameKey
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       expectedSuggestion,
       {
@@ -489,6 +471,7 @@ describe('predictionAutoSelect', () => {
               insert: 'teen',
               deleteLeft: 0
             },
+            displayAs: ''
           },
           p: .8
         },
@@ -497,10 +480,11 @@ describe('predictionAutoSelect', () => {
       }
     ];
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
+
+    predictions.sort(tupleDisplayOrderSort);
+    originalPredictions.sort(tupleDisplayOrderSort);
     assert.sameDeepOrderedMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
@@ -510,10 +494,7 @@ describe('predictionAutoSelect', () => {
   // The idea:  avoid "over-correcting" when a potential correction has a
   // super-high-frequency word.
   it('does not auto-select suggestion if its root correction is not most likely', () => {
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
-     */
-    const keepSuggestion = {
+    const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thi', // can be null / "mocked out"
         p: .7
@@ -525,6 +506,7 @@ describe('predictionAutoSelect', () => {
             insert: 'i',
             deleteLeft: 0
           },
+          displayAs: '',
           matchesModel: false
         },
         p: .05
@@ -532,7 +514,7 @@ describe('predictionAutoSelect', () => {
       totalProb: .035
     }
 
-    const highestCorrectionSuggestion = {
+    const highestCorrectionSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thi', // can be null / "mocked out"
         p: .7
@@ -543,13 +525,14 @@ describe('predictionAutoSelect', () => {
             insert: 'in',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: .1
       },
       totalProb: .07
     };
 
-    const highestNonKeepSuggestion = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'the', // can be null / "mocked out"
         p: .3
@@ -560,16 +543,14 @@ describe('predictionAutoSelect', () => {
             insert: 'e',
             deleteLeft: 0
           },
+          displayAs: ''
         },
         p: 1
       },
       totalProb: .3
     };
 
-    /**
-     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
-     */
-    const predictions = [
+    const predictions: CorrectionPredictionTuple[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       highestCorrectionSuggestion
@@ -578,10 +559,12 @@ describe('predictionAutoSelect', () => {
     const totalProb = predictions.reduce((accum, current) => accum + current.totalProb, 0);
     assert.isAbove(highestNonKeepSuggestion.totalProb, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
+
+    predictions.sort(tupleDisplayOrderSort);
+    originalPredictions.sort(tupleDisplayOrderSort);
+
     assert.sameDeepOrderedMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);

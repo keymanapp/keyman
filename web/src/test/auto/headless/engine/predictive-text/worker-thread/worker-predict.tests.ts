@@ -1,33 +1,43 @@
-import { assert } from 'chai';
+
+import { createRequire } from 'node:module';
 import sinon from 'sinon';
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-import LMLayerWorker from '#./index.js';
-
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
          importScriptsWith, randomToken, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { timedPromise } from '@keymanapp/web-utils';
+
+import { LMLayerWorker } from '@keymanapp/lm-worker/test-index';
+import { OutgoingMessage } from '@keymanapp/lm-message-types';
+
+import Suggestion = LexicalModelTypes.Suggestion;
+
+const require = createRequire(import.meta.url);
+
+interface MockedContext {
+  onmessage?: () => void;
+  importScripts?: () => void;
+  postMessage: (e: any) => void;
+}
 
 describe('LMLayerWorker', function () {
   describe('#predict()', function () {
     it('should send back suggestions', async function () {
       // Initialize the worker with a model that will produce one suggestion.
       var fakePostMessage = sinon.fake();
-      var filteredFakePostMessage = function(event) {
+      var filteredFakePostMessage = function(event: OutgoingMessage) {
         if(event.message == 'suggestions') {
           let suggestions = event.suggestions;
 
           // Strip any IDs set by the model compositor.
-          suggestions.forEach(function(suggestion) {
+          suggestions.forEach(function(suggestion: Suggestion) {
             delete suggestion.id;
           });
         }
 
         fakePostMessage(event);
       }
-      var context = {
+      var context: MockedContext = {
         postMessage: filteredFakePostMessage
       };
       context.importScripts = importScriptsWith(context);

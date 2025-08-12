@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import TransformUtils from '#./transformUtils.js';
+import { TransformUtils } from '@keymanapp/lm-worker/test-index';
 
 describe('TransformUtils', function () {
   describe('isWhitespace', function () {

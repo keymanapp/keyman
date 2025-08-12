@@ -1,18 +1,23 @@
 import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
+import { Token, Tokenization, tokenize } from '@keymanapp/models-templates';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { tokenize } from '@keymanapp/models-templates';
-import { tokenizeTransform } from '#./correction/transform-tokenization.js';
+import { tokenizeTransform } from '@keymanapp/lm-worker/test-index';
 
-const defaultTokenize = (context) => tokenize(defaultBreaker, context);
+import Context = LexicalModelTypes.Context;
+
+const defaultTokenize = (context: Context) => tokenize(defaultBreaker, context);
 
 describe('tokenizeTransform', () => {
   describe('with default wordbreaking', () => {
     it('properly handles simple token-edit transform', () => {
-      const context = {
+      const context: Context = {
         left: 'an apple a date',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -33,7 +38,9 @@ describe('tokenizeTransform', () => {
     it('properly handles simple token-replacing transform', () => {
       const context = {
         left: 'an apple a date',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -54,7 +61,9 @@ describe('tokenizeTransform', () => {
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
       const context = {
         left: 'an apple a date',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       // 'an apple any'
@@ -76,7 +85,9 @@ describe('tokenizeTransform', () => {
     it('properly handles a simple appended whitespace', () => {
       const context = {
         left: 'an apple a day',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -103,7 +114,9 @@ describe('tokenizeTransform', () => {
     it('properly handles a simple appended period', () => {
       const context = {
         left: 'an apple a day',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -128,7 +141,9 @@ describe('tokenizeTransform', () => {
     it('handles word-breakable transforms (case 1)', () => {
       const context = {
         left: 'an apple a dat',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -153,7 +168,9 @@ describe('tokenizeTransform', () => {
     it('handles word-breakable transforms (case 2)', () => {
       const context = {
         left: 'an apple a dat',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -179,7 +196,9 @@ describe('tokenizeTransform', () => {
     it('handles complex breakable cases', () => {
       const context = {
         left: 'an apple a date',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       // 'an apple any'
@@ -204,18 +223,20 @@ describe('tokenizeTransform', () => {
   });
 
   describe('with mocked dictionary-based wordbreaking', () => {
-    function mockedTokenization(entries) {
+    function mockedTokenization(entries: string[]) {
       return {
         left: entries.map((text) => {
-          return {text: text}
+          return {text: text} as Token
         })
-      };
+      } as Tokenization;
     }
 
     it('properly handles simple token-edit transform', () => {
       const context = {
         left: 'anappleadate',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -236,7 +257,9 @@ describe('tokenizeTransform', () => {
     it('properly handles simple token-replacing transform', () => {
       const context = {
         left: 'anappleadate',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -257,7 +280,9 @@ describe('tokenizeTransform', () => {
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
       const context = {
         left: 'anappleadate',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       // 'an apple any'
@@ -279,7 +304,9 @@ describe('tokenizeTransform', () => {
     it('handles word-breakable transforms (case 1)', () => {
       const context = {
         left: 'anappleadat',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -303,7 +330,9 @@ describe('tokenizeTransform', () => {
     it('handles word-breakable transforms (case 2)', () => {
       const context = {
         left: 'anappleadat',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -327,7 +356,9 @@ describe('tokenizeTransform', () => {
     it('handles word-breakable transforms (case 2 alternate output)', () => {
       const context = {
         left: 'anappleadat',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       const editTransform = {
@@ -352,7 +383,9 @@ describe('tokenizeTransform', () => {
     it('handles complex breakable cases', () => {
       const context = {
         left: 'anappleadate',
-        right: ''
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
       };
 
       // 'an apple any'

@@ -1,9 +1,13 @@
-import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
 import { assert } from 'chai';
 
-import { dedupeSuggestions } from "#./predict-helpers.js";
-import { DummyModel } from "#./models/dummy-model.js";
+import * as wordBreakers from '@keymanapp/models-wordbreakers';
+import { deepCopy } from '@keymanapp/web-utils';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { CorrectionPredictionTuple, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+
+import Context = LexicalModelTypes.Context;
+import DummyModel = models.DummyModel;
 
 /*
  * This file's tests use these parts of a lexical model:
@@ -20,8 +24,7 @@ const testModel = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const its = {
+  const its: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -40,8 +43,7 @@ const build_its_is_set = () => {
     // matchLevel does not yet exist.
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const it_is = {
+  const it_is: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -59,8 +61,7 @@ const build_its_is_set = () => {
     totalProb: 0.64
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is = {
+  const is: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -78,8 +79,7 @@ const build_its_is_set = () => {
     totalProb: 0.1
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is_not = {
+  const is_not: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -107,8 +107,7 @@ const build_its_is_set = () => {
 
 describe('dedupeSuggestions', () => {
   it('preserves all entries when there are no duplicates', () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
@@ -125,8 +124,7 @@ describe('dedupeSuggestions', () => {
   });
 
   it('removes duplicates, combining their total-probabilities', () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,

@@ -10,15 +10,17 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
+import Keep = LexicalModelTypes.Keep;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import Outcome = LexicalModelTypes.Outcome;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
-  private contextTracker?: correction.ContextTracker;
+  public contextTracker?: correction.ContextTracker;
 
   static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
@@ -66,7 +68,7 @@ export class ModelCompositor {
     this.testMode = !!testMode;
   }
 
-  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
     const lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
@@ -193,7 +195,7 @@ export class ModelCompositor {
   }
 
   // Responsible for applying casing rules to suggestions.
-  private applySuggestionCasing(suggestion: Suggestion, baseWord: string, casingForm: CasingForm) {
+  applySuggestionCasing(suggestion: Suggestion, baseWord: string, casingForm: CasingForm) {
     // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
     let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
 
