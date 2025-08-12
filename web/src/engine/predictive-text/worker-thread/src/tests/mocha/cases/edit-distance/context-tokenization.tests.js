@@ -1,13 +1,21 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * This file contains low-level tests designed to validate the behavior of the
+ * of the ContextTokenization class and its integration with the lower-level
+ * classes that it utilizes.
+ */
+
 import { assert } from 'chai';
 
-import { ContextToken } from '#./correction/context-token.js';
-import { ContextTokenization } from '#./correction/context-tokenization.js';
-
-import * as models from '#./models/index.js';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-var TrieModel = models.TrieModel;
+import { ContextToken } from '#./correction/context-token.js';
+import { ContextTokenization } from '#./correction/context-tokenization.js';
+import { TrieModel } from '#./models/index.js';
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
