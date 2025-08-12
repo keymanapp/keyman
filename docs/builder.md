@@ -1,4 +1,7 @@
-# Using the builder-basic.inc.sh builder functions
+# Using the builder.inc.sh builder functions
+
+Note: see [resources/build/README.md](../resources/build/README.md) for
+distinction on builder-basic.inc.sh and builder-full.inc.sh.
 
 The Keyman repository is standardising on bash scripts for builds. These may
 call project-specific builders, such as `tsc` for Typescript projects, `meson`
