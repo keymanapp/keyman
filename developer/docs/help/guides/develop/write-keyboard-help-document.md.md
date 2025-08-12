@@ -56,7 +56,7 @@ Please feel free to adjust the `data-states` according to the keyboard layers; [
 
 ### Keep in mind
 
-* Some readers are visual learner, and they might be pleased to find a documentation that has more to the eyes than plain texts, check [Khmer (SIL) Keyboard Help](https://help.keyman.com/keyboard/sil_khmer/) for minimal design of keys (`<kbd>`) and one of the many methods to showcase key combinations.
+* Some readers are visual learners, and they might be pleased to find a documentation that has more to the eyes than plain text. Check [Khmer (SIL) Keyboard Help](https://help.keyman.com/keyboard/sil_khmer/) for minimal design of keys (`<kbd>`) and one of the many methods to showcase key combinations.
 
 * Please avoid using this:
 
