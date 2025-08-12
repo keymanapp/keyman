@@ -33,7 +33,7 @@ function do_build() {
   build_manifest.res
   vs_msbuild mcompile.vcxproj //t:Build "//p:Platform=Win32"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/mcompile.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/mcompile.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish() {

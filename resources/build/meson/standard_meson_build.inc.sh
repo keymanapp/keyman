@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+# shellcheck disable=SC2154
 #
 # Keyman is copyright (C) SIL Global. MIT License.
 #
@@ -29,7 +31,7 @@
 #
 
 standard_meson_build() {
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
-  echo "$KEYMAN_VERSION_WITH_TAG" > "$THIS_SCRIPT_PATH/resources/KEYMAN_VERSION_WITH_TAG.md"
+  mkdir -p "${THIS_SCRIPT_PATH}/resources"
+  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
+  echo "${KEYMAN_VERSION_WITH_TAG}" > "${THIS_SCRIPT_PATH}/resources/KEYMAN_VERSION_WITH_TAG.md"
 }
