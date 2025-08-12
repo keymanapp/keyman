@@ -207,6 +207,12 @@ export interface RevertMessage {
    * corresponding Suggestion.
    */
   context: Context;
+
+  /**
+   * Indicates if only the appended transform should be reverted, and not the base component
+   * of the previously-applied suggestion.
+   */
+  appendedOnly?: boolean;
 }
 
 export interface ResetContextMessage {
