@@ -2,8 +2,7 @@ import 'mocha';
 import {expect} from 'chai';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
-import { CompilerErrorNamespace, CompilerEvent } from '@keymanapp/developer-utils';
-import { withOffset } from './helpers/index.js';
+import { CompilerErrorNamespace, CompilerEvent, withOffset } from '@keymanapp/developer-utils';
 
 describe('LdmlCompilerMessages', function () {
   it('should have a valid LdmlCompilerMessages object', function() {

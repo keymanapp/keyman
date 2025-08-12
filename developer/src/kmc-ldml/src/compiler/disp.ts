@@ -62,7 +62,7 @@ export class DispCompiler extends SectionCompiler {
     const result = new Disp();
 
     // displayOptions
-    result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, { unescape: true, x: this.keyboard3?.displays?.displayOptions });
+    result.baseCharacter = sections.strs.allocString(this.keyboard3.displays?.displayOptions?.baseCharacter, { unescape: true, compileContext:this.keyboard3?.displays?.displayOptions });
 
     // displays
     result.disps = this.keyboard3.displays?.display.map(display => ({
@@ -70,13 +70,13 @@ export class DispCompiler extends SectionCompiler {
         stringVariables: true,
         markers: true,
         unescape: true,
-        x: display,
+        compileContext: display,
       }, sections),
-      id: sections.strs.allocString(display.keyId, { x: display }), // not escaped, not substituted
+      id: sections.strs.allocString(display.keyId, { compileContext: display }), // not escaped, not substituted
       display: sections.strs.allocString(display.display, {
         stringVariables: true,
         unescape: true,
-        x: display,
+        compileContext: display,
       }, sections),
     })) || []; // TODO-LDML: need coverage for the []
 

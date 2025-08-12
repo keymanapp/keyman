@@ -141,7 +141,7 @@ export class StrsItem {
   /** add any context from the options to this strsitem */
   setContext(opts?: StrsOptions) {
     // At present, there's only a single piece of context available
-    this._context = this._context || opts?.x;
+    this._context = this._context || opts?.compileContext;
   }
 
   get context() : any {
@@ -174,7 +174,7 @@ export interface StrsOptions {
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
   /** optional context */
-  x?: any;
+  compileContext?: any;
 };
 
 export class Strs extends Section {
@@ -374,13 +374,13 @@ export class Vars extends Section {
 export class VarsItem extends Section {
   id: StrsItem;
   value: StrsItem;
-  x?: any;
+  compileContext?: any;
 
-  constructor(id: string, value: string, sections: DependencySections, x?: any) {
+  constructor(id: string, value: string, sections: DependencySections, compileContext?: any) {
     super();
     this.id = sections.strs.allocString(id);
-    this.value = sections.strs.allocString(value, {unescape: true});
-    this.x = x;
+    this.value = sections.strs.allocString(value, { unescape: true });
+    this.compileContext = compileContext;
   }
 
   valid() : boolean {
@@ -389,11 +389,11 @@ export class VarsItem extends Section {
 };
 
 export class UnicodeSetItem extends VarsItem {
-  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser, x?: any) {
-    super(id, value, sections, x);
+  constructor(id: string, value: string, sections: DependencySections, usetparser: UnicodeSetParser, compileContext?: any) {
+    super(id, value, sections, compileContext);
     const needRanges = sections.usetparser.sizeUnicodeSet(value);
     if (needRanges >= 0) {
-      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges);
+      this.unicodeSet = sections.usetparser.parseUnicodeSet(value, needRanges, compileContext);
     } // otherwise: error (was recorded via callback)
   }
   unicodeSet?: UnicodeSet;
@@ -403,9 +403,9 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections, x?: any) {
-    super(id, value.join(' '), sections, x);
-    this.items = sections.elem.allocElementString(sections, {x}, value);
+  constructor(id: string, value: string[], sections: DependencySections, compileContext?: any) {
+    super(id, value.join(' '), sections, compileContext);
+    this.items = sections.elem.allocElementString(sections, { compileContext }, value);
   }
   items: ElementString;  // element string array
   valid() : boolean {
@@ -414,8 +414,8 @@ export class SetVarItem extends VarsItem {
 };
 
 export class StringVarItem extends VarsItem {
-  constructor(id: string, value: string, sections: DependencySections, x?: any) {
-    super(id, value, sections, x);
+  constructor(id: string, value: string, sections: DependencySections, compileContext?: any) {
+    super(id, value, sections, compileContext);
   }
   // no added fields
 };
@@ -453,7 +453,7 @@ export class Tran extends Section {
 };
 
 export class UsetItem {
-  constructor(public uset: UnicodeSet, public str: StrsItem, public x?: any) {
+  constructor(public uset: UnicodeSet, public str: StrsItem, public compileContext?: any) {
   }
   compareTo(other: UsetItem) : number {
     return this.str.compareTo(other.str);
@@ -462,11 +462,11 @@ export class UsetItem {
 
 export class Uset extends Section {
   usets: UsetItem[] = [];
-  allocUset(set: UnicodeSet, sections: DependencySections, x?: any) : UsetItem {
+  allocUset(set: UnicodeSet, sections: DependencySections, compileContext?: any) : UsetItem {
     // match the same pattern
     let result = this.usets.find(s => set.pattern == s.uset.pattern);
     if (result === undefined) {
-      result = new UsetItem(set, sections.strs.allocString(set.pattern), x);
+      result = new UsetItem(set, sections.strs.allocString(set.pattern), compileContext);
       this.usets.push(result);
     }
     return result;
