@@ -35,15 +35,9 @@ export class ContextTokenization {
    * tokens represented by this tokenization instance.
    */
   get exampleInput(): string[] {
-    const sequence: string[] = [];
-
-    for(const token of this.tokens) {
+    return this.tokens
       // Hide any tokens representing wordbreaks.  (Thinking ahead to phrase-level possibilities)
-      if(token.exampleInput !== null) {
-        sequence.push(token.exampleInput);
-      }
-    }
-
-    return sequence;
+      .filter(token => token.exampleInput !== null)
+      .map(token => token.exampleInput);
   }
 }
