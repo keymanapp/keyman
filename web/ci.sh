@@ -13,6 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/pull-requests.inc.sh"
 
 # This script runs from its own folder
@@ -154,32 +155,12 @@ function prepare_downloads_keyman_com_action() {
 
   mkdir -p "${UPLOAD_PATH}"
 
-  # On Windows, we use 7-zip (SEVEN_Z_HOME env var).  On other platforms, we use zip.
-
-  COMPRESS_CMD=
-  COMPRESS_ADD=
-
-  # Marc's preference; use $SEVEN_Z_HOME and have the BAs set up with THAT as an env var.
-  if [[ ! -z "${SEVEN_Z_HOME+x}" ]]; then
-    COMPRESS_CMD="${SEVEN_Z_HOME}/7z"
-    COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
-  fi
-
-  if [[ -z "${COMPRESS_CMD}" ]] ; then
-    if command -v zip &> /dev/null; then
-      # Note:  does not support within-archive renames!
-      COMPRESS_CMD=zip
-      COMPRESS_ADD="-r"
-    else
-      builder_die "7z and zip commands are both unavailable"
-    fi
-  fi
-
-  pushd build/publish
-  # Zip both the 'debug' and 'release' configurations together.
-  # shellcheck disable=SC2086
-  "${COMPRESS_CMD}" ${COMPRESS_ADD} "${ZIP}" ./*
-  popd
+  (
+    # shellcheck disable=2164
+    cd build/publish
+    # Zip both the 'debug' and 'release' configurations together.
+    add_zip_files -q -r "${ZIP}" ./*
+  )
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
 
@@ -189,9 +170,10 @@ function prepare_downloads_keyman_com_action() {
   mkdir -p "${STATIC}"
 
   mkdir -p "${STATIC}/build"
-  cp -rf build/app    "${STATIC}/build/app"
-  cp -rf build/engine "${STATIC}/build/engine"
-  cp -rf build/tools  "${STATIC}/build/tools"
+  cp -rf build/app     "${STATIC}/build/app"
+  cp -rf build/engine  "${STATIC}/build/engine"
+  cp -rf build/publish "${STATIC}/build/publish"
+  cp -rf build/tools   "${STATIC}/build/tools"
   # avoid build/upload, since that's the folder we're building!
 
   cp -f index.html "${STATIC}/index.html"

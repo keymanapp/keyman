@@ -123,6 +123,13 @@ package.json (`npm run <script>`).
   passed in, or `release` otherwise, which corresponds to the output folder
   names for many projects.
 
+* `BUILDER_OS` will be set to `linux`, `mac`, or `win`, depending on the platform
+  the builder script is currently running on.
+
+  **NOTE:** Only use `BUILDER_OS` in a `case` statement. Use one of the
+  `builder_is_macos`, `builder_is_windows`, or `builder_is_linux` functions
+  to check if the script is running on a particular platform.
+
 Other environment variables and paths will probably be added over time.
 
 ## Split
@@ -181,6 +188,8 @@ a user or called by another script:
 
   An option will be inherited by child scripts if you append a `+` to the option
   name.
+
+  Other standard options are listed in [standard builder options].
 
 * **module dependencies**: these are other builder scripts which must be
   configured and built before the actions in this script can continue. Only
@@ -320,20 +329,33 @@ across targets. Use this judiciously; for example, Keyman Core uses this to
 build both x86_64 and arm64 targets, and test only the appropriate architecture
 on macOS.
 
-# Standard builder parameters
+# Standard builder options
 
-The following parameters are pre-defined and should not be overridden:
+The following options are pre-defined and should not be overridden:
 
 * `--help`, `-h`: displays help on using this script
 * `--color`: forces on ANSI color output for the script
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
-* `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
+* `--debug`, `-d`: debug build (default for local builds); see
+  [`builder_is_debug_build`] for more detail
+* `--release`: release build, inverse of `--debug`, to force a non-debug build
 * `--offline`: allow to build while offline. This might fail if not all
   dependencies are cached.
 * `--deps`: Build dependencies if required (default)
 * `--no-deps`: Skip build of dependencies
 * `--force-deps`: Reconfigure and rebuild all dependencies
+* `--builder-ignore-unknown-options`: Ignore any subsequent unrecognized `-` or
+  `--` prefixed options in the parameter list. This is intended for use in
+  transitional situations where scripts may need to temporarily support passing
+  additional parameters; see also: #14200 for more background,
+  [`builder_ignore_unknown_options`], and [`$builder_ignored_options`].
+
+## Internal builder options
+
+The following options are used internally in builder and should never be included
+as parameters otherwise: `--builder-dep-parent`, `--builder-child`,
+`--builder-report-dependencies`, `--builder-completion-describe`
 
 --------------------------------------------------------------------------------
 
@@ -482,7 +504,7 @@ There is one standard option: `--debug`. You should not include `--debug` in the
 `builder_describe` call, as it is always available. See
 [`builder_is_debug_build`] for more details.
 
-Note that you should not include any of the [standard builder parameters] here.
+Note that you should not include any of the [standard builder options] here.
 
 **Dependencies** are defined with a `@` prefix, for example:
 
@@ -842,6 +864,47 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_ignore_unknown_options` function
+
+Returns `true` (aka 0) if the `--builder-ignore-unknown-options` standard option
+was passed in.
+
+### Usage
+
+```bash
+if builder_ignore_unknown_options; then
+  builder_echo "These options were ignored: ${builder_ignored_options[@]}"
+fi
+```
+
+### Description
+
+This function should probably never be used in a builder script; it is included
+for completeness and testing. See discussion in [standard builder options].
+
+--------------------------------------------------------------------------------
+
+## `$builder_ignored_options` variable
+
+Lists all the unrecognized options passed in; only used if the
+`--builder-ignore-unknown-options` option was set (because if not set, the
+script would have aborted in `builder_parse` with an unknown option error).
+
+### Usage
+
+```bash
+if builder_ignore_unknown_options; then
+  builder_echo "These options were ignored: ${builder_ignored_options[@]}"
+fi
+```
+
+### Description
+
+This variable should probably never be used in a builder script; it is included
+for completeness and testing. See discussion in [standard builder options].
+
+--------------------------------------------------------------------------------
+
 ## `builder_is_debug_build` function
 
 Returns `true` (aka 0) if the `--debug` standard option was passed in. This
@@ -1185,6 +1248,20 @@ builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
 
 --------------------------------------------------------------------------------
 
+## `builder_is_windows`, `builder_is_macos`, and `builder_is_linux` functions
+
+Returns 0 (true) if building on the particular platform.
+
+### Usage
+
+```bash
+if builder_is_windows; then
+  builder_echo "We're building on a Windows machine"
+fi
+```
+
+--------------------------------------------------------------------------------
+
 ## Formatting variables
 
 These helper variables define ANSI color escapes when running in color mode, and
@@ -1208,7 +1285,7 @@ Note: it is often cleaner to use [`builder_echo`] than to use these variables di
 Note: it is recommended that you use `$(builder_term text)` instead of
 `${BUILDER_TERM_START}text${BUILDER_TERM_END}`.
 
-[standard builder parameters]: #standard-builder-parameters
+[standard builder options]: #standard-builder-options
 [`builder_describe`]: #builder_describe-function
 [`builder_describe_internal_dependency`]: #builder_describe_internal_dependency-function
 [`builder_describe_outputs`]: #builder_describe_outputs-function
@@ -1218,6 +1295,9 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`builder_finish_action`]: #builder_finish_action-function
 [`builder_has_action`]: #builder_has_action-function
 [`builder_has_option`]: #builder_has_option-function
+[`$builder_ignored_options`]: #builder_ignored_options-variable
+[`builder_ignore_unknown_options`]: #builder_ignore_unknown_options-function
+[`builder_is_debug_build`]: #builder_is_debug_build-function
 [`builder_parse`]: #builder_parse-function
 [`builder_start_action`]: #builder_start_action-function
 [`builder_use_color`]: #builder_use_color-function
@@ -1228,4 +1308,3 @@ Note: it is recommended that you use `$(builder_term text)` instead of
 [`builder_echo`]: #builder_echo-function
 [`builder_die`]: #builder_die-function
 [`builder_echo_debug`]: #builder_echo_debug-function
-[`builder_is_debug_build`]: #builder_is_debug_build-function
