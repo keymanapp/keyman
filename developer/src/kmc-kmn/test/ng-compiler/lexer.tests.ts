@@ -1177,6 +1177,27 @@ describe("Lexer Tests", () => {
         'use',
       ].forEach((text) => { handleInvalidCommand(text); });
     });
+    it("can handle a command with a missing bracket", () => {
+      [
+        'baselayout',
+        'layer',
+        'platform',
+        'any',
+        'call',
+        'deadkey',
+        'dk',
+        'group',
+        'if',
+        'index',
+        'notany',
+        'outs',
+        'reset',
+        'save',
+        'set',
+        'store',
+        'use',
+      ].forEach((text) => { handleCommandWithMissingLeftBracket(text); });
+    });
   });
   describe("Token", () => {
     describe("Token.constructor()", () => {
@@ -1429,4 +1450,17 @@ function handleInvalidCommand(text: string, {addEOF=false, emitAll=true, handleC
       {addEOF, emitAll, handleContinuation}
     );
   });
+}
+
+function handleCommandWithMissingLeftBracket(text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+  const line = `${text} \n`;
+  recogniseTokens(
+    line,
+    [
+      new Token(TokenTypes.PARAMETER, text),
+      new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
+      new Token(TokenTypes.NEWLINE, '\n', 1, 2+text.length, line),
+    ],
+   {addEOF, emitAll, handleContinuation}
+  );
 }
