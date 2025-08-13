@@ -1,0 +1,32 @@
+<!--
+ * Keyman is 2025 copyright (C) SIL International. MIT License.
+ *
+ * Created by S. Schmitt on 2025-07-14
+ *
+ * This DTD describes a technical preview of Keylayout Data
+ -->
+
+<!ELEMENT keyboard (layouts, keyMapSet) >
+<!ELEMENT keyboard (modifierMap)* >
+<!ATTLIST keyboard (group, id, name, maxout) #REQUIRED >
+
+<!ELEMENT layouts ( layout)* >
+<!ATTLIST layout (first, last, mapSet, modifiers) #REQUIRED >
+
+<!ELEMENT modifierMap (keyMapSelect)*>
+<!ATTLIST modifierMap (id, defaultIndex) #REQUIRED >
+
+<!ELEMENT keyMapSelect (modifier)*>
+<!ATTLIST keyMapSelect (mapIndex) #REQUIRED >
+
+<!ATTLIST modifier (keys) #REQUIRED >
+
+<!ELEMENT keyMapSet ( keyMap)* >
+<!ATTLIST keyMapSet (id) #REQUIRED >
+
+<!ELEMENT keyMap (key)* >
+<!ATTLIST keyMap (index) #REQUIRED >
+
+<!ATTLIST key (code) #REQUIRED >
+<!ATTLIST key (action #REQUIRED output #IMPLIED | output #REQUIRED action #IMPLIED)>
+

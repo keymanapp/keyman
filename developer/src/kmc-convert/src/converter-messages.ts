@@ -19,7 +19,8 @@ export class ConverterMessages {
   static ERROR_OutputFilenameIsRequired = SevError | 0x0001;
   static Error_OutputFilenameIsRequired = () => m(
     this.ERROR_OutputFilenameIsRequired,
-    `An output filename is required for keyboard conversion.`);
+    `An output filename is required for keyboard conversion.`
+  );
 
   static ERROR_NoConverterFound = SevError | 0x0002;
   static Error_NoConverterFound = (o: { inputFilename: string, outputFilename: string; }) => m(
@@ -56,5 +57,4 @@ export class ConverterMessages {
     this.ERROR_UnsupportedCharactersDetected,
     `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key ( ${def(o.key)}) at keyMap index ${def(o.keymap_index)}`,
   );
-
 }

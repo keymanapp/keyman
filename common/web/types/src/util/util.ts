@@ -9,6 +9,7 @@ export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
  * @param x Name of element to box
  */
 export function boxXmlArray(o: any, x: string): void {
+
   if (typeof o == 'object' && !Array.isArray(o[x])) {
     if (o[x] === null || o[x] === undefined) {
       o[x] = [];
@@ -248,7 +249,7 @@ export function decodeUniHexValue(Uni_Val: string): any {
 /**
  * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
  * @param  in_str the value that will converted
- * @return a unicode character or undefined if in_str is not recognized
+ * @return a unicode character like 'c', 'ሴ', '😎' or undefined if in_str is not recognized
  */
 export function convertToUnicodeCharacter(in_str: string): string {
 
@@ -272,14 +273,18 @@ export function convertToUnicodeCharacter(in_str: string): string {
     return decodeUniHexValue(in_str);
   }
 
-  else if ( [...new Intl.Segmenter().segment(in_str)].length <= 1) {
+  else if ([...new Intl.Segmenter().segment(in_str)].length <= 1) {
     return in_str;
   }
   else {
     return undefined;
   }
 }
-
+/**
+ * @brief  function to convert a numeric character reference to a unicode Code Point e.g. &#4660 -> U+1234;  &#x10F601 -> U+1F60E
+ * @param  instr the value that will converted
+ * @return returns a unicode Code Point like U+0063, U+1234, U+1F60E; returns the input character if a non-numeric reference is used or returns 'undefined' if instr is not recognized
+ */
 export function convertToUnicodeCodePoint(instr: string): string {
 
   if ((instr === null) || (instr === undefined)) {

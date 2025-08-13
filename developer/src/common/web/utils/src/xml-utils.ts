@@ -66,12 +66,14 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     preserveOrder: true,     // Gives us a 'special' format
   },
   'keylayout': {
-    attributeNamePrefix: '', // avoid @_
+    attributeNamePrefix: '@_', // avoid @_
     htmlEntities: true,
-    ignoreAttributes: false, // We do not like attributes
-    ignorePiTags: true,
-    preserveOrder: true,     // Gives us a 'special' format
-    ignoreDeclaration: true,
+    ignoreAttributes: false, // We'd like attributes, please
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+      // since trimValues: false, we need to zap any element values that would be trimmed.
+      return tagValue?.trim();
+    },
+    trimValues: false, // preserve spaces, but see tagValueProcessor
   },
   'kps': {
     ...PARSER_COMMON_OPTIONS,
@@ -234,6 +236,43 @@ export class KeymanXMLReader {
     }
   }
 
+
+  /**
+   * Requires attribute prefix @_ (double underscore)
+   * For attributes, just remove @_ and continue.
+   * For objects, replace any empty string "" with an empty object {} */
+  private static fixupEmptyStringToEmptyObject_keylayout(data: any) : any {
+
+    if (typeof data === 'object') {
+      // For arrays of objects, we map "" to {}
+      // "" means an empty object
+      if (Array.isArray(data)) {
+        return data.map(v => {
+          if (v === '') {
+            return {};
+          } else {
+            return KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v);
+          }
+        });
+      }
+      // otherwise: remove @_ for attributes, remap objects
+      const e: any = [];
+      Object.entries(data).forEach(([k, v]) => {
+        if (k.startsWith('@_')) {
+          e.push([k.substring(3), KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
+        } else {
+          if (v === '') {
+            e.push([k, {}]);
+          } else {
+            e.push([k, KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(v)]);
+          }
+        }
+     });
+      return Object.fromEntries(e);
+    } else {
+      return data;
+    }
+  }
   /**
    * Replace:
    * ```json
@@ -294,10 +333,14 @@ export class KeymanXMLReader {
   }
 
   public parse(data: string): any {
+    console.log(" PARSER_OPTIONS[this.type].attributeNamePrefix",PARSER_OPTIONS[this.type].attributeNamePrefix);
+
     const parser = this.parser();
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {
       result = KeymanXMLReader.fixupDollarAttributes(result);
+    } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@_') {
+      result = KeymanXMLReader.fixupEmptyStringToEmptyObject_keylayout(result);
     } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@__') {
       result = KeymanXMLReader.fixupEmptyStringToEmptyObject(result);
     } else if (PARSER_OPTIONS[this.type].preserveOrder) {
@@ -369,3 +412,40 @@ export class KeymanXMLWriter {
   }
 }
 
+
+/**
+ * traverse an AJV instancePath and map to an object if possible
+ * @param source object tree root (contains the root object)
+ * @param path ajv split instancePath, such as '/keyboard3/layers/0'.split('/')
+ * @returns undefined if the path was not present, null if path went to something that wasn't an object, otherwise the compileContext object is returned.
+ */
+export function findInstanceObject(source: any, path: string[]) : any {
+  if(!path || !source || path.length == 0) {
+    return source;
+  } else if(path[0] == '') {
+    return findInstanceObject(source, path.slice(1));
+  } else if(Array.isArray(source) || typeof source == 'object') {
+    const child = source[path[0]];
+    if (child == undefined) return child; // nothing here
+    if (!child || typeof child == 'string') {
+      return source; // return the *parent* object if the child is empty (could be a property)
+    }
+    return findInstanceObject(child, path.slice(1));
+  } else {
+    return null;
+  }
+}
+/**
+ * Return an object simulating an XML object with an offset number
+ * For use in calling message functions
+ * @param c number for the offset setting
+ * @param x if set, this object will be used as the base object instead of {}
+ */
+export function withOffset(c: number, compileContext?: any) : KeymanXMLMetadata {
+  // set metadata on an empty object
+  const o = Object.assign({}, compileContext);
+  KeymanXMLReader.setMetaData(o, {
+    startIndex: c
+  });
+  return o;
+}

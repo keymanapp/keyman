@@ -30,6 +30,7 @@ export interface ConverterToKmnResult extends ConverterResult {
   artifacts: ConverterToKmnArtifacts;
 };
 
+
 export interface convert_object {
   keylayout_filename: string,
   kmn_filename: string,
@@ -71,7 +72,17 @@ export class KeylayoutToKmnConverter {
     outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
-    const jsonO: object = KeylayoutReader.read(inputFilename);
+    const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
+
+    try {
+      if (!KeylayoutReader.validate(jsonO)) {
+        return null;
+      }
+    } catch (e) {
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
+
     if (!jsonO) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
       return null;
