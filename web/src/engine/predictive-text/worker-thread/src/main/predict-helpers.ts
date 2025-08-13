@@ -58,24 +58,77 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
   REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
 }
 
+/**
+ * Collates information related to suggestions during the suggestion generation
+ * process.
+ */
 export type CorrectionPredictionTuple = {
-  prediction: ProbabilityMass<Suggestion>,
+  /**
+   * The potential Suggestion (or Keep)
+   */
+  prediction: ProbabilityMass<Suggestion | Keep>,
+  /**
+   * The correction upon which the Suggestion (or Keep) is based
+   */
   correction: ProbabilityMass<string>,
+  /**
+   * The likelihood of the prediction - its lexical-model likelihood multiplied
+   * by the keystroke-sequence + correction likelihood.
+   */
   totalProb: number;
-  matchLevel: SuggestionSimilarity;
+  /**
+   * How directly the prediction matches the current token in the context.
+   *
+   * This is determined later in the suggestion-analysis project and is not
+   * available upon initial construction of this type.
+   */
+  matchLevel?: SuggestionSimilarity;
+  /**
+   * Text from the triggering input that should _not_ be affected by the
+   * prediction.
+   */
   preservationTransform?: Transform;
 };
 
+/**
+ * An enum to be used when categorizing the level of similarity between
+ * generated Suggestions and the actual text upon which a Suggestion is
+ * based.
+ *
+ * Note that Suggestions require .exact matching to stand-in as the Keep
+ * option.
+ */
 export enum SuggestionSimilarity {
+  /**
+   * The keyed form for the current token / word does not match
+   * the keyed form of the suggestion.
+   */
   none = 0,
+
+  /**
+   * The keyed form for the current token / word matches the
+   * the keyed form of the suggestion, but they do not match
+   * in a case-insensitive manner.
+   */
   sameKey = 1,
+
+  /**
+   * The current token / word has a case-insensitive match with
+   * the suggestion, but not a case-sensitive match.  Both share
+   * the same keyed form.
+   */
   sameText = 2,
+
+  /**
+   * The current token / word has a case-sensitive match with
+   * the suggestion in addition to sharing the same keyed form.
+   */
   exact = 3
 }
 
 export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
   // Similarity distance
-  const simDist = b.matchLevel - a.matchLevel;
+  const simDist = b.matchLevel ?? 0 - a.matchLevel ?? 0;
   if(simDist != 0) {
     return simDist;
   }
@@ -590,8 +643,7 @@ export function processSimilarity(
     deleteLeft: basePrefixLength
   };
 
-  // 1 is a filler value; goes unused b/c is for a 'keep'.
-  let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+  let keepSuggestion = models.transformToSuggestion(keepTransform);
   // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
   keepSuggestion.displayAs = truePrefix;
 
@@ -603,10 +655,12 @@ export function processSimilarity(
 
   // Insert our synthetic keepOption as a prediction.
   suggestionDistribution.unshift({
-    totalProb: keepOption.p,
+    // Product of the two p's below.
+    totalProb: inputTransformProb,
     prediction: {
       sample: keepOption,
-      p: keepOption.p,
+      // 1 is a filler value; goes unused b/c is for a 'keep'.
+      p: 1,
     },
     correction: {
       sample: truePrefix,
@@ -705,7 +759,7 @@ export function finalizeSuggestions(
   context: Context,
   inputTransform: Transform,
   verbose?: boolean
-) {
+): Outcome<Suggestion | Keep>[] {
   const punctuation = determinePunctuationFromModel(lexicalModel);
   const tokenize = determineModelTokenizer(lexicalModel);
 
@@ -734,11 +788,7 @@ export function finalizeSuggestions(
         p: tuple.totalProb
       };
     } else {
-      const sample: Suggestion & {
-        p?: number,
-        "lexical-p"?: number,
-        "correction-p"?: number
-      } = {
+      const sample: Outcome<Suggestion | Keep> = {
         ...prediction.sample,
         p: tuple.totalProb,
         "lexical-p": prediction.p,
@@ -781,28 +831,28 @@ export function finalizeSuggestions(
 
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: SuggestionTag,
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Suggestion>;
+): Suggestion;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: 'keep',
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Keep>;
+): Keep;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: 'revert',
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Reversion>;
+): Reversion;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: SuggestionTag,
   quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default
-): Outcome<Suggestion> {
+): Suggestion | Keep | Reversion {
   // A method-internal 'import' of the enum.
   let QuoteBehavior = models.QuoteBehavior;
   const punctuation = determinePunctuationFromModel(lexicalModel);
@@ -812,11 +862,10 @@ export function toAnnotatedSuggestion(
     defaultQuoteBehavior = QuoteBehavior.useQuotes;
   }
 
-  const result: Outcome<Suggestion> = {
+  const result: Suggestion = {
     transform: suggestion.transform,
     displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, punctuation, defaultQuoteBehavior),
     tag: annotationType,
-    p: suggestion.p
   };
 
   if(suggestion.transformId !== undefined) {

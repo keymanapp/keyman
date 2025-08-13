@@ -10,8 +10,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
+import Keep = LexicalModelTypes.Keep;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import Outcome = LexicalModelTypes.Outcome;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
@@ -66,7 +68,7 @@ export class ModelCompositor {
     this.testMode = !!testMode;
   }
 
-  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
     const lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
