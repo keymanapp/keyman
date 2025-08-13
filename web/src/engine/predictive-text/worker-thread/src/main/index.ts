@@ -72,11 +72,7 @@ export default class LMLayerWorker {
    * handleMessage() can transition to a different state, if
    * necessary.
    */
-  private _state: LMLayerWorkerState;
-
-  public get state(): LMLayerWorkerState {
-    return this._state;
-  }
+  private state: LMLayerWorkerState;
 
   /**
    * By default, it's self.postMessage(), but can be overridden
@@ -116,6 +112,11 @@ export default class LMLayerWorker {
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
     this.setupConfigState();
+  }
+
+  /** @internal */
+  public readonly unitTestEndPoints = {
+    getStateName: () => this.state.name
   }
 
   public error(message: string, error?: any) {
@@ -176,7 +177,7 @@ export default class LMLayerWorker {
     }
 
     // We got a message! Delegate to the current state.
-    this._state.handleMessage(im);
+    this.state.handleMessage(im);
   }
 
   /**
@@ -271,7 +272,7 @@ export default class LMLayerWorker {
    * the config data from the host platform.
    */
   private setupConfigState() {
-    this._state = {
+    this.state = {
       name: 'unconfigured',
       handleMessage: (payload) => {
         // ... that message must have been 'config'!
@@ -295,7 +296,7 @@ export default class LMLayerWorker {
    */
   private transitionToLoadingState() {
     let _this = this;
-    this._state = {
+    this.state = {
       name: 'modelless',
       handleMessage: (payload) => {
         // ...that message must have been 'load'!
@@ -331,7 +332,7 @@ export default class LMLayerWorker {
    */
   private transitionToReadyState(model: LexicalModel): ModelCompositor {
     let compositor = new ModelCompositor(model, this._testMode);
-    this._state = {
+    this.state = {
       name: 'ready',
       handleMessage: (payload) => {
         switch(payload.message) {

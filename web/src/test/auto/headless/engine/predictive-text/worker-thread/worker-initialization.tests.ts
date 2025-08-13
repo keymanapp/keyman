@@ -125,7 +125,7 @@ describe('LMLayerWorker', function() {
       // Trigger the config message
       configWorker(worker);
 
-      assert.equal(worker.state.name, 'modelless');
+      assert.equal(worker.unitTestEndPoints.getStateName(), 'modelless');
     });
   });
 
