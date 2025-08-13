@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fvKeyboardSettingsConstraintLayout"
+    android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-  <include layout="@layout/list_toolbar" />
+  <include layout="@layout/list_toolbar"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"/>
 
     <include
         android:id="@+id/keyboard_toggle"
         layout="@layout/fv_list_row_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/list_appbar"/>
+        android:layout_above="@+id/modeling_settings_layout"
+        android:layout_below="@+id/list_appbar"
+        app:layout_constraintTop_toBottomOf="@id/list_appbar"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <LinearLayout
-        android:id="@+id/modeling_settings_layout"
+        android:id="@id/modeling_settings_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/keyboard_toggle"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/keyboard_toggle"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Enable predictions toggle -->
         <include
@@ -63,4 +76,4 @@
 
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
