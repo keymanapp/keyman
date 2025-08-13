@@ -1131,6 +1131,31 @@ describe("Lexer Tests", () => {
         'ncaps',
       ].forEach((text) => { handleInvalidKeyword(text); });
     });
+    it("can recognise a command with whitespace before the bracket", () => {
+      [
+        {type: TokenTypes.BASELAYOUT_SHORTCUT, text: 'baselayout'},
+        {type: TokenTypes.LAYER_SHORTCUT,      text: 'layer'},
+        {type: TokenTypes.PLATFORM_SHORTCUT,   text: 'platform'},
+        {type: TokenTypes.ANY,                 text: 'any'},
+        {type: TokenTypes.CALL,                text: 'call'},
+        {type: TokenTypes.DEADKEY,             text: 'deadkey'},
+        {type: TokenTypes.DEADKEY,             text: 'dk'},
+        {type: TokenTypes.GROUP,               text: 'group'},
+        {type: TokenTypes.IF,                  text: 'if'},
+        {type: TokenTypes.INDEX,               text: 'index'},
+        {type: TokenTypes.MATCH,               text: 'match'},
+        {type: TokenTypes.NOMATCH,             text: 'nomatch'},
+        {type: TokenTypes.NOTANY,              text: 'notany'},
+        {type: TokenTypes.OUTS,                text: 'outs'},
+        {type: TokenTypes.RESET,               text: 'reset'},
+        {type: TokenTypes.SAVE,                text: 'save'},
+        {type: TokenTypes.SET,                 text: 'set'},
+        {type: TokenTypes.STORE,               text: 'store'},
+        {type: TokenTypes.USE,                 text: 'use'},
+      ].forEach((testCase) => {
+        recogniseTokenFollowedBySpacedLeftBracket(testCase.type, testCase.text);
+      });
+    });
     it("can handle an invalid command tokens", () => {
       [
         'baselayout',
@@ -1328,6 +1353,18 @@ function recogniseTokenFollowedByLeftBracket(type: TokenTypes, text: string, {ad
     [
       new Token(type, text),
       new Token(TokenTypes.LEFT_BR, '(', 1, 1+text.length),
+    ],
+   {addEOF, emitAll, handleContinuation}
+  );
+}
+
+function recogniseTokenFollowedBySpacedLeftBracket(type: TokenTypes, text: string, {addEOF=false, emitAll=true, handleContinuation=false}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): void {
+  recogniseTokens(
+    `${text} (`,
+    [
+      new Token(type, text),
+      new Token(TokenTypes.WHITESPACE, ' ', 1, 1+text.length),
+      new Token(TokenTypes.LEFT_BR, '(', 1, 2+text.length),
     ],
    {addEOF, emitAll, handleContinuation}
   );
