@@ -21,6 +21,9 @@
 #include <windows.h>
 #include <stdio.h>
 #include "imlib.h"
+#include "../../../../common/include/keyman_vkey.h"
+
+using namespace km_vk;
 
 HWND hwnd;
 HWND hwndChild;

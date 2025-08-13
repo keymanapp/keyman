@@ -82,6 +82,7 @@
 #include "../../../../common/windows/cpp/include/keymanversion.h"
 #include "../../../../common/windows/cpp/include/crc32.h"
 #include "../../../../common/windows/cpp/include/ConvertUTF.h"
+#include "../../../../common/include/keyman_vkey.h"
 
 #include "debugstore.h"
 #include "NamedCodeConstants.h"
@@ -110,6 +111,7 @@
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
 using namespace kmcmp;
+using namespace km_vk;
 
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
