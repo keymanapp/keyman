@@ -13,9 +13,9 @@ import { assert } from 'chai';
 import { TokenTypes } from '../../src/ng-compiler/token-types.js';
 
 describe("TokenTypes Tests", () => {
-    it("is sorted in alphabetical order", () => {
-      const keys       = Object.keys(TokenTypes);
-      const sortedKeys = [...keys].sort();
-      assert.deepEqual(keys, sortedKeys);
-    });
+  it("is sorted in alphabetical order", () => {
+    const keys       = Object.keys(TokenTypes);
+    const sortedKeys = [...keys].sort();
+    assert.deepEqual(keys, sortedKeys);
+  });
 });
