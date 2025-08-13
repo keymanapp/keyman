@@ -3,8 +3,7 @@
  */
 
 import { assert } from 'chai';
-import { searchForProperty } from '../build/main/obj/default/searchForProperty.js';
-import { propertyMap } from '../build/main/obj/default/data.inc.js';
+import { propertyMap, searchForProperty } from '@keymanapp/models-wordbreakers/test-index';
 
 describe('searchForProperty', () => {
   it('correctly finds character classes for standard ASCII characters', () => {
