@@ -119,6 +119,16 @@ export class TraversalModel implements LexicalModel {
   }
 
   predict(transform: Transform, context: Context): Distribution<Suggestion> {
+    const makeDistribution = function(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
+      let distribution: Distribution<Suggestion> = [];
+
+      for(const s of suggestions) {
+        distribution.push({sample: s, p: s.p});
+      }
+
+      return distribution;
+    }
+
     // Special-case the empty buffer/transform: return the top suggestions.
     if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
       return makeDistribution(this.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
@@ -132,14 +142,14 @@ export class TraversalModel implements LexicalModel {
     }
 
     // Compute the results of the keystroke:
-    let newContext = applyTransform(transform, context);
+    const newContext = applyTransform(transform, context);
 
     // Computes the different in word length after applying the transform above.
-    let leftDelOffset = transform.deleteLeft - KMWString.length(transform.insert);
+    const leftDelOffset = transform.deleteLeft - KMWString.length(transform.insert);
 
     // All text to the left of the cursor INCLUDING anything that has
     // just been typed.
-    let prefix = getLastPreCaretToken(this.breakWords, newContext);
+    const prefix = getLastPreCaretToken(this.breakWords, newContext);
 
     // Return suggestions from the trie.
     return makeDistribution(this.lookup(prefix).map(({text, p}) =>
@@ -152,18 +162,6 @@ export class TraversalModel implements LexicalModel {
       },
       p
     )));
-
-    /* Helper */
-
-    function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
-      let distribution: Distribution<Suggestion> = [];
-
-      for(let s of suggestions) {
-        distribution.push({sample: s, p: s.p});
-      }
-
-      return distribution;
-    }
   }
 
   get wordbreaker(): WordBreakingFunction {

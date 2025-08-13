@@ -1,5 +1,194 @@
 # Keyman Version History
 
+## 19.0.94 alpha 2025-08-01
+
+* maint(common): use `cpp_std=c++17` in meson project default_options (#14433)
+
+## 19.0.93 alpha 2025-07-29
+
+* test(developer): add unit tests for `isValidUtf8` (#14381)
+* maint(linux): fix stopping of test server (#14403)
+
+## 19.0.92 alpha 2025-07-28
+
+* build(deps): bump multer from 2.0.1 to 2.0.2 (#14373)
+* refactor(linux): remove shellcheck warnings (#14409)
+* refactor(linux): move dbus defines to common include (#14407)
+* docs(linux): update readme for test service (#14408)
+* fix(windows): add check a fix for registry datatypes (#14358)
+
+## 19.0.91 alpha 2025-07-26
+
+* maint(windows): fix calls of renamed functions (#14413)
+
+## 19.0.90 alpha 2025-07-25
+
+* maint(common): fix standalone use of `resources/builder.inc.sh` (#14399)
+* maint(resources): use `tc_` prefix for all `tc-*.inc.sh` functions (#14267)
+
+## 19.0.89 alpha 2025-07-24
+
+* docs(common): Document minimum version of Chrome 95.0 for Android (#14385)
+* refactor(android): Update minimum target Chrome version to 95.0 and refactor to use constants (#14391)
+
+## 19.0.88 alpha 2025-07-23
+
+* maint(windows): consider `GO_FAST` env variable in `add_zip_files` (#14338)
+* maint(common): add unit tests for `locate_emscripten.inc.sh` (#14346)
+* refactor(android): create functions for actions (#14351)
+* maint(linux): fix `locate_emscripten` if `$EMSCRIPTEN_BASE` dir missing (#14347)
+* maint(android): consolidate creating zip file (#14353)
+
+## 19.0.87 alpha 2025-07-22
+
+* refactor(common): use test framework for zip tests (#14380)
+* maint(common): fix use of `jq.inc.sh` in git hooks (#14382)
+* test(common): improve zip tests (#14386)
+* maint(common): fix `add_zip_files` if flags come before zip filename (#14387)
+
+## 19.0.86 alpha 2025-07-21
+
+* maint(common): fail build if adding relative file to zip (#14352)
+* maint(common): set C++17 in standard.meson.build (#14355)
+* fix(linux): add `python3-pkg-resources` as explicit dependency (#14356)
+* docs(developer): add ansi and iso context and image, change img tags, and polish for readability (#14243)
+* maint(mac): consolidate `write-download_info` (#14325)
+* maint(common): add simple unit testing framework for bash (#14345)
+* maint(common): consolidate functions to determine OS (#14324)
+* fix(android): use correct path to zip.inc.sh for CI (#14377)
+* test(common): add unit test for reporting test failures (#14379)
+
+## 19.0.85 alpha 2025-07-18
+
+* refactor(common): remove warnings (#14368)
+* refactor(developer): replace deprecated std::codecvt_utf8_utf16 (#14369)
+* refactor(linux): move defines to common header files (#14372)
+
+## 19.0.84 alpha 2025-07-15
+
+* maint(common): add support for inline file exclusions to `add_zip_files` and unit tests (#14333)
+* maint(developer): use `add_zip_files` function (#14334)
+
+## 19.0.83 alpha 2025-07-14
+
+* maint(resources): add `build.sh` to run all `resource/build/test` tests (#14335)
+* maint(developer): consolidate creating KMC_ZIP file (#14309)
+
+## 19.0.82 alpha 2025-07-10
+
+* maint(android): fix Android release build (#14329)
+* maint(mac): fix end of blocks (#14330)
+* maint(mac): don't run `build.sh publish` twice (#14331)
+
+## 19.0.81 alpha 2025-07-09
+
+* docs(developer): explanation of the Description field added in Details section. (#14304)
+* fix(ios): restore keyboard scale map for iPad Air 2 (#14305)
+* maint(linux): remove Oracular, add Questing (#14319)
+* maint(android): remove `--ci` parameter from Android release builds (#14320)
+* maint(android): use absolute paths (#14308)
+* maint(windows): fix platform name for Windows (#14321)
+* maint(developer): include missing shellHelperFunctions.sh file (#14322)
+* maint(windows): replace hardcoded `symbols` paths with parameters (#14323)
+
+## 19.0.80 alpha 2025-07-08
+
+* maint(common): remove include of deleted `tc-download-info.inc.sh` (#14311)
+* maint(resources): fix triggering of builds (#14314)
+
+## 19.0.79 alpha 2025-07-07
+
+* maint(android): use `--release` for release builds (#14307)
+* refactor(common): some reformattings in `shellHelperFunctions.sh` (#14269)
+* maint(common): consolidate `write_download_info` functions (#14270)
+
+## 19.0.78 alpha 2025-07-04
+
+* docs(developer): Fix links in gestures guide (#14297)
+
+## 19.0.77 alpha 2025-07-04
+
+* maint(mac): rename `_do_publish` function to `do_publish` to fix release build (#14273)
+* maint(ios): remove extra `cd` command from ios release builds (#14272)
+* maint(android): remove `--ci` parameter from android builds (#14264)
+* refactor(resources): replace shebang for TC include files (#14265)
+* fix(core): fix failing `common-test-core.sh` script (#14271)
+* maint(common): match OSTYPE correctly on macOS (#14277)
+* fix(common): fix triggering builds if no builds to start (#14274)
+* maint(common): trigger common builds for resources/teamcity/common changes (#14279)
+
+## 19.0.76 alpha 2025-07-03
+
+* maint(common): move TC configuration for common tests (#14205)
+* refactor(common): improve downloads include script (#14253)
+* maint(web): move rsync code to shared functions (#14254)
+* maint(developer): replace Powershell scripts (#14255)
+* maint(windows): move TC configuration for Keyman Windows to scripts (#14186)
+* feat(windows): human text message for 413 error (#14055)
+* refactor(web): move helper functions to beginning of function (#14252)
+* maint(android): add TC build scripts for Keyman for Android (#14222)
+* maint(linux): use `tc_rsync_upload` and `write_download_info` functions (#14258)
+* maint(ios): add TC build scripts for iOS (#14229)
+* maint(mac): add TC build scripts for macOS (#14239)
+
+## 19.0.75 alpha 2025-07-02
+
+* feat(resources): support ignoring unknown options in builder (#14216)
+* maint(common): consolidate 7Z_HOME, SEVENZ_HOME, SEVEN_Z_HOME env vars (#14162)
+
+## 19.0.74 alpha 2025-07-01
+
+* maint(web): adjust rsync path (#14249)
+
+## 19.0.73 alpha 2025-07-01
+
+* fix(web): deploy `web/build/publish` folder (#14237)
+* fix(web): change env variable name (#14244)
+
+## 19.0.72 alpha 2025-07-01
+
+* maint(web): cleanup rsync call from bash for Windows agents and refactor (#14236)
+
+## 19.0.71 alpha 2025-06-30
+
+* refactor(linux): rename linux agent specific functions (#14231)
+
+## 19.0.70 alpha 2025-06-27
+
+* docs(developer): Add details on Template choices (#14228)
+* chore(common,developer): expand 'x' to 'compileContext' (#14218)
+
+## 19.0.69 alpha 2025-06-25
+
+* maint(resources): support additional workflow events for pr-build-status (#14219)
+* chore: add tips and caution of gestures for Keyman Developer + update license + removal of span tag (#14204)
+
+## 19.0.68 alpha 2025-06-24
+
+* maint(resources): Build-bot now available to control test builds (#14125)
+* maint(developer): support buildLevel (#14196)
+* fix(resources): allow branch names in run-required-test-builds shortcut call (#14217)
+* maint(resources): add pr-build-status GitHub Action to summarize build status (#14199)
+
+## 19.0.67 alpha 2025-06-22
+
+* chore(developer): ldml: additional line numbers (#14104)
+
+## 19.0.66 alpha 2025-06-16
+
+* fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult  enum (#14123)
+
+## 19.0.65 alpha 2025-06-13
+
+* maint(developer): fix developer release build (#14185)
+* maint(developer,web): use double quotes inside `--rsync-path` again (#14194)
+
+## 19.0.64 alpha 2025-06-13
+
+* fix(windows): fix download failing when cache.json missing (#14095)
+* maint(resources): only automatically merge keyman-server PRs with automerge label (#14171)
+* maint(developer,web): use braces for variables in powershell scripts (#14184)
+
 ## 19.0.63 alpha 2025-06-12
 
 * maint(web): add some more arguments for web release build script (#14167)

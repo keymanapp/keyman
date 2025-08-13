@@ -324,16 +324,16 @@ export class KeysCompiler extends SectionCompiler {
 
       // allocate the in-memory <flick id=…>
       const flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(flickId, { x: flick })
+        sections.strs.allocString(flickId, { compileContext: flick })
       );
 
       // add data from each segment
       for (const flickSegment of flick.flickSegment) {
         const { keyId, directions } = flickSegment;
-        const keyIdStr = sections.strs.allocString(keyId, { x: flickSegment });
+        const keyIdStr = sections.strs.allocString(keyId, { compileContext: flickSegment });
         const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
-          { x: flickSegment },
+          { compileContext: flickSegment },
           sections);
         flicks.flicks.push({
           directions: directionsList,
@@ -370,20 +370,20 @@ export class KeysCompiler extends SectionCompiler {
       if (!!gap) {
         flags |= constants.keys_key_flags_gap;
       }
-      const id = sections.strs.allocString(key.id, { x: key });
+      const id = sections.strs.allocString(key.id, { compileContext: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(
-        longPressKeyIds, { x: key },
+        longPressKeyIds, { compileContext: key },
         sections);
 
       const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
-        { x: key },
+        { compileContext: key },
         sections);
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
         multiTapKeyIds,
-        { x: key },
+        { compileContext: key },
         sections);
-      const keySwitch = sections.strs.allocString(layerId, { x: key }); // 'switch' is a reserved word
+      const keySwitch = sections.strs.allocString(layerId, { compileContext: key }); // 'switch' is a reserved word
 
       const toRaw = output;
 
@@ -396,7 +396,7 @@ export class KeysCompiler extends SectionCompiler {
           unescape: true,
           singleOk: true,
           nfd: true,
-          x: key,
+          compileContext: key,
         },
         sections);
       if (!to.isOneChar) {
