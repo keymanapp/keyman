@@ -118,7 +118,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.KMDefault_KeyboardFont,
       KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, specialKBInfo);
-    KMManager.registerAssociatedLexicalModel("en");
   }
 
   @Override
