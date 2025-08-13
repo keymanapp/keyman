@@ -139,7 +139,7 @@ export class ModelCompositor {
     const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
     const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
-    const { postContextState, rawPredictions } = await correctAndEnumerate(this._contextTracker, this.lexicalModel, timer, transformDistribution, context);
+    const { postContextState, rawPredictions } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
 
     if(this.activeTimer == timer) {
       this.activeTimer = null;
@@ -257,15 +257,15 @@ export class ModelCompositor {
     }
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
-    if(this._contextTracker) {
-      let contextState = this._contextTracker.newest;
+    if(this.contextTracker) {
+      let contextState = this.contextTracker.newest;
       if(!contextState) {
-        contextState = this._contextTracker.analyzeState(this.lexicalModel, context).state;
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
       }
 
       contextState.tail.activeReplacementId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
-      this._contextTracker.analyzeState(this.lexicalModel, acceptedContext);
+      this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
 
     return reversion;
@@ -290,14 +290,14 @@ export class ModelCompositor {
       return suggestions;
     }
 
-    if(!this._contextTracker) {
+    if(!this.contextTracker) {
       return fallbackSuggestions();
     }
 
     // When the context is tracked, we prefer the tracked information.
     let contextMatchFound = false;
-    for(let c = this._contextTracker.count - 1; c >= 0; c--) {
-      let contextState = this._contextTracker.item(c);
+    for(let c = this.contextTracker.count - 1; c >= 0; c--) {
+      let contextState = this.contextTracker.item(c);
 
       if(contextState.tail.activeReplacementId == -reversion.id) {
         contextMatchFound = true;
@@ -310,16 +310,16 @@ export class ModelCompositor {
     }
 
     // Remove all contexts more recent than the one we're reverting to.
-    while(this._contextTracker.newest.tail.activeReplacementId != -reversion.id) {
-      this._contextTracker.popNewest();
+    while(this.contextTracker.newest.tail.activeReplacementId != -reversion.id) {
+      this.contextTracker.popNewest();
     }
 
-    this._contextTracker.newest.tail.activeReplacementId = -1;
+    this.contextTracker.newest.tail.activeReplacementId = -1;
 
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    let suggestions = this._contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
+    let suggestions = this.contextTracker.newest.tail.replacements.map(function(trackedSuggestion) {
       return trackedSuggestion.suggestion;
     });
 
@@ -349,9 +349,9 @@ export class ModelCompositor {
     // Force-resets the context, throwing out any previous fat-finger data, etc.
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.
-    if(this._contextTracker) {
-      this._contextTracker.clearCache();
-      this._contextTracker.analyzeState(this.lexicalModel, context, null);
+    if(this.contextTracker) {
+      this.contextTracker.clearCache();
+      this.contextTracker.analyzeState(this.lexicalModel, context, null);
     }
   }
 }
