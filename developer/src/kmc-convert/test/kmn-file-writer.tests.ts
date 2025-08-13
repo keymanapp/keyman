@@ -22,7 +22,7 @@ describe('KmnFileWriter', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe("writeToFile()() ", function () {
+  describe("writeToFile() ", function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
