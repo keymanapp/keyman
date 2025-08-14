@@ -1,11 +1,12 @@
 import 'mocha';
 import {assert} from 'chai';
 import { DispCompiler } from '../src/compiler/disp.js';
-import { compilerTestCallbacks, loadSectionFixture, testCompilationCases, withOffset } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import Disp = KMXPlus.Disp;
+import { withOffset } from '@keymanapp/developer-utils';
 
 describe('disp', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

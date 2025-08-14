@@ -5,13 +5,17 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 ################################ Main script ################################
+
+SUBPROJECT_NAME=engine/predictive-text/wordbreakers
 
 # Note:  the raw text files used for data.inc.ts are found within
 # /resources/standards-data/unicode-character-database.
@@ -28,7 +32,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   # This is a script used to build the data.inc.ts file needed by the
   # default wordbreaker.  We rarely update the backing data, but it
@@ -57,4 +61,4 @@ function do_test() {
 builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
-builder_run_action test       do_test
+builder_run_action test       test-headless-typescript $SUBPROJECT_NAME

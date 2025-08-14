@@ -12,7 +12,7 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter, findInstanceObject } from '../src/xml-utils.js';
 import { LineFinder } from '../src/line-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 import { SymbolUtils } from '../src/symbol-utils.js';
@@ -197,6 +197,37 @@ describe(`XML Reader line number test`, () => {
     assert.deepEqual(
       LineFinder.offsetToLineColumn(
         getMetaData(actual.keyboard3.transforms).startIndex, lines), { line: 8, column: 2 });
+  });
+  describe('findInstanceObject test', () => {
+    const path0 = '/keyboard3/layers/0';
+    const TARGET = Symbol("Looking for this!");
+    it(`Should be able to parse ${path0}`, () => {
+      const o = {
+        keyboard3: {
+          layers: [
+            TARGET,
+          ]
+        }
+      };
+      assert.equal(findInstanceObject(o, path0.split('/')), TARGET);
+    });
+    // path to property
+    const path1 = '/keyboard3/conformsTo';
+    it(`Should be able to parse ${path1}`, () => {
+      const keyboard3 = { conformsTo: "1234"};
+      const o = {
+        keyboard3,
+      };
+      assert.equal(findInstanceObject(o, path1.split('/')), keyboard3);
+    });
+    const path2 = '/keyboard3/bad/path';
+    it(`Should be able to handle ${path2}`, () => {
+      const keyboard3 = { conformsTo: "1234"};
+      const o = {
+        keyboard3,
+      };
+      assert.equal(findInstanceObject(o, path2.split('/')), undefined);
+    });
   });
 });
 

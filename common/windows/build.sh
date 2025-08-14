@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 #
@@ -18,7 +18,7 @@ builder_describe "Keyman common Windows modules" \
 
 builder_parse "$@"
 
-if [[ $BUILDER_OS != win ]]; then
+if ! builder_is_windows; then
   builder_echo grey "Platform is not Windows; skipping common/windows"
   exit 0
 fi

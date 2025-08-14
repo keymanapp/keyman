@@ -2,17 +2,12 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <kmx/kmx_processevent.h>
+#include <km_linux_test_common.h>
 #include "EventSource.h"
 #include "KeyHandling.h"
 #include "KeymanSystemServiceClient.h"
 #include "kmx_test_source.hpp"
 #include "DbusTestHelper.h"
-
-// TODO: move these to a common header. Also defined in
-// keyman-system-service/tests/OrderedOutputDeviceMock.cpp
-#define KEYMAN_TESTHELPER_BUS_NAME "com.keyman.TestService"
-#define KEYMAN_TESTHELPER_OBJECT_PATH "/com/keyman/TestService/TestHelper"
-#define KEYMAN_TESTHELPER_INTERFACE_NAME "com.keyman.TestService.TestHelper"
 
 static sd_bus* bus = NULL;
 static EventSource *source = NULL;
