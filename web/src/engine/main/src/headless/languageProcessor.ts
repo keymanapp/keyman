@@ -21,7 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
-  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
+  private _mayAutoCorrect: boolean = true;
 
   private _state: StateChangeEnum = 'inactive';
 
@@ -216,6 +216,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       // Step 1:  determine the final output text
       const final = Mock.from(original.preInput, false);
       final.apply(suggestion.transform);
+      if(suggestion.appendedTransform) {
+        final.apply(suggestion.appendedTransform);
+      }
 
       // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
       // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -289,6 +292,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Step 1:  determine the final output text
     const final = Mock.from(original.preInput, false);
     final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
+    if(reversion.appendedTransform) {
+      final.apply(reversion.appendedTransform);
+    }
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its

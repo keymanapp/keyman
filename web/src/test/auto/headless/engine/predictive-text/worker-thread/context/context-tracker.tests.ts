@@ -25,6 +25,391 @@ describe('ContextTracker', function() {
     }];
   }
 
+  describe('isSubstitutionAlignable', () => {
+    it(`returns true:  'ca' => 'can'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('can', 'ca'));
+    });
+
+    // Leading word in context window starts sliding out of said window.
+    it(`returns true:  'can' => 'an'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('an', 'can'));
+    });
+
+    // Same edits on both sides:  not valid.
+    it(`returns false: 'apple' => 'grapples'`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('grapples', 'apple'));
+    });
+
+    // Edits on one side:  valid.
+    it(`returns true: 'apple' => 'grapple'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('grapple', 'apple'));
+    });
+
+    // Edits on one side:  valid.
+    it(`returns true: 'apple' => 'grapple'`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('apples', 'apple'));
+    });
+
+    // Same edits on both sides:  not valid.
+    it(`returns false: 'grapples' => 'apple'`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('apple', 'grapples'));
+    });
+
+    // Substitution:  not valid when not permitted via parameter.
+    it(`returns false:  'apple' => 'banana'`, () => {
+      // edit path:  'insert' ('b' of banana), 'match' (on leading a), rest are 'substitute'.
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('banana', 'apple'));
+    });
+
+    // Substitution:  not valid if too much is substituted, even if allowed via parameter.
+    it(`returns false:  'apple' => 'banana' (subs allowed)`, () => {
+      // edit path:  'insert' ('b' of banana), 'match' (on leading a), rest are 'substitute'.
+      // 1 match vs 4 substitute = no bueno.  It'd require too niche of a keyboard rule.
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('banana', 'apple', true));
+    });
+
+    it(`returns true: 'a' => 'à' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('à', 'a', true));
+    });
+
+    // Leading substitution:  valid if enough of the remaining word matches.
+    // Could totally happen from a legit Keyman keyboard rule.
+    it(`returns true: 'can' => 'van' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('van', 'can', true));
+    });
+
+    // Trailing substitution:  invalid if not allowed.
+    it(`returns false: 'can' => 'cap' (subs not allowed)`, () => {
+      assert.isFalse(ContextTracker.isSubstitutionAlignable('cap', 'can'));
+    });
+
+    // Trailing substitution:  valid.
+    it(`returns false: 'can' => 'cap' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('cap', 'can', true));
+    });
+
+    it(`returns true:  'clasts' => 'clasps' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('clasps', 'clasts', true));
+    });
+
+    // random deletion at the start + later substitution = still permitted
+    it(`returns false:  'clasts' => 'lasps' (subs allowed)`, () => {
+      assert.isTrue(ContextTracker.isSubstitutionAlignable('lasps', 'clasts', true));
+    });
+  });
+
+  describe('attemptTokenizedAlignment', () => {
+    it("properly matches and aligns when contexts match", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [...baseContext];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 5,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("detects unalignable contexts - no matching tokens", () => {
+      const baseContext = [
+        'swift', 'tan', 'wolf', 'leaped', 'across'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("detects unalignable contexts - too many mismatching tokens", () => {
+      const baseContext = [
+        'swift', 'tan', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("fails alignment for leading-edge word substitutions", () => {
+      const baseContext = [
+        'swift', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("fails alignment for small leading-edge word substitutions", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'sick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("properly matches and aligns when lead token is modified", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'uick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 5,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead token is removed", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: -1,
+        matchLength: 4,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead token is added", () => {
+      const baseContext = [
+        'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 1,
+        matchLength: 4,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead tokens are removed and modified", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'ox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: -2,
+        matchLength: 3,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead tokens are added and modified", () => {
+      const baseContext = [
+        'rown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 1,
+        matchLength: 4,
+        tailEditLength: 0,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead token is removed and tail token is added", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'brown', 'fox', 'jumped', 'over', 'the'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: -1,
+        matchLength: 4,
+        tailEditLength: 0,
+        tailTokenShift: 1
+      });
+    });
+
+    it("properly matches and aligns when lead token and tail token are modified", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'ove'
+      ];
+      const newContext = [
+        'uick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 4, // we treat 'quick' and 'uick' as the same
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly matches and aligns when lead token and tail token are modified + new token appended", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'ove'
+      ];
+      const newContext = [
+        'uick', 'brown', 'fox', 'jumped', 'over', 't'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 4, // we treat 'quick' and 'uick' as the same
+        tailEditLength: 1,
+        tailTokenShift: 1
+      });
+    });
+
+    it("properly handles context window sliding backward", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'e', 'quick', 'brown', 'fox', 'jumped', 'ove'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 1,
+        matchLength: 4, // we treat 'quick' and 'uick' as the same
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+    });
+
+    it("properly handles context window sliding far backward", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'the', 'quick', 'brown', 'fox', 'jumped'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 1,
+        matchLength: 4, // we treat 'quick' and 'uick' as the same
+        tailEditLength: 0,
+        tailTokenShift: -1
+      });
+    });
+
+    it("properly handles context window sliding farther backward", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'the', 'quick', 'brown', 'fox', 'jumpe'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 1,
+        matchLength: 3, // we treat 'quick' and 'uick' as the same
+        tailEditLength: 1,
+        tailTokenShift: -1
+      });
+    });
+
+    it("fails alignment for mid-head deletion", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("fails alignment for mid-head insertion", () => {
+      const baseContext = [
+        'quick', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("fails alignment for mid-tail deletion", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+
+    it("fails alignment for mid-tail insertion", () => {
+      const baseContext = [
+        'quick', 'brown', 'fox', 'jumped', 'over'
+      ];
+      const newContext = [
+        'quick', 'brown', 'fox', 'jumped', 'far', 'over'
+      ];
+
+      const computedAlignment = ContextTracker.attemptTokenizedAlignment(newContext, baseContext);
+      assert.deepEqual(computedAlignment, {canAlign: false});
+    });
+  });
+
   describe('attemptMatchContext', function() {
     it("properly matches and aligns when lead token is removed", function() {
       let existingContext = models.tokenize(defaultBreaker, {
@@ -136,7 +521,7 @@ describe('ContextTracker', function() {
 
       // The 'wordbreak' transform
       assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 0);
+      assert.equal(newContextMatch.tailTokensAdded, -2);
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
@@ -219,7 +604,7 @@ describe('ContextTracker', function() {
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0, deleteRight: 0});
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0});
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;
@@ -252,7 +637,7 @@ describe('ContextTracker', function() {
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokens.map(token => token.raw), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
-      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0, deleteRight: 0 });
+      assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
       let state = newContextMatch.state;

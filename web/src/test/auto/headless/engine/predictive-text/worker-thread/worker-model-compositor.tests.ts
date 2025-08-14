@@ -96,13 +96,14 @@ describe('ModelCompositor', function() {
         });
 
         assert.isDefined(keep);
-        assert.equal(keep.transform.insert, 'the ');
+        assert.equal(keep.transform.insert, 'the');
+        assert.isDefined(keep.appendedTransform?.insert, ' ');
 
         // Expect an appended space.
-        let expectedEntries = ['they ', 'there ', 'their ', 'these ', 'themselves '];
+        let expectedEntries = ['they', 'there', 'their', 'these', 'themselves'];
         expectedEntries.forEach(function(entry) {
           assert.isDefined(suggestions.find(function(suggestion) {
-            return suggestion.transform.insert == entry;
+            return suggestion.transform.insert == entry && suggestion.appendedTransform?.insert == ' ';
           }));
         });
       });
@@ -813,10 +814,14 @@ describe('ModelCompositor', function() {
       assert.equal(suggestions.length, 1);
 
       let expectedTransform = {
-        insert: 'hi ',  // Keeps current context the same, though it adds a wordbreak.
+        insert: 'hi',  // Keeps current context the same, though it adds a wordbreak.
         deleteLeft: 2
       }
       assert.deepEqual(suggestions[0].transform, expectedTransform);
+      assert.deepEqual(suggestions[0].appendedTransform, {
+        insert: ' ',
+        deleteLeft: 0
+      });
     });
 
     it('model with traversals: returns appropriate suggestions upon reversion', async function() {

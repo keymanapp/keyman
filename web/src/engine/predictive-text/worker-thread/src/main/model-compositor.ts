@@ -204,7 +204,7 @@ export class ModelCompositor {
 
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
     // Step 1:  generate and save the reversion's Transform.
-    let sourceTransform = suggestion.transform;
+    let sourceTransform = models.buildMergedTransform(suggestion.transform, suggestion.appendedTransform ?? { insert: '', deleteLeft: 0});
     let deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
     let insertedLength = KMWString.length(sourceTransform.insert);
 
@@ -265,6 +265,9 @@ export class ModelCompositor {
 
       contextState.tail.activeReplacementId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
+      if(suggestion.appendedTransform) {
+        acceptedContext = models.applyTransform(suggestion.appendedTransform, acceptedContext);
+      }
       this.contextTracker.analyzeState(this.lexicalModel, acceptedContext);
     }
 
