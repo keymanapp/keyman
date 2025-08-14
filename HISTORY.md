@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.100 alpha 2025-08-14
+
+* maint(resources): add space to test-bot command (#14528)
+* fix(web): improve accuracy of types for suggestions & suggestion-generation (#14517)
+* refactor(web): move applySuggestionCasing to standalone exportable method (#14518)
+* chore(web): convert worker-thread tests to TS (#14510)
+
 ## 19.0.99 alpha 2025-08-14
 
 * maint(web): skip unnecessary steps for `build` buildLevel (#14516)
