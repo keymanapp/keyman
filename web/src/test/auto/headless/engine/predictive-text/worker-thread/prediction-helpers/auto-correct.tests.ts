@@ -62,7 +62,7 @@ describe('predictionAutoSelect', () => {
               deleteLeft: 0
             },
             matchesModel: false,
-            displayAs: ''
+            displayAs: '"appl"'
           },
           p: 1
         },
@@ -92,7 +92,7 @@ describe('predictionAutoSelect', () => {
             deleteLeft: 0
           },
           matchesModel: true,
-          displayAs: ''
+          displayAs: 'thin'
         },
         p: .05
       },
@@ -110,7 +110,7 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'think'
         },
         p: .55
       },
@@ -131,7 +131,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thing'
           },
           p: .4
         },
@@ -148,7 +148,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thick'
           },
           p: 1
         },
@@ -179,7 +179,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
-          displayAs: '',
+          displayAs: '"thin"',
           matchesModel: false
         },
         p: .05
@@ -202,7 +202,7 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'think'
         },
         p: .01
       },
@@ -240,7 +240,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
-          displayAs: '',
+          displayAs: '"thin"',
           matchesModel: false
         },
         p: .05
@@ -263,7 +263,7 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'think'
         },
         p: .55
       },
@@ -284,7 +284,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thing'
           },
           p: .4
         },
@@ -301,7 +301,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thick'
           },
           p: 1
         },
@@ -335,7 +335,7 @@ describe('predictionAutoSelect', () => {
             insert: 'n',
             deleteLeft: 0
           },
-          displayAs: '',
+          displayAs: '"thin"',
           matchesModel: false
         },
         p: .05
@@ -354,7 +354,7 @@ describe('predictionAutoSelect', () => {
             insert: 'nk',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'think'
         },
         p: .75
       },
@@ -375,7 +375,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ng',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thing'
           },
           p: .2
         },
@@ -392,7 +392,7 @@ describe('predictionAutoSelect', () => {
               insert: 'ck',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'thick'
           },
           p: 1
         },
@@ -429,7 +429,7 @@ describe('predictionAutoSelect', () => {
             insert: 't',
             deleteLeft: 0
           },
-          displayAs: '',
+          displayAs: '"cant"',
           matchesModel: false
         },
         p: 1
@@ -449,7 +449,7 @@ describe('predictionAutoSelect', () => {
             insert: '\'t',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: "can't"
         },
         p: .2
       },
@@ -471,7 +471,7 @@ describe('predictionAutoSelect', () => {
               insert: 'teen',
               deleteLeft: 0
             },
-            displayAs: ''
+            displayAs: 'canteen'
           },
           p: .8
         },
@@ -506,7 +506,7 @@ describe('predictionAutoSelect', () => {
             insert: 'i',
             deleteLeft: 0
           },
-          displayAs: '',
+          displayAs: '"thi"',
           matchesModel: false
         },
         p: .05
@@ -525,7 +525,7 @@ describe('predictionAutoSelect', () => {
             insert: 'in',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'thin'
         },
         p: .1
       },
@@ -543,7 +543,7 @@ describe('predictionAutoSelect', () => {
             insert: 'e',
             deleteLeft: 0
           },
-          displayAs: ''
+          displayAs: 'the'
         },
         p: 1
       },
