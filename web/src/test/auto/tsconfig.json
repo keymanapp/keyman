@@ -12,6 +12,7 @@
     "dom/**/*.ts",
     "headless/**/*.ts",
     "integrated/**/*.ts",
-    "resources/**/*.ts"
+    "resources/**/*.ts",
+    "predictive-text/**/*.ts"
   ]
 }

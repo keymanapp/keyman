@@ -3,7 +3,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
 # Test builder_describe_outputs and dependencies
@@ -24,7 +24,7 @@ builder_parse "$@"
 if builder_is_child_build; then
   builder_die "FAIL: builder_is_child_build should be false but was $_builder_is_child for the parent script"
 else
-  builder_echo "PASS: builder_is_child_build is false ($_builder_is_child) for the parent script"
+  builder_echo green "  ✓ PASS: builder_is_child_build is false ($_builder_is_child) for the parent script"
 fi
 
 # All child actions will generate files which we need to verify for test
@@ -41,7 +41,7 @@ function test_present() {
     if [ ! -f $target.$action ]; then
       builder_die "$CROSS FAIL: ./$target.$action to be present"
     else
-      echo -e "$CHECK PASS: ./$target.$action found as expected"
+      builder_echo green "  ✓ PASS: ./$target.$action found as expected"
     fi
   fi
 }

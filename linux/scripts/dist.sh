@@ -12,7 +12,7 @@ set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASEDIR=$(pwd)
@@ -93,7 +93,7 @@ dpkg-source \
   --tar-ignore=keyman/resources/scopes \
   --tar-ignore=keyman/resources/teamcity \
   --tar-ignore=keyman/resources/build/*.lua \
-  --tar-ignore=keyman/resources/build/jq* \
+  --tar-ignore=keyman/resources/build/jq-* \
   --tar-ignore=keyman/results \
   --tar-ignore=keyman/tmp \
   --tar-ignore=keyman/web \

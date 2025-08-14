@@ -1,6 +1,16 @@
-import { ContextTokenization } from './context-tokenization.js';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * Represents cached data about the state of the sliding context window either
+ * before or after a context transition event and related functionality.
+ */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { ContextTokenization } from './context-tokenization.js';
+
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;

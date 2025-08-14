@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Build Keyman Developer IDE" \
@@ -76,11 +76,10 @@ function do_build() {
   cp kmlmp.cmd "$DEVELOPER_PROGRAM"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$DEVELOPER_PROGRAM"
-  if [[ -f "$WIN32_TARGET_PATH/tike.dbg" ]]; then
-    cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
-  fi
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
+
   cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$WIN32_TARGET_PATH"
-  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
+  builder_if_release_build_level cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
 
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" "$DEVELOPER_PROGRAM/"
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" "$DEVELOPER_PROGRAM/"
