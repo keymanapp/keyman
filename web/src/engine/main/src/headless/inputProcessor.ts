@@ -190,7 +190,6 @@ export class InputProcessor {
       if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
         return new RuleBehavior();
         // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
-        // TODO:  consider auto-application based on auto-reverting punctuation?
       } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
         return new RuleBehavior();
       }

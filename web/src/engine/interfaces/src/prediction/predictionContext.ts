@@ -212,8 +212,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     });
 
     // By default, we assume we were triggered by the banner.
-    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
-    this._recentAcceptCause = 'banner';
+    this._recentAcceptCause = ruleBehavior ? 'key' : 'banner';
     this.recentRevert = false;
 
     this.swallowPrediction = true;
