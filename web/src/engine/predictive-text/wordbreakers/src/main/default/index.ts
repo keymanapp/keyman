@@ -303,6 +303,22 @@ function isNonSpace(chunk: string, options?: DefaultWordBreakerOptions): boolean
  * @param text Text to find word boundaries in.
  */
 function findBoundaries(text: string, options?: DefaultWordBreakerOptions): number[] {
+  /**
+   * Returns the position of the start of the next scalar value. This jumps
+   * over surrogate pairs.
+   *
+   * If asked for the character AFTER the end of the string, this always
+   * returns the length of the string.
+   */
+  const positionAfter = function(pos: number): number {
+    if (pos >= text.length) {
+      return text.length;
+    } else if (isStartOfSurrogatePair(text[pos])) {
+      return pos + 2;
+    }
+    return pos + 1;
+  }
+
   // WB1 and WB2: no boundaries if given an empty string.
   if (text.length === 0) {
     // There are no boundaries in an empty string!
@@ -331,7 +347,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
   //    left, and some look at what's to the right of right. So
   //    keep track of this!
 
-  let boundaries = [];
+  const boundaries = [];
 
   let rightPos: number;
   let lookaheadPos = 0; // lookahead, one scalar value to the right of right.
@@ -536,24 +552,6 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
   } while (rightPos < text.length);
 
   return boundaries;
-
-  ///// Internal utility functions /////
-
-  /**
-   * Returns the position of the start of the next scalar value. This jumps
-   * over surrogate pairs.
-   *
-   * If asked for the character AFTER the end of the string, this always
-   * returns the length of the string.
-   */
-  function positionAfter(pos: number): number {
-    if (pos >= text.length) {
-      return text.length;
-    } else if (isStartOfSurrogatePair(text[pos])) {
-      return pos + 2;
-    }
-    return pos + 1;
-  }
 }
 
 function isStartOfSurrogatePair(character: string) {

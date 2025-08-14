@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
@@ -21,7 +21,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe \
-  "Run tests for native KeymanWeb" \
+  "Build and publish KeymanWeb" \
   "all            run all actions" \
   "configure      install dependencies" \
   "build          build Web + embedded" \
@@ -53,28 +53,27 @@ function _push_release_to_skeymancom() {
 function _zip_and_upload_artifacts() {
   builder_echo start "zip and upload artifacts" "Zipping and uploading artifacts"
 
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/zip-and-upload-artifacts.ps1"
-
-  builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
-}
-
-function _upload_help() {
-  builder_echo start "upload help" "Uploading new Keyman for Web help to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  cd "${KEYMAN_ROOT}/resources/build"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" web
   cd "${KEYMAN_ROOT}/web"
 
-  builder_echo end "upload help" success "Finished uploading new Keyman for Web help to help.keyman.com"
+  local UPLOAD_DIR="build/upload/${KEYMAN_VERSION}"
+
+  ./ci.sh prepare:downloads.keyman.com
+
+  write_download_info "${UPLOAD_DIR}" "keymanweb-${KEYMAN_VERSION}.zip" KeymanWeb zip web
+
+  (
+    cd build/upload
+    tc_rsync_upload "${KEYMAN_VERSION}" "web/${KEYMAN_TIER}"
+  )
+
+  builder_echo end "zip and upload artifacts" success "Finished zipping and uploading artifacts"
 }
 
 function publish_web_action() {
   builder_echo start publish "Publishing KeymanWeb release"
 
   # TODO: refactor to allow to run on Linux/macOS as well
-  if ! is_windows; then
+  if ! builder_is_windows; then
     builder_echo end publish error "Publishing KeymanWeb is only supported on Windows"
     return 1
   fi
@@ -89,7 +88,7 @@ function publish_web_action() {
   _push_release_to_skeymancom
 
   _zip_and_upload_artifacts
-  _upload_help
+  tc_upload_help "Keyman for Web" web
 
   builder_echo end publish success "Finished publishing KeymanWeb release"
 }
@@ -97,14 +96,14 @@ function publish_web_action() {
 if builder_has_action all; then
   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   web_build_action
   publish_web_action
 else
   builder_run_action  configure   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       web_build_action
   builder_run_action  publish     publish_web_action

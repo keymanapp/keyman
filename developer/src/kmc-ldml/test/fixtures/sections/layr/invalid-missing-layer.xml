@@ -8,7 +8,7 @@
     <key id="one" output="1" />
   </keys>
 
-  <layers formId="touch">
+  <layers formId="touch" minDeviceWidth="123">
     <!-- INVALID: need at least one layer. -->
   </layers>
 </keyboard3>
