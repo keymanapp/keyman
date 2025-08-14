@@ -100,8 +100,8 @@ export default class LMLayerWorker {
   private _currentModelSource: ModelSourceSpec;
 
   constructor(options: {
-    importScripts: typeof importScripts,
-    postMessage: typeof postMessage
+    importScripts: (...urls: string[]) => void,
+    postMessage: (message: any, extra?: any) => void
   } = {
     importScripts: null,
     postMessage: null
@@ -112,6 +112,11 @@ export default class LMLayerWorker {
     this._postMessage = options.postMessage || postMessage;
     this._importScripts = options.importScripts || importScripts;
     this.setupConfigState();
+  }
+
+  /** @internal */
+  public readonly unitTestEndPoints = {
+    getStateName: () => this.state.name
   }
 
   public error(message: string, error?: any) {
@@ -403,7 +408,7 @@ export default class LMLayerWorker {
    *
    * @param scope A global scope to install upon.
    */
-  static install(scope: DedicatedWorkerGlobalScope): LMLayerWorker {
+  static install(scope: any /*DedicatedWorkerGlobalScope*/): LMLayerWorker {
     let worker = new LMLayerWorker({ postMessage: scope.postMessage, importScripts: scope.importScripts.bind(scope) });
     scope.onmessage = worker.onMessage.bind(worker);
     worker.self = scope;

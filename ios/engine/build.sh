@@ -3,15 +3,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
@@ -22,6 +19,8 @@ builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad.
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
+
+verify_on_mac
 
 CONFIG="Release"
 if builder_is_debug_build; then
@@ -50,7 +49,7 @@ XCODEFLAGS="-quiet -configuration $CONFIG"
 XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath \"$DERIVED_DATA\" -workspace ../keymanios.xcworkspace"
 
 CODE_SIGN=
-if builder_is_debug_build; then
+if builder_is_debug_build || ( builder_is_ci_build && ! builder_is_ci_build_level_release ); then
   CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
 fi
 
@@ -133,7 +132,9 @@ function build_engine() {
             KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
             UPLOAD_SENTRY=$UPLOAD_SENTRY
 
-  assertDirExists "$KEYMAN_XCFRAMEWORK"
+  if ! [[ -d "${KEYMAN_XCFRAMEWORK}" ]]; then
+    builder_die "Build failed: directory '${KEYMAN_XCFRAMEWORK}' missing"
+  fi
 }
 
 builder_run_action clean         do_clean

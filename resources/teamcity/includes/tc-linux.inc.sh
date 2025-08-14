@@ -1,21 +1,13 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
-
-# Returns 0 if the OS version is greater than or equal to the specified version.
-# Parameter:
-#   $1 - OS version to compare against (e.g., "20.04")
-is_os_version_or_higher() {
-  local OS_VERSION=$1
-
-  # we use `dpkg --compare-versions` to compare the current Ubuntu version
-  # shellcheck disable=SC2312
-  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
-}
+#
+# Shared functions for any builds that run on Linux agents,
+# e.g. linux, android, web, ...
 
 # Returns 0 if the specified package is installed.
 # Parameter:
 #   $1 - Package name to check (e.g., "curl")
-is_package_installed() {
+_is_package_installed() {
   local PACKAGE=$1
 
   dpkg -s "${PACKAGE}" >/dev/null 2>&1
@@ -24,8 +16,8 @@ is_package_installed() {
 # Check if the specified packages are installed and install them if not.
 # Parameters:
 #   $* - List of package names to check and install (e.g., "lcov jq")
-linux_check_and_install_packages() {
-  if ! is_ubuntu; then
+ba_linux_check_and_install_packages() {
+  if ! builder_is_linux; then
     return 0
   fi
 
@@ -35,7 +27,7 @@ linux_check_and_install_packages() {
 
   for p in ${PACKAGES}
   do
-    if ! is_package_installed "${p}"; then
+    if ! _is_package_installed "${p}"; then
       TOINSTALL="${TOINSTALL} ${p}"
     fi
   done
@@ -49,7 +41,7 @@ linux_check_and_install_packages() {
 }
 
 # Install nvm if it is not already installed and install the latest LTS
-linux_install_nvm() {
+ba_linux_install_nvm() {
   builder_echo start install_nvm "Checking and installing nvm"
   if [[ -f "${HOME}/.nvm/nvm.sh" ]]; then
     builder_echo "nvm is already installed"
@@ -59,14 +51,14 @@ linux_install_nvm() {
     NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2)
     # shellcheck disable=SC2312
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
-    set_variables_for_nvm
+    tc_set_variables_for_nvm
     nvm install --lts --default --save
     nvm use --lts
   fi
   builder_echo end install_nvm success "Finished checking and installing nvm"
 }
 
-linux_install_emscripten() {
+ba_linux_install_emscripten() {
   builder_echo start "install emscripten" "Checking and installing emscripten"
   if { [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -f "${EMSCRIPTEN_BASE}/emcc" ]] ; } ||
     [[ -f "${HOME}/emsdk/upstream/emscripten/emcc" ]]; then
@@ -85,20 +77,20 @@ linux_install_emscripten() {
     ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
   fi
-  set_variables_for_emscripten
+  tc_set_variables_for_emscripten
   builder_echo end "install emscripten" success "Finished checking and installing emscripten"
 }
 
 # Install additional dependencies required for running integration tests.
-linux_install_dependencies_for_tests() {
+ba_linux_install_dependencies_for_tests() {
   builder_echo start install_dependencies_for_tests "Installing dependencies for tests"
 
-  linux_check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
+  ba_linux_check_and_install_packages xvfb xserver-xephyr metacity mutter dbus-x11 weston xwayland
 
   builder_echo end install_dependencies_for_tests success "Finished installing dependencies for tests"
 }
 
-linux_start_xvfb() {
+ba_linux_start_xvfb() {
   # On Linux start Xvfb etc
   local PID_FILE=/tmp/keymanweb-pids
   builder_echo "Starting Xvfb..."
@@ -115,11 +107,26 @@ linux_start_xvfb() {
   export DISPLAY=:32
 }
 
-linux_stop_xvfb() {
+ba_linux_stop_xvfb() {
   # On Linux stop Xvfb etc
   local PID_FILE=/tmp/keymanweb-pids
   if [[ -f "${PID_FILE}" ]]; then
     bash "${PID_FILE}"
     rm -f "${PID_FILE}"
   fi
+}
+
+# Returns 0 if the OS version is greater than or equal to the specified version.
+# Parameter:
+#   $1 - OS version to compare against (e.g., "20.04")
+ba_linux_is_os_version_or_higher() {
+  if ! builder_is_linux; then
+     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
+  fi
+
+  local OS_VERSION=$1
+
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  # shellcheck disable=SC2312
+  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
 }

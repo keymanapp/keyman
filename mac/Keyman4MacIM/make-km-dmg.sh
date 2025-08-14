@@ -3,11 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-if [[ "${OSTYPE}" != "darwin"* ]]; then
+if ! builder_is_macos; then
   echo "This build script will only run in a Mac environment."
   exit 1
 fi
@@ -46,7 +46,7 @@ cd `dirname ${KEYMAN_MACIM_BASE_PATH}` > /dev/null
 KEYMAN_MACIM_BASE_PATH=`pwd`;
 popd  > /dev/null
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 KM_APP_NAME="Install Keyman.app"
 OUTPUT_DIR="$KEYMAN_MACIM_BASE_PATH/output"
@@ -141,14 +141,14 @@ fi
 
 # Step 1 - Copy template to working copy to prevent unintended changes
 WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$KEYMAN_VERSION.dmg"
-displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
+builder_echo info "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
 if [[ -e "$WORKING_COPY_OF_IMAGE" && "$VERBOSITY" != "-quiet" ]] ; then
     builder_warn "Overwriting: $WORKING_COPY_OF_IMAGE"
 fi
 cp -f "$TEMPLATE_IMAGE" "$WORKING_COPY_OF_IMAGE"
 
 # Step 2 - Mount (copy of) template image - writeable
-displayInfo "Attaching \"$WORKING_COPY_OF_IMAGE\"" "Mounting as \"$STAGING_DIR\"..."
+builder_echo info "Attaching \"$WORKING_COPY_OF_IMAGE\"" "Mounting as \"$STAGING_DIR\"..."
 if [[ -e "$STAGING_DIR" ]]; then
     builder_die "Mount folder $STAGING_DIR is already present. Unmount it first."
 fi
@@ -170,7 +170,7 @@ ls -la "$STAGING_DIR/background"
 echo "---- End Listing ----"
 
 # Step 3 - Replace existing application files with new version
-displayInfo "Copying files from \"$SOURCE_KM_APP\"..."
+builder_echo info "Copying files from \"$SOURCE_KM_APP\"..."
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1
 echo "---------"
 find "$DEST_KM_APP" -mindepth 1 -maxdepth 1 -print0 | xargs -0 rm -rf
@@ -184,7 +184,7 @@ ls -la "$STAGING_DIR/background"
 echo "---- End Listing ----"
 
 # Step 4 - Detach/unmount the temporary image/staging area
-displayInfo "Detaching \"$WORKING_COPY_OF_IMAGE\""
+builder_echo info "Detaching \"$WORKING_COPY_OF_IMAGE\""
 
 # Attempt to detach 10 times, waiting 5 seconds each time
 # because macOS may still be working in the folder in the
@@ -213,7 +213,7 @@ fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
 DMG_FILE_PATH="$DEST_DIR/keyman-$KEYMAN_VERSION.dmg"
-displayInfo "Converting/compressing image to create \"$DMG_FILE_PATH\""
+builder_echo info "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then
         builder_warn "Overwriting: $DMG_FILE_PATH"
@@ -226,8 +226,8 @@ if ! [[ $? == 0 && -f "$DMG_FILE_PATH" ]]; then
 fi
 
 # Step 6 - Clean up
-displayInfo "Cleaning up..."
+builder_echo info "Cleaning up..."
 rm "$WORKING_COPY_OF_IMAGE"
 
-displayInfo "Make DMG completed successfully."
+builder_echo info "Make DMG completed successfully."
 exit 0

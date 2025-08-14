@@ -12,7 +12,7 @@ set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/zip.inc.sh"
@@ -27,7 +27,7 @@ fi
 
 #Include script dependency
 . $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
-#. ../resources/shellHelperFunctions.sh
+#. ../resources/build/utils.inc.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`
 KEYMAN_TIER=`cat ../TIER.md`
@@ -50,12 +50,10 @@ mkdir -p "${UPLOAD_DIR}"
 echo "Writing changelog to $CHANGELOG_PATH"
 get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
-assertFileExists "${CHANGELOG_PATH}"
 
 # Strip emoji as App Store does not allow emoji in changelogs
 node "$KEYMAN_ROOT/resources/tools/strip-emoji" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
 mv -f "$CHANGELOG_PATH.1" "$CHANGELOG_PATH"
-assertFileExists "${CHANGELOG_PATH}"
 
 #
 # Keyman Engine
@@ -129,11 +127,9 @@ fi
 # Write download info files
 #
 
-cd "${UPLOAD_DIR}"
+write_download_info "${UPLOAD_DIR}" "${KMEI_DST_NAME}" "Keyman Engine for iOS" zip ios
+write_download_info "${UPLOAD_DIR}" "${KEYMANAPP_IPA_DST}" "Keyman for iPhone and iPad" ipa ios
 
-write_download_info "Keyman Engine for iOS" "${KMEI_DST_NAME}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
-write_download_info "Keyman for iPhone and iPad" "${KEYMANAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
-
-if [ ${RELEASE_OEM_FIRSTVOICES} = true ]; then
-  write_download_info "FirstVoices Keyboards" "${FIRSTVOICESAPP_IPA_DST}" "${BUILD_NUMBER}" "${KEYMAN_TIER}" "ios"
+if [[ ${RELEASE_OEM_FIRSTVOICES} = true ]]; then
+  write_download_info "${UPLOAD_DIR}" "${FIRSTVOICESAPP_IPA_DST}" "FirstVoices Keyboards" ipa ios
 fi

@@ -1,6 +1,7 @@
 import {assert} from 'chai';
 import {readFileSync} from 'node:fs';
 import { KeymanXMLReader, SymbolUtils } from "@keymanapp/developer-utils";
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 
 /**
  *
@@ -8,10 +9,10 @@ import { KeymanXMLReader, SymbolUtils } from "@keymanapp/developer-utils";
  * @param expect path to expected XML
  * @param mutator optional function that will be applied to the parsed object
  */
-export function compareXml(actual : string, expect: string, mutator?: (input: any) => any) {
+export function compareXml(actual : string, expect: string, mutator?: (input: ObjectWithCompileContext) => ObjectWithCompileContext) {
     if (!mutator) {
         // no-op
-        mutator = (x: any) => x;
+        mutator = (compileContext: ObjectWithCompileContext) => compileContext;
     }
     const reader = new KeymanXMLReader('keyboard3');
 

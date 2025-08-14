@@ -5,10 +5,10 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 cd "$THIS_SCRIPT_PATH"
 
@@ -109,7 +109,7 @@ builder_parse_test() {
 }
 
 builder_describe \
-  "Tests the build-utils.sh builder functions. This is merely an example." \
+  "Tests the builder-basic.inc.sh builder functions. This is merely an example." \
   "clean        Cleans up any build artifacts" \
   "build        Do some building" \
   "test         Does some test stuff" \
@@ -127,7 +127,7 @@ builder_describe \
 builder_parse_test "clean:app test:engine" "--power" clean:app test:engine --power
 
 if builder_has_option --power; then
-  echo "PASS: --power option found"
+  builder_echo green "  ✓ PASS: --power option found"
 else
   builder_die "FAIL: --power option not found"
 fi
@@ -135,7 +135,7 @@ fi
 builder_parse_test "clean:app test:engine" "--zoom" clean:app test:engine -z
 
 if builder_has_option --zoom; then
-  echo "PASS: --zoom option found"
+  builder_echo green "  ✓ PASS: --zoom option found"
 else
   builder_die "FAIL: --zoom option not found"
 fi
@@ -143,13 +143,13 @@ fi
 function verify_option() {
   local OPTIONNAME=$1
   local VARIABLE=$2
-  local EXCPECTED=$3
+  local EXPECTED=$3
 
   if builder_has_option ${OPTIONNAME}; then
-    if [[ ${!VARIABLE} == ${EXCPECTED} ]]; then
-      echo "PASS: ${OPTIONNAME} option variable \$${VARIABLE} has expected value '${EXCPECTED}'"
+    if [[ ${!VARIABLE} == ${EXPECTED} ]]; then
+      builder_echo green "  ✓ PASS: ${OPTIONNAME} option variable \$${VARIABLE} has expected value '${EXPECTED}'"
     else
-      builder_die "FAIL: ${OPTIONNAME} option variable \$${VARIABLE} had value '${!VARIABLE}' but should have had '${EXCPECTED}'"
+      builder_die "FAIL: ${OPTIONNAME} option variable \$${VARIABLE} had value '${!VARIABLE}' but should have had '${EXPECTED}'"
     fi
   else
     builder_die "FAIL: ${OPTIONNAME} option not found"
@@ -183,6 +183,53 @@ if [[ ${builder_extra_params[1]} != "two" ]]; then
 fi
 if [[ ${builder_extra_params[2]} != "three four five" ]]; then
   builder_die "FAIL: -- extra parameter 'three four five' not found"
+fi
+
+#----------------------------------------------------------------------
+# Test handling of unknown options
+echo -e "${COLOR_BLUE}## Running 'unknown options' tests${COLOR_RESET}"
+
+# Test long form option with --builder-ignore-unknown-options
+builder_parse --builder-ignore-unknown-options --some-other-option
+if ! builder_ignore_unknown_options; then
+  builder_die "FAIL: builder_ignore_unknown_options should be set"
+fi
+if [[ "${builder_ignored_options[@]}" != "--some-other-option" ]]; then
+  builder_die "FAIL: --builder-ignore-unknown-options did not collect --some-other-option"
+fi
+builder_echo green "  ✓ PASS: --builder-ignore-unknown-options, --some-other-option was collected but ignored"
+
+# Test short form option with --builder-ignore-unknown-options
+builder_parse --builder-ignore-unknown-options -x
+if ! builder_ignore_unknown_options; then
+  builder_die "FAIL: builder_ignore_unknown_options should be set"
+fi
+if [[ "${builder_ignored_options[@]}" != "-x" ]]; then
+  builder_die "FAIL: --builder-ignore-unknown-options '${builder_ignored_options[@]}' did not collect -x"
+fi
+builder_echo green "  ✓ PASS: --builder-ignore-unknown-options, -x was collected but ignored"
+
+# Test long form option without --builder-ignore-unknown-options
+(builder_parse --some-other-option >/dev/null) && EXIT_CODE=0 || EXIT_CODE=$?
+if [[ $EXIT_CODE != 64 ]]; then
+  builder_die "FAIL: without --builder-ignore-unknown-options, --some-other-option parameter should not have been recognized"
+fi
+builder_echo green "  ✓ PASS: without --builder-ignore-unknown-options, --some-other-option was not a recognized parameter"
+
+# Test short form option without --builder-ignore-unknown-options
+(builder_parse -x >/dev/null) && EXIT_CODE=0 || EXIT_CODE=$?
+if [[ $EXIT_CODE != 64 ]]; then
+  builder_die "FAIL: without --builder-ignore-unknown-options, -x parameter should not have been recognized"
+fi
+builder_echo green "  ✓ PASS: without --builder-ignore-unknown-options, -x was not a recognized parameter"
+
+# Test that ignored options variables are correct without --builder-ignore-unknown-options
+builder_parse test
+if builder_ignore_unknown_options; then
+  builder_die "FAIL: without --builder-ignore-unknown-options, builder_ignore_unknown_options() should not be set"
+fi
+if [[ ! -z "${builder_ignored_options[@]}" ]]; then
+  builder_die "FAIL: without --builder-ignore-unknown-options, builder_ignored_options should be empty"
 fi
 
 #----------------------------------------------------------------------

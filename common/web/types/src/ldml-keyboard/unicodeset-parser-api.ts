@@ -8,13 +8,13 @@ export interface UnicodeSetParser {
    * @param pattern string to parse such as `[a-z]`
    * @param rangeCount number of ranges to allow for
    */
-  parseUnicodeSet(pattern: string, rangeCount: number, x?: any) : UnicodeSet | null;
+  parseUnicodeSet(pattern: string, rangeCount: number, compileContext?: any) : UnicodeSet | null;
   /**
    * Calculate the number of ranges in a UnicodeSet
    * @param pattern string to parse such as `[a-z]`
    * @returns number of ranges, or -1 (with callback-reported err) on err
    */
-  sizeUnicodeSet(pattern: string, x?: any) : number;
+  sizeUnicodeSet(pattern: string, compileContext?: any) : number;
 }
 
 /**

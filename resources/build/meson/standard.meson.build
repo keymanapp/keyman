@@ -16,13 +16,6 @@
 cpp_compiler = meson.get_compiler('cpp')
 c_compiler = meson.get_compiler('c')
 
-# Once we can assume meson 0.60 we can delete this
-# (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
-if cpp_compiler.get_id() == 'msvc'
-  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
-  add_global_arguments('/execution-charset:utf-8', language: ['c', 'cpp'])
-endif
-
 #
 # Standard informational messages for our builds
 #

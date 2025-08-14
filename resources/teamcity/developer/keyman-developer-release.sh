@@ -9,24 +9,29 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
+. "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe \
-  "Build Keyman Developer on Windows" \
+  "Build release of Keyman Developer" \
   "all            run all actions" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish release of Keyman Developer" \
-  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
-  "--rsync-user=RSYNC_USER            rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
-  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository"
+  "--rsync-path=RSYNC_PATH                    rsync path on remote server" \
+  "--rsync-user=RSYNC_USER                    rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST                    rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT                    rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
+  "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
+  "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
 
 builder_parse "$@"
 
@@ -57,50 +62,44 @@ function _publish_sentry() {
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 
-function _download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-
-  cd "${KEYMAN_ROOT}/.."
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/download-symbol-server-index.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-function _publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-
-  cd "${KEYMAN_ROOT}/../symbols"
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-new-symbols.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
-
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
-}
-
 function _publish_to_downloads_keyman_com() {
   # Publish to downloads.keyman.com
   builder_echo start "publish to downloads.keyman.com" "Publishing release to downloads.keyman.com"
 
-  cd "${KEYMAN_ROOT}/developer"
-  # shellcheck disable=SC2154
-  powershell -NonInteractive -ExecutionPolicy Bypass -File "${THIS_SCRIPT_PATH}/publish-to-downloads-keyman-com.ps1"
-  cd "${KEYMAN_ROOT}/developer/src"
+  (
+    cd "${KEYMAN_ROOT}/developer"
+
+    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP
+    # shellcheck disable=SC2154
+    UPLOAD_PATH="${KEYMAN_ROOT}/developer/upload/${KEYMAN_VERSION}"
+    KEYBOARDS_PATH="${UPLOAD_PATH}/keyboards"
+    KMCOMP_ZIP="kmcomp-${KEYMAN_VERSION}.zip"
+    DEVELOPER_EXE="keymandeveloper-${KEYMAN_VERSION}.exe"
+    DEBUG_ZIP="debug-${KEYMAN_VERSION}.zip"
+
+    rm -rf "${UPLOAD_PATH}"
+    mkdir -p "${UPLOAD_PATH}"
+
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${KMCOMP_ZIP}"    "${UPLOAD_PATH}/"
+
+    write_download_info "${UPLOAD_PATH}" "${DEVELOPER_EXE}" "Keyman Developer" exe win
+    write_download_info "${UPLOAD_PATH}" "${KMCOMP_ZIP}" "Keyman Developer Command-Line Compiler" zip win
+
+    mkdir -p "${KEYBOARDS_PATH}"
+    cp -r "${KEYMAN_ROOT}/common/test/keyboards"/*/build/*.kmp "${KEYBOARDS_PATH}/"
+
+    if [[ -f "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
+      cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
+      write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Developer debug files" zip win
+    fi
+
+    cd "${KEYMAN_ROOT}/developer/upload"
+    # shellcheck disable=SC2154
+    tc_rsync_upload "${KEYMAN_VERSION}" "developer/${KEYMAN_TIER}"
+  )
 
   builder_echo end "publish to downloads.keyman.com" success "Finished publishing release to downloads.keyman.com"
-}
-
-function _publish_api_documentation() {
-  # Upload new Keyman Developer API documentation to help.keyman.com
-  builder_echo start "publish api documentation" "Uploading new Keyman Developer API documentation to help.keyman.com"
-
-  export HELP_KEYMAN_COM="${HELP_KEYMAN_COM:-${KEYMAN_ROOT}/../help.keyman.com}"
-  "${KEYMAN_ROOT}/resources/build/help-keyman-com.sh" developer
-
-  builder_echo end "publish api documentation" success "Finished uploading new Keyman Developer API documentation to help.keyman.com"
 }
 
 function build_developer_action() {
@@ -109,7 +108,7 @@ function build_developer_action() {
 }
 
 function publish_action() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # requires Powershell, so currently only supported on Windows
     builder_echo error "This script is intended to be run on Windows only."
     return 1
@@ -121,10 +120,10 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  _download_symbol_server_index
-  _publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  _publish_api_documentation
+  tc_upload_help "api documentation" developer
 }
 
 if builder_has_action all; then
