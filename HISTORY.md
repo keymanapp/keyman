@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.99 alpha 2025-08-14
+
+* maint(web): skip unnecessary steps for `build` buildLevel (#14516)
+
 ## 19.0.98 alpha 2025-08-14
 
 * maint(resources): specify `keymanapp/keyman` for gh in automerge (#14524)
