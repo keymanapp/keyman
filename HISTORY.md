@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.97 alpha 2025-08-14
+
+* maint(resources): use GH_TOKEN variable for gh calls (#14522)
+
 ## 19.0.96 alpha 2025-08-14
 
 * maint(resources): add build-bot commands to increment-version auto PRs (#14504)
