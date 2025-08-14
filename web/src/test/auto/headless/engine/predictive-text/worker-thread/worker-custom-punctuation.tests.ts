@@ -4,8 +4,8 @@
 
 import { assert } from 'chai';
 
-import DummyModel from '#./models/dummy-model.js';
-import ModelCompositor from '#./model-compositor.js';
+import { ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
+import DummyModel = models.DummyModel;
 
 describe('Custom Punctuation', function () {
   it('appears in the keep suggestion', async function () {
@@ -31,6 +31,7 @@ describe('Custom Punctuation', function () {
         quotesForKeepSuggestion: {
           open: "«", close: "»"
         },
+        insertAfterWord: ''
       }
     });
 
@@ -76,6 +77,10 @@ describe('Custom Punctuation', function () {
           // U+1680 OGHAM SPACE MARK:
           // it's technically whitespace, but it don't look it!
           insertAfterWord: " ",
+          quotesForKeepSuggestion: {
+            open: "'",
+            close: "'"
+          }
         }
       });
 

@@ -1,11 +1,21 @@
-import { deepCopy } from "@keymanapp/web-utils";
+
 import { assert } from 'chai';
 
-import { predictFromCorrections, tupleDisplayOrderSort } from "#./predict-helpers.js";
-import { DummyModel } from "#./models/dummy-model.js";
+import { deepCopy } from "@keymanapp/web-utils";
+import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { models, predictFromCorrections, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import DummyModel = models.DummyModel;
+import Outcome = LexicalModelTypes.Outcome;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
 
 // See: developer/src/kmc-model/model-defaults.ts, defaultApplyCasing
-const applyCasing = (casing, text) => {
+const applyCasing: CasingFunction = (casing, text) => {
   switch(casing) {
     case 'lower':
       return text.toLowerCase();
@@ -44,7 +54,7 @@ const DUMMY_MODEL_CONFIG = {
     insertAfterWord: '\u00a0' // non-breaking space
   },
   applyCasing: applyCasing,
-  searchTermToKey: (wordform) => {
+  searchTermToKey: (wordform: string) => {
     // See: developer/src/kmc-model/model-defaults.ts, defaultCasedSearchTermToKey
     return applyCasing('lower', wordform)
       .normalize('NFKD')
@@ -63,16 +73,14 @@ const DUMMY_MODEL_CONFIG = {
 
 describe('predictFromCorrections', () => {
   it('handles a single correction prefixing multiple entries - no transform ID', () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     };
 
-    /** @type {Distribution<Transform>} */
-    const correctionDistribution = [{
+    const correctionDistribution: Distribution<Transform> = [{
         sample: {
           insert: 's',
           deleteLeft: 0
@@ -81,8 +89,7 @@ describe('predictFromCorrections', () => {
       }
     ];
 
-    /** @type {ProbabilityMass<Suggestion>[]} */
-    const dummied_suggestions = [
+    const dummied_suggestions: Outcome<Suggestion>[] = [
       {
         transform: {
           insert: "it's",
@@ -117,16 +124,14 @@ describe('predictFromCorrections', () => {
   });
 
   it('handles a single correction prefixing multiple entries - with transform ID', () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     };
 
-    /** @type {Distribution<Transform>} */
-    const correctionDistribution = [{
+    const correctionDistribution: Distribution<Transform> = [{
         sample: {
           insert: 's',
           deleteLeft: 0,
@@ -136,8 +141,7 @@ describe('predictFromCorrections', () => {
       }
     ];
 
-    /** @type {ProbabilityMass<Suggestion>[]} */
-    const dummied_suggestions = [
+    const dummied_suggestions: Outcome<Suggestion>[] = [
       {
         transform: {
           insert: "it's",
@@ -177,8 +181,7 @@ describe('predictFromCorrections', () => {
   });
 
   it('handles multiple corrections at once', () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
@@ -187,7 +190,7 @@ describe('predictFromCorrections', () => {
 
     // Note:  each correction is used in order in a separate model.predict call.
     /** @type {Distribution<Transform>} */
-    const correctionDistribution = [{
+    const correctionDistribution: Distribution<Transform> = [{
         // postContext:  is
         sample: {
           insert: 's',
@@ -204,8 +207,7 @@ describe('predictFromCorrections', () => {
       }
     ];
 
-    /** @type {ProbabilityMass<Suggestion>[]} */
-    const dummied_suggestions = [
+    const dummied_suggestions: Outcome<Suggestion>[][] = [
       // postContext:  is
       [{
         transform: {

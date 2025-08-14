@@ -7,18 +7,19 @@
  * lexical-model's casing rules to generated suggestions.
  */
 
-import { applySuggestionCasing } from '#./predict-helpers.js';
-import * as models from '#./models/index.js';
-import * as wordBreakers from '@keymanapp/models-wordbreakers';
-
 import { assert } from 'chai';
 
+import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
-var TrieModel = models.TrieModel;
+import { applySuggestionCasing, models } from '@keymanapp/lm-worker/test-index';
+
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import TrieModel = models.TrieModel;
 
 describe('applySuggestionCasing', function() {
-  let plainApplyCasing = function(caseToApply, text) {
+  let plainApplyCasing: CasingFunction = function(caseToApply, text) {
     switch(caseToApply) {
       case 'lower':
         return text.toLowerCase();
@@ -36,9 +37,9 @@ describe('applySuggestionCasing', function() {
       languageUsesCasing: true,
       applyCasing: plainApplyCasing,
       wordBreaker: wordBreakers.default,
-      searchTermToKey: function(text) {
+      searchTermToKey: function(text: string) {
         // We're dealing with very simple English text; no need to normalize or remove diacritics here.
-        return applyCasing('lower', text);
+        return plainApplyCasing('lower', text);
       }
     }
   );

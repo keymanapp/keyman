@@ -1,19 +1,21 @@
 import { assert } from 'chai';
-import * as models from '#./models/index.js';
-import * as correction from '#./correction/index.js';
 
 import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+
+import { correction, models } from '@keymanapp/lm-worker/test-index';
+
+import TrieModel = models.TrieModel;
 
 function buildTestTimer() {
   return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
-function assertEdgeChars(edge, input, match) {
+function assertEdgeChars(edge: correction.SearchNode, input: string, match: string) {
   assert.isTrue(edgeHasChars(edge, input, match));
 }
 
-function edgeHasChars(edge, input, match) {
+function edgeHasChars(edge: correction.SearchNode, input: string, match: string) {
   if(edge.priorInput[edge.priorInput.length - 1].sample.insert != input) {
     return false;
   }
@@ -21,7 +23,7 @@ function edgeHasChars(edge, input, match) {
   return edge.calculation.lastMatchEntry.key == match;
 }
 
-function findEdgeWithChars(edgeArray, input, match) {
+function findEdgeWithChars(edgeArray: correction.SearchNode[], input: string, match: string) {
   let results = edgeArray.filter(function(value) {
     return value.calculation.lastMatchEntry.key == match && value.priorInput[value.priorInput.length - 1].sample.insert == input;
   });
@@ -32,10 +34,10 @@ function findEdgeWithChars(edgeArray, input, match) {
 
 describe('Correction Distance Modeler', function() {
   describe('SearchNode + SearchEdge', function() {
-    var testModel;
+    var testModel: TrieModel;
 
     before(function() {
-      testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
+      testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
     it('SearchNode.buildInsertionEdges() - from root', function() {
@@ -247,17 +249,17 @@ describe('Correction Distance Modeler', function() {
   });
 
   describe('SearchSpaceTier + SearchSpace', function() {
-    var testModel;
+    var testModel: TrieModel;
 
     before(function() {
-      testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
+      testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
-    let checkResults_teh = async function(iter) {
-      let firstResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstResult.done);
+    let checkResults_teh = async function(iter: AsyncGenerator<correction.SearchResult, any, any>) {
+      let firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstIterResult.done);
 
-      firstResult = firstResult.value; // Retrieves <actual value>
+      const firstResult: correction.SearchResult = firstIterResult.value; // Retrieves <actual value>
       // No checks on the first set's cost.
       assert.equal(firstResult.matchString, "ten");
 
@@ -268,9 +270,8 @@ describe('Correction Distance Modeler', function() {
         'the'
       ];
 
-      async function checkBatch(batch, prevCost) {
+      async function checkBatch(batch: string[], prevCost: number) {
         let cost;
-        firstResult = firstResult;
         while(batch.length > 0) {
           const iter_result = await iter.next();
           assert.isFalse(iter_result.done);

@@ -1,9 +1,15 @@
-import * as wordBreakers from '@keymanapp/models-wordbreakers';
+
 import { assert } from 'chai';
 
-import { finalizeSuggestions } from "#./predict-helpers.js";
-import { DummyModel } from "#./models/dummy-model.js";
 import { deepCopy } from '@keymanapp/web-utils';
+import * as wordBreakers from '@keymanapp/models-wordbreakers';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { CorrectionPredictionTuple, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+
+import DummyModel = models.DummyModel;
+import Outcome = LexicalModelTypes.Outcome;
+import Suggestion = LexicalModelTypes.Suggestion;
 
 /*
  * This file's tests use these parts of a lexical model:
@@ -39,11 +45,10 @@ const testModelWithoutSpacing = new DummyModel({
  * @param {'verbose'=} verbose
  * @returns
  */
-const build_its_is_set = (verbose) => {
+const build_its_is_set = (verbose?: string) => {
   const verboseFlag = (verbose == 'verbose' ? true : false);
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const its = {
+  const its: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -62,8 +67,7 @@ const build_its_is_set = (verbose) => {
     // matchLevel does not yet exist.
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const it_is = {
+  const it_is: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -81,8 +85,7 @@ const build_its_is_set = (verbose) => {
     totalProb: 0.64
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is = {
+  const is: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -100,8 +103,7 @@ const build_its_is_set = (verbose) => {
     totalProb: 0.1
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is_not = {
+  const is_not: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -129,7 +131,7 @@ const build_its_is_set = (verbose) => {
   const unfinalized = [...Object.values(baseDefinitions)].map((entry) => deepCopy(entry));
   const expected = unfinalized.map((entry) => {
 
-    const mapped = {
+    const mapped: Outcome<Suggestion & { 'correction-p'?: number, 'lexical-p'?: number }> = {
       ...deepCopy(entry.prediction.sample),
       p: entry.totalProb
     };

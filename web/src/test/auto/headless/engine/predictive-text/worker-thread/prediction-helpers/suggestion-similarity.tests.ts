@@ -1,10 +1,18 @@
+import { assert } from 'chai';
+
 import { QuoteBehavior } from "@keymanapp/models-templates";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from '@keymanapp/web-utils';
-import { assert } from 'chai';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SuggestionSimilarity, processSimilarity, toAnnotatedSuggestion } from "#./predict-helpers.js";
-import { DummyModel } from "#./models/dummy-model.js";
+import { CorrectionPredictionTuple, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
+
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import Context = LexicalModelTypes.Context;
+import DummyModel = models.DummyModel;
+import DummyOptions = models.DummyOptions;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
+import Transform = LexicalModelTypes.Transform;
 
 /*
  * This file's tests use these parts of a lexical model:
@@ -14,8 +22,7 @@ import { DummyModel } from "#./models/dummy-model.js";
  * - model.punctuation
  */
 
-/** @type { import("#./models/dummy-model.js").DummyOptions } */
-const DUMMY_MODEL_CONFIG = {
+const DUMMY_MODEL_CONFIG: DummyOptions = {
   punctuation: {
     quotesForKeepSuggestion: {
       open: '<',
@@ -27,7 +34,7 @@ const DUMMY_MODEL_CONFIG = {
 };
 
 // See: developer/src/kmc-model/model-defaults.ts, defaultApplyCasing
-const applyCasing = (casing, text) => {
+const applyCasing: CasingFunction = (casing, text) => {
   switch(casing) {
     case 'lower':
       return text.toLowerCase();
@@ -102,8 +109,7 @@ const testModelWithCasing = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const its = {
+  const its: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -122,8 +128,7 @@ const build_its_is_set = () => {
     // matchLevel does not yet exist.
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const it_is = {
+  const it_is: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
       p: 0.8
@@ -141,8 +146,7 @@ const build_its_is_set = () => {
     totalProb: 0.64
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is = {
+  const is: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -160,8 +164,7 @@ const build_its_is_set = () => {
     totalProb: 0.1
   };
 
-  /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-  const is_not = {
+  const is_not: CorrectionPredictionTuple = {
     correction: {
       sample: 'is',
       p: 0.2
@@ -189,16 +192,14 @@ const build_its_is_set = () => {
 
 describe('processSimilarity', () => {
   it(`selects non-contraction as 'more similar' than same-keyed contraction when context is non-contraction`, () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     };
 
-    /** @type {ProbabilityMass<Transform>} */
-    const trueInput = {
+    const trueInput: ProbabilityMass<Transform> = {
       sample: {
         insert: 's',
         deleteLeft: 0
@@ -209,8 +210,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-    const expectation = [
+    const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
         matchLevel: SuggestionSimilarity.exact
@@ -239,16 +239,14 @@ describe('processSimilarity', () => {
   });
 
   it(`selects contraction as 'more similar' than same-keyed non-contraction when context is contraction`, () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'It',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     };
 
-    /** @type {ProbabilityMass<Transform>} */
-    const trueInput = {
+    const trueInput: ProbabilityMass<Transform> = {
       sample: {
         insert: '\'s',
         deleteLeft: 0
@@ -259,8 +257,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-    const expectation = [
+    const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
         matchLevel: SuggestionSimilarity.sameKey
@@ -289,16 +286,14 @@ describe('processSimilarity', () => {
   });
 
   it(`creates an 'exact'-match suggestion as 'keep' if no exact-match exists`, () => {
-    /** @type {Context} */
-    const context = {
+    const context: Context = {
       left: 'iphon',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     };
 
-    /** @type {ProbabilityMass<Transform>} */
-    const trueInput = {
+    const trueInput: ProbabilityMass<Transform> = {
       sample: {
         insert: 'e',
         deleteLeft: 0
@@ -306,8 +301,7 @@ describe('processSimilarity', () => {
       p: 1
     };
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-    const iPhone = {
+    const iPhone: CorrectionPredictionTuple = {
       correction: {
         sample: 'iphone',
         p: 0.8
@@ -326,13 +320,11 @@ describe('processSimilarity', () => {
       // matchLevel does not yet exist.
     };
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-    const distribution = [
+    const distribution: CorrectionPredictionTuple[] = [
       iPhone
     ];
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
-    const keep_iphone = {
+    const keep_iphone: CorrectionPredictionTuple = {
       correction: {
         sample: 'iphone',
         p: 1
@@ -354,8 +346,7 @@ describe('processSimilarity', () => {
     };
 
 
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-    const expectation = [
+    const expectation: CorrectionPredictionTuple[] = [
       {
         ...keep_iphone,
         matchLevel: SuggestionSimilarity.exact
@@ -379,16 +370,14 @@ describe('processSimilarity', () => {
     // keeps a separate entry for the two versions (or only has the title-cased
     // one).
     it(`differentiates same-keyed suggestions when one only mismatches due to casing`, () => {
-      /** @type {Context} */
-      const context = {
+      const context: Context = {
         left: 'It',
         right: '',
         startOfBuffer: true,
         endOfBuffer: true
       };
 
-      /** @type {ProbabilityMass<Transform>} */
-      const trueInput = {
+      const trueInput: ProbabilityMass<Transform> = {
         sample: {
           insert: '\'s',
           deleteLeft: 0
@@ -407,8 +396,7 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-      const expectation = [
+      const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
           matchLevel: SuggestionSimilarity.sameKey
@@ -445,16 +433,14 @@ describe('processSimilarity', () => {
 
   describe('without casing', () => {
     it(`does not utilize casing behaviors when checking similarity`, () => {
-      /** @type {Context} */
-      const context = {
+      const context: Context = {
         left: 'It',
         right: '',
         startOfBuffer: true,
         endOfBuffer: true
       };
 
-      /** @type {ProbabilityMass<Transform>} */
-      const trueInput = {
+      const trueInput: ProbabilityMass<Transform> = {
         sample: {
           insert: '\'s',
           deleteLeft: 0
@@ -473,8 +459,7 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-      const expectation = [
+      const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
           matchLevel: SuggestionSimilarity.none

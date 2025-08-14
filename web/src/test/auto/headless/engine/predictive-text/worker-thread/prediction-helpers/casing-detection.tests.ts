@@ -1,8 +1,9 @@
 import { assert } from 'chai';
-import { ModelCompositor } from '#./model-compositor.js';
 
-import { detectCurrentCasing } from "#./model-helpers.js";
-import { DummyModel } from "#./models/dummy-model.js";
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import { detectCurrentCasing, ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
+
+import DummyModel = models.DummyModel;
 
 const defaultCasingModel = new DummyModel({
   languageUsesCasing: true,
@@ -37,8 +38,7 @@ const defaultCasingModel = new DummyModel({
   }
 });
 
-/** @type {CasingFunction} */
-const leetCasing = (casing, text) => {
+const leetCasing: LexicalModelTypes.CasingFunction = (casing, text) => {
   // Don't know if there's a standard analogue for '9', but this'll work well enough.
   const plain = ['O', 'L', 'Z', 'E', 'A', 'S', 'G', 'T', 'B']
   const leet  = ['0', '1', '2', '3', '4', '5', '6', '7', '8']

@@ -3,9 +3,11 @@
  */
 
 import { assert } from 'chai';
-import DummyModel from '#./models/dummy-model.js';
 
 import { emptyContext, iGotDistractedByHazel, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
+
+import { models } from '@keymanapp/lm-worker/test-index'
+import DummyModel = models.DummyModel;
 
 describe('LMLayerWorker dummy model', function() {
   describe('instantiation', function () {

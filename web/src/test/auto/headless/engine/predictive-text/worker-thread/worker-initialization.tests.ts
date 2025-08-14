@@ -1,13 +1,21 @@
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+
 import { assert } from 'chai';
 import sinon from 'sinon';
-import fs from 'fs';
-
-import LMLayerWorker from '#./index.js';
 
 import { configWorker, createMessageEventWithData, importScriptsWith } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { createRequire } from 'module';
+// @ts-ignore
+import { LMLayerWorker } from '@keymanapp/lm-worker/test-index';
+
 const require = createRequire(import.meta.url);
+
+interface MockedContext {
+  onmessage?: () => void;
+  importScripts?: () => void;
+  postMessage: sinon.SinonSpy<any, any>;
+}
 
 // Unit tests for instantiating and initializing the LMLayer Worker in isolation.
 //
@@ -18,7 +26,7 @@ describe('LMLayerWorker', function() {
   describe('#constructor()', function() {
     it('should allow for the mocking of postMessage()', function () {
       var fakePostMessage = sinon.fake();
-      var context = {
+      var context: MockedContext = {
         postMessage: fakePostMessage
       };
       context.importScripts = importScriptsWith(context);
@@ -42,7 +50,7 @@ describe('LMLayerWorker', function() {
 
   describe('#onMessage()', function() {
     it('should fail if not given the `message` attribute', function () {
-      var context = {
+      var context: MockedContext = {
         postMessage: sinon.fake()
       };
       context.importScripts = importScriptsWith(context);
@@ -60,9 +68,9 @@ describe('LMLayerWorker', function() {
 
   describe('.install()', function () {
     it('should create a new instance, installed on our global object', function () {
-      var fakeWorkerGlobal = {
+      var fakeWorkerGlobal: MockedContext = {
         onmessage: undefined,
-        postMessage: new sinon.fake(),
+        postMessage: sinon.fake(),
       };
       fakeWorkerGlobal.importScripts = importScriptsWith(fakeWorkerGlobal);
 
@@ -91,7 +99,7 @@ describe('LMLayerWorker', function() {
 
   describe('Message: config', function () {
     it('should disallow any other message', function () {
-      var context = {
+      var context: MockedContext = {
         postMessage: sinon.fake()
       };
       context.importScripts = importScriptsWith(context);
@@ -107,7 +115,7 @@ describe('LMLayerWorker', function() {
     });
 
     it('accepts a capability set and transitions to the "modelless" state', function () {
-      var context = {
+      var context: MockedContext = {
         postMessage: sinon.fake()
       };
       context.importScripts = importScriptsWith(context);
@@ -117,13 +125,13 @@ describe('LMLayerWorker', function() {
       // Trigger the config message
       configWorker(worker);
 
-      assert.equal(worker.state.name, 'modelless');
+      assert.equal(worker.unitTestEndPoints.getStateName(), 'modelless');
     });
   });
 
   describe('Message: load', function () {
     it('should disallow any other message', function () {
-      var context = {
+      var context: MockedContext = {
         postMessage: sinon.fake()
       };
       context.importScripts = importScriptsWith(context);
@@ -142,7 +150,7 @@ describe('LMLayerWorker', function() {
 
     it('should send back a "ready" message when given a file', function () {
       var fakePostMessage = sinon.fake();
-      var context = {
+      var context: MockedContext = {
         postMessage: fakePostMessage
       };
       context.importScripts = importScriptsWith(context);
@@ -165,7 +173,7 @@ describe('LMLayerWorker', function() {
 
     it('should send back a "ready" message when given raw code', function () {
       var fakePostMessage = sinon.fake();
-      var context = {
+      var context: MockedContext = {
         postMessage: fakePostMessage
       };
       context.importScripts = importScriptsWith(context);
@@ -190,7 +198,7 @@ describe('LMLayerWorker', function() {
 
     it('should send back configuration', function () {
       var fakePostMessage = sinon.fake();
-      var context = {
+      var context: MockedContext = {
         postMessage: fakePostMessage
       };
       context.importScripts = importScriptsWith(context);

@@ -42,8 +42,8 @@ import { Token } from '@keymanapp/models-templates';
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.
  */
-export type PostMessage = typeof DedicatedWorkerGlobalScope.prototype.postMessage;
-export type ImportScripts = typeof DedicatedWorkerGlobalScope.prototype.importScripts;
+export type PostMessage = (message: any, extra?: any) => void;
+export type ImportScripts = (...urls: string[]) => void;
 
 
 /**

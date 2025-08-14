@@ -20,7 +20,15 @@ import Transform = LexicalModelTypes.Transform;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
-  private contextTracker?: correction.ContextTracker;
+  private _contextTracker?: correction.ContextTracker;
+
+  /**
+   * Returns the context-caching store used to store intermediate
+   * correction-search and context-tokenization calculations.
+   */
+  public get contextTracker() {
+    return this._contextTracker;
+  }
 
   static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
@@ -62,7 +70,7 @@ export class ModelCompositor {
   ) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
-      this.contextTracker = new correction.ContextTracker();
+      this._contextTracker = new correction.ContextTracker();
     }
     this.punctuation = determinePunctuationFromModel(lexicalModel);
     this.testMode = !!testMode;
