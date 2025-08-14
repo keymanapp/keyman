@@ -8,7 +8,7 @@ import { testReaderCases } from '../helpers/reader-callback-test.js';
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
-import { KeymanXMLReader, XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
+import { KeymanXMLReader, withOffset, XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -25,7 +25,7 @@ describe('ldml keyboard xml reader tests', function () {
         keyword: 'required',
         message: `must have required property 'info'`,
         params: 'missingProperty="info"',
-      })],
+      }, withOffset(39))],
     },
     {
       subpath: 'invalid-conforms-to.xml',
@@ -34,7 +34,7 @@ describe('ldml keyboard xml reader tests', function () {
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
         params: 'allowedValues="45,46"', // this has to be kept in sync with the DTD
-      })],
+      }, withOffset(39))],
     },
     {
       subpath: 'import-minimal.xml',

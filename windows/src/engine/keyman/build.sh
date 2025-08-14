@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman main host process (32-bit)" \
@@ -42,7 +42,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/keyman.dbg" "$WINDOWS_DEBUGPATH_ENGINE/keyman.dbg"
 
   # Also copy sentry files here
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" \

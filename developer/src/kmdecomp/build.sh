@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
@@ -33,7 +33,7 @@ function do_build() {
   build_version.res
   vs_msbuild kmdecomp.sln //t:Build "//p:Platform=Win32"
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  cp "$WIN32_TARGET_PATH/kmdecomp.pdb" "$DEVELOPER_DEBUGPATH"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmdecomp.pdb" "$DEVELOPER_DEBUGPATH"
 }
 
 function do_publish() {

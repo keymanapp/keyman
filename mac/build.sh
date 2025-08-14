@@ -2,12 +2,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
-. "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
 
 builder_describe "Builds Keyman for macOS." \
   "@/core:mac" \
@@ -26,6 +26,8 @@ builder_describe "Builds Keyman for macOS." \
   "--quick,-q  Bypasses notarization for $(builder_term install)"
 
 builder_parse "$@"
+
+verify_on_mac
 
 # Default is release build of Engine and (code-signed) Input Method
 if builder_is_debug_build; then
@@ -102,7 +104,7 @@ execBuildCommand() {
     shift
     declare -r cmnd="$*"
 
-    displayInfo "Building $component:" "$cmnd"
+    builder_echo heading "Building $component:" "$cmnd"
     set +e
     local ret_code=0
     eval "$cmnd" || ret_code=$?
@@ -276,7 +278,7 @@ do_install() {
 
   builder_heading "Attempting local deployment with command:"
   KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-  displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
+  builder_echo info "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
   "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
 }
 
@@ -286,10 +288,10 @@ do_publish() {
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
 
-  "$KM4MIM_BASE_PATH/make-km-dmg.sh"
+  "${KM4MIM_BASE_PATH}/make-km-dmg.sh"
 
-  # Create download info
-  "$KM4MIM_BASE_PATH/write-download_info.sh"
+  local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
+  write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION}.dmg" "Keyman4MacIM" dmg mac
 
   do_sentry
 }

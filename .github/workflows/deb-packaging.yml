@@ -86,7 +86,14 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+        if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh" ]]; then
+          . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+        else
+          # TODO: remove following block post v19 release (file was renamed in v19 alpha)
+          if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh" ]]; then
+            . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+          fi
+        fi
         echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
@@ -127,7 +134,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, oracular]
+        dist: [jammy, noble, plucky]
 
     steps:
     - name: Checkout
@@ -153,7 +160,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [plucky]
+        dist: [questing]
 
     steps:
     - name: Checkout

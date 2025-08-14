@@ -15,8 +15,8 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url uri("${projectDir}/libs") }
         google()
-        jcenter()
         mavenCentral()
     }
 }

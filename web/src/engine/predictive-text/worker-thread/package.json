@@ -10,6 +10,9 @@
     "./worker-main.wrapped.min.js": {
       "types": "./build/lib/worker-main.wrapped.d.ts",
       "default": "./build/lib/worker-main.wrapped.min.js"
+    },
+    "./test-index": {
+      "default": "./build/obj/test-index.js"
     }
   },
   "imports": {

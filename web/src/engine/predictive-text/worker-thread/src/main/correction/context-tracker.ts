@@ -357,7 +357,7 @@ export class ContextTracker extends CircularArray<ContextState> {
   }
 
   // Aim:  relocate to ContextState in some form.
-  private static modelContextState(
+  static modelContextState(
     context: Context,
     lexicalModel: LexicalModel
   ): ContextState {
