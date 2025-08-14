@@ -165,11 +165,9 @@ describe('predictionAutoSelect', () => {
       }
     ];
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.equal(autoselected, keepSuggestion);
@@ -420,11 +418,9 @@ describe('predictionAutoSelect', () => {
     const totalProb = predictions.reduce((accum, current) => accum + current.totalProb, 0);
     assert.isAbove(highestNonKeepSuggestion.totalProb, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.equal(autoselected, highestNonKeepSuggestion);
@@ -578,11 +574,9 @@ describe('predictionAutoSelect', () => {
     const totalProb = predictions.reduce((accum, current) => accum + current.totalProb, 0);
     assert.isAbove(highestNonKeepSuggestion.totalProb, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.isNotOk(autoselected);
