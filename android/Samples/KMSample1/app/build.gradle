@@ -2,6 +2,12 @@ plugins {
     id 'com.android.application'
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
     compileSdk 34
     namespace="com.keyman.kmsample1"

@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * This file defines methods used as helpers when aligning cached context state
+ * information with incoming contexts and when validating partial substitution
+ * edits for aligned context tokens.
+ */
+
 import { ClassicalDistanceCalculation, EditOperation } from "./classical-calculation.js";
 
 /**

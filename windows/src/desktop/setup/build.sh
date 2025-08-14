@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman Setup bootstrap" \
@@ -43,7 +43,7 @@ function do_build() {
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
   # setup-redist.exe does not get signed as it is intended for a bundled installer
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP/setup-redist.exe"
-  cp "$WIN32_TARGET_PATH/setup.dbg" "$WINDOWS_DEBUGPATH_APP/setup.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/setup.dbg" "$WINDOWS_DEBUGPATH_APP/setup.dbg"
 }
 
 function do_build_debug_manifest() {

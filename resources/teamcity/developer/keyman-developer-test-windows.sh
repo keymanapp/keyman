@@ -9,7 +9,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
@@ -19,11 +19,16 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Build Keyman Developer on Windows" \
-  "all            run all actions" \
+  "all            run all actions (used by TeamCity build configuration)" \
   "build          build Keyman Developer and test keyboards" \
   "publish        publish debug information files to sentry"
 
 builder_parse "$@"
+
+if ! builder_is_windows; then
+  builder_echo error "This script is intended to be run on Windows only."
+  exit 1
+fi
 
 # shellcheck disable=SC2154
 cd "${KEYMAN_ROOT}/developer/src"
@@ -34,11 +39,11 @@ function build_developer_action() {
 }
 
 function _build_developer() {
-  builder_echo start "build developer" "Building Keyman Developer"
+  builder_echo start "build developer" "Building and testing Keyman Developer"
 
-  ./build.sh configure build test api publish --dry-run
+  ./build.sh configure build test
 
-  builder_echo end "build developer" success "Finished building Keyman Developer"
+  builder_echo end "build developer" success "Finished building and testing Keyman Developer"
 }
 
 function _build_testkeyboards() {
@@ -50,21 +55,22 @@ function _build_testkeyboards() {
 }
 
 function publish_sentry_action() {
+  builder_echo start "publish" "Dry-run publish and api"
+  ./build.sh api publish --dry-run
+  builder_echo end "publish" "Dry-run publish and api"
+
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
-
+  # TODO: move this into build.sh publish? re-scope --dry-run into build.sh?
   "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
-
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 
-if ! is_windows; then
-  builder_echo error "This script is intended to be run on Windows only."
-  exit 1
-fi
-
 if builder_has_action all; then
+  # TODO: control codesign by KEYMAN_BUILD_LEVEL
   build_developer_action
-  publish_sentry_action
+  if builder_is_ci_build_level_release; then
+    publish_sentry_action
+  fi
 else
   builder_run_action  build    build_developer_action
   builder_run_action  publish  publish_sentry_action

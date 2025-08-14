@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Text Services Framework Text Input Processor" \
@@ -35,9 +35,9 @@ function do_build() {
   vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=Win32"
   vs_msbuild kmtip.vcxproj //t:Build "//p:Platform=x64"
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/kmtip.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmtip.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$X64_TARGET_PATH/kmtip64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$X64_TARGET_PATH/kmtip64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish() {

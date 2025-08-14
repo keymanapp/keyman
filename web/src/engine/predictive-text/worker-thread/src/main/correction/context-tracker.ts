@@ -392,7 +392,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     };
   }
 
-  private static modelContextState(
+  static modelContextState(
     tokenizedContext: Token[],
     lexicalModel: LexicalModel
   ): TrackedContextState {
