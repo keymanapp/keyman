@@ -136,7 +136,7 @@ if [ "$action" == "commit" ]; then
   NEWVERSION=`cat $KEYMAN_VERSION_MD | tr -d "[:space:]"`
 
   pushd "$KEYMAN_ROOT" > /dev/null
-  message="auto: increment $base version to $NEWVERSION"$'\n\nTest-bot:skip\nBuild-bot: skip'
+  message="auto: increment $base version to $NEWVERSION"$'\n\nTest-bot: skip\nBuild-bot: skip'
   branch="auto/version-$base-$NEWVERSION"
   git tag -a "$KEYMAN_VERSION_GIT_TAG" -m "Keyman release $KEYMAN_VERSION_WITH_TAG"
   git checkout -b "$branch"
