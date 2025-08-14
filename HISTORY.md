@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.98 alpha 2025-08-14
+
+* maint(resources): specify `keymanapp/keyman` for gh in automerge (#14524)
+
 ## 19.0.97 alpha 2025-08-14
 
 * maint(resources): use GH_TOKEN variable for gh calls (#14522)
