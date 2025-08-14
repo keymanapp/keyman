@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-08-01
+ *
+ * This file tests designed to validate the behavior of ContextState class and
+ * its integration with the lower-level classes that it utilizes.
+ */
+
 import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
