@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.96 alpha 2025-08-14
+
+* maint(resources): add build-bot commands to increment-version auto PRs (#14504)
+* maint(resources): use GH builtin automerge for auto PRs (#14519)
+
 ## 19.0.95 alpha 2025-08-13
 
 * fix(web): use actual legacy model for legacy-model support unit tests (#14460)
