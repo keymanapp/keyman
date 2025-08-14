@@ -31,16 +31,11 @@ export type StateChangeEnum = 'active' | 'configured' | 'inactive';
  */
 export type StateChangeHandler = (state: StateChangeEnum) => any;
 
-/**
- * Covers 'tryaccept' events.
- */
-export type TryUIHandler = (source: string, returnObj: { shouldSwallow: boolean }) => boolean;
 
 export interface LanguageProcessorEventMap {
   'suggestionsready': ReadySuggestionsHandler,
   'invalidatesuggestions': InvalidateSuggestionsHandler,
   'statechange': StateChangeHandler,
-  'tryaccept': TryUIHandler,
   'tryrevert': () => void,
 
   /**

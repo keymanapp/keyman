@@ -112,7 +112,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.addListener('tryaccept', this.doTryAccept);
     this.langProcessor.addListener('tryrevert', this.doTryRevert);
     this.langProcessor.addListener('statechange', this.onModelStateChange);
   }
@@ -120,7 +119,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   public disconnect() {
     this.langProcessor.removeListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.removeListener('suggestionsready', this.updateSuggestions);
-    this.langProcessor.removeListener('tryaccept', this.doTryAccept);
     this.langProcessor.removeListener('tryrevert', this.doTryRevert);
     this.langProcessor.removeListener('statechange', this.onModelStateChange);
     this.clearSuggestions();
@@ -224,44 +222,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // Construct a 'revert suggestion' to facilitate a reversion UI component.
     this.doRevert = true;
     this.sendUpdateEvent();
-  }
-
-  /**
-   * Receives messages from the keyboard that the 'accept' keystroke has been entered.
-   * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
-   * Otherwise, return true.
-   */
-  private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
-    const recentAcceptCause = this.recentAcceptCause;
-
-    if(!recentAcceptCause && this.selected) {
-      this.accept(this.selected);
-      // If there is right-context, DO emit the space instead of swallowing it.
-      // It's not auto-added by the predictive-text worker for such cases.
-      returnObj.shouldSwallow = !this.currentTarget.getTextAfterCaret();
-
-      // doTryAccept is the path for keystroke-based auto-acceptance.
-      // Overwrite the cause to reflect this.
-      this._recentAcceptCause = 'key';
-    } else if(recentAcceptCause && source == 'space') {
-      this._recentAcceptCause = null;
-      if(recentAcceptCause == 'key') {
-        // No need to swallow the keystroke's whitespace; we triggered the prior acceptance
-        // FROM a space, so we've already aliased the suggestion's built-in space.
-        returnObj.shouldSwallow = false;
-        return;
-      }
-
-      // Standard whitespace applications from the banner, those we DO want to
-      // swallow the first time.
-      //
-      // If the model doesn't insert wordbreaks, there's no space to alias, so
-      // don't swallow the space.  If it does, we consider that insertion to be
-      // the results of the first post-accept space.
-      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions && !this.currentTarget.getTextAfterCaret();; // can be handed outside
-    } else {
-      returnObj.shouldSwallow = false;
-    }
   }
 
   /**

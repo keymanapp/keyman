@@ -504,20 +504,6 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return this.configuration?.appendsWordbreaks;
   }
 
-  public tryAcceptSuggestion(source: string): boolean {
-    if(!this.isActive) {
-      return false;
-    }
-
-    // The object below is to facilitate a pass-by-reference on the boolean flag,
-    // allowing the event's handler to signal if whitespace has been added via
-    // auto-applied suggestion that should be blocked on the next keystroke.
-    const returnObj = {shouldSwallow: false};
-    this.emit('tryaccept', source, returnObj);
-
-    return returnObj.shouldSwallow ?? false;
-  }
-
   public tryRevertSuggestion(): boolean {
     if(!this.isActive) {
       return false;
