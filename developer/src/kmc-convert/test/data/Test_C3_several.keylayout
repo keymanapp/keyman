@@ -28,7 +28,7 @@
             <key code="0" action="A6"/>
         </keyMap>
         <keyMap index="2">
-            <key code="28" action="A7"/>
+            <key code="0" action="A7"/>
             <key code="32" action="A5"/>
         </keyMap>
         <keyMap index="3">

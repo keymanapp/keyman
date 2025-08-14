@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import * as NodeAssert from 'node:assert';
 import { CompilerErrorNamespace, CompilerErrorSeverity } from '@keymanapp/developer-utils';
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { idStateOutput_object, allArrayContents_object, KeylayoutToKmnConverter } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 import { ConverterMessages } from '../src/converter-messages.js';
 
@@ -22,6 +22,27 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
+  // todo remove
+    describe('RunAllFiles', function () {
+      const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        [makePathToFixture('../data/Italian.keylayout')],
+        [makePathToFixture('../data/Italian_command.keylayout')],
+        [makePathToFixture('../data/Swiss_French.keylayout')],
+        [makePathToFixture('../data/Spanish.keylayout')],
+        [makePathToFixture('../data/Swiss_German.keylayout')],
+        [makePathToFixture('../data/US.keylayout')],
+        [makePathToFixture('../data/Polish.keylayout')],
+        [makePathToFixture('../data/French.keylayout')],
+        [makePathToFixture('../data/Latin_American.keylayout')],
+      //  [makePathToFixture('../data/German_complete.keylayout')],
+        [makePathToFixture('../data/German_complete_reduced.keylayout')],
+       // [makePathToFixture('../data/German_Standard.keylayout')],
+      ].forEach(function (files_) {
+        sut.run(files_[0]);
+        assert.isTrue(true);
+      });
+    });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -161,12 +182,12 @@ describe('KeylayoutToKmnConverter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // convert_object from unavailable file name
+    // ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
-    // convert_object from empty filename
+    // ProcesData from empty filename
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
     const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);
@@ -209,7 +230,7 @@ describe('KeylayoutToKmnConverter', function () {
         && converted_rule.arrayOf_Rules.length === 0));
     });
 
-    it('should return empty array of rukes on null input', async function () {
+    it('should return empty array of rules on null input', async function () {
       const converted_rule = sut.convert_bound.convert(null, 'ABC.kmn');
       assert.isTrue(converted_rule.arrayOf_Rules.length === 0);
     });
@@ -343,7 +364,7 @@ describe('KeylayoutToKmnConverter', function () {
       it((values[1] !== null) ?
         ("get_Modifier_array__From__KeyModifier_array('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
         ("get_Modifier_array__From__KeyModifier_array('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
-          const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0] as allArrayContents_object[]);
+          const result = sut.get_Modifier_array__From__KeyModifier_array(converted.arrayOf_Modifiers, values[0] as KeylayoutFileData[]);
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -461,7 +482,7 @@ describe('KeylayoutToKmnConverter', function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
-    const b1_keycode_arr: allArrayContents_object[] = [
+    const b1_keycode_arr: KeylayoutFileData[] = [
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '0', outchar: 'ˆ' },
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '1', outchar: 'ˆ' },
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '2', outchar: 'ˆ' },
@@ -486,7 +507,7 @@ describe('KeylayoutToKmnConverter', function () {
       { keyCode: '0', key: 'K_A', actionId: 'A_9', behaviour: '0', outchar: 'â' }
 
     ];
-    const b1_modifierKey_arr: allArrayContents_object[] = [
+    const b1_modifierKey_arr: KeylayoutFileData[] = [
       { actionId: 'A_0', key: 'K_SPACE', behaviour: '0', modifier: 'NCAPS', outchar: 'ˆ' },
       { actionId: 'A_0', key: 'K_SPACE', behaviour: '1', modifier: 'CAPS', outchar: 'ˆ' },
       { actionId: 'A_0', key: 'K_SPACE', behaviour: '2', modifier: 'NCAPS SHIFT', outchar: 'ˆ' },
@@ -651,7 +672,7 @@ describe('KeylayoutToKmnConverter', function () {
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sut_r.read(inputFilename);
 
-    const b6_actionId_arr: idStateOutput_object[] = [
+    const b6_actionId_arr: ActionStateOutput[] = [
       { "id": "A_0", "state": "1", "output": "ˆ" },
       { "id": "A_1", "state": "1", "output": "Â" },
       { "id": "A_10", "state": "1", "output": "ê" },
@@ -665,7 +686,7 @@ describe('KeylayoutToKmnConverter', function () {
       { "id": "A_9", "state": "1", "output": "â" }
     ];
 
-    const b1_keycode_arr: allArrayContents_object[] = [
+    const b1_keycode_arr: KeylayoutFileData[] = [
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '0', outchar: 'ˆ' },
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '1', outchar: 'ˆ' },
       { keyCode: '49', key: 'K_SPACE', actionId: 'A_0', behaviour: '2', outchar: 'ˆ' },
@@ -693,7 +714,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[b6_actionId_arr, b1_keycode_arr],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array([['" + JSON.stringify(values[0]) + "'],..])").padEnd(73, " ") + '1 should return an array of objects', async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as idStateOutput_object[]);
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -723,7 +744,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[{ "id": "A_0", "state": "", "output": "ˆ" }], oneEntryResult],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + JSON.stringify(values[0]) + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as idStateOutput_object[]);
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -734,7 +755,7 @@ describe('KeylayoutToKmnConverter', function () {
 
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as idStateOutput_object[]);
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -744,8 +765,69 @@ describe('KeylayoutToKmnConverter', function () {
     [null, []],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as idStateOutput_object[]);
+        const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
+      });
+    });
+  });
+
+  describe('createRuleData ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
+
+    [
+      [
+        ['../data/Test_C0.keylayout'],
+        [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
+        new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+        new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+        new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_D', new TextEncoder().encode('d'))]
+      ],
+      [
+        ['../data/Test_C1.keylayout'],
+        [new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))]
+      ],
+      [
+        ['../data/Test_C2.keylayout'],
+        [new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))],
+      ],
+      [
+        ['../data/Test_C3.keylayout'],
+        [new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))]
+      ],
+
+      [
+        ['../data/Test_C3_several.keylayout'],
+        [new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â'))]
+      ],
+      [
+        ['../data/Test_C0_C1_C2_C3.keylayout'],
+        [new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+        new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 1, 'CAPS', 'K_S', 2, 6, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 3, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 4, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 5, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_S', 2, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+        new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_U', new TextEncoder().encode('U')),]
+      ],
+    ].forEach(function (values: any) {
+      it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
+        const inputFilename = makePathToFixture(values[0][0]);
+        const read = sut_r.read(inputFilename);
+        const outArray = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        assert.deepEqual(outArray.arrayOf_Rules[0], values[1][0]);
       });
     });
   });

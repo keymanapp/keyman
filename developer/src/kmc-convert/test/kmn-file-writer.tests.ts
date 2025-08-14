@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { util } from '@keymanapp/common-types';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 
@@ -30,7 +30,7 @@ describe('KmnFileWriter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from unavailable file name
+    // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
@@ -70,7 +70,7 @@ describe('KmnFileWriter', function () {
       + "group(main) using keys\n\n"
       + "\n";
 
-    // empty convert_object from unavailable file name
+    // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
@@ -111,7 +111,7 @@ describe('KmnFileWriter', function () {
       + "\n";
 
 
-    // empty convert_object from unavailable file name
+    // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
@@ -134,7 +134,7 @@ describe('KmnFileWriter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from unavailable file name
+    // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
@@ -159,12 +159,12 @@ describe('KmnFileWriter', function () {
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from unavailable file name
+    // empty ProcesData from unavailable file name
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
-    // empty convert_object from empty filename
+    // empty ProcesData from empty filename
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
     const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);
@@ -502,7 +502,107 @@ describe('KmnFileWriter', function () {
     });
   });
 
-
-
+  describe('write form intermediate data array', function () {
+    const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [
+        [ /* see ../data/Test_C0.keylayout */
+          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_A', new TextEncoder().encode('a')),
+          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_D', new TextEncoder().encode('d'))
+        ],
+        ["+ [NCAPS K_A]  >  'a'\n" +
+          "+ [CAPS K_A]  >  'A'\n\n" +
+          "+ [NCAPS K_S]  >  's'\n\n" +
+          "+ [NCAPS K_D]  >  'd'\n"]
+      ],
+      [
+        [ /* see ../data/Test_C1.keylayout */
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS', 'K_S', new TextEncoder().encode('s')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S'))
+        ],
+        ["+ [NCAPS K_S]  >  's'\n" +
+          "+ [CAPS K_S]  >  'S'\n"]
+      ],
+      [
+        [ /* see ../data/Test_C2.keylayout */
+          new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_U', 1, 1, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
+        ],
+        ["+ [NCAPS K_U]  >  dk(A1)\n" +
+          "dk(A1) + [CAPS K_A]  >  'Â'\n\n"]
+      ],
+      [
+        [ /* see ../data/Test_C3.keylayout */
+          new Rule("C3", 'NCAPS SHIFT', 'K_D', 2, 1, 'NCAPS', 'K_U', 1, 2, 'CAPS', 'K_A', new TextEncoder().encode('Â'))
+        ],
+        ["+ [NCAPS SHIFT K_D]   >   dk(A2)\n" +
+          "dk(A2)  + [NCAPS K_U]  >  dk(B1)\n" +
+          "dk(B1) + [CAPS K_A]  >  'Â'\n\n"
+        ]
+      ],
+      [
+        [ /* see ../data/Test_C0_C1_C2_C3.keylayout */
+          new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_A', new TextEncoder().encode('A')),
+          new Rule("C2", '', '', 0, 0, 'NCAPS RALT', 'K_EQUAL', 1, 1, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 1, 'CAPS', 'K_S', 2, 6, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 3, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 4, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 5, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_S', new TextEncoder().encode('S')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'NCAPS RALT', 'K_U', new TextEncoder().encode('S')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_S', 2, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'CAPS', 'K_U', 3, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_S', 4, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 6, 0, 'NCAPS RALT', 'K_U', 5, 0, 'CAPS', 'K_D', new TextEncoder().encode('Â')),
+          new Rule("C1", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_U', new TextEncoder().encode('U')),
+        ],
+        ["+ [CAPS K_A]  >  'A'\n" +
+          "+ [CAPS K_S]  >  'S'\n\n" +
+          "+ [NCAPS RALT K_U]  >  'S'\n" +
+          "+ [CAPS K_U]  >  'U'\n" +
+          "+ [NCAPS RALT K_EQUAL]  >  dk(A1)\n" +
+          "dk(A1) + [CAPS K_D]  >  'Â'\n\n" +
+          "+ [NCAPS RALT K_8]   >   dk(A6)\n" +
+          "dk(A6)  + [CAPS K_S]  >  dk(B2)\n" +
+          "dk(B2) + [CAPS K_D]  >  'Â'\n\n" +
+          "dk(A6)  + [CAPS K_U]  >  dk(B3)\n" +
+          "dk(B3) + [CAPS K_D]  >  'Â'\n\n" +
+          "dk(A6)  + [NCAPS RALT K_S]  >  dk(B4)\n" +
+          "dk(B4) + [CAPS K_D]  >  'Â'\n\n" +
+          "dk(A6)  + [NCAPS RALT K_U]  >  dk(B5)\n" +
+          "dk(B5) + [CAPS K_D]  >  'Â'\n\n"]
+      ],
+      [
+        [ /* see ../data/Test_C3_several.keylayout */
+          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 1, 'CAPS', 'K_U', 1, 3, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'CAPS', 'K_U', 1, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 2, 'NCAPS', 'K_A', new TextEncoder().encode('â')),
+          new Rule("C3", 'NCAPS RALT', 'K_8', 3, 0, 'NCAPS RALT', 'K_U', 2, 0, 'NCAPS RALT', 'K_A', new TextEncoder().encode('â'))
+        ],
+        ["+ [NCAPS RALT K_8]   >   dk(A3)\n" +
+          "dk(A3)  + [CAPS K_U]  >  dk(B1)\n" +
+          "dk(B1) + [NCAPS K_A]  >  'â'\n\n" +
+          "dk(B1) + [NCAPS RALT K_A]  >  'â'\n\n" +
+          "dk(A3)  + [NCAPS RALT K_U]  >  dk(B2)\n" +
+          "dk(B2) + [NCAPS K_A]  >  'â'\n\n" +
+          "dk(B2) + [NCAPS RALT K_A]  >  'â'\n\n"
+        ]
+      ],
+    ].forEach(function (values: any) {
+      it(('an array of Rules should create a set of kmn rules '), async function () {
+        const data: ProcesData = {
+          keylayout_filename: "",
+          kmn_filename: "",
+          arrayOf_Modifiers: [[]],
+          arrayOf_Rules: values[0]
+        };
+        const result1 = sut_w.writeData_Rules(data);
+        assert.isTrue(result1 === values[1][0]);
+      });
+    });
+  });
 
 });

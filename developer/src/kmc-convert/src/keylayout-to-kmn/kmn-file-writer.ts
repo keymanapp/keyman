@@ -8,7 +8,7 @@
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { KeylayoutToKmnConverter, convert_object, Rule } from './keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, ProcesData, Rule } from './keylayout-to-kmn-converter.js';
 import { util } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
@@ -23,7 +23,7 @@ export class KmnFileWriter {
    * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
    * @return true if data has been written; false if not
    */
-  public write(data_ukelele: convert_object): boolean {
+  public write(data_ukelele: ProcesData): boolean {
 
     let data: string = "\n";
 
@@ -42,7 +42,7 @@ export class KmnFileWriter {
     }
   }
 
-  public writeToString(data_ukelele: convert_object): string {
+  public writeToString(data_ukelele: ProcesData): string {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
@@ -59,7 +59,7 @@ export class KmnFileWriter {
     }
   }
 
-  public writeToUint8Array(data_ukelele: convert_object): Uint8Array {
+  public writeToUint8Array(data_ukelele: ProcesData): Uint8Array {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
@@ -81,7 +81,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeData_Stores(data_ukelele: convert_object): string {
+  public writeData_Stores(data_ukelele: ProcesData): string {
 
     let data: string = "";
 
@@ -108,7 +108,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all rules to be printed
    */
-  public writeData_Rules(data_ukelele: convert_object): string {
+  public writeData_Rules(data_ukelele: ProcesData): string {
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     let data: string = "";
