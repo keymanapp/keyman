@@ -8,7 +8,8 @@
 #
 name: Auto Merge PRs from keyman-server
 on:
-- pull_request
+  pull_request:
+    types: [opened]
 
 jobs:
   build:
@@ -16,12 +17,13 @@ jobs:
     if: ${{ github.repository == 'keymanapp/keyman' && github.actor == 'keyman-server' && startsWith(github.event.pull_request.title, 'auto:') }}
     steps:
     - name: auto approve PR from keyman-server
-      uses: hmarr/auto-approve-action@f0939ea97e9205ef24d872e76833fa908a770363  # v4.0.0
-      with:
-        github-token: "${{ secrets.GITHUB_TOKEN }}"
-    - name: auto merge PR from keyman-server
-      uses: "pascalgn/automerge-action@7854d3bd607dccdaf0b2c134b699a812c8960213"  # v0.7.3
+      shell: bash
+      run: |
+        gh pr review --approve ${{ github.event.pull_request.number }}
+    - name: mark PR for auto-merge from keyman-server
+      shell: bash
+      if: contains(github.event.pull_request.labels.*.name, 'automerge')
       env:
         GITHUB_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
-        MERGE_LABELS: "automerge"
-        MERGE_FORKS: false
+      run: |
+        gh pr merge --auto ${{ github.event.pull_request.number }}
