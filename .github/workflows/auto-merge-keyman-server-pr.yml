@@ -28,4 +28,4 @@ jobs:
       env:
         GH_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
       run: |
-        gh pr merge -R keymanapp/keyman --auto ${{ github.event.pull_request.number }}
+        gh pr merge -R keymanapp/keyman --merge --auto ${{ github.event.pull_request.number }}
