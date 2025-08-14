@@ -1,3 +1,14 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-08-01
+ *
+ * Implements a 'rewindable cache' designed for use with Transcriptions
+ * and context-transition events.  The cache can clear all entries more
+ * recent than a specified entry while otherwise pushing old entries out
+ * when the cached history grows too large.
+ */
+
 /**
  * Defines a Map-like cache that forgets the least-recent entry when
  * reaching a specified capacity and that provides the ability to

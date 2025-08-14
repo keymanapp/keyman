@@ -1,5 +1,12 @@
 /*
- * Unit tests for the priority queue.
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-08-01
+ *
+ * This test suite provides basic unit tests for the functionality of
+ * the RewindableCache class, which tracks the original ordering of
+ * cached entries, forgets the oldest when too full, and also allows
+ * removal of all entries _more recent_ than a specified key's entry.
  */
 
 import { assert } from 'chai';
