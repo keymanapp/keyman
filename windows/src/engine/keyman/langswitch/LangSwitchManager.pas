@@ -1,4 +1,4 @@
-(*
+﻿(*
   Name:             LangSwitchManager
   Copyright:        Copyright (C) SIL International.
   Documentation:
@@ -47,6 +47,7 @@ unit LangSwitchManager;
 interface
 
 uses
+  ErrorControlledRegistry,
   System.Classes,
   System.Contnrs,
   System.SysUtils,
@@ -230,6 +231,19 @@ type
     FLanguageToggle: string;
     FLayoutToggle: string;
     procedure LoadCurrentHotkey;
+    (**
+     * Ensures that the specified registry value has a valid string data type.
+     * If the registry value exists but is not of type `rdString` or `rdExpandString`,
+     * the function deletes the existing value and writes a default string value
+     * of `'3'`.
+     *
+     * @param    RegistryKey   The registry key object wrapper used to access the registry.
+     * @param    ValueName     The name of the registry value to check and correct.
+     *
+     * @returns  True if the data type was incorrect and the value was reset;
+     *           False if the value did not exist or was already a valid string type.
+     *)
+    function  FixRegistryDataType(RegistryKey: TRegistryErrorControlled; const ValueName: string): Boolean;
     procedure DisableWindowsHotkey;
     procedure RestoreWindowsHotkey;
   public
@@ -251,7 +265,6 @@ uses
   InterfaceHotkeys,
   kmint,
   LoadIndirectStringUnit,
-  ErrorControlledRegistry,
   Registry,
   RegistryKeys,
   UfrmKeyman7Main,
@@ -981,42 +994,76 @@ begin
   FCurrentHotkey := FindHotkey(kmcom.Hotkeys);
 end;
 
+function TLangSwitchConfiguration.FixRegistryDataType(
+  RegistryKey: TRegistryErrorControlled;
+  const ValueName: string
+): Boolean;
+var
+  RegType: TRegDataType;
+  const CHotkeyNotAssigned = '3';
+begin
+  Result := False;
+
+  if RegistryKey.ValueExists(ValueName) then
+  begin
+    RegType := RegistryKey.GetDataType(ValueName);
+    if not ((RegType = rdString) or (RegType = rdExpandString)) then
+    begin
+      RegistryKey.DeleteValue(ValueName);
+      RegistryKey.WriteString(ValueName, CHotkeyNotAssigned);
+      Result := True;
+    end;
+  end;
+
+end;
+
 procedure TLangSwitchConfiguration.DisableWindowsHotkey;
 var
   MatchValue: string;
+  KeyboardToggleReg: TRegistryErrorControlled;
   FReset: Boolean;
+  const CHotkeyNotAssigned = '3';
 begin
   if FCurrentHotkey = (HK_ALT or HK_SHIFT) then MatchValue := '1'
   else if FCurrentHotkey = (HK_CTRL or HK_SHIFT) then MatchValue := '2'
   else Exit;
 
-  FLanguageToggle := '3';
-  FLayoutToggle := '3';
+  FLanguageToggle := CHotkeyNotAssigned;
+  FLayoutToggle := CHotkeyNotAssigned;
 
   FReset := False;
 
-  with TRegistryErrorControlled.Create do  // I2890
+  KeyboardToggleReg := TRegistryErrorControlled.Create; // I2890
   try
-    if not OpenKey(SRegKey_KeyboardLayoutToggle, True) then  // I2890
-      RaiseLastRegistryError;
+    if not KeyboardToggleReg.OpenKey(SRegKey_KeyboardLayoutToggle, True) then  // I2890
+      KeyboardToggleReg.RaiseLastRegistryError;
+    // Fix potential corrupted registry keys
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_Hotkey) then
+      FReset := True;
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_LanguageHotkey) then
+      FReset := True;
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_LayoutHotkey) then
+      FReset := True;
 
-    if ValueExists(SRegValue_Toggle_Hotkey) then FLanguageToggle := ReadString(SRegValue_Toggle_Hotkey);
+    if KeyboardToggleReg.ValueExists(SRegValue_Toggle_Hotkey) then
+      FLanguageToggle := KeyboardToggleReg.ReadString(SRegValue_Toggle_Hotkey);
     if FLanguageToggle = MatchValue then
     begin
-      WriteString(SRegValue_Toggle_Hotkey, '3');
-      WriteString(SRegValue_Toggle_LanguageHotkey, '3');
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_Hotkey, CHotkeyNotAssigned);
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_LanguageHotkey, CHotkeyNotAssigned);
       FReset := True;
     end;
 
-    if ValueExists(SRegValue_Toggle_LayoutHotkey) then FLayoutToggle := ReadString(SRegValue_Toggle_LayoutHotkey);
+    if KeyboardToggleReg.ValueExists(SRegValue_Toggle_LayoutHotkey) then
+      FLayoutToggle := KeyboardToggleReg.ReadString(SRegValue_Toggle_LayoutHotkey);
 
     if FLayoutToggle = MatchValue then
     begin
-      WriteString(SRegValue_Toggle_LayoutHotkey, '3');
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_LayoutHotkey, CHotkeyNotAssigned);
       FReset := True;
     end;
   finally
-    Free;
+    KeyboardToggleReg.Free;
   end;
 
   if FReset then SystemParametersInfo(SPI_SETLANGTOGGLE, 0, nil, 0);
@@ -1024,31 +1071,42 @@ end;
 
 procedure TLangSwitchConfiguration.RestoreWindowsHotkey;
 var
-  FReset: Boolean;
+  FReset, Changed: Boolean;
+  KeyboardToggleReg: TRegistryErrorControlled;
 begin
   FReset := False;
 
   if FLanguageToggle = '' then Exit;
 
-  with TRegistryErrorControlled.Create do  // I2890
+  KeyboardToggleReg := TRegistryErrorControlled.Create; // I2890
   try
-    if not OpenKey(SRegKey_KeyboardLayoutToggle, True) then  // I2890
-      RaiseLastRegistryError;
+    if not KeyboardToggleReg.OpenKey(SRegKey_KeyboardLayoutToggle, True) then  // I2890
+      KeyboardToggleReg.RaiseLastRegistryError;
 
-    if not ValueExists(SRegValue_Toggle_Hotkey) or (ReadString(SRegValue_Toggle_Hotkey) <> FLanguageToggle) then
+    // Fix potential corrupted registry keys
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_Hotkey) then
+      FReset := True;
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_LanguageHotkey) then
+      FReset := True;
+    if FixRegistryDataType(KeyboardToggleReg, SRegValue_Toggle_LayoutHotkey) then
+      FReset := True;
+
+    if not KeyboardToggleReg.ValueExists(SRegValue_Toggle_Hotkey) or
+      (KeyboardToggleReg.ReadString(SRegValue_Toggle_Hotkey) <> FLanguageToggle) then
     begin
-      WriteString(SRegValue_Toggle_Hotkey, FLanguageToggle);
-      WriteString(SRegValue_Toggle_LanguageHotkey, FLanguageToggle);
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_Hotkey, FLanguageToggle);
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_LanguageHotkey, FLanguageToggle);
       FReset := True;
     end;
 
-    if not ValueExists(SRegValue_Toggle_LayoutHotkey) or (ReadString(SRegValue_Toggle_LayoutHotkey) <> FLayoutToggle) then
+    if not KeyboardToggleReg.ValueExists(SRegValue_Toggle_LayoutHotkey) or
+      (KeyboardToggleReg.ReadString(SRegValue_Toggle_LayoutHotkey) <> FLayoutToggle) then
     begin
-      WriteString(SRegValue_Toggle_LayoutHotkey, FLayoutToggle);
+      KeyboardToggleReg.WriteString(SRegValue_Toggle_LayoutHotkey, FLayoutToggle);
       FReset := True;
     end;
   finally
-    Free;
+    KeyboardToggleReg.Free;
   end;
 
   if FReset then

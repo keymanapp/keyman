@@ -15,8 +15,8 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-# shellcheck source=resources/build/build-utils.sh
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+# shellcheck source=resources/build/builder-basic.inc.sh
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck source=linux/scripts/package-build.inc.sh
@@ -33,7 +33,7 @@ else
 fi
 echo "ppa: ${ppa}"
 
-distributions="${DIST:-jammy noble oracular plucky questing}"
+distributions="${DIST:-jammy noble plucky questing}"
 packageversion="${PACKAGEVERSION:-1~sil1}"
 
 BASEDIR=$(pwd)

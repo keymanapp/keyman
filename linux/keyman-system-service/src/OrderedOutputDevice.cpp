@@ -5,13 +5,10 @@
 #include <string>
 #include <syslog.h>
 #include <unistd.h>
+#include <km_linux_common.h>
 #include "OrderedOutputDevice.h"
 
 using namespace std;
-
-// TODO: Move to a common header file. Also defined in ibus-keyman/src/engine.c
-// and ibus-keyman/tests/testfixture.h
-#define KEYMAN_F24_KEYCODE_OUTPUT_SENTINEL 194  // 0xC2
 
 #ifndef KEYMAN_TESTING
 OrderedOutputDevice* CreateOrderedOutputDevice() {

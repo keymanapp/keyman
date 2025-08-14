@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman main host process (64-bit)" \
@@ -33,7 +33,7 @@ function do_build() {
   build_manifest.res
   vs_msbuild keymanx64.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$X64_TARGET_PATH/keymanx64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
+  builder_if_release_build_level cp "$X64_TARGET_PATH/keymanx64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
 }
 
 function do_publish() {
