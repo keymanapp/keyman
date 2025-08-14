@@ -128,7 +128,7 @@ export enum SuggestionSimilarity {
 
 export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
   // Similarity distance
-  const simDist = b.matchLevel ?? 0 - a.matchLevel ?? 0;
+  const simDist = (b.matchLevel ?? 0) - (a.matchLevel ?? 0);
   if(simDist != 0) {
     return simDist;
   }
