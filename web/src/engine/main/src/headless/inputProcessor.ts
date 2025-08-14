@@ -362,7 +362,10 @@ export class InputProcessor {
 
     // ... if we're not reverting appended whitespace... might we be in a position
     // to apply an auto-selected suggestion instead?
-    if(predictionContext?.selected) {
+    //
+    // Don't actually do it if it's a keep suggestion, though.  No need for
+    // the extra noise.
+    if(predictionContext?.selected && predictionContext.selected != predictionContext.keepSuggestion) {
       // At this stage, merely "post-key".
       const postApplyContext = Mock.from(ruleBehavior.transcription.preInput);
       // And now it's post-application.
