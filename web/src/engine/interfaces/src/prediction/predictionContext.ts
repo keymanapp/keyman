@@ -5,6 +5,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
 import { type OutputTarget } from "keyman/engine/keyboard";
+import { type RuleBehavior } from 'keyman/engine/js-processor';
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
@@ -73,7 +74,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     }
   }
 
-  private readonly suggestionApplier: (suggestion: Suggestion) => Promise<Reversion>;
+  private readonly suggestionApplier: (suggestion: Suggestion, ruleBehavior?: RuleBehavior) => {
+    reversion: Promise<Reversion>,
+    appendedRuleBehavior?: RuleBehavior
+  };
   private readonly suggestionReverter: (reversion: Reversion) => void;
 
   public constructor(langProcessor: LanguageProcessorSpec, getLayerId: () => string) {
@@ -85,9 +89,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     const validSuggestionState: () => boolean = () =>
       this.currentTarget && langProcessor.state == 'configured';
 
-    this.suggestionApplier = (suggestion) => {
+    this.suggestionApplier = (suggestion, ruleBehavior) => {
       if(validSuggestionState()) {
-        return langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId);
+        return langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId, ruleBehavior);
       } else {
         return null;
       }
@@ -146,7 +150,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * Function apply
    * Description  Applies the predictive `Suggestion` represented by this `BannerSuggestion`.
    */
-  private acceptInternal(suggestion: Suggestion): Promise<Reversion> {
+  private acceptInternal(suggestion: Suggestion, ruleBehavior?: RuleBehavior): {
+    reversion: Promise<Reversion>,
+    appendedRuleBehavior?: RuleBehavior
+  } {
     if(!suggestion) {
       return null;
     }
@@ -157,7 +164,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       this.suggestionReverter(suggestion as Reversion);
       return null;
     } else {
-      return this.suggestionApplier(suggestion);
+      return this.suggestionApplier(suggestion, ruleBehavior);
     }
   }
 
@@ -173,13 +180,17 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * @param suggestion Either a `Suggestion` or `Reversion`.
    * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
-  public accept(suggestion: Suggestion): Promise<Reversion> | Promise<null> {
+  public accept(suggestion: Suggestion, ruleBehavior?: RuleBehavior): {
+    reversion: Promise<Reversion> | Promise<null>,
+    appendedRuleBehavior?: RuleBehavior
+  } {
     // Selecting a suggestion or a reversion should both clear selection
     // and clear the reversion-displaying state of the banner.
     this.selected = null;
     this.doRevert = false;
 
-    this.revertAcceptancePromise = this.acceptInternal(suggestion);
+    const results = this.acceptInternal(suggestion, ruleBehavior);
+    this.revertAcceptancePromise = results?.reversion;
     if(!this.revertAcceptancePromise) {
       // We get here either if suggestion acceptance fails or if it was a reversion.
       if(suggestion && suggestion.tag == 'revert') {
@@ -188,7 +199,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         this.recentRevert = true;
       }
 
-      return Promise.resolve(null);
+      return {
+        reversion: Promise.resolve(null)
+      };
     }
 
     this.revertAcceptancePromise.then((suggestion) => {
@@ -205,7 +218,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     this.swallowPrediction = true;
 
-    return this.revertAcceptancePromise;
+    return results;
   }
 
   private showRevert() {

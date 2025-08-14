@@ -212,7 +212,6 @@ export class InputProcessor {
     // Check to see if the incoming keystroke should revert the appended component of an
     // immediately-preceding applied Suggestion.
     ruleBehavior = this.doPredictiveAutoBreaking(ruleBehavior, outputTarget, predictionContext) || ruleBehavior;
-    // TODO:  if it doesn't revert something, could it accept something?
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -296,11 +295,16 @@ export class InputProcessor {
   }
 
   /**
-   * Implements one predictive-text behavior:
+   * Implements two separate-but-related predictive-text behaviors:
    *
-   * When a suggestion is manually applied and then followed by input of a
+   * 1.  When a suggestion is manually applied and then followed by input of a
    * model-defined "wordbreaking mark", any usual appended (usually, whitespace)
    * transform will be reverted and replaced with the "wordbreaking mark".
+   *
+   * 2.  When a suggestion is auto-selected and the user inputs a "wordbreaking
+   * mark", the suggestion will be automatically applied, with its appended
+   * transform replaced by the "wordbreaking mark" input.  (I.e., it will
+   * trigger auto-correct behaviors.)
    *
    * @param ruleBehavior  The rule behavior from the keyboard for the incoming keystroke
    * @param outputTarget  The context source affected by the incoming keystroke
@@ -357,6 +361,71 @@ export class InputProcessor {
 
         // And overwrite the rule behavior transform with the form from the reverted context.
         return postRevertBehavior;
+      }
+    }
+
+    // ... if we're not reverting appended whitespace... might we be in a position
+    // to apply an auto-selected suggestion instead?
+    if(predictionContext?.selected) {
+      // At this stage, merely "post-key".
+      const postApplyContext = Mock.from(ruleBehavior.transcription.preInput);
+      // And now it's post-application.
+      postApplyContext.apply(predictionContext.selected.transform);
+
+      // Do we get the same result if the key is typed in the post-application context?
+      const postApplyBehavior = this.keyboardProcessor.processKeystroke(keyEvent, Mock.from(postApplyContext));
+      const postApplyTransform = postApplyBehavior.transcription.transform;
+
+      // Does the rule produce the same text & still match one of the breaking-mark patterns?
+      // (with no deleteLeft, etc)
+      //
+      // If so, since it behaves the same in either case, and it's a known word-breaking mark,
+      // let's apply the selected suggestion automatically.
+      if(postApplyTransform.insert == ruleTransform.insert && transformMatchesPattern(postApplyTransform, breakingMarks)) {
+        const baseTransition = this.contextCache.get(predictionContext.selected.transformId);
+
+        // Somehow, the base state is out of context - abort!
+        if(!baseTransition) {
+          return null;
+        }
+
+        // First, we revert to the latest prior pre-input transform - that's what suggestions
+        // are based from.  This also erases the keystroke output.
+        this.contextCache.rewindTo(baseTransition.token);
+        outputTarget.restoreTo(baseTransition.preInput);
+
+        // Erase the appended transform AND replace it with the input keystroke;
+        // the input should take its place automatically, and the worker needs
+        // to know this.
+        //
+        // This pipeline will also automatically output the keystroke's transform in
+        // the correct location.
+        predictionContext.selected.appendedTransform = ruleBehavior.transcription.transform;
+
+        // With that done, do all usual suggestion-acceptance procedures.
+        // **DO NOT AWAIT the reversion.**  We DO NOT want any worker-async causing
+        // async in the keystroke-processing pipeline!
+        //
+        // This call will also produce the corrected RuleBehavior for us.
+        const results = predictionContext.accept(predictionContext.selected, ruleBehavior);
+
+        if(!results.appendedRuleBehavior) {
+          console.error("Breaking-mark auto-applied suggestion did not build expected RuleBehavior!");
+
+          const appliedAppendedTranscription = this.contextCache.get(ruleBehavior.transcription.token);
+
+          // Rebuild the rule behavior; preInput needs a rewrite, but it's readonly!
+          // This version does NOT have a matching transition ID to what the actual
+          // suggestion application built, so it's suboptimal.
+          ruleBehavior.transcription = outputTarget.buildTranscriptionFrom(
+            appliedAppendedTranscription.preInput,
+            ruleBehavior.transcription.keystroke,
+            false,
+            ruleBehavior.transcription.alternates
+          );
+        }
+
+        return results.appendedRuleBehavior ?? ruleBehavior;
       }
     }
 

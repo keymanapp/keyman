@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
-import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
+import { OutputTarget, Transcription, Mock, RuleBehavior } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -188,7 +188,15 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  public applySuggestion(suggestion: Suggestion, outputTarget: OutputTarget, getLayerId: ()=>string): Promise<Reversion> {
+  public applySuggestion(
+    suggestion: Suggestion,
+    outputTarget: OutputTarget,
+    getLayerId: () => string,
+    ruleBehavior: RuleBehavior
+  ): {
+    reversion: Promise<Reversion>,
+    appendedRuleBehavior?: RuleBehavior
+  } {
     if(!outputTarget) {
       throw "Accepting suggestions requires a destination OutputTarget instance."
     }
@@ -216,19 +224,43 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     // Apply the Suggestion!
 
-    // Step 1:  determine the final output text
+    // Step 1:  determine the intermediate and final output texts
     const intermediate = Mock.from(original.preInput, false);
+    let finalTranscription: Transcription;
+    let resultBehavior: RuleBehavior;
     intermediate.apply(suggestion.transform);
     let final = intermediate;
     if(suggestion.appendedTransform) {
       final = Mock.from(intermediate);
       final.apply(suggestion.appendedTransform);
 
+      // Build the intermediate state - we may return here via reversion.
+
+      // This condition is met when auto-correct is triggered by a (non-spacebar)
+      // word-breaking mark.  In this case, this application also matches the
+      // correct Transcription for the keystroke, so we need to build it here.
+      if(ruleBehavior?.transcription?.transform == suggestion.appendedTransform) {
+        finalTranscription = final.buildTranscriptionFrom(
+          intermediate,
+          ruleBehavior.transcription.keystroke,
+          false,
+          ruleBehavior.transcription.alternates
+        );
+
+        // Preserve all prior RuleBehavior properties; only replace the Transcription.
+        resultBehavior = new RuleBehavior();
+        Object.assign(resultBehavior, ruleBehavior);
+        resultBehavior.transcription = finalTranscription;
+      } else {
+        // Simple case - a direct application of the suggestion (via banner or space key)
+        finalTranscription = final.buildTranscriptionFrom(intermediate, null, false);
+      }
       // Somewhere here, save-state the intermediate state!
-      const appendedTranscription = final.buildTranscriptionFrom(intermediate, null, false);
-      this.recordTranscription(appendedTranscription);
+      // It's fine to do even if it's for a keystroke-based version; it'll just
+      // override itself in the cache if recorded again.
+      this.recordTranscription(finalTranscription);
       // We set the appended transform with its own ID before passing it off to the predictive-text worker.
-      suggestion.appendedTransform.id = appendedTranscription.token;
+      suggestion.appendedTransform.id = finalTranscription.token;
     }
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
@@ -274,7 +306,10 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return mappedReversion;
     });
 
-    return reversionPromise;
+    return {
+      reversion: reversionPromise,
+      appendedRuleBehavior: resultBehavior
+    };
   }
 
   public applyReversion(reversion: Reversion, outputTarget: OutputTarget, appendedOnly?: boolean) {
