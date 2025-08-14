@@ -345,8 +345,7 @@ describe('processSimilarity', () => {
           },
           displayAs: '<iphone>',
           matchesModel: false,
-          tag: 'keep',
-          p: 1
+          tag: 'keep'
         },
         p: 1
       },

@@ -417,13 +417,24 @@ export interface ProbabilityMass<T> {
 export type Distribution<T> = ProbabilityMass<T>[];
 
 /**
- * A type augmented with an optional probability.
+ * A type augmented with optional probability data.
  */
 export type Outcome<T> = T & {
   /**
-   * [optional] probability of this outcome.
+   * [optional] the modeled likelihood associated with this outcome.
    */
   p?: number;
+
+  /**
+   * The likelihood of the suggestion itself based solely on the lexical model
+   */
+  ['lexical-p']?: number
+
+  /**
+   * The likelihood associated with the keystroke sequence and/or associated
+   * text corrections best matching the suggestion.
+   */
+  ['correction-p']?: number
 };
 
 /**
@@ -434,6 +445,21 @@ export type WithOutcome<T> = T & {
    * Probability of this outcome.
    */
   p: number;
+
+  /**
+   * The likelihood of the suggestion itself based solely on the lexical model
+   *
+   * Only emitted for verbose mode.
+   */
+  ['lexical-p']?: number
+
+  /**
+   * The likelihood associated with the keystroke sequence and/or associated
+   * text corrections best matching the suggestion.
+   *
+   * Only omitted for verbose mode.
+   */
+  ['correction-p']?: number
 };
 
 
