@@ -1,6 +1,16 @@
-import { ContextState } from './context-state.js';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * Represents cached data about a single context transition event, as well
+ * as the state of the context both before and after the transition.
+ */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import { ContextState } from './context-state.js';
+
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 
