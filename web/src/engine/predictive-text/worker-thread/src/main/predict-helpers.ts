@@ -1,12 +1,13 @@
 import * as models from '@keymanapp/models-templates';
 import { KMWString } from '@keymanapp/web-utils';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -509,6 +510,28 @@ export function predictFromCorrections(
   }
 
   return returnedPredictions;
+}
+
+/**
+ * Applies the specified casing-form to generated suggestions, leveraging the model's
+ * defined casing behaviors to do so.
+ * @param suggestion
+ * @param baseWord
+ * @param lexicalModel
+ * @param casingForm
+ */
+export function applySuggestionCasing(suggestion: Suggestion, baseWord: string, lexicalModel: LexicalModel, casingForm: CasingForm) {
+  // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
+  let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
+
+  if(unchangedLength > 0) {
+    suggestion.transform.deleteLeft += unchangedLength;
+    suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
+  }
+
+  // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
+  suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+  suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
 }
 
 /**
