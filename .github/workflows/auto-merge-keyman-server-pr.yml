@@ -21,11 +21,11 @@ jobs:
       env:
         GH_TOKEN: "${{ github.token }}"
       run: |
-        gh pr review --approve ${{ github.event.pull_request.number }}
+        gh pr review -R keymanapp/keyman --approve ${{ github.event.pull_request.number }}
     - name: mark PR for auto-merge from keyman-server
       shell: bash
       if: contains(github.event.pull_request.labels.*.name, 'automerge')
       env:
         GH_TOKEN: "${{ secrets.AUTOINC_GITHUB_TOKEN }}"
       run: |
-        gh pr merge --auto ${{ github.event.pull_request.number }}
+        gh pr merge -R keymanapp/keyman --auto ${{ github.event.pull_request.number }}
