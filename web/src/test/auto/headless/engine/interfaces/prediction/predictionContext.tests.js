@@ -293,7 +293,8 @@ describe("PredictionContext", () => {
       predictiveContext.once('update', resolve);
     });
 
-    let reversion = await predictiveContext.accept(suggestionApply);
+    const results = predictiveContext.accept(suggestionApply);
+    const reversion = await results.reversion;
     await postApplySuggestions;
 
     // Test setup complete.
@@ -328,10 +329,10 @@ describe("PredictionContext", () => {
     });
 
     // And now, apply the reversion itself.
-    let returnValue = await predictiveContext.accept(reversion);
+    const revertResults = predictiveContext.accept(reversion);
 
     // 'accepting' a reversion performs a rewind; there's no need for async ops here.
-    assert.isNull(returnValue); // as per the method's spec.
+    assert.isNull(await revertResults.reversion); // as per the method's spec.
 
     // Verify that the rewind + application of reversion worked!
     let rewoundTextStateWithInput = Mock.from(revertBaseTextState); // appl
