@@ -156,11 +156,9 @@ describe('predictionAutoSelect', () => {
       }
     ];
 
-    predictions.sort(tupleDisplayOrderSort);
-
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.equal(autoselected, keepSuggestion);
@@ -405,12 +403,7 @@ describe('predictionAutoSelect', () => {
 
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-
-    // Sort after - we need the 'keep' to remain in the first position.
-    predictions.sort(tupleDisplayOrderSort);
-    originalPredictions.sort(tupleDisplayOrderSort);
-
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.equal(autoselected, highestNonKeepSuggestion);
@@ -483,9 +476,7 @@ describe('predictionAutoSelect', () => {
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
 
-    predictions.sort(tupleDisplayOrderSort);
-    originalPredictions.sort(tupleDisplayOrderSort);
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.equal(autoselected, expectedSuggestion);
@@ -561,11 +552,7 @@ describe('predictionAutoSelect', () => {
 
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
-
-    predictions.sort(tupleDisplayOrderSort);
-    originalPredictions.sort(tupleDisplayOrderSort);
-
-    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+    assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.isNotOk(autoselected);

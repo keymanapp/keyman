@@ -27,6 +27,12 @@ import Transform = LexicalModelTypes.Transform;
 export const AUTOSELECT_PROPORTION_THRESHOLD = .66;
 
 /**
+ * Standard probability rules - the maximum probability something can
+ * have is 100%, or a simple '1'.
+ */
+const MAX_PROB = 1;
+
+/**
  * Defines thresholds used to determine when it is appropriate to stop searching
  * for more prediction-roots.
  *
@@ -129,7 +135,7 @@ export enum SuggestionSimilarity {
 
 export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
   // Similarity distance
-  const simDist = b.matchLevel ?? 0 - a.matchLevel ?? 0;
+  const simDist = (b.matchLevel ?? 0) - (a.matchLevel ?? 0);
   if(simDist != 0) {
     return simDist;
   }
@@ -679,15 +685,16 @@ export function processSimilarity(
   // Insert our synthetic keepOption as a prediction.
   suggestionDistribution.unshift({
     // Product of the two p's below.
-    totalProb: inputTransformProb,
+    totalProb: inputTransformProb * MAX_PROB,
     prediction: {
       sample: keepOption,
-      // 1 is a filler value; goes unused b/c is for a 'keep'.
-      p: 1,
+      // We always show the keep option if it doesn't directly match,
+      // so max probability is fine.
+      p: MAX_PROB,
     },
     correction: {
       sample: truePrefix,
-      p: inputTransformProb
+      p: inputTransformProb * MAX_PROB
     },
     matchLevel: SuggestionSimilarity.exact
   });
