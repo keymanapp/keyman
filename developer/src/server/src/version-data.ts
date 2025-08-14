@@ -1,5 +1,5 @@
 /*
-  Version information from build-utils.sh:
+  Version information from builder-basic.inc.sh:
 
   #   KEYMAN_VERSION:              Full current build version, e.g. "14.0.1"
   #   [KEYMAN_VERSION_WIN:         Full current build version for Windows, e.g. "14.0.1.0"]

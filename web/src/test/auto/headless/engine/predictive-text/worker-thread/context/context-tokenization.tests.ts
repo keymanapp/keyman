@@ -1,0 +1,92 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * This file contains low-level tests designed to validate the behavior of the
+ * of the ContextTokenization class and its integration with the lower-level
+ * classes that it utilizes.
+ */
+
+import { assert } from 'chai';
+
+import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
+import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+
+import { ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+
+import TrieModel = models.TrieModel;
+
+var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
+  {wordBreaker: defaultBreaker});
+
+function toToken(text: string) {
+  let isWhitespace = text == ' ';
+  let token = new ContextToken(plainModel, text);
+  token.isWhitespace = isWhitespace;
+  return token;
+}
+
+describe('ContextTokenization', function() {
+  describe("<constructor>", () => {
+    it("constructs from just a token array", () => {
+      const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+      assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
+      assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
+      assert.isNotOk(tokenization.alignment);
+      assert.equal(tokenization.tail.exampleInput, 'day');
+      assert.isFalse(tokenization.tail.isWhitespace);
+      assert.isUndefined(tokenization.tail.appliedSuggestionId);
+    });
+
+    it("constructs from a token array + alignment data", () => {
+      const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+      let alignment = {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 6,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      };
+
+      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), alignment);
+
+      assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
+      assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
+      assert.isOk(tokenization.alignment);
+      assert.deepEqual(tokenization.alignment, alignment);
+      assert.equal(tokenization.tail.exampleInput, 'day');
+      assert.isFalse(tokenization.tail.isWhitespace);
+      assert.isUndefined(tokenization.tail.appliedSuggestionId);
+    });
+
+    it('clones', () => {
+      const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+
+      let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 6,
+        tailEditLength: 1,
+        tailTokenShift: 0
+      });
+
+      let cloned = new ContextTokenization(baseTokenization);
+
+      assert.notDeepEqual(cloned, baseTokenization);
+      assert.notDeepEqual(cloned.tokens, baseTokenization.tokens);
+      assert.deepEqual(cloned.tokens.map((token) => token.searchSpace.inputSequence),
+        baseTokenization.tokens.map((token) => token.searchSpace.inputSequence));
+      assert.deepEqual(cloned.alignment, baseTokenization.alignment);
+    });
+  });
+
+  it('exampleInput', () => {
+    const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
+    let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+
+    assert.deepEqual(tokenization.exampleInput, rawTextTokens);
+  });
+});

@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 #
-# Tell TeamCity to trigger new builds
+# Tell TeamCity to trigger new release builds
 #
-
-function triggerBuilds() {
+function triggerReleaseBuilds() {
   local base=`git branch --show-current`
   # convert stable-14.0 to stable_14_0 to fit in with the definitions
   # in trigger-definitions.inc.sh
@@ -19,39 +18,49 @@ function triggerBuilds() {
       if [[ $build == "" ]]; then continue; fi
       if [ "${build:(-7)}" == "_GitHub" ]; then
         local job=${build%_GitHub}
-        echo Triggering GitHub action build "$job" "$base"
-        triggerGitHubActionsBuild false "$job" "$base"
+        echo "Triggering GitHub action release build (isTestBuild=false) (level=release) $job $base"
+        triggerGitHubActionsBuild false release "$job" "$base"
       else
-        echo Triggering TeamCity build false $build $TEAMCITY_VCS_ID $base
-        triggerTeamCityBuild false $build $TEAMCITY_VCS_ID $base
+        echo "Triggering TeamCity release build (isTestBuild=false) (level=release) $build $TEAMCITY_VCS_ID $base"
+        triggerTeamCityBuild false release $build $TEAMCITY_VCS_ID $base
       fi
     done
   done
 }
 
+#
+# Trigger a build on TeamCity
+#
+# Parameters:
+#   1: isTestBuild: 'true' if this is for a PR branch or a test build
+#                   for a primary branch; false is this is a release
+#                   build for a primary branch (master/beta/stable-x.y)
+#   2: buildLevel:  'skip' - don't run build;
+#                   'build' - run build and unit tests;
+#                   'release' - run build, unit tests, and deploy
+#   3: TeamCity build configuration name
+#   4: TeamCity VCS id, which is different for PR test configurations
+#   5: branch name in git
+#
 function triggerTeamCityBuild() {
   local isTestBuild="$1"
-  local TEAMCITY_BUILDTYPE="$2"
-  local TEAMCITY_VCS_ID="$3"
+  local buildLevel="$2"
+  local TEAMCITY_BUILDTYPE="$3"
+  local TEAMCITY_VCS_ID="$4"
+  local TEAMCITY_BRANCH_NAME="$5"
 
-  if [[ $# -gt 3 ]]; then
-    local TEAMCITY_BRANCH_NAME="$4"
-    #debug echo "  Triggering build for: $TEAMCITY_BRANCH_NAME"
-    TEAMCITY_BRANCH_NAME="branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'"
-  else
-    local TEAMCITY_BRANCH_NAME=
-  fi
-
-  local GIT_OID=`git rev-parse HEAD`
   local TEAMCITY_SERVER=https://build.palaso.org
 
-  local command
+  local commandProperties="<properties><property name='env.KEYMAN_BUILD_LEVEL' value='$buildLevel' /></properties>"
+  local commandLastChanges=
 
-  if $isTestBuild; then
-    command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /></build>"
-  else
-    command="<build $TEAMCITY_BRANCH_NAME><buildType id='$TEAMCITY_BUILDTYPE' /><lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges></build>"
+  if ! $isTestBuild; then
+    local GIT_OID=`git rev-parse HEAD`
+    commandLastChanges="<lastChanges><change vcsRootInstance='$TEAMCITY_VCS_ID' locator='version:$GIT_OID'/></lastChanges>"
   fi
+
+  local command="<build branchName='$TEAMCITY_BRANCH_NAME' defaultBranch='false'><buildType id='$TEAMCITY_BUILDTYPE' />$commandLastChanges$commandProperties</build>"
+
   echo "TeamCity Build Command: $command"
 
   # adjust indentation for output of curl
@@ -66,10 +75,20 @@ function triggerTeamCityBuild() {
   echo
 }
 
+#
+# Trigger a build on GitHub Actions
+#
+# Parameters:
+#   1: 'true' if this is for a PR branch, otherwise 'false' (for master/beta/stable-x.y)
+#   2: 'skip' - don't run build; 'build' - run build and unit tests; 'test' - run build, unit tests, and deploy
+#   3: Action name
+#   4: branch name in git
+#
 function triggerGitHubActionsBuild() {
   local IS_TEST_BUILD="$1"
-  local GITHUB_ACTION="$2"
-  local GIT_BRANCH="${3:-master}"
+  local BUILD_LEVEL="$2"
+  local GITHUB_ACTION="$3"
+  local GIT_BRANCH="$4"
   local GIT_BASE_BRANCH="${GIT_BRANCH}"
   local GIT_USER="keyman-server"
   local GIT_BUILD_SHA GIT_BASE_REF JSON
@@ -81,7 +100,8 @@ function triggerGitHubActionsBuild() {
     GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$KEYMAN_VERSION_WITH_TAG")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${KEYMAN_VERSION_WITH_TAG}"
-  elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+  elif [[ $GIT_BRANCH =~ ^[0-9]+$ ]]; then
+    # pull request
     local JSON=$(call_curl "${GITHUB_SERVER}/pulls/${GIT_BRANCH}" --header "Authorization: token $GITHUB_TOKEN")
     GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
@@ -90,6 +110,7 @@ function triggerGitHubActionsBuild() {
     GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.sha')"
     GIT_BRANCH="PR-${GIT_BRANCH}"
   else
+    # another branch: stable-x.y, beta, or master
     GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"
     GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
     GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
@@ -103,7 +124,8 @@ function triggerGitHubActionsBuild() {
       \"baseBranch\": \"$GIT_BASE_BRANCH\", \
       \"baseRef\": \"$GIT_BASE_REF\", \
       \"user\": \"$GIT_USER\", \
-      \"isTestBuild\": \"$IS_TEST_BUILD\" \
+      \"isTestBuild\": \"$IS_TEST_BUILD\", \
+      \"buildLevel\": \"$BUILD_LEVEL\" \
     }}"
 
   echo "GitHub Action Data: $DATA"

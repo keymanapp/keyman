@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman low-level configuration tool" \
@@ -32,7 +32,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp "$WIN32_TARGET_PATH/kmconfig.dbg" "$WINDOWS_DEBUGPATH_APP/kmconfig.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmconfig.dbg" "$WINDOWS_DEBUGPATH_APP/kmconfig.dbg"
 }
 
 function do_publish() {
