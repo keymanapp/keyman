@@ -8,7 +8,7 @@
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { KeylayoutToKmnConverter, convert_object, Rule } from './keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter, ProcesData, Rule } from './keylayout-to-kmn-converter.js';
 import { util } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
@@ -23,7 +23,7 @@ export class KmnFileWriter {
    * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
    * @return true if data has been written; false if not
    */
-  public write(data_ukelele: convert_object): boolean {
+  public write(data_ukelele: ProcesData): boolean {
 
     let data: string = "\n";
 
@@ -42,7 +42,7 @@ export class KmnFileWriter {
     }
   }
 
-  public writeToString(data_ukelele: convert_object): string {
+  public writeToString(data_ukelele: ProcesData): string {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
@@ -59,7 +59,7 @@ export class KmnFileWriter {
     }
   }
 
-  public writeToUint8Array(data_ukelele: convert_object): Uint8Array {
+  public writeToUint8Array(data_ukelele: ProcesData): Uint8Array {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
@@ -81,7 +81,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeData_Stores(data_ukelele: convert_object): string {
+  public writeData_Stores(data_ukelele: ProcesData): string {
 
     let data: string = "";
 
@@ -108,7 +108,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all rules to be printed
    */
-  public writeData_Rules(data_ukelele: convert_object): string {
+  public writeData_Rules(data_ukelele: ProcesData): string {
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     let data: string = "";
@@ -149,7 +149,7 @@ export class KmnFileWriter {
 
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
-        for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+        for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
           if (keylayoutKmnConverter.map_UkeleleKC_To_VK(j) === unique_data_Rules[k].key) {
             keyNr = j;
             break;
@@ -207,12 +207,22 @@ export class KmnFileWriter {
           }
 
           if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "+ ["
-              + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
-              + `]  > \'`
-              + version_output_character
-              + '\'\n';
+            if (version_output_character === "'") {
+              data += warningTextToWrite
+                + "+ ["
+                + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+                + `]  >  \"`
+                + version_output_character
+                + '\"\n';
+            }
+            else {
+              data += warningTextToWrite
+                + "+ ["
+                + (unique_data_Rules[k].modifier_key + ' ' + unique_data_Rules[k].key).trim()
+                + `]  >  \'`
+                + version_output_character
+                + '\'\n';
+            }
           }
         }
       }
@@ -234,10 +244,9 @@ export class KmnFileWriter {
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
-          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
-
+          if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
             version_output_character = output_Unicode_CodePoint;
-            if (output_Unicode_Character.length > 1) {
+            if (output_Unicode_CodePoint.length > 1) {
               if (warn_text[2] == "") {
                 warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
               }
@@ -245,7 +254,6 @@ export class KmnFileWriter {
                 warn_text[2] = warn_text[2] + "; Use of a control character ";
               }
             }
-
           } else {
             version_output_character = output_Unicode_Character;
           }
@@ -278,14 +286,28 @@ export class KmnFileWriter {
           }
 
           if (!((warn_text[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite
-              + "dk(A"
-              + (String(unique_data_Rules[k].id_deadkey) + ") + ["
-                + unique_data_Rules[k].modifier_key).trim()
-              + " "
-              + unique_data_Rules[k].key + "]  >  \'"
-              + version_output_character
-              + "\'\n";
+            if (version_output_character === "'") {
+              data += warningTextToWrite
+                + "dk(A"
+                + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+                  + unique_data_Rules[k].modifier_key).trim()
+                + " "
+                + unique_data_Rules[k].key + ']  >  \"'
+                + version_output_character
+                + '\"\n';
+            }
+            else {
+              data += warningTextToWrite
+                + "dk(A"
+                + (String(unique_data_Rules[k].id_deadkey) + ") + ["
+                  + unique_data_Rules[k].modifier_key).trim()
+                + " "
+                + unique_data_Rules[k].key + "]  >  \'"
+                + version_output_character
+                + "\'\n";
+            }
+
+
           }
           data += "\n";
         }
@@ -308,11 +330,11 @@ export class KmnFileWriter {
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
-          if (Number("0x" + output_Unicode_Character.substring(2, output_Unicode_Character.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
+          if (Number("0x" + output_Unicode_CodePoint.substring(2, output_Unicode_CodePoint.length)) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
 
             version_output_character = output_Unicode_CodePoint;
 
-            if (output_Unicode_Character.length > 1) {
+            if (output_Unicode_CodePoint.length > 1) {
               if (warn_text[2] == "") {
                 warn_text[2] = warn_text[2] + "c WARNING: use of a control character ";
               }
@@ -438,13 +460,6 @@ export class KmnFileWriter {
           + "]  >  dk(A"
           + rule[index].id_prev_deadkey
           + ") ) : ";
-
-        warningTextArray[2] = "unavailable superior rule ( ["
-          + rule[index].modifier_deadkey + " "
-          + rule[index].deadkey
-          + "]  >  dk(A"
-          + rule[index].id_deadkey
-          + ") ) : ";
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifier_deadkey)) {
@@ -452,7 +467,7 @@ export class KmnFileWriter {
         warningTextArray[2] = "unavailable superior rule ( ["
           + rule[index].modifier_deadkey + " "
           + rule[index].deadkey
-          + "]  >  dk(A"
+          + "]  >  dk(B"
           + rule[index].id_deadkey
           + ") ) : ";
       }
@@ -478,7 +493,6 @@ export class KmnFileWriter {
         && new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output)
         && idx < index
       );
-
       // 1-1: + [CAPS K_N]  > 'N' <-> + [CAPS K_N]  >  'N'
       const dup_1_1 = rule.filter((curr, idx) =>
         (curr.rule_type === "C0" || curr.rule_type === "C1")
@@ -508,7 +522,7 @@ export class KmnFileWriter {
 
       if (amb_4_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 4-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_4_1[0].modifier_prev_deadkey
             + " "
             + amb_4_1[0].prev_deadkey
@@ -519,7 +533,7 @@ export class KmnFileWriter {
 
       if (amb_2_1.length > 0) {
         warningTextArray[2] = warningTextArray[2]
-          + ("ambiguous 2-1 rule: later: ["
+          + ("ambiguous rule: later: ["
             + amb_2_1[0].modifier_deadkey
             + " "
             + amb_2_1[0].deadkey
@@ -708,23 +722,27 @@ export class KmnFileWriter {
       );
 
       // 5-5  dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C3)
-      const amb_5_5 = rule.filter((curr, idx) =>
+      const amb_5_5 = rule.filter((curr, idx) => (
         (curr.rule_type === "C3")
-        && curr.modifier_key === rule[index].modifier_key
-        && curr.key === rule[index].key
-        && curr.id_deadkey === rule[index].id_deadkey
-        && (new TextDecoder().decode(curr.output) !== new TextDecoder().decode(rule[index].output))
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_deadkey === rule[index].modifier_deadkey
+        && curr.deadkey === rule[index].deadkey
+        && curr.id_deadkey === rule[index].id_deadkey)
         && idx < index
+        && (rule[index].unique_deadkey !== 0 || rule[index].unique_prev_deadkey !== 0)
       );
 
       // 5-5 dk(C1) + [SHIFT CAPS K_A]  >   dk(C2)  <-> dk(C1) + [SHIFT CAPS K_A]  >  dk(C2)
       const dup_5_5 = rule.filter((curr, idx) =>
         (curr.rule_type === "C3")
+        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
+        && curr.modifier_prev_deadkey === rule[index].modifier_prev_deadkey
+        && curr.prev_deadkey === rule[index].prev_deadkey
         && curr.modifier_deadkey === rule[index].modifier_deadkey
         && curr.deadkey === rule[index].deadkey
-        && curr.id_prev_deadkey === rule[index].id_prev_deadkey
         && curr.id_deadkey === rule[index].id_deadkey
         && rule[index].unique_deadkey === 0
+        && idx < index
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'B'
@@ -738,14 +756,15 @@ export class KmnFileWriter {
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
-      const dup_6_6 = rule.filter((curr, idx) =>
-        (curr.rule_type === "C3")
-        && curr.id_deadkey === rule[index].id_deadkey
-        && curr.modifier_key === rule[index].modifier_key
-        && curr.key === rule[index].key
-        && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
-        && idx < index
-      );
+      const dup_6_6 =
+        rule.filter((curr, idx) =>
+          (curr.rule_type === "C3")
+          && curr.id_deadkey === rule[index].id_deadkey
+          && curr.modifier_key === rule[index].modifier_key
+          && curr.key === rule[index].key
+          && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
+          && idx < index
+        );
 
       if (amb_2_4.length > 0) {
         warningTextArray[0] = warningTextArray[0]
@@ -858,7 +877,13 @@ export class KmnFileWriter {
             + "\' ");
       }
     }
-    // In rare cases a rule might not be written out therefore we need to inform the user
+    // In rare cases a rule might not be written out therefore we need to inform the user:
+    // usually we write the first occurance of an ambiguous C0/C1 rule and comment out the later
+    //    assuming that if several C0/C1 rules are ambiguous the user prefers to use the first C0/C1 rule
+    // for C2/C3 rules we write the last occurance of an ambiguous rule and comment out the earlier
+    //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
+    // if both happens, nothing would be written, therefore this messsage
+
     const extra_warning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
 
     if (warningTextArray[0] !== "") {
