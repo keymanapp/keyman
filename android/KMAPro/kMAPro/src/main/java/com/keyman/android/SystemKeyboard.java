@@ -309,9 +309,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       return true;
     };
 
-    // TODO: Implement IME setting similar to Gboard "Show on-screen keyboard" with physical keyboard
-    // (default false)
-    return true;
+    // IME setting similar to Gboard "Show on-screen keyboard" with physical keyboard
+    Context context = getApplicationContext();
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    return showOSK;
   }
 
   @Override
