@@ -1,10 +1,19 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2025-07-30
+ *
+ * This file contains tests designed to validate the context-caching
+ * and context-tracking components for the Keyman predictive-text worker.
+ */
+
 import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { ContextState, ContextTracker, determineModelTokenizer, ModelCompositor, models, tokenizeTransformDistribution } from '@keymanapp/lm-worker/test-index';
+import { ContextState, ContextTracker, ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
 
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
@@ -14,13 +23,10 @@ const plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker}
 );
 
-const tokenizer = determineModelTokenizer(new models.DummyModel({wordbreaker: defaultBreaker}));
-
 describe('ContextTracker', function() {
-  function toWrapperDistribution(transforms: Transform | Transform[]) {
-    transforms = Array.isArray(transforms) ? transforms : [transforms];
+  function toWrapperDistribution(transform: Transform) {
     return [{
-      sample: transforms,
+      sample: transform,
       p: 1.0
     }];
   }
@@ -86,15 +92,10 @@ describe('ContextTracker', function() {
         insert: 'r',
         deleteLeft: 0
       }
-      let newContext = {
-        left: "an apple a day keeps the doctor",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
+      let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.equal(newContextMatch.headTokensRemoved, 0);
@@ -112,15 +113,10 @@ describe('ContextTracker', function() {
         insert: ' ',
         deleteLeft: 0
       }
-      let newContext = {
-        left: "an apple a day keeps the doctor ",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
+      let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
@@ -144,15 +140,10 @@ describe('ContextTracker', function() {
         insert: '',
         deleteLeft: 1
       }
-      let newContext = {
-        left: "an apple a day keeps the doctor",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["an", " ", "apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
+      let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isOk(newContextMatch?.state);
       assert.deepEqual(newContextMatch?.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
@@ -171,15 +162,10 @@ describe('ContextTracker', function() {
         insert: 'a',
         deleteLeft: 0
       }
-      let newContext = {
-        left: "'a",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["'", "a"];
 
       let baseState = new ContextState(existingContext, plainModel);
-      let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
+      let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
@@ -237,19 +223,14 @@ describe('ContextTracker', function() {
         insert: 'd ',
         deleteLeft: 0
       }
-      let newContext = {
-        left: "and ",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["and", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext,
+        existingContext,
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "an", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -275,19 +256,14 @@ describe('ContextTracker', function() {
         insert: 'tor ',
         deleteLeft: 0
       }
-      let newContext = {
-        left: "apple a day keeps the doctor ",
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
       let rawTokens = ["apple", " ", "a", " ", "day", " ", "keeps", " ", "the", " ", "doctor", " ", ""];
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(
-        newContext,
+        existingContext,
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "apple a day keeps the doc", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNotNull(newContextMatch?.state);
       assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
@@ -328,10 +304,10 @@ describe('ContextTracker', function() {
         deleteLeft: 0
       }
       let problemContextMatch = ContextTracker.attemptMatchContext(
-        {left: "text'\"", startOfBuffer: true, endOfBuffer: true},
+        {left: "text'", startOfBuffer: true, endOfBuffer: true},
         plainModel,
         baseState,
-        tokenizeTransformDistribution(tokenizer, {left: "text'", startOfBuffer: true, endOfBuffer: true}, [{sample: transform, p: 1}])
+        [{sample: transform, p: 1}]
       );
       assert.isNull(problemContextMatch);
     });
