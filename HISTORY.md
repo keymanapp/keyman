@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 19.0.99 alpha 2025-08-14
+
+* maint(web): skip unnecessary steps for `build` buildLevel (#14516)
+
+## 19.0.98 alpha 2025-08-14
+
+* maint(resources): specify `keymanapp/keyman` for gh in automerge (#14524)
+
+## 19.0.97 alpha 2025-08-14
+
+* maint(resources): use GH_TOKEN variable for gh calls (#14522)
+
+## 19.0.96 alpha 2025-08-14
+
+* maint(resources): add build-bot commands to increment-version auto PRs (#14504)
+* maint(resources): use GH builtin automerge for auto PRs (#14519)
+
+## 19.0.95 alpha 2025-08-13
+
+* fix(web): use actual legacy model for legacy-model support unit tests (#14460)
+* chore(common): Update Crowdin strings for Spanish (#14464)
+* fix(android): Get default sizes before initializing keyboard (#14472)
+* docs(resources): clarify Build-bot usage (#14282)
+* maint(resources): build.sh-style commands for build-bot (#14461)
+* chore(android): Update keycode test app dependencies (#14474)
+* maint(common): update npm modules brace-expansion to 1.1.12, form-data to 4.0.4 (#14479)
+* chore(android): Specify Java language version 21 (#14491)
+* maint(ios): skip unnecessary network steps when buildLevel is build (#14466)
+* maint(common): rename shellHelperFunctions.sh to utils.inc.sh (#14446)
+* maint(common): consolidate builder scripts (#14449)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14451)
+* maint(common): move typescript script functions into typescript.inc.sh (#14452)
+* maint(common): reorganize mac/ios build script includes (#14458)
+* docs(resources): add note on builder-basic vs builder-full (#14507)
+
 ## 19.0.94 alpha 2025-08-01
 
 * maint(common): use `cpp_std=c++17` in meson project default_options (#14433)

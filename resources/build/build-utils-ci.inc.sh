@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # This script gets CI / pull request details for builds, part of the build-utils
 # builder_ suite of functions. All functions and variables in this file have the

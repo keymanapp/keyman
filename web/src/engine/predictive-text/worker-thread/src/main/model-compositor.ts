@@ -1,24 +1,34 @@
 import * as models from '@keymanapp/models-templates';
-import * as correction from './correction/index.js'
-
 import { KMWString } from '@keymanapp/web-utils';
-
-import TransformUtils from './transformUtils.js';
-import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
-import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+
+import * as correction from './correction/index.js'
+import TransformUtils from './transformUtils.js';
+import { applySuggestionCasing, correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
+import Keep = LexicalModelTypes.Keep;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import Outcome = LexicalModelTypes.Outcome;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
-  private contextTracker?: correction.ContextTracker;
+  private _contextTracker?: correction.ContextTracker;
+
+  /**
+   * Returns the context-caching store used to store intermediate
+   * correction-search and context-tokenization calculations.
+   */
+  public get contextTracker() {
+    return this._contextTracker;
+  }
 
   static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
@@ -60,13 +70,13 @@ export class ModelCompositor {
   ) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
-      this.contextTracker = new correction.ContextTracker();
+      this._contextTracker = new correction.ContextTracker();
     }
     this.punctuation = determinePunctuationFromModel(lexicalModel);
     this.testMode = !!testMode;
   }
 
-  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
     const lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
@@ -142,7 +152,7 @@ export class ModelCompositor {
     // lexicon for a word.  (Example:  "Apple" the company vs "apple" the fruit.)
     for(let tuple of rawPredictions) {
       if(currentCasing && currentCasing != 'lower') {
-        this.applySuggestionCasing(tuple.prediction.sample, basePrefix, currentCasing);
+        applySuggestionCasing(tuple.prediction.sample, basePrefix, this.lexicalModel, currentCasing);
       }
     }
 
@@ -190,21 +200,6 @@ export class ModelCompositor {
     }
 
     return suggestions;
-  }
-
-  // Responsible for applying casing rules to suggestions.
-  private applySuggestionCasing(suggestion: Suggestion, baseWord: string, casingForm: CasingForm) {
-    // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
-    let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
-
-    if(unchangedLength > 0) {
-      suggestion.transform.deleteLeft += unchangedLength;
-      suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
-    }
-
-    // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
-    suggestion.transform.insert = this.lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
-    suggestion.displayAs = this.lexicalModel.applyCasing(casingForm, suggestion.displayAs);
   }
 
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {

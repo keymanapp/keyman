@@ -19,7 +19,7 @@ set -u
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
@@ -136,7 +136,7 @@ if [ "$action" == "commit" ]; then
   NEWVERSION=`cat $KEYMAN_VERSION_MD | tr -d "[:space:]"`
 
   pushd "$KEYMAN_ROOT" > /dev/null
-  message="auto: increment $base version to $NEWVERSION"
+  message="auto: increment $base version to $NEWVERSION"$'\n\nTest-bot: skip\nBuild-bot: skip'
   branch="auto/version-$base-$NEWVERSION"
   git tag -a "$KEYMAN_VERSION_GIT_TAG" -m "Keyman release $KEYMAN_VERSION_WITH_TAG"
   git checkout -b "$branch"
