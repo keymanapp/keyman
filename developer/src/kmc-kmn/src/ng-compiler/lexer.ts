@@ -8,29 +8,12 @@
 
 import { TokenTypes } from "./token-types.js";
 
-export class ScanRecogniser {
-  tokenType: TokenTypes;
-  regExp: RegExp;
-  emit: boolean;
-
-  /**
-   * Construct a ScanRecogniser
-   *
-   * @param tokenType the token type to return if matched
-   * @param regExp    the regex to identify the token
-   * @param emit      whether to emit the token or not
-   */
-  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
-    this.tokenType = tokenType;
-    this.regExp    = regExp;
-    this.emit      = emit;
-  }
-
-  public toString(): string {
-    return `[${this.tokenType},${this.regExp},${this.emit}]`;
-  }
-}
-
+/**
+ * The Next Generation Lexer for the Keyman Keyboard Language.
+ *
+ * The Lexer identifies Tokens in the supplied buffer using ScanRecognisers.
+ *
+ */
 export class Lexer {
   private buffer: string;
   private offset: number;            // offset into the buffer
@@ -38,7 +21,7 @@ export class Lexer {
   private charNum: number;           // the current character number
   private line: string;              // the line seen so far
   private tokenList: Token[];        // the accumulating tokens
-  private seenContinuation: boolean; // have we just seen a continuation line
+  private seenContinuation: boolean; // have we just seen a continuation line?
   private scanRecognisers: ScanRecogniser[];
 
   /**
@@ -203,7 +186,7 @@ export class Lexer {
       handleContinuation = false;
     }
 
-    // loop over all ScanRecognisers looking for a match at the start of the buffer
+    // loop over all ScanRecognisers looking for a match at the offset into the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       recogniser                  = iterResult.value;
       recogniser.regExp.lastIndex = this.offset;
@@ -274,12 +257,42 @@ export class Lexer {
   }
 }
 
+/**
+ * A ScanRecogniser identifies an individual Token as part of the Next Generation Lexer.
+ */
+export class ScanRecogniser {
+  tokenType: TokenTypes;
+  regExp: RegExp;
+  emit: boolean;
+
+  /**
+   * Construct a ScanRecogniser
+   *
+   * @param tokenType the token type to return if matched
+   * @param regExp    the regex to identify the token
+   * @param emit      whether to emit the token or not?
+   */
+  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
+    this.tokenType = tokenType;
+    this.regExp    = regExp;
+    this.emit      = emit;
+  }
+
+  public toString(): string {
+    return `[${this.tokenType},${this.regExp},${this.emit}]`;
+  }
+}
+
+/**
+ * An input Token found by the Next Generation Lexer for the Parser.
+ */
 export class Token {
   readonly tokenType: TokenTypes;
   private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
   private _line: string;
+  // a _filename will also be needed for multi-file compilation
 
   /**
    * Construct a Token
