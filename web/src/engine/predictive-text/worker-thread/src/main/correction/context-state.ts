@@ -16,6 +16,8 @@ import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
+import { ContextToken } from './context-token.js';
+import { determineModelTokenizer } from '#./model-helpers.js';
 
 /**
  * Represents a state of the active context at some point in time along with the
@@ -26,12 +28,12 @@ export class ContextState {
    * The context window in view for the represented Context state,
    * as passed between the predictive-text worker and its host.
    */
-  context: Context;
+  readonly context: Context;
 
   /**
    * The active lexical model operating upon the Context.
    */
-  model: LexicalModel;
+  readonly model: LexicalModel;
 
   /**
    * Denotes the most likely tokenization for the represented Context.
@@ -78,21 +80,31 @@ export class ContextState {
   isManuallyApplied?: boolean;
 
   /**
-   * Deep-copies a previously-constructed instance.
+   * Deep-copies a prior instance.
    * @param stateToClone
    */
   constructor(stateToClone: ContextState);
   /**
-   * Constructs a new instance based on the current context.
+   * Initializes a new ContextState instance based on the active model and context.
+   *
+   * If a precomputed tokenization of the context (with prior correction-search
+   * calculation data) is not available, it will be spun up from scratch.
+   *
    * @param context The context available within the current sliding context-window
    * @param model The active lexical model.
+   * @param tokenization Precomputed tokenization for the context, leveraging previous
+   * correction-search progress and results
    */
-  constructor(context: Context, model: LexicalModel);
-  constructor(param1: Context | ContextState, model?: LexicalModel) {
+  constructor(context: Context, model: LexicalModel, tokenization?: ContextTokenization);
+  constructor(param1: Context | ContextState, model?: LexicalModel, tokenization?: ContextTokenization) {
     if(!(param1 instanceof ContextState)) {
-      const context = param1;
-      this.context = context;
+      this.context = param1;
       this.model = model;
+      if(tokenization) {
+        this.tokenization = tokenization;
+      } else {
+        this.initFromReset();
+      }
     } else {
       const stateToClone = param1;
 
@@ -106,5 +118,29 @@ export class ContextState {
         this.suggestions = [].concat(stateToClone.suggestions);
       }
     }
+  }
+
+  /**
+   * Initializes the ContextState instance for use when no valid prior
+   * information is available - typically, immediately after engine
+   * initialization or a context reset.
+   */
+  private initFromReset() {
+    const tokenizedContext = determineModelTokenizer(this.model)(this.context).left;
+    const baseTokens = tokenizedContext.map((entry) => {
+      const token = new ContextToken(this.model, entry.text);
+
+      if(entry.isWhitespace) {
+        token.isWhitespace = true;
+      }
+
+      return token;
+    });
+
+    // And now build the final context state object, which includes whitespace 'tokens'.);
+    if(baseTokens.length == 0) {
+      baseTokens.push(new ContextToken(this.model));
+    }
+    this.tokenization = new ContextTokenization(baseTokens);
   }
 }
