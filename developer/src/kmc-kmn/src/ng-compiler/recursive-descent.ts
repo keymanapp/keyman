@@ -132,8 +132,8 @@ export class ManyRule extends SingleChildRule {
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     while (parseSuccess) {
-      let save: number = Rule.tokenBuffer.currentPosition;
-      let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      const save: number = Rule.tokenBuffer.currentPosition;
+      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
       parseSuccess     = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());

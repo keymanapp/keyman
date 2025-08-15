@@ -205,7 +205,7 @@ export class ASTNode {
     let text: string = '';
     if (this.hasSoleChildOfType(NodeTypes.SOURCE_CODE)) {
       const sourceCodeNode = this.getSoleChildOfType(NodeTypes.SOURCE_CODE);
-      for (let lineNode of sourceCodeNode.getChildren()) {
+      for (const lineNode of sourceCodeNode.getChildren()) {
         text = text.concat(lineNode.token.line.toString())
       }
     }

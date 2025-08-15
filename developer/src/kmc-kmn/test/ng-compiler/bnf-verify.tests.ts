@@ -81,7 +81,7 @@ function getSourceRules(buffer:string): Dictionary {
     const rules: Dictionary = {};
     // Rules that extend AlternateTokenRule
     let matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+AlternateTokenRule.+?super\(\[([^\]]+)/sg);
-    for (let match of matches) {
+    for (const match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
       rules[name] = replaceCommas(rules[name]);
@@ -90,7 +90,7 @@ function getSourceRules(buffer:string): Dictionary {
     }
     // Other Rules
     matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+(?!AlternateTokenRule).+?constructor\(\)\s*\{[^}]+this.rule\s*=\s*new([^;}]+)[^}]+\}/sg);
-    for (let match of matches) {
+    for (const match of matches) {
       const name  = lowerCaseFirstLetter(match[1]);
       rules[name] = removeWhiteSpace(match[2]);
       rules[name] = replaceSequenceRule(rules[name]);

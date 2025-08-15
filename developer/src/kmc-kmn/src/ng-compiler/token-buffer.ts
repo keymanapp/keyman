@@ -35,7 +35,7 @@ export class TokenBuffer {
 
   public toText(): string {
     let text: string = '';
-    for (let token of this.list) {
+    for (const token of this.list) {
       text = text.concat(token.text)
     }
     return text;

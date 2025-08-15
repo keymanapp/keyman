@@ -29,7 +29,7 @@ export class KmnTreeRule extends SingleChildRule {
       return false;
     }
     const parseSuccess = this.rule.parse(node);
-    let children: ASTNode[] = [];
+    const children: ASTNode[] = [];
     const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
     const groupNodes: ASTNode[]   = this.gatherGroups(node);
     const storesNode: ASTNode     = this.gatherStores(node);
