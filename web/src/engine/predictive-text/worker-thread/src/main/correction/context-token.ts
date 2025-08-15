@@ -94,7 +94,10 @@ export class ContextToken {
       this.searchSpace = new SearchSpace(priorToken.searchSpace);
       this.suggestions = priorToken.suggestions.slice();
 
-      this.appliedSuggestionId = priorToken.appliedSuggestionId;
+      // because of unit tests.
+      if(priorToken.appliedSuggestionId !== undefined) {
+        this.appliedSuggestionId = priorToken.appliedSuggestionId;
+      }
     } else {
       const model = param;
 
