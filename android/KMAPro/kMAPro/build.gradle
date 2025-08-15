@@ -44,6 +44,12 @@ android {
         versionName KEYMAN_VERSION_NAME
         buildConfigField 'String', 'KEYMAN_VERSION_ENVIRONMENT', '"'+KEYMAN_VERSION_ENVIRONMENT+'"'
         buildConfigField 'String', 'KEYMAN_VERSION_GIT_TAG', '"'+KEYMAN_VERSION_GIT_TAG+'"'
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON:"
+            }
+        }
     }
 
     String env_release_store_file = System.getenv("release_store_file")

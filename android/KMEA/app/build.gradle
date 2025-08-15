@@ -34,6 +34,12 @@ android {
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+KEYMAN_VERSION_NAME+"\""
         buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON:"
+            }
+        }
     }
 
     buildTypes {
