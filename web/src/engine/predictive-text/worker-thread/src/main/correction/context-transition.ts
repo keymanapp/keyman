@@ -17,6 +17,17 @@ import Transform = LexicalModelTypes.Transform;
 import { buildMergedTransform } from '@keymanapp/models-templates';
 import { ContextTracker } from './context-tracker.js';
 
+// Mark affected tokens with the applied-suggestion transition ID
+// for easy future reference.
+const tagTokens = (state: ContextState, suggestion: Suggestion) => {
+  const alignment = state.tokenization.alignment
+  const appliedTokenCount = (alignment.canAlign && true) && (alignment.tailEditLength + Math.max(alignment.tailTokenShift, 0));
+  const tokens = state.tokenization.tokens;
+  for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
+    tokens[i].appliedTransitionId = suggestion.transformId;
+  }
+}
+
 /**
  * Represents the transition between two context states as triggered
  * by input keystrokes or applied suggestions.
@@ -131,39 +142,43 @@ export class ContextTransition {
       throw new Error("Could not find matching suggestion to apply");
     }
 
+    // This closure captures `suggestion`, and definition here / within the class also
+    // gives us private access to `._final`.
+    const buildAppliedTransition = (
+      transition: ContextTransition,
+      baseState: ContextState,
+      transform: Transform
+    ) => {
+      const state = ContextTracker.attemptMatchContext(
+        baseState.context,
+        baseState.model,
+        baseState,
+        [{sample: transform, p: 1}],
+        true
+      ).final;
+
+      tagTokens(state, suggestion);
+      transition._final = state;
+
+      // Applying a suggestion should not forget the original suggestion set.
+      state.appliedSuggestionId = suggestion.id;
+      state.suggestions = preAppliedState.suggestions;
+    }
+
     const fullTransform = suggestion.appendedTransform
       ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
       : suggestion.transform;
-
-    // An applied suggestion should replace the original Transition's effects, though keeping
-    // the original input around.
-    const appliedState = ContextTracker.attemptMatchContext(
-      this.base.context,
-      this.base.model,
-      this.base,
-      [{sample: fullTransform, p: 1}],
-      true
-    ).final;
-
-    // Mark affected tokens with the applied-suggestion transition ID
-    // for easy future reference.
-    const alignment = appliedState.tokenization.alignment
-    const appliedTokenCount = (alignment.canAlign && true) && (alignment.tailEditLength + Math.max(alignment.tailTokenShift, 0));
-    const tokens = appliedState.tokenization.tokens;
-    for(let i = tokens.length - appliedTokenCount; i < tokens.length; i++) {
-      tokens[i].appliedTransitionId = suggestion.transformId;
-    }
 
     // Start from a deep copy, then replace as needed to overwrite with the context
     // state resulting from the suggestion while preserving suggestion + primary
     // keystroke data.
     const resultTransition = new ContextTransition(this);
-    resultTransition._final = appliedState;
-    resultTransition._transitionId = suggestion.transformId;
+    buildAppliedTransition(resultTransition, this.base, fullTransform);
 
-    appliedState.appliedSuggestionId = suggestion.id;
-    appliedState.appliedInput = preAppliedState.appliedInput;
-    appliedState.suggestions = preAppliedState.suggestions;
+    // An applied suggestion should replace the original Transition's effects, though keeping
+    // the original input around.
+    resultTransition._transitionId = suggestion.transformId;
+    resultTransition.final.appliedInput = preAppliedState.appliedInput;
 
     return resultTransition;
   }
