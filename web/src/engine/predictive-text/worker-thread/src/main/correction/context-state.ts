@@ -179,13 +179,11 @@ export class ContextState {
 
     // Apply all transforms to the base context state
     const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
+    const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
 
-    if(transformDistribution?.[0]) {
-      context = applyTransform(transformDistribution[0].sample, context);
-    }
     // Note for future:  the next line's pattern asserts that there is only one true tokenization.
     // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
-    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(postContext).left;
     if(tokenizedContext.length == 0) {
       tokenizedContext.push({text: ''});
     }
@@ -204,7 +202,7 @@ export class ContextState {
     }
 
     const resultTokenization = this.tokenization.transitionTo(
-      determineModelTokenizer(lexicalModel)(context).left,
+      tokenizedContext,
       alignmentResults,
       lexicalModel,
       transformSequenceDistribution
@@ -243,7 +241,7 @@ export class ContextState {
       preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
     }
 
-    const state = new ContextState(context, lexicalModel);
+    const state = new ContextState(postContext, lexicalModel);
     state.tokenization = resultTokenization;
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution, preservationTransform);

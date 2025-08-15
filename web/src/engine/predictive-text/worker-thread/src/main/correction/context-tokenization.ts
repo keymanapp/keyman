@@ -325,7 +325,7 @@ export class ContextTokenization {
    * with the tokenization represented by the current instance.
    * @param alignment The alignment, as determined by a prior call to `computeAlignment`.
    * @param lexicalModel The active lexical model
-   * @param alignedTransformDistribution The tokenized version of the input Transform instance accounting
+   * @param alignedTransformDistribution The tokenized version of the input distribution accounting
    * for the difference between the context represented by this instance and that of `tokenizedContext`.
    * @returns
    */
