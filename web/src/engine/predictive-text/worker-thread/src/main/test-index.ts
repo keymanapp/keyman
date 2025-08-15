@@ -1,4 +1,5 @@
 export { ClassicalDistanceCalculation } from './correction/classical-calculation.js';
+export { ContextToken } from './correction/context-token.js';
 export { ContextTracker } from './correction/context-tracker.js';
 export * as correction from './correction/index.js';
 export * from './model-helpers.js';
