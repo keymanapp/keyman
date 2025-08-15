@@ -424,8 +424,7 @@ describe('ContextTracker', function() {
       // Actual test assertion - was the replacement tracked?
       assert.equal(baseContextMatch.final.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
       assert.equal(reversion.id, -baseSuggestion.id);
-      // TODO:  Restore this line!  Currently breaks a unit test.
-      //compositor.contextTracker.cache.keys().forEach((key) => assert.isDefined(key));
+      compositor.contextTracker.cache.keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
       let postContext = models.applyTransform(baseSuggestion.transform, baseContext);
