@@ -84,6 +84,12 @@ export class ContextToken {
       // In case we are unable to perfectly track context (say, due to multitaps)
       // we need to ensure that only fully-utilized keystrokes are considered.
       this.searchSpace = new SearchSpace(priorToken.searchSpace);
+
+      // Preserve any annotated applied-suggestion transition ID data; it's useful
+      // for delayed reversion operations.
+      if(priorToken.appliedTransitionId !== undefined) {
+        this.appliedTransitionId = priorToken.appliedTransitionId
+      }
     } else {
       const model = param;
 
