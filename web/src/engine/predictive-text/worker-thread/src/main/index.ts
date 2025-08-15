@@ -242,6 +242,7 @@ export default class LMLayerWorker {
       if(configuration.wordbreaksAfterSuggestions === undefined) {
         configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
       }
+      compositor.setConfiguration(configuration);
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
