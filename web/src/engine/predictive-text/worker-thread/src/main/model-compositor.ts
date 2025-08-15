@@ -255,7 +255,7 @@ export class ModelCompositor {
     if(this.contextTracker) {
       let contextState = this.contextTracker.newest;
       if(!contextState) {
-        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).final;
       }
 
       contextState.tokenization.tail.appliedSuggestionId = suggestion.id;

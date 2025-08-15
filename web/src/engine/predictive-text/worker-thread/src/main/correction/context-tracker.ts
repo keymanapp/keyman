@@ -11,6 +11,7 @@ import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextState } from './context-state.js';
+import { ContextTransition } from './context-transition.js';
 
 class CircularArray<Item> {
   static readonly DEFAULT_ARRAY_SIZE = 5;
@@ -103,37 +104,6 @@ class CircularArray<Item> {
   }
 }
 
-interface ContextMatchResult {
-  /**
-   * Represents the current state of the context after applying incoming keystroke data.
-   */
-  state: ContextState;
-
-  /**
-   * Represents the previously-cached context state that best matches `state` if available.
-   * May be `null` if no such state could be found within the context-state cache.
-   */
-  baseState: ContextState;
-
-  /**
-   * Indicates the portion of the incoming keystroke data, if any, that applies to
-   * tokens before the last pre-caret token and thus should not be replaced by predictions
-   * based upon `state`.  If the provided context state + the incoming transform do not
-   * adequately match the current context, the match attempt will fail with a `null` result.
-   *
-   * Should generally be non-null if the token before the caret did not previously exist.
-   *
-   * The result may be null if it does not match the prior context state or if bookkeeping
-   * based upon it is problematic - say, if wordbreaking effects shift due to new input,
-   * causing a mismatch with the prior state's tokenization.
-   * (Refer to #12494 for an example case.)
-   */
-  preservationTransform?: Transform;
-
-  headTokensRemoved: number;
-  tailTokensAdded: number;
-}
-
 export class ContextTracker extends CircularArray<ContextState> {
   // Aim:  relocate to ContextTransition in some form?
   // Or can we split it up in some manner across the different types?
@@ -143,7 +113,8 @@ export class ContextTracker extends CircularArray<ContextState> {
     matchState: ContextState,
     // the distribution should be tokenized already.
     transformDistribution?: Distribution<Transform> // transform distribution is needed here.
-  ): ContextMatchResult {
+  ): ContextTransition {
+    const baseTransition = new ContextTransition(matchState, matchState.appliedInput?.id);
     const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
 
     if(transformDistribution?.[0]) {
@@ -168,7 +139,8 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      return { state: matchState, baseState: matchState, headTokensRemoved: 0, tailTokensAdded: 0 };
+      baseTransition.finalize(matchState, transformDistribution);
+      return baseTransition;
     } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,
@@ -195,12 +167,8 @@ export class ContextTracker extends CircularArray<ContextState> {
     if(tailEditLength == 0 && tailTokenShift == 0) {
       const state = new ContextState(context, lexicalModel);
       state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-      return {
-        state: state,
-        baseState: matchState,
-        headTokensRemoved: -leadTokenShift,
-        tailTokensAdded: tailTokenShift
-      }
+      baseTransition.finalize(state, transformDistribution);
+      return baseTransition;
     }
 
     // ***
@@ -352,14 +320,8 @@ export class ContextTracker extends CircularArray<ContextState> {
 
     const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
-
-    return {
-      state,
-      baseState: matchState,
-      preservationTransform,
-      headTokensRemoved: alignmentResults.leadTokenShift < 0 ? -alignmentResults.leadTokenShift : 0,
-      tailTokensAdded: alignmentResults.tailTokenShift
-    };
+    baseTransition.finalize(state, transformDistribution, preservationTransform);
+    return baseTransition;
   }
 
   // Aim:  relocate to ContextState in some form... or ContextTransition?
@@ -378,7 +340,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     context: Context,
     transformDistribution?: Distribution<Transform>,
     preserveMatchState?: boolean
-  ): ContextMatchResult {
+  ): ContextTransition {
     if(!model.traverseFromRoot) {
       // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
       // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
@@ -388,6 +350,7 @@ export class ContextTracker extends CircularArray<ContextState> {
     if(transformDistribution?.length == 0) {
       transformDistribution = null;
     }
+
     const inputTransform = transformDistribution?.[0];
     const postContext = inputTransform ? applyTransform(inputTransform.sample, context) : context;
 
@@ -420,17 +383,17 @@ export class ContextTracker extends CircularArray<ContextState> {
 
         let result = ContextTracker.attemptMatchContext(context, model, this.item(i), transformDistribution);
 
-        if(result?.state) {
+        if(result?.final) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
           // in the history.  However, if it's the most current already, there's no need
           // to refresh it.
-          if(this.newest != result.state && this.newest != priorMatchState) {
+          if(this.newest != result.final && this.newest != priorMatchState) {
             // Already has a taggedContext.
             this.enqueue(priorMatchState);
           }
 
-          if(result.state != this.item(i)) {
-            this.enqueue(result.state);
+          if(result.final != this.item(i)) {
+            this.enqueue(result.final);
           }
           return result;
         }
@@ -444,7 +407,11 @@ export class ContextTracker extends CircularArray<ContextState> {
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
     let state = new ContextState(context, model);
     this.enqueue(state);
-    return { state, baseState: null, headTokensRemoved: 0, tailTokensAdded: 0 };
+    const transition = new ContextTransition(state, /* TODO:  we need a clear value here in the future! */ null);
+    // Hacky, but holds the course for now.  This should only really happen from context resets, which can
+    // then use a different path.
+    transition.finalize(state, []);
+    return transition;
   }
 
   clearCache() {

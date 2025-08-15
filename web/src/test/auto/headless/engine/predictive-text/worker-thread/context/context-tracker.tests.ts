@@ -51,10 +51,15 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
-      assert.equal(newContextMatch.headTokensRemoved, 1);
-      assert.equal(newContextMatch.tailTokensAdded, 0);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -1);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when lead token + following whitespace are removed", function() {
@@ -76,10 +81,15 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
-      assert.equal(newContextMatch.headTokensRemoved, 2);
-      assert.equal(newContextMatch.tailTokensAdded, 0);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when final token is edited", function() {
@@ -96,10 +106,15 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 0);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     // Needs improved context-state management (due to 2x tokens)
@@ -117,17 +132,22 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
-      let state = newContextMatch?.state;
+      let state = newContextMatch?.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 2);
+
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when a 'wordbreak' is removed via backspace", function() {
@@ -144,12 +164,15 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isOk(newContextMatch?.state);
-      assert.deepEqual(newContextMatch?.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isOk(newContextMatch?.final);
+      assert.deepEqual(newContextMatch?.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
 
-      // The 'wordbreak' transform
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, -2);
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, -2);
     });
 
     it("properly matches and aligns when an implied 'wordbreak' occurs (as when following \"'\")", function() {
@@ -166,17 +189,21 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(existingContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       assert.deepEqual(newContextMatch.preservationTransform, { insert: '', deleteLeft: 0 });
 
       // The 'wordbreak' transform
-      let state = newContextMatch.state;
+      let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 1);
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 1);
     })
 
     // Needs improved context-state management (due to 2x tokens)
@@ -199,18 +226,22 @@ describe('ContextTracker', function() {
 
       let baseState = new ContextState(existingContext, plainModel);
       let newContextMatch = ContextTracker.attemptMatchContext(newContext, plainModel, baseState, toWrapperDistribution(transform));
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
-      let state = newContextMatch.state;
+      let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      assert.equal(newContextMatch.headTokensRemoved, 2);
-      assert.equal(newContextMatch.tailTokensAdded, 2);
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, -2);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when initial token is modified AND a 'wordbreak' is added'", function() {
@@ -232,18 +263,22 @@ describe('ContextTracker', function() {
         baseState,
         [{sample: transform, p: 1}]
       );
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: 'd ', deleteLeft: 0});
 
       // The 'wordbreak' transform
-      let state = newContextMatch.state;
+      let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 2);
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it("properly matches and aligns when tail token is modified AND a 'wordbreak' is added'", function() {
@@ -265,18 +300,22 @@ describe('ContextTracker', function() {
         baseState,
         [{sample: transform, p: 1}]
       );
-      assert.isNotNull(newContextMatch?.state);
-      assert.deepEqual(newContextMatch.state.tokenization.tokens.map(token => token.exampleInput), rawTokens);
+      assert.isNotNull(newContextMatch?.final);
+      assert.deepEqual(newContextMatch.final.tokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve all text preceding the new token when applying a suggestion.
       assert.deepEqual(newContextMatch.preservationTransform, { insert: 'tor ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
-      let state = newContextMatch.state;
+      let state = newContextMatch.final;
       assert.isNotEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 2].searchSpace.inputSequence);
       assert.isEmpty(state.tokenization.tokens[state.tokenization.tokens.length - 1].searchSpace.inputSequence);
 
-      assert.equal(newContextMatch.headTokensRemoved, 0);
-      assert.equal(newContextMatch.tailTokensAdded, 2);
+      if(!newContextMatch.final.tokenization.alignment.canAlign) {
+        // Done this way b/c TS can infer types correctly afterward.
+        assert.fail("context alignment failed");
+      }
+      assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
+      assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 2);
     });
 
     it('rejects hard-to-handle case: tail token is split into three rather than two', function() {
@@ -377,12 +416,12 @@ describe('ContextTracker', function() {
       let compositor = new ModelCompositor(model);
       let baseContextMatch = compositor.contextTracker.analyzeState(model, baseContext);
 
-      baseContextMatch.state.tokenization.tail.suggestions = [ baseSuggestion ];
+      baseContextMatch.final.tokenization.tail.suggestions = [ baseSuggestion ];
 
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
 
       // Actual test assertion - was the replacement tracked?
-      assert.equal(baseContextMatch.state.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
+      assert.equal(baseContextMatch.final.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Next step - on the followup context, is the replacement still active?
@@ -390,10 +429,10 @@ describe('ContextTracker', function() {
       let postContextMatch = compositor.contextTracker.analyzeState(model, postContext);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
-      assert.equal(postContextMatch.state.tokenization.tokens[postContextMatch.state.tokenization.tokens.length - 2].exampleInput, ' ');
+      assert.equal(postContextMatch.final.tokenization.tokens[postContextMatch.final.tokenization.tokens.length - 2].exampleInput, ' ');
 
       // Final token is empty (follows a wordbreak)
-      assert.equal(postContextMatch.state.tokenization.tail.exampleInput, '');
+      assert.equal(postContextMatch.final.tokenization.tail.exampleInput, '');
     });
   });
 });
