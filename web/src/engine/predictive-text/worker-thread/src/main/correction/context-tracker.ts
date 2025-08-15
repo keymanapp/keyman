@@ -1,4 +1,4 @@
-import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
+import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
@@ -7,49 +7,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
-import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
-
-export class TrackedContextSuggestion {
-  suggestion: Suggestion;
-  tokenWidth: number;
-}
-
-export class TrackedContextState {
-  // Stores the post-transform Context.  Useful as a debugging reference, but also used to
-  // pre-validate context state matches in case of discarded changes from multitaps.
-  taggedContext: Context;
-  model: LexicalModel;
-
-  tokenization: ContextTokenization;
-
-  /**
-   * How many tokens were removed from the start of the best-matching ancestor.
-   * Useful for restoring older states, e.g., when the user moves the caret backwards, we can recover the context at that position.
-   */
-  indexOffset: number;
-
-  constructor(source: TrackedContextState);
-  constructor(model: LexicalModel);
-  constructor(obj: TrackedContextState | LexicalModel) {
-    if(obj instanceof TrackedContextState) {
-      let source = obj;
-      // Be sure to deep-copy the tokens!  Pointer-aliasing is bad here.
-      this.tokenization = new ContextTokenization(source.tokenization.tokens.map((token) => new ContextToken(token)));
-
-      this.indexOffset = 0;
-      this.model = obj.model;
-      this.taggedContext = obj.taggedContext;
-    } else {
-      let lexicalModel = obj;
-      this.tokenization = null;
-      this.indexOffset = Number.MIN_SAFE_INTEGER;
-      this.model = lexicalModel;
-    }
-  }
-}
+import { ContextState } from './context-state.js';
 
 class CircularArray<Item> {
   static readonly DEFAULT_ARRAY_SIZE = 5;
@@ -146,13 +107,13 @@ interface ContextMatchResult {
   /**
    * Represents the current state of the context after applying incoming keystroke data.
    */
-  state: TrackedContextState;
+  state: ContextState;
 
   /**
    * Represents the previously-cached context state that best matches `state` if available.
    * May be `null` if no such state could be found within the context-state cache.
    */
-  baseState: TrackedContextState;
+  baseState: ContextState;
 
   /**
    * Indicates the portion of the incoming keystroke data, if any, that applies to
@@ -173,13 +134,16 @@ interface ContextMatchResult {
   tailTokensAdded: number;
 }
 
-export class ContextTracker extends CircularArray<TrackedContextState> {
+export class ContextTracker extends CircularArray<ContextState> {
   static attemptMatchContext(
-    tokenizedContext: Token[],
-    matchState: TrackedContextState,
+    context: Context,
+    lexicalModel: LexicalModel,
+    matchState: ContextState,
     // the distribution should be tokenized already.
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+
     const alignmentResults = matchState.tokenization.computeAlignment(tokenizedContext.map((token) => token.text));
 
     if(!alignmentResults.canAlign) {
@@ -223,7 +187,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // If no TAIL mutations have happened, we're safe to return now.
     if(tailEditLength == 0 && tailTokenShift == 0) {
-      const state = new TrackedContextState(matchState);
+      const state = new ContextState(context, lexicalModel);
       state.tokenization = new ContextTokenization(tokenization, alignmentResults);
       return {
         state: state,
@@ -292,7 +256,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       let token: ContextToken;
 
       if(isBackspace) {
-        token = new ContextToken(matchState.model, incomingToken.text);
+        token = new ContextToken(lexicalModel, incomingToken.text);
         token.searchSpace.inputSequence.forEach((entry) => entry[0].sample.id = primaryInput.id);
       } else {
         // Assumption:  there have been no intervening keystrokes since the last well-aligned context.
@@ -338,7 +302,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           preservationTransform = preservationTransform && primaryInput ? buildMergedTransform(preservationTransform, primaryInput) : (primaryInput ?? preservationTransform);
         }
 
-        let pushedToken = new ContextToken(matchState.model);
+        let pushedToken = new ContextToken(lexicalModel);
 
         // TODO:  assumes that there was no shift in wordbreaking from the
         // prior context to the current one.  This may actually be a major
@@ -380,7 +344,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       }
     }
 
-    const state = new TrackedContextState(matchState);
+    const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
 
     return {
@@ -392,10 +356,13 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     };
   }
 
+  // Aim:  relocate to ContextState in some form.
   static modelContextState(
-    tokenizedContext: Token[],
+    context: Context,
     lexicalModel: LexicalModel
-  ): TrackedContextState {
+  ): ContextState {
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(context).left;
+
     let baseTokens = tokenizedContext.map(function(entry) {
       let token = new ContextToken(lexicalModel, entry.text);
 
@@ -407,7 +374,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     });
 
     // And now build the final context state object, which includes whitespace 'tokens'.
-    let state = new TrackedContextState(lexicalModel);
+    let state = new ContextState(context, lexicalModel);
     const tokenization: ContextToken[] = [];
 
     while(baseTokens.length > 0) {
@@ -423,6 +390,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     return state;
   }
 
+  // Aim:  relocate to ContextState in some form... or ContextTransition?
   /**
    * Compares the current, post-input context against the most recently-seen contexts from previous prediction calls, returning
    * the most information-rich `TrackedContextState` possible.  If a match is found, the state will be annotated with the
@@ -485,7 +453,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         // Skip intermediate multitap-produced contexts.
         // When multitapping, we skip all contexts from prior taps within the same interaction,
         // but not any contexts from before the multitap started.
-        const priorTaggedContext = priorMatchState.taggedContext;
+        const priorTaggedContext = priorMatchState.context;
         if(priorTaggedContext && transformDistribution && transformDistribution.length > 0) {
           // Using the potential `matchState` + the incoming transform, do the results line up for
           // our observed context?  If not, skip it.
@@ -502,7 +470,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           continue;
         }
 
-        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution);
+        let result = ContextTracker.attemptMatchContext(context, model, this.item(i), tokenizedDistribution);
 
         if(result?.state) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
@@ -513,7 +481,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
             this.enqueue(priorMatchState);
           }
 
-          result.state.taggedContext = context;
+          result.state.context = context;
           if(result.state != this.item(i)) {
             this.enqueue(result.state);
           }
@@ -527,8 +495,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     //
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-    let state = ContextTracker.modelContextState(tokenizedContext.left, model);
-    state.taggedContext = context;
+    let state = ContextTracker.modelContextState(context, model);
+    state.context = context;
     this.enqueue(state);
     return { state, baseState: null, headTokensRemoved: 0, tailTokensAdded: 0 };
   }

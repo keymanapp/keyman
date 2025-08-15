@@ -5,7 +5,8 @@ import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbre
 
 import TransformUtils from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
+import { ContextTracker } from './correction/context-tracker.js';
+import { ContextState } from './correction/context-state.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
 
@@ -169,7 +170,7 @@ export async function correctAndEnumerate(
    *
    * Otherwise, is `null`.
    */
-  postContextState?: TrackedContextState;
+  postContextState?: ContextState;
 
   /**
    * The suggestions generated based on the user's input state.
