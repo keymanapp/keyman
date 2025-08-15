@@ -172,13 +172,11 @@ export class ContextState {
    * @returns
    */
   analyzeTransition(
-    // Alignable to the context expected for the transition's base state
     context: Context,
-    // the distribution should be tokenized already.
-    transformDistribution?: Distribution<Transform>, // transform distribution is needed here.
+    transformDistribution?: Distribution<Transform>,
     // overrides checks for token substitution that can fail for large applied suggestions.
     isApplyingSuggestion?: boolean
-  ): ContextTransition /* returns null if matchState is NOT a valid base state */ {
+  ): ContextTransition {
     const lexicalModel = this.model;
 
     // Apply all transforms to the base context state
