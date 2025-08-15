@@ -177,6 +177,13 @@ export async function correctAndEnumerate(
    * The suggestions generated based on the user's input state.
    */
   rawPredictions: CorrectionPredictionTuple[];
+
+  /**
+   * The id of a prior ContextTransition event that triggered a Suggestion found
+   * at the end of the Context.  Will be undefined if no edits have occurred
+   * since the Suggestion was applied.
+   */
+  revertableTransitionId: number
 }> {
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
@@ -233,7 +240,8 @@ export async function correctAndEnumerate(
 
     return {
       postContextState: null,
-      rawPredictions: rawPredictions
+      rawPredictions: rawPredictions,
+      revertableTransitionId: undefined
     };
   }
 
@@ -285,6 +293,7 @@ export async function correctAndEnumerate(
     // Only known remaining use of `analyzeState` currently - and it's as a failsafe!
     transition = contextTracker.analyzeState(lexicalModel, context, transformDistribution);
   }
+
   contextTracker.latest = transition;
   const postContextState = transition.final;
 
@@ -373,7 +382,8 @@ export async function correctAndEnumerate(
     // Only one 'correction' / prediction root is allowed - the actual text.
     return {
       postContextState: postContextState,
-      rawPredictions: predictions
+      rawPredictions: predictions,
+      revertableTransitionId: transition.revertableTransitionId
     }
   }
 
@@ -465,7 +475,8 @@ export async function correctAndEnumerate(
 
   return {
     postContextState: postContextState,
-    rawPredictions: rawPredictions
+    rawPredictions: rawPredictions,
+    revertableTransitionId: transition.revertableTransitionId
   };
 }
 
