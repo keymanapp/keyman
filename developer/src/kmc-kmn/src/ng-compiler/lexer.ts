@@ -175,12 +175,12 @@ export class Lexer {
    * @return                   whether a matching token was found
    */
   private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): boolean {
-    let patternIterator: Iterator<ScanRecogniser> = this.scanRecognisers.values();
-    let iterResult: IteratorResult<ScanRecogniser, any>;
-    let recogniser: ScanRecogniser;
-    let match: RegExpExecArray | null;
-    let tokenMatch: boolean      = false;
-    let parseInProgress: boolean = true;
+    const patternIterator: Iterator<ScanRecogniser> = this.scanRecognisers.values();
+    let   iterResult: IteratorResult<ScanRecogniser, any>;
+    let   recogniser: ScanRecogniser;
+    let   match: RegExpExecArray | null;
+    let   tokenMatch: boolean      = false;
+    let   parseInProgress: boolean = true;
 
     // we cannot handle line continuation if emitAll is true
     // (i.e. emitAll:true => handleContinuation:false)
