@@ -237,14 +237,23 @@ export default class LMLayerWorker {
       }
 
       let compositor = this.transitionToReadyState(model);
+      const autoInsert = compositor.punctuation.insertAfterWord;
+
       // This test allows models to directly specify the property without it being auto-overridden by
       // this default.
       if(configuration.appendsWordbreaks === undefined) {
-        if(compositor.punctuation.insertAfterWord != '') {
+        // If we automatically insert something after a suggestion, that implies
+        // it serves as a wordbreaking token.
+        if(autoInsert != '') {
           configuration.appendsWordbreaks = {
-            breakingMarks: ['.', ',', ';', ':', '?', '!']
+            breakingMarks: [autoInsert, '.', ',', ';', ':', '?', '!']
           };
-        } // else leave undefined (falsy)
+        } // else leave undefined (falsy) - it has unusual wordbreaking patterns,
+          // so avoid further assumptions.
+      } else if(autoInsert != '') {
+        // If it's auto-inserted after a suggestion, we treat it as an
+        // implied wordbreaking mark.  This array may safely have duplicates.
+        configuration.appendsWordbreaks.breakingMarks.push(autoInsert);
       }
       compositor.setConfiguration(configuration);
       this.cast('ready', { configuration });
