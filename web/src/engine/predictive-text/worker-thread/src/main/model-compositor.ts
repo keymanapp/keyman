@@ -253,7 +253,7 @@ export class ModelCompositor {
 
     // Step 3:  if we track Contexts, update the tracking data as appropriate.
     if(this.contextTracker) {
-      let contextState = this.contextTracker.newest;
+      let contextState = this.contextTracker.newest.final;
       if(!contextState) {
         contextState = this.contextTracker.analyzeState(this.lexicalModel, context).final;
       }
@@ -293,31 +293,20 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let contextMatchFound = false;
-    for(let c = this.contextTracker.count - 1; c >= 0; c--) {
-      let contextState = this.contextTracker.item(c);
-
-      if(contextState.tokenization.tail.appliedSuggestionId == -reversion.id) {
-        contextMatchFound = true;
-        break;
-      }
-    }
+    let contextMatchFound = this.contextTracker.cache.peek(-reversion.transformId);
 
     if(!contextMatchFound) {
       return fallbackSuggestions();
     }
 
     // Remove all contexts more recent than the one we're reverting to.
-    while(this.contextTracker.newest.tokenization.tail.appliedSuggestionId != -reversion.id) {
-      this.contextTracker.popNewest();
-    }
-
-    this.contextTracker.newest.tokenization.tail.appliedSuggestionId = undefined;
+    this.contextTracker.cache.rewindTo(-reversion.transformId);
+    this.contextTracker.newest.final.tokenization.tail.appliedSuggestionId = undefined;
 
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    let suggestions = this.contextTracker.newest.tokenization.tail.suggestions;
+    let suggestions = this.contextTracker.newest.final.tokenization.tail.suggestions;
 
     suggestions.forEach(function(suggestion) {
       // A reversion's transform ID is the additive inverse of its original suggestion;
@@ -338,7 +327,7 @@ export class ModelCompositor {
     return tokenizer(context);
   }
 
-  public resetContext(context: Context) {
+  public resetContext(context: Context, stateId: number) {
     // If we're resetting the context, any active prediction requests are no
     // longer valid.
     this.activeTimer?.terminate();
