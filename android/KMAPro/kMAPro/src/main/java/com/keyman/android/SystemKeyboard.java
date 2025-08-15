@@ -5,10 +5,10 @@
 package com.keyman.android;
 
 import com.keyman.engine.util.DownloadFileUtils;
-import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.tavultesoft.kmapro.PreferencesManager;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -30,7 +30,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
@@ -287,9 +286,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       return true;
     };
 
-    // TODO: Implement IME setting similar to Gboard "Show on-screen keyboard" with physical keyboard
-    // (default false)
-    return true;
+    Context context = getApplicationContext();
+    SharedPreferences prefs = context.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    return showOSK;
   }
 
   @Override
