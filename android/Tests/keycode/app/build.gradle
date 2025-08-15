@@ -6,8 +6,8 @@ ext.rootPath = '../../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdk 34
-    namespace "com.keyman.android.tests.keycode"
+    compileSdk 35
+    namespace="com.keyman.android.tests.keycode"
 
     buildFeatures {
         // needed for custom BuildConfigField values in defaultConfig
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId "com.keyman.android.tests.keycode"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
         versionCode KEYMAN_VERSION_CODE as Integer
