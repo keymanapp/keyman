@@ -4,7 +4,9 @@
  * Created by jahorton on 2025-07-30
  *
  * Represents cached data about the state of the sliding context window either
- * before or after a context transition event and related functionality.
+ * before or after a context transition event and related functionality,
+ * including logic used to determine the transition from one context state to
+ * another.
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -18,6 +20,9 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import { ContextToken } from './context-token.js';
 import { determineModelTokenizer } from '#./model-helpers.js';
+import { ContextTransition } from './context-transition.js';
+import { tokenizeAndFilterDistribution } from './transform-tokenization.js';
+import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
 
 /**
  * Represents a state of the active context at some point in time along with the
@@ -142,5 +147,103 @@ export class ContextState {
       baseTokens.push(new ContextToken(this.model));
     }
     this.tokenization = new ContextTokenization(baseTokens);
+  }
+
+  /**
+   * As written, this method attempts to determine the context state and tokenization(s)
+   * that result from applying an incoming transform distribution to the incoming context
+   * state based upon data from _this_ instance's modeled context state.
+   *
+   * If the two versions of Context are not alignable, this method will return null.
+   *
+   * If they are alignable, this method will reuse as much prior cached data (for
+   * tokenization and correction-search reuse) as possible when tokenizing and building
+   * the final resulting ContextState for the modeled ContextTransition.
+   *
+   * @param context The incoming Context instance for a prediction or suggestion application,
+   * which should be alignable to this instance's .context.  (I.e, should be "the same"
+   * context after adjusting for sliding context-window behaviors.)
+   * @param transformDistribution A distribution of incoming potential edits to the context -
+   * typically from a keystroke's fat-finger distribution.
+   *
+   * May also contain a single entry for applying Suggestions or when correction behavior
+   * is disabled.
+   * @param isApplyingSuggestion Indicates if this is being used to apply a Suggestion.
+   * @returns
+   */
+  analyzeTransition(
+    context: Context,
+    transformDistribution?: Distribution<Transform>,
+    // overrides checks for token substitution that can fail for large applied suggestions.
+    isApplyingSuggestion?: boolean
+  ): ContextTransition {
+    const lexicalModel = this.model;
+
+    // Apply all transforms to the base context state
+    const transformSequenceDistribution = tokenizeAndFilterDistribution(context, lexicalModel, transformDistribution);
+    const postContext = transformDistribution?.[0] ? applyTransform(transformDistribution[0].sample, context) : context;
+
+    // Note for future:  the next line's pattern asserts that there is only one true tokenization.
+    // We may eventually allow for multiple potential tokenizations (per epic-dict-breaker)
+    const tokenizedContext = determineModelTokenizer(lexicalModel)(postContext).left;
+    if(tokenizedContext.length == 0) {
+      tokenizedContext.push({text: ''});
+    }
+    // In which case we could try need to align for each of them, starting from the most likely.
+    //
+    // It's possible the tokenization will remember more of the initial token than is
+    // actually present in the sliding context window, which imposes a need for a wide-band
+    // computeDistance 'radius' in the called function.
+    const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isApplyingSuggestion);
+
+    if(!alignmentResults.canAlign) {
+      return null;
+    }
+
+    const resultTokenization = this.tokenization.transitionTo(
+      tokenizedContext,
+      alignmentResults,
+      lexicalModel,
+      transformSequenceDistribution
+    );
+
+    if(!resultTokenization) {
+      return null;
+    }
+
+    const transition = new ContextTransition(this, this.appliedInput?.id);
+    if(resultTokenization == this.tokenization) {
+      // If the tokenizations match, clone the ContextState; we want to preserve a post-application
+      // context separately from pre-application contexts for predictions based on empty roots.
+      const state = new ContextState(this);
+      transition.finalize(state, transformDistribution);
+      return transition;
+    }
+
+    // Used to construct and represent the part of the incoming transform that
+    // does not land as part of the final token in the resulting context.  This
+    // component should be preserved by any suggestions that get applied.
+    let preservationTransform: Transform;
+
+    // Handling for non-whitespace word boundaries - for example,
+    // `the '` => `the 'a` - a fun word boundary shift!
+    // We expect such cases to have SOMETHING for a preservation transform here;
+    // we need to ensure that any suggestions for the new token believe that
+    // the token is starting fresh, without any prior text.
+    if(alignmentResults.tailTokenShift > 0) {
+      preservationTransform = { insert: '', deleteLeft: 0 };
+    }
+
+    // Leave out the final entry!
+    for(let i = 0; i < transformSequenceDistribution?.[0].sample.length - 1; i++) {
+      const primaryInput = transformSequenceDistribution[0].sample[i];
+      preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput): primaryInput;
+    }
+
+    const state = new ContextState(postContext, lexicalModel);
+    state.tokenization = resultTokenization;
+    state.appliedInput = transformDistribution?.[0].sample;
+    transition.finalize(state, transformDistribution, preservationTransform);
+    return transition;
   }
 }
