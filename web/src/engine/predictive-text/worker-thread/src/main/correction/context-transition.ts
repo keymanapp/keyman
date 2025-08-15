@@ -14,7 +14,7 @@ import { ContextState } from './context-state.js';
 import Distribution = LexicalModelTypes.Distribution;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import { buildMergedTransform } from '@keymanapp/models-templates';
+
 
 // Mark affected tokens with the applied-suggestion transition ID
 // for easy future reference.
@@ -135,7 +135,10 @@ export class ContextTransition {
    * @param suggestion
    * @returns
    */
-  applySuggestion(suggestion: Suggestion) {
+  applySuggestion(suggestion: Suggestion): {
+    base: ContextTransition,
+    appended?: ContextTransition
+  } {
     const preAppliedState = this.final;
     if(!preAppliedState.suggestions?.find((s) => s.id == suggestion?.id)) {
       throw new Error("Could not find matching suggestion to apply");
@@ -162,22 +165,33 @@ export class ContextTransition {
       state.suggestions = preAppliedState.suggestions;
     }
 
-    const fullTransform = suggestion.appendedTransform
-      ? buildMergedTransform(suggestion.transform, suggestion.appendedTransform)
-      : suggestion.transform;
-
     // Start from a deep copy, then replace as needed to overwrite with the context
     // state resulting from the suggestion while preserving suggestion + primary
     // keystroke data.
+
     const resultTransition = new ContextTransition(this);
-    buildAppliedTransition(resultTransition, this.base, fullTransform);
+    buildAppliedTransition(resultTransition, this.base, suggestion.transform);
 
     // An applied suggestion should replace the original Transition's effects, though keeping
     // the original input around.
     resultTransition._transitionId = suggestion.transformId;
     resultTransition.final.appliedInput = preAppliedState.appliedInput;
 
-    return resultTransition;
+    if(!suggestion.appendedTransform) {
+      return { base: resultTransition };
+    }
+
+    const finalTransition = new ContextTransition(resultTransition.final, suggestion.appendedTransform.id);
+    buildAppliedTransition(finalTransition, resultTransition.final, suggestion.appendedTransform);
+
+    // The appended transform is applied with no intermediate input.
+    finalTransition.final.appliedInput = { insert: '', deleteLeft: 0 };
+    finalTransition.inputDistribution = [];
+
+    return {
+      base: resultTransition,
+      appended: finalTransition
+    };
   }
 
   /**

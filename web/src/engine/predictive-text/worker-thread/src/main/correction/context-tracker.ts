@@ -107,7 +107,7 @@ export class ContextTracker {
           if(transitionId !== undefined) {
             // Special case:  if base and final match, we should use the old Transition instance.
             // This is currently used in some unit tests.
-            if(result.final != result.base) {
+            if(result.final.context != result.base.context) {
               this.cache.add(transitionId, result);
             } else {
               return this.cache.peek(priorMatchState.transitionId);

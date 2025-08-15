@@ -19,8 +19,6 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-var emptyInput = (id: number) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
-
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
     describe('Basic suggestion generation', function() {
@@ -851,6 +849,7 @@ describe('ModelCompositor', function() {
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
@@ -892,18 +891,21 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 0);
 
       let baseSuggestion = initialSuggestions[1];
+      baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
+      // Two rewind states:  one for the suggestion's base word text, one for
+      // appended post-suggestion whitespace.
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
+      let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
 
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
-      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(15));
+      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().peek(15);
 
       // Accepting the suggestion rewrites the latest context transition.
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
-      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [15, baseSuggestion.transformId]);
+      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [...contextIds]);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
       assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
