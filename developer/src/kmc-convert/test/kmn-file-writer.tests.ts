@@ -152,7 +152,7 @@ describe('KmnFileWriter', function () {
 
   });
 
-  describe("writeData_Stores() ", function () {
+  describe("write_KmnFileHeader() ", function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -187,18 +187,18 @@ describe('KmnFileWriter', function () {
       + "group(main) using keys\n\n"
       + "\n";
 
-    it(('writeData_Stores should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
-      const written_correctName = sut_w.writeData_Stores(converted);
+    it(('write_KmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
+      const written_correctName = sut_w.write_KmnFileHeader(converted);
       assert.equal(written_correctName, (out_expected_first + converted.keylayout_filename + out_expected_last));
     });
 
-    it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
-      const written_emptyName = sut_w.writeData_Stores(converted_empty);
+    it(('write_KmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on empty input', async function () {
+      const written_emptyName = sut_w.write_KmnFileHeader(converted_empty);
       assert.equal(written_emptyName, (out_expected_first + out_expected_last));
     });
 
-    it(('writeData_Stores should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
-      const written_onlyName = sut_w.writeData_Stores(converted_unavailable);
+    it(('write_KmnFileHeader should return store text without filename ').padEnd(62, " ") + 'on only filename as input', async function () {
+      const written_onlyName = sut_w.write_KmnFileHeader(converted_unavailable);
       assert.equal(written_onlyName, (out_expected_first + converted_unavailable.keylayout_filename + out_expected_last));
     });
   });
