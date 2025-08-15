@@ -102,4 +102,10 @@ describe('isSubstitutionAlignable', () => {
   it(`returns false:  'clasts' => 'lasps' (subs allowed)`, () => {
     assert.isTrue(isSubstitutionAlignable('lasps', 'clasts', true));
   });
+
+  // deletion, then sub at the start, duplicate letters with one dropped
+  it(`returns true:  'applesauce' => 'plesauce' (subs not allowed)`, () => {
+    // The double-p adds a fun complication once the first gets dropped.
+    assert.isTrue(isSubstitutionAlignable('applesauce', 'plesauce'));
+  });
 });

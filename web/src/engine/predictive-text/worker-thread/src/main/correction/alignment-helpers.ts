@@ -74,12 +74,19 @@ export function isSubstitutionAlignable(
     const firstSubstitute = subEditPath.indexOf('substitute');
     const firstMatch      = subEditPath.indexOf('match');
     if(firstSubstitute > -1) {
+      // When this is called for a word not adjacent to the caret, its letters shouldn't be
+      // substituted - that operation doesn't happen at a sliding context-window edge.
       return false;
     } else if(firstMatch > -1) {
+      const lastMatch     = subEditPath.lastIndexOf('match');
       // Should not have inserts or deletes on both sides of matched text!
-      if(firstInsert > -1 && firstInsert < firstMatch && subEditPath.lastIndexOf('insert') > firstMatch) {
+      // Due to how the edit path is calculated, an insert or delete could appear after the
+      // firstMatch - especially in the case of adjacent double letters.
+      //
+      // Ex: applesauce => plesauce tends to say 'match', then 'delete', on the two 'p's.
+      if(firstInsert > -1 && firstInsert < firstMatch && subEditPath.lastIndexOf('insert') > lastMatch) {
         return false;
-      } else if(firstDelete > -1 && firstDelete < firstMatch && subEditPath.lastIndexOf('delete') > firstMatch) {
+      } else if(firstDelete > -1 && firstDelete < firstMatch && subEditPath.lastIndexOf('delete') > lastMatch) {
         return false;
       }
     }
