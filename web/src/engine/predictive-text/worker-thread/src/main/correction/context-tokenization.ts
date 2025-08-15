@@ -95,6 +95,8 @@ export class ContextTokenization {
    * Determines the alignment between a new, incoming tokenization source and the
    * tokenization modeled by the current instance.
    * @param incomingTokenization Raw strings corresponding to the tokenization of the incoming context
+   * @param noSubVerify When true, this disables inspection of 'substitute' transitions that avoids
+   * wholesale replacement of the original token.
    * @returns Alignment data that details if and how the incoming tokenization aligns with
    * the tokenization modeled by this instance.
    */
