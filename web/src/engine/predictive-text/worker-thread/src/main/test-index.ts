@@ -2,6 +2,8 @@ export { ClassicalDistanceCalculation } from './correction/classical-calculation
 export { ContextToken } from './correction/context-token.js';
 export { ContextTokenization } from './correction/context-tokenization.js';
 export { ContextTracker } from './correction/context-tracker.js';
+export { EditOperation } from './correction/classical-calculation.js';
+export * from './correction/alignment-helpers.js';
 export * as correction from './correction/index.js';
 export * from './model-helpers.js';
 export * as models from './models/index.js';
