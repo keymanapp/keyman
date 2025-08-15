@@ -15,6 +15,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
+
 # This script runs from its parent's folder
 cd "$(dirname "$THIS_SCRIPT")/.."
 
@@ -28,9 +30,9 @@ fi
 #. ../resources/shellHelperFunctions.sh
 
 BUILD_NUMBER=`cat ../VERSION.md`
-TIER=`cat ../TIER.md`
+KEYMAN_TIER=`cat ../TIER.md`
 
-KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${TIER}.txt"
+KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${KEYMAN_TIER}.txt"
 CHANGELOG_PATH="upload/$BUILD_NUMBER/$KEYMAN_CHANGELOG"
 
 WORK_DIR=`pwd`
@@ -46,7 +48,7 @@ mkdir -p "${UPLOAD_DIR}"
 # First, we prep the files for publication: write changelog
 
 echo "Writing changelog to $CHANGELOG_PATH"
-get_version_notes "ios" "${BUILD_NUMBER}" "$TIER" > $CHANGELOG_PATH
+get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
 assertFileExists "${CHANGELOG_PATH}"
 
@@ -68,16 +70,17 @@ FRAMEWORK="KeymanEngine.xcframework"
 KEYMAN_SAMPLES="samples"
 
 echo "engine dest: $KMEI_DST"
+ZIP_FLAGS=("-q" "-r" "-X") # quiet, recursive, no-extra
 
 echo "Zipping ${FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
 cd "${KMEI_FRAMEWORK_BASE}"
-zip -qrX "${KMEI_DST}" ${FRAMEWORK}
+add_zip_files "${KMEI_DST}" "${ZIP_FLAGS[@]}" "${FRAMEWORK}"
 cd "$WORK_DIR"
 
 echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
 cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
 cd "${UPLOAD_DIR}"
-zip -qr "${KMEI_DST_NAME}" "samples"
+add_zip_files "${KMEI_DST_NAME}" "-x@../../zip-excludes" "${ZIP_FLAGS[@]}" "samples"
 rm -rf "samples"
 cd "$WORK_DIR"
 
@@ -97,7 +100,7 @@ KEYMANAPP_SIM_APP_DST="keyman-ios-simulator-${BUILD_NUMBER}.app.zip"
 
 echo "Zipping Keyman simulator artifact ${KEYMANAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
 cd "${KEYMANAPP_SIM_FOLDER}"
-zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}" "Keyman.app"
+add_zip_files "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}" "${ZIP_FLAGS[@]}" "Keyman.app"
 echo "${WORK_DIR}/${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}"
 cd "$WORK_DIR"
 
@@ -118,7 +121,7 @@ if [ "${RELEASE_OEM_FIRSTVOICES}" = true ]; then
 
   echo "Zipping FirstVoices simulator artifact ${FIRSTVOICESAPP_SIM_APP} => ${UPLOAD_DIR}/${KEYMANAPP_SIM_APP_DST}..."
   cd "${FIRSTVOICESAPP_SIM_FOLDER}"
-  zip -qrX "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_APP_DST}" "FirstVoices.app"
+  add_zip_files "${WORK_DIR}/${UPLOAD_DIR}/${FIRSTVOICESAPP_SIM_APP_DST}" "${ZIP_FLAGS[@]}" "FirstVoices.app"
   cd "$WORK_DIR"
 fi
 
@@ -126,11 +129,9 @@ fi
 # Write download info files
 #
 
-cd "${UPLOAD_DIR}"
+write_download_info "${UPLOAD_DIR}" "${KMEI_DST_NAME}" "Keyman Engine for iOS" zip ios
+write_download_info "${UPLOAD_DIR}" "${KEYMANAPP_IPA_DST}" "Keyman for iPhone and iPad" ipa ios
 
-write_download_info "Keyman Engine for iOS" "${KMEI_DST_NAME}" "${BUILD_NUMBER}" "${TIER}" "ios"
-write_download_info "Keyman for iPhone and iPad" "${KEYMANAPP_IPA_DST}" "${BUILD_NUMBER}" "${TIER}" "ios"
-
-if [ ${RELEASE_OEM_FIRSTVOICES} = true ]; then
-  write_download_info "FirstVoices Keyboards" "${FIRSTVOICESAPP_IPA_DST}" "${BUILD_NUMBER}" "${TIER}" "ios"
+if [[ ${RELEASE_OEM_FIRSTVOICES} = true ]]; then
+  write_download_info "${UPLOAD_DIR}" "${FIRSTVOICESAPP_IPA_DST}" "FirstVoices Keyboards" ipa ios
 fi

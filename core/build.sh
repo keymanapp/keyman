@@ -69,7 +69,8 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--test,-t=opt_tests             test[s] to run (space separated)"
+  "--test,-t=opt_tests             test[s] to run (space separated)" \
+  "--no-werror                     don't report warnings as errors"
 
 builder_parse "$@"
 
@@ -115,12 +116,15 @@ builder_describe_outputs \
   build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root
+MESON_ARGS=--werror
+if builder_has_option --no-werror; then
+  MESON_ARGS=
+fi
+
 if builder_has_action configure; then
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built

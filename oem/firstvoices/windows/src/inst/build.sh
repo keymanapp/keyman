@@ -16,17 +16,17 @@ builder_describe "Installation files for FirstVoices Keyboards" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /windows/release/${VERSION}/firstvoices-${VERSION}.exe
+  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe
 
 builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 . "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
-if [[ -z ${TIER+x} ]]; then
-  TIER=alpha
+if [[ -z ${KEYMAN_TIER+x} ]]; then
+  KEYMAN_TIER=alpha
 fi
 
 # TODO: why are we not bundling CEF?
@@ -61,7 +61,7 @@ function do_publish() {
 
   "$WIXHEAT" dir ../xml -o desktopui.wxs -ag -cg DesktopUI -dr INSTALLDIR -suid -var var.DESKTOPUISOURCE -wx -nologo
   "$WIXCANDLE" -dOEMNAME="FirstVoices" -dPRODUCTNAME="FirstVoices Keyboards" -dROOT="$KEYMAN_ROOT/windows" \
-     -dVERSION=$VERSION_WIN -dRELEASE=$VERSION_RELEASE \
+     -dKEYMAN_VERSION=$KEYMAN_VERSION_WIN -dRELEASE=$KEYMAN_VERSION_RELEASE \
      -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=../xml \
      firstvoices.wxs desktopui.wxs
 
@@ -85,7 +85,7 @@ function do_publish() {
   # Build self-extracting archive
   #
   create-setup-inf
-  wzzip firstvoices.zip firstvoices.msi license.html setup.inf setuptitle.png fv_all.kmp
+  add_zip_files firstvoices.zip firstvoices.msi license.html setup.inf setuptitle.png fv_all.kmp
   rm -f setup.inf
   cat "$WINDOWS_PROGRAM_APP/setup-redist.exe" firstvoices.zip > firstvoices.exe
   rm -f firstvoices.zip
@@ -101,24 +101,24 @@ function do_publish() {
 function copy-installer() {
   builder_heading copy-installer
 
-  mkdir -p "$KEYMAN_ROOT/windows/release/${VERSION}"
-  cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${VERSION}/firstvoices.msi"
-  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${VERSION}/firstvoices-${VERSION}.exe"
+  mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
+  cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
+  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe"
 
-  verify-installer-signatures
+  builder_if_release_build_level verify-installer-signatures
 }
 
 function verify-installer-signatures() {
   builder_heading verify-installer-signatures
 
-  verify-all-executable-signatures-in-folder "$KEYMAN_ROOT/windows/release/${VERSION}"
+  verify-all-executable-signatures-in-folder "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
 }
 
 function create-setup-inf() {
   builder_heading create-setup-inf
 
   echo "[Setup]" > setup.inf
-  echo "Version=$VERSION_WIN" >> setup.inf
+  echo "Version=$KEYMAN_VERSION_WIN" >> setup.inf
   echo "MSIFileName=firstvoices.msi" >> setup.inf
   echo "MSIOptions=" >> setup.inf
   echo "AppName=FirstVoices Keyboards" >> setup.inf

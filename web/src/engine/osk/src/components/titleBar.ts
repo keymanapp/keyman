@@ -103,7 +103,7 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
   }
 
   public setTitleFromKeyboard(keyboard: Keyboard) {
-    let title = "<span style='font-weight:bold'>" + keyboard?.name + '</span>';  // I1972  // I2186
+    const title = "<span style='font-weight:bold'>" + keyboard?.name + '</span>';  // I1972  // I2186
     this._caption.innerHTML = title;
   }
 
@@ -111,16 +111,16 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
    * Create a control bar with title and buttons for the desktop OSK
    */
   buildTitleBar(): HTMLDivElement {
-    let bar = createUnselectableElement('div');
+    const bar = createUnselectableElement('div');
     bar.id='keymanweb_title_bar';
     bar.className='kmw-title-bar';
 
-    var Ltitle = this._caption = createUnselectableElement('span');
+    const Ltitle = this._caption = createUnselectableElement('span');
     Ltitle.className='kmw-title-bar-caption';
     Ltitle.style.color='#fff';
     bar.appendChild(Ltitle);
 
-    var Limg = this._closeButton = this.buildCloseButton();
+    let Limg = this._closeButton = this.buildCloseButton();
     this._closeButton.onclick = () => {
       this.emit('close');
       return false;
@@ -152,7 +152,7 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
   }
 
   private buildCloseButton(): HTMLDivElement {
-    var Limg = createUnselectableElement('div');
+    const Limg = createUnselectableElement('div');
 
     Limg.id='kmw-close-button';
     Limg.className='kmw-title-bar-image';
@@ -162,7 +162,7 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
   }
 
   private buildHelpButton(): HTMLDivElement {
-    let Limg = createUnselectableElement('div');
+    const Limg = createUnselectableElement('div');
     Limg.id='kmw-help-image';
     Limg.className='kmw-title-bar-image';
     Limg.title='KeymanWeb Help';
@@ -171,7 +171,7 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
   }
 
   private buildConfigButton(): HTMLDivElement {
-    let Limg = createUnselectableElement('div');
+    const Limg = createUnselectableElement('div');
 
     Limg.id='kmw-config-image';
     Limg.className='kmw-title-bar-image';
@@ -185,7 +185,7 @@ export default class TitleBar extends EventEmitter<EventMap, TitleBar> implement
    * Builds an 'unpin' button for restoring OSK to default location, handle mousedown and click events
    */
   private buildUnpinButton(): HTMLDivElement {
-    let Limg = createUnselectableElement('div');  //I2186
+    const Limg = createUnselectableElement('div');  //I2186
 
     Limg.id = 'kmw-pin-image';
     Limg.className = 'kmw-title-bar-image';

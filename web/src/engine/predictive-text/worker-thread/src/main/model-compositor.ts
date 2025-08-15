@@ -1,6 +1,8 @@
 import * as models from '@keymanapp/models-templates';
 import * as correction from './correction/index.js'
 
+import { KMWString } from '@keymanapp/web-utils';
+
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
@@ -13,7 +15,6 @@ import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
@@ -192,13 +193,13 @@ export class ModelCompositor {
   }
 
   // Responsible for applying casing rules to suggestions.
-  private applySuggestionCasing(suggestion: Suggestion, baseWord: USVString, casingForm: CasingForm) {
+  private applySuggestionCasing(suggestion: Suggestion, baseWord: string, casingForm: CasingForm) {
     // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
-    let unchangedLength  = baseWord.kmwLength() - suggestion.transform.deleteLeft;
+    let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
 
     if(unchangedLength > 0) {
       suggestion.transform.deleteLeft += unchangedLength;
-      suggestion.transform.insert = baseWord.kmwSubstr(0, unchangedLength) + suggestion.transform.insert;
+      suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
     }
 
     // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
@@ -209,8 +210,8 @@ export class ModelCompositor {
   acceptSuggestion(suggestion: Suggestion, context: Context, postTransform?: Transform): Reversion {
     // Step 1:  generate and save the reversion's Transform.
     let sourceTransform = suggestion.transform;
-    let deletedLeftChars = context.left.kmwSubstr(-sourceTransform.deleteLeft, sourceTransform.deleteLeft);
-    let insertedLength = sourceTransform.insert.kmwLength();
+    let deletedLeftChars = KMWString.substr(context.left, -sourceTransform.deleteLeft, sourceTransform.deleteLeft);
+    let insertedLength = KMWString.length(sourceTransform.insert);
 
     let reversionTransform: Transform = {
       insert: deletedLeftChars,

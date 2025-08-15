@@ -70,7 +70,7 @@ export default class FloatingOSKView extends OSKView {
     const onListenedEvent = (eventName: keyof EventMap | keyof LegacyOSKEventMap) => {
       // As the following title bar buttons (for desktop / FloatingOSKView) do nothing unless a site
       // designer uses these events, we disable / hide them unless an event-handler is attached.
-      let titleBar = this.headerView;
+      const titleBar = this.headerView;
       if(titleBar && titleBar instanceof TitleBar) {
         switch(eventName) {
           case 'configclick':
@@ -87,7 +87,7 @@ export default class FloatingOSKView extends OSKView {
 
     const listenerSpyNew = new EmitterListenerSpy(this);
     const listenerSpyOld = new EmitterListenerSpy(this.legacyEvents);
-    for(let listenerSpy of [listenerSpyNew, listenerSpyOld]) {
+    for(const listenerSpy of [listenerSpyNew, listenerSpyOld]) {
       listenerSpy.on('listeneradded', onListenedEvent);
       listenerSpy.on('listenerremoved', onListenedEvent);
     }
@@ -162,9 +162,9 @@ export default class FloatingOSKView extends OSKView {
    * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/restorePosition
    */
   public restorePosition: (keepDefaultPosition?: boolean) => void = function(this: FloatingOSKView, keepDefaultPosition?: boolean) {
-    let isVisible = this._Visible;
+    const isVisible = this._Visible;
 
-    let dragPromise = new ManagedPromise<void>();
+    const dragPromise = new ManagedPromise<void>();
     this.emit('dragmove', dragPromise.corePromise);
 
     this.loadPersistedLayout();
@@ -209,7 +209,7 @@ export default class FloatingOSKView extends OSKView {
    * Save size, position, font size and visibility of OSK
    */
   private savePersistedLayout() {
-    var p = this.getPos();
+    const p = this.getPos();
 
     const c: FloatingOSKCookie = {
       visible: this.displayIfActive ? 1 : 0,
@@ -233,7 +233,7 @@ export default class FloatingOSKView extends OSKView {
    *  @return {boolean}
    */
   private loadPersistedLayout(): void {
-    let c = this.layoutSerializer.loadWithDefaults({
+    const c = this.layoutSerializer.loadWithDefaults({
       visible: 1,
       userSet: 0,
       left: -1,
@@ -313,11 +313,10 @@ export default class FloatingOSKView extends OSKView {
       return this.configuration.heightOverride();
     }
 
-    var oskHeightLandscapeView=Math.floor(Math.min(screen.availHeight,screen.availWidth)/2),
-        height=oskHeightLandscapeView;
+    let height=Math.floor(Math.min(screen.availHeight,screen.availWidth)/2);
 
     if(this.targetDevice.formFactor == 'phone') {
-      var sx=Math.min(screen.height,screen.width),
+      const sx=Math.min(screen.height,screen.width),
           sy=Math.max(screen.height,screen.width);
 
       if(!landscapeView())
@@ -345,7 +344,7 @@ export default class FloatingOSKView extends OSKView {
       return this.configuration.widthOverride();
     }
 
-    var width: number;
+    let width: number;
     if(this.targetDevice.OS == DeviceSpec.OperatingSystem.iOS) {
       // iOS does not interchange these values when the orientation changes!
       //width = util.portraitView() ? screen.width : screen.height;
@@ -386,7 +385,7 @@ export default class FloatingOSKView extends OSKView {
       return;
     }
 
-    var b = this._Box, bs = b.style;
+    const b = this._Box, bs = b.style;
     if('left' in p) {
       this.x = p['left'] - getAbsoluteX(b) + b.offsetLeft;
       bs.left= this.x + 'px';
@@ -401,11 +400,11 @@ export default class FloatingOSKView extends OSKView {
 
     //Do not allow user resizing for non-standard keyboards (e.g. EuroLatin)
     if(this.vkbd != null) {
-      var d=this.vkbd.kbdDiv, ds=d.style;
+      const d=this.vkbd.kbdDiv, ds=d.style;
 
       // Set width, but limit to reasonable value
       if('width' in p) {
-        var w=(p['width']-(b.offsetWidth-d.offsetWidth));
+        let w=(p['width']-(b.offsetWidth-d.offsetWidth));
         if(w < 0.2*screen.width) {
           w=0.2*screen.width;
         }
@@ -423,7 +422,7 @@ export default class FloatingOSKView extends OSKView {
       // can be modified at the key text level by setting
       // the font size in em in the kmw-key-text class
       if('height' in p) {
-        var h=(p['height']-(b.offsetHeight-d.offsetHeight));
+        let h=(p['height']-(b.offsetHeight-d.offsetHeight));
         if(h < 0.1*screen.height) {
           h=0.1*screen.height;
         }
@@ -457,7 +456,7 @@ export default class FloatingOSKView extends OSKView {
    * @return      {Object.<string,number>}     Array object with OSK window position
   **/
   getPos(): OSKPos {
-    var Lkbd=this._Box, p={
+    const Lkbd=this._Box, p={
       left: this._Visible ? Lkbd.offsetLeft : this.x,
       top: this._Visible ? Lkbd.offsetTop : this.y
     };
@@ -479,7 +478,7 @@ export default class FloatingOSKView extends OSKView {
     }
 
     if(this.userPositioned) {
-      var Px=p['left'], Py=p['top'];
+      let Px=p['left'], Py=p['top'];
 
       if(typeof(Px) != 'undefined') {
         if(Px < -0.8*this._Box.offsetWidth) {
@@ -507,7 +506,7 @@ export default class FloatingOSKView extends OSKView {
   }
 
   public setDisplayPositioning() {
-    var Ls = this._Box.style;
+    const Ls = this._Box.style;
 
     Ls.position='absolute';
     // Keep it hidden if not currently displayed.
@@ -519,7 +518,7 @@ export default class FloatingOSKView extends OSKView {
       Ls.left = this.x+'px';
       Ls.top  = this.y+'px';
     } else {
-      let el: HTMLElement = this.typedActivationModel.activationTrigger || null;
+      const el: HTMLElement = this.typedActivationModel.activationTrigger || null;
 
       if(this.dfltX) {
         Ls.left=this.dfltX;
@@ -680,7 +679,7 @@ export default class FloatingOSKView extends OSKView {
         _this._Box.style.left = (this.startX + cumulativeX) + 'px';
         _this._Box.style.top  = (this.startY + cumulativeY) + 'px';
 
-        var r=_this.getRect();
+        const r=_this.getRect();
         _this.setSize(r.width, r.height, true);
         _this.x = r.left;
         _this.y = r.top;

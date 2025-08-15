@@ -34,10 +34,10 @@ export class KeysCompiler extends SectionCompiler {
     KeysCompiler.addUsedGestureKeys(layerKeyIds, keyBag, usedKeys);
 
     // process each used key. unused keys don't get checked.
-    for (let keyId of usedKeys.values()) {
+    for (const keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // key not found is handled elsewhere.
-      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
+      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output, key);
     }
     return true;
   }
@@ -73,7 +73,7 @@ export class KeysCompiler extends SectionCompiler {
     this.keyboard3.forms?.form?.forEach((form) => {
       if (!LDMLKeyboard.ImportStatus.isImpliedImport(form)) {
         // If it's not an implied import, give a warning.
-        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm({ id: form.id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CustomForm({ id: form.id }, form));
       }
     });
 
@@ -100,7 +100,7 @@ export class KeysCompiler extends SectionCompiler {
         if (!flickHash.has(flickId)) {
           valid = false;
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_MissingFlicks({ flickId, id: keyId })
+            LdmlCompilerMessages.Error_MissingFlicks({ id: key.id, flickId: key.flickId }, key)
           );
         }
       }
@@ -109,10 +109,13 @@ export class KeysCompiler extends SectionCompiler {
       for(const [gestureKeyId, attrs] of gestureKeys.entries()) {
         const gestureKey = keyBag.get(gestureKeyId);
         if (gestureKey == null) {
-          // TODO-LDML: could keep track of already missing keys so we don't warn multiple times on gesture keys
+          // We don't keep track of already missing keys - might warn multiple times on gesture keys,
+          // however we leave it to the caller to handle eliding duplicate messages
           valid = false;
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_GestureKeyNotFoundInKeyBag({keyId: gestureKeyId, parentKeyId: keyId, attribute: attrs.join(',')})
+            LdmlCompilerMessages.Error_GestureKeyNotFoundInKeyBag({
+              keyId: gestureKeyId, parentKeyId: keyId, attribute: attrs.join(',')
+            }, key)
           );
         } else {
           usedKeys.add(gestureKeyId);
@@ -131,10 +134,15 @@ export class KeysCompiler extends SectionCompiler {
 
     if (hardwareLayers.length >= 1) {
       // validate all errors
-      for (let layers of hardwareLayers) {
-        for (let layer of layers.layer) {
-          valid =
-            this.validateHardwareLayerForKmap(layers.formId, layer, keyBag) && valid; // note: always validate even if previously invalid results found
+      for (const layers of hardwareLayers) {
+        const keymap = this.validateAndGetKeymapFromLayers(layers);
+        if (!keymap) {
+          valid = false;
+        } else {
+          for (const layer of layers.layer) {
+            valid =
+              this.validateHardwareLayerForKmap(keymap, layers, layer, keyBag) && valid; // note: always validate even if previously invalid results found
+          }
         }
       }
       // TODO-LDML: } else { touch?
@@ -143,8 +151,30 @@ export class KeysCompiler extends SectionCompiler {
     return valid;
   }
 
+  private validateAndGetKeymapFromLayers(layers: LDMLKeyboard.LKLayers) : Constants.KeyMap {
+    const { formId } = layers;
+    const badScans = new Set<number>();
+    const form = this.getForm(formId);
+    if (!form) {
+      this.callbacks.reportMessage(
+        LdmlCompilerMessages.Error_InvalidHardware({formId}, layers)
+      );
+      return null;
+    }
+    const keymap = KeysCompiler.getKeymapFromScancodes(form, badScans);
+    if (!keymap) {
+    } else if (badScans.size !== 0) {
+      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort().join(' ');
+      this.callbacks.reportMessage(
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes, id: form.id }, form)
+      );
+      return null;
+    }
+    return keymap;
+  }
+
   static addKeysFromFlicks(usedFlicks: Set<string>, flickHash: Map<string, LDMLKeyboard.LKFlick>, usedKeys: Set<string>) {
-    for (let flickId of usedFlicks.values()) {
+    for (const flickId of usedFlicks.values()) {
       const flick = flickHash.get(flickId);
       if (!flick) continue;
       const flickKeys = allUsedKeyIdsInFlick(flick);
@@ -174,7 +204,7 @@ export class KeysCompiler extends SectionCompiler {
       return null;
     }
 
-    let sect = new Keys(sections.strs);
+    const sect = new Keys(sections.strs);
 
     // TODO-LDML: some duplication with validate()
     const keyBag = this.getKeyBag();
@@ -204,7 +234,7 @@ export class KeysCompiler extends SectionCompiler {
     } else if (hardwareLayers.length === 1) {
       const theLayers = hardwareLayers[0];
       const { formId } = theLayers;
-      for (let layer of theLayers.layer) {
+      for (const layer of theLayers.layer) {
         this.compileHardwareLayerToKmap(sections, layer, sect, formId);
       }
     } // else: TODO-LDML do nothing if only touch layers
@@ -265,10 +295,10 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   static addUsedGestureKeys(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>, usedKeys: Set<string>) {
-    for (let keyId of layerKeyIds) {
+    for (const keyId of layerKeyIds) {
       const key = keyBag.get(keyId);
       if (!key) continue;
-      for (let gestureKeyId of allUsedKeyIdsInKey(key).keys()) {
+      for (const gestureKeyId of allUsedKeyIdsInKey(key).keys()) {
         usedKeys.add(gestureKeyId);
       }
     }
@@ -288,21 +318,22 @@ export class KeysCompiler extends SectionCompiler {
     // only include used flicks in the table
     // this way, extra unused imported flicks are ignored
     // in id order, for now
-    for (let flickId of Array.from(usedFlicks.values()).sort()) {
+    for (const flickId of Array.from(usedFlicks.values()).sort()) {
       const flick = flickHash.get(flickId);
       if (!flick) continue; // already reported by validate()
 
       // allocate the in-memory <flick id=…>
-      let flicks: KeysFlicks = new KeysFlicks(
-        sections.strs.allocString(flickId)
+      const flicks: KeysFlicks = new KeysFlicks(
+        sections.strs.allocString(flickId, { compileContext: flick })
       );
 
       // add data from each segment
-      for (let { keyId, directions } of flick.flickSegment) {
-        const keyIdStr = sections.strs.allocString(keyId);
-        let directionsList: ListItem = sections.list.allocListFromSpaces(
+      for (const flickSegment of flick.flickSegment) {
+        const { keyId, directions } = flickSegment;
+        const keyIdStr = sections.strs.allocString(keyId, { compileContext: flickSegment });
+        const directionsList: ListItem = sections.list.allocListFromSpaces(
           directions,
-          { },
+          { compileContext: flickSegment },
           sections);
         flicks.flicks.push({
           directions: directionsList,
@@ -317,7 +348,7 @@ export class KeysCompiler extends SectionCompiler {
 
   static getUsedFlicks(layerKeyIds: string[], keyBag: Map<string, LDMLKeyboard.LKKey>) {
     const usedFlicks = new Set<string>();
-    for (let keyId of layerKeyIds) {
+    for (const keyId of layerKeyIds) {
       const key = keyBag.get(keyId);
       if (!key?.flickId) continue;
       usedFlicks.add(key.flickId);
@@ -330,7 +361,7 @@ export class KeysCompiler extends SectionCompiler {
 
     // for each used key (whether from layer, gesture, etc.)
     // push these in id order, for tidiness
-    for (let keyId of Array.from(usedKeys.values()).sort()) {
+    for (const keyId of Array.from(usedKeys.values()).sort()) {
       const key = keyBag.get(keyId);
       if (!key) continue; // missing key
 
@@ -339,20 +370,20 @@ export class KeysCompiler extends SectionCompiler {
       if (!!gap) {
         flags |= constants.keys_key_flags_gap;
       }
-      const id = sections.strs.allocString(key.id);
+      const id = sections.strs.allocString(key.id, { compileContext: key });
       const longPress: ListItem = sections.list.allocListFromSpaces(
-        longPressKeyIds, {},
+        longPressKeyIds, { compileContext: key },
         sections);
 
       const longPressDefault = sections.strs.allocString(longPressDefaultKeyId,
-        {},
+        { compileContext: key },
         sections);
 
       const multiTap: ListItem = sections.list.allocListFromSpaces(
         multiTapKeyIds,
-        {},
+        { compileContext: key },
         sections);
-      const keySwitch = sections.strs.allocString(layerId); // 'switch' is a reserved word
+      const keySwitch = sections.strs.allocString(layerId, { compileContext: key }); // 'switch' is a reserved word
 
       const toRaw = output;
 
@@ -365,6 +396,7 @@ export class KeysCompiler extends SectionCompiler {
           unescape: true,
           singleOk: true,
           nfd: true,
+          compileContext: key,
         },
         sections);
       if (!to.isOneChar) {
@@ -390,12 +422,20 @@ export class KeysCompiler extends SectionCompiler {
   }
 
   public static getKeymapFromForms(forms: LDMLKeyboard.LKForm[], hardware: string, badScans?: Set<number>): Constants.KeyMap {
-    // seach in reverse form because of overrides
-    const ldmlForm = [...forms].reverse().find((f) => f.id === hardware);
+    const ldmlForm = KeysCompiler.findForm(forms, hardware);
     if (!ldmlForm) {
       return undefined;
     }
     return KeysCompiler.getKeymapFromScancodes(ldmlForm, badScans);
+  }
+
+  private getForm(hardware: string) {
+    return KeysCompiler.findForm(this.keyboard3?.forms.form, hardware);
+  }
+
+  public static findForm(forms: LDMLKeyboard.LKForm[], hardware: string) {
+    // seach in reverse form because of overrides
+    return [...forms].reverse().find((f) => f.id === hardware);
   }
 
   public static getKeymapFromScancodes(ldmlForm: LDMLKeyboard.LKForm, badScans?: Set<number>) {
@@ -413,7 +453,8 @@ export class KeysCompiler extends SectionCompiler {
    * @returns true if valid
    */
   private validateHardwareLayerForKmap(
-    hardware: string,
+    keymap: Constants.KeyMap,
+    layers: LDMLKeyboard.LKLayers,
     layer: LDMLKeyboard.LKLayer,
     keyHash: Map<string, LDMLKeyboard.LKKey>
   ): boolean {
@@ -422,54 +463,38 @@ export class KeysCompiler extends SectionCompiler {
     const { modifiers } = layer;
     if (!validModifier(modifiers)) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers, layer: layer.id })
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer)
       );
       valid = false;
-    }
-
-    const badScans = new Set<number>();
-    const keymap = this.getKeymapFromForm(hardware, badScans);
-    if (!keymap) {
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidHardware({ formId: hardware })
-      );
-      valid = false;
-      return valid;
-    } else if (badScans.size !== 0) {
-      const codes = Array.from(badScans.values()).map(n => Number(n).toString(16)).sort();
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: hardware, codes })
-      );
-      valid = false;
-      return valid;
     }
 
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows()
+        LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(layer)
       );
       valid = false;
     }
 
     for (let y = 0; y < layer.row.length && y < keymap.length; y++) {
-      const keys = layer.row[y].keys.split(" ");
+      const row = layer.row[y];
+      const keys = row.keys.split(" ");
 
       if (keys.length > keymap[y].length) {
         this.callbacks.reportMessage(
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
-            hardware,
-            modifiers,
-          })
+            hardware: layers.formId,
+            modifiers: modifiers || 'none',
+          }, row)
         );
         valid = false;
       }
 
       let x = -1;
-      for (let key of keys) {
+      for (const key of keys) {
         x++;
 
-        let keydef = keyHash.get(key);
+        const keydef = keyHash.get(key);
         if (!keydef) {
           this.callbacks.reportMessage(
             LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({
@@ -478,14 +503,17 @@ export class KeysCompiler extends SectionCompiler {
               row: y + 1,
               layer: layer.id,
               form: "hardware",
-            })
+            }, row)
           );
           valid = false;
           continue;
         }
         if (!keydef.output && !keydef.gap && !keydef.layerId) {
           this.callbacks.reportMessage(
-            LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({ keyId: key })
+            LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(
+              { keyId: key },
+              keydef,
+            )
           );
           valid = false;
           continue;

@@ -1,7 +1,8 @@
 # shellcheck shell=bash
-# no hashbang for .inc.sh
+# Keyman is copyright (C) SIL Global. MIT License.
 
-. "$KEYMAN_ROOT/resources/build/minimum-versions.inc.sh"
+# shellcheck disable=SC2154
+. "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
 
 #
 # We don't want to rely on emcc being on the path, because Emscripten puts far
@@ -20,23 +21,28 @@
 #
 locate_emscripten() {
   local EMCC_EXECUTABLE
-  if [[ "${BUILDER_OS}" == "win" ]]; then
+  if builder_is_windows; then
     EMCC_EXECUTABLE="emcc.py"
   else
     EMCC_EXECUTABLE="emcc"
   fi
-  if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
-    if [[ -z ${EMCC+x} ]]; then
-      local EMCC=$(which ${EMCC_EXECUTABLE})
-      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (${EMCC_EXECUTABLE}) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
+  if [[ -z "${EMSCRIPTEN_BASE:-}" ]]; then
+    if [[ -z "${EMCC:-}" ]]; then
+      local EMCC
+      EMCC="$(command -v "${EMCC_EXECUTABLE}")"
+      [[ -z "${EMCC}" ]] && builder_die "locate_emscripten: Could not locate emscripten (${EMCC_EXECUTABLE}) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
-    [[ -f $EMCC && ! -x $EMCC ]] && builder_die "locate_emscripten: Variable EMCC ($EMCC) points to ${EMCC_EXECUTABLE} but it is not executable"
-    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable ${EMCC_EXECUTABLE}"
-    EMSCRIPTEN_BASE="$(dirname "$EMCC")"
+    [[ -f "${EMCC}" && ! -x "${EMCC}" ]] && builder_die "locate_emscripten: Variable EMCC (${EMCC}) points to ${EMCC_EXECUTABLE} but it is not executable"
+    [[ -x "${EMCC}" ]] || builder_die "locate_emscripten: Variable EMCC (${EMCC}) does not point to a valid executable ${EMCC_EXECUTABLE}"
+    EMSCRIPTEN_BASE="$(dirname "${EMCC}")"
   fi
-  [[ -f ${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE} && ! -x ${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE} ]] && builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) contains ${EMCC_EXECUTABLE} but it is not executable"
-  [[ -x ${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE} ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to ${EMCC_EXECUTABLE}'s folder"
-
+  [[ -f "${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE}" && ! -x "${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE}" ]] && builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE (${EMSCRIPTEN_BASE}) contains ${EMCC_EXECUTABLE} but it is not executable"
+  if [[ ! -d "${EMSCRIPTEN_BASE}" ]]; then
+    # $EMSCRIPTEN_BASE does not exist, but check if we have emsdk in a parent directory. #13464
+    _can_locate_emsdk "${EMSCRIPTEN_BASE}" || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE (${EMSCRIPTEN_BASE}) points to a non-existent directory"
+  else
+    [[ -x "${EMSCRIPTEN_BASE}/${EMCC_EXECUTABLE}" ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE (${EMSCRIPTEN_BASE}) does not point to ${EMCC_EXECUTABLE}'s folder"
+  fi
   verify_emscripten_version
 }
 
@@ -44,8 +50,22 @@ locate_emscripten() {
 # For developers, define KEYMAN_USE_EMSDK to do this on your
 # build machine.
 verify_emscripten_version() {
-  if [[ "$VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_EMSDK+x}" ]]; then
+  # shellcheck disable=SC2154
+  if [[ "${KEYMAN_VERSION_ENVIRONMENT}" != local || ! -z "${KEYMAN_USE_EMSDK+x}" ]]; then
     _select_emscripten_version_with_emsdk
+  fi
+}
+
+# Check if the grandparent directory (i.e. emscripten root) contains emsdk
+_can_locate_emsdk() {
+  local DIR="$1"
+  local GRANDPARENT
+  GRANDPARENT="$(dirname "$(dirname "${DIR}")")"
+
+  if [[ -f "${GRANDPARENT}/emsdk" ]]; then
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -60,26 +80,31 @@ _select_emscripten_version_with_emsdk() {
     builder_die "Variable KEYMAN_MIN_VERSION_EMSCRIPTEN must be set"
   fi
 
-  pushd "${EMSCRIPTEN_BASE}/../.." > /dev/null
-  if [[ ! -f emsdk ]]; then
-    builder_die "emsdk[.bat] should be in $(pwd)"
-  fi
+  local GRANDPARENT
+  GRANDPARENT="$(dirname "$(dirname "${EMSCRIPTEN_BASE}")")"
+  (
+    # shellcheck disable=SC2164
+    cd "${GRANDPARENT}"
+    if [[ ! -f emsdk ]]; then
+      builder_die "emsdk[.bat] should be in ${GRANDPARENT}"
+    fi
 
-  export EMSDK_KEEP_DOWNLOADS=1
-  if builder_try_offline; then
-    if [[ ! -f ./emsdk_env.sh ]]; then
-      builder_die "emsdk_env.sh not found - emsdk not installed?"
+    export EMSDK_KEEP_DOWNLOADS=1
+    if builder_try_offline; then
+      if [[ ! -f ./emsdk_env.sh ]]; then
+        builder_die "emsdk_env.sh not found - emsdk not installed?"
+      fi
+      . ./emsdk_env.sh
+      if ! emcc --version | grep -q "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"; then
+        builder_die "Wrong emsdk version installed"
+      fi
+    else
+      git pull
+      ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+      ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+      # shellcheck disable=SC2164
+      cd upstream/emscripten
+      npm install
     fi
-    . ./emsdk_env.sh
-    if ! emcc --version | grep -q "$KEYMAN_MIN_VERSION_EMSCRIPTEN"; then
-      builder_die "Wrong emsdk version installed"
-    fi
-  else
-    git pull
-    ./emsdk install "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
-    ./emsdk activate "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
-    cd upstream/emscripten
-    npm install
-  fi
-  popd > /dev/null
+  )
 }

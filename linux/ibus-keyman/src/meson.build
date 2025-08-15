@@ -13,6 +13,7 @@ engine_files = files(
 
 include_dirs = [
   core_include_dirs,
+  linux_include_dirs,
   include_directories('..'),
   include_directories(meson.current_build_dir() / '..'),
 ]
@@ -21,7 +22,7 @@ deps = [gtk, ibus, icu, json_glib, keymancore_lib, systemd]
 
 prefix = get_option('prefix')
 cfg = configuration_data()
-cfg.set('VERSION', meson.project_version())
+cfg.set('KEYMAN_VERSION', meson.project_version())
 cfg.set('LIBEXECDIR', get_option('prefix') / get_option('libexecdir'))
 
 configure_file(

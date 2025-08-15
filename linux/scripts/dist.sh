@@ -29,7 +29,7 @@ mkdir -p dist
 cp -a debian ../
 cd ..
 echo "3.0 (native)" > debian/source/format
-dch keyman --newversion "${VERSION}" --force-bad-version --nomultimaint
+dch keyman --newversion "${KEYMAN_VERSION}" --force-bad-version --nomultimaint
 
 # Create the tarball
 # Note: the files end up in subdirectories under `keyman`, so we can
@@ -57,8 +57,19 @@ dpkg-source \
   --tar-ignore=keyman/common/models \
   --tar-ignore=keyman/common/resources \
   --tar-ignore=keyman/common/schemas \
+  --tar-ignore=keyman/common/test/keyboards/baseline/kmcomp-*.zip \
   --tar-ignore=keyman/common/test/keyboards/build.* \
+  --tar-ignore=keyman/common/test/keyboards/caps* \
+  --tar-ignore=keyman/common/test/keyboards/full* \
+  --tar-ignore=keyman/common/test/keyboards/invalid \
+  --tar-ignore=keyman/common/test/keyboards/issue \
+  --tar-ignore=keyman/common/test/keyboards/obolo* \
+  --tar-ignore=keyman/common/test/keyboards/start* \
+  --tar-ignore=keyman/common/test/keyboards/text* \
+  --tar-ignore=keyman/common/test/keyboards/u* \
+  --tar-ignore=keyman/common/test/keyboards/web* \
   --tar-ignore=keyman/common/test/resources \
+  --tar-ignore=keyman/common/tools \
   --tar-ignore=keyman/common/web \
   --tar-ignore=keyman/common/windows \
   \
@@ -76,28 +87,30 @@ dpkg-source \
   --tar-ignore=keyman/mac \
   --tar-ignore=keyman/oem \
   --tar-ignore=keyman/resources/devbox \
+  --tar-ignore=keyman/resources/docker-images \
   --tar-ignore=keyman/resources/environment.sh \
   --tar-ignore=keyman/resources/git-hooks \
   --tar-ignore=keyman/resources/scopes \
+  --tar-ignore=keyman/resources/teamcity \
   --tar-ignore=keyman/resources/build/*.lua \
-  --tar-ignore=keyman/resources/build/jq* \
+  --tar-ignore=keyman/resources/build/jq-* \
   --tar-ignore=keyman/results \
   --tar-ignore=keyman/tmp \
   --tar-ignore=keyman/web \
   --tar-ignore=keyman/windows \
   \
   -Zgzip -b .
-mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
+mv ../keyman_"${KEYMAN_VERSION}".tar.gz linux/dist/keyman-"${KEYMAN_VERSION}".tar.gz
 echo "3.0 (quilt)" > debian/source/format
 cd "${BASEDIR}"
 
 # create orig.tar.gz
 if [[ ! -z "${create_origdist+x}" ]]; then
     cd dist
-    pkgvers="keyman-$VERSION"
-    tar xfz keyman-"${VERSION}".tar.gz
+    pkgvers="keyman-$KEYMAN_VERSION"
+    tar xfz keyman-"${KEYMAN_VERSION}".tar.gz
     mv -v keyman "${pkgvers}" 2>/dev/null || mv -v "$(find . -mindepth 1 -maxdepth 1 -type d)" "${pkgvers}"
-    tar cfz "keyman_${VERSION}.orig.tar.gz" "${pkgvers}"
-    rm "keyman-${VERSION}.tar.gz"
+    tar cfz "keyman_${KEYMAN_VERSION}.orig.tar.gz" "${pkgvers}"
+    rm "keyman-${KEYMAN_VERSION}.tar.gz"
     rm -rf "${pkgvers}"
 fi

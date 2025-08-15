@@ -19,13 +19,13 @@ interface AnalysisActivityOptions extends CompilerBaseOptions {
 };
 
 export function declareAnalyze(program: Command) {
-  let command = program.command('analyze');
+  const command = program.command('analyze');
   declareOskCharUse(command);
   declareOskRewrite(command);
 }
 
 function declareOskCharUse(command: Command) {
-  let subCommand = command.command('osk-char-use [infile...]');
+  const subCommand = command.command('osk-char-use [infile...]');
   BaseOptions.addAll(subCommand);
   subCommand
     .description('Analyze On Screen Keyboards for character usage')
@@ -51,7 +51,7 @@ function declareOskCharUse(command: Command) {
 }
 
 function declareOskRewrite(command: Command) {
-  let subCommand = command.command('osk-rewrite-from-char-use [infile...]');
+  const subCommand = command.command('osk-rewrite-from-char-use [infile...]');
   subCommand
     .description('Rewrite On Screen Keyboard files from source mapping; given file.ext, output is written to file-pua.ext')
     .addOption(new Option('-m, --mapping-file <filename>', 'JSON mapping file to read from').makeOptionMandatory())
@@ -88,7 +88,7 @@ function commanderOptionsToAnalyzeOptions(options: any): AnalysisActivityOptions
 async function analyze(action: (callbacks: CompilerCallbacks, filenames: string[], options: AnalysisActivityOptions)=>Promise<boolean>,
     filenames: string[], commanderOptions: any): Promise<boolean> {
   const options = commanderOptionsToAnalyzeOptions(commanderOptions);
-  let callbacks = new NodeCompilerCallbacks(options);
+  const callbacks = new NodeCompilerCallbacks(options);
   try {
     return await action(callbacks, filenames, options);
   } catch(e) {
@@ -129,7 +129,7 @@ async function analyzeOskRewritePua(callbacks: CompilerCallbacks, filenames: str
       return false;
     }
     const mappedFilenames = Object.keys(analyzer.data);
-    for(let filename of mappedFilenames) {
+    for(const filename of mappedFilenames) {
       const ext = path.extname(filename);
       const outputFilename = filename.substring(0, filename.length - ext.length) + '-pua' + ext;
       fs.writeFileSync(outputFilename, analyzer.data[filename]);

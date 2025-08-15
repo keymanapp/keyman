@@ -116,12 +116,14 @@ public class PackageActivity extends AppCompatActivity implements
       kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0) : 0;
 
     // Sanity check for keyboard packages
+    // Not using showErrorToast to avoid cluttering Sentry with noise
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
         showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
         return;
       } else if (languageCount == 0) {
-        showErrorToast(getString(R.string.no_associated_languages));
+        showErrorDialog(context, pkgId, getString(R.string.no_associated_languages));
+        return;
       }
     }
 

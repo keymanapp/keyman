@@ -36,7 +36,7 @@ describe('visual-keyboard-compiler', function() {
     checkMessages();
     assert.isTrue(valid, 'k.validate should not have failed');
 
-    let kmx = await k.compile(source);
+    const kmx = await k.compile(source);
     assert(kmx, 'k.compile should not have failed');
 
     const keyboardId = path.basename(inputFilename, '.xml');
@@ -57,7 +57,7 @@ describe('visual-keyboard-compiler', function() {
     assert.isNotNull(code);
 
     // Compare output
-    let expected = await hextobin(binaryFilename, undefined, {silent:true});
+    const expected = await hextobin(binaryFilename, undefined, {silent:true});
 
     assert.deepEqual<Uint8Array>(code, expected);
   });

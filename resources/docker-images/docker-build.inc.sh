@@ -59,3 +59,15 @@ check_for_default_values() {
 is_default_values() {
   ${is_default_values}
 }
+
+# Check that `docker buildx` is available
+check_buildx_available() {
+  if ! docker --help | grep -q buildx; then
+    if builder_is_linux; then
+      builder_echo error "Docker buildx is not available. Please install Docker buildx to use this script. E.g. 'sudo apt install docker-buildx'"
+    else
+      builder_echo error "Docker buildx is not available. Please install Docker buildx to use this script."
+    fi
+    exit 1
+  fi
+}

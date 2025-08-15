@@ -16,17 +16,17 @@ builder_describe "Installation files for Keyman Developer" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /developer/src/inst/keymandeveloper-${VERSION}.exe
+  publish       /developer/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe
 
 builder_parse "$@"
 
-. "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/environment.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/wix.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
-if [[ -z ${TIER+x} ]]; then
-  TIER=alpha
+if [[ -z ${KEYMAN_TIER+x} ]]; then
+  KEYMAN_TIER=alpha
 fi
 
 # We use different directories so that heat generates
@@ -51,7 +51,7 @@ function do_clean() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_publish() {
-  verify-program-signatures
+  builder_if_release_build_level verify-program-signatures
   verify-node-installer-version
 
   "$KEYMAN_ROOT/common/windows/cef-checkout.sh"
@@ -80,7 +80,7 @@ function do_publish() {
 
   copy-kmdev
 
-  verify-installer-signatures
+  builder_if_release_build_level verify-installer-signatures
 }
 
 function do_test() {
@@ -90,13 +90,13 @@ function do_test() {
 function copy-kmdev() {
   builder_heading copy-kmdev
 
-  mkdir -p "$DEVELOPER_ROOT/release/${VERSION}"
+  mkdir -p "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}"
 
   make-installer
   make-kmc-install-zip
 
-  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper.msi" "$DEVELOPER_ROOT/release/${VERSION}/keymandeveloper.msi"
-  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${VERSION}.exe" "$DEVELOPER_ROOT/release/${VERSION}/keymandeveloper-${VERSION}.exe"
+  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper.msi" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper.msi"
+  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper-${KEYMAN_VERSION}.exe"
 }
 
 function verify-program-signatures() {
@@ -108,7 +108,7 @@ function verify-program-signatures() {
 function verify-installer-signatures() {
   builder_heading verify-installer-signatures
 
-  verify-all-executable-signatures-in-folder "$DEVELOPER_ROOT/release/${VERSION}"
+  verify-all-executable-signatures-in-folder "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}"
 }
 
 function verify-node-installer-version() {
@@ -126,8 +126,8 @@ function verify-node-installer-version() {
 }
 
 function test-releaseexists() {
-  if [[ -d "$DEVELOPER_ROOT/release/${VERSION}" ]]; then
-    builder_die "Release ${VERSION} already exists. Delete it or update VERSION.md and try again"
+  if [[ -d "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}" ]]; then
+    builder_die "Release ${KEYMAN_VERSION} already exists. Delete it or update VERSION.md and try again"
   fi
 }
 
@@ -141,12 +141,12 @@ function candle() {
   heat-kmc
 
   builder_heading "candle: calling WIX:candle"
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" kmdev.wxs
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" "-dXmlSourceDir=${DEVELOPER_ROOT}/src/tike/xml" xml.wxs
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" "-dCefSourceDir=${KEYMAN_CEF4DELPHI_ROOT}" cef.wxs
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" "-dTemplatesSourceDir=${KEYMAN_DEVELOPER_TEMPLATES_ROOT}" templates.wxs
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" "-dkmcSourceDir=${KEYMAN_WIX_TEMP_KMC}" kmc.wxs
-  "$WIXCANDLE" -wx -nologo "-dVERSION=${VERSION_WIN}" "-dRELEASE=${VERSION_RELEASE}" "-dServerSourceDir=${KEYMAN_WIX_KMDEV_SERVER}" server.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" kmdev.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" "-dXmlSourceDir=${DEVELOPER_ROOT}/src/tike/xml" xml.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" "-dCefSourceDir=${KEYMAN_CEF4DELPHI_ROOT}" cef.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" "-dTemplatesSourceDir=${KEYMAN_DEVELOPER_TEMPLATES_ROOT}" templates.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" "-dkmcSourceDir=${KEYMAN_WIX_TEMP_KMC}" kmc.wxs
+  "$WIXCANDLE" -wx -nologo "-dKEYMAN_VERSION=${KEYMAN_VERSION_WIN}" "-dRELEASE=${KEYMAN_VERSION_RELEASE}" "-dServerSourceDir=${KEYMAN_WIX_KMDEV_SERVER}" server.wxs
 }
 
 function heat-xml() {
@@ -230,39 +230,36 @@ function make-installer() {
   builder_heading make-installer
 
   echo [Setup] > setup.inf
-  echo "Version=$VERSION" >> setup.inf
+  echo "Version=$KEYMAN_VERSION" >> setup.inf
   echo "MSIFileName=keymandeveloper.msi" >> setup.inf
-  echo "Title=Keyman Developer ${VERSION_WITH_TAG}" >>setup.inf
-  wzzip setup.zip keymandeveloper.msi setup.inf
-  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$VERSION.exe"
-  wrap-signcode //d "Keyman Developer" "keymandeveloper-$VERSION.exe"
+  echo "Title=Keyman Developer ${KEYMAN_VERSION_WITH_TAG}" >>setup.inf
+  add_zip_files setup.zip keymandeveloper.msi setup.inf
+  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$KEYMAN_VERSION.exe"
+  wrap-signcode //d "Keyman Developer" "keymandeveloper-$KEYMAN_VERSION.exe"
 
   #
   # Zip the files we distribute as part of the standalone kmc distro into release\$Version\kmcomp-$Version.zip
   #
 }
 
-# TODO: rename this to keyman-developer-cli-$Version.zip
-KMC_ZIP="$DEVELOPER_ROOT/release/$VERSION/kmcomp-$VERSION.zip"
-
 function make-kmc-install-zip() {
   builder_heading make-kmc-install-zip
 
   copy-schemas
-  cd "$DEVELOPER_ROOT/bin"
+  (
+    # shellcheck disable=2164
+    cd "${DEVELOPER_ROOT}/bin"
 
-  wzzip -bd -bb0 "$KMC_ZIP" \
-    kmconvert.exe \
-    sentry.dll sentry.x64.dll \
-    kmdecomp.exe \
-    keyboard_info.schema.json \
-    kmp.schema.json \
-    keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
-    xml/layoutbuilder/*.keyman-touch-layout \
-    projects/* \
-    server/*
+    # TODO: rename this to keyman-developer-cli-$Version.zip
+    local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${KEYMAN_VERSION}.zip"
 
-  cd "$THIS_SCRIPT_PATH"
+    add_zip_files "${KMCOMP_ZIP}" -q -r \
+      kmconvert.exe \
+      keyboard_info.schema.json \
+      xml/layoutbuilder/*.keyman-touch-layout \
+      projects/ \
+      server/
+  )
 }
 
 # TODO: are these required?

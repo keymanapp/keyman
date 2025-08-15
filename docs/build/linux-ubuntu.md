@@ -6,6 +6,7 @@ On Linux, you can build the following projects:
 
 - [Keyman Core](#keyman-core) (aka core)
 - [Keyman for Linux](#keyman-for-linux)
+- [Keyman Developer (node modules only)](#keyman-developer-node-modules-only)
 - [Keyman Web](#keyman-web)
 - [Keyman for Android](#keyman-for-android)
 <!-- TODO: document how to build for Common/Web on Linux.
@@ -15,7 +16,7 @@ On Linux, you can build the following projects:
 The following projects **cannot** be built on Linux:
 
 - Keyman for Windows
-- Keyman Developer
+- Keyman Developer (Windows components - IDE, setup, Server - has Windows components currently)
 - Keyman for macOS
 - Keyman for iOS
 
@@ -47,7 +48,7 @@ They are most easily installed with the `mk-build-deps` tool:
 
 ```bash
 sudo apt update
-sudo apt install devscripts equivs
+sudo apt install devscripts equivs jq
 sudo mk-build-deps --install linux/debian/control
 ```
 
@@ -125,6 +126,15 @@ under [Prerequisites](#prerequisites).
 Keyman for Linux can be built with the `linux/build.sh` script.
 
 - [Building Keyman for Linux](../../linux/README.md)
+
+## Keyman Developer (node modules only)
+
+All dependencies are already installed if you followed the instructions
+under [Prerequisites](#prerequisites).
+
+### Building Keyman Developer
+
+The node modules for Keyman Developer can be built with the `developer/build.sh` script.
 
 ## Keyman Web
 

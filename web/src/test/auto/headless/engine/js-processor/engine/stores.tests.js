@@ -1,10 +1,7 @@
 import { assert } from 'chai';
 
-import { Keyboard } from 'keyman/engine/keyboard';
+import { Keyboard, KMWString } from 'keyman/engine/keyboard';
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
-import { extendString } from '@keymanapp/web-utils';
-
-extendString();
 
 let device = {
   formFactor: 'desktop',
@@ -42,11 +39,11 @@ describe('Engine - Stores', function() {
     for(var i=0; i < STORES.length; i++) {
       var s = STORES[i];
 
-      String.kmwEnableSupplementaryPlane(s.smp);
+      KMWString.enableSupplementaryPlane(s.smp);
       var result = processor.keyboardInterface._ExplodeStore(s.in);
       assert.sameOrderedMembers(result, s.out, "Failure exploding " + (s.smp ? "SMP" : "non-SMP") + " string value \"" + s.in + "\"");
     }
-    String.kmwEnableSupplementaryPlane(false);
+    KMWString.enableSupplementaryPlane(false);
   });
 
   // TODO:  Migrate a Node-based copy of the variable store tests here as well.

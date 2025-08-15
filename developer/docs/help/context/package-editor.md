@@ -129,6 +129,12 @@ are optional.
 A web site is encouraged and should be filled in the web site field, including
 the initial "http://" or "https://".
 
+The Description is the keyboard summary that users will see on the keyboard’s 
+overview page at the keyman.com web site. 
+[GitHub style Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+can be used in the description text.  However, HTML tags are not supported.
+
+
 A package can optionally include a 140x250 JPEG or PNG image file to be shown
 during installation. This image file must be added to the Files list in step 1,
 then selected from the list here.

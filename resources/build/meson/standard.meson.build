@@ -5,18 +5,16 @@
 # and is copied into each project's <project>/resources/meson.build in the
 # configure step, so that it can be referenced by meson directly.
 #
+# Use standard_meson_build.inc.sh to make the file copy
+#
+
+
+#
 # Where possible, we want to use these flags everywhere
 #
 
 cpp_compiler = meson.get_compiler('cpp')
 c_compiler = meson.get_compiler('c')
-
-# Once we can assume meson 0.60 we can delete this
-# (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
-if cpp_compiler.get_id() == 'msvc'
-  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
-  add_global_arguments('/execution-charset:utf-8', language: ['c', 'cpp'])
-endif
 
 #
 # Standard informational messages for our builds
@@ -25,6 +23,17 @@ endif
 message('meson.project_version(): ' + meson.project_version())
 message('host_machine.system(): ' + host_machine.system())
 message('compiler.get_id(): ' + cpp_compiler.get_id())
+
+#
+# Import `VERSION_WITH_TAG` which we can use where appropriate instead of
+# meson.project_version() which is only major.minor.patch.
+#
+
+fs = import('fs')
+if fs.exists('VERSION_WITH_TAG.md')
+  VERSION_WITH_TAG = fs.read('VERSION_WITH_TAG.md').strip()
+  message('VERSION_WITH_TAG: ' + VERSION_WITH_TAG)
+endif
 
 #
 # Standard compiler flags for all platforms

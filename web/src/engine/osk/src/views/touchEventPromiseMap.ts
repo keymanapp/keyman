@@ -13,17 +13,17 @@ export default class TouchEventPromiseMap {
   }
 
   public maintainTouches(list: TouchList) {
-    let keys = Array.from(this.map.keys());
+    const keys = Array.from(this.map.keys());
 
     for(let i=0; i < list.length; i++) {
-      let pos = keys.indexOf(list.item(i).identifier);
+      const pos = keys.indexOf(list.item(i).identifier);
       if(pos != -1) {
         keys.splice(pos, 1);
       }
     }
 
     // Any remaining entries of `keys` are no longer in the map!
-    for(let endedKey of keys) {
+    for(const endedKey of keys) {
       this.map.get(endedKey).resolve();
       this.map.delete(endedKey);
     }

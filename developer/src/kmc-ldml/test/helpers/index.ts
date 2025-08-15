@@ -8,7 +8,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
-import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
+import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, CompilerError } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -80,7 +80,7 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
     return null;
   }
 
-  let sections: DependencySections = {
+  const sections: DependencySections = {
     usetparser: await getTestUnicodeSetParser(callbacks)
   };
 
@@ -144,7 +144,7 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
 
   const valid = await k.validate(source);
   if (validateMessages) {
-    assert.sameDeepMembers(compilerTestCallbacks.messages, validateMessages, "validation messages mismatch");
+    assert.sameDeepMembers(scrubContextFromMessages(compilerTestCallbacks.messages), validateMessages, "validation messages mismatch");
     assert.notEqual(valid, expectFailValidate, 'validation failure');
   } else {
     checkMessages();
@@ -155,7 +155,7 @@ export async function compileKeyboard(inputFilename: string, options: LdmlCompil
 
   const kmx = await k.compile(source);
   if (compileMessages) {
-    assert.sameDeepMembers(compilerTestCallbacks.messages, compileMessages, "compiler messages mismatch");
+    assert.sameDeepMembers(scrubContextFromMessages(compilerTestCallbacks.messages), compileMessages, "compiler messages mismatch");
   } else {
     checkMessages();
   }
@@ -252,6 +252,31 @@ export interface CompilationCase {
    * Optional, if true, postValidate() must return false. (must be != postValidate())
    */
   postValidateFail?: boolean;
+  /**
+   * retain offset (line number) information. otherwise, scrub it to reduce testing noise.
+   * only tests that specifically are checking offsets will set this to true
+   */
+  retainOffsetInMessages?: boolean;
+}
+
+/**
+ * Scrub 'context' from messages. to simplify unit tests
+ * @param messages input array of messages
+ * @returns copy of messages
+ */
+export function scrubContextFromMessages(messages: CompilerEvent[]): CompilerEvent[] {
+  return messages.map(m => {
+    const scrubbed = Object.assign({}, m);
+    // Turn this on once all messages have offsets, see messages.tests.ts
+    // if (!scrubbed.offset) {
+    //   throw Error(`Error, no offset detected in message ${CompilerError.formatEvent(m)}`);
+    // }
+    delete scrubbed.offset;
+    delete scrubbed.line;
+    delete scrubbed.filename;
+    delete scrubbed.column;
+    return scrubbed;
+  });
 }
 
 /**
@@ -263,7 +288,7 @@ export interface CompilationCase {
 export function testCompilationCases(compiler: SectionCompilerNew, cases : CompilationCase[], dependencies?: (SectionCompilerNew)[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
-  for (let testcase of cases) {
+  for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
                                         `should compile: ${testcase.subpath}`;
@@ -274,27 +299,32 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
         return;
       }
-      let section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
-      const testcaseErrors = matchCompilerEventsOrBoolean(callbacks.messages, testcase.errors);
-      const testcaseWarnings = matchCompilerEvents(callbacks.messages, testcase.warnings);
+      const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
+      let messagesToCheck = callbacks.messages;
+      // scrub offsets from messages to reduce churn in the test casws
+      if (!testcase.retainOffsetInMessages && callbacks.messages) {
+        messagesToCheck = scrubContextFromMessages(callbacks.messages);
+      }
+      const testcaseErrors = matchCompilerEventsOrBoolean(messagesToCheck, testcase.errors);
+      const testcaseWarnings = matchCompilerEvents(messagesToCheck, testcase.warnings);
       // if we expected errors or warnings, show them
       if (testcaseErrors && testcaseErrors !== true) {
-        assert.includeDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected errors to be included');
+        assert.includeDeepMembers(messagesToCheck, <CompilerEventOrMatch[]>testcaseErrors, 'expected errors to be included');
       }
       if (testcaseErrors && testcase.strictErrors) {
-        assert.sameDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected same errors to be included');
+        assert.sameDeepMembers(messagesToCheck, <CompilerEventOrMatch[]>testcaseErrors, 'expected same errors to be included');
       }
       if (testcaseWarnings) {
-        assert.includeDeepMembers(callbacks.messages, testcaseWarnings, 'expected warnings to be included');
+        assert.includeDeepMembers(messagesToCheck, testcaseWarnings, 'expected warnings to be included');
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
-        assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
+        assert.sameDeepMembers(messagesToCheck, [], 'expected zero messages but got ' + callbacks.messages);
       }
-      
+
       if (expectFailure) {
         assert.isNull(section, 'expected compilation result failure (null)');
       } else {
-        assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
+        assert.isNotNull(section, `failed with ${CompilerError.formatEvent(callbacks.messages)}`);
       }
 
       // run the user-supplied callback if any
@@ -327,3 +357,4 @@ const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
 export function hex_str(s?: string) : string {
   return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
 }
+

@@ -22,8 +22,7 @@ builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/keyman-version" \
   "@/web/src/tools/es-bundling" \
-  clean configure build test \
-  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
+  clean configure build test
 
 builder_describe_outputs \
   configure "/node_modules" \
@@ -32,7 +31,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_build() {
-  tsc --build $builder_verbose "$THIS_SCRIPT_PATH/tsconfig.json"
+  compile $SUBPROJECT_NAME
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
@@ -49,7 +48,7 @@ function do_test() {
   builder_heading "Running web-utils test suite"
 
   local FLAGS=
-  if builder_has_option --ci; then
+  if builder_is_ci_build; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
     FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
   fi

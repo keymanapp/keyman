@@ -13,9 +13,9 @@ describe('LexicalModelCompiler', function () {
     it('should compile punctuation into the generated code', async function () {
       const callbacks = new TestCompilerCallbacks();
 
-      let compiler = new LexicalModelCompiler();
+      const compiler = new LexicalModelCompiler();
       assert.isTrue(await compiler.init(callbacks, null));
-      let code = compiler.generateLexicalModelCode(MODEL_ID, {
+      const code = compiler.generateLexicalModelCode(MODEL_ID, {
         format: 'trie-1.0',
         sources: ['wordlist.tsv'],
         punctuation: {
@@ -31,7 +31,7 @@ describe('LexicalModelCompiler', function () {
       assert.match(code, /\u1680/);
 
       // Make sure it compiles!
-      let compilation = compileModelSourceCode(code);
+      const compilation = compileModelSourceCode(code);
       assert.isFalse(compilation.hasSyntaxError);
       assert.isNotNull(compilation.exportedModel);
     });

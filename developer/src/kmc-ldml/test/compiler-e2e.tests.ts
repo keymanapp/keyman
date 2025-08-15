@@ -1,11 +1,13 @@
 import 'mocha';
 import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
-import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
+import {compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture, scrubContextFromMessages} from './helpers/index.js';
 import { compareXml } from './helpers/compareXml.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 import { kmxToXml } from '../src/util/serialize.js';
 import { writeFileSync } from 'node:fs';
+import { LdmlCompilerMessages } from '../src/main.js';
+import { util } from '@keymanapp/common-types';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -24,7 +26,7 @@ describe('compiler-tests', function() {
     const binaryFilename = makePathToFixture('basic.txt');
 
     // Compare output
-    let expected = await hextobin(binaryFilename, undefined, {silent:true});
+    const expected = await hextobin(binaryFilename, undefined, {silent:true});
 
     // now compare it to use with run()
     // Let's build basic.xml
@@ -41,6 +43,25 @@ describe('compiler-tests', function() {
     // TODO-LDML: compare the .kvk file to something else?
     assert.isNotNull(kvk?.data);
   });
+
+  it('should-validate-on-run compiling sections/strs/invalid-illegal.xml', async function() {
+    this.timeout(4000);
+    const inputFilename = makePathToFixture('sections/strs/invalid-illegal.xml');
+
+    // should fail validation
+    const k = new LdmlKeyboardCompiler();
+    await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
+
+    const runOutput = await k.run(inputFilename, "invalid-illegal.kmx"); // need the exact name passed to build-fixtures
+    assert.isNull(runOutput, "Expect invalid-illegal to fail to run()");
+    assert.sameDeepMembers( scrubContextFromMessages(compilerTestCallbacks.messages), [
+      // copied from strs.tests.ts
+      // validation messages
+      LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: util.describeCodepoint(0xFDD0) }),
+      LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: util.describeCodepoint(0xE010) }),
+    ]);
+  });
+
 
   it('should-serialize-kmx', async function() {
     this.timeout(4000);

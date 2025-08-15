@@ -8,37 +8,21 @@
 
 import { TokenTypes } from "./token-types.js";
 
-export class ScanRecogniser {
-  tokenType: TokenTypes;
-  regExp: RegExp;
-  emit: boolean;
-
-  /**
-   * Construct a ScanRecogniser
-   *
-   * @param tokenType the token type to return if matched
-   * @param regExp    the regex to identify the token
-   * @param emit      whether to emit the token or not
-   */
-  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
-    this.tokenType = tokenType;
-    this.regExp    = regExp;
-    this.emit      = emit;
-  }
-
-  public toString(): string {
-    return `[${this.tokenType},${this.regExp},${this.emit}]`;
-  }
-}
-
+/**
+ * The Next Generation Lexer for the Keyman Keyboard Language.
+ *
+ * The Lexer identifies Tokens in the supplied buffer using ScanRecognisers.
+ *
+ */
 export class Lexer {
   private buffer: string;
   private offset: number;            // offset into the buffer
+  private filename: string;          // the filename (for use in the Tokens)
   private lineNum: number;           // the current line number
   private charNum: number;           // the current character number
   private line: string;              // the line seen so far
   private tokenList: Token[];        // the accumulating tokens
-  private seenContinuation: boolean; // have we just seen a continuation line
+  private seenContinuation: boolean; // have we just seen a continuation line?
   private scanRecognisers: ScanRecogniser[];
 
   /**
@@ -46,12 +30,13 @@ export class Lexer {
    *
    * @param buffer the string to search for tokens
    */
-  public constructor(buffer: string) {
+  public constructor(buffer: string, filename: string=null) {
     this.buffer           = buffer;
     this.offset           = 0;
     this.lineNum          = 1;
     this.charNum          = 1;
     this.line             = '';
+    this.filename         = filename;
     this.tokenList        = [];
     this.seenContinuation = false;
 
@@ -190,12 +175,12 @@ export class Lexer {
    * @return                   whether a matching token was found
    */
   private matchToken({addEOF=true, emitAll=false, handleContinuation=true}:{addEOF?:boolean, emitAll?:boolean, handleContinuation?:boolean}={}): boolean {
-    let patternIterator: Iterator<ScanRecogniser> = this.scanRecognisers.values();
-    let iterResult: IteratorResult<ScanRecogniser, any>;
-    let recogniser: ScanRecogniser;
-    let match: RegExpExecArray | null;
-    let tokenMatch: boolean      = false;
-    let parseInProgress: boolean = true;
+    const patternIterator: Iterator<ScanRecogniser> = this.scanRecognisers.values();
+    let   iterResult: IteratorResult<ScanRecogniser, any>;
+    let   recogniser: ScanRecogniser;
+    let   match: RegExpExecArray | null;
+    let   tokenMatch: boolean      = false;
+    let   parseInProgress: boolean = true;
 
     // we cannot handle line continuation if emitAll is true
     // (i.e. emitAll:true => handleContinuation:false)
@@ -203,7 +188,7 @@ export class Lexer {
       handleContinuation = false;
     }
 
-    // loop over all ScanRecognisers looking for a match at the start of the buffer
+    // loop over all ScanRecognisers looking for a match at the offset into the buffer
     while (!(iterResult = patternIterator.next()).done && !tokenMatch) {
       recogniser                  = iterResult.value;
       recogniser.regExp.lastIndex = this.offset;
@@ -220,7 +205,7 @@ export class Lexer {
           } else if (recogniser.tokenType === TokenTypes.NEWLINE) {
             if (!this.seenContinuation) {
               if (emitAll || recogniser.emit) {
-               this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, this.line));
+               this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, this.line, this.filename));
               }
               this.line = '';
             }
@@ -230,7 +215,7 @@ export class Lexer {
               // TODO: warning as non-WHITESPACE tokens between CONTINUATION and NEWLINE
             }
             if (emitAll || recogniser.emit) {
-              this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, null));
+              this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, null, this.filename));
             }
           }
         } else { // not handling continuation
@@ -239,7 +224,7 @@ export class Lexer {
             this.line = '';
           }
           if (emitAll || recogniser.emit) {
-            this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line));
+            this.tokenList.push(new Token(recogniser.tokenType, match[0], this.lineNum, this.charNum, line, this.filename));
           }
         }
         tokenMatch  = true;
@@ -263,7 +248,7 @@ export class Lexer {
 
     // add an end-of-file token if required
     if (this.offset >= this.buffer.length && addEOF) {
-      this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line));
+      this.tokenList.push(new Token(TokenTypes.EOF, '', 1, 1, this.line, this.filename));
     }
 
     // return false if there was no match or the buffer is empty
@@ -274,12 +259,42 @@ export class Lexer {
   }
 }
 
+/**
+ * A ScanRecogniser identifies an individual Token as part of the Next Generation Lexer.
+ */
+export class ScanRecogniser {
+  tokenType: TokenTypes;
+  regExp: RegExp;
+  emit: boolean;
+
+  /**
+   * Construct a ScanRecogniser
+   *
+   * @param tokenType the token type to return if matched
+   * @param regExp    the regex to identify the token
+   * @param emit      whether to emit the token or not?
+   */
+  public constructor(tokenType: TokenTypes, regExp: RegExp, emit: boolean) {
+    this.tokenType = tokenType;
+    this.regExp    = regExp;
+    this.emit      = emit;
+  }
+
+  public toString(): string {
+    return `[${this.tokenType},${this.regExp},${this.emit}]`;
+  }
+}
+
+/**
+ * An input Token found by the Next Generation Lexer for the Parser.
+ */
 export class Token {
   readonly tokenType: TokenTypes;
   private _text: string;
   private _lineNum: number; // starts from 1
   private _charNum: number; // starts from 1
   private _line: string;
+  private _filename: string;
 
   /**
    * Construct a Token
@@ -289,13 +304,15 @@ export class Token {
    * @param lineNum   the line number of the matched text
    * @param charNum   the character number of the matched text
    * @param line      the line of the matched next (NEWLINE/EOF) or null
+   * @param filename  the filename
    */
-  public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null) {
+  public constructor(tokenType: TokenTypes, text: string, lineNum: number=1, charNum: number=1, line: string=null, filename:string=null) {
     this.tokenType = tokenType;
     this._text     = text;
     this._lineNum  = (lineNum < 1 )? 1 : lineNum;
     this._charNum  = (charNum < 1 )? 1 : charNum;
     this._line     = (tokenType === TokenTypes.NEWLINE || tokenType === TokenTypes.EOF) ? line : null;
+    this._filename = filename;
   }
 
   public isTokenType(tokenType: TokenTypes): boolean {
@@ -309,6 +326,7 @@ export class Token {
   public get charNum(): number { return this._charNum; }
   public set charNum(charNum: number) { this._charNum = (charNum < 1 )? 1 : charNum; }
   public get line(): string { return this._line; }
+  public get filename(): string { return this._filename; }
 
   public toString(): string {
     let buf: string = `[${this.tokenType}`

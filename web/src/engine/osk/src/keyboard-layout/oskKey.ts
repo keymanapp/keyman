@@ -43,7 +43,7 @@ export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string 
  }
 
  const specialCode = specialChars[oldText as keyof typeof specialChars];
- let specialCodePUA = 0XE000 + specialCode;
+ const specialCodePUA = 0XE000 + specialCode;
 
  return specialCode ?
    String.fromCharCode(specialCodePUA) :
@@ -84,10 +84,10 @@ export default abstract class OSKKey {
    * @param       {Object=}   layout  source layout description (optional, sometimes)
    */
   public setButtonClass() {
-    let key = this.spec;
-    let btn = this.btn;
+    const key = this.spec;
+    const btn = this.btn;
 
-    var n=0;
+    let n=0;
     // @ts-ignore // (Probably) supports legacy KMW keyboards that predate the sp entry
     if(typeof key['dk'] == 'string' && key['dk'] == '1') {
       n=8;
@@ -110,9 +110,7 @@ export default abstract class OSKKey {
    * @param {boolean=} flag The new toggle state
    */
   public setToggleState(flag?: boolean) {
-    let btnClassId: number;
-
-    btnClassId = this.spec['sp'];
+    const btnClassId = this.spec.sp;
 
     // 1 + 2:   shift  +  shift-on
     // 3 + 4:  special + special-on
@@ -144,7 +142,7 @@ export default abstract class OSKKey {
 
   // "Frame key" - generally refers to non-linguistic keys on the keyboard
   public isFrameKey(): boolean {
-    let classIndex = this.spec['sp'] || 0;
+    const classIndex = this.spec['sp'] || 0;
     switch(buttonClassNames[classIndex]) {
       case 'default':
       case 'deadkey':
@@ -164,7 +162,7 @@ export default abstract class OSKKey {
   }
 
   public highlight(on: boolean) {
-    var classes=this.btn.classList;
+    const classes=this.btn.classList;
 
     if(on) {
       if(!classes.contains(OSKKey.HIGHLIGHT_CLASS)) {
@@ -211,24 +209,24 @@ export default abstract class OSKKey {
       height: layoutParams.keyHeight
     }
 
-    let metrics = getTextMetrics(text, emScale.scaledBy(scale).val, style);
+    const metrics = getTextMetrics(text, emScale.scaledBy(scale).val, style);
 
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
     const X_PADDING = 2;
 
-    var fontHeight: number;
+    let fontHeight: number;
     if(metrics.fontBoundingBoxAscent) {
       fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
     }
 
     // Don't add extra padding to height - multiplying with MAX_Y_PROPORTION already gives
     // padding
-    let textHeight = fontHeight ?? 0;
-    let xProportion = (keyWidth * MAX_X_PROPORTION) / (metrics.width + X_PADDING); // How much of the key does the text want to take?
-    let yProportion = textHeight && keyHeight ? (keyHeight * MAX_Y_PROPORTION) / textHeight : undefined;
+    const textHeight = fontHeight ?? 0;
+    const xProportion = (keyWidth * MAX_X_PROPORTION) / (metrics.width + X_PADDING); // How much of the key does the text want to take?
+    const yProportion = textHeight && keyHeight ? (keyHeight * MAX_Y_PROPORTION) / textHeight : undefined;
 
-    var proportion: number = xProportion;
+    let proportion: number = xProportion;
     if(yProportion && yProportion < xProportion) {
       proportion = yProportion;
     }
@@ -264,12 +262,12 @@ export default abstract class OSKKey {
   protected generateKeyText(vkbd: VisualKeyboard): HTMLSpanElement {
     const spec = this.spec;
 
-    let t = document.createElement('span'), ts=t.style;
+    const t = document.createElement('span'), ts=t.style;
     t.className='kmw-key-text';
 
     // Add OSK key labels
     let keyText = this.keyText;
-    let specialText = renameSpecialKey(keyText, vkbd);
+    const specialText = renameSpecialKey(keyText, vkbd);
     if(specialText != keyText) {
       // The keyboard wants to use the code for a special glyph defined by the SpecialOSK font.
       keyText = specialText;
@@ -287,7 +285,7 @@ export default abstract class OSKKey {
 
     // For some reason, fonts will sometimes 'bug out' for the embedded iOS page if we
     // instead assign fontFamily to the existing style 'ts'.  (Occurs in iOS 12.)
-    let styleSpec: {fontFamily?: string, fontSize: string} = {fontSize: ts.fontSize};
+    const styleSpec: {fontFamily?: string, fontSize: string} = {fontSize: ts.fontSize};
 
     if(ts.fontFamily) {
       styleSpec.fontFamily = ts.fontFamily;

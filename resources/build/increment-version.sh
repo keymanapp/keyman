@@ -111,10 +111,10 @@ fi
 
 if [[ $ABORT = 50 ]]; then
   if [[ $FORCE = 0 ]]; then
-    echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
+    echo "Skipping version increment from $KEYMAN_VERSION: no recently merged pull requests were found"
     if [ ! -z "${TEAMCITY_VERSION-}" ]; then
       # Send TeamCity a build status
-      echo "##teamcity[buildStatus status='SUCCESS' text='Skipping version increment from $VERSION: no recently merged pull requests were found']"
+      echo "##teamcity[buildStatus status='SUCCESS' text='Skipping version increment from $KEYMAN_VERSION: no recently merged pull requests were found']"
     fi
     exit 0
   else
@@ -131,14 +131,14 @@ popd > /dev/null
 #
 
 if [ "$action" == "commit" ]; then
-  echo "increment-version.sh: committing to repository and tagging release version $VERSION_WITH_TAG"
-  VERSION_MD="$KEYMAN_ROOT/VERSION.md"
-  NEWVERSION=`cat $VERSION_MD | tr -d "[:space:]"`
+  echo "increment-version.sh: committing to repository and tagging release version $KEYMAN_VERSION_WITH_TAG"
+  KEYMAN_VERSION_MD="$KEYMAN_ROOT/VERSION.md"
+  NEWVERSION=`cat $KEYMAN_VERSION_MD | tr -d "[:space:]"`
 
   pushd "$KEYMAN_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
-  git tag -a "$VERSION_GIT_TAG" -m "Keyman release $VERSION_WITH_TAG"
+  git tag -a "$KEYMAN_VERSION_GIT_TAG" -m "Keyman release $KEYMAN_VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
 
@@ -158,7 +158,7 @@ if [ "$action" == "commit" ]; then
   # Trigger builds for the previous version on TeamCity and GitHub
   #
 
-  triggerBuilds
+  triggerReleaseBuilds
 
   #
   # Now, create the PR on GitHub which will be merged when ready
@@ -166,7 +166,7 @@ if [ "$action" == "commit" ]; then
 
   cd "$KEYMAN_ROOT"
   git checkout "$branch"
-  hub pull-request -f --no-edit -b $base -l auto
+  hub pull-request -f --no-edit -b $base -l auto,automerge
 
   #
   # If we are on a stable-x.y branch, then we also want to merge changes to
@@ -174,6 +174,8 @@ if [ "$action" == "commit" ]; then
   # beta changes will be merged to master periodically anyway.
   #
   if [[ "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
+    # TODO: why is this not happening?
+
     git switch master
 
     # In order to avoid potential git conflicts, we run the history collater
@@ -190,8 +192,8 @@ if [ "$action" == "commit" ]; then
       git switch -c "chore/version-$base-$NEWVERSION-master-history" master
       git add HISTORY.md
       git commit -m "$message (history cherry-pick to master)"
-      # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
-      # label
+      # TODO: once we are sure this is stable, add `-l auto,automerge` to get
+      # the "auto" label
       hub pull-request -fp --no-edit
     fi
 
@@ -206,7 +208,7 @@ if [ "$action" == "commit" ]; then
   echo "Version was incremented and pull request was created, and builds were triggered"
   if [ ! -z "${TEAMCITY_VERSION-}" ]; then
     # Send TeamCity a build status
-    echo "##teamcity[buildStatus status='SUCCESS' text='Version was incremented from $VERSION to $NEWVERSION and pull request was created']"
+    echo "##teamcity[buildStatus status='SUCCESS' text='Version was incremented from $KEYMAN_VERSION to $NEWVERSION and pull request was created']"
   fi
 
   #
