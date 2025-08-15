@@ -23,6 +23,8 @@ const plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker}
 );
 
+var emptyInput = (id: number) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
+
 describe('ContextTracker', function() {
   function toWrapperDistribution(transform: Transform) {
     return [{
@@ -388,11 +390,15 @@ describe('ContextTracker', function() {
     it('tracks an accepted suggestion', function() {
       let baseSuggestion: Suggestion = {
         transform: {
-          insert: 'world ',
+          insert: 'world',
           deleteLeft: 3,
-          id: 1
+          id: 2
         },
-        transformId: 0,
+        appendedTransform: {
+          insert: ' ',
+          deleteLeft: 0
+        },
+        transformId: 2,
         id: 1,
         displayAs: 'world'
       };
@@ -415,21 +421,20 @@ describe('ContextTracker', function() {
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), options);
       let compositor = new ModelCompositor(model);
-      let baseContextMatch = compositor.contextTracker.analyzeState(model, baseContext, [{sample: {insert: '', deleteLeft: 0, id: 0}, p: 1}]);
-
-      baseContextMatch.final.tokenization.tail.suggestions = [ baseSuggestion ];
-
+      let preAppliedTransition = compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
+      // Mocks a prior prediction request without having done it.
+      preAppliedTransition.final.suggestions = [baseSuggestion];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
 
       // Actual test assertion - was the replacement tracked?
-      assert.equal(baseContextMatch.final.tokenization.tail.appliedSuggestionId, baseSuggestion.id);
+      assert.isUndefined(preAppliedTransition.final.appliedSuggestionId);
       assert.equal(reversion.id, -baseSuggestion.id);
-      // TODO:  Restore this line!  Currently breaks a unit test.
-      //compositor.contextTracker.cache.keys().forEach((key) => assert.isDefined(key));
+      compositor.contextTracker.cache.keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
-      let postContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      let postContextMatch = compositor.contextTracker.analyzeState(model, postContext);
+      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
+      let postContextMatch = compositor.contextTracker.analyzeState(model, postContext, emptyInput(2));
+      assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
       assert.equal(postContextMatch.final.tokenization.tokens[postContextMatch.final.tokenization.tokens.length - 2].exampleInput, ' ');
