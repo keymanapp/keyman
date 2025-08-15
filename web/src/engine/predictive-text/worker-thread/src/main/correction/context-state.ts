@@ -4,7 +4,9 @@
  * Created by jahorton on 2025-07-30
  *
  * Represents cached data about the state of the sliding context window either
- * before or after a context transition event and related functionality.
+ * before or after a context transition event and related functionality,
+ * including logic used to determine the transition from one context state to
+ * another.
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
