@@ -148,21 +148,29 @@ export class ContextState {
   }
 
   /**
-   * As written, this method attempts to match an incoming context with this instance's
-   * modeled context state for context-tracking & correction-search reuse purposes.
-   * Upon success, this method will determine the ContextState properties that best
-   * leverage reuse of prior correction-search data based upon the prior state and return
-   * the overall results as a ContextTransition.
+   * As written, this method attempts to determine the context state and tokenization(s)
+   * that result from applying an incoming transform distribution to the incoming context
+   * state based upon data from _this_ instance's modeled context state.
    *
-   * If the two versions of Context match poorly, this method will return null.
+   * If the two versions of Context are not alignable, this method will return null.
    *
-   * @param context
-   * @param transformDistribution
-   * @param isApplyingSuggestion
+   * If they are alignable, this method will reuse as much prior cached data (for
+   * tokenization and correction-search reuse) as possible when tokenizing and building
+   * the final resulting ContextState for the modeled ContextTransition.
+   *
+   * @param context The incoming Context instance for a prediction or suggestion application,
+   * which should be alignable to this instance's .context.  (I.e, should be "the same"
+   * context after adjusting for sliding context-window behaviors.)
+   * @param transformDistribution A distribution of incoming potential edits to the context -
+   * typically from a keystroke's fat-finger distribution.
+   *
+   * May also contain a single entry for applying Suggestions or when correction behavior
+   * is disabled.
+   * @param isApplyingSuggestion Indicates if this is being used to apply a Suggestion.
    * @returns
    */
   analyzeTransition(
-    // Matching the context expected for the transition's base state
+    // Alignable to the context expected for the transition's base state
     context: Context,
     // the distribution should be tokenized already.
     transformDistribution?: Distribution<Transform>, // transform distribution is needed here.
