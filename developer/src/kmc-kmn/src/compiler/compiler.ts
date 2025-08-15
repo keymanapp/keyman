@@ -6,10 +6,11 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { VisualKeyboard, KvkFileReader, LdmlKeyboardTypes, KeymanFileTypes, KvkFileWriter } from '@keymanapp/common-types';
+import { VisualKeyboard, KvkFileReader, LdmlKeyboardTypes, KeymanFileTypes, KvkFileWriter, ObjectWithCompileContext } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanCompiler, KeymanCompilerArtifacts,
-  KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact, KvksFileReader
+  KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact, KvksFileReader,
+  CompilerError
 } from '@keymanapp/developer-utils';
 import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
@@ -217,7 +218,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
   }
 
   private copyWasmResult(wasm_result: any): KmnCompilerResult {
-    let result: KmnCompilerResult = {
+    const result: KmnCompilerResult = {
       // We cannot Object.assign or {...} on a wasm-defined object, so...
       artifacts: {},
       extra: {
@@ -229,10 +230,10 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       },
       displayMap: null
     };
-    for(let store of wasm_result.extra.stores) {
+    for(const store of wasm_result.extra.stores) {
       result.extra.stores.push({storeType: store.storeType, name: store.name, line: store.line});
     }
-    for(let group of wasm_result.extra.groups) {
+    for(const group of wasm_result.extra.groups) {
       result.extra.groups.push({isReadOnly: group.isReadOnly, name: group.name});
     }
 
@@ -314,7 +315,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       }
     });
 
-    let wasm_options = new Module.CompilerOptions();
+    const wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
     try {
       wasm_options.saveDebug = options.saveDebug;
@@ -454,9 +455,9 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
         this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
         return null;
       }
-      let invalidVkeys: string[] = [];
+      const invalidVkeys: string[] = [];
       vk = reader.transform(kvks, invalidVkeys);
-      for(let invalidVkey of invalidVkeys) {
+      for(const invalidVkey of invalidVkeys) {
         this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
       }
     }
@@ -470,7 +471,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       Osk.remapVisualKeyboard(vk, displayMap);
     }
 
-    let writer = new KvkFileWriter();
+    const writer = new KvkFileWriter();
     return {
       filename: this.callbacks.path.join(this.callbacks.path.dirname(kmxFilename),
         basename + KeymanFileTypes.Binary.VisualKeyboard),
@@ -529,7 +530,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
    * @param rangeCount - number of ranges to allocate
    * @returns            UnicodeSet accessor object, or null on failure
    */
-  public parseUnicodeSet(pattern: string, rangeCount: number) : LdmlKeyboardTypes.UnicodeSet | null {
+  public parseUnicodeSet(pattern: string, rangeCount: number, compileContext?: any) : LdmlKeyboardTypes.UnicodeSet | null {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       // verifyInitialized will set a callback if needed
@@ -562,7 +563,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
       // rc is negative: it's an error code.
       this.wasmExports.free(buf);
       // translate error code into callback
-      this.callbacks.reportMessage(getUnicodeSetError(rc));
+      this.callbacks.reportMessage(getUnicodeSetError(rc, compileContext));
       return null;
     }
   }
@@ -570,7 +571,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
   /**
    * @internal
    */
-  public sizeUnicodeSet(pattern: string) : number {
+  public sizeUnicodeSet(pattern: string, compileContext?: any) : number {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       return null;
@@ -582,7 +583,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
     if (rc >= 0) {
       return rc;
     } else {
-      this.callbacks.reportMessage(getUnicodeSetError(rc));
+      this.callbacks.reportMessage(getUnicodeSetError(rc, compileContext));
       return -1;
     }
   }
@@ -593,7 +594,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
  * @param rc parseUnicodeSet error code
  * @returns the compiler event
  */
-function getUnicodeSetError(rc: number) : CompilerEvent {
+function getUnicodeSetError(rc: number, compileContext?: ObjectWithCompileContext) : CompilerEvent {
   // from kmcmplib.h
   const KMCMP_ERROR_SYNTAX_ERR = -1;
   const KMCMP_ERROR_HAS_STRINGS = -2;
@@ -601,16 +602,16 @@ function getUnicodeSetError(rc: number) : CompilerEvent {
   const KMCMP_FATAL_OUT_OF_RANGE = -4;
   switch(rc) {
     case KMCMP_ERROR_SYNTAX_ERR:
-       return KmnCompilerMessages.Error_UnicodeSetSyntaxError();
+       return KmnCompilerMessages.Error_UnicodeSetSyntaxError(compileContext);
     case KMCMP_ERROR_HAS_STRINGS:
-    return KmnCompilerMessages.Error_UnicodeSetHasStrings();
+    return KmnCompilerMessages.Error_UnicodeSetHasStrings(compileContext);
     case KMCMP_ERROR_UNSUPPORTED_PROPERTY:
-       return KmnCompilerMessages.Error_UnicodeSetHasProperties();
+       return KmnCompilerMessages.Error_UnicodeSetHasProperties(compileContext);
     case KMCMP_FATAL_OUT_OF_RANGE:
-      return KmnCompilerMessages.Fatal_UnicodeSetOutOfRange();
+      return KmnCompilerMessages.Fatal_UnicodeSetOutOfRange(compileContext);
     default:
       /* c8 ignore next */
-      return KmnCompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
+      return CompilerError.setFromMetadata(KmnCompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`}), compileContext);
   }
 }
 

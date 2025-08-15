@@ -29,10 +29,10 @@ export function getTextMetrics(text: string, emScale: number, style: {fontFamily
     style.fontSize = '1em';
   }
 
-  let fontFamily = style.fontFamily;
-  let fontSpec = getFontSizeStyle(style.fontSize);
+  const fontFamily = style.fontFamily;
+  const fontSpec = getFontSizeStyle(style.fontSize);
 
-  var fontSize: string;
+  let fontSize: string;
   if(fontSpec.absolute) {
     // We've already got an exact size - use it!
     fontSize = fontSpec.val + 'px';
@@ -43,9 +43,9 @@ export function getTextMetrics(text: string, emScale: number, style: {fontFamily
   // re-use canvas object for better performance
   metricsCanvas = metricsCanvas ?? document.createElement("canvas");
 
-  var context = metricsCanvas.getContext("2d");
+  const context = metricsCanvas.getContext("2d");
   context.font = fontSize + " " + fontFamily;
-  var metrics = context.measureText(text);
+  const metrics = context.measureText(text);
 
   return metrics;
 }

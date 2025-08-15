@@ -16,10 +16,10 @@ export type KeyElement = HTMLDivElement & KeyData;
 
 // Many thanks to https://www.typescriptlang.org/docs/handbook/advanced-types.html for this.
 export function link(elem: HTMLDivElement, data: KeyData): KeyElement {
-  let e = <KeyElement> elem;
+  const e = <KeyElement> elem;
 
   // Merges all properties and methods of KeyData onto the underlying HTMLDivElement, creating a merged class.
-  for(let id in data) {
+  for(const id in data) {
     if(!e.hasOwnProperty(id)) {
       (<any>e)[id] = (<any>data)[id];
     }

@@ -1,13 +1,11 @@
 import { assert } from 'chai';
 
-import { extendString } from 'keyman/engine/keyboard';
+import { KMWString } from 'keyman/engine/keyboard';
 import { Mock } from 'keyman/engine/js-processor';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
 import { DynamicElements } from '../../test_utils.js';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
-
-extendString();
 
 const host = document.createElement('div');
 host.id = 'DynamicElements';
@@ -346,7 +344,7 @@ class MockTestHelper implements TestHelper {
   }
 
   setSelectionRange(pair: ElementPair<any>, start: number, end: number) {
-    const convert = (index: number) => pair.wrapper.text.kmwCodeUnitToCodePoint(index);
+    const convert = (index: number) => KMWString.codeUnitToCodePoint(pair.wrapper.text, index);
     pair.wrapper.setSelection(convert(start), convert(end));
   }
 
@@ -383,25 +381,25 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       assert.equal(pair.wrapper.getCaret(), 4, "Failed to correctly read the caret's position within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       assert.equal(pair.wrapper.getCaret(), 4, "Failed to correctly read the caret's position within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 5);
       assert.equal(pair.wrapper.getCaret(), 4, "Failed to correctly read the caret's position within a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     // Corresponds to a helper method for certain classes.
@@ -409,61 +407,61 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getCaret(), 5, "Failed to choose the caret's initial position for forward-selections within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 5, 3);
       assert.equal(pair.wrapper.getCaret(), 3, "Failed to choose the caret's initial position for backward-selections within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 6, 10);
       assert.equal(pair.wrapper.getCaret(), 5, "Failed to caret's initial position for forward-selections within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 10, 6);
       assert.equal(pair.wrapper.getCaret(), 3, "Failed to caret's initial position for backward-selections within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getSelectedText(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getSelectedText(), '45', "Failed to properly retrieve selected text");
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 5, 3);
       assert.equal(pair.wrapper.getSelectedText(), '45', "Failed to properly retrieve reverse-direction selected text");
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 3);
       assert.equal(pair.wrapper.getSelectedText(), '', "No text was selected, but some was returned");
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 6, 10);
       assert.equal(pair.wrapper.getSelectedText(), Apple.smp.substring(6, 10), "Failed to properly retrieve selected SMP text");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
     }
 
@@ -472,25 +470,25 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 4, "Failed to correctly set the caret within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       testObj.resetWithText(pair, Apple.smp);
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 8, "Failed to correctly set the caret within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
       testObj.resetWithText(pair, Apple.mixed);
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 5, "Failed to correctly set the caret within a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     // Corresponds to a helper method for certain classes.
@@ -498,247 +496,247 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 5);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 4, "Failed to correctly set the caret within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 5, 3);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 4, "Failed to correctly set the caret within a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 6, 10);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 8, "Failed to correctly set the caret within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 10, 6);
       pair.wrapper.setCaret(4);
       assert.equal(testObj.getCaret(pair), 8, "Failed to correctly set the caret within an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextNoSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       assert.equal(pair.wrapper.getText(), Apple.normal, "Failed to properly return its stored value:  a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       assert.equal(pair.wrapper.getText(), Apple.smp, "Failed to properly return its stored value:  a string of SMP characters");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.mixed);
       assert.equal(pair.wrapper.getText(), Apple.mixed, "Failed to properly return its stored value:  a string with some SMP characters");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextWithSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getText(), Apple.normal, "Failed to properly return its stored value:  a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 6, 10);
       assert.equal(pair.wrapper.getText(), Apple.smp, "Failed to properly return its stored value:  a string of SMP characters");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 4, 7);
       assert.equal(pair.wrapper.getText(), Apple.mixed, "Failed to properly return its stored value:  a string with some SMP characters");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextBeforeCaretNoSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.normal.substr(0, 4), "Failed to properly return correct substring for a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.smp.substr(0, 8), "Failed to properly return correct substring for an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 5);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.mixed.substr(0, 5), "Failed to properly return correct substring for a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextBeforeCaretWithSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.normal.substr(0, 3), "Failed simple string, normal-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 5, 3);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.normal.substr(0, 3), "Failed simple string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 6, 10);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.smp.substr(0, 6), "Failed SMP string, normal-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 10, 6);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.smp.substr(0, 6), "Failed SMP string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 4, 7);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.mixed.substr(0, 4), "Failed mixed SMP string, forward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 7, 4);
       assert.equal(pair.wrapper.getTextBeforeCaret(), Apple.mixed.substr(0, 4), "Failed mixed SMP string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextAfterCaretNoSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.normal.substr(4), "Failed to properly return correct substring for a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.smp.substr(8), "Failed to properly return correct substring for an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 5);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.mixed.substr(5), "Failed to properly return correct substring for a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getTextAfterCaretWithSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 2, 4);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.normal.substr(4), "Failed simple string, normal-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 4, 2);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.normal.substr(4), "Failed simple string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 4, 8);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.smp.substr(8), "Failed SMP string, normal-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setSelectionRange(pair, 8, 4);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.smp.substr(8), "Failed SMP string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.mixed.substr(5), "Failed mixed SMP string, forward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 5, 3);
       assert.equal(pair.wrapper.getTextAfterCaret(), Apple.mixed.substr(5), "Failed mixed SMP string, reverse-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static clearSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       assert.equal(pair.wrapper.getText(), Apple.mixed, "String should not be modified on selection: forward-order selection");
       pair.wrapper.clearSelection();
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.mixed.substr(5), "Selected text improperly removed: forward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 5, 3);
       assert.equal(pair.wrapper.getText(), Apple.mixed, "String should not be modified on selection: reverse-order selection");
       pair.wrapper.clearSelection();
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.mixed.substr(5), "Selected text improperly removed: backward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     // Corresponds to a helper method for certain subclasses.
@@ -746,91 +744,91 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       pair.wrapper.setTextBeforeCaret(Apple.normal.substr(0, 2))
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 2) + Apple.normal.substr(4), "Error replacing text in a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.smp.substr(8), "Error replacing text in an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 5);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4))
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.mixed.substr(5), "Error replacing text in a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static setTextBeforeCaretWithSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       pair.wrapper.setTextBeforeCaret(Apple.mixed.substr(0, 3));
       assert.equal(pair.wrapper.getText(), Apple.mixed, "Actively-selected text was erroneously removed");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement: forward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 5, 3);
       pair.wrapper.setTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement:  backward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static deleteCharsBeforeCaretNoSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 3) + Apple.normal.substr(4), "Error deleting context chars from a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 6) + Apple.smp.substr(8), "Error deleting context chars from an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 4);
       pair.wrapper.deleteCharsBeforeCaret(2);
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 1) + Apple.mixed.substr(4), "Error deleting context chars from a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       pair.wrapper.deleteCharsBeforeCaret(7);
       assert.equal(pair.wrapper.getText(), "5", "Bounds-check on deletion range failed; context improperly deleted.");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
     }
 
@@ -838,12 +836,12 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setSelectionRange(pair, 2, 4);
       pair.wrapper.deleteCharsBeforeCaret(1);
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 1) + Apple.normal.substr(2), "Selected text erroneously deleted from selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
     }
 
@@ -851,56 +849,56 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       testObj.resetWithText(pair, Apple.normal);
       testObj.setCaret(pair, 4);
       pair.wrapper.insertTextBeforeCaret(Apple.normal.substr(0, 2))
       assert.equal(pair.wrapper.getText(), Apple.normal.substr(0, 4) + Apple.normal.substr(0, 2) + Apple.normal.substr(4), "Error inserting text in a simple string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.smp);
       testObj.setCaret(pair, 8);
       pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.smp.substr(0, 8) + Apple.smp.substr(0, 4) + Apple.smp.substr(8), "Error inserting text in an SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 5);
       pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 5) + Apple.smp.substr(0, 4) + Apple.mixed.substr(5), "Error inserting text in a mixed SMP string");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static insertTextBeforeCaretWithSelection(testObj: TestHelper) {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       pair.wrapper.insertTextBeforeCaret("");
       assert.equal(pair.wrapper.getText(), Apple.mixed, "Actively-selected text was erroneously removed");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 3, 5);
       pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement: forward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
       pair.wrapper.invalidateSelection();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setSelectionRange(pair, 5, 3);
       pair.wrapper.insertTextBeforeCaret(Apple.smp.substr(0, 4));
       assert.equal(pair.wrapper.getText(), Apple.mixed.substr(0, 3) + Apple.smp.substr(0, 4) + Apple.mixed.substr(3), "Error with text replacement:  backward-order selection");
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
     public static getSelectionOwned(testObj: ContentEditableTestHelper) {
@@ -950,7 +948,7 @@ class InterfaceTests {
       const Apple = InterfaceTests.Strings.Apple;
       const pair = testObj.setupElement();
 
-      String.kmwEnableSupplementaryPlane(true);
+      KMWString.enableSupplementaryPlane(true);
 
       testObj.resetWithText(pair, Apple.mixed);
       testObj.setCaret(pair, 1);
@@ -979,7 +977,7 @@ class InterfaceTests {
       assert.isTrue(pair.wrapper.deadkeys().isMatch(1, 0, 1), "Failed to leave deadkey before caret unmoved after text insertion");
       assert.isTrue(pair.wrapper.deadkeys().isMatch(8, 0, 3), "Failed to properly adjust position of post-caret deadkey after text insertion");
 
-      String.kmwEnableSupplementaryPlane(false);
+      KMWString.enableSupplementaryPlane(false);
     }
 
   //#endregion
@@ -992,7 +990,7 @@ describe('Element Input/Output Interfacing', function () {
 
   before(function () {
     // Make sure the basic SMP extension hooks exist to prevent errors later.
-    String.kmwEnableSupplementaryPlane(false);
+    KMWString.enableSupplementaryPlane(false);
   });
   afterEach(function () {
     host.innerHTML = '';

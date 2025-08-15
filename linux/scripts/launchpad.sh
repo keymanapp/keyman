@@ -24,16 +24,16 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 checkPrerequisites
 
-if [ "${TIER}" == "stable" ]; then
+if [ "${KEYMAN_TIER}" == "stable" ]; then
     ppa="ppa:keymanapp/keyman"
-elif [ "${TIER}" == "beta" ]; then
+elif [ "${KEYMAN_TIER}" == "beta" ]; then
     ppa="ppa:keymanapp/keyman-beta"
 else
     ppa="ppa:keymanapp/keyman-alpha"
 fi
 echo "ppa: ${ppa}"
 
-distributions="${DIST:-jammy noble oracular plucky}"
+distributions="${DIST:-jammy noble plucky questing}"
 packageversion="${PACKAGEVERSION:-1~sil1}"
 
 BASEDIR=$(pwd)

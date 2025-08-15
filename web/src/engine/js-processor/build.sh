@@ -17,8 +17,7 @@ builder_describe "Builds configuration subclasses used by the Keyman Engine for 
   "clean" \
   "configure" \
   "build" \
-  "test" \
-  "--ci+                     Set to utilize CI-based test configurations & reporting."
+  "test"
 
 builder_describe_outputs \
   configure    "/node_modules" \

@@ -63,13 +63,13 @@ export default class KeyboardStub extends KeyboardProperties {
   constructor(arg0: string | RawKeyboardStub | (APISimpleKeyboard & { filename: string }), arg1?: string, arg2?: string) {
     if(typeof arg0 !== 'string') {
       if(arg0.id !== undefined) {
-        let apiSpec = arg0 as APISimpleKeyboard & { filename: string };
+        const apiSpec = arg0 as APISimpleKeyboard & { filename: string };
         apiSpec.id = prefixed(apiSpec.id);
         super(apiSpec, arg2);
         this.KF = configureFilePathing(apiSpec.filename, arg1);
         this.mapRegion(apiSpec.languages);
       } else {
-        let rawStub = arg0 as RawKeyboardStub;
+        const rawStub = arg0 as RawKeyboardStub;
         rawStub.KI = prefixed(rawStub.KI);
         super(rawStub, arg2);
 
@@ -97,7 +97,7 @@ export default class KeyboardStub extends KeyboardProperties {
         rIndex = region-1;
       }
     } else if(typeof(region) == 'string') {
-      let list = (region.length == 2 ? REGION_CODES : REGIONS);
+      const list = (region.length == 2 ? REGION_CODES : REGIONS);
       for(let i=0; i<list.length; i++) {
         if(region.toLowerCase() == list[i].toLowerCase()) {
           rIndex=i;
@@ -156,7 +156,7 @@ export default class KeyboardStub extends KeyboardProperties {
       languages = languages.concat(arg.languages);
     }
 
-    let stubs: KeyboardStub[] = [];
+    const stubs: KeyboardStub[] = [];
     languages.forEach(language => {
       // The deprecated `language` is assigned to satisfy TS type-checking.
       const intermediate = {...arg, languages: language, language: undefined as LanguageAPIPropertySpec};
@@ -223,7 +223,7 @@ export function mergeAndResolveStubPromises(keyboardStubs: (KeyboardStub|ErrorSt
     return rejectErrorStubs(errorStubs);
   } else {
     // Merge this with errorStubs
-    let result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
+    const result: (KeyboardStub|ErrorStub)[] = keyboardStubs;
     return Promise.resolve(result.concat(errorStubs));
   }
 }

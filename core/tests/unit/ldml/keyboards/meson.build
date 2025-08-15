@@ -65,13 +65,8 @@ kmc_cmd = [node, '--enable-source-maps', kmc_root]
 # Build all keyboards in output folder
 
 foreach kbd : tests_needing_copy
-  fs.copyfile(kbd + '.xml', kbd + '.xml')
-
-  configure_file(
-    command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
-    input: kbd + '.xml',
-    output: kbd + '.kmx',
-  )
+  # This will output a (wrong) deprecation warning with meson < 1.5 - see #13250
+  configure_file(input: kbd + '.xml', output: kbd + '.xml', copy: true)
 endforeach
 
 foreach kbd : tests_with_testdata
@@ -83,15 +78,41 @@ foreach kbd : tests_with_testdata
 endforeach
 
 foreach kbd : tests_from_cldr
-  fs.copyfile(ldml_data / kbd + '.xml', kbd + '.xml')
-  configure_file(
-    command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
-    input: join_paths(ldml_data, kbd + '.xml'),
-    output: kbd + '.kmx',
-  )
+  # This will output a (wrong) deprecation warning with meson < 1.5 - see #13250
+  configure_file(input: ldml_data / kbd + '.xml', output: kbd + '.xml', copy: true)
   configure_file(
     command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
     input: join_paths(ldml_testdata, kbd + '-test.xml'),
     output: kbd + '-test.json',
   )
 endforeach
+
+# Build a single keyboards.kpj which lists all keyboard sources
+
+test_ldml_kmx_targets = tests_needing_copy + tests_from_cldr
+
+test_ldml_keyboards_kpj = ''
+foreach kbd : test_ldml_kmx_targets
+  test_ldml_keyboards_kpj += '''
+    <File>
+      <ID>keyboard_'''+kbd+'''</ID>
+      <Filename>'''+kbd+'''.xml</Filename>
+      <Filepath>'''+kbd+'''.xml</Filepath>
+    </File>
+  '''
+endforeach
+
+cfg = configuration_data()
+cfg.set('keyboards_kpj', test_ldml_keyboards_kpj)
+
+ldml_keyboards_kpj = configure_file(
+  configuration: cfg,
+  input: 'keyboards.kpj.in',
+  output: 'keyboards.kpj'
+)
+
+configure_file(
+  input: ldml_keyboards_kpj,
+  output: tests_from_cldr[0]+'.kmx',
+  command: kmc_cmd + ['build', '@INPUT@']
+)

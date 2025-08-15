@@ -362,8 +362,7 @@ public final class KMManager {
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSSentry = "sentry.min.js";
-  protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
+  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
@@ -496,6 +495,11 @@ public final class KMManager {
       didCopyAssets = true;
     }
 
+    calculateDefaultKeyboardHeights(context);
+    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
+    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
+
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       String msg = "Cannot initialize: Invalid keyboard type";
       KMLog.LogError(TAG, msg);
@@ -509,12 +513,6 @@ public final class KMManager {
     migrateCloudKeyboards(appContext);
 
     CloudDownloadMgr.getInstance().initialize(appContext);
-
-    calculateDefaultKeyboardHeights(context);
-    SharedPreferences prefs = context.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
-    KeyboardHeight_Context_Portrait_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, KMManager.KeyboardHeight_Context_Portrait_Default);
-    KeyboardHeight_Context_Landscape_Current = prefs.getInt(KMManager.KMKey_KeyboardHeightLandscape, KMManager.KeyboardHeight_Context_Landscape_Default);
-
   }
 
   public static void executeResourceUpdate(Context aContext)
@@ -982,7 +980,6 @@ public final class KMManager {
 
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
-      copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);

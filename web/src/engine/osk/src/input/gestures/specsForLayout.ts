@@ -203,7 +203,7 @@ interface LayoutGestureSupportFlags {
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
 // @ts-ignore // so that we don't trigger "unused local" warnings.
-let dummy2: LayoutGestureSupportFlags = dummy;
+const dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
  * Defines the set of gestures appropriate for use with the specified Keyman
@@ -865,14 +865,9 @@ export function flickRestartModel(params: FullGestureParams): GestureModel<KeyEl
       }
     ],
     id: 'flick-restart',
-    sustainWhenNested: true,
-    rejectionActions: {
-      // Only 'rejects' in this form if the path is completed before direction-locking state.
-      path: {
-        type: 'replace',
-        replace: 'flick-reset-end'
-      }
-    },
+    sustainWhenNested: true
+    // Do not emit a key if we're still in the 'restart' phase; the user unlocked the flick,
+    // so they want a cancel if they 'let up' in this state.
   }
 }
 

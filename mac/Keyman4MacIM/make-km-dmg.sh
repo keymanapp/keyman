@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-if [[ "${OSTYPE}" != "darwin"* ]]; then
+if ! builder_is_macos; then
   echo "This build script will only run in a Mac environment."
   exit 1
 fi
@@ -110,7 +110,7 @@ while [[ $# -gt 0 ]] ; do
 done
 
 # Step 0 - check parameter and initial file state
-if [ "$VERSION" = "" ]; then
+if [ "$KEYMAN_VERSION" = "" ]; then
   builder_die "Required -version parameter not specified!"
 fi
 
@@ -129,7 +129,7 @@ elif [[ ! -d "$OUTPUT_DIR" ]]; then
 fi
 
 if $ADD_VERSION_TO_DEST_DIR ; then
-    DEST_DIR="$DEST_DIR/$VERSION"
+    DEST_DIR="$DEST_DIR/$KEYMAN_VERSION"
 fi
 if [[ ! -e "$DEST_DIR" ]]; then
 	mkdir -p "$DEST_DIR"
@@ -140,7 +140,7 @@ fi
 # TODO: Check that no Keyman volume is already mounted.
 
 # Step 1 - Copy template to working copy to prevent unintended changes
-WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$VERSION.dmg"
+WORKING_COPY_OF_IMAGE="$OUTPUT_DIR/Keyman-temp-$KEYMAN_VERSION.dmg"
 displayInfo "Copying \"$TEMPLATE_IMAGE\" to \"$WORKING_COPY_OF_IMAGE\"..."
 if [[ -e "$WORKING_COPY_OF_IMAGE" && "$VERBOSITY" != "-quiet" ]] ; then
     builder_warn "Overwriting: $WORKING_COPY_OF_IMAGE"
@@ -212,7 +212,7 @@ if (( DETACH_SUCCESS < 999 )); then
 fi
 
 # Step 5 - Convert image to a compressed readonly DMG image
-DMG_FILE_PATH="$DEST_DIR/keyman-$VERSION.dmg"
+DMG_FILE_PATH="$DEST_DIR/keyman-$KEYMAN_VERSION.dmg"
 displayInfo "Converting/compressing image to create \"$DMG_FILE_PATH\""
 if [[ -e "$DMG_FILE_PATH" ]] ; then
     if [[ "$VERBOSITY" != "-quiet" ]] ; then

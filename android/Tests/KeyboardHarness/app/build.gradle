@@ -6,7 +6,7 @@ ext.rootPath = '../../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.keyman.android.tests.keyboardHarness"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -14,15 +14,19 @@ android {
         noCompress "kmp"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "com.keyman.android.tests.keyboardHarness"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
-        // VERSION_CODE and VERSION_NAME from version.gradle
-        versionCode VERSION_CODE as Integer
-        versionName VERSION_NAME
-        buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+        // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
     }
     buildTypes {
         release {
@@ -42,7 +46,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     api (name:'keyman-engine', ext:'aar')
     implementation 'androidx.preference:preference:1.2.1'

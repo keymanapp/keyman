@@ -42,10 +42,10 @@ function phaseSetBundleVersions() {
     TAGGED=false
   fi
 
-  # For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.
-  if [ -z "${VERSION:-}" ]; then
+  # For command-line builds, KEYMAN_VERSION and KEYMAN_VERSION_WITH_TAG) are forwarded through xcodebuild.
+  if [ -z "${KEYMAN_VERSION:-}" ]; then
     # This is likely not a command-line build at the top level; it's been triggered through Xcode.
-    # The $VERSION-loading code is in build-utils.sh, but we need $THIS_SCRIPT to be set
+    # The $KEYMAN_VERSION-loading code is in build-utils.sh, but we need $THIS_SCRIPT to be set
     # (in similar manner to the "standard build header") in order to avoid script errors therein.
     THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
@@ -53,9 +53,9 @@ function phaseSetBundleVersions() {
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
     . "$KEYMAN_ROOT/resources/build/build-utils.sh"
     echo "phaseSetBundleVersions: UI build - fetching version from repository:"
-    echo "  Plain:  $VERSION"
-    echo "  Tagged: $VERSION_WITH_TAG"
-    echo "  Environment: $VERSION_ENVIRONMENT"
+    echo "  Plain:  $KEYMAN_VERSION"
+    echo "  Tagged: $KEYMAN_VERSION_WITH_TAG"
+    echo "  Environment: $KEYMAN_VERSION_ENVIRONMENT"
   else
     echo "phaseSetBundleVersions: Command-line build - using provided version parameters"
   fi
@@ -76,48 +76,48 @@ function phaseSetBundleVersions() {
   APP_PLIST="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
   echo "phaseSetBundleVersions: Setting CFBundleVersion to $BUILD_NUMBER for $APP_PLIST"
   /usr/libexec/Plistbuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_PLIST"
-  echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $VERSION for $APP_PLIST"
-  /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $VERSION" "$APP_PLIST"
+  echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $KEYMAN_VERSION for $APP_PLIST"
+  /usr/libexec/Plistbuddy -c "Set :CFBundleShortVersionString $KEYMAN_VERSION" "$APP_PLIST"
 
   /usr/libexec/Plistbuddy -c "Print" "$APP_PLIST"
 
   # Only attempt to write this when directly specified (otherwise, generates minor warning)
   if [ $TAGGED == true ]; then
-    echo "phaseSetBundleVersions: Setting KeymanVersionWithTag to $VERSION_WITH_TAG for tagged version for $APP_PLIST"
-    /usr/libexec/Plistbuddy -c "Set :KeymanVersionWithTag $VERSION_WITH_TAG" "$APP_PLIST"
-    echo "phaseSetBundleVersions: Setting KeymanVersionEnvironment to $VERSION_ENVIRONMENT for $APP_PLIST"
-    /usr/libexec/Plistbuddy -c "Set :KeymanVersionEnvironment $VERSION_ENVIRONMENT" "$APP_PLIST"
+    echo "phaseSetBundleVersions: Setting KeymanVersionWithTag to $KEYMAN_VERSION_WITH_TAG for tagged version for $APP_PLIST"
+    /usr/libexec/Plistbuddy -c "Set :KeymanVersionWithTag $KEYMAN_VERSION_WITH_TAG" "$APP_PLIST"
+    echo "phaseSetBundleVersions: Setting KeymanVersionEnvironment to $KEYMAN_VERSION_ENVIRONMENT for $APP_PLIST"
+    /usr/libexec/Plistbuddy -c "Set :KeymanVersionEnvironment $KEYMAN_VERSION_ENVIRONMENT" "$APP_PLIST"
   fi
 
   if [ -f "${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist" ]; then
     DSYM_PLIST="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}.dSYM/Contents/Info.plist"
     echo "phaseSetBundleVersions: Setting CFBundleVersion to $BUILD_NUMBER for $DSYM_PLIST"
     /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$DSYM_PLIST"
-    echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $VERSION for $DSYM_PLIST"
-    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$DSYM_PLIST"
+    echo "phaseSetBundleVersions: Setting CFBundleShortVersionString to $KEYMAN_VERSION for $DSYM_PLIST"
+    /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $KEYMAN_VERSION" "$DSYM_PLIST"
   fi
 }
 
 # Used by Keyman for iOS to update the human-readable string for its Settings screen.
 function setSettingsBundleVersion() {
-  # For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.
-  if [ -z "${VERSION:-}" ]; then
+  # For command-line builds, KEYMAN_VERSION and KEYMAN_VERSION_WITH_TAG) are forwarded through xcodebuild.
+  if [ -z "${KEYMAN_VERSION:-}" ]; then
     # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
     . "$KEYMAN_ROOT/resources/build/build-utils.sh"
     echo "setSettingsBundleVersion: UI build - fetching version from repository:"
-    echo "  Plain:  $VERSION"
-    echo "  Tagged: $VERSION_WITH_TAG"
+    echo "  Plain:  $KEYMAN_VERSION"
+    echo "  Tagged: $KEYMAN_VERSION_WITH_TAG"
     echo "  Environment: (not setting, assume 'local')"
   else
     echo "setSettingsBundleVersion: Command-line build - using provided version parameters"
   fi
 
   SETTINGS_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Settings.bundle/Root.plist"
-  echo "setSettingsBundleVersion: Setting $VERSION_WITH_TAG for $SETTINGS_PLIST"
+  echo "setSettingsBundleVersion: Setting $KEYMAN_VERSION_WITH_TAG for $SETTINGS_PLIST"
   # We assume that entry 0 = the version "preference" entry.
-  /usr/libexec/PlistBuddy -c "Set :PreferenceSpecifiers:0:DefaultValue $VERSION_WITH_TAG" "$SETTINGS_PLIST"
+  /usr/libexec/PlistBuddy -c "Set :PreferenceSpecifiers:0:DefaultValue $KEYMAN_VERSION_WITH_TAG" "$SETTINGS_PLIST"
 }
 
 # Build Phase:  Upload dSYM (debug) files to Sentry

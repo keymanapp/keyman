@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
@@ -28,7 +29,6 @@ builder_describe "Builds Keyman for Android app." \
   "build" \
   "test             Runs lint and unit tests." \
   "publish          Publishes symbols to Sentry and the APK to the Play Store." \
-  "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
 # parse before describe_outputs to check debug flags
@@ -37,32 +37,32 @@ builder_parse "$@"
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
-  BUILD_FLAGS="assembleDebug -x lint -x test"
+  BUILD_FLAGS="assembleDebug -x lintDebug -x testDebug"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
 builder_describe_outputs \
   configure     /android/KMAPro/kMAPro/libs/keyman-engine.aar \
-  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk
 
 #### Build
 
 
 # Parse args
 
-if builder_has_option --ci; then
+if builder_is_ci_build; then
   DAEMON_FLAG=--no-daemon
 fi
 
 #### Build action definitions ####
 
 function makeLocalSentryRelease() {
-  echo "Making a Sentry release for tag $VERSION_GIT_TAG"
+  echo "Making a Sentry release for tag $KEYMAN_VERSION_GIT_TAG"
   sentry-cli upload-dif -p keyman-android --include-sources
-  sentry-cli releases -p keyman-android files $VERSION_GIT_TAG upload-sourcemaps ./
+  sentry-cli releases -p keyman-android files $KEYMAN_VERSION_GIT_TAG upload-sourcemaps ./
 
-  echo "Finalizing release tag $VERSION_GIT_TAG"
-  sentry-cli releases finalize "$VERSION_GIT_TAG"
+  echo "Finalizing release tag $KEYMAN_VERSION_GIT_TAG"
+  sentry-cli releases finalize "$KEYMAN_VERSION_GIT_TAG"
 }
 
 
