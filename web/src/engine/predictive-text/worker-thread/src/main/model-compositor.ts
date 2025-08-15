@@ -191,7 +191,7 @@ export class ModelCompositor {
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
-      postContextState.tail.suggestions = suggestions;
+      postContextState.tokenization.tail.suggestions = suggestions;
     }
 
     return suggestions;
@@ -258,7 +258,7 @@ export class ModelCompositor {
         contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
       }
 
-      contextState.tail.appliedSuggestionId = suggestion.id;
+      contextState.tokenization.tail.appliedSuggestionId = suggestion.id;
       let acceptedContext = models.applyTransform(suggestion.transform, context);
       if(suggestion.appendedTransform) {
         acceptedContext = models.applyTransform(suggestion.appendedTransform, acceptedContext);
@@ -297,7 +297,7 @@ export class ModelCompositor {
     for(let c = this.contextTracker.count - 1; c >= 0; c--) {
       let contextState = this.contextTracker.item(c);
 
-      if(contextState.tail.appliedSuggestionId == -reversion.id) {
+      if(contextState.tokenization.tail.appliedSuggestionId == -reversion.id) {
         contextMatchFound = true;
         break;
       }
@@ -308,16 +308,16 @@ export class ModelCompositor {
     }
 
     // Remove all contexts more recent than the one we're reverting to.
-    while(this.contextTracker.newest.tail.appliedSuggestionId != -reversion.id) {
+    while(this.contextTracker.newest.tokenization.tail.appliedSuggestionId != -reversion.id) {
       this.contextTracker.popNewest();
     }
 
-    this.contextTracker.newest.tail.appliedSuggestionId = undefined;
+    this.contextTracker.newest.tokenization.tail.appliedSuggestionId = undefined;
 
     // Will need to be modified a bit if/when phrase-level suggestions are implemented.
     // Those will be tracked on the first token of the phrase, which won't be the tail
     // if they cover multiple tokens.
-    let suggestions = this.contextTracker.newest.tail.suggestions;
+    let suggestions = this.contextTracker.newest.tokenization.tail.suggestions;
 
     suggestions.forEach(function(suggestion) {
       // A reversion's transform ID is the additive inverse of its original suggestion;

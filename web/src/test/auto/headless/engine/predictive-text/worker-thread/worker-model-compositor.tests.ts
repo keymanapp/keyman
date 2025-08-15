@@ -898,7 +898,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.count, 3);
 
       // The replacement should be marked on the context-tracking token.
-      assert.isAtLeast(suggestionContextState.tail.appliedSuggestionId, 0);
+      assert.isAtLeast(suggestionContextState.tokenization.tail.appliedSuggestionId, 0);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       compositor.applyReversion(reversion, appliedContext);
@@ -908,7 +908,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.item(1), suggestionContextState);
 
       // The replacement should no longer be marked for the context-tracking token.
-      assert.isNotOk(suggestionContextState.tail.appliedSuggestionId);
+      assert.isNotOk(suggestionContextState.tokenization.tail.appliedSuggestionId);
     });
   });
 });

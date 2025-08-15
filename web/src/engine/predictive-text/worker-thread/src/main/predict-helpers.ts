@@ -263,7 +263,7 @@ export async function correctAndEnumerate(
   // let's just note that right now, there will only ever be one.
   //
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  const searchSpace = postContextState.tail.searchSpace;
+  const searchSpace = postContextState.tokenization.tail.searchSpace;
 
   // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
   // same amount of text.  We can handle this before the big 'prediction root' loop.
@@ -271,9 +271,9 @@ export async function correctAndEnumerate(
 
   // The amount of text to 'replace' depends upon whatever sort of context change occurs
   // from the received input.
-  const postContextTokens = postContextState.tokens;
+  const postContextTokens = postContextState.tokenization.tokens;
   // Only use of `contextState`.
-  let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
+  let contextLengthDelta = postContextTokens.length - contextState.tokenization.tokens.length;
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
   if(contextChangeAnalysis.preservationTransform) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
