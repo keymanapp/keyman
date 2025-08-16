@@ -9,5 +9,8 @@
     "rootDir": "./src"
   },
 
-  "include": [ "**/*.ts", "src/import/core/km-core.js" ],
+  "references": [
+    { "path": "../keyboard"},
+  ],
+  "include": [ "**/*.ts" ],
 }

@@ -22,7 +22,7 @@ builder_describe \
   "@/web/src/tools/testing/recorder-core  test" \
   "@/web/src/tools/es-bundling" \
   "@/web/src/engine/common/web-utils" \
-  "@/web/src/engine/core-processor" \
+  "@/web/src/engine/core-adapter" \
   configure \
   clean \
   build \
