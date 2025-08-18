@@ -57,7 +57,7 @@ export class RewindableCache<Key, Value> {
   get(key: Key): Value {
     const set = this.cacheOrderSet;
     if(!set.has(key)) {
-      return null;
+      return undefined;
     }
 
     set.delete(key);

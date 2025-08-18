@@ -87,11 +87,10 @@ describe("RewindableCache", () => {
     const cache = new RewindableCache(2);
     cache.add(1, 'a');
     cache.add(2, 'b');
-    cache.add(3, 'c');
-    cache.add(4, 'd');
-    cache.add(5, 'e');
+    cache.add(3, 'c'); // Entry 1 no longer valid
+    cache.add(4, 'd'); //       2
+    cache.add(5, 'e'); //       3
 
-    assert.doesNotThrow(() => cache.get(2));
     assert.throws(() => cache.rewindTo(3));
   });
 
@@ -99,11 +98,11 @@ describe("RewindableCache", () => {
     const cache = new RewindableCache(2);
     cache.add(1, 'a');
     cache.add(2, 'b');
-    cache.add(3, 'c');
-    cache.add(4, 'd');
-    cache.add(5, 'e');
+    cache.add(3, 'c'); // Entry 1 no longer valid
+    cache.add(4, 'd'); //       2
+    cache.add(5, 'e'); //       3
 
-    assert.doesNotThrow(() => cache.peek(2));
-    assert.doesNotThrow(() => cache.get(2));
+    assert.isUndefined(cache.peek(2), 'outdated cache entry should be forgotten');
+    assert.isUndefined(cache.get(2), 'outdated cache entry should be forgotten');
   });
 });
