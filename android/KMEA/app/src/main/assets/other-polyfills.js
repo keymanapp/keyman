@@ -15,3 +15,6 @@ if(!Array.prototype.includes){
    return !!~this.indexOf(search);
  }
 }
+
+// This file is only referenced by the main Web engine; its "global" object is `window`.
+var globalThis = window;
