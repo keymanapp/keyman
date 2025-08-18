@@ -176,10 +176,23 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * upon the completed async `predict`.
    *
    * @param suggestion Either a `Suggestion` or `Reversion`.
+   * @param ruleBehavior When set with the results of applying an incoming keystroke, the effects
+   * of that keystroke will be appended to the suggestion being applied.
    * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
   public accept(suggestion: Suggestion, ruleBehavior?: RuleBehavior): {
+    /**
+     * The Reversion object that will restore the context to its state before applying the
+     * Suggestion.
+     */
     reversion: Promise<Reversion> | Promise<null>,
+    /**
+     * When set, this provides a replacement RuleBehavior with the same effects as the original
+     * for the incoming keystroke, but as applied to the context after the Suggestion is applied
+     * (rather than before).
+     *
+     * Note that the unique `.token` entry will not match the original; it will be replaced.
+     */
     appendedRuleBehavior?: RuleBehavior
   } {
     // Selecting a suggestion or a reversion should both clear selection
