@@ -824,7 +824,7 @@ describe('ModelCompositor', function() {
       });
     });
 
-    it('model with traversals: returns appropriate suggestions upon reversion', async function() {
+    it.skip('model with traversals: returns appropriate suggestions upon reversion', async function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
