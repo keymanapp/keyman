@@ -62,9 +62,6 @@ describe("RewindableCache", () => {
     cache.add(4, 'd');
     cache.add(5, 'e');
 
-    assert.sameMembers([...cache.keys()], [4, 5]);
-    assert.sameMembers([...cache.keys().map((k) => cache.peek(k))], ['d', 'e']);
-
     assert.sameOrderedMembers([...cache.keys()], [5, 4]);
     assert.sameOrderedMembers([...cache.keys().map((k) => cache.peek(k))], ['e', 'd']);
     assert.equal(cache.size, 2);
@@ -80,9 +77,6 @@ describe("RewindableCache", () => {
 
     cache.get(2);
     cache.rewindTo(3);
-
-    assert.sameMembers([...cache.keys()], [1, 3]);
-    assert.sameMembers([...cache.keys().map((k) => cache.peek(k))], ['a', 'c']);
 
     assert.sameOrderedMembers([...cache.keys()], [3, 1]);
     assert.sameOrderedMembers([...cache.keys().map((k) => cache.peek(k))], ['c', 'a']);
