@@ -56,6 +56,9 @@ advisable to run a `git clean -dxf` before switching between the two. The
 reason is that the Docker images use a different user, so that paths
 will be different.
 
+**Warning:** On Windows, don't mix building in Windows/git-bash and WSL/Docker.
+This will fail because the tools have different names.
+
 ## Running tests locally
 
 To run the tests locally, use the `run.sh` script:
