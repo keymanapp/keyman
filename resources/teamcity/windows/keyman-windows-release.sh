@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
@@ -104,10 +104,10 @@ function windows_publish_action() {
 
   "${KEYMAN_ROOT}/windows/build.sh" publish
   windows_upload_symbols_to_sentry
-  download_symbol_server_index
-  publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for Windows" windows
+  tc_upload_help "Keyman for Windows" windows
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"
 }
 

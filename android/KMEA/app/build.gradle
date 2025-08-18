@@ -12,6 +12,12 @@ base {
     archivesName = "keyman-engine"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
     compileSdk 35
     namespace "com.keyman.engine"
@@ -19,11 +25,6 @@ android {
     buildFeatures {
         // needed for custom BuildConfigField values in defaultConfig
         buildConfig = true
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
     }
 
     defaultConfig {

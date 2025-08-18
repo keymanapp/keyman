@@ -16,12 +16,6 @@
 cpp_compiler = meson.get_compiler('cpp')
 c_compiler = meson.get_compiler('c')
 
-# Unfortunately this outputs a warning: 'Consider using the built-in option
-# for language standard version instead of using "-std=c++17".'
-# But that is not possible to do after creating the project...
-# See also https://github.com/mesonbuild/meson/issues/10685
-add_project_arguments('-std=c++17', language: 'cpp')
-
 #
 # Standard informational messages for our builds
 #

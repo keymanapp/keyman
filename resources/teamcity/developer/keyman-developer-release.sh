@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
@@ -60,30 +60,6 @@ function _publish_sentry() {
   "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
 
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
-}
-
-function _download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-  (
-    mkdir -p "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-    cd "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/lastid.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/history.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/server.txt" "."
-  )
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-function _publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-  (
-    cd "${LOCAL_SYMBOLS_PATH}"
-    tc_rsync_upload "." "${REMOTE_SYMBOLS_PATH}"
-  )
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }
 
 function _publish_to_downloads_keyman_com() {
@@ -144,10 +120,10 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  download_symbol_server_index
-  publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  upload_help "api documentation" developer
+  tc_upload_help "api documentation" developer
 }
 
 if builder_has_action all; then

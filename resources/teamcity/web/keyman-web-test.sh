@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/web/web-actions.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-linux.inc.sh"
@@ -40,7 +40,7 @@ function check_build_size_action() {
 if builder_has_action all; then
   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   web_build_action
   web_test_action
@@ -48,7 +48,7 @@ if builder_has_action all; then
 else
   builder_run_action  configure   web_install_dependencies_on_linux_action
 
-  set_variables_for_nvm
+  tc_set_variables_for_nvm
 
   builder_run_action  build       web_build_action
   builder_run_action  test        web_test_action
