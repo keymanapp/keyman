@@ -293,7 +293,9 @@ do_publish() {
   local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
   write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION}.dmg" "Keyman4MacIM" dmg mac
 
-  builder_if_release_build_level do_sentry
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    do_sentry
+  fi
 }
 
 ### PROCESS COMMAND-LINE ARGUMENTS ###
