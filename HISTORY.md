@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.101 alpha 2025-08-18
+
+* maint(android): Update Android Target API to 35 (#14395)
+* fix(android): Convert Keyman app layout to use ConstraintLayout for handling edge-to-edge (#14396)
+* fix(android): Update other activities for edge to edge (#14463)
+* fix(android): Update Sample, Test, and FirstVoices apps for edge to edge (#14514)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14540)
+
 ## 19.0.100 alpha 2025-08-14
 
 * maint(resources): add space to test-bot command (#14528)
