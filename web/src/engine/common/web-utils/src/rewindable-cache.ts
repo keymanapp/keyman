@@ -14,10 +14,10 @@
  * reaching a specified capacity and that provides the ability to
  * forget _all_ entries more recent than a specified entry.
  */
-export class RewindableCache<Key, Value> {
+export class RewindableCache<Value> {
   static readonly DEFAULT_MAX_SIZE = 5;
 
-  private map: Map<Key, Value> = new Map();
+  private map: Map<number, Value> = new Map();
   private maxSize: number;
 
   /**
@@ -41,28 +41,9 @@ export class RewindableCache<Key, Value> {
    * @param key
    * @returns
    */
-  peek(key: Key): Value {
+  get(key: number): Value {
     const entry = this.map.get(key);
     return entry;
-  }
-
-  /**
-   * Fetches the cache entry with the specified key and also updates its
-   * most recent access time.
-   * @param key
-   * @returns
-   */
-  get(key: Key): Value {
-    const map = this.map;
-    const entry = map.get(key);
-    if(!map.has(key)) {
-      return undefined;
-    }
-
-    map.delete(key);
-    map.set(key, entry);
-
-    return this.peek(key);
   }
 
   /**
@@ -71,7 +52,7 @@ export class RewindableCache<Key, Value> {
    * @param key
    * @returns
    */
-  add(key: Key, value: Value) {
+  add(key: number, value: Value) {
     const map = this.map;
 
     if(map.has(key)) {
@@ -81,7 +62,7 @@ export class RewindableCache<Key, Value> {
       map.set(key, value);
 
       if(map.size > this.maxSize) {
-        const oldest = map.keys().next().value as Key;
+        const oldest = map.keys().next().value as number;
         map.delete(oldest);
         map.delete(oldest);
       }
@@ -95,7 +76,7 @@ export class RewindableCache<Key, Value> {
    * Note:  returns an Array and is accordingly O(N).
    * @returns
    */
-  keys(): Key[] {
+  keys(): number[] {
     return [...this.map.keys()].reverse();
   }
 
@@ -107,30 +88,26 @@ export class RewindableCache<Key, Value> {
   }
 
   /**
-   * Deletes all entries more recent than the specified key, leaving
+   * Deletes all entries with a key less than the specified key, leaving
    * the specified key as the most recent entry.
    * @param key
    */
-  rewindTo(key: Key) {
+  rewindTo(key: number) {
     const map = this.map;
 
     if(!map.has(key)) {
       throw new Error("Key not found; cannot clear entries appearing afterward.");
     }
 
-    let keyFound: boolean = false;
     // Iteration:  by insertion order
     // The most recent entries will appear after the specified key.
     for(const k of map.keys()) {
-      if(!keyFound) {
-        keyFound = k == key;
-        continue;
+      if(k > key) {
+        // It is safe to delete a key from a Set or Map while iterating over it in ES6+.
+        // https://stackoverflow.com/a/28306768
+        map.delete(k);
+        map.delete(k);
       }
-
-      // It is safe to delete a key from a Set while iterating over it in ES6+.
-      // https://stackoverflow.com/a/28306768
-      map.delete(k);
-      map.delete(k);
     }
   }
 }

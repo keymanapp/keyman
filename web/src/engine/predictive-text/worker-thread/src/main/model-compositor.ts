@@ -293,7 +293,7 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let contextMatchFound = this.contextTracker.cache.peek(-reversion.transformId);
+    let contextMatchFound = this.contextTracker.cache.get(-reversion.transformId);
 
     if(!contextMatchFound) {
       return fallbackSuggestions();
