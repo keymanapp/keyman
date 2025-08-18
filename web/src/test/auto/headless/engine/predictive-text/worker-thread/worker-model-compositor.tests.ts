@@ -826,7 +826,7 @@ describe('ModelCompositor', function() {
       });
     });
 
-    it.skip('model with traversals: returns appropriate suggestions upon reversion', async function() {
+    it('model with traversals: returns appropriate suggestions upon reversion', async function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
@@ -894,7 +894,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.cache.size, 2);
 
       let contextIds = compositor.contextTracker.cache.keys();
-      let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key));
+      let transitionInstances = compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key));
 
       let baseSuggestion = initialSuggestions[1];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
@@ -907,7 +907,7 @@ describe('ModelCompositor', function() {
       // Accepting the suggestion rewrites the latest context transition.
       assert.equal(compositor.contextTracker.cache.size, 2);
       assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
-      assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.peek(key)), transitionInstances);
+      assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key)), transitionInstances);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
       assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
@@ -915,7 +915,7 @@ describe('ModelCompositor', function() {
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       await compositor.applyReversion(reversion, appliedContext);
-      assert.isUndefined(compositor.contextTracker.cache.peek(13).final.appliedSuggestionId);
+      assert.isUndefined(compositor.contextTracker.cache.get(13).final.appliedSuggestionId);
     });
   });
 });
