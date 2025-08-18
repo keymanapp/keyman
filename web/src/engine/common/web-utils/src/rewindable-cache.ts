@@ -17,9 +17,7 @@
 export class RewindableCache<Key, Value> {
   static readonly DEFAULT_MAX_SIZE = 5;
 
-  private cacheOrderSet: Set<Key> = new Set();
-  private transitionMap: Map<Key, Value> = new Map();
-
+  private map: Map<Key, Value> = new Map();
   private maxSize: number;
 
   /**
@@ -34,7 +32,7 @@ export class RewindableCache<Key, Value> {
    * Gets the current number of entries in the cache.
    */
   get size() {
-    return this.cacheOrderSet.size;
+    return this.map.size;
   }
 
   /**
@@ -44,7 +42,7 @@ export class RewindableCache<Key, Value> {
    * @returns
    */
   peek(key: Key): Value {
-    const entry = this.transitionMap.get(key);
+    const entry = this.map.get(key);
     return entry;
   }
 
@@ -55,13 +53,14 @@ export class RewindableCache<Key, Value> {
    * @returns
    */
   get(key: Key): Value {
-    const set = this.cacheOrderSet;
-    if(!set.has(key)) {
+    const map = this.map;
+    const entry = map.get(key);
+    if(!map.has(key)) {
       return undefined;
     }
 
-    set.delete(key);
-    set.add(key);
+    map.delete(key);
+    map.set(key, entry);
 
     return this.peek(key);
   }
@@ -73,23 +72,20 @@ export class RewindableCache<Key, Value> {
    * @returns
    */
   add(key: Key, value: Value) {
-    const set = this.cacheOrderSet;
-    const map = this.transitionMap;
+    const map = this.map;
 
-    if(set.has(key)) {
-      set.delete(key);
-      set.add(key);
+    if(map.has(key)) {
+      map.delete(key);
+      map.set(key, value);
     } else {
-      set.add(key);
+      map.set(key, value);
 
-      if(set.size > this.maxSize) {
-        const oldest = set.keys().next().value as Key;
-        set.delete(oldest);
+      if(map.size > this.maxSize) {
+        const oldest = map.keys().next().value as Key;
+        map.delete(oldest);
         map.delete(oldest);
       }
     }
-
-    map.set(key, value);
   }
 
   /**
@@ -100,15 +96,14 @@ export class RewindableCache<Key, Value> {
    * @returns
    */
   keys(): Key[] {
-    return [...this.cacheOrderSet.keys()].reverse();
+    return [...this.map.keys()].reverse();
   }
 
   /**
    * Deletes all entries from the cache.
    */
   clear() {
-    this.cacheOrderSet = new Set();
-    this.transitionMap = new Map();
+    this.map = new Map();
   }
 
   /**
@@ -117,17 +112,16 @@ export class RewindableCache<Key, Value> {
    * @param key
    */
   rewindTo(key: Key) {
-    const set = this.cacheOrderSet;
-    const map = this.transitionMap;
+    const map = this.map;
 
-    if(!set.has(key)) {
+    if(!map.has(key)) {
       throw new Error("Key not found; cannot clear entries appearing afterward.");
     }
 
     let keyFound: boolean = false;
     // Iteration:  by insertion order
     // The most recent entries will appear after the specified key.
-    for(const k of set.keys()) {
+    for(const k of map.keys()) {
       if(!keyFound) {
         keyFound = k == key;
         continue;
@@ -135,7 +129,7 @@ export class RewindableCache<Key, Value> {
 
       // It is safe to delete a key from a Set while iterating over it in ES6+.
       // https://stackoverflow.com/a/28306768
-      set.delete(k);
+      map.delete(k);
       map.delete(k);
     }
   }
