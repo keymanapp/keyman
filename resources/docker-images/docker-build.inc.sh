@@ -30,7 +30,7 @@ convert_parameters_to_args() {
   build_version=
   local required_node_version keyman_default_distro
   # shellcheck disable=SC2034
-  required_node_version="$(_print_expected_node_version)"
+  required_node_version="$(_node_print_expected_version)"
   # shellcheck disable=SC2034
   keyman_default_distro="ubuntu"
 
