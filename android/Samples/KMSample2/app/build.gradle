@@ -9,7 +9,7 @@ java {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.keyman.kmsample2"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId "com.keyman.kmsample2"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
     }
