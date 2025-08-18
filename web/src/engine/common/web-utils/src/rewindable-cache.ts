@@ -89,7 +89,7 @@ export class RewindableCache<Key, Value> {
       }
     }
 
-    this.transitionMap.set(key, value);
+    map.set(key, value);
   }
 
   /**
