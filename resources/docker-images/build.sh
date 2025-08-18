@@ -9,7 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
-. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/node.inc.sh"
 . "${KEYMAN_ROOT}/resources/docker-images/docker-build.inc.sh"
 
 builder_describe \
