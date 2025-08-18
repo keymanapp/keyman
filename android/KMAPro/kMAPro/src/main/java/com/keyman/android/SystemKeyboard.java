@@ -279,6 +279,20 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   }
 
   @Override
+  public boolean onEvaluateInputViewShown() {
+    // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
+    // If the default implementation returns true, recommend honoring it
+    // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
+    if (super.onEvaluateInputViewShown()) {
+      return true;
+    };
+
+    // TODO: Implement IME setting similar to Gboard "Show on-screen keyboard" with physical keyboard
+    // (default false)
+    return true;
+  }
+
+  @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     // Determine if Physical keystroke should be passed off
     if (inputType == InputType.TYPE_NULL) {
@@ -298,20 +312,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     return interpreter.onKeyDown(keyCode, event);  // if false, will revert to default handling.
-  }
-
-  @Override
-  public boolean onEvaluateInputViewShown() {
-    // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
-    // If the default implementation returns true, recommend honoring it
-    // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
-    if (super.onEvaluateInputViewShown()) {
-      return true;
-    };
-
-    // TODO: Implement IME setting similar to Gboard "Show on-screen keyboard" with physical keyboard
-    // (default false)
-    return true;
   }
 
   @Override
