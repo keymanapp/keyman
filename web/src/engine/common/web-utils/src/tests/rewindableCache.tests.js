@@ -62,11 +62,8 @@ describe("RewindableCache", () => {
     cache.add(4, 'd');
     cache.add(5, 'e');
 
-    assert.sameMembers([...cache.keys()], [4, 5]);
-    assert.sameMembers([...cache.keys().map((k) => cache.peek(k))], ['d', 'e']);
-
     assert.sameOrderedMembers([...cache.keys()], [5, 4]);
-    assert.sameOrderedMembers([...cache.keys().map((k) => cache.peek(k))], ['e', 'd']);
+    assert.sameOrderedMembers([...cache.keys().map((k) => cache.get(k))], ['e', 'd']);
     assert.equal(cache.size, 2);
   });
 
@@ -78,26 +75,23 @@ describe("RewindableCache", () => {
     cache.add(4, 'd');
     cache.add(5, 'e');
 
-    cache.get(2);
+    // make it more recently-accessed, but don't remove it.
     cache.rewindTo(3);
 
-    assert.sameMembers([...cache.keys()], [1, 3]);
-    assert.sameMembers([...cache.keys().map((k) => cache.peek(k))], ['a', 'c']);
-
-    assert.sameOrderedMembers([...cache.keys()], [3, 1]);
-    assert.sameOrderedMembers([...cache.keys().map((k) => cache.peek(k))], ['c', 'a']);
-    assert.equal(cache.size, 2);
+    cache.add(2, 'b'); // 2 is still ORIGINALLY older than 3, even if accessed more recently.
+    assert.sameOrderedMembers([...cache.keys()], [2, 3, 1]);
+    assert.sameOrderedMembers([...cache.keys().map((k) => cache.get(k))], ['b', 'c', 'a']);
+    assert.equal(cache.size, 3);
   });
 
   it("forgets no entries if invalid key is provided", () => {
     const cache = new RewindableCache(2);
     cache.add(1, 'a');
     cache.add(2, 'b');
-    cache.add(3, 'c');
-    cache.add(4, 'd');
-    cache.add(5, 'e');
+    cache.add(3, 'c'); // Entry 1 no longer valid
+    cache.add(4, 'd'); //       2
+    cache.add(5, 'e'); //       3
 
-    assert.doesNotThrow(() => cache.get(2));
     assert.throws(() => cache.rewindTo(3));
   });
 
@@ -105,11 +99,10 @@ describe("RewindableCache", () => {
     const cache = new RewindableCache(2);
     cache.add(1, 'a');
     cache.add(2, 'b');
-    cache.add(3, 'c');
-    cache.add(4, 'd');
-    cache.add(5, 'e');
+    cache.add(3, 'c'); // Entry 1 no longer valid
+    cache.add(4, 'd'); //       2
+    cache.add(5, 'e'); //       3
 
-    assert.doesNotThrow(() => cache.peek(2));
-    assert.doesNotThrow(() => cache.get(2));
+    assert.isUndefined(cache.get(2), 'outdated cache entry should be forgotten');
   });
 });
