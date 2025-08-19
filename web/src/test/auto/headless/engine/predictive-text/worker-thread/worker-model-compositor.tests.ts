@@ -912,7 +912,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       await compositor.applyReversion(reversion, appliedContext);
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
-      assert.isUndefined(compositor.contextTracker.unitTestEndPoints.cache().peek(13).final.appliedSuggestionId);
+      assert.isUndefined(compositor.contextTracker.unitTestEndPoints.cache().get(13).final.appliedSuggestionId);
     });
   });
 });
