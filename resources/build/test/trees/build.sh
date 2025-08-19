@@ -17,7 +17,8 @@ builder_describe "parent test module" \
   build \
   test \
   install \
-  error
+  error \
+  nothing
 
 builder_parse "$@"
 
@@ -79,5 +80,8 @@ builder_run_child_actions install:child1
 test_present child1 install
 
 builder_run_child_actions error
+
+# Test that there is a no-op for unsupported child actions
+builder_run_child_actions nothing
 
 echo Done

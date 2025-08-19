@@ -80,8 +80,8 @@ function build_bot_check_messages() {
 
   for buildBotCommand in "${buildBotCommands[@]}"; do
     # Block illegal Build-bot: commands
-    if [[ ! "$buildBotCommand" =~ ^[a-z,\ :]+$ ]]; then
-      builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
+    if [[ ! "$buildBotCommand" =~ ^[a-z_,\ :,]+$ ]]; then
+      builder_echo warning "WARNING[Build-bot]: ignoring invalid command [2]: '${buildBotCommand}'"
       continue
     fi
 
