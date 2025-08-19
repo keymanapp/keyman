@@ -64,7 +64,6 @@ export class RewindableCache<Value> {
       if(map.size > this.maxSize) {
         const oldest = map.keys().next().value as number;
         map.delete(oldest);
-        map.delete(oldest);
       }
     }
   }
@@ -88,8 +87,9 @@ export class RewindableCache<Value> {
   }
 
   /**
-   * Deletes all entries with a key less than the specified key, leaving
-   * the specified key as the most recent entry.
+   * Deletes all entries with a key greater than the specified key (which indicates
+   * the entry was first created more recently), leaving the specified key as
+   * the most recent entry.
    * @param key
    */
   rewindTo(key: number) {
@@ -105,7 +105,6 @@ export class RewindableCache<Value> {
       if(k > key) {
         // It is safe to delete a key from a Set or Map while iterating over it in ES6+.
         // https://stackoverflow.com/a/28306768
-        map.delete(k);
         map.delete(k);
       }
     }
