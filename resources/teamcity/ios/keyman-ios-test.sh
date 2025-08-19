@@ -21,6 +21,13 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# TODO: remove unused `--pr-number` option. Unfortunately, the mechanism we
+# designed to skip this, `--builder-ignore-unknown-options`, does not work for
+# options with values. We need another one, for example, something like
+# `--builder-ignore-unknown-value-options=pr-number[,...]`, so for now I will
+# leave it alone. The option ultimately needs to be removed from the TC build
+# configuration also. (Unused as of #14466)
+
 builder_describe \
   "Build KeymanEngine and Keyman for iOS" \
   "all            run all actions" \
@@ -70,12 +77,6 @@ function __do_upload_to_testflight() {
 }
 
 function _upload_to_testflight_pr_area() {
-  # shellcheck disable=SC2154
-  if ! [[ "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
-    builder_echo "Ignoring TestFlight upload for non-PR build"
-    return
-  fi
-
   builder_echo start "upload to testflight" "Uploading build to TestFlight (PR area)"
   # shellcheck disable=SC2154
   __do_upload_to_testflight "${SIL_ITC_PROVIDER}" "${SIL_API_KEY_ID}" "${SIL_ITC_TEAM_ID}"  keyman
@@ -83,12 +84,6 @@ function _upload_to_testflight_pr_area() {
 }
 
 function _upload_to_testflight_pr_area_fv() {
-  # shellcheck disable=SC2154
-  if ! [[ "${PR_NUMBER}" =~ ^[0-9]+$ ]]; then
-    builder_echo "Ignoring TestFlight upload for non-PR build"
-    return
-  fi
-
   if ! builder_has_option --fv; then
     builder_echo "Skipping FirstVoices upload to TestFlight as --fv option is not set"
     return
@@ -103,8 +98,8 @@ function _upload_to_testflight_pr_area_fv() {
 function do_build() {
   ios_build
   ios_capture_build_artifacts
-  _upload_to_testflight_pr_area
-  _upload_to_testflight_pr_area_fv
+  builder_if_release_build_level _upload_to_testflight_pr_area
+  builder_if_release_build_level _upload_to_testflight_pr_area_fv
 }
 
 ba_mac_unlock_keychain

@@ -10,8 +10,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 ################################ Main script ################################
+
+SUBPROJECT_NAME=engine/predictive-text/wordbreakers
 
 # Note:  the raw text files used for data.inc.ts are found within
 # /resources/standards-data/unicode-character-database.
@@ -57,4 +60,4 @@ function do_test() {
 builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
-builder_run_action test       do_test
+builder_run_action test       test-headless-typescript $SUBPROJECT_NAME

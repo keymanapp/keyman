@@ -67,8 +67,8 @@ function build_bot_check_messages() {
 
 
   IFS=$'\n'
-  local buildBotCommands=($(echo "$prcommits" | "${JQ}" -r '.[].commit.message' | grep 'Build-bot:' | cut -d: -f 2 -))
-  local prCommands=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -d: -f 2 -))
+  local buildBotCommands=($(echo "$prcommits" | "${JQ}" -r '.[].commit.message' | grep 'Build-bot:' | cut -c 11- -))
+  local prCommands=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -c 11- -))
   unset IFS
 
   # The PR body Build-bot comment will be read last, which allows it to override
@@ -80,13 +80,15 @@ function build_bot_check_messages() {
 
   for buildBotCommand in "${buildBotCommands[@]}"; do
     # Block illegal Build-bot: commands
-    if [[ ! "$buildBotCommand" =~ ^[a-z,\ ]+$ ]]; then
+    if [[ ! "$buildBotCommand" =~ ^[a-z,\ :]+$ ]]; then
       builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
       continue
     fi
 
-    # We now know that our command has only a-z, comma and space, so we can
-    # parse without risking escaping our bash jail
+    # debug_echo "buildBotCommand:{$buildBotCommand}"
+
+    # We now know that our command has only a-z, comma, colon, and space, so we
+    # can parse without risking escaping our bash jail
 
     if [[ ! -z "${buildBotCommand// }" ]]; then
       build_bot_update_commands $buildBotCommand
@@ -97,7 +99,7 @@ function build_bot_check_messages() {
 }
 
 #
-# parses a 'Build-bot: <level> [platform...]' command and modifies
+# parses a 'Build-bot: <level>[[:| ]platform,...]' command and modifies
 # the global build_platforms associative array with new levels.
 #
 # Note that this function assumes that inputs are sanitized, see
@@ -108,34 +110,71 @@ function build_bot_update_commands() {
   local platforms=
   local command="$*"
 
-  if [[ $# == 1 ]]; then
-    level=$1
-    platforms=all
+  local re='^(build|skip|release)( [a-z,]+)?$'
+  if [[ "$command" =~ $re ]]; then
+    # legacy (until aug 2025) format is "level [platform]" (comma format never used)
+    if [[ $# == 1 ]]; then
+      level=$1
+      platforms="${!build_platforms[@]}"
+    else
+      level=$1
+      shift
+
+      # remaining parameters are comma/space separated platforms
+      IFS=','
+      read -r -a platforms <<< "$*"
+      unset IFS
+    fi
+
+    if [[ ! $level =~ ^$valid_build_levels$ ]]; then
+      # Just skip this build command
+      builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '$level' in command '$command'"
+      return 0
+    fi
+
+    build_bot_verify_platforms platforms
+
+    local platform
+    for platform in "${platforms[@]}"; do
+      builder_echo "Build-bot: Updating build level for $platform to $level"
+      build_platforms[$platform]=$level
+    done
   else
-    level=$1
-    shift
-
-    # remaining parameters are comma/space separated platforms
-    IFS=', '
-    read -r -a platforms <<< "$*"
+    # modern format is "level[:platform[,platform...]][ level[:platform[,platform...]]...]"
+    declare -a commands
+    IFS=' '
+    read -r -a commands <<< "$command"
     unset IFS
+
+    for command in "${commands[@]}"; do
+      declare -a params
+      IFS=:
+      read -r -a params <<< "$command"
+      level=${params[0]}
+      if [[ ! $level =~ ^$valid_build_levels$ ]]; then
+        # Just skip this build command
+        builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '$level' in command '$command'"
+        continue
+      fi
+
+      if [[ ${#params[@]} == 1 ]]; then
+        platforms="${!build_platforms[@]}"
+      else
+        # remaining parameters are comma separated platforms
+        IFS=','
+        read -r -a platforms <<< "${params[1]}"
+        unset IFS
+      fi
+
+      build_bot_verify_platforms platforms
+
+      local platform
+      for platform in "${platforms[@]}"; do
+        builder_echo "Build-bot: Updating build level for $platform to $level"
+        build_platforms[$platform]=$level
+      done
+    done
   fi
-
-  if [[ ! $level =~ ^$valid_build_levels$ ]]; then
-    # Just skip this build command
-    builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '$level' in command '$command'"
-    return 0
-  fi
-
-  build_bot_verify_platforms platforms
-
-  # a build command should be <level> [platform[, platform...]]
-
-  local platform
-  for platform in "${platforms[@]}"; do
-    builder_echo "Build-bot: Updating build level for $platform to $level"
-    build_platforms[$platform]=$level
-  done
 }
 
 #
