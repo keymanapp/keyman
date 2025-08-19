@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Build Keyman common file types module" \
   "@/core/include/ldml" \
@@ -105,4 +105,4 @@ builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schem
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       do_test
-builder_run_action publish    builder_publish_npm
+builder_run_action publish    ci_publish_npm
