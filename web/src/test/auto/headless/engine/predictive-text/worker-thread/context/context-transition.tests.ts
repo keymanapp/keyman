@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { ContextState, ContextTracker, ContextTransition, models } from '@keymanapp/lm-worker/test-index';
+import { ContextState, ContextTransition, models } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -82,7 +82,7 @@ describe('ContextTransition', () => {
       }, plainModel);
 
       // currently, also calls the .finalize method internally.
-      const transition = ContextTracker.attemptMatchContext(baseState.context, plainModel, baseState, [
+      const transition = baseState.analyzeTransition(baseState.context, [
         { sample: { insert: '!', deleteLeft: 0 }, p: 1 }
       ]);
 
@@ -101,7 +101,7 @@ describe('ContextTransition', () => {
     const baseState = new ContextState(baseContext, plainModel);
 
     // currently, also calls the .finalize method internally.
-    const transition = ContextTracker.attemptMatchContext(baseContext, plainModel, baseState, [
+    const transition = baseState.analyzeTransition(baseContext, [
       { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
     ]);
     assert.isOk(transition);
@@ -163,7 +163,7 @@ describe('ContextTransition', () => {
       const baseState = new ContextState(baseContext, plainModel);
 
       // currently, also calls the .finalize method internally.
-      const transition = ContextTracker.attemptMatchContext(baseContext, plainModel, baseState, [
+      const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
       ]);
 
@@ -213,7 +213,7 @@ describe('ContextTransition', () => {
       const baseState = new ContextState(baseContext, plainModel);
 
       // currently, also calls the .finalize method internally.
-      const transition = ContextTracker.attemptMatchContext(baseContext, plainModel, baseState, [
+      const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
       ]);
 
