@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.102 alpha 2025-08-19
+
+* maint(mac): skip unnecessary network steps when buildLevel is build (#14467)
+* maint(common): cleanup and reorganize ci scripts (#14459)
+* refactor(linux): cleanup some code in bash completion script (#14543)
+* maint(resources): handle build-bot skip correctly (#14551)
+* maint(resources): don't fall back to 'build' action (#14552)
+* maint(resources): handle unset build platform in trigger-build-bot (#14554)
+
 ## 19.0.101 alpha 2025-08-18
 
 * maint(android): Update Android Target API to 35 (#14395)
