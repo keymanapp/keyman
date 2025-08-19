@@ -172,7 +172,7 @@ function build_bot_update_commands() {
 
       local platform
       for platform in "${platforms[@]}"; do
-        if [[ "${build_platforms[$platform]}" != "${level}" ]]; then
+        if [[ "${build_platforms[$platform]+x}" != "${level}" ]]; then
           builder_echo "Build-bot: Updating build level for $platform to $level"
           build_platforms[$platform]=$level
         fi
