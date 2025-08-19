@@ -18,4 +18,6 @@ if(!Array.prototype.includes){
 
 // This file is only referenced by the main Web engine; its "global" object is `window`.
 // `globalThis` is defined in Chrome 71+.
-var globalThis = window;
+if(typeof globalThis == 'undefined') {
+  var globalThis = window;
+}
