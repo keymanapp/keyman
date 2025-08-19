@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 . "$KEYMAN_ROOT/developer/src/packages.inc.sh"
 
 builder_describe \
@@ -93,7 +93,7 @@ function do_prepublish() {
   # the global publish
   #
 
-  builder_publish_cleanup
+  ci_publish_cleanup
 
   #
   # Verify that the Delphi environment is correct for a release build
@@ -164,7 +164,7 @@ function do_publish() {
 
   builder_echo info "Cleaning up package.json after 'npm version'"
   # And then cleanup the mess
-  builder_publish_cleanup
+  ci_publish_cleanup
   # Restore all the package.json files and package-lock.json files that
   # were clobbered by 'npm version'
   pushd "$KEYMAN_ROOT" >/dev/null
