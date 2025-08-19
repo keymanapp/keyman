@@ -12,7 +12,9 @@ import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts } from "../converter-artifacts.js";
-import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
+import { ConverterToKmnArtifacts } from "../converter-artifacts.js"
+import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
+
 
 export interface ConverterResult extends KeymanCompilerResult {
   /**

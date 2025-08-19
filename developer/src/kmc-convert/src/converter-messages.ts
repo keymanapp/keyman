@@ -57,4 +57,8 @@ export class ConverterMessages {
     this.ERROR_UnsupportedCharactersDetected,
     `Input file ${def(o.inputFilename)} contains unsupported character ('${def(o.output)}') on key ( ${def(o.key)}) at keyMap index ${def(o.keymap_index)}`,
   );
+
+  static ERROR_InvalidFile = SevError | 0x0008;
+  static Error_InvalidFile = (o: { errorText: string; }) => m(
+    this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
 }
