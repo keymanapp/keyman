@@ -64,7 +64,6 @@ export class RewindableCache<Value> {
       if(map.size > this.maxSize) {
         const oldest = map.keys().next().value as number;
         map.delete(oldest);
-        map.delete(oldest);
       }
     }
   }
