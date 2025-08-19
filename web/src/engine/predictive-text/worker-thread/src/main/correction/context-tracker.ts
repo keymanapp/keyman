@@ -12,7 +12,7 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  readonly cache = new RewindableCache<number, ContextTransition>(5);
+  readonly cache = new RewindableCache<ContextTransition>(5);
 
   /**
    * As written, this method attempts to match an incoming context with a candidate
@@ -139,7 +139,7 @@ export class ContextTracker {
 
     if(tokenizedPostContext.left.length > 0) {
       for(const id of this.cache.keys()) {
-        const priorMatchState = this.cache.peek(id);
+        const priorMatchState = this.cache.get(id);
 
         // Skip intermediate multitap-produced contexts.
         // When multitapping, we skip all contexts from prior taps within the same interaction,
@@ -175,7 +175,8 @@ export class ContextTracker {
             if(result.final != result.base) {
               this.cache.add(transitionId, result);
             } else {
-              return this.cache.peek(priorMatchState.transitionId);
+              this.cache.add(priorMatchState.transitionId, priorMatchState);
+              return this.cache.get(priorMatchState.transitionId);
             }
           }
 
@@ -203,7 +204,7 @@ export class ContextTracker {
     if(key === undefined) {
       return undefined;
     } else {
-      return this.cache.peek(key);
+      return this.cache.get(key);
     }
   }
 

@@ -299,7 +299,7 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    let originalTransition = this.contextTracker.cache.peek(-reversion.transformId);
+    let originalTransition = this.contextTracker.cache.get(-reversion.transformId);
 
     if(!originalTransition) {
       // We forgot the original base state... and what suggestions we gave.  We can make
