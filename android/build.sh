@@ -15,7 +15,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck disable=SC2154
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
-. "${KEYMAN_ROOT}/resources/build/build-utils-ci.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
 ################################ Main script ################################
