@@ -198,7 +198,7 @@ function build_bot_verify_platforms() {
       input_platforms=(${available_platforms[@]})
       return
     else
-      if [[ ! "${output_platforms[@]}" =~ $platform ]]; then
+      if [[ ! "${output_platforms[@]}" =~ [[:\<:]]$platform[[:\>:]] ]]; then
         output_platforms+=($platform)
       fi
     fi
