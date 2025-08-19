@@ -9,11 +9,9 @@
 
 import { assert } from 'chai';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
 
-import Suggestion = LexicalModelTypes.Suggestion;
 import TrieModel = models.TrieModel;
 
 
@@ -27,8 +25,8 @@ describe('ContextTracker', function() {
     };
 
     // Needs improved context-state management (due to 2x tokens)
-    it('tracks an accepted suggestion', function() {
-      let baseSuggestion: Suggestion = {
+    it('tracks an accepted suggestion', async function() {
+      let baseSuggestion = {
         transform: {
           insert: 'world',
           deleteLeft: 3,
@@ -61,15 +59,19 @@ describe('ContextTracker', function() {
 
       let model = new TrieModel(jsonFixture('models/tries/english-1000'), options);
       let compositor = new ModelCompositor(model);
-      let preAppliedTransition = compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
-      // Mocks a prior prediction request without having done it.
-      preAppliedTransition.final.suggestions = [baseSuggestion];
+      compositor.initContextTracker(baseContext, 0);
+      const contextTracker = compositor.contextTracker;
+
+      let preAppliedTransition = contextTracker.analyzeState(model, baseContext, emptyInput(0));
+      // We'll ignore and overwrite the results.  We do need the prediction round to occur, though.
+      await compositor.predict([{sample: postTransform, p: 1}], baseContext);
+      contextTracker.latest.final.suggestions = [baseSuggestion];
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
 
       // Actual test assertion - was the replacement tracked?
       assert.isUndefined(preAppliedTransition.final.appliedSuggestionId);
       assert.equal(reversion.id, -baseSuggestion.id);
-      compositor.contextTracker.unitTestEndPoints.cache().keys().forEach((key) => assert.isDefined(key));
+      contextTracker.unitTestEndPoints.cache().keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
       let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));

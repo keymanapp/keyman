@@ -35,6 +35,9 @@ export function tokenizeTransform(
   // Context does not slide within this function.
   const postContext = applyTransform(transform, context);
   const postTokenization = tokenize(postContext).left;
+  if(postTokenization.length == 0) {
+    postTokenization.push({text: ''});
+  }
 
   let insert = transform.insert;
 
