@@ -114,7 +114,9 @@ function build_bot_update_commands() {
     # legacy (until aug 2025) format is "level [platform]" (comma format never used)
     if [[ $# == 1 ]]; then
       level=$1
-      platforms="${!build_platforms[@]}"
+      IFS=' '
+      read -r -a platforms <<< "${!build_platforms[@]}"
+      unset IFS
     else
       level=$1
       shift
