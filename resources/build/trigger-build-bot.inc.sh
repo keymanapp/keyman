@@ -114,9 +114,7 @@ function build_bot_update_commands() {
     # legacy (until aug 2025) format is "level [platform]" (comma format never used)
     if [[ $# == 1 ]]; then
       level=$1
-      IFS=' '
-      read -r -a platforms <<< "${!build_platforms[@]}"
-      unset IFS
+      platforms="${!build_platforms[@]}"
     else
       level=$1
       shift
@@ -132,6 +130,8 @@ function build_bot_update_commands() {
       builder_echo warning "WARNING[Build-bot]: ignoring invalid build level '$level' in command '$command'"
       return 0
     fi
+
+    builder_echo blue "Platforms to be updated from command '$command' are: ${platforms[@]}"
 
     build_bot_verify_platforms platforms
 

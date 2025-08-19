@@ -238,7 +238,7 @@ function find_platform_changes() {
     done
   done <<< "$prfiles"
 
-  debug_echo "Default build platforms: ${!build_platforms[@]}"
+  builder_echo blue "Default build platforms: ${!build_platforms[@]}"
 }
 
 find_platform_changes
