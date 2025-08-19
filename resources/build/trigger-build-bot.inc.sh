@@ -114,7 +114,7 @@ function build_bot_update_commands() {
     # legacy (until aug 2025) format is "level [platform]" (comma format never used)
     if [[ $# == 1 ]]; then
       level=$1
-      platforms="${!build_platforms[@]}"
+      read -r -a platforms <<< "${!build_platforms[@]}"
     else
       level=$1
       shift
@@ -171,8 +171,10 @@ function build_bot_update_commands() {
 
       local platform
       for platform in "${platforms[@]}"; do
-        builder_echo "Build-bot: Updating build level for $platform to $level"
-        build_platforms[$platform]=$level
+        if [[ "${build_platforms[$platform]}" != "${level}" ]]; then
+          builder_echo "Build-bot: Updating build level for $platform to $level"
+          build_platforms[$platform]=$level
+        fi
       done
     done
   fi
