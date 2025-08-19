@@ -286,10 +286,10 @@ do_publish() {
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
 
-  "$KM4MIM_BASE_PATH/make-km-dmg.sh"
+  "${KM4MIM_BASE_PATH}/make-km-dmg.sh"
 
-  # Create download info
-  "$KM4MIM_BASE_PATH/write-download_info.sh"
+  local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
+  write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION}.dmg" "Keyman4MacIM" dmg mac
 
   do_sentry
 }

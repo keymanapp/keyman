@@ -1,7 +1,8 @@
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
 import { util, KMXPlus, LdmlKeyboardTypes } from "@keymanapp/common-types";
-import { CompilerCallbacks, LDMLKeyboard, ObjectWithMetadata } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
 import { VarsCompiler } from './vars.js';
 import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 
@@ -34,7 +35,7 @@ export class StrsCompiler extends EmptyCompiler {
     const strs = <KMXPlus.Strs>section;
 
     /** attempt to find a context object for the string */
-    function findContextForString(s: string): ObjectWithMetadata {
+    function findContextForString(s: string): ObjectWithCompileContext {
       // try exact match
       for(const str of strs.strings) {
         if (str.value == s) return str.context;
