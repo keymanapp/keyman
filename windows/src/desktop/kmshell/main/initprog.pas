@@ -672,7 +672,7 @@ var
 begin
   ReadyToInstall := BUpdateSM.ReadyToInstall;
   // The setting for automatic updates may have been set to disable
-  // after updates where checked and downloaded. The user should
+  // after updates were checked and downloaded. The user should
   // not be prompted for an update in this case and the update should
   // abort.
   if not BUpdateSM.GetAutomaticUpdates and ReadyToInstall then

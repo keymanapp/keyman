@@ -731,7 +731,6 @@ end;
 
 function UpdateAvailableState.HandleKmShell;
 begin
-
   if bucStateContext.FAutomaticUpdate then
   begin
     // we will use a new kmshell process to enable
