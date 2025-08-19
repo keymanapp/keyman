@@ -563,7 +563,7 @@ describe('ContextTokenization', function() {
         "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "breakf"
       ];
 
-      // 73 chars above, vs a sliding window of length 64.
+      // 74 chars above, vs a sliding window of length 64.
       assert.equal(baseContext3.reduce((accum, curr) => accum + curr.length, 0), 74);
       // Actual window + one newly-typed character
       assert.equal(incomingContext3.reduce((accum, curr) => accum + curr.length, 0), 65);
