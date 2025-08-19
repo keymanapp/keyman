@@ -93,7 +93,7 @@ dpkg-source \
   --tar-ignore=keyman/resources/scopes \
   --tar-ignore=keyman/resources/teamcity \
   --tar-ignore=keyman/resources/build/*.lua \
-  --tar-ignore=keyman/resources/build/jq* \
+  --tar-ignore=keyman/resources/build/jq-* \
   --tar-ignore=keyman/results \
   --tar-ignore=keyman/tmp \
   --tar-ignore=keyman/web \
