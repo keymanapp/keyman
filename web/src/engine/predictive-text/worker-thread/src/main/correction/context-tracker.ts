@@ -15,7 +15,7 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  readonly cache = new RewindableCache<number, ContextTransition>(5);
+  readonly cache = new RewindableCache<ContextTransition>(5);
 
   // Aim:  relocate to ContextTransition in some form?
   // Or can we split it up in some manner across the different types?
@@ -275,7 +275,7 @@ export class ContextTracker {
 
     if(tokenizedPostContext.left.length > 0) {
       for(const id of this.cache.keys()) {
-        const priorMatchState = this.cache.peek(id);
+        const priorMatchState = this.cache.get(id);
 
         // Skip intermediate multitap-produced contexts.
         // When multitapping, we skip all contexts from prior taps within the same interaction,
@@ -303,7 +303,7 @@ export class ContextTracker {
           if(transitionId !== undefined) {
             if(priorMatchState.transitionId != transitionId) {
               // Already has a taggedContext.
-              this.cache.get(transformDistribution.find((entry) => entry.sample.id !== undefined).sample.id);
+              this.cache.add(priorMatchState.transitionId, priorMatchState);
             }
             this.cache.add(transitionId, result);
           }
@@ -332,7 +332,7 @@ export class ContextTracker {
     if(key === undefined) {
       return undefined;
     } else {
-      return this.cache.peek(key);
+      return this.cache.get(key);
     }
   }
 
