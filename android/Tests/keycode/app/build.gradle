@@ -1,11 +1,18 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 ext.rootPath = '../../../'
 apply from: "$rootPath/version.gradle"
 
 android {
     compileSdk 34
-    namespace="com.keyman.android.tests.keycode"
+    namespace "com.keyman.android.tests.keycode"
+
+    buildFeatures {
+        // needed for custom BuildConfigField values in defaultConfig
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId "com.keyman.android.tests.keycode"
@@ -27,11 +34,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-    testImplementation 'androidx.test:core:1.5.0'
-    testImplementation 'androidx.test.ext:junit:1.1.5'
-    testImplementation 'org.robolectric:robolectric:4.10.3'
+    testImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'androidx.test:core:1.6.1'
 }

@@ -28,7 +28,7 @@ export class KmnFileWriter {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
+    data += this.write_KmnFileHeader(data_ukelele);
 
     // add bottom part of kmn file: RULES
     data += this.writeData_Rules(data_ukelele);
@@ -46,7 +46,7 @@ export class KmnFileWriter {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
+    data += this.write_KmnFileHeader(data_ukelele);
 
     // add bottom part of kmn file: RULES
     data += this.writeData_Rules(data_ukelele);
@@ -63,7 +63,7 @@ export class KmnFileWriter {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
-    data += this.writeData_Stores(data_ukelele);
+    data += this.write_KmnFileHeader(data_ukelele);
 
     // add bottom part of kmn file: RULES
     data += this.writeData_Rules(data_ukelele);
@@ -81,7 +81,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeData_Stores(data_ukelele: ProcesData): string {
+  public write_KmnFileHeader(data_ukelele: convert_object): string {
 
     let data: string = "";
 
@@ -114,6 +114,9 @@ export class KmnFileWriter {
     let data: string = "";
 
     // filter array of all rules and remove duplicates
+    // during the process of creating Rule[], duplicate rules might occur
+    // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules). 
+    // This is to filter out those duplicate Rule objects
     const unique_data_Rules: Rule[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
         && (curr.key !== "")
@@ -416,7 +419,8 @@ export class KmnFileWriter {
 
   /**
    * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings.
-   *         Definition of comparisons e.g. 1-1, 2-4, 6-6
+   *         Keyman can not handle duplicate rules so we need to make sure a rule is written only once by either omitting a duplicate rule or commenting out an ambiguous rule.
+   *         Omitting rules and definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
    * @param  rule : Rule[] - an array of all rules
    * @param  index the index of a rule in array[rule]

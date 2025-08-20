@@ -102,7 +102,7 @@ Example: keys.ts  \- compiler \- call site for error
 
 ```js
 static ERROR_InvalidScanCode = SevError | 0x0009;
-static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, x: ObjectWithMetadata) => mx(
+static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, compileContext:ObjectWithCompileContext) => mx(
   this.ERROR_InvalidScanCode, context,
 Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}',
   `…additional markdown detail…`
@@ -126,7 +126,7 @@ The `mx()` function does the following (note that `m()` is called first).
 
 ```js
 let evt = m(code, message, detail);        // raw message
-evt = LdmlCompilerMessages.offset(evt, x); // with offset
+evt = LdmlCompilerMessages.offset(evt, compileContext); // with offset
 ```
 
 Note: We could have:    `ml(e:CompilerEvent, lineNumber?: number)` so that  compilers with a line number could pass that in directly.
