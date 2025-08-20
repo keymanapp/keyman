@@ -56,8 +56,15 @@ advisable to run a `git clean -dxf` before switching between the two. The
 reason is that the Docker images use a different user, so that paths
 will be different.
 
-**Warning:** On Windows, don't mix building in Windows/git-bash and WSL/Docker.
-This will fail because the tools have different names.
+**Warning:** On Windows, don't mix building in Windows/git-bash and WSL/Docker
+without a full clean (`git clean -fdx`) of the repository. Mixed building will 
+fail for many reasons, including, among others:
+* many CLI tools have different names, and references are cached in configure 
+  steps
+* cached paths may be stored with backslashes which work only on Windows
+* Keyman Core has varying targets based on the build platform
+* npm writes build-platform-specific settings/modules in node_modules
+* meson creates build-platform-specific build files
 
 ## Running tests locally
 
