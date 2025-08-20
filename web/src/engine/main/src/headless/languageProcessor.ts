@@ -391,7 +391,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    * @returns The matching `Transcription`, or `null` none is found.
    */
   public getPredictionState(id: number): Transcription {
-    return this.recentTranscriptions.peek(id);
+    return this.recentTranscriptions.get(id);
   }
 
   public shutdown() {

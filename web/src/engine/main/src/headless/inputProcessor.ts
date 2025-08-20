@@ -116,7 +116,7 @@ export class InputProcessor {
       // Support for multitap context reversion; multitap keys should act as if they were
       // the first thing typed since `preInput`, the state before the original base key.
       if(keyEvent.baseTranscriptionToken) {
-        const transcription = this.contextCache.peek(keyEvent.baseTranscriptionToken);
+        const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
           this.contextCache.rewindTo(keyEvent.baseTranscriptionToken);
           // Has there been a context change at any point during the multitap?  If so, we need
