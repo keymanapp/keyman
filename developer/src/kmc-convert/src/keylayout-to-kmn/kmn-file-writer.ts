@@ -81,7 +81,7 @@ export class KmnFileWriter {
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public write_KmnFileHeader(data_ukelele: convert_object): string {
+  public write_KmnFileHeader(data_ukelele: ProcesData) {
 
     let data: string = "";
 
