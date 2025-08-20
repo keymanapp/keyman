@@ -29,8 +29,6 @@ describe('ContextToken', function() {
       assert.isEmpty(token.searchSpace.inputSequence);
       assert.isEmpty(token.exampleInput);
       assert.isFalse(token.isWhitespace);
-      assert.isEmpty(token.suggestions);
-      assert.isUndefined(token.appliedSuggestionId);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
       let searchIterator = token.searchSpace.getBestMatches(new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
@@ -57,43 +55,12 @@ describe('ContextToken', function() {
       assert.equal(token.exampleInput, 'and');
 
       assert.isFalse(token.isWhitespace);
-
-      // Is only set with a different value later, outside the constructor.
-      assert.isEmpty(token.suggestions);
-      assert.isUndefined(token.appliedSuggestionId);
     });
 
     it("(token: ContextToken", () => {
       // Same as in a test above, since we verified that it works correctly.
       let baseToken = new ContextToken(plainModel, "and");
-      baseToken.suggestions = [
-        {
-          transform: {
-            insert: 'd ',
-            deleteLeft: 0
-          },
-          id: 37,
-          transformId: 1,
-          displayAs: '"and"',
-          tag: 'keep',
-          autoAccept: true
-        },
-        {
-          transform: {
-            insert: 'Andes ',
-            deleteLeft: 2
-          },
-          id: 38,
-          transformId: 1,
-          displayAs: 'Andes',
-        }
-      ]
-      baseToken.appliedSuggestionId = 37;
-
       let clonedToken = new ContextToken(baseToken);
-
-      assert.notEqual(clonedToken.suggestions, baseToken.suggestions);
-      assert.deepEqual(clonedToken.suggestions, baseToken.suggestions);
 
       assert.notEqual(clonedToken.searchSpace, baseToken.searchSpace);
       // Deep equality on .searchSpace can't be directly checked due to the internal complexities involved.

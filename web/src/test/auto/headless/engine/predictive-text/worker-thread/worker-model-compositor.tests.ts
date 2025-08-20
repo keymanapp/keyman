@@ -19,6 +19,8 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
+var emptyInput = (id: number) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
+
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
     describe('Basic suggestion generation', function() {
@@ -807,7 +809,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let suggestions = await compositor.applyReversion(reversion, appliedContext);
+      let suggestions = await compositor.applyReversion(reversion, models.applyTransform(postTransform, baseContext));
 
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.
@@ -824,7 +826,7 @@ describe('ModelCompositor', function() {
       });
     });
 
-    it.skip('model with traversals: returns appropriate suggestions upon reversion', async function() {
+    it('model with traversals: returns appropriate suggestions upon reversion', async function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
@@ -860,8 +862,7 @@ describe('ModelCompositor', function() {
       assert.deepEqual(reversionSuggestions, initialSuggestions);
     });
 
-    // TODO:  Restore this test:  currently fails due to recent structural changes.
-    it.skip('model with traversals: properly tracks context state', async function() {
+    it('model with traversals: properly tracks context state', async function() {
       // Could be merged with the previous test case, but I think it's good to have the error
       // sets flagged separately.
 
@@ -879,6 +880,8 @@ describe('ModelCompositor', function() {
 
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
+
+      compositor.contextTracker.analyzeState(model, baseContext, emptyInput(0));
 
       let initialSuggestions = await compositor.predict(postTransform, baseContext);
       const suggestionContextState = compositor.contextTracker.newest;
@@ -898,19 +901,21 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
+      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
+      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(13));
+
       // Accepting the suggestion rewrites the latest context transition.
       assert.equal(compositor.contextTracker.cache.size, 2);
       assert.sameMembers(compositor.contextTracker.cache.keys(), contextIds);
       assert.notSameDeepMembers(compositor.contextTracker.cache.keys().map((key) => compositor.contextTracker.cache.get(key)), transitionInstances);
 
-      // The replacement should be marked on the context-tracking token.
-      assert.isAtLeast(suggestionContextState.final.tokenization.tail.appliedSuggestionId, 0);
+      // The replacement should be marked on the context-tracking token for the applied version of the results.
+      assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);
+      assert.isAtLeast(appliedContextState.final.appliedSuggestionId, 0);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      compositor.applyReversion(reversion, appliedContext);
-
-      // The replacement should no longer be marked for the context-tracking token.
-      assert.isNotOk(suggestionContextState.final.tokenization.tail.appliedSuggestionId);
+      await compositor.applyReversion(reversion, appliedContext);
+      assert.isUndefined(compositor.contextTracker.cache.get(13).final.appliedSuggestionId);
     });
   });
 });
