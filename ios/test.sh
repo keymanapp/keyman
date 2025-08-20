@@ -10,7 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
-verify_on_mac
+mac_verify_on_mac
 
 if [ "$#" -ge 1 ]; then
   DEVICE=$1

@@ -30,7 +30,7 @@ build_archive ( ) {
   #        our build processes.
   #        (It nukes the base .framework file used to build the archive with a
   #        broken alias that subsequent builds [like the main app's!] can't process.)
-  run_xcodebuild build \
+  mac_xcodebuild build \
              -scheme "${SCHEME_NAME}" \
              -configuration ${CONFIGURATION} \
              -sdk "$1" \
@@ -67,7 +67,7 @@ echo ""
 # -allow-internal-distribution:  preserves the .swiftmodule files, greatly
 #                                simplifying integration in consuming apps.
 #                                - Carthage uses this for its XCFramework support.
-run_xcodebuild -create-xcframework \
+mac_xcodebuild -create-xcframework \
   -allow-internal-distribution \
   -framework ${IPHONE_FRAMEWORK} \
   -framework ${SIMULATOR_FRAMEWORK} \
