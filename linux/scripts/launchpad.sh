@@ -2,8 +2,6 @@
 
 # Build source packages from nightly builds and upload to PPA
 
-# must be run from linux dir
-
 # parameters: [UPLOAD="yes"] [PROJECT="<project>"] [DIST="<dist>"] [PACKAGEVERSION="<version>"] ./scripts/launchpad.sh
 # UPLOAD="yes" do the dput for real
 # PROJECT="<project>" only upload this project
@@ -21,6 +19,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # shellcheck source=linux/scripts/package-build.inc.sh
 . "$(dirname "${THIS_SCRIPT}")/package-build.inc.sh"
+
+cd "${KEYMAN_ROOT}/linux"
 
 checkPrerequisites
 

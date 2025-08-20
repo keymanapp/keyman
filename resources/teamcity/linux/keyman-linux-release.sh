@@ -107,7 +107,7 @@ function _publish_to_launchpad() {
   git reset --hard
 
   /usr/lib/gnupg/gpg-preset-passphrase --passphrase "${GPGKEYPW}" --preset "${GPGKEYGRIP}"
-  UPLOAD=yes scripts/launchpad.sh
+  UPLOAD=yes "${KEYMAN_ROOT}/linux/scripts/launchpad.sh"
   /usr/lib/gnupg/gpg-preset-passphrase --forget "${GPGKEYGRIP}" || true
 
   builder_echo end "upload to launchpad" success "Upload to launchpad"
