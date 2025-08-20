@@ -20,16 +20,16 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck source=linux/scripts/package-build.inc.sh
-. "$(dirname "$THIS_SCRIPT")/package-build.inc.sh"
+. "$(dirname "${THIS_SCRIPT}")/package-build.inc.sh"
 
 checkPrerequisites
 
-if [ "${KEYMAN_TIER}" == "stable" ]; then
-    ppa="ppa:keymanapp/keyman"
-elif [ "${KEYMAN_TIER}" == "beta" ]; then
-    ppa="ppa:keymanapp/keyman-beta"
+if [[ "${KEYMAN_TIER}" == "stable" ]]; then
+  ppa="ppa:keymanapp/keyman"
+elif [[ "${KEYMAN_TIER}" == "beta" ]]; then
+  ppa="ppa:keymanapp/keyman-beta"
 else
-    ppa="ppa:keymanapp/keyman-alpha"
+  ppa="ppa:keymanapp/keyman-alpha"
 fi
 echo "ppa: ${ppa}"
 
@@ -42,20 +42,20 @@ rm -rf launchpad
 mkdir -p launchpad
 
 for proj in ${projects:-}; do
-    downloadSource launchpad
+  downloadSource launchpad
 
-    cd "${proj}-${version:-}"
-    pwd
-    cp debian/changelog "../${proj}-changelog"
-    for dist in ${distributions}; do
-        cp "../${proj}-changelog" debian/changelog
-        dch -v "${version}-${packageversion}~${dist}" "source package for PPA"
-        dch -D "${dist}" -r ""
-        debuild -d -S -sa -Zxz
-    done
-    cd ..
-    for dist in ${distributions}; do
-        dput ${SIM} ${ppa} "${proj}_${version}-${packageversion}~${dist}_source.changes"
-    done
-    cd "${BASEDIR}"
+  cd "${proj}-${version:-}"
+  pwd
+  cp debian/changelog "../${proj}-changelog"
+  for dist in ${distributions}; do
+    cp "../${proj}-changelog" debian/changelog
+    dch -v "${version}-${packageversion}~${dist}" "source package for PPA"
+    dch -D "${dist}" -r ""
+    debuild -d -S -sa -Zxz
+  done
+  cd ..
+  for dist in ${distributions}; do
+    dput ${SIM} "${ppa}" "${proj}_${version}-${packageversion}~${dist}_source.changes"
+  done
+  cd "${BASEDIR}"
 done
