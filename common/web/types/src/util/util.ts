@@ -209,12 +209,12 @@ export function describeCodepoint(ch: number): string {
 
 /**
  * @brief  function to convert a Html-Entity Hex value to a unicode character e.g. &#x63 -> c;  &#x1F60E; -> 😎
- * @param  hex_Entity the value that will converted
+ * @param  hexEntity the value that will converted
  * @return a unicode character or undefined if in_str is not recognized
  */
-export function decodeHexEntity(hex_Entity: string) {
-  const hex = hex_Entity.replace('&#x', '').replace(';', '');
-  if (hex_Entity.length > 9)
+export function decodeHexEntity(hexEntity: string) {
+  const hex = hexEntity.replace('&#x', '').replace(';', '');
+  if (hexEntity.length > 9)
     return undefined;
   else
     return String.fromCodePoint(parseInt(hex, 16));
