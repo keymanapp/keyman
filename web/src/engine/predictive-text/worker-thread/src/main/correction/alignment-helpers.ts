@@ -13,28 +13,42 @@ import { ClassicalDistanceCalculation, EditOperation } from "./classical-calcula
 /**
  * Determines the proper 'last match' index for a tokenized sequence based on its edit path.
  *
- * In particular, this method is designed to handle the following case:
- * ['to', 'apple', ' ', ''] => ['to', 'apply', ' ', 'n']
+ * In particular, this method is designed to handle the following cases:
+ * - ['to', ' ', 'apple', ' ', ''] => ['to', ' ', 'apply', ' ', '']
+ * - ['to', ' ', 'apple', ' ', ''] => ['to', ' ', 'apply', ' ', 'n']
  *
- * Edit path for this example case:
- * ['match', 'substitute', 'match', 'substitute']
+ * Edit path for these example case:
+ * - ['match', 'match', 'substitute', 'match', 'match']
+ * - ['match', 'match', 'substitute', 'match', 'substitute']
  *
- * In cases such as these, the whitespace match should be considered 'edited'. While the ' '
- * is unedited, it follows the edited 'apple' => 'apply', so it must have been deleted and
- * then re-inserted.  As a result, 'to' is the true "last matched" token.
+ * In cases such as these, the late whitespace match should be considered 'edited'. While the
+ * ' ' is unedited, it follows the edited 'apple' => 'apply', so it must have been deleted and
+ * then re-inserted.  As a result, the whitespace after 'to' is the true "last matched" token.
+ *
+ * Returns -1 if an unexpected edit other than 'substitute' occurs in the middle of the big
+ * 'match' block.
  * @param editPath
  * @returns
  */
 export function getEditPathLastMatch(editPath: EditOperation[]) {
-  const editLength = editPath.length;
-  // Special handling: appending whitespace to whitespace with the default wordbreaker.
-  // The default wordbreaker currently adds an empty token after whitespace; this would
-  // show up with 'substitute', 'match' at the end of the edit path.  (This should remain.)
-  if(editLength >= 2 && editPath[editLength - 2] == 'substitute' && editPath[editLength - 1] == 'match') {
-    return editPath.lastIndexOf('match', editLength - 2);
-  } else {
-    return editPath.lastIndexOf('match');
+  // Assertion:  for a long context, the bulk of the edit path should be a
+  // continuous block of 'match' entries.  If there's anything but a substitution
+  // in the middle, we have a context mismatch.
+  //
+  // That said, it is possible to apply a suggestion after a backspace.  Anything
+  // after the substitution needs to be treated as a substitution rather than
+  // a match.
+  const firstMatch = editPath.indexOf('match');
+  const lastMatch = editPath.lastIndexOf('match');
+  if(firstMatch > -1) {
+    for(let i = firstMatch+1; i <= lastMatch; i++) {
+      if(editPath[i] != 'match') {
+        return (editPath[i] == 'substitute') ? (i - 1) : -1;
+      }
+    }
   }
+
+  return lastMatch;
 }
 
 /**
@@ -74,12 +88,19 @@ export function isSubstitutionAlignable(
     const firstSubstitute = subEditPath.indexOf('substitute');
     const firstMatch      = subEditPath.indexOf('match');
     if(firstSubstitute > -1) {
+      // When this is called for a word not adjacent to the caret, its letters shouldn't be
+      // substituted - that operation doesn't happen at a sliding context-window edge.
       return false;
     } else if(firstMatch > -1) {
+      const lastMatch     = subEditPath.lastIndexOf('match');
       // Should not have inserts or deletes on both sides of matched text!
-      if(firstInsert > -1 && firstInsert < firstMatch && subEditPath.lastIndexOf('insert') > firstMatch) {
+      // Due to how the edit path is calculated, an insert or delete could appear after the
+      // firstMatch - especially in the case of adjacent double letters.
+      //
+      // Ex: applesauce => plesauce tends to say 'match', then 'delete', on the two 'p's.
+      if(firstInsert > -1 && firstInsert < firstMatch && subEditPath.lastIndexOf('insert') > lastMatch) {
         return false;
-      } else if(firstDelete > -1 && firstDelete < firstMatch && subEditPath.lastIndexOf('delete') > firstMatch) {
+      } else if(firstDelete > -1 && firstDelete < firstMatch && subEditPath.lastIndexOf('delete') > lastMatch) {
         return false;
       }
     }
