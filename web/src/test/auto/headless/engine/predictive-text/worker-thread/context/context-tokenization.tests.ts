@@ -12,9 +12,11 @@ import { assert } from 'chai';
 
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
 
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
@@ -101,6 +103,10 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(1, { insert: ' ', deleteLeft: 0 });
+      inputTransformMap.set(2, { insert: '', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
@@ -110,7 +116,7 @@ describe('ContextTokenization', function() {
           tailTokenShift: 2
         },
         plainModel,
-        [{ sample: [{ insert: ' ', deleteLeft: 0 }, { insert: '', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
@@ -125,6 +131,9 @@ describe('ContextTokenization', function() {
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)), null);
 
       const targetTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'y', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
@@ -134,7 +143,7 @@ describe('ContextTokenization', function() {
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'y', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
@@ -160,6 +169,9 @@ describe('ContextTokenization', function() {
         "seem", " ", "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "b"
       ];
       const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'b', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
@@ -169,7 +181,7 @@ describe('ContextTokenization', function() {
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'b', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
@@ -192,6 +204,9 @@ describe('ContextTokenization', function() {
         "like", " ", "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "break"
       ];
       const targetTokens = targetTexts.map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: 'k', deleteLeft: 0 });
+
       const tokenization = baseTokenization.transitionTo(
         targetTokens, {
           canAlign: true,
@@ -201,7 +216,7 @@ describe('ContextTokenization', function() {
           tailTokenShift: 0
         },
         plainModel,
-        [{ sample: [{ insert: 'k', deleteLeft: 0 }], p: 1}]
+        [{ sample: inputTransformMap, p: 1}]
       );
 
       assert.isOk(tokenization);
