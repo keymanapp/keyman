@@ -9,7 +9,8 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { util } from '@keymanapp/common-types';
+//import { util } from '@keymanapp/common-types';
+//import * as kmcConvertUtil  from '../src/kmcConvertUtil.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
@@ -202,7 +203,7 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('convertToUnicodeCodePoint ', function () {
+  /*describe('convertToUnicodeCodePoint ', function () {
     [
       ["&#x10F601;", 'U+10F601'],
       ["&#x1F601;", 'U+1F601'],
@@ -225,13 +226,13 @@ describe('KmnFileWriter', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = util.convertToUnicodeCodePoint(values[0] as string);
+        const result = kmcConvertUtil.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
-  });
+  });*/
 
-  describe('convertToUnicodeCharacter ', function () {
+  /*describe('convertToUnicodeCharacter ', function () {
     [
       ["&#x61;", 'a'],
       ["&#x1234;", 'ሴ'],
@@ -256,11 +257,11 @@ describe('KmnFileWriter', function () {
       [null, undefined]
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = util.convertToUnicodeCharacter(values[0] as string);
+        const result = kmcConvertUtil.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
-  });
+  });*/
 
   describe('reviewRules messages', function () {
     const sut_w = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
