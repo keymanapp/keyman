@@ -492,6 +492,26 @@ describe('ContextTokenization', function() {
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
 
+    it("handles late-context suggestion application after backspace", () => {
+      const baseContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'oven', ' ', ''
+      ];
+      const newContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'over', ' ', ''
+      ];
+
+      const baseTokenization = buildBaseTokenization(baseContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
+
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 8,
+        tailEditLength: 3,
+        tailTokenShift: 0
+      });
+    });
+
     it("handles sliding context-window scenarios", () => {
       // // Explicitly-defined window, though it's not needed directly by the method.
       // const config = {
@@ -563,7 +583,7 @@ describe('ContextTokenization', function() {
         "they'd", " ", "make", " ", "for", " ", "the", " ", "best", " ", "breakf"
       ];
 
-      // 73 chars above, vs a sliding window of length 64.
+      // 74 chars above, vs a sliding window of length 64.
       assert.equal(baseContext3.reduce((accum, curr) => accum + curr.length, 0), 74);
       // Actual window + one newly-typed character
       assert.equal(incomingContext3.reduce((accum, curr) => accum + curr.length, 0), 65);

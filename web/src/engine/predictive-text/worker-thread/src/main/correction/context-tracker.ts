@@ -12,7 +12,7 @@ import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
 export class ContextTracker {
-  private readonly cache = new RewindableCache<number, ContextTransition>(5);
+  private readonly cache = new RewindableCache<ContextTransition>(5);
   /**
    * Tracks the most recent transition handled by the context-tracking engine.
    */
@@ -74,7 +74,7 @@ export class ContextTracker {
 
     if(tokenizedPostContext.left.length > 0) {
       for(const id of [...this.cache.keys()]) {
-        const priorMatchState = this.cache.peek(id);
+        const priorMatchState = this.cache.get(id);
 
         // Skip intermediate multitap-produced contexts.
         // When multitapping, we skip all contexts from prior taps within the same interaction,
@@ -110,7 +110,8 @@ export class ContextTracker {
             if(result.final.context != result.base.context) {
               this.cache.add(transitionId, result);
             } else {
-              return this.cache.peek(priorMatchState.transitionId);
+              this.cache.add(priorMatchState.transitionId, priorMatchState);
+              return this.cache.get(priorMatchState.transitionId);
             }
           }
 
@@ -154,7 +155,7 @@ export class ContextTracker {
   }
 
   findAndRevert(id: number) {
-    const transition = this.cache.peek(id);
+    const transition = this.cache.get(id);
     if(transition) {
       this.cache.rewindTo(id);
       this.cache.get(id);

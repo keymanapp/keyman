@@ -3,7 +3,7 @@ import { RewindableCache } from "@keymanapp/web-utils";
 
 const TRANSCRIPTION_BUFFER_SIZE = 10;
 
-export class TranscriptionCache extends RewindableCache<number, Transcription> {
+export class TranscriptionCache extends RewindableCache<Transcription> {
   constructor() {
     super(TRANSCRIPTION_BUFFER_SIZE);
   }
@@ -17,7 +17,7 @@ export class TranscriptionCache extends RewindableCache<number, Transcription> {
     const entries = [...this.keys()].map((key) => {
       return {
         key: key,
-        entry: this.peek(key)
+        entry: this.get(key)
       }
     });
 
