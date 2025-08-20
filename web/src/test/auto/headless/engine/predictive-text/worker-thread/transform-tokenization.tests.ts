@@ -7,11 +7,35 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { tokenizeTransform } from '@keymanapp/lm-worker/test-index';
 
 import Context = LexicalModelTypes.Context;
+import Transform = LexicalModelTypes.Transform;
 
 const defaultTokenize = (context: Context) => tokenize(defaultBreaker, context);
 
 describe('tokenizeTransform', () => {
   describe('with default wordbreaking', () => {
+    it('produces a single empty transform at index 0 when an empty transform is input', () => {
+      const context: Context = {
+        left: 'an apple a date',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 0
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
+        editTransform
+      );
+
+      assert.equal(result.size, 1);
+      assert.deepEqual(result.get(0), editTransform);
+    });
+
     it('properly handles simple token-edit transform', () => {
       const context: Context = {
         left: 'an apple a date',
@@ -31,8 +55,8 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      assert.equal(result.size, 1);
+      assert.deepEqual(result.get(0), editTransform);
     });
 
     it('properly handles simple token-replacing transform', () => {
@@ -54,8 +78,8 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      assert.equal(result.size, 1);
+      assert.deepEqual(result.get(0), editTransform);
     });
 
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
@@ -69,7 +93,7 @@ describe('tokenizeTransform', () => {
       // 'an apple any'
       const editTransform = {
         insert: 'ny',
-        deleteLeft: 6
+        deleteLeft: 5
       };
 
       const result = tokenizeTransform(
@@ -78,8 +102,22 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-2, {
+        insert: 'ny',
+        deleteLeft: 0
+      });
+      expectedMap.set(-1, {
+        insert: '',
+        deleteLeft: 1
+      });
+      expectedMap.set(0, {
+        insert: '',
+        deleteLeft: 4
+      });
+
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('properly handles a simple appended whitespace', () => {
@@ -101,14 +139,15 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 2);
-      assert.deepEqual(result, [
-        // The whitespace belongs on the whitespace token that will be added.
-        editTransform,
-        // The default-breaker adds an empty token after whitespace, hence this
-        // empty transform.
-        { insert: '', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      // The whitespace belongs on the whitespace token that will be added.
+      expectedMap.set(1, editTransform);
+      // The default-breaker adds an empty token after whitespace, hence this
+      // empty transform.
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('properly handles a simple appended period', () => {
@@ -132,10 +171,40 @@ describe('tokenizeTransform', () => {
 
       // The default wordbreaker does not (currently) append a blank token
       // after standard English punctuation.
-      assert.equal(result.length, 1);
-      assert.deepEqual(result, [
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(1, editTransform);
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
+    });
+
+    it('properly deletes a simple appended whitespace', () => {
+      const context = {
+        left: 'an apple a day ',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      const editTransform = {
+        insert: '',
+        deleteLeft: 1
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
         editTransform
-      ]);
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      // The whitespace belongs on the whitespace token that will be added.
+      expectedMap.set(-1, editTransform);
+      // The default-breaker adds an empty token after whitespace, hence this
+      // empty transform.
+      expectedMap.set(0, { insert: '', deleteLeft: 0 });
+
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles word-breakable transforms (case 1)', () => {
@@ -157,12 +226,15 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 3);
-      assert.deepEqual(result, [
-        { insert: 'y', deleteLeft: 1 },
-        { insert: ' ', deleteLeft: 0 },
-        { insert: 'k', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      // dat => day
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      // new whitespace
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      // new 'k' token
+      expectedMap.set(2, { insert: 'k', deleteLeft: 0 });
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles word-breakable transforms (case 2)', () => {
@@ -184,18 +256,18 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 4);
-      assert.deepEqual(result, [
-        { insert: 'y', deleteLeft: 1 },
-        { insert: '.', deleteLeft: 0 },
-        { insert: ' ', deleteLeft: 0 },
-        { insert: '', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      expectedMap.set(1, { insert: '.', deleteLeft: 0 });
+      expectedMap.set(2, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(3, { insert: '', deleteLeft: 0 });
+      assert.equal(result.size, 4);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles complex breakable cases', () => {
       const context = {
-        left: 'an apple a date',
+        left: 'an apple as date',
         right: '',
         startOfBuffer: true,
         endOfBuffer: true
@@ -213,22 +285,31 @@ describe('tokenizeTransform', () => {
         editTransform
       );
 
-      assert.equal(result.length, 3);
-      assert.deepEqual(result, [
-        { insert: 'ny', deleteLeft: 6 },
-        { insert: ' ', deleteLeft: 0 },
-        { insert: 'day', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      // as => any
+      expectedMap.set(-2, { insert: 'ny', deleteLeft: 1 }); // 2 back from the last token before the text insertion point.
+      // ' ' replaced with another ' ' (but still edited)
+      expectedMap.set(-1, { insert: ' ', deleteLeft: 1 });
+      // date => day, but with full replacement due to the large deleteLeft.
+      expectedMap.set( 0, { insert: 'day', deleteLeft: 4 }); // The original token before the text insertion point.
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
   });
 
   describe('with mocked dictionary-based wordbreaking', () => {
-    function mockedTokenization(entries: string[]) {
-      return {
-        left: entries.map((text) => {
-          return {text: text} as Token
-        })
-      } as Tokenization;
+    function mockedTokenization(map: Map<string, string[]>) {
+      return (context: Context) => {
+        let tokens = map.get(context.left);
+        if(!tokens) {
+          assert.fail("Mocked tokenization was not properly constructed");
+        }
+        return {
+          left: tokens.map((text) => {
+            return {text: text} as Token
+          })
+        } as Tokenization;
+      }
     }
 
     it('properly handles simple token-edit transform', () => {
@@ -244,14 +325,19 @@ describe('tokenizeTransform', () => {
         deleteLeft: 2
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadate', ['an', 'apple', 'a', 'date']);
+      mockMap.set('anappleaday', ['an', 'apple', 'a', 'day']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'a', 'day']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, editTransform); // The original token before the text insertion point.
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('properly handles simple token-replacing transform', () => {
@@ -267,14 +353,19 @@ describe('tokenizeTransform', () => {
         deleteLeft: 4
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadate', ['an', 'apple', 'a', 'date']);
+      mockMap.set('anappleaweek', ['an', 'apple', 'a', 'week']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'a', 'week']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, editTransform); // The original token before the text insertion point.
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles simple token-replacing transform with cross-token deleteLeft', () => {
@@ -288,17 +379,23 @@ describe('tokenizeTransform', () => {
       // 'an apple any'
       const editTransform = {
         insert: 'ny',
-        deleteLeft: 5
+        deleteLeft: 4
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadate', ['an', 'apple', 'a', 'date']);
+      mockMap.set('anappleany', ['an', 'apple', 'any']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'any']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 1);
-      assert.deepEqual(result[0], editTransform);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-1, { insert: 'ny', deleteLeft: 0 });
+      expectedMap.set( 0, { insert: '', deleteLeft: 4 });
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles word-breakable transforms (case 1)', () => {
@@ -314,17 +411,20 @@ describe('tokenizeTransform', () => {
         deleteLeft: 1
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadat',  ['an', 'apple', 'a', 'dat']);
+      mockMap.set('anappleadayk', ['an', 'apple', 'a', 'day', 'k']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'any', 'k']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 2);
-      assert.deepEqual(result, [
-        { insert: 'y', deleteLeft: 1 },
-        { insert: 'k', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      expectedMap.set(1, { insert: 'k', deleteLeft: 0 });
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles word-breakable transforms (case 2)', () => {
@@ -340,17 +440,20 @@ describe('tokenizeTransform', () => {
         deleteLeft: 1
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadat',  ['an', 'apple', 'a', 'dat']);
+      mockMap.set('anappleaday.', ['an', 'apple', 'a', 'day', '.']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'any', 'day', '.']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 2);
-      assert.deepEqual(result, [
-        { insert: 'y', deleteLeft: 1 },
-        { insert: '.', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      expectedMap.set(1, { insert: '.', deleteLeft: 0 });
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles word-breakable transforms (case 2 alternate output)', () => {
@@ -366,18 +469,21 @@ describe('tokenizeTransform', () => {
         deleteLeft: 1
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadat', ['an', 'apple', 'a', 'dat']);
+      mockMap.set('anappleaday.', ['an', 'apple', 'a', 'day', '.', '']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'any', 'day', '.', '']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 3);
-      assert.deepEqual(result, [
-        { insert: 'y', deleteLeft: 1 },
-        { insert: '.', deleteLeft: 0 },
-        { insert: '', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'y', deleteLeft: 1 });
+      expectedMap.set(1, { insert: '.', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '',  deleteLeft: 0});
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
 
     it('handles complex breakable cases', () => {
@@ -391,20 +497,23 @@ describe('tokenizeTransform', () => {
       // 'an apple any'
       const editTransform = {
         insert: 'nyday',
-        deleteLeft: 5
+        deleteLeft: 4
       };
 
+      const mockMap = new Map<string, string[]>();
+      mockMap.set('anappleadate', ['an', 'apple', 'a', 'date']);
+      mockMap.set('anappleanyday', ['an', 'apple', 'any', 'day']);
       const result = tokenizeTransform(
-        () => mockedTokenization(['an', 'apple', 'any', 'day']),
+        mockedTokenization(mockMap),
         context,
         editTransform
       );
 
-      assert.equal(result.length, 2);
-      assert.deepEqual(result, [
-        { insert: 'ny', deleteLeft: 5 },
-        { insert: 'day', deleteLeft: 0 }
-      ]);
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(-1, { insert: 'ny', deleteLeft: 0 });
+      expectedMap.set( 0, { insert: 'day', deleteLeft: 4 });
+      assert.equal(result.size, expectedMap.size);
+      assert.deepEqual(result, expectedMap);
     });
   });
 });
