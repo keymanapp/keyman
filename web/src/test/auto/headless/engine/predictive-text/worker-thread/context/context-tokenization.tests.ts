@@ -492,6 +492,26 @@ describe('ContextTokenization', function() {
       assert.deepEqual(computedAlignment, {canAlign: false});
     });
 
+    it("handles late-context suggestion application after backspace", () => {
+      const baseContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'oven', ' ', ''
+      ];
+      const newContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'over', ' ', ''
+      ];
+
+      const baseTokenization = buildBaseTokenization(baseContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
+
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 8,
+        tailEditLength: 3,
+        tailTokenShift: 0
+      });
+    });
+
     it("handles sliding context-window scenarios", () => {
       // // Explicitly-defined window, though it's not needed directly by the method.
       // const config = {

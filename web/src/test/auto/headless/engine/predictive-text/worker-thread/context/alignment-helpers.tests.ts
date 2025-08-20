@@ -23,11 +23,19 @@ describe('getEditPathLastMatch', () => {
   });
 
   // is intended to handle application of suggestions.
-  it('returns the second-to-last match when a substitution exists before final "match"', () => {
+  it('returns the last match before a substitute occurring after the first match', () => {
     // limitation:  if there is _anything_ after that last match, the first assertion will fail.
-    const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'match', 'substitute', 'match'];
+    const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'substitute', 'match', 'match'];
     assert.notEqual(getEditPathLastMatch(path), path.lastIndexOf('match'));
-    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.lastIndexOf('match')-1));
+    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.lastIndexOf('substitute')));
+  });
+
+  // is intended to handle complex transforms that include a whitespace and affect prior tokens.
+  it('returns the last match before a substitute occurring after the first match', () => {
+    // limitation:  if there is _anything_ after that last match, the first assertion will fail.
+    const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'substitute', 'match', 'substitute'];
+    assert.notEqual(getEditPathLastMatch(path), path.lastIndexOf('match'));
+    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.indexOf('substitute')));
   });
 });
 

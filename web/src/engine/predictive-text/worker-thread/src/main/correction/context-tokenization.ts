@@ -162,7 +162,7 @@ export class ContextTokenization {
     // From here on assumes that at least one 'match' exists on the path.
     // It all works great... once the context is long enough for at least one stable token.
     const firstMatch = editPath.indexOf('match');
-    const lastMatch = getEditPathLastMatch(editPath);
+
     if(firstMatch == -1) {
       // If there are no matches, there's no alignment.
       return {
@@ -172,6 +172,17 @@ export class ContextTokenization {
 
     // Transpositions are not allowed at the token level during context alignment.
     if(editPath.find((entry) => entry.indexOf('transpose') > -1)) {
+      return {
+        canAlign: false
+      };
+    }
+
+    const lastMatch = getEditPathLastMatch(editPath);
+
+    // Assertion:  for a long context, the bulk of the edit path should be a
+    // continuous block of 'match' entries.  If there's anything else in
+    // the middle, we have a context mismatch.
+    if(lastMatch == -1) {
       return {
         canAlign: false
       };
@@ -195,19 +206,6 @@ export class ContextTokenization {
       };
     }
     const tailSubstituteLength = (editPath.length - 1 - lastMatch) - tailInsertLength - tailDeleteLength;
-
-    // Assertion:  for a long context, the bulk of the edit path should be a
-    // continuous block of 'match' entries.  If there's anything else in
-    // the middle, we have a context mismatch.
-    if(firstMatch > -1) {
-      for(let i = firstMatch+1; i < lastMatch; i++) {
-        if(editPath[i] != 'match') {
-          return {
-            canAlign: false
-          };
-        }
-      }
-    }
 
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; we have a 100% perfect match.
@@ -433,7 +431,7 @@ export class ContextTokenization {
         token = new ContextToken(matchedToken);
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex]));
+        token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex] ?? { sample: { insert: '', deleteLeft: 0 }, p: 1 }));
       }
 
       tokenization[incomingIndex] = token;
