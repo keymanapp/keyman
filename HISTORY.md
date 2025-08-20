@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 19.0.103 alpha 2025-08-20
+
+* fix(android): Show system OSK when physical keyboard connected on Android API 36 (#14538)
+* fix(android): Add "Show On-screen keyboard" preference to display OSK when physical keyboard is connected (#14539)
+* fix(android): Add FirstVoices preference to show on-screen keyboard (#14546)
+* fix(linux): normalize language tags from keyboard (#14542)
+* maint(common): fix running docker on Windows (#14154)
+* maint(mac): use mac_ prefix for functions in mac.inc.sh (#14562)
+* maint(android): publish symbols to Sentry on release buildLevel (#14490)
+* maint(linux): add missing `--help.keyman.com` option (#14571)
+* docs(web): improve documentation for SearchSpace and SearchNode (#14555)
+
 ## 19.0.102 alpha 2025-08-19
 
 * maint(mac): skip unnecessary network steps when buildLevel is build (#14467)
