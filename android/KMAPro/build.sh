@@ -41,7 +41,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure     /android/KMAPro/kMAPro/libs/keyman-engine.aar \
+  configure     /android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp \
   build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk
 
 #### Build

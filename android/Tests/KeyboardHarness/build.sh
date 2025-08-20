@@ -39,7 +39,6 @@ fi
 
 
 builder_describe_outputs \
-  configure    /android/Tests/KeyboardHarness/app/libs/keyman-engine.aar \
   build:app    /android/Tests/KeyboardHarness/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build

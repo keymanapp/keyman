@@ -40,7 +40,7 @@ fi
 ARTIFACT="firstvoices-$KEYMAN_VERSION.apk"
 
 builder_describe_outputs \
-  configure     /oem/firstvoices/android/app/libs/keyman-engine.aar \
+  configure     /oem/firstvoices/android/app/src/main/assets/fv_all.kmp \
   build         /oem/firstvoices/android/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build

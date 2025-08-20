@@ -39,7 +39,6 @@ fi
 
 
 builder_describe_outputs \
-  configure             /android/Samples/KMSample2/app/libs/keyman-engine.aar \
   build:app             /android/Samples/KMSample2/app/build/outputs/apk/$CONFIG/$ARTIFACT
 
 
