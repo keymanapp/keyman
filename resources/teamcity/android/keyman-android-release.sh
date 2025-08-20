@@ -66,7 +66,7 @@ function _publish_to_playstore() {
   local PUBTARGETS="$1"
   builder_echo start "publish to Google Play Store" "Publishing release to Google Play Store"
 
-  "${KEYMAN_ROOT}/android/build.sh" "publish:${PUBTARGETS}"
+  "${KEYMAN_ROOT}/android/build.sh" "publish-play-store:${PUBTARGETS}"
 
   builder_echo end "publish to Google Play Store" success "Finished publishing release to Google Play Store"
 }
@@ -93,6 +93,7 @@ function do_publish() {
 
   _create_zip_archive
   _publish_to_downloads_keyman_com
+  android_publish_symbols "${PUBTARGETS}"
   _publish_to_playstore "${PUBTARGETS}"
   tc_upload_help "Keyman for Android" android
 }

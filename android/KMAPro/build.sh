@@ -27,8 +27,8 @@ builder_describe "Builds Keyman for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
-  "--upload-sentry  Upload to sentry"
+  "publish-symbols  Publishes symbols to Sentry." \
+  "publish-play-store  Publishes the APK to the Play Store."
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -52,18 +52,6 @@ builder_describe_outputs \
 if builder_is_ci_build; then
   DAEMON_FLAG=--no-daemon
 fi
-
-#### Build action definitions ####
-
-function makeLocalSentryRelease() {
-  echo "Making a Sentry release for tag $KEYMAN_VERSION_GIT_TAG"
-  sentry-cli upload-dif -p keyman-android --include-sources
-  sentry-cli releases -p keyman-android files $KEYMAN_VERSION_GIT_TAG upload-sourcemaps ./
-
-  echo "Finalizing release tag $KEYMAN_VERSION_GIT_TAG"
-  sentry-cli releases finalize "$KEYMAN_VERSION_GIT_TAG"
-}
-
 
 #### Build action definitions ####
 
@@ -97,10 +85,6 @@ if builder_start_action build; then
   echo "BUILD_FLAGS $BUILD_FLAGS"
   ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
-  if builder_has_option --upload-sentry; then
-    makeLocalSentryRelease
-  fi
-
   builder_finish_action success build
 fi
 
@@ -112,12 +96,23 @@ if builder_start_action test; then
   builder_finish_action success test
 fi
 
-if builder_start_action publish; then
-  # Copy Release Notes
-  generateReleaseNotes
+publish_symbols() {
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # TODO: what does publishSentry even do?
+    ./gradlew $DAEMON_FLAG publishSentry
+    builder_echo "Making a Sentry release for tag $KEYMAN_VERSION_GIT_TAG"
+    sentry-cli upload-dif -p keyman-android --include-sources
+    sentry-cli releases -p keyman-android files $KEYMAN_VERSION_GIT_TAG upload-sourcemaps ./
+  fi
+}
 
-  # Publish symbols and Keyman for Android to Play Store
-  ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
+publish_play_store() {
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    generateReleaseNotes
+    # Publish Keyman for Android to Play Store
+    ./gradlew $DAEMON_FLAG publishReleaseApk
+  fi
+}
 
-  builder_finish_action success publish
-fi
+builder_run_action publish-symbols      publish_symbols
+builder_run_action publish-play-store  publish_play_store
