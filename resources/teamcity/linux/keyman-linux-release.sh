@@ -24,12 +24,13 @@ builder_describe \
   "build          make a release build" \
   "test           run unit tests" \
   "publish        make a source tarball and publish to downloads and launchpad" \
-  "--gpgkey=GPGKEYGRIP      GPG key for signing" \
-  "--gpgpw=GPGKEYPW         GPG key passphrase" \
-  "--rsync-path=RSYNC_PATH  rsync path on remote server" \
-  "--rsync-user=RSYNC_USER  rsync user on remote server" \
-  "--rsync-host=RSYNC_HOST  rsync host on remote server" \
-  "--rsync-root=RSYNC_ROOT  rsync root on remote server"
+  "--gpgkey=GPGKEYGRIP                GPG key for signing" \
+  "--gpgpw=GPGKEYPW                   GPG key passphrase" \
+  "--rsync-path=RSYNC_PATH            rsync path on remote server" \
+  "--rsync-user=RSYNC_USER            rsync user on remote server" \
+  "--rsync-host=RSYNC_HOST            rsync host on remote server" \
+  "--rsync-root=RSYNC_ROOT            rsync root on remote server" \
+  "--help.keyman.com=HELP_KEYMAN_COM  path to help.keyman.com repository" \
 
 builder_parse "$@"
 
