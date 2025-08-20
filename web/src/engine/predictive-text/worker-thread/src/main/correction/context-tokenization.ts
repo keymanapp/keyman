@@ -226,9 +226,9 @@ export class ContextTokenization {
         const primaryInput = hasDistribution ? tokenizedPrimaryInput.get(i) : null;
         let pushedToken = new ContextToken(lexicalModel);
 
-        // TODO:  assumes that there was no shift in wordbreaking from the
-        // prior context to the current one.  This may actually be a major
-        // issue for dictionary-based wordbreaking!
+        // TODO:  assumes that there was no shift in wordbreaking for the actual
+        // context when transitioning from the prior context to the current one.
+        // This may actually be a major issue for dictionary-based wordbreaking!
         //
         // If there was such a shift, then we may have extra transforms
         // originally on a 'previous' token that got moved into this one!
@@ -238,8 +238,13 @@ export class ContextTokenization {
         // next keystroke results in `butterfli`, this would likely be
         // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
         // we know to properly relocate the `f` and `l` transforms?
+
+        // Build a distribution for transforms aligned to the current token,
+        // then remove any empty / null / undefined entries.
         let tokenDistribComponent = tokenDistribution.map((seq) => {
           const entry = seq.get(i);
+          // Do not add empty Transforms into the correction-search input
+          // at this stage.
           if(!entry || TransformUtils.isEmpty(entry.sample)) {
             return null;
           } else {
@@ -248,7 +253,13 @@ export class ContextTokenization {
         }).filter((entry) => !!entry);
         if(primaryInput) {
           let transformDistribution = tokenDistribComponent.length > 0 ? tokenDistribComponent : null;
+
+          // If there are no entries in our would-be distribution, there's no
+          // reason to pass in what amounts to a no-op.
           if(transformDistribution) {
+            // If we ever stop filtering tokenized transform distributions, it may
+            // be worth adding an empty transform here with weight to balance
+            // the distribution back to a cumulative prob sum of 1.
             pushedToken.searchSpace.addInput(transformDistribution);
           }
         } else if(incomingToken.text) {
