@@ -39,8 +39,10 @@ fi
 
 ARTIFACT="firstvoices-$KEYMAN_VERSION.apk"
 
+KEYBOARD_PACKAGE_ID="fv_all"
+KEYBOARDS_TARGET="oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 builder_describe_outputs \
-  configure     /oem/firstvoices/android/app/src/main/assets/fv_all.kmp \
+  configure     "/${KEYBOARDS_TARGET}" \
   build         /oem/firstvoices/android/app/build/outputs/apk/$CONFIG/${ARTIFACT}
 
 #### Build
@@ -61,10 +63,7 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
-  KEYBOARD_PACKAGE_ID="fv_all"
-  KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
-
-  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "${KEYMAN_ROOT}/$KEYBOARDS_TARGET"
 
   builder_finish_action success configure
 fi

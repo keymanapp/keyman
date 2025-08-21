@@ -40,8 +40,12 @@ if builder_is_debug_build; then
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
 fi
 
+KEYBOARD_PACKAGE_ID="sil_euro_latin"
+KEYBOARDS_TARGET="android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+MODEL_PACKAGE_ID="nrc.en.mtnt"
+MODELS_TARGET="android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
 builder_describe_outputs \
-  configure     /android/KMAPro/kMAPro/src/main/assets/sil_euro_latin.kmp \
+  configure     "/${MODELS_TARGET}" \
   build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${KEYMAN_VERSION}.apk
 
 #### Build
@@ -75,13 +79,8 @@ fi
 
 if builder_start_action configure; then
 
-  KEYBOARD_PACKAGE_ID="sil_euro_latin"
-  KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
-  MODEL_PACKAGE_ID="nrc.en.mtnt"
-  MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
-
-  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
-  downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "${KEYMAN_ROOT}/$KEYBOARDS_TARGET"
+  downloadModelPackage "$MODEL_PACKAGE_ID" "${KEYMAN_ROOT}/$MODELS_TARGET"
 
   builder_finish_action success configure
 fi
