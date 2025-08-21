@@ -6,6 +6,7 @@ package com.tavultesoft.kmapro;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
@@ -20,6 +21,7 @@ import androidx.preference.SwitchPreference;
 import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Dataset;
+import com.tavultesoft.kmapro.PreferencesManager;
 
 import java.util.HashMap;
 
@@ -157,6 +159,31 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
+    SwitchPreference oskWithPhysicalKeyboardPreference = new SwitchPreference(context);
+    oskWithPhysicalKeyboardPreference.setKey(KeymanSettingsActivity.oskWithPhysicalKeyboardKey);
+    oskWithPhysicalKeyboardPreference.setTitle(getString(R.string.show_osk));
+    oskWithPhysicalKeyboardPreference.setSummary(getString(R.string.show_osk_hint));
+
+    SharedPreferences prefs = context.getSharedPreferences(
+      PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    boolean showOSK = prefs.getBoolean(
+      KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    oskWithPhysicalKeyboardPreference.setDefaultValue(showOSK);
+
+    oskWithPhysicalKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (newValue == null) {
+          return false;
+        }
+
+        editor.putBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, (boolean)newValue);
+        editor.commit();
+        return true;
+      }
+    });
+
     SwitchPreference hapticFeedbackPreference = new SwitchPreference(context);
     hapticFeedbackPreference.setKey(KeymanSettingsActivity.hapticFeedbackKey);
     hapticFeedbackPreference.setTitle(getString(R.string.haptic_feedback));
@@ -198,6 +225,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     screen.addPreference(adjustKeyboardHeight);
     screen.addPreference(adjustLongpressDelay);
+
+    screen.addPreference(oskWithPhysicalKeyboardPreference);
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(hapticFeedbackPreference);

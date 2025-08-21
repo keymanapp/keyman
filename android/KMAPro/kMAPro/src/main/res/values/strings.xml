@@ -143,6 +143,12 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Do not show caption on spacebar</string>
 
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard -->
+  <string name="show_osk" comment="show OSK when physical keyboard is connected">Show On-Screen Keyboard</string>
+
+  <!-- Context: Keyman Settings menu / Show OSK with Physical Keyboard hint -->
+  <string name="show_osk_hint" comment="When physical keyboard is connected">When physical keyboard is connected</string>
+
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
 

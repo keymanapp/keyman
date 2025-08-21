@@ -14,6 +14,7 @@ public class KeymanSettingsActivity extends BaseActivity {
   protected static final String sendCrashReport = "SendCrashReport";
   public static final String spacebarTextKey = "SpacebarText";
   public static final String hapticFeedbackKey = "HapticFeedback";
+  public static final String oskWithPhysicalKeyboardKey = "ShowOSK";
 
   protected KeymanSettingsFragment innerFragment;
 
