@@ -7,19 +7,32 @@
  *
  */
 
-import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
+import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
+import { ConverterArtifacts } from "../converter-artifacts.js";
+import { ConverterToKmnArtifacts } from "../converter-artifacts.js"
 import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 
-/**
- * Object holding all important data for the conversion between
- * input (*.keylayout) format and output (*.kmn) format.
- * It contains input and output filenames, an array of all used modifiers
- * and all preprocessed key rules for up to 3 key/modifier combinations.
- */
+
+export interface ConverterResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link Converter.write}
+   */
+  artifacts: ConverterArtifacts;
+};
+
+export interface ConverterToKmnResult extends ConverterResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link Converter.write}
+   */
+  artifacts: ConverterToKmnArtifacts;
+};
+
+
 export interface convert_object {
   keylayout_filename: string,
   kmn_filename: string,
@@ -83,18 +96,14 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnArtifacts> {
-
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
       return null;
     }
 
-    if (outputFilename === null) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
-      return null;
-    }
+    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
@@ -113,8 +122,6 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
-
     const outArray: convert_object = await this.convert(jsonO, outputFilename);
     if (!outArray) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
@@ -123,15 +130,27 @@ export class KeylayoutToKmnConverter {
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    const out_text_ok: boolean = kmnFileWriter.write(outArray);
+    // _S2 still write to file - will be removed later
+    const out_text_ok: boolean = kmnFileWriter.writeToFile(outArray);
     if (!out_text_ok) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
     }
 
-    return null;
-  }
+    // write to object/ConverterToKmnResult
+    const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
+    const Result_toBeReturned: ConverterToKmnResult = {
+      artifacts: {
+        kmn: { data: out_Uint8, filename: outputFilename }
+      }
+    };
 
+    if (!out_Uint8) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
+      return null;
+    }
+    return Result_toBeReturned;
+  }
 
   /**
    * @brief  member function to read filename and behaviour of a json object into a convert_object

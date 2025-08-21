@@ -85,11 +85,14 @@ function do_bundle() {
   mkdir -p build/dist
   node build-bundler.js
 
-  sentry-cli sourcemaps inject \
-    --org keyman \
-    --project keyman-developer \
-    --release "$KEYMAN_VERSION_GIT_TAG"  \
-    build/dist/ "${SOURCEMAP_PATHS[@]}"
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # Only inject sourcemaps for release builds
+    sentry-cli sourcemaps inject \
+      --org keyman \
+      --project keyman-developer \
+      --release "$KEYMAN_VERSION_GIT_TAG"  \
+      build/dist/ "${SOURCEMAP_PATHS[@]}"
+  fi
 
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
