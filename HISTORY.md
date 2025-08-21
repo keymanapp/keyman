@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.104 alpha 2025-08-21
+
+* fix(android): Update sentry-android dependency to 8.19.1 for 16 KB page alignment (#14559)
+* maint(android): Cleanup builder_describe_outputs for configure action (#14566)
+* fix(windows): emit nunit report path correctly and update TeamCity links (#14564)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14568)
+
 ## 19.0.103 alpha 2025-08-20
 
 * fix(android): Show system OSK when physical keyboard connected on Android API 36 (#14538)
