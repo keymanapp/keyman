@@ -239,8 +239,12 @@ export default class LMLayerWorker {
       let compositor = this.transitionToReadyState(model);
       // This test allows models to directly specify the property without it being auto-overridden by
       // this default.
-      if(configuration.wordbreaksAfterSuggestions === undefined) {
-        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      if(configuration.appendsWordbreaks === undefined) {
+        if(compositor.punctuation.insertAfterWord != '') {
+          configuration.appendsWordbreaks = {
+            breakingMarks: ['.', ',', ';', ':', '?', '!']
+          };
+        } // else leave undefined (falsy)
       }
       compositor.setConfiguration(configuration);
       this.cast('ready', { configuration });
@@ -368,9 +372,9 @@ export default class LMLayerWorker {
             });
             break;
           case 'revert':
-            var {reversion, context} = payload;
+            var {reversion, context, appendedOnly} = payload;
 
-            compositor.applyReversion(reversion, context).then((suggestions) => {
+            compositor.applyReversion(reversion, context, appendedOnly).then((suggestions) => {
               this.cast('postrevert', {
                 token: payload.token,
                 suggestions: suggestions
