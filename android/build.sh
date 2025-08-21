@@ -37,9 +37,9 @@ builder_describe \
   configure \
   build \
   test \
-  "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
+  "publish-symbols                          Publishes symbols to Sentry" \
+  "publish-play-store                       Publishes APKs to the Play Store" \
   "archive                                  Copy release artifacts to upload/ and create zip" \
-  --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
   ":help                                    Online documentation" \
@@ -129,6 +129,6 @@ builder_run_child_actions configure build test
 
 builder_run_action        test:help  do_test_help
 
-builder_run_child_actions publish
+builder_run_child_actions publish-symbols publish-play-store
 
 builder_run_action        archive    archive_artifacts

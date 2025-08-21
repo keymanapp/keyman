@@ -71,3 +71,21 @@ check_buildx_available() {
     exit 1
   fi
 }
+
+docker_wrapper() {
+  if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
+    # Prevent POSIX-to-Windows path conversion if running in Git Bash on Windows
+    # (https://github.com/git-for-windows/git/issues/577#issuecomment-166118846)
+    MSYS_NO_PATHCONV=1 docker "$@"
+  else
+    docker "$@"
+  fi
+}
+
+setup_docker() {
+  if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
+    DOCKER_RUN_ARGS="--env DOCKER_RUN_AS_ROOT=1"
+  else
+    DOCKER_RUN_ARGS=
+  fi
+}

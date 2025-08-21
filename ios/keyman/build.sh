@@ -82,7 +82,7 @@ function build_app() {
   # Time to prepare the deployment archive data.
   echo ""
   echo "Preparing .xcarchive for real devices."
-  run_xcodebuild $XCODEFLAGS_EXT \
+  mac_xcodebuild $XCODEFLAGS_EXT \
               $CODE_SIGN \
               -scheme Keyman \
               -archivePath "$ARCHIVE_PATH" \
@@ -101,7 +101,7 @@ function build_app() {
     echo "Preparing .ipa file for deployment to real devices"
     # Do NOT use the _EXT variant here; there's no scheme to ref, which will lead
     # Xcode to generate a build error.
-    run_xcodebuild $XCODEFLAGS \
+    mac_xcodebuild $XCODEFLAGS \
                 -exportArchive \
                 -archivePath "$ARCHIVE_PATH" \
                 -exportOptionsPlist ../exportAppStore.plist \
@@ -111,7 +111,7 @@ function build_app() {
 
   if builder_has_option --sim-artifact; then
     echo "Preparing .app file for simulator-targeted artifact for testing"
-    run_xcodebuild $XCODEFLAGS_EXT \
+    mac_xcodebuild $XCODEFLAGS_EXT \
                 $CODE_SIGN \
                 -scheme Keyman \
                 -sdk iphonesimulator \

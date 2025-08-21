@@ -10,7 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 
-verify_on_mac
+mac_verify_on_mac
 
 cd "${THIS_SCRIPT_PATH}"
 
@@ -73,7 +73,7 @@ cp textinputsource/textinputsource "$TARGETAPP/Contents/MacOS/textinputsource"
 xattr -rc "$TARGETAPP"
 
 if ! builder_is_ci_build || ! builder_is_ci_build_level_build; then
-  execCodeSign direct --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
+  mac_codesign direct --force --options runtime --deep --sign "${CERTIFICATE_ID}" "$TARGETAPP"
 
   #
   # Notarize the app (copied from ../build.sh)
