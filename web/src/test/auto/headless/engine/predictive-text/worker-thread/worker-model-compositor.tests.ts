@@ -901,7 +901,7 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().peek(15);
+      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(15);
 
       // Accepting the suggestion rewrites the latest context transition.
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
