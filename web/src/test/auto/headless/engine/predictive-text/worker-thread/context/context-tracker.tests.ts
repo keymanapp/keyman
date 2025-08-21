@@ -72,7 +72,7 @@ describe('ContextTracker', function() {
       contextTracker.unitTestEndPoints.cache().keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
-      let postContextMatch = contextTracker.unitTestEndPoints.cache().peek(baseSuggestion.appendedTransform.id);
+      let postContextMatch = contextTracker.unitTestEndPoints.cache().get(baseSuggestion.appendedTransform.id);
       assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
