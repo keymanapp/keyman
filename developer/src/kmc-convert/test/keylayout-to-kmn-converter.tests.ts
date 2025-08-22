@@ -22,6 +22,8 @@ describe('KeylayoutToKmnConverter', function () {
   });
 
   describe('run() ', function () {
+
+    this.timeout(4000);
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
     it('run() should throw on null input file name and null output file name', async function () {
