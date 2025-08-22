@@ -12,7 +12,7 @@ apply from: "$rootPath/version.gradle"
 String tier = new File('../../TIER.md').getText('UTF-8').trim();
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration

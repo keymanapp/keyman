@@ -8,13 +8,13 @@ ext.rootPath = '../../../../android'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.firstvoices.keyboards"
 
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // VERSION_CODE and VERSION_NAME from version.gradle
         versionCode VERSION_CODE as Integer
