@@ -154,6 +154,10 @@ export class ContextTracker {
     }]);
   }
 
+  peek(id: number) {
+    return this.cache.peek(id);
+  }
+
   findAndRevert(id: number) {
     const transition = this.cache.get(id);
     if(transition) {
