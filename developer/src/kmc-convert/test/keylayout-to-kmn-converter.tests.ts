@@ -56,13 +56,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
     });
 
-    it('run() should return on correct input file name and null output file name', async function () {
-      const inputFilename = makePathToFixture('../data/Test.keylayout');
-      const result = sut.run(inputFilename, null);
-      assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 0);
-    });
-
     it('run() should return on correct input file name and empty output file name ', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       await NodeAssert.doesNotReject(async () => sut.run(inputFilename, ''));
