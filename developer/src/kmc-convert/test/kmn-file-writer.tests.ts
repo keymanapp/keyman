@@ -37,7 +37,7 @@ describe('KmnFileWriter', function () {
 
 
     it('write() should return true (no error) if written', async function () {
-      const result = sut_w.write(converted);
+      const result = sut_w.writeToFile(converted);
 
       assert.isTrue(result);
     });

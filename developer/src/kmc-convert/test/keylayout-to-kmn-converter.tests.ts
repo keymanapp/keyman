@@ -39,7 +39,6 @@ describe('KeylayoutToKmnConverter', function () {
       assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: null }));
     });
 
-
     it('run() should throw on null input file name and unknown output file name', async function () {
       const result = sut.run(null, 'X');
       assert.isNotNull(result);
@@ -51,16 +50,15 @@ describe('KeylayoutToKmnConverter', function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_OutputFilenameIsRequired());
+      assert.equal(compilerTestCallbacks.messages.length, 2);
+      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_FileNotFound({ inputFilename: inputFilename }));
     });
 
-    it('run() should throw on and null output file name', async function () {
+    it('run() should return on correct input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result = sut.run(inputFilename, null);
       assert.isNotNull(result);
-      assert.equal(compilerTestCallbacks.messages.length, 1);
-      assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_OutputFilenameIsRequired());
+      assert.equal(compilerTestCallbacks.messages.length, 0);
     });
 
     it('run() should return on correct input file name and empty output file name ', async function () {
