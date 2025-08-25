@@ -65,6 +65,7 @@ kmc_cmd = [node, '--enable-source-maps', kmc_root]
 # Build all keyboards in output folder
 
 foreach kbd : tests_needing_copy
+  # This will output a (wrong) deprecation warning with meson < 1.5 - see #13250
   configure_file(input: kbd + '.xml', output: kbd + '.xml', copy: true)
 endforeach
 
@@ -77,6 +78,7 @@ foreach kbd : tests_with_testdata
 endforeach
 
 foreach kbd : tests_from_cldr
+  # This will output a (wrong) deprecation warning with meson < 1.5 - see #13250
   configure_file(input: ldml_data / kbd + '.xml', output: kbd + '.xml', copy: true)
   configure_file(
     command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],

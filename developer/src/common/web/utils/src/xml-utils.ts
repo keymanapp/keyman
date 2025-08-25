@@ -412,7 +412,6 @@ export class KeymanXMLWriter {
   }
 }
 
-
 /**
  * traverse an AJV instancePath and map to an object if possible
  * @param source object tree root (contains the root object)
@@ -435,6 +434,7 @@ export function findInstanceObject(source: any, path: string[]) : any {
     return null;
   }
 }
+
 /**
  * Return an object simulating an XML object with an offset number
  * For use in calling message functions
