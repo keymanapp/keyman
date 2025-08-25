@@ -118,16 +118,16 @@ function push_to_github_and_create_pr() {
 }
 
 function cleanup_worktree() {
-  if [[ -d "linux/debianpackage" ]]; then
-    cp -r linux/debianpackage "${KEYMAN_ROOT}/linux"
+  if [[ -d "${WORKTREE_DIR:-}/linux/debianpackage" ]]; then
+    cp -r "${WORKTREE_DIR}/linux/debianpackage" "${KEYMAN_ROOT}/linux"
   fi
 
-  cd "${PREV_DIR:-}" || true
+  cd "${PREV_DIR:-}"
 
   if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
     builder_echo "Removing temporary worktree"
-    git worktree remove -f "${WORKTREE_DIR}" || true
-    git branch -f -D "${WORKTREE_BRANCH}" || true
+    git worktree remove -f "${WORKTREE_DIR}"
+    git branch -f -D "${WORKTREE_BRANCH}"
   fi
 }
 
@@ -143,7 +143,7 @@ fi
 
 # Create a temporary worktree so that we start with a clean copy of the
 # target branch (stable/beta). Checkout stable/beta branch so that
-# `scripts/debian.sh` picks up correct version
+# scripts/debian.sh picks up correct version
 
 WORKTREE_BRANCH="maint/linux/tmp-packaging-${DEPLOY_BRANCH#origin/}"
 PREV_DIR="$PWD"
@@ -151,6 +151,7 @@ PREV_DIR="$PWD"
 WORKTREE_DIR="$(git worktree list | grep "${WORKTREE_BRANCH}" | cut -d' ' -f1)"
 if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
   builder_heading "Reusing existing worktree at ${WORKTREE_DIR}"
+  git checkout -B "${WORKTREE_BRANCH}" "${DEPLOY_BRANCH#origin/}"
 else
   WORKTREE_DIR="$(mktemp -d)"
   builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
