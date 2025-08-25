@@ -5,7 +5,6 @@ import android.os.Bundle;
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class KeymanSettingsActivity extends BaseActivity {
@@ -23,6 +22,10 @@ public class KeymanSettingsActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
 
     setContentView(R.layout.keyman_settings_layout);
+
+    setupEdgeToEdge(R.id.keyman_settings_layout);
+    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.keyman_settings_toolbar);
     toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
     toolbar.setTitle(R.string.keyman_settings);

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:orientation="vertical"
+  android:id="@+id/adjust_keyboard_layout"
+  android:fitsSystemWindows="true"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent"
+  android:orientation="vertical">
 
   <include layout="@layout/titlebar" />
 
@@ -15,7 +17,7 @@
     android:layout_marginStart="@dimen/activity_horizontal_margin"
     android:text="@string/drag_the_keyboard"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
-    />
+    app:layout_constraintTop_toBottomOf="@id/titlebar" />
 
   <TextView
     android:id="@+id/rotate_the_device"
@@ -25,23 +27,35 @@
     android:layout_marginStart="@dimen/activity_horizontal_margin"
     android:text="@string/rotate_the_device"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
-    />
+    app:layout_constraintTop_toBottomOf="@id/drag_the_keyboard" />
 
-  <Button
-    android:id="@+id/reset_to_defaults"
-    style="@style/Widget.AppCompat.Button.Colored"
-    android:background="@color/keyman_blue"
-    android:textColor="@color/ms_white"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@id/rotate_the_device"
-    android:layout_centerInParent="true"
-    android:singleLine="true"
-    android:layout_marginTop="8dp"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    android:text="@string/reset_to_defaults"
-    android:textSize="@dimen/adjust_keyboard_height_label_textsize" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/button_layout"
+      android:orientation="horizontal"
+      android:layout_below="@id/rotate_the_device"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/rotate_the_device">
+
+      <Button
+        android:id="@+id/reset_to_defaults"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:background="@color/keyman_blue"
+        android:textColor="@color/ms_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:singleLine="true"
+        android:layout_marginTop="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/reset_to_defaults"
+        android:textSize="@dimen/adjust_keyboard_height_label_textsize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Resizable keyboard "image -->
     <ImageView
@@ -56,6 +70,10 @@
       android:paddingStart="@dimen/blank_osk_padding"
       android:paddingEnd="@dimen/blank_osk_padding"
       android:paddingTop="@dimen/blank_osk_padding"
-      android:paddingBottom="@dimen/blank_osk_padding"/>
+      android:paddingBottom="@dimen/blank_osk_padding"
+      app:layout_constraintTop_toBottomOf="@id/button_layout"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintVertical_bias="1.0" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
