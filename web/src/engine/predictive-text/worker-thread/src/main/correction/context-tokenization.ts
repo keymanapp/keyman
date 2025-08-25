@@ -106,7 +106,9 @@ export class ContextTokenization {
     // If we have a perfect match with a pre-existing tokenization, no mutations have
     // happened; just re-use the old context tokenization.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
-      return this;
+      // We must build a new instance in case the original did not have
+      // alignment data (like when it's the initial context!)
+      return new ContextTokenization(this.tokens, alignment);
     } else {
       // If we didn't get any input, we really should perfectly match
       // a previous context state.  If such a state is out of our cache,

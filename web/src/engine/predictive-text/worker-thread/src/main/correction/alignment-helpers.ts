@@ -8,6 +8,7 @@
  * edits for aligned context tokens.
  */
 
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { ClassicalDistanceCalculation, EditOperation } from "./classical-calculation.js";
 
 /**
@@ -201,10 +202,27 @@ export function computeAlignment(
   isSliding: boolean,
   noSubVerify?: boolean
 ): ContextStateAlignment {
+  const src = tokenizationToMatch.map(value => ({key: value}));
+  const dst = incomingTokenization.map(value => ({key: value}));
+
+  // let changedEmptyTail = false;
+  if(dst[dst.length - 1].key == '') {
+    // Only allow matching if the tokenizations are identical, thus the empty
+    // token was unaffected.
+    if(src.length != dst.length || src[dst.length - 1].key != '') {
+      // Do not allow empty-token matches to match each other; this complicates
+      // things when applying zero-root suggestions.
+      //
+      // The SENTINEL char should never appear in raw text, thus should never
+      // match anything in the "tokenization to match".
+      dst[dst.length - 1].key = SENTINEL_CODE_UNIT;
+    }
+  }
+
   // Inverted order, since 'match' existed before our new context.
   let mapping = ClassicalDistanceCalculation.computeDistance(
-    tokenizationToMatch.map(value => ({key: value})),
-    incomingTokenization.map(value => ({key: value})),
+    src,
+    dst,
     // Diagonal width to consider must be at least 2, as adding a single
     // whitespace after a token tends to add two tokens: one for whitespace,
     // one for the empty token to follow it.
