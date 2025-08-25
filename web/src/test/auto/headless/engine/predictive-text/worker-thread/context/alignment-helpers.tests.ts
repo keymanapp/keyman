@@ -182,7 +182,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'substitute', 'substitute', 'substitute']});
   });
 
   it("detects unalignable contexts - too many mismatching tokens", () => {
@@ -194,7 +194,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'match', 'match', 'match']});
   });
 
   it("fails alignment for leading-edge word substitutions", () => {
@@ -206,7 +206,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
   });
 
   it("fails alignment for small leading-edge word substitutions", () => {
@@ -218,7 +218,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
   });
 
   it("properly matches and aligns when lead token is modified", () => {
@@ -428,7 +428,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "delete", "match", "match", "match"]});
   });
 
   it("fails alignment for mid-head insertion", () => {
@@ -440,7 +440,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "insert", "match", "match", "match"]});
   });
 
   it("fails alignment for mid-tail deletion", () => {
@@ -452,7 +452,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "delete", "match"]});
   });
 
   it("fails alignment for mid-tail insertion", () => {
@@ -464,7 +464,7 @@ describe('computeAlignment', () => {
     ];
 
     const computedAlignment = computeAlignment(baseContext, newContext, false);
-    assert.deepEqual(computedAlignment, {canAlign: false});
+    assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "match", "insert", "match"]});
   });
 
   it("handles late-context suggestion application after backspace", () => {

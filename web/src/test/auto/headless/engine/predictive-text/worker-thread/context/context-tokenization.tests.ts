@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+import { ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -41,7 +41,7 @@ describe('ContextTokenization', function() {
 
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      let alignment = {
+      let alignment: ContextStateAlignment = {
         canAlign: true,
         leadTokenShift: 0,
         matchLength: 6,
