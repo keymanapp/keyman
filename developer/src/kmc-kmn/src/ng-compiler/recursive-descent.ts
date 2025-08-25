@@ -13,6 +13,10 @@ import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
 
+/**
+ * Rule is the abstract base class of all the recursive-descent
+ * syntax analyser rules
+ */
 export abstract class Rule { // equivalent to a no-child rule
   protected static _tokenBuffer: TokenBuffer = null;
 
@@ -23,9 +27,19 @@ export abstract class Rule { // equivalent to a no-child rule
 
   public static get tokenBuffer(): TokenBuffer { return Rule._tokenBuffer; }
 
+  /**
+   * Parse the tokenBuffer, building it into an abstract syntax tree (AST)
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public abstract parse(node: ASTNode): boolean;
 }
 
+/**
+ * SingleChildRule is the abstract base class of all the recursive-descent
+ * syntax analyser rules with a single child
+ */
 export abstract class SingleChildRule extends Rule {
   protected rule: Rule;
 
@@ -39,6 +53,10 @@ export abstract class SingleChildRule extends Rule {
   }
 }
 
+/**
+ * MultiChildRule is the abstract base class of all the recursive-descent
+ * syntax analyser rules with multiple children
+ */
 export abstract class MultiChildRule extends Rule {
   protected rules: Rule[];
 
@@ -49,11 +67,23 @@ export abstract class MultiChildRule extends Rule {
   }
 }
 
+/**
+ * SequenceRule represents sequential rules in the recursive-descent
+ * syntax analyser
+ */
 export class SequenceRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
     super(rules);
   }
 
+  /**
+   * Parse each rule in turn, succeeding only if all succeed.
+   * In the event of failure, reset the TokenBuffer to the position
+   * saved at the start of the attempted parse.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     const save: number = Rule.tokenBuffer.currentPosition;
@@ -75,11 +105,23 @@ export class SequenceRule extends MultiChildRule {
   }
 }
 
+/**
+ * AlternateRule represents alternative rules in the recursive-descent
+ * syntax analyser
+ */
 export class AlternateRule extends MultiChildRule {
   public constructor(rules: Rule[]) {
     super(rules);
   }
 
+  /**
+   * Parse each rule in turn, succeeding if any succeed.
+   * In the event of failure, reset the TokenBuffer to the position
+   * saved at the start of the attempted parse.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
     const save: number = Rule.tokenBuffer.currentPosition;
@@ -102,11 +144,23 @@ export class AlternateRule extends MultiChildRule {
   }
 }
 
+/**
+ * OptionalRule represents optional rules in the recursive-descent
+ * syntax analyser ('?' in the BNF)
+ */
 export class OptionalRule extends SingleChildRule {
   public constructor(rule: Rule) {
     super(rule);
   }
 
+  /**
+   * Parses the stored rule, always succeeding as the rule is optional.
+   * In the event of failure of the stored rule, reset the TokenBuffer
+   * to the position saved at the start of the attempted parse.
+   *
+   * @param node where to build the AST
+   * @returns true
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     const save: number = Rule.tokenBuffer.currentPosition;
@@ -124,17 +178,30 @@ export class OptionalRule extends SingleChildRule {
   }
 }
 
+/**
+ * ManyRule represents 'many' rules in the recursive-descent
+ * syntax analyser ('*' in the BNF)
+ */
 export class ManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
     super(rule);
   }
 
+  /**
+   * Parses the stored rule as many times as possible, always succeeding
+   * as the rule is optional.
+   * In the event of failure of the stored rule, reset the TokenBuffer
+   * to the position saved at the start of that individual attempt to parse.
+   *
+   * @param node where to build the AST
+   * @returns true
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = true;
     while (parseSuccess) {
       const save: number = Rule.tokenBuffer.currentPosition;
       const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-      parseSuccess     = this.rule.parse(tmp);
+      parseSuccess       = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
       } else {
@@ -145,43 +212,56 @@ export class ManyRule extends SingleChildRule {
   }
 }
 
+/**
+ * OneOrManyRule represents one-or-many rules in the recursive-descent
+ * syntax analyser ('+' in the BNF)
+ */
 export class OneOrManyRule extends SingleChildRule {
   public constructor(rule: Rule) {
     super(rule);
   }
 
+  /**
+   * Parses the stored rule as many times as possible, succeeding if the
+   * rule suceeds at least once.
+   * In the event of failure of the stored rule, reset the TokenBuffer
+   * to the position saved at the start of that individual attempt to parse.
+   *
+   * @param node where to build the AST
+   * @returns true
+   */
   public parse(node: ASTNode): boolean {
-    let parseSuccess: boolean = false;
-    let save: number = Rule.tokenBuffer.currentPosition;
-    let tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-
-    parseSuccess = this.rule.parse(tmp);
-    if (parseSuccess) {
-      node.addChildren(tmp.getChildren());
-    } else {
-      Rule.tokenBuffer.resetCurrentPosition(save);
-      return false;
-    }
-
-    while (parseSuccess) {
-      save         = Rule.tokenBuffer.currentPosition;
-      tmp          = new ASTNode(NodeTypes.TMP);
-      parseSuccess = this.rule.parse(tmp);
+    let anyParseSuccess: boolean = false;
+    let parseSuccess: boolean    = true;
+    do {
+      const save: number = Rule.tokenBuffer.currentPosition;
+      const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+      parseSuccess       = this.rule.parse(tmp);
       if (parseSuccess) {
         node.addChildren(tmp.getChildren());
+        anyParseSuccess = true;
       } else {
         Rule.tokenBuffer.resetCurrentPosition(save);
       }
-    }
-    return true;
+    } while (parseSuccess);
+    return anyParseSuccess;
   }
 }
 
+/**
+ * TokenRule represents a Token (terminal) in the BNF
+ */
 export class TokenRule extends Rule {
   private static tokenToNodeMap: Map<TokenTypes, NodeTypes>;
   private tokenType: TokenTypes;
-  private addNode: boolean;
+  private addNode: boolean; // whether to add an ASTNode if the rule succeeds
 
+  /**
+   * Construct a TokenRule
+   *
+   * @param tokenType the TokenType to match
+   * @param addNode whether to add an ASTNode if the rule succeeds
+   */
   public constructor(tokenType: TokenTypes, addNode: boolean=false) {
     super();
     this.tokenType = tokenType;
@@ -197,6 +277,15 @@ export class TokenRule extends Rule {
     }
   }
 
+  /**
+   * Parse the next Token looking to match the stored TokenType.
+   * If matched, the rule succeeds.  Moreover, if adding an ASTNode has
+   * been requested (addNode), and there is a valid mapping from the
+   * TokenType to a NodeType, then add the ASTNode.
+   *
+   * @param node where to build the AST
+   * @returns true if this rule was successfully parsed
+   */
   public parse(node: ASTNode): boolean {
     let parseSuccess: boolean = false;
     const token: Token = Rule.tokenBuffer.nextToken();
@@ -208,6 +297,7 @@ export class TokenRule extends Rule {
         const nodeType: NodeTypes = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
+          // TODO: warning if there is no valid mapping
         }
       }
     } else {

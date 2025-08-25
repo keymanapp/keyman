@@ -10,9 +10,7 @@ import { TokenTypes } from "./token-types.js";
 import { Token } from "./lexer.js";
 
 /**
- * The Next Generation Lexer/Parser for the Keyman Keyboard Language.
- * 
- * The TokenBuffer adds additional methods to the Token array produced
+ * TokenBuffer adds additional methods to the Token array produced
  * by the Lexer, and is used by the KMN syntax analyser (KMNTreeRule)
  */
 export class TokenBuffer {
@@ -35,7 +33,7 @@ export class TokenBuffer {
   /**
    * The current Token
    *
-   * @returns the current token or the EOF Token
+   * @returns the current token or the EOF token
    */
   public nextToken(): Token {
     return this._currentPosition == this.list.length ? this.eof : this.list[this._currentPosition];
