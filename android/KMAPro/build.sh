@@ -76,8 +76,8 @@ fi
 if builder_start_action build; then
 
   # Copy Keyman Engine for Android
-  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
-
+  cp "${KEYMAN_ROOT}/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "${KEYMAN_ROOT}/android/KMAPro/kMAPro/libs/keyman-engine.aar"
+  
   # Convert markdown to html for offline help
   build_help_html android KMAPro/kMAPro/src/main/assets/info
 

@@ -114,6 +114,12 @@ android {
         disable 'MissingQuantity', 'MissingTranslation'
         lintConfig file("lint.xml")
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 // how to configure the sentry android gradle plugin
@@ -158,9 +164,6 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
 }
 
@@ -170,7 +173,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
-    api(name: 'keyman-engine', ext: 'aar')
+    implementation files('libs/keyman-engine.aar')
     implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
