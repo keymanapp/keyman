@@ -108,7 +108,7 @@ function _publish_to_launchpad() {
   git reset --hard
 
   /usr/lib/gnupg/gpg-preset-passphrase --passphrase "${GPGKEYPW}" --preset "${GPGKEYGRIP}"
-  UPLOAD=yes scripts/launchpad.sh
+  UPLOAD=yes "${KEYMAN_ROOT}/linux/scripts/launchpad.sh"
   /usr/lib/gnupg/gpg-preset-passphrase --forget "${GPGKEYGRIP}" || true
 
   builder_echo end "upload to launchpad" success "Upload to launchpad"
@@ -117,12 +117,9 @@ function _publish_to_launchpad() {
 function _publish_linux_help() {
   builder_echo start "upload linux help" "Upload new Keyman Linux help to help.keyman.com"
 
-  (
-    cd "${KEYMAN_ROOT}/../help.keyman.com" || exit 1
-    # shellcheck disable=SC2016
-    git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER}"; echo "password=${GITHUB_TOKEN}"; }; f'
-    "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" linux
-  )
+  # shellcheck disable=SC2016
+  git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER}"; echo "password=${GITHUB_TOKEN}"; }; f'
+  "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" linux
 
   builder_echo end "upload linux help" success "Upload new Keyman Linux help to help.keyman.com"
 }
