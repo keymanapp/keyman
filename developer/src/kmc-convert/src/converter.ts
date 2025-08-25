@@ -81,9 +81,9 @@ export class Converter implements KeymanCompiler {
     }
 
     const converter = new ConverterClass(this.callbacks, converterOptions);
-    const artifacts = await converter.run(inputFilename, outputFilename);
+    const result = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
-    return artifacts ? { artifacts } : null;
+    return result ?  result : null;
   }
 
   /**

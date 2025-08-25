@@ -7,19 +7,34 @@
  *
  */
 
-import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
-import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
+import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { KeylayoutXMLSourceFile } from '@keymanapp/developer-utils';
+import { ConverterArtifacts } from "../converter-artifacts.js";
+import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
+import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 
-/**
- * Object holding all important data for the conversion between
- * input (*.keylayout) format and output (*.kmn) format.
- * It contains input and output filenames, an array of all used modifiers
- * and all preprocessed key rules for up to 3 key/modifier combinations.
- */
+
+export interface ConverterResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link Converter.write}
+   */
+  artifacts: ConverterArtifacts;
+};
+
+export interface ConverterToKmnResult extends ConverterResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link Converter.write}
+   */
+  artifacts: ConverterToKmnArtifacts;
+};
+
+
+
+
 export interface ProcesData {
   keylayout_filename: string,
   kmn_filename: string,
@@ -51,12 +66,12 @@ export interface ActionStateOutput {
  */
 export function find_usedKeysCount(data: any, pos: number): number {
 
-  let usedKeyCount  = KeylayoutToKmnConverter.MAX_KEY_COUNT;
-  if (data.keyboard.keyMapSet[0].keyMap[pos].key.length < usedKeyCount ) {
-    // set the max to n-1 (keys are zero indexed )
-    usedKeyCount  = data.keyboard.keyMapSet[0].keyMap[pos].key.length - 1;
+  let usedKeyCount = KeylayoutToKmnConverter.MAX_KEY_COUNT;
+  if (data.keyboard.keyMapSet[0].keyMap[pos].key.length < usedKeyCount) {
+    // set max to n-1 (keys are zero indexed )
+    usedKeyCount = data.keyboard.keyMapSet[0].keyMap[pos].key.length - 1;
   }
-  return usedKeyCount ;
+  return usedKeyCount;
 }
 
 export class KeylayoutToKmnConverter {
@@ -83,8 +98,7 @@ export class KeylayoutToKmnConverter {
    * @param  outputFilename the resulting keyman .kmn-file
    * @return null on success
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnArtifacts> {
-
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult> {
 
     if (!inputFilename) {
       this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
@@ -123,15 +137,20 @@ export class KeylayoutToKmnConverter {
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    const out_text_ok: boolean = kmnFileWriter.write(outArray);
-    if (!out_text_ok) {
+    // write to object/ConverterToKmnResult
+    const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
+    const Result_toBeReturned: ConverterToKmnResult = {
+      artifacts: {
+        kmn: { data: out_Uint8, filename: outputFilename }
+      }
+    };
+
+    if (!out_Uint8) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
       return null;
     }
-
-    return null;
+    return Result_toBeReturned;
   }
-
 
   /**
    * @brief  member function to read filename and behaviour of a json object into a ProcesData
@@ -148,10 +167,8 @@ export class KeylayoutToKmnConverter {
       arrayOf_Modifiers: [],
       arrayOf_Rules: []
     };
-//_S2 do I need to "validate again here?"
-    if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
-    //if ((jsonObj !== null) ) {
 
+    if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
       data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');
       data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
