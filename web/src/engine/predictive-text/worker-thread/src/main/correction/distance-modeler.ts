@@ -30,6 +30,10 @@ enum TimedTaskTypes {
   CORRECTING = 2
 }
 
+/**
+ * This type models a partially-processed subset of Transforms to be processed
+ * as a batch due to sharing similar properties.
+ */
 export interface PartialSearchEdge {
   /**
    * `subsetSubIndex` indicates the next portion of the subset to be incorporated.
@@ -39,8 +43,6 @@ export interface PartialSearchEdge {
   /**
    * Indicates the depth in the insert string of the most recently added input
    * that should next be incorporated into the search path.
-   *
-   * If undefined, the most recently added input is fully incorporated.
    */
   subsetSubindex: number;
 
@@ -50,7 +52,6 @@ export interface PartialSearchEdge {
    */
   doSubsetMatching: boolean;
 }
-
 
 // Represents a processed node for the correction-search's search-space's
 // tree-like graph.  May represent internal and 'leaf' nodes on said graph, as
