@@ -144,14 +144,14 @@
                 repo,
                 head_sha: sha,
                 name: 'Build Outcome',
-                status: 'in_progress',
+                status: 'pending',
               });
               return check.data.id;
             }
 
             async function updateCheck(github, owner, repo, checkRunId, status, description) {
-              const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
-              const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
+              const checkStatus = status == 'pending' ? 'pending' : 'completed';
+              const conclusion = checkStatus == 'pending' ? undefined : (status == 'success' ? 'success' : 'failure');
 
               await github.rest.checks.update({
                 owner,
