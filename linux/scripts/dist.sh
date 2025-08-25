@@ -42,6 +42,7 @@ dpkg-source \
   --tar-ignore=experiments \
   --tar-ignore=debian \
   --tar-ignore=.github \
+  --tar-ignore=.pc \
   --tar-ignore=.vscode \
   --tar-ignore=.devcontainer \
   --tar-ignore=__pycache__ \
