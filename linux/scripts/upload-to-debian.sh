@@ -118,6 +118,16 @@ function push_to_github_and_create_pr() {
   fi
 }
 
+function cleanup_worktree() {
+  cd "${PREV_DIR:-}" || true
+
+  if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+    builder_echo "Removing temporary worktree"
+    git worktree remove -f "${WORKTREE_DIR}" || true
+    git branch -f -D "${WORKTREE_BRANCH}" || true
+  fi
+}
+
 builder_heading "Fetching latest changes"
 git fetch -p origin
 
@@ -128,12 +138,32 @@ else
   DEPLOY_BRANCH=$(get_latest_stable_branch_name)
 fi
 
-# Checkout stable/beta branch so that `scripts/debian.sh` picks up correct version
-git checkout "${DEPLOY_BRANCH#origin/}"
+# Create a temporary worktree so that we start with a clean copy of the
+# target branch (stable/beta). Checkout stable/beta branch so that
+# `scripts/debian.sh` picks up correct version
+
+WORKTREE_BRANCH="maint/linux/tmp-packaging-${DEPLOY_BRANCH#origin/}"
+PREV_DIR="$PWD"
+
+WORKTREE_DIR="$(git worktree list | grep "${WORKTREE_BRANCH}" | cut -d' ' -f1)"
+if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+  builder_heading "Reusing existing worktree at ${WORKTREE_DIR}"
+else
+  WORKTREE_DIR="$(mktemp -d)"
+  builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
+  if git branch | grep -q "${WORKTREE_BRANCH}"; then
+    git branch -f -D "${WORKTREE_BRANCH}"
+  fi
+  git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH#origin/}"
+fi
+cd "${WORKTREE_DIR}"
+
+trap cleanup_worktree EXIT
+
 git pull origin "${DEPLOY_BRANCH#origin/}"
 
 builder_heading "Building source package"
-cd "${KEYMAN_ROOT}/linux"
+cd "${WORKTREE_DIR}/linux"
 DIST=unstable DEBREVISION=${REVISION} scripts/debian.sh
 cd debianpackage/
 builder_heading "Signing source package"
@@ -160,4 +190,4 @@ push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_
 Test-bot: skip"
 
 builder_heading "Finishing"
-git checkout "${CURRENT_BRANCH}"
+cleanup_worktree
