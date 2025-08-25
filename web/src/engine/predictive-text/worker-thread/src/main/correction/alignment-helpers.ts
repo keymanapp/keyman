@@ -8,6 +8,7 @@
  * edits for aligned context tokens.
  */
 
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { ClassicalDistanceCalculation, EditOperation } from "./classical-calculation.js";
 
 /**
@@ -18,7 +19,14 @@ export type ContextStateAlignment = {
   /**
    * Denotes whether or not alignment is possible between two contexts.
    */
-  canAlign: false
+  canAlign: false,
+
+  /**
+   * Indicates the edit path that could not be handled.  (Useful for error reporting)
+   *
+   * The edit path does not include actual user text and is sanitized.
+   */
+  editPath: EditOperation[];
 } | {
   /**
    * Denotes whether or not alignment is possible between two contexts.
@@ -201,10 +209,27 @@ export function computeAlignment(
   isSliding: boolean,
   noSubVerify?: boolean
 ): ContextStateAlignment {
+  const src = tokenizationToMatch.map(value => ({key: value}));
+  const dst = incomingTokenization.map(value => ({key: value}));
+
+  // let changedEmptyTail = false;
+  if(dst[dst.length - 1].key == '') {
+    // Only allow matching if the tokenizations are identical, thus the empty
+    // token was unaffected.
+    if(src.length != dst.length || src[dst.length - 1].key != '') {
+      // Do not allow empty-token matches to match each other; this complicates
+      // things when applying zero-root suggestions.
+      //
+      // The SENTINEL char should never appear in raw text, thus should never
+      // match anything in the "tokenization to match".
+      dst[dst.length - 1].key = SENTINEL_CODE_UNIT;
+    }
+  }
+
   // Inverted order, since 'match' existed before our new context.
   let mapping = ClassicalDistanceCalculation.computeDistance(
-    tokenizationToMatch.map(value => ({key: value})),
-    incomingTokenization.map(value => ({key: value})),
+    src,
+    dst,
     // Diagonal width to consider must be at least 2, as adding a single
     // whitespace after a token tends to add two tokens: one for whitespace,
     // one for the empty token to follow it.
@@ -212,6 +237,12 @@ export function computeAlignment(
   );
 
   let editPath = mapping.editPath();
+
+  const failure: ContextStateAlignment = {
+    canAlign: false,
+    editPath
+  };
+
   // Special case:  new context bootstrapping - first token often substitutes.
   // The text length is small enough that no words should be able to rotate out the start of the context.
   // Special handling needed in case of no 'match'; the rest of the method assumes at least one 'match'.
@@ -222,9 +253,7 @@ export function computeAlignment(
       if(editPath[i] == 'substitute') {
         subCount++;
         if(!noSubVerify && !isSubstitutionAlignable(incomingTokenization[i], tokenizationToMatch[i], true)) {
-          return {
-            canAlign: false
-          };
+          return failure;
         }
       } else if(editPath[i] == 'match') {
         // If a substitution is already recorded, treat the 'match' as a substitution.
@@ -254,16 +283,12 @@ export function computeAlignment(
 
   if(firstMatch == -1) {
     // If there are no matches, there's no alignment.
-    return {
-      canAlign: false
-    };
+    return failure;
   }
 
   // Transpositions are not allowed at the token level during context alignment.
   if(editPath.find((entry) => entry.indexOf('transpose') > -1)) {
-    return {
-      canAlign: false
-    };
+    return failure;
   }
 
   const lastMatch = getEditPathLastMatch(editPath);
@@ -272,9 +297,7 @@ export function computeAlignment(
   // continuous block of 'match' entries.  If there's anything else in
   // the middle, we have a context mismatch.
   if(lastMatch == -1) {
-    return {
-      canAlign: false
-    };
+    return failure;
   }
 
   let matchLength = lastMatch - firstMatch + 1;
@@ -290,9 +313,7 @@ export function computeAlignment(
   if(tailInsertLength > 0 && tailDeleteLength > 0) {
     // Something's gone weird if this happens; that should appear as a substitution instead.
     // Otherwise, we have a VERY niche edit scenario.
-    return {
-      canAlign: false
-    };
+    return failure;
   }
   const tailSubstituteLength = (editPath.length - 1 - lastMatch) - tailInsertLength - tailDeleteLength;
 
@@ -330,9 +351,7 @@ export function computeAlignment(
         // All deletions should appear at the sliding window edge; if a deletion appears
         // after the edge, but before the first match, something's wrong.
         if(priorEdit && priorEdit != 'delete') {
-          return {
-            canAlign: false
-          };
+          return failure;
         }
         leadTokensRemoved++;
         break;
@@ -342,9 +361,7 @@ export function computeAlignment(
         // Any extras in the front would be pure inserts, not substitutions, due to
         // the sliding context window and its implications.
         if(leadSubstitutions++ > 0) {
-          return {
-            canAlign: false
-          };
+          return failure;
         }
 
         // Find the word before and after substitution.
@@ -360,9 +377,7 @@ export function computeAlignment(
         // Exception: if the word is at the start of the context window and the
         // context window is likely sliding, don't check it.
         if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
-          return {
-            canAlign: false
-          };
+          return failure;
         }
 
         // There's no major need to drop parts of a token being 'slid' out of the context window.
@@ -372,9 +387,7 @@ export function computeAlignment(
       case 'insert':
         // Only allow an insert at the leading edge, as with 'delete's.
         if(priorEdit && priorEdit != 'insert') {
-          return {
-            canAlign: false
-          };
+          return failure;
         }
         // In case of backspaces, it's also possible to 'insert' a 'new'
         // token - an old one that's slid back into view.
@@ -383,9 +396,7 @@ export function computeAlignment(
       default:
         // No 'match' can exist before the first found index for a 'match'.
         // No 'transpose-' edits should exist within this section, either.
-        return {
-          canAlign: false
-        };
+        return failure;
     }
     priorEdit = editPath[i];
   }

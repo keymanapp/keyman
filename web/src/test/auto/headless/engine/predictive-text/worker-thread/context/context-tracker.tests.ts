@@ -14,9 +14,6 @@ import { ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
-
-var emptyInput = (id: number) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
-
 describe('ContextTracker', function() {
   describe('suggestion acceptance tracking', function() {
     let englishPunctuation = {
@@ -62,7 +59,7 @@ describe('ContextTracker', function() {
       compositor.initContextTracker(baseContext, 0);
       const contextTracker = compositor.contextTracker;
 
-      let preAppliedTransition = contextTracker.analyzeState(model, baseContext, emptyInput(0));
+      let preAppliedTransition = contextTracker.latest;
       // We'll ignore and overwrite the results.  We do need the prediction round to occur, though.
       await compositor.predict([{sample: postTransform, p: 1}], baseContext);
       contextTracker.latest.final.suggestions = [baseSuggestion];
@@ -74,8 +71,7 @@ describe('ContextTracker', function() {
       contextTracker.unitTestEndPoints.cache().keys().forEach((key) => assert.isDefined(key));
 
       // Next step - on the followup context, is the replacement still active?
-      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
-      let postContextMatch = compositor.contextTracker.analyzeState(model, postContext, emptyInput(2));
+      let postContextMatch = contextTracker.unitTestEndPoints.cache().get(2);
       assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.

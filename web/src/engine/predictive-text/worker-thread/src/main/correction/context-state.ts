@@ -197,7 +197,10 @@ export class ContextState {
     // computeDistance 'radius' in the called function.
     const alignmentResults = this.tokenization.computeAlignment(tokenizedContext.map((token) => token.text), isSliding, isApplyingSuggestion);
 
-    if(!alignmentResults.canAlign) {
+    if(alignmentResults.canAlign == false) { // Needs to be explicit for TS type inference.
+      if(console && console.error) {
+        console.error(`Could not align contexts with edit path ${JSON.stringify(alignmentResults.editPath)}`);
+      }
       return null;
     }
 
