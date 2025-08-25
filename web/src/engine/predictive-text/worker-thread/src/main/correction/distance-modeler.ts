@@ -339,7 +339,13 @@ export class SearchNode {
       let calculation = this.calculation;
       if(char) {
         const childTraversal = traversal.child(char);
-        // These are cases - where there's no match in the lexicon - are bundled after this for-loop.
+        // These cases - where there's no match in the lexicon - are bundled
+        // after this for-loop.
+        //
+        // ... except for when there ARE no children at all.  But, for those
+        // cases... a substitution would be invalid - we can't substitute for
+        // each char in the insert string, so abort.  It's better matched by an
+        // 'insert' edge or a by different input from a sibling subset.
         if(!childTraversal) {
           continue;
         }
