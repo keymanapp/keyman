@@ -167,6 +167,8 @@ describe("TokenBuffer Tests", () => {
       const output: string = tokenBuffer.toText();
       assert.equal(output, buffer);
     });
+  });
+  describe("TokenBuffer round trip tests", () => {
     it("can provide round trip text for baseline keyboards", () => {
       [
         'k_000___null_keyboard',
@@ -229,7 +231,7 @@ describe("TokenBuffer Tests", () => {
         assert.equal(output, buffer, `${name}.kmn`);
       });
     });
-   it("can provide round trip text for repository keyboards (0-99)", () => {
+    it("can provide round trip text for repository keyboards (0-99)", () => {
       [
         'experimental/a/alephwithbeth/source/alephwithbeth',
         'experimental/a/amuzgo_guerrero/source/amuzgo_guerrero',
