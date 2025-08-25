@@ -13,7 +13,7 @@ import { assert } from 'chai';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
+import { ContextStateAlignment, ContextToken, ContextTokenization, models } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
 
@@ -46,7 +46,7 @@ describe('ContextTokenization', function() {
 
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      let alignment = {
+      let alignment: ContextStateAlignment = {
         canAlign: true,
         leadTokenShift: 0,
         matchLength: 6,
@@ -171,7 +171,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'substitute', 'substitute', 'substitute']});
     });
 
     it("detects unalignable contexts - too many mismatching tokens", () => {
@@ -185,7 +185,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'substitute', 'match', 'match', 'match']});
     });
 
     it("fails alignment for leading-edge word substitutions", () => {
@@ -199,7 +199,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
     });
 
     it("fails alignment for small leading-edge word substitutions", () => {
@@ -213,7 +213,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ['substitute', 'match', 'match', 'match', 'match']});
     });
 
     it("properly matches and aligns when lead token is modified", () => {
@@ -447,7 +447,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "delete", "match", "match", "match"]});
     });
 
     it("fails alignment for mid-head insertion", () => {
@@ -461,7 +461,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "insert", "match", "match", "match"]});
     });
 
     it("fails alignment for mid-tail deletion", () => {
@@ -475,7 +475,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "delete", "match"]});
     });
 
     it("fails alignment for mid-tail insertion", () => {
@@ -489,7 +489,7 @@ describe('ContextTokenization', function() {
       const baseTokenization = buildBaseTokenization(baseContext);
       const computedAlignment = baseTokenization.computeAlignment(newContext, false);
 
-      assert.deepEqual(computedAlignment, {canAlign: false});
+      assert.deepEqual(computedAlignment, {canAlign: false, editPath: ["match", "match", "match", "match", "insert", "match"]});
     });
 
     it("handles late-context suggestion application after backspace", () => {

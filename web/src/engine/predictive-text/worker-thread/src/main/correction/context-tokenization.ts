@@ -260,7 +260,7 @@ export class ContextTokenization {
           // All deletions should appear at the sliding window edge; if a deletion appears
           // after the edge, but before the first match, something's wrong.
           if(priorEdit && priorEdit != 'delete') {
-            failure;
+            return failure;
           }
           leadTokensRemoved++;
           break;
@@ -270,7 +270,7 @@ export class ContextTokenization {
           // Any extras in the front would be pure inserts, not substitutions, due to
           // the sliding context window and its implications.
           if(leadSubstitutions++ > 0) {
-            failure;
+            return failure;
           }
 
           // Find the word before and after substitution.
@@ -286,7 +286,7 @@ export class ContextTokenization {
           // Exception: if the word is at the start of the context window and the
           // context window is likely sliding, don't check it.
           if(!noSubVerify && !atSlidePoint && !isSubstitutionAlignable(incomingSub, matchingSub)) {
-            failure;
+            return failure;
           }
 
           // There's no major need to drop parts of a token being 'slid' out of the context window.
@@ -296,7 +296,7 @@ export class ContextTokenization {
         case 'insert':
           // Only allow an insert at the leading edge, as with 'delete's.
           if(priorEdit && priorEdit != 'insert') {
-            failure;
+            return failure;
           }
           // In case of backspaces, it's also possible to 'insert' a 'new'
           // token - an old one that's slid back into view.
@@ -305,7 +305,7 @@ export class ContextTokenization {
         default:
           // No 'match' can exist before the first found index for a 'match'.
           // No 'transpose-' edits should exist within this section, either.
-          failure;
+          return failure;
       }
       priorEdit = editPath[i];
     }
