@@ -21,48 +21,11 @@ export class KmnFileWriter {
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
 
   /**
-   * @brief  member function to write data from object to a kmn file
+   * @brief  member function to write data from object to a Uint8Array
    * @param  data_ukelele the array holding all keyboard data
-   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
-   * @return true if data has been written; false if not
+   * @return a Uint8Array holding data
    */
-  public write(data_ukelele: ProcesData): boolean {
-
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.write_KmnFileHeader(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
-      return true;
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
-      return false;
-    }
-  }
-
-  public writeToString(data_ukelele: ProcesData): string {
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.write_KmnFileHeader(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      return data;
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
-      return null;
-    }
-  }
-
-  public writeToUint8Array(data_ukelele: ProcesData): Uint8Array {
+  public write(data_ukelele: ProcesData): Uint8Array {
     let data: string = "\n";
 
     // add top part of kmn file: STORES
@@ -74,17 +37,17 @@ export class KmnFileWriter {
     try {
       return new TextEncoder().encode(data);
     } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
       return null;
     }
   }
 
   /**
-   * @brief  member function to create data for stores that will be printed to the resulting kmn file
+   * @brief  member function to create data for the header (stores) that will be printed to the resulting kmn file
    * @param  data_ukelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public write_KmnFileHeader(data_ukelele: ProcesData) {
+  public write_KmnFileHeader(data_ukelele: ProcesData): string {
 
     let data: string = "";
 
@@ -118,7 +81,7 @@ export class KmnFileWriter {
 
     // filter array of all rules and remove duplicates
     // during the process of creating Rule[], duplicate rules might occur
-    // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules). 
+    // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules).
     // This is to filter out those duplicate Rule objects
     const unique_data_Rules: Rule[] = data_ukelele.arrayOf_Rules.filter((curr) => {
       return (!(curr.output === new TextEncoder().encode("") || curr.output === undefined)
@@ -426,7 +389,7 @@ export class KmnFileWriter {
    *         Omitting rules and definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
    * @param  rule : Rule[] - an array of all rules
-   * @param  index the index of a rule in array[rule]
+   * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
   public reviewRules(rule: Rule[], index: number): string[] {
