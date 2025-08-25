@@ -744,7 +744,7 @@ describe('Correction Distance Modeler', function() {
   });
 
   describe('SearchSpaceTier + SearchSpace', function() {
-    let checkResults_teh = async function(iter: AsyncGenerator<correction.SearchResult, any, any>) {
+    let checkRepeatableResults_teh = async function(iter: AsyncGenerator<correction.SearchResult, any, any>) {
       let firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(firstIterResult.done);
 
@@ -752,11 +752,12 @@ describe('Correction Distance Modeler', function() {
       // No checks on the first set's cost.
       assert.equal(firstResult.matchString, "ten");
 
+      // All start with 'te' but one, and invoke one edit of the same cost.
+      // 'th' has an 'h' at the same cost (input 3) of the 'e' (input 2).
       let secondBatch = [
-        'beh',  'te',  'tec',
-        'tech', 'tel', 'tem',
-        'ter',  'tes', 'th',
-        'the'
+        'tec', 'tel', 'tem',
+        'ter', 'tes', 'th',
+        'te'
       ];
 
       async function checkBatch(batch: string[], prevCost: number) {
@@ -783,15 +784,33 @@ describe('Correction Distance Modeler', function() {
 
       const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
 
+      // Single hard edit, all other input probability aspects are equal
       let thirdBatch = [
-        'cen', 'en',  'gen',
-        'ken', 'len', 'men',
-        'sen', 'tha', 'then',
-        'thi', 'tho', 'thr',
-        'thu', 'wen'
+        // 't' -> 'b' (sub)
+        'beh',
+        // '' -> 'c' (insertion)
+        'tech'
       ];
 
       await checkBatch(thirdBatch, secondCost);
+
+      // All replace the low-likelihood case for the third input.
+      let fourthBatch = [
+        'the', 'thi', 'tho', 'thr',
+        'thu', 'tha'
+      ];
+
+      await checkBatch(fourthBatch, secondCost);
+
+      // Replace the _first_ input's char OR insert an extra char,
+      // also matching the low-likelihood third-char option.
+      let fifthBatch = [
+        'cen', 'en',  'gen',
+        'ken', 'len', 'men',
+        'sen', 'then', 'wen'
+      ];
+
+      await checkBatch(fifthBatch, secondCost);
     }
 
     it('Simple search without input', async function() {
@@ -807,7 +826,7 @@ describe('Correction Distance Modeler', function() {
     });
 
     // Hmm... how best to update this...
-    it.skip('Simple search (paralleling "Small integration test")', async function() {
+    it('Simple search (paralleling "Small integration test")', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -834,10 +853,10 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution3);
 
       let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkResults_teh(iter);
+      await checkRepeatableResults_teh(iter);
     });
 
-    it.skip('Allows reiteration (sequentially)', async function() {
+    it('Allows reiteration (sequentially)', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -864,12 +883,12 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution3);
 
       let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkResults_teh(iter);
+      await checkRepeatableResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
       let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
-      await checkResults_teh(iter2);
+      await checkRepeatableResults_teh(iter2);
     });
 
     it('Empty search space, loaded model', async function() {
