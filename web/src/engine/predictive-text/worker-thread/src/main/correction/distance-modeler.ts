@@ -548,8 +548,6 @@ class SearchSpaceTier {
   correctionQueue: PriorityQueue<SearchNode>;
   processed: SearchNode[] = [];
 
-  // Should not change to the number of characters.  Inputs is correct, since that's what affects
-  // input-path likelihood.
   /**
    * Indicates the depth searched, in terms of number of inputs, by this tier of the search space.
    */
@@ -825,7 +823,7 @@ export class SearchSpace {
       const batch = deletions.concat(substitutions);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-      // and queue-enqueing does come with a bit of cost.
+      // and queue-enqueing does come with a cost.  Avoid the unnecessary overhead.
       return batch.flatMap(e => e.processSubsetEdge());
     });
 
@@ -927,8 +925,8 @@ export class SearchSpace {
       return unmatchedResult;
     }
 
-    // OK, we fully crossed a graph edge and have landed on a transition point.
-    // Do we take a new input, model a deletion, ...both?  Handle this correctly.
+    // OK, we fully crossed a graph edge and have landed on a transition point;
+    // time to build more edges / edge batches.
 
     // Always possible, as this does not require any new input.
     if(!substitutionsOnly) {
@@ -962,7 +960,7 @@ export class SearchSpace {
       let batch = deletionEdges.concat(substitutionEdges);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-      // and queue-enqueing does come with a bit of cost.
+      // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
       batch = batch.flatMap(e => e.processSubsetEdge());
 
       // Note:  we're live-modifying the tier's cost here!  The priority queue loses its guarantees as a result.
