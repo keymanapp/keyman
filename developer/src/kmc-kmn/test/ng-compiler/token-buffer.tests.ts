@@ -158,7 +158,7 @@ describe("TokenBuffer Tests", () => {
       assert.equal(tb.nextToken().tokenType,TokenTypes.NOMATCH);
     });
   });
-  describe("TokenBuffer toText()", () => {
+  describe("TokenBuffer round trip tests [toText()]", () => {
     it("can provide round trip text for khmer_angkor.kmn", () => {
       const buffer: string = readFileSync('test/fixtures/keyboards/khmer_angkor.kmn').toString();
       const lexer = new Lexer(buffer);
@@ -167,8 +167,6 @@ describe("TokenBuffer Tests", () => {
       const output: string = tokenBuffer.toText();
       assert.equal(output, buffer);
     });
-  });
-  describe("TokenBuffer round trip tests", () => {
     it("can provide round trip text for baseline keyboards", () => {
       [
         'k_000___null_keyboard',
