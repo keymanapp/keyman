@@ -18,31 +18,6 @@ export class KmnFileWriter {
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
 
   /**
-   * @brief  member function to write data from object to a kmn file
-   * @param  data_ukelele the array holding all keyboard data
-   * @param  outputfilename the file that will be written; if no outputfilename is given an outputfilename will be created from data_ukelele.keylayout_filename
-   * @return true if data has been written; false if not
-   */
-  public writeToFile(data_ukelele: ProcesData): boolean {
-
-    let data: string = "\n";
-
-    // add top part of kmn file: STORES
-    data += this.write_KmnFileHeader(data_ukelele);
-
-    // add bottom part of kmn file: RULES
-    data += this.writeData_Rules(data_ukelele);
-
-    try {
-      this.callbacks.fs.writeFileSync(data_ukelele.kmn_filename, new TextEncoder().encode(data));
-      return true;
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({outputFilename: data_ukelele.kmn_filename}));
-      return false;
-    }
-  }
-
-  /**
    * @brief  member function to write data from object to a Uint8Array
    * @param  data_ukelele the array holding all keyboard data
    * @return a Uint8Array holding data
