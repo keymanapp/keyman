@@ -26,7 +26,6 @@ const LIST: Token[] = [
 ];
 
 describe("TokenBuffer Tests", () => {
-
   describe("TokenBuffer constructor", () => {
     it("can construct a TokenBuffer with list", () => {
       const tb: TokenBuffer = new TokenBuffer(LIST);
