@@ -512,6 +512,26 @@ describe('ContextTokenization', function() {
       });
     });
 
+    it("handles late-context application of default suggestion", () => {
+      const baseContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'over', ' ', ''
+      ];
+      const newContext = [
+        'quick', ' ', 'brown', ' ', 'fox', ' ', 'jumped', ' ', 'over', ' ', 'the', ' ', ''
+      ];
+
+      const baseTokenization = buildBaseTokenization(baseContext);
+      const computedAlignment = baseTokenization.computeAlignment(newContext, false);
+
+      assert.deepEqual(computedAlignment, {
+        canAlign: true,
+        leadTokenShift: 0,
+        matchLength: 10,
+        tailEditLength: 1,
+        tailTokenShift: 2
+      });
+    });
+
     it("handles sliding context-window scenarios", () => {
       // // Explicitly-defined window, though it's not needed directly by the method.
       // const config = {
