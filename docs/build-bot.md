@@ -26,8 +26,42 @@ Build-bot: skip
 Or you may want to ensure that an artifact is built for Windows:
 
 ```
-Build-bot: release windows
+Build-bot: release:windows
 ```
+
+## The Build-bot command
+
+The build bot is controlled through the `Build-bot` command, which can be put
+into commit trailers or the PR body (not PR comments). The format of the command
+is:
+
+```
+Build-bot: <BuildLevel>:[Platforms] ...
+```
+
+* `BuildLevel` can be `skip`, `build`, or `release`. See [Build Level] for more
+  details.
+* `Platforms` can be omitted, in which case the command applies to all
+  previously-specified platforms (which is not equivalent to specifying `all` --
+  if no platform is specified, it will only update platforms that were already
+  in the build set). If specified, it must be a comma-separated list, without
+  spaces, of one or more of the following platform identifiers:
+
+  * `all`: apply to all platforms listed below
+  * `android`
+  * `developer`
+  * `ios`
+  * `linux`
+  * `mac`
+  * `web`
+  * `windows`
+  * `common`: build common components, on all three build platforms (note:
+    `release` is equivalent to `build` buildLevel for `common`)
+  * `core`: build Keyman Core, on all three build platforms, and also WASM
+    (note: `release` is equivalent to `build` buildLevel for `core`)
+
+The list of platforms can be found in the `available_platforms` variable in
+trigger-definitions.inc.sh.
 
 ## Build Level
 
@@ -42,8 +76,8 @@ other release distribution endpoints.
 The build level is controlled by the Build-bot commit trailer and PR body
 Build-bot/Test-bot trailers. The default build level will be 'build'.
 
-For target branch builds, the build level will always be 'build', and Build-bot:
-commit trailers are ignored.
+For target branch (master, beta, stable-x.y) builds, the build level will always
+be 'build', and Build-bot: commit trailers are ignored.
 
 ### 'skip' build level
 
@@ -82,7 +116,8 @@ For a 'release' build level:
 * we won't upload artifacts to any release endpoint such as Debian,
   packages.sil.org, etc, or to the release areas for Play Store or App Store
 
-(uploading to *.keyman.com and to release endpoints happens in the release TC build config/GHA)
+(uploading to *.keyman.com and to release endpoints happens in the release TC
+build config/GHA)
 
 ## Controlling the build bot with trailers
 
@@ -113,10 +148,11 @@ The Build-bot has limited interactions with the Keyman test bot (aka
 keymanapp-test-bot): if a 'User Testing' section is found in the PR body, the
 default build level will be upgraded from 'build' to 'release'.
 
-Build bot trailers found in the commits or in the PR body are applied after the
-test bot command.
+Build bot trailers found in either the commits or in the PR body are applied
+after the test bot command.
 
-WARNING: The build bot does not check PR comments for Test-bot commands.
+WARNING: The build bot does not check PR comments for Test-bot commands or a
+'User Testing' section.
 
 ## Example Build-bot interactions
 
@@ -126,16 +162,68 @@ Say we have a PR that touches `/android/build.sh`. The default build set will be
 The PR body has a User Testing section: `# User Testing`. The build set is
 upgraded to: `(android:release)`.
 
-The first commit includes a Build-bot command: `Build-bot: build ios`. The build
+The first commit includes a Build-bot command: `Build-bot: build:ios`. The build
 set is now `(android:release ios:build)`.
 
 In a subsequent commit, the PR author decides that nothing needs to be built,
 after all: `Build-bot: skip`. The build set is now `(android:skip ios:skip)`.
 Note that other platforms are still 'skip' but not included in the build set.
 
-Finally, the PR author pushes another commit, with `Build-bot: release windows`.
+Finally, the PR author pushes another commit, with `Build-bot: release:windows`.
 The build set is now: `(android:skip ios:skip windows:release)`.
 
+# FAQ
 
+* How do I specify commands for multiple platforms, e.g. building on Windows and Linux?
+
+```
+Build-bot: build:windows,linux
+```
+
+* If I modify a file that would cause a build on all platforms, does `Build-bot:
+  build android` then cause a build only on Android and skip all others? Or is
+  it only additive?
+
+The commands are additive. To skip all others, you would do:
+
+```
+Build-bot: skip
+Build-bot: build:android
+```
+
+* What happens in the following scenario: I have a PR that I only want to build
+  on Android and I add `Build-bot: build android`. Later on I merge in the
+  changes from `master` and add another commit. If I still only want to build on
+  Android, do I have to add `Build-bot: build android` on my new commit again?
+  Or what happens with merges that touch other files which would cause builds
+  for other platforms?
+
+First, you would need to specify `skip` for all other platforms in order to only
+build on Android:
+
+```
+Build-bot: skip
+Build-bot: build:android
+```
+
+Then, the build bot scans all the commits in the PR, and additively builds the
+final build set from the `Build-bot` commands from all the commits (up to 2000
+in one PR). Thus, earlier bot commands commits will continue to be honoured.
+This makes it easier to apply merge commits, for example, or small fixups,
+without needing to think about what needs to be built again.
+
+* How can I re-trigger builds after changing my build bot commands?
+
+In [TeamCity - Trigger Test Builds](https://build.palaso.org/buildConfiguration/Keyman_Test),
+select a custom Run (small button attached to right of Run button), and in the
+"Changes" tab, "Build branch" field, enter the PR number to re-run the builds.
+Any test builds currently running against that PR will be cancelled and
+restarted.
+
+Note: if you reduce the build set (with `skip`), and re-run builds in this way
+without pushing a new commit, you will end up with stale status checks on the
+latest commit in your PR for the builds that are now skipped on the new run, so
+in this scenario it is safest to push a new commit with the updated build bot
+commands.
 
 [Build Level]: #Build_Level

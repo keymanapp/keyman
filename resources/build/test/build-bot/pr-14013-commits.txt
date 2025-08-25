@@ -13,7 +13,7 @@
         "email": "marc@durdin.net",
         "date": "2025-04-30T01:59:27Z"
       },
-      "message": "maint(common): consolidate VC++ environment setup for meson\n\nUse the automated environment setup that we built for Windows and\nDeveloper builds in our meson build configurations, so we don't need to\ncall out to vsdevcmd.bat for every build step. This makes the build\nfaster, more consistent across the various ways we call VC++, and\nsimplifies the shell scripts. Removes the complicated build.bat wrappers.\n\nAlso removes the `cleanup_visual_studio_path` function which should no\nlonger be necessary, as our environment builder does the job for us.\n\nMinor complication in that `$TARGET_PATH` variable in kmcmplib/build.sh\nis also used in the Windows environment setup, so eliminated its use in\nkmcmplib/build.sh.\n\nFinally, removes the `$MESON_LOW_VERSION` variable as we know we are\nalways on Meson 1.0 or later now.\n\nBuild-bot: skip developer, windows, foo\nBuild-bot: bash windows",
+      "message": "maint(common): consolidate VC++ environment setup for meson\n\nUse the automated environment setup that we built for Windows and\nDeveloper builds in our meson build configurations, so we don't need to\ncall out to vsdevcmd.bat for every build step. This makes the build\nfaster, more consistent across the various ways we call VC++, and\nsimplifies the shell scripts. Removes the complicated build.bat wrappers.\n\nAlso removes the `cleanup_visual_studio_path` function which should no\nlonger be necessary, as our environment builder does the job for us.\n\nMinor complication in that `$TARGET_PATH` variable in kmcmplib/build.sh\nis also used in the Windows environment setup, so eliminated its use in\nkmcmplib/build.sh.\n\nFinally, removes the `$MESON_LOW_VERSION` variable as we know we are\nalways on Meson 1.0 or later now.\n\nBuild-bot: skip:developer skip:windows\nBuild-bot: build:windows",
       "tree": {
         "sha": "df937f0cb23e2e3736d92cf39b3b7f62ce20bcc1",
         "url": "https://api.github.com/repos/keymanapp/keyman/git/trees/df937f0cb23e2e3736d92cf39b3b7f62ce20bcc1"
@@ -95,7 +95,7 @@
         "email": "noreply@github.com",
         "date": "2025-04-30T02:18:26Z"
       },
-      "message": "Merge branch 'maint/meson-versioning-improvements' into maint/core-developer/12639-meson-no-batch-wrappers\n\nBuild-bot: skip all",
+      "message": "Merge branch 'maint/meson-versioning-improvements' into maint/core-developer/12639-meson-no-batch-wrappers\n\nBuild-bot: skip:all",
       "tree": {
         "sha": "47bb7ca6f52998e8a14e478f5e9f5d7ba415ace3",
         "url": "https://api.github.com/repos/keymanapp/keyman/git/trees/47bb7ca6f52998e8a14e478f5e9f5d7ba415ace3"

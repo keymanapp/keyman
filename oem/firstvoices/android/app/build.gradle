@@ -7,8 +7,14 @@ plugins {
 ext.rootPath = '../../../../android'
 apply from: "$rootPath/version.gradle"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 35
     namespace="com.firstvoices.keyboards"
 
     buildFeatures {
@@ -18,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
         versionCode KEYMAN_VERSION_CODE as Integer
@@ -123,9 +129,10 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
 }
 

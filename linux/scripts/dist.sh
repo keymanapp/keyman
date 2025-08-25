@@ -12,7 +12,7 @@ set -e
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 BASEDIR=$(pwd)
@@ -89,6 +89,12 @@ dpkg-source \
   --tar-ignore=keyman/resources/devbox \
   --tar-ignore=keyman/resources/docker-images \
   --tar-ignore=keyman/resources/environment.sh \
+  --tar-ignore=keyman/resources/build/ci \
+  --tar-ignore=keyman/resources/build/history \
+  --tar-ignore=keyman/resources/build/mac \
+  --tar-ignore=keyman/resources/build/pr-build-status \
+  --tar-ignore=keyman/resources/build/version \
+  --tar-ignore=keyman/resources/build/win \
   --tar-ignore=keyman/resources/git-hooks \
   --tar-ignore=keyman/resources/scopes \
   --tar-ignore=keyman/resources/teamcity \
