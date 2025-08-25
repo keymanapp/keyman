@@ -30,6 +30,28 @@ enum TimedTaskTypes {
   CORRECTING = 2
 }
 
+export interface PartialSearchEdge {
+  /**
+   * `subsetSubIndex` indicates the next portion of the subset to be incorporated.
+   */
+  transformSubset: TransformSubset<number>;
+
+  /**
+   * Indicates the depth in the insert string of the most recently added input
+   * that should next be incorporated into the search path.
+   *
+   * If undefined, the most recently added input is fully incorporated.
+   */
+  subsetSubindex: number;
+
+  /**
+   * Indicates whether the subset is for a substitution/match edge pattern (true) or
+   * a deletion pattern (false) of the dynamic search-graph construction.
+   */
+  doSubsetMatching: boolean;
+}
+
+
 // Represents a processed node for the correction-search's search-space's
 // tree-like graph.  May represent internal and 'leaf' nodes on said graph, as
 // well as the overall root of the search.  Also used to represent edges on the
@@ -100,24 +122,9 @@ export class SearchNode {
 
   /**
    * When defined, indicates that this instance models a set of transforms that have not
-   * yet been fully input into the search path.  `subsetSubIndex` indicates the next
-   * portion of the subset to be incorporated.
+   * yet been fully input into the search path.
    */
-  private transformSubset?: TransformSubset<number>;
-
-  /**
-   * When defined, indicates the depth in the insert string of the most recently added input
-   * that should next be incorporated into the search path.
-   *
-   * If undefined, the most recently added input is fully incorporated.
-   */
-  private subsetSubindex?: number;
-
-  /**
-   * Indicates whether the subset is for a substitution/match edge pattern (true) or
-   * a deletion pattern (false) of the dynamic search-graph construction.
-   */
-  private doSubsetMatching?: boolean;
+  private partialEdge?: PartialSearchEdge;
 
   /**
    * Internal lazy-cache for .inputSamplingCost; it's a bit expensive to re-compute.
@@ -133,6 +140,9 @@ export class SearchNode {
       const priorNode = rootTraversal;
 
       Object.assign(this, priorNode);
+      if(this.partialEdge) {
+        this.partialEdge = Object.assign({}, this.partialEdge);
+      }
       this.priorInput = priorNode.priorInput.slice(0);
       // Do NOT copy over _inputCost; this is a helper-constructor for methods
       // building new nodes... which will have a different cost.
@@ -160,7 +170,7 @@ export class SearchNode {
    * inputs should be received or processed while this returns `true`.
    */
   get hasPartialInput(): boolean {
-    return this.subsetSubindex !== undefined || !!this.transformSubset;
+    return !!this.partialEdge;
   }
 
   /**
@@ -178,8 +188,8 @@ export class SearchNode {
       // TODO:  probably more efficient to instead use actual 'probability space'... but that'll involve extra changes.
       this._inputCost = this.priorInput.map(mass => mass.p > MIN_P ? mass.p : MIN_P).reduce((previous, current) => previous - Math.log(current), 0);
       // For a partiallly-processed set, we do include the set's full modeled probability mass.
-      if(this.transformSubset) {
-        const mass = this.transformSubset.cumulativeMass;
+      if(this.partialEdge) {
+        const mass = this.partialEdge.transformSubset.cumulativeMass;
         this._inputCost -= Math.log(mass > MIN_P ? mass : MIN_P);
       }
       return this._inputCost;
@@ -261,7 +271,7 @@ export class SearchNode {
     const node = new SearchNode(this);
     node.calculation = calculation;
     // no update to the match string or traversal to be found here...
-    node.subsetSubindex++;
+    node.partialEdge.subsetSubindex++;
     return node;
   }
 
@@ -271,22 +281,24 @@ export class SearchNode {
    * @returns
    */
   private tryFinalize() {
-    const subset = this.transformSubset;
-    if(subset.key > this.subsetSubindex) {
+    const subset = this.partialEdge?.transformSubset;
+    if(!subset || subset.key > this.partialEdge.subsetSubindex) {
       // Not yet ready for finalization.  Just exit.
       return this;
     }
 
     // Finalization time!  We can safely transition the result node out
     // of 'subset' mode.
-    delete this.subsetSubindex;
-    delete this.transformSubset;
+    delete this.partialEdge;
 
     // Whatever entries are in the subset, they actually resolve down to the
     // same net edit, as specified here.  It's more efficient to build the
     // transform insert string on the subset, rather than mass-editing a group
     // at each step and then consolidating them at the end.
-    this.priorInput.push({sample: { insert: subset.insert, deleteLeft: subset.key }, p: subset.cumulativeMass });
+    this.priorInput.push({
+      sample: { insert: subset.insert, deleteLeft: subset.entries[0]?.sample.deleteLeft ?? 0 },
+      p: subset.cumulativeMass
+    });
     return this;
   }
 
@@ -298,19 +310,20 @@ export class SearchNode {
    * @returns
    */
   processSubsetEdge(): SearchNode[] {
-    if(!this.hasPartialInput) {
+    const partialEdge = this.partialEdge;
+    if(!partialEdge) {
       throw new Error("Invalid state:  not currently processing a Transform subset");
     }
 
-    const startSubset = this.transformSubset;
-    const subIndex = this.subsetSubindex;
+    const startSubset = partialEdge.transformSubset;
+    const subIndex = partialEdge.subsetSubindex;
 
     // For raw backspaces - if no insert string, we can already finalize!
-    if(this.subsetSubindex >= this.transformSubset.key) {
+    if(partialEdge.subsetSubindex >= partialEdge.transformSubset.key) {
       return [this.tryFinalize()];
     }
 
-    if(!this.doSubsetMatching) {
+    if(!partialEdge.doSubsetMatching) {
       return [this.processDeletionSubset().tryFinalize()];
     }
 
@@ -340,10 +353,9 @@ export class SearchNode {
       const node = new SearchNode(this);
       node.calculation = calculation;
       node.currentTraversal = calculation.lastMatchEntry?.traversal ?? this.root;
-      node.subsetSubindex++;
+      node.partialEdge.subsetSubindex++;
       // Append the newly-processed char to the subset's `insert` string.
-      node.transformSubset = {...subset, key: startSubset.key, insert: subset.insert + char};
-      node.doSubsetMatching = true;
+      node.partialEdge.transformSubset = {...subset, key: startSubset.key, insert: subset.insert + char};
       nodesToReturn.push(node);
     };
 
@@ -383,10 +395,10 @@ export class SearchNode {
       childSubset.insert += SENTINEL_CODE_UNIT;
 
       const node = new SearchNode(this);
-      node.subsetSubindex++;
       node.calculation = childCalc;
       node.currentTraversal = childCalc.lastMatchEntry?.traversal ?? this.root;
-      node.transformSubset = childSubset;
+      node.partialEdge.subsetSubindex++;
+      node.partialEdge.transformSubset = childSubset;
       nodesToReturn.push(node);
     }
 
@@ -435,13 +447,15 @@ export class SearchNode {
 
         const node = new SearchNode(this);
         node.calculation = edgeCalc;
-        node.transformSubset = isSubstitution ? insSubset : {
-          ...insSubset,
-          entries: [ { sample: { insert: SENTINEL_CODE_UNIT.repeat(ins), deleteLeft: dl }, p: insSubset.cumulativeMass}]
-        };
-        node.subsetSubindex = 0;
+        node.partialEdge = {
+          doSubsetMatching: isSubstitution,
+          subsetSubindex: 0,
+          transformSubset: isSubstitution ? insSubset : {
+            ...insSubset,
+            entries: [ { sample: { insert: SENTINEL_CODE_UNIT.repeat(ins), deleteLeft: dl }, p: insSubset.cumulativeMass}]
+          }
+        }
         node.currentTraversal = traversalBase;
-        node.doSubsetMatching = isSubstitution;
 
         edges.push(node);
       }
@@ -491,12 +505,13 @@ export class SearchNode {
   get pathKey(): string {
     // Note:  deleteLefts apply before inserts, so order them that way.
     let inputString = this.priorInput.map((value) => '-' + value.sample.deleteLeft + '+' + value.sample.insert).join('');
-    const subset = this.transformSubset;
+    const partialEdge = this.partialEdge;
     // Make sure the subset progress contributes to the key!
-    if(subset) {
+    if(partialEdge) {
+      const subset = partialEdge.transformSubset;
       // We need a copy of at least one insert string in the subset here.  Without that, all subsets
       // at the same level of the search, against the same match, look identical - not cool!
-      inputString += `-${subset.entries[0].sample.deleteLeft}+<${subset.key},${this.subsetSubindex},${subset.entries[0].sample.insert}>`;
+      inputString += `-${subset.entries[0].sample.deleteLeft}+<${subset.key},${partialEdge.subsetSubindex},${subset.entries[0].sample.insert}>`;
     }
     let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
 
