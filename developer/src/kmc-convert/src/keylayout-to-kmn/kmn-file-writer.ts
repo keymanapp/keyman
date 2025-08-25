@@ -386,7 +386,7 @@ export class KmnFileWriter {
    *         Omitting rules and definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
    * @param  rule : Rule[] - an array of all rules
-   * @param  index the index of a rule in array[rule]
+   * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
   public reviewRules(rule: Rule[], index: number): string[] {

@@ -78,7 +78,7 @@ export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly MAX_CTRL_CHARACTER = 32;
+  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint
   static readonly MAX_KEY_COUNT = 49;                             // At most we use key Nr 0 (A) -> key Nr 49 (Space)
   static USE_KEY_COUNT = KeylayoutToKmnConverter.MAX_KEY_COUNT;   // we use key Nr 0 (A) -> highest available key of .keylayout file
 
@@ -122,34 +122,20 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    if (!jsonO) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
-      return null;
-    }
-
     outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
     const outArray: ProcesData = await this.convert(jsonO, outputFilename);
-    if (outArray.arrayOf_Rules.length === 0) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
-      return null;
-    }
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
     // write to object/ConverterToKmnResult
     const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
-    const Result_toBeReturned: ConverterToKmnResult = {
+    const result: ConverterToKmnResult = {
       artifacts: {
         kmn: { data: out_Uint8, filename: outputFilename }
       }
     };
-
-    if (!out_Uint8) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
-      return null;
-    }
-    return Result_toBeReturned;
+    return result;
   }
 
   /**
@@ -189,12 +175,16 @@ export class KeylayoutToKmnConverter {
       // fill rules into arrayOf_Rules of data_object
       return this.createRuleData(data_object, jsonObj);
     }
-    return data_object;
+    else {
+      const inputFilename = data_object.keylayout_filename;
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
+      return data_object;
+    }
   }
 
   /**
     * @brief  member function to read the rules contained in a json object and add array of Rules[] to an ProcesData
-    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an (empty) array of Rules
+    * @param  data_ukelele: an object containing the name of the in/output file, an array of behaviours and an (empty) array of Rules
     * @param  jsonObj: json Object containing all data read from a keylayout file
     * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
     */
@@ -215,8 +205,6 @@ export class KeylayoutToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText }));
     }
 
-    // loop keys 0-49 (= all keys we use)
-    //for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
     for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
 
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
@@ -500,7 +488,7 @@ export class KeylayoutToKmnConverter {
 
   /**
     * @brief  member function to review data in array of Rules[] of data_ukelele: remove duplicate rules and mark first occurance of a rule in object_array
-    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an array of Rules
+    * @param  data_ukelele: an object containing the name of the in/output file, an array of behaviours and an array of Rules
     * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
     */
   public reviewRuleInputData(data_ukelele: ProcesData): ProcesData {
@@ -697,14 +685,14 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to check if CAPS is used throughout a keylayout file or not
    * @param  keylayout_modifier the modifier string used in the .keylayout-file
-   * @return kmn_modifier the modifier string used in the .kmn-file
+   * @return kmn_modifier: the modifier string used in the .kmn-file
    */
   public checkIfCapsIsUsed(keylayout_modifier: string[][]): boolean {
     return JSON.stringify(keylayout_modifier).toUpperCase().includes("CAPS");
   }
 
   /**
-  * @brief  member function to check if a modifier can be used in keyman
+  * @brief  member function to check if a modifier can be used in Keyman
   * @param  keylayout_modifier the modifier string used in the .keylayout-file
   * @return true if the modifier can be used in keyman; false if not
   */
@@ -739,7 +727,7 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to map Ukelele keycodes to Windows Keycodes
    * @param  pos Ukelele (=mac) keycodes
-   * @return keycode on a Windows Keyboard
+   * @return VK
    */
   public map_UkeleleKC_To_VK(pos: number): string {
     const vk = [
@@ -821,7 +809,7 @@ export class KeylayoutToKmnConverter {
   * @brief  member function to  find the actionID of a certain state-next pair
   * @param  data   :any an object containing all data read from a .keylayout file
   * @param  search :string value 'next' to be found
-  * @return a string containing the actionId of a certain state-next pair
+  * @return a string containing the actionId of a certain state(none)-next pair
   */
   public get_ActionID__From__ActionNext(data: any, search: string): string {
     if (search !== "none") {
@@ -840,7 +828,7 @@ export class KeylayoutToKmnConverter {
    * @brief  member function to create an array of (modifier) behaviours for a given keycode in [{keycode,modifier}]
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : KeylayoutFileData[] - an array[{keycode,modifier}]  to be found
-   * @return an array: string[] containing modifiers
+   * @return a string[] containing modifiers
    */
   public get_Modifier_array__From__KeyModifier_array(data: any, search: KeylayoutFileData[]): string[] {
     const returnString1D: string[] = [];

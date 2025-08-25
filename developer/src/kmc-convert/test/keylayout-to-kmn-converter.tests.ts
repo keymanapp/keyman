@@ -22,27 +22,6 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  // todo remove
-    describe('RunAllFiles', function () {
-      const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-      [
-        [makePathToFixture('../data/Italian.keylayout')],
-        [makePathToFixture('../data/Italian_command.keylayout')],
-        [makePathToFixture('../data/Swiss_French.keylayout')],
-        [makePathToFixture('../data/Spanish.keylayout')],
-        [makePathToFixture('../data/Swiss_German.keylayout')],
-        [makePathToFixture('../data/US.keylayout')],
-        [makePathToFixture('../data/Polish.keylayout')],
-        [makePathToFixture('../data/French.keylayout')],
-        [makePathToFixture('../data/Latin_American.keylayout')],
-      //  [makePathToFixture('../data/German_complete.keylayout')],
-        [makePathToFixture('../data/German_complete_reduced.keylayout')],
-       // [makePathToFixture('../data/German_Standard.keylayout')],
-      ].forEach(function (files_) {
-        sut.run(files_[0]);
-        assert.isTrue(true);
-      });
-    });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -178,16 +157,18 @@ describe('KeylayoutToKmnConverter', function () {
   describe('convert() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const sut_r = new KeylayoutFileReader(compilerTestCallbacks);
+
+    // ProcesData from usable file
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sut_r.read(inputFilename);
     const converted = sut.convert_bound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
-    // ProcesData from unavailable file name
+    // ProcesData from unavailable file
     const inputFilename_unavailable = makePathToFixture('../data/X.keylayout');
     const read_unavailable = sut_r.read(inputFilename_unavailable);
     const converted_unavailable = sut.convert_bound.convert(read_unavailable, inputFilename_unavailable.replace(/\.keylayout$/, '.kmn'));
 
-    // ProcesData from empty filename
+    // ProcesData from empty file
     const inputFilename_empty = makePathToFixture('');
     const read_empty = sut_r.read(inputFilename_empty);
     const converted_empty = sut.convert_bound.convert(read_empty, inputFilename_empty);

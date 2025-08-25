@@ -39,8 +39,8 @@ export class KeylayoutFileReader {
 
   /**
    * If object contains attribute #text it will be removed.
-   * @param o Object with possible property #text
-   * @return objects that do not contain  property #text
+   * @param o Object with possible property #text containing whitespaces
+   * @return objects that do not contain property #text
    */
   public remove_whitespace(o: any): void {
     if (o['#text']) {
@@ -50,7 +50,7 @@ export class KeylayoutFileReader {
 
   /**
    * @brief wrapper to remove whitespace and box single-entry objects into arrays
-   * @param o Object with property to box/remove whitespace from
+   * @param o Object with property to box/remove whitespaces from
    * @param x Name of element to box
    * @return objects that contain only boxed arrays
    */
@@ -63,7 +63,7 @@ export class KeylayoutFileReader {
   /**
    * @brief  member function to box single-entry objects into arrays
    * @param  source the object to be changed
-   * @return objects that contain only boxed arrays
+   * @return object that contain only boxed arrays
    */
   public boxArray(source: any) {
 
@@ -101,7 +101,7 @@ export class KeylayoutFileReader {
   }
 
   /**
-   * @brief  member function to parse data from a .keylayout-file and store to a json object
+   * @brief  member function to parse data from a .keylayout-file and store in a json object
    *         we need to be able to ignore an output character of "", process an output character of " " (space) and allow surrounding whitespace in #text (which will be removed later)
    * @param  inputFilename the ukelele .keylayout-file to be parsed
    * @return in case of success: json object containing data of the .keylayout file; else null
