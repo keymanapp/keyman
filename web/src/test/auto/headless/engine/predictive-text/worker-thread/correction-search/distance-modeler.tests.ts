@@ -11,12 +11,15 @@ import { assert } from 'chai';
 
 import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { correction, models } from '@keymanapp/lm-worker/test-index';
 
 import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
+import Distribution = LexicalModelTypes.Distribution;
 import SearchNode = correction.SearchNode;
 import SearchResult = correction.SearchResult;
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 // Exposes an extra property that's very useful for validating behaviors during unit testing:
@@ -24,6 +27,8 @@ import TrieModel = models.TrieModel;
 type TrieTraversal = ReturnType<TrieModel['traverseFromRoot']>;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
+const toKey = (s: string) => testModel.toKey(s);
+
 /**
  * The total number of top-level child paths in the lexicon.
  */
@@ -57,7 +62,6 @@ function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
 describe('Correction Distance Modeler', function() {
   describe('SearchNode', function() {
     it('constructs a fresh instance from a traversal + keyingFunction', () => {
-      const toKey = (s: string) => testModel.toKey(s);
       const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
       assert.equal(rootNode.resultKey, '');
 
@@ -73,8 +77,198 @@ describe('Correction Distance Modeler', function() {
       assert.equal(rootNode.toKey, toKey);
     });
 
-    // TODO:
-    it.skip('supports the cloning constructor pattern', () => {})
+    describe('supports the cloning constructor pattern', () => {
+      it('properly deep-copies the root node', () => {
+        const originalNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+        const clonedNode = new SearchNode(originalNode);
+
+        // Root node properties; may as well re-assert 'em.
+        assert.equal(clonedNode.resultKey, '');
+
+        assert.equal(clonedNode.editCount, 0);
+        assert.equal(clonedNode.inputSamplingCost, 0);
+        assert.equal(clonedNode.currentCost, 0);
+
+        assert.equal((clonedNode.currentTraversal as TrieTraversal).prefix, '');
+        assert.isFalse(clonedNode.hasPartialInput);
+        assert.isFalse(clonedNode.isFullReplacement)
+        assert.isUndefined(clonedNode.calculation.lastInputEntry);
+        assert.isUndefined(clonedNode.calculation.lastMatchEntry);
+        assert.equal(clonedNode.toKey, toKey);
+
+        // Avoid aliasing for properties holding mutable objects
+        assert.notEqual(clonedNode.priorInput, originalNode.priorInput);
+
+        // Verify aliasing for properties holding immutable objects
+        assert.equal(clonedNode.calculation, originalNode.calculation);
+        assert.equal(clonedNode.currentTraversal, originalNode.currentTraversal);
+      });
+
+      it('properly deep-copies fully-processed nodes later in the search path', () => {
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+
+        // Establish desired source node:  prefix 'te'.
+        const firstLayerTransforms: Distribution<Transform> = [{
+          sample: {
+            insert: 't',
+            deleteLeft: 0
+          },
+          p: 0.75
+        }, {
+          sample: {
+            insert: 'r',
+            deleteLeft: 0
+          },
+          p: 0.25
+        }];
+        const firstLayerNodes = rootNode
+          .buildSubstitutionEdges(firstLayerTransforms)
+          .flatMap(node => node.processSubsetEdge());
+        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
+        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+
+        const tNode = firstLayerNodes[0];
+        assert.equal(tNode.resultKey, 't');
+        assert.sameDeepMembers(tNode.priorInput, [firstLayerTransforms[0]]);
+        assert.isFalse(tNode.hasPartialInput);
+
+        const secondLayerTransforms: Distribution<Transform> = [{
+          sample: {
+            insert: 'e',
+            deleteLeft: 0
+          },
+          p: 0.8
+        }, {
+          sample: {
+            insert: 'r',
+            deleteLeft: 0
+          },
+          p: 0.2
+        }];
+        const secondLayerNodes = tNode
+          .buildSubstitutionEdges(secondLayerTransforms)
+          .flatMap(node => node.processSubsetEdge());
+        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
+        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+
+        const teNode = secondLayerNodes[0];
+
+        // *****
+
+        function assertSourceNodeProps(node: SearchNode) {
+          assert.equal(node.resultKey, 'te');
+
+          assert.equal(node.editCount, 0);
+          assert.equal(node.inputSamplingCost, -Math.log(firstLayerTransforms[0].p) - Math.log(secondLayerTransforms[0].p));
+          assert.equal(node.currentCost, node.inputSamplingCost);
+
+          assert.isFalse(node.hasPartialInput);
+          assert.isFalse(node.isFullReplacement)
+          assert.equal(node.calculation.lastInputEntry.key, 'e');
+          assert.equal(node.calculation.lastMatchEntry.key, 'e');
+          assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
+          assert.equal(node.calculation.lastMatchEntry.traversal, node.currentTraversal);
+          assert.equal(node.toKey, toKey);
+        }
+
+        assertSourceNodeProps(teNode);
+
+        const clonedNode = new SearchNode(teNode);
+
+        // Root node properties; may as well re-assert 'em.
+        assertSourceNodeProps(clonedNode);
+
+        // Avoid aliasing for properties holding mutable objects
+        assert.notEqual(clonedNode.priorInput, teNode.priorInput);
+
+        // Verify aliasing for properties holding immutable objects
+        assert.equal(clonedNode.calculation, teNode.calculation);
+        assert.equal(clonedNode.currentTraversal, teNode.currentTraversal);
+      });
+
+      it('properly deep-copies partially-processed edges later in the search path', () => {
+        const rootNode = new SearchNode(testModel.traverseFromRoot(), toKey);
+
+        // Establish desired source node:  prefix 'te', with 'e' the first letter of
+        // a multi-char insert Transform.
+        const firstLayerTransforms: Distribution<Transform> = [{
+          sample: {
+            insert: 't',
+            deleteLeft: 0
+          },
+          p: 0.75
+        }, {
+          sample: {
+            insert: 'r',
+            deleteLeft: 0
+          },
+          p: 0.25
+        }];
+        const firstLayerNodes = rootNode
+          .buildSubstitutionEdges(firstLayerTransforms)
+          .flatMap(node => node.processSubsetEdge());
+        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
+        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+
+        const tNode = firstLayerNodes[0];
+        assert.equal(tNode.resultKey, 't');
+        assert.sameDeepMembers(tNode.priorInput, [firstLayerTransforms[0]]);
+        assert.isFalse(tNode.hasPartialInput);
+
+        const secondLayerTransforms: Distribution<Transform> = [{
+          sample: {
+            insert: 'ests',
+            deleteLeft: 0
+          },
+          p: 0.8
+        }, {
+          sample: {
+            insert: 'rial',
+            deleteLeft: 0
+          },
+          p: 0.2
+        }];
+        const secondLayerNodes = tNode
+          .buildSubstitutionEdges(secondLayerTransforms)
+          .flatMap(node => node.processSubsetEdge());
+        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
+        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+
+        const teNode = secondLayerNodes[0];
+
+        // *****
+
+        function assertSourceNodeProps(node: SearchNode) {
+          assert.equal(node.resultKey, 'te');
+
+          assert.equal(node.editCount, 0);
+          assert.equal(node.inputSamplingCost, -Math.log(firstLayerTransforms[0].p) - Math.log(secondLayerTransforms[0].p));
+          assert.equal(node.currentCost, node.inputSamplingCost);
+
+          assert.isTrue(node.hasPartialInput);
+          assert.isFalse(node.isFullReplacement)
+          assert.equal(node.calculation.lastInputEntry.key, 'e');
+          assert.equal(node.calculation.lastMatchEntry.key, 'e');
+          assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
+          assert.equal(node.calculation.lastMatchEntry.traversal, node.currentTraversal);
+          assert.equal(node.toKey, toKey);
+        }
+
+        assertSourceNodeProps(teNode);
+
+        const clonedNode = new SearchNode(teNode);
+
+        // Root node properties; may as well re-assert 'em.
+        assertSourceNodeProps(clonedNode);
+
+        // Avoid aliasing for properties holding mutable objects
+        assert.notEqual(clonedNode.priorInput, teNode.priorInput);
+
+        // Verify aliasing for properties holding immutable objects
+        assert.equal(clonedNode.calculation, teNode.calculation);
+        assert.equal(clonedNode.currentTraversal, teNode.currentTraversal);
+      });
+    });
 
     // Consider adding more, deeper?
     it('builds insertion edges based on lexicon, from root', function() {
