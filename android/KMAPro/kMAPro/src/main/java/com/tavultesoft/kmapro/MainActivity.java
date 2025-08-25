@@ -440,41 +440,41 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case R.id.action_info:
-        showInfo();
-        return true;
-      case R.id.action_share:
-        showShareDialog();
-        return true;
+    // Android Gradle 8.0 no longer declares resources final, so can't use switch statement here
+    if (item.getItemId() == R.id.action_info) {
+      showInfo();
+      return true;
+    } else if (item.getItemId() == R.id.action_share) {
+      showShareDialog();
+      return true;
       /* Disable Web Browser to investigate Google sign-in
-      case R.id.action_web:
+    } else if ((item.getItemId() == R.id.action_web) {
         showWebBrowser();
         return true;*/
-      case R.id.action_text_size:
-        showTextSizeDialog();
-        return true;
-      case R.id.action_clear_text:
-        showClearTextDialog();
-        return true;
-      case R.id.action_get_started:
-        showGetStarted();
-        return true;
-      case R.id.action_settings:
-        showSettings();
-        return true;
-      case R.id.action_update_keyboards:
-        KMManager.getUpdateTool().executeOpenUpdates();
-        // Dismiss icon
-        updateUpdateCountIndicator(0);
-        final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-        if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
-          _keyboardupdate.setVisible(false);
-        }
+    } else if (item.getItemId() == R.id.action_text_size) {
+      showTextSizeDialog();
+      return true;
+    } else if (item.getItemId() == R.id.action_clear_text){
+      showClearTextDialog();
+      return true;
+    } else if (item.getItemId() == R.id.action_get_started) {
+      showGetStarted();
+      return true;
+    } else if (item.getItemId() == R.id.action_settings) {
+      showSettings();
+      return true;
+    } else if (item.getItemId() == R.id.action_update_keyboards) {
+      KMManager.getUpdateTool().executeOpenUpdates();
+      // Dismiss icon
+      updateUpdateCountIndicator(0);
+      final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
+      if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
+        _keyboardupdate.setVisible(false);
+      }
 
-        return true;
-      default:
-        return super.onOptionsItemSelected(item);
+      return true;
+    } else {
+      return super.onOptionsItemSelected(item);
     }
   }
 
@@ -632,7 +632,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     Intent i = new Intent(this, InfoActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
-    overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
+    overridePendingTransition(android.R.anim.fade_in, com.keyman.engine.R.anim.hold);
   }
 
   private void showWebBrowser() {
@@ -643,7 +643,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     Intent i = new Intent(this, WebBrowserActivity.class);
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
     startActivity(i);
-    overridePendingTransition(android.R.anim.fade_in, R.anim.hold);
+    overridePendingTransition(android.R.anim.fade_in, com.keyman.engine.R.anim.hold);
   }
 
   private void showShareDialog() {

@@ -141,6 +141,10 @@ android {
     aaptOptions {
         noCompress "kmp"
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 ```
 5. After the `android {}` object, include the following:
 ````gradle
@@ -154,7 +158,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     api (name:'keyman-engine', ext:'aar')
     implementation 'androidx.preference:preference:1.2.1'

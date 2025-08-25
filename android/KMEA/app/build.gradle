@@ -1,4 +1,5 @@
 plugins {
+    id 'base'
     id 'com.android.library'
     id 'name.remal.default-plugins'
 }
@@ -6,13 +7,29 @@ plugins {
 ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
+base {
+    // Specify library filename keyman-engine-$CONFIG.aar
+    archivesName = "keyman-engine"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 35
     namespace "com.keyman.engine"
+
+    buildFeatures {
+        // needed for custom BuildConfigField values in defaultConfig
+        buildConfig = true
+    }
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
@@ -36,10 +53,6 @@ android {
     }
 
     testOptions {
-        unitTests {
-            // Allows use of a simulated Android API for tests.  (Thanks, roboelectric!)
-            includeAndroidResources = true
-        }
         unitTests.all {
             testLogging {
                 // May also add "passed", "skipped".
@@ -55,17 +68,17 @@ android {
 
 dependencies {
     // 1.6.0-rc01 needed to resolve https://issuetracker.google.com/issues/238425626
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     // material:1.7.0 will need Gradle plugin 7.1.0+
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'commons-io:commons-io:2.13.0'
+    implementation 'commons-io:commons-io:2.16.1'
     implementation 'io.sentry:sentry-android:7.22.6'
     implementation 'androidx.preference:preference:1.2.1'
 
     // Robolectric
-    testImplementation 'androidx.test:core:1.5.0'
-    testImplementation 'androidx.test.ext:junit:1.1.5'
-    testImplementation 'org.robolectric:robolectric:4.10.3'
+    testImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'androidx.test:core:1.6.1'
 
     // Generate QR Codes
     implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
