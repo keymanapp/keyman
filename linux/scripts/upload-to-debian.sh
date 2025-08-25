@@ -119,6 +119,10 @@ function push_to_github_and_create_pr() {
 }
 
 function cleanup_worktree() {
+  if [[ -d "linux/debianpackage" ]]; then
+    cp -r linux/debianpackage "${KEYMAN_ROOT}/linux"
+  fi
+
   cd "${PREV_DIR:-}" || true
 
   if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
