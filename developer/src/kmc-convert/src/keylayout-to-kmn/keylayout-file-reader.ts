@@ -13,7 +13,7 @@ import { util } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import { SchemaValidators } from '@keymanapp/common-types';
 import { DeveloperUtilsMessages } from '@keymanapp/developer-utils';
-import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils"
+import { KeylayoutXMLSourceFile } from "@keymanapp/developer-utils";
 
 import boxXmlArray = util.boxXmlArray;
 
@@ -26,14 +26,10 @@ export class KeylayoutFileReader {
    */
 
   public validate(source: KeylayoutXMLSourceFile): boolean {
-
     if (!SchemaValidators.default.keylayout(source)) {
-      for (const err of (<any>SchemaValidators.default.keylayout).errors) {
-        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
-          instancePath: err.instancePath,
-          keyword: err.keyword,
-          message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
-          params: Object.entries(err.params || {}).sort().map(([k, v]) => `${k}="${v}"`).join(' '),
+       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
+        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
+          e: err.instancePath
         }));
       }
       return false;
@@ -73,27 +69,22 @@ export class KeylayoutFileReader {
 
     this.remove_whitespace(source);
 
-    this.removeWhitespace_boxArray(source.layouts, 'layout');
+    this.removeWhitespace_boxArray(source, 'keyMapSet');
 
+    this.removeWhitespace_boxArray(source.layouts, 'layout');
     this.removeWhitespace_boxArray(source?.modifierMap, 'keyMapSelect');
+
     for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
       this.removeWhitespace_boxArray(keyMapSelect, 'modifier');
     }
 
-    // keyMapSet is the only top level tag that might occur several times => we need to consider 2 cases
-    if (!Array.isArray(source?.keyMapSet) === false) {
-      for (let i = 0; i < source?.keyMapSet.length; i++) {
-        for (const keyMap of source?.keyMapSet[i]?.keyMap) {
-          this.removeWhitespace_boxArray(keyMap, 'key');
-        }
-        this.removeWhitespace_boxArray(source.keyMapSet[i], 'keyMap');
-      }
-    } else {
-      for (const keyMap of source?.keyMapSet?.keyMap) {
+    this.removeWhitespace_boxArray(source.keyMapSet[0], 'keyMap');
+
+    for (const keyMapSet of source?.keyMapSet) {
+      for (const keyMap of keyMapSet.keyMap) {
         this.removeWhitespace_boxArray(keyMap, 'key');
       }
-      this.removeWhitespace_boxArray(source.keyMapSet, 'keyMap');
-      this.removeWhitespace_boxArray(source, 'keyMapSet');
+      this.removeWhitespace_boxArray(keyMapSet, 'keyMap');
     }
 
     this.removeWhitespace_boxArray(source?.actions, 'action');
@@ -133,7 +124,7 @@ export class KeylayoutFileReader {
       return jsonObj;
     }
     catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
       return null;
     }
   }
