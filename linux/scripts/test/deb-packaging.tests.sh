@@ -7,9 +7,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "${KEYMAN_ROOT}/resources/build/test/testing-framework.inc.sh"
 . "${THIS_SCRIPT%/*}/test.inc.sh"
 
-test_check_updated_version_number__NoChange_OK() {
+function test__check_updated_version_number__NoChange_OK() {
   createBase alpha
 
   echo "readme" > README.md
@@ -21,7 +22,7 @@ test_check_updated_version_number__NoChange_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base master verify
 }
 
-test_check_updated_version_number__LineAdded_OK() {
+function test__check_updated_version_number__LineAdded_OK() {
   createBase alpha
 
   sed -i 's/ km_core_actions_dispose@Base 17.0.197/ km_core_actions_dispose@Base 17.0.197\n km_core_added@Base 17.0.255/' linux/debian/libkeymancore1.symbols
@@ -33,7 +34,7 @@ test_check_updated_version_number__LineAdded_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base master verify
 }
 
-test_check_updated_version_number__LineAddedWithoutVerUpd_ERROR() {
+function test__check_updated_version_number__LineAddedWithoutVerUpd_ERROR() {
   local output
   createBase alpha
 
@@ -48,7 +49,7 @@ test_check_updated_version_number__LineAddedWithoutVerUpd_ERROR() {
   [[ "${output[*]}" == *"ERROR: libkeymancore1.symbols file got changed without changing the package version number of the symbol"* ]]
 }
 
-test_check_updated_version_number__LineRemovedWithAPIUpd_OK() {
+function test__check_updated_version_number__LineRemovedWithAPIUpd_OK() {
   createBase alpha
   echo "2.0.0" > core/CORE_API_VERSION.md
   git add core/CORE_API_VERSION.md
@@ -64,7 +65,7 @@ test_check_updated_version_number__LineRemovedWithAPIUpd_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base master verify
 }
 
-test_check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR() {
+function test__check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR() {
   local output
   createBase alpha
   echo "2.0.0" > core/CORE_API_VERSION.md
@@ -80,7 +81,7 @@ test_check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR() {
   [[ "${output[*]}" == *"ERROR: Missing libkeymancore2.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR() {
+function test__check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR() {
   local output
   createBase alpha
   git mv linux/debian/libkeymancore{1,2}.symbols
@@ -97,7 +98,7 @@ test_check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR() {
   [[ "${output[*]}" == *"ERROR: Missing libkeymancore1.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineRemovedWithAPIUpd_NotMetadataUpd_ERROR() {
+function test__check_updated_version_number__LineRemovedWithAPIUpd_NotMetadataUpd_ERROR() {
   local output
   createBase alpha
   echo "2.0.0" > core/CORE_API_VERSION.md
@@ -114,7 +115,7 @@ test_check_updated_version_number__LineRemovedWithAPIUpd_NotMetadataUpd_ERROR() 
   [[ "${output[*]}" == *"ERROR: API version in .symbols file and in CORE_API_VERSION.md is different"* ]]
 }
 
-test_check_updated_version_number__LineRemoved_InAlpha_ChangedBefore_OK() {
+function test__check_updated_version_number__LineRemoved_InAlpha_ChangedBefore_OK() {
   createBase alpha
   git checkout master
   # simulate a commit that already introduced an API version change
@@ -137,7 +138,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_ChangedBefore_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base master verify
 }
 
-test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerChanged_OK() {
+function test__check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerChanged_OK() {
   createBase alpha
   git checkout master
   # simulate a commit that renamed the .symbols file and updated the API version
@@ -164,7 +165,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base master verify
 }
 
-test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerUnchanged_ERROR() {
+function test__check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerUnchanged_ERROR() {
   local output
   createBase alpha
   git checkout master
@@ -189,7 +190,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
   [[ "${output[*]}" == *" ERROR: Major API change without updating API version number in libfoo1.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR() {
+function test__check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR() {
   local output
   createBase alpha
 
@@ -204,7 +205,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR() 
   [[ "${output[*]}" == *" ERROR: Major API change without updating API version number in libkeymancore1.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR() {
+function test__check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR() {
   local output
   createBase beta
 
@@ -231,7 +232,7 @@ test_check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR() {
   [[ "${output[*]}" == *" ERROR: Major API change without updating API version number in libkeymancore2.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK() {
+function test__check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK() {
   createBase beta
 
   # simulate a commit that already introduced an API version change in Beta
@@ -260,7 +261,7 @@ test_check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base beta verify
 }
 
-test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVerUnchanged_ERROR() {
+function test__check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVerUnchanged_ERROR() {
   local output
   createBase alpha
   git checkout -b beta
@@ -285,7 +286,7 @@ test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVer
   [[ "${output[*]}" == *" ERROR: Major API change without updating API version number in libfoo1.symbols file"* ]]
 }
 
-test_check_updated_version_number__LineInsertedInBranch_OK() {
+function test__check_updated_version_number__LineInsertedInBranch_OK() {
   createBase alpha
 
   local base_sha=$(git rev-parse master)
@@ -313,21 +314,6 @@ test_check_updated_version_number__LineInsertedInBranch_OK() {
   linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base "${base_sha}" verify
 }
 
-echo "(test logs are in /tmp/<testname>.log)"
-run_test test_check_updated_version_number__NoChange_OK
-run_test test_check_updated_version_number__LineAdded_OK
-run_test test_check_updated_version_number__LineAddedWithoutVerUpd_ERROR
-run_test test_check_updated_version_number__LineRemovedWithAPIUpd_OK
-run_test test_check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR
-run_test test_check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR
-run_test test_check_updated_version_number__LineRemovedWithAPIUpd_NotMetadataUpd_ERROR
-run_test test_check_updated_version_number__LineRemoved_InAlpha_ChangedBefore_OK
-run_test test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerChanged_OK
-run_test test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerUnchanged_ERROR
-run_test test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR
-run_test test_check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR
-run_test test_check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK
-run_test test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVerUnchanged_ERROR
-run_test test_check_updated_version_number__LineInsertedInBranch_OK
-
 # TODO: still some test cases missing for the different checks
+
+run_tests --quiet

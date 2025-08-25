@@ -9,42 +9,56 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+# shellcheck disable=2154
+. "${KEYMAN_ROOT}/resources/build/test/testing-framework.inc.sh"
 . "${THIS_SCRIPT%/*}/test.inc.sh"
 . "${KEYMAN_ROOT}/linux/scripts/verify_api.inc.sh"
 
 
-fixture_setup() {
+function setup_file() {
   SONAME=1
   LIB_NAME=libkeymancore
   PKG_NAME="${LIB_NAME}${SONAME}"
   EXIT_CODE=-1
 }
 
-test_compare_versions__less_patch() {
-  [[ $(compare_versions "17.0.197" "17.0.198") == -1 ]]
+function test__compare_versions__less_patch() {
+  local result
+  result="$(compare_versions "17.0.197" "17.0.198")"
+  assert-equal "${result}" -1
 }
 
-test_compare_versions__less_minor() {
-  [[ $(compare_versions "17.0.197" "17.1.197") == -1 ]]
+function test__compare_versions__less_minor() {
+  local result
+  result="$(compare_versions "17.0.197" "17.1.197")"
+  assert-equal "${result}" -1
 }
 
-test_compare_versions__less_major() {
-  [[ $(compare_versions "17.0.197" "18.0.0") == -1 ]]
+function test__compare_versions__less_major() {
+  local result
+  result="$(compare_versions "17.0.197" "18.0.0")"
+  assert-equal "${result}" -1
 }
 
-test_compare_versions__greater() {
-  [[ $(compare_versions "17.0.198" "17.0.197") == 1 ]]
+function test__compare_versions__greater() {
+  local result
+  result="$(compare_versions "17.0.198" "17.0.197")"
+  assert-equal "${result}" 1
 }
 
-test_compare_versions__same() {
-  [[ $(compare_versions "17.0.197" "17.0.197") == 0 ]]
+function test__compare_versions__same() {
+  local result
+  result="$(compare_versions "17.0.197" "17.0.197")"
+  assert-equal "${result}" 0
 }
 
-test_compare_versions__greater0() {
-  [[ $(compare_versions "17.0.197" "0") == 1 ]]
+function test__compare_versions__greater0() {
+  local result
+  result="$(compare_versions "17.0.197" "0")"
+  assert-equal "${result}" 1
 }
 
-test_get_highest_version_in_symbols_file() {
+function test__get_highest_version_in_symbols_file() {
   local output
   createBase alpha
   echo ' (c++|optional)"typeinfo name for std::codecvt@Base" 17.0.244' >> linux/debian/libkeymancore1.symbols
@@ -54,10 +68,10 @@ test_get_highest_version_in_symbols_file() {
   # Execute
   output=$(get_highest_version_in_symbols_file "$(git rev-parse HEAD)")
   echo "${output[*]}" # for logging
-  [[ "${output}" == "17.0.244" ]]
+  assert-equal "${output}" "17.0.244"
 }
 
-test_check_updated_version_number__LineInsertedInBranch_OK() {
+function test__check_updated_version_number__LineInsertedInBranch_OK() {
   local output
   createBase alpha
 
@@ -89,17 +103,7 @@ test_check_updated_version_number__LineInsertedInBranch_OK() {
 
   output=$(check_updated_version_number)
   echo "${output[*]}" # for logging
-  [[ "${output[*]}" == *"OK: libkeymancore1.symbols file got updated with package version number"* ]]
+  assert-contains "${output[*]}" "OK: libkeymancore1.symbols file got updated with package version number"
 }
 
-
-fixture_setup
-echo "(test logs are in /tmp/<testname>.log)"
-run_test test_compare_versions__less_patch
-run_test test_compare_versions__less_minor
-run_test test_compare_versions__less_major
-run_test test_compare_versions__greater
-run_test test_compare_versions__same
-run_test test_compare_versions__greater0
-run_test test_get_highest_version_in_symbols_file
-run_test test_check_updated_version_number__LineInsertedInBranch_OK
+run_tests --quiet
