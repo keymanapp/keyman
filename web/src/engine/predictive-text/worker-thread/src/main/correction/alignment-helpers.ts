@@ -17,7 +17,7 @@ import { ClassicalDistanceCalculation, EditOperation } from "./classical-calcula
  * - ['to', ' ', 'apple', ' ', ''] => ['to', ' ', 'apply', ' ', '']
  * - ['to', ' ', 'apple', ' ', ''] => ['to', ' ', 'apply', ' ', 'n']
  *
- * Edit path for these example case:
+ * Edit path for these example cases:
  * - ['match', 'match', 'substitute', 'match', 'match']
  * - ['match', 'match', 'substitute', 'match', 'substitute']
  *
