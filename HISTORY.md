@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.105 alpha 2025-08-25
+
+* maint(linux): ignore generate patch directories (#14600)
+
 ## 19.0.104 alpha 2025-08-21
 
 * fix(android): Update sentry-android dependency to 8.19.1 for 16 KB page alignment (#14559)
