@@ -14,28 +14,32 @@ import { EditOperation, getEditPathLastMatch, isSubstitutionAlignable } from '@k
 describe('getEditPathLastMatch', () => {
   it('returns the last match when no substitutions exist', () => {
     const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'match', 'match', 'insert'];
-    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match'));
+    assert.equal(path.lastIndexOf('match'), 5);
+    assert.equal(getEditPathLastMatch(path), 5);
   });
 
   it('returns the last match when no substitutions exist left of a "match"', () => {
     const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'match', 'match', 'substitute', 'insert'];
-    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match'));
+    assert.equal(path.lastIndexOf('match'), 5);
+    assert.equal(getEditPathLastMatch(path), 5);
   });
 
   // is intended to handle application of suggestions.
   it('returns the last match before a substitute occurring after the first match', () => {
     // limitation:  if there is _anything_ after that last match, the first assertion will fail.
+    //                                0         1         2        3           4          5        6
     const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'substitute', 'match', 'match'];
-    assert.notEqual(getEditPathLastMatch(path), path.lastIndexOf('match'));
-    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.lastIndexOf('substitute')));
+    assert.notEqual(getEditPathLastMatch(path), 6);
+    assert.equal(getEditPathLastMatch(path), 3);
   });
 
   // is intended to handle complex transforms that include a whitespace and affect prior tokens.
   it('returns the last match before a substitute occurring after the first match', () => {
     // limitation:  if there is _anything_ after that last match, the first assertion will fail.
+    //                                0         1         2        3           4          5           6
     const path: EditOperation[] = ['delete', 'delete', 'match', 'match', 'substitute', 'match', 'substitute'];
-    assert.notEqual(getEditPathLastMatch(path), path.lastIndexOf('match'));
-    assert.equal(getEditPathLastMatch(path), path.lastIndexOf('match', path.indexOf('substitute')));
+    assert.notEqual(getEditPathLastMatch(path), 5);
+    assert.equal(getEditPathLastMatch(path), 3);
   });
 });
 
