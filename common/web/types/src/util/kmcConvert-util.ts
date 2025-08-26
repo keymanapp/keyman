@@ -1,12 +1,11 @@
 /*
  * Keyman is 2025 copyright (C) SIL International. MIT License.
  *
- * Created by S. Schmitt on 2025-08-21
+ * Created by S. Schmitt on 2025-08-24
  *
- * functions to convert
+ * functions for kmcConvertutil
  *
  */
-
 
 /**
  * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
@@ -19,22 +18,22 @@ export function convertToUnicodeCharacter(inputString: string): string {
     return undefined;
   }
 
-  // U+0061 U+1234 U+1F60E
+  // e.g. U+0061 U+1234 U+1F60E
   else if (inputString.match(/^U\+([0-9a-f]{2,6})$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^U\+([0-9a-f]{2,6})$/i))[1], 16));
   }
 
-  // &#x61;  &#x1234; &#x1F60E;
+  // e.g. &#x61;  &#x1234; &#x1F60E;
   else if (inputString.match(/^&#x([0-9a-f]{2,6});$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^&#x([0-9a-f]{2,6});$/i))[1], 16));
   }
 
-  //  &#97; &#4660; &#128518;
+  // e.g. &#97; &#4660; &#128518;
   else if (inputString.match(/^&#([0-9a-f]{2,6});$/i)) {
     return String.fromCodePoint(parseInt((inputString.match(/^&#([0-9a-f]{2,6});$/i))[1], 10));
   }
 
-  // &gt; &quot;
+  // e.g. &gt; &quot;
   else if (inputString.match(/^&([a-z]{1,4});$/i)) {
     if (inputString === '&gt;') { return '>'; }
     else if (inputString === '&lt;') { return '<'; }
@@ -66,18 +65,19 @@ export function convertToUnicodeCodePoint(instr: string): string {
     return undefined;
   }
 
-  if (instr.startsWith("&#x")) {      
-    const numLength = instr.length - 3;
-    const numStr = instr.substring(3, instr.length - 1);
-    return ("U+" + numStr.slice(-numLength).padStart(4, "0"));
+  if (instr.substring(0, 3) === "&#x") {
+    const num_length = instr.length - instr.indexOf("x") - 1;
+    const num_str = instr.substring(instr.indexOf("x") + 1, instr.length - 1);
+    return ("U+" + num_str.slice(-num_length).padStart(4, "0"));
   }
 
-  // if not hex: convert to hex    
-  if (instr.startsWith("&#")) {    
-    const numLength = instr.length - 2;
-    const numStr = instr.substring(2, instr.length - 1);
-    return "U+" + Number(numStr.slice(-numLength)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
+  // if not hex: convert to hex
+  if ((instr.substring(0, 2) === "&#")) {
+    const num_length = instr.length - instr.indexOf("#") - 1;
+    const num_str = instr.substring(instr.indexOf("#") + 1, instr.length - 1);
+    return "U+" + Number(num_str.slice(-num_length)).toString(16).slice(-6).toUpperCase().padStart(4, "0");
   }
   else
     return instr;
 }
+

@@ -3,22 +3,20 @@
  *
  * Created by S. Schmitt on 2025-08-21
  *
- * Tests for kmcConvertUtil
+ * Tests for kmcConvertutil
  *
  */
 
 import 'mocha';
 import { assert } from 'chai';
-//import { util } from '@keymanapp/common-types';
-import * as kmcConvertUtil  from '../src/kmcConvertUtil.js';
 import { compilerTestCallbacks } from './helpers/index.js';
+import { kmcConvertutil } from '@keymanapp/common-types';
 
-describe('kmcConvertUtil', function () {
+describe('kmcConvertutil', function () {
 
   before(function () {
     compilerTestCallbacks.clear();
   });
-
 
   describe('convertToUnicodeCodePoint ', function () {
     [
@@ -43,7 +41,7 @@ describe('kmcConvertUtil', function () {
       [' ;', ' ;']
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = kmcConvertUtil.convertToUnicodeCodePoint(values[0] as string);
+        const result = kmcConvertutil.convertToUnicodeCodePoint(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
@@ -83,7 +81,7 @@ describe('kmcConvertUtil', function () {
       [null, undefined]
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = kmcConvertUtil.convertToUnicodeCharacter(values[0] as string);
+        const result = kmcConvertutil.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });

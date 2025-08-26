@@ -9,8 +9,6 @@
 
 import 'mocha';
 import { assert } from 'chai';
-//import { util } from '@keymanapp/common-types';
-//import * as kmcConvertUtil  from '../src/kmcConvertUtil.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter, ProcesData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';

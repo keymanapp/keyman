@@ -9,10 +9,7 @@
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcesData, Rule } from './keylayout-to-kmn-converter.js';
-//import { util } from '@keymanapp/common-types';
-import * as kmcConvertUtil  from '../kmcConvertUtil.js';
-
-
+import { kmcConvertutil } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -143,8 +140,8 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_Unicode_Character = kmcConvertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = kmcConvertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
 
@@ -208,8 +205,8 @@ export class KmnFileWriter {
         const warn_text = this.reviewRules(unique_data_Rules, k);
 
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_Unicode_Character = kmcConvertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = kmcConvertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if it is a control character
@@ -294,8 +291,8 @@ export class KmnFileWriter {
 
         const warn_text = this.reviewRules(unique_data_Rules, k);
         const output_character = new TextDecoder().decode(unique_data_Rules[k].output);
-        const output_Unicode_Character = kmcConvertUtil.convertToUnicodeCharacter(output_character);
-        const output_Unicode_CodePoint = kmcConvertUtil.convertToUnicodeCodePoint(output_character);
+        const output_Unicode_Character = kmcConvertutil.convertToUnicodeCharacter(output_character);
+        const output_Unicode_CodePoint = kmcConvertutil.convertToUnicodeCodePoint(output_character);
 
         if ((output_Unicode_Character !== undefined) && (output_Unicode_CodePoint !== undefined)) {
           // if we are about to print a unicode codepoint instead of a single character we need to check if a control character is to be used
