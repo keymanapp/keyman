@@ -68,8 +68,6 @@ export function tokenizeTransform(
     throw new Error(`Could not align context ${JSON.stringify(context)} before and after transform ${JSON.stringify(transform)}`);
   }
 
-  const baseIndex = Math.min(1, 1 - alignment.tailEditLength) + Math.min(0, alignment.tailTokenShift);
-
   let deleteLeft = transform.deleteLeft;
   const tokenizedTransforms: Transform[] = [];
   // Create deletion transforms for deleted ...
@@ -108,6 +106,13 @@ export function tokenizeTransform(
   }
 
   const returnedMap = new Map<number, Transform>();
+
+  // We can very easily compute the final index that should appear in the math -
+  // what's the difference in tokenization length?
+  const finalIndex = postTokenization.length - preTokenization.length;
+  // We pushed the tokenizations onto a stack such that we pop them from
+  // early-context to late-context; we need to count up when indexing.
+  const baseIndex = finalIndex - tokenizedTransforms.length + 1;
   let pushedCount: number = 0;
   while(tokenizedTransforms.length > 0) {
     returnedMap.set(baseIndex + pushedCount, tokenizedTransforms.pop());

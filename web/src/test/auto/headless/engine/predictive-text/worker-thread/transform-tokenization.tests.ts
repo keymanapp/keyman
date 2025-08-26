@@ -295,6 +295,64 @@ describe('tokenizeTransform', () => {
       assert.equal(result.size, expectedMap.size);
       assert.deepEqual(result, expectedMap);
     });
+
+    it('properly aligns tokenization of transforms that match-replace existing tokens (1)', () => {
+      const context = {
+        left: 'properly',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      // Case:  the user had input a backspace and then selected a suggestion that restored
+      // the original word (which also appended whitespace).
+      const editTransform = {
+        insert: 'properly ',
+        deleteLeft: 8
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'properly', deleteLeft: 8 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+      assert.equal(result.size, 3);
+      assert.deepEqual(result, expectedMap);
+    });
+
+    it('properly aligns tokenization of transforms that match-replace existing tokens (2)', () => {
+      const context = {
+        left: 'do it properly',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      // Case:  the user had input a backspace and then selected a suggestion that restored
+      // the original word (which also appended whitespace).
+      const editTransform = {
+        insert: 'properly ',
+        deleteLeft: 8
+      };
+
+      const result = tokenizeTransform(
+        defaultTokenize,
+        context,
+        editTransform
+      );
+
+      const expectedMap = new Map<number, Transform>();
+      expectedMap.set(0, { insert: 'properly', deleteLeft: 8 });
+      expectedMap.set(1, { insert: ' ', deleteLeft: 0 });
+      expectedMap.set(2, { insert: '', deleteLeft: 0 });
+      assert.equal(result.size, 3);
+      assert.deepEqual(result, expectedMap);
+    });
   });
 
   describe('with mocked dictionary-based wordbreaking', () => {
