@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=2154 disable=1091
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -25,7 +26,7 @@ test_build_bot_check_messages() {
   builder_echo start test_build_bot_check_messages 'START TEST: build_bot_check_messages'
 
   # Mostly real data (only Build-bot commands edited for test)
-  _do_test_build_bot_check_messages_file 14013 "[windows]=release" "$ALL_BUILD_PLATFORMS_SKIP_EXPECTED"
+  _do_test_build_bot_check_messages_file 14013 "[windows]=release" "${ALL_BUILD_PLATFORMS_SKIP_EXPECTED}"
   # Simplified data for testing Build-bot command sequences only
   _do_test_build_bot_check_messages_file 9999 "[windows]=release" '[windows]="skip" [developer]="release"'
 
@@ -42,6 +43,7 @@ test_build_bot_check_messages() {
   _do_test_build_bot_check_messages_inline 3 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: '"'"'echo foo" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
   _do_test_build_bot_check_messages_inline 4 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: echo *" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
   _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: \\0" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
+  # shellcheck disable=SC2016
   _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: `echo escaped`" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
   _do_test_build_bot_check_messages_inline 6 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: ' '[{ "commit": { "message": "maint(common): test\n" }}]'
   # incomplete command
@@ -62,13 +64,14 @@ _do_test_build_bot_check_messages_file() {
   eval "declare -gA build_platforms=($2)"
   eval "declare -A expected_build_platforms=($3)"
 
-  build_bot_check_messages $prnum "$(cat ${THIS_SCRIPT_PATH}/pr-$prnum-data.txt)" "$(cat ${THIS_SCRIPT_PATH}/pr-$prnum-commits.txt)"
+  # shellcheck disable=2312
+  build_bot_check_messages "${prnum}" "$(cat "${THIS_SCRIPT_PATH}/pr-${prnum}-data.txt")" "$(cat "${THIS_SCRIPT_PATH}/pr-${prnum}-commits.txt")"
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]:-missing}" "${expected_build_platforms[${i}]:-missing}" "PR #${prnum}: build_platforms[${i}]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]:-missing}" "${expected_build_platforms[${i}]:-missing}" "PR #${prnum}: build_platforms[${i}]"
   done
 }
 
@@ -89,13 +92,13 @@ _do_test_build_bot_check_messages_inline() {
   local prinfo="$4"
   local prcommits="$5"
 
-  build_bot_check_messages $prnum "$prinfo" "$prcommits"
+  build_bot_check_messages "${prnum}" "${prinfo}" "${prcommits}"
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]:-missing}" "${expected_build_platforms[${i}]:-missing}" "PR #${prnum}: build_platforms[${i}]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]:-missing}" "${expected_build_platforms[$i]:-missing}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]:-missing}" "${expected_build_platforms[${i}]:-missing}" "PR #${prnum}: build_platforms[${i}]"
   done
 }
 
@@ -119,8 +122,8 @@ test_build_bot_update_commands() {
   # not testing invalid legacy command: _do_test_build_bot_update_commands '[windows]="release"' "build foo" '[windows]="release"'
   _do_test_build_bot_update_commands '[windows]="release"' "build:common" '[common]="build" [windows]="release"'
   _do_test_build_bot_update_commands '[windows]="release"' "build common" '[common]="build" [windows]="release"'
-  _do_test_build_bot_update_commands '[windows]="release"' "build:all" "$ALL_BUILD_PLATFORMS_BUILD_EXPECTED"
-  _do_test_build_bot_update_commands '[windows]="release"' "build all" "$ALL_BUILD_PLATFORMS_BUILD_EXPECTED"
+  _do_test_build_bot_update_commands '[windows]="release"' "build:all" "${ALL_BUILD_PLATFORMS_BUILD_EXPECTED}"
+  _do_test_build_bot_update_commands '[windows]="release"' "build all" "${ALL_BUILD_PLATFORMS_BUILD_EXPECTED}"
   builder_echo end test_build_bot_update_commands success 'SUCCESS: build_bot_update_commands'
 }
 
@@ -134,16 +137,17 @@ test_build_bot_update_commands() {
 #
 _do_test_build_bot_update_commands() {
   eval "declare -gA build_platforms=($1)"
-  local update_command="$2"
+  local update_commands="$2"
   eval "declare -A expected_build_platforms=($3)"
 
-  build_bot_update_commands $update_command
+  # shellcheck disable=SC2086  # intentionally no quotes
+  build_bot_update_commands ${update_commands}
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "build_platforms[${i}]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "build_platforms[${i}]"
   done
 }
 
@@ -159,14 +163,16 @@ test_build_bot_verify_platforms() {
 }
 
 _do_test_build_bot_verify_platforms() {
+  # shellcheck disable=SC2206  # intentionally no quotes
   local platforms=($1)
+  # shellcheck disable=SC2206  # intentionally no quotes
   local expected_platforms=($2)
 
   build_bot_verify_platforms platforms
 
   assert-equal ${#platforms[@]} ${#expected_platforms[@]} "#platforms[@]"
   for i in "${!expected_platforms[@]}"; do
-    assert-equal "${platforms[$i]}" "${expected_platforms[$i]}" "platforms[$i]"
+    assert-equal "${platforms[${i}]}" "${expected_platforms[${i}]}" "platforms[${i}]"
   done
 }
 
@@ -194,13 +200,13 @@ _do_test_test_bot_check_pr_body() {
   local prinfo="$3"
   eval "declare -A expected_build_platforms=($4)"
 
-  test_bot_check_pr_body $prnum "$prinfo"
+  test_bot_check_pr_body "${prnum}" "${prinfo}"
 
   for i in "${!expected_build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "PR #${prnum}: build_platforms[${i}]"
   done
   for i in "${!build_platforms[@]}"; do
-    assert-equal "${build_platforms[$i]}" "${expected_build_platforms[$i]}" "PR #$prnum: build_platforms[$i]"
+    assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "PR #${prnum}: build_platforms[${i}]"
   done
 }
 
