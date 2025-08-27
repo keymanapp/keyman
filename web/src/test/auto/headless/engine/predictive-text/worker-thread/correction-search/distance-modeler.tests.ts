@@ -47,12 +47,12 @@ function edgeHasChars(edge: correction.SearchNode, input: string, match: string)
     return false;
   }
 
-  return edge.calculation.lastMatchEntry.key == match;
+  return edge.calculation.lastMatchEntry == match;
 }
 
 function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
   let results = edgeArray.filter(function(value) {
-    return value.calculation.lastMatchEntry.key == match;
+    return value.calculation.lastMatchEntry == match;
   });
 
   assert.isAtLeast(results.length, 1);
@@ -219,10 +219,9 @@ describe('Correction Distance Modeler', function() {
 
           assert.isFalse(node.hasPartialInput);
           assert.isFalse(node.isFullReplacement)
-          assert.equal(node.calculation.lastInputEntry.key, 'e');
-          assert.equal(node.calculation.lastMatchEntry.key, 'e');
+          assert.equal(node.calculation.lastInputEntry, 'e');
+          assert.equal(node.calculation.lastMatchEntry, 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
-          assert.equal(node.calculation.lastMatchEntry.traversal, node.currentTraversal);
           assert.equal(node.toKey, toKey);
         }
 
@@ -302,10 +301,9 @@ describe('Correction Distance Modeler', function() {
 
           assert.isTrue(node.hasPartialInput);
           assert.isFalse(node.isFullReplacement)
-          assert.equal(node.calculation.lastInputEntry.key, 'e');
-          assert.equal(node.calculation.lastMatchEntry.key, 'e');
+          assert.equal(node.calculation.lastInputEntry, 'e');
+          assert.equal(node.calculation.lastMatchEntry, 'e');
           assert.equal((node.currentTraversal as TrieTraversal).prefix, 'te');
-          assert.equal(node.calculation.lastMatchEntry.traversal, node.currentTraversal);
           assert.equal(node.toKey, toKey);
         }
 
@@ -340,7 +338,7 @@ describe('Correction Distance Modeler', function() {
       for(let child of rootTraversal.children()) {
         expectedChildCount++;
 
-        let childEdge = edges.filter(value => value.calculation.lastMatchEntry.key == child.char)[0];
+        let childEdge = edges.filter(value => value.calculation.lastMatchEntry == child.char)[0];
         assert.isOk(childEdge);
         assert.isEmpty(childEdge.priorInput);
         assert.isEmpty(childEdge.calculation.inputSequence);
@@ -407,7 +405,7 @@ describe('Correction Distance Modeler', function() {
         // step.
         assert.isFalse(processedNodes[0].hasPartialInput);
         assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(processedNodes[0].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[0].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
         assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
 
@@ -423,13 +421,13 @@ describe('Correction Distance Modeler', function() {
         // Sorted indices 2, 3:  both had 2 inserts.
         assert.isTrue(processedNodes[1].hasPartialInput);
         assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(processedNodes[1].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
         assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
 
         assert.isTrue(processedNodes[2].hasPartialInput);
         assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(processedNodes[2].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[2].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
         assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
       });
@@ -456,7 +454,7 @@ describe('Correction Distance Modeler', function() {
           assert.isFalse(processedNode.hasPartialInput);
           assert.equal(processedNode.editCount, 2);
           assert.equal(processedNode.calculation.inputSequence.length, 2);
-          assert.equal(processedNode.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
           assert.equal(processedNode.inputSamplingCost, step2Nodes[index].inputSamplingCost);
           assert.isAbove(processedNode.currentCost, step2Nodes[index].currentCost);
         });
@@ -520,7 +518,7 @@ describe('Correction Distance Modeler', function() {
         // step.
         assert.isFalse(processedNodes[0].hasPartialInput);
         assert.equal(processedNodes[0].editCount, 1);
-        assert.equal(processedNodes[0].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[0].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[0].inputSamplingCost, subsetNodes[0].inputSamplingCost);
         assert.isAbove(processedNodes[0].currentCost, subsetNodes[0].currentCost);
 
@@ -530,20 +528,20 @@ describe('Correction Distance Modeler', function() {
         // No insert string => no sentinel char to delete.
         assert.equal(processedNodes[3].editCount, 0);
         // ... and a prior character exists.
-        assert.equal(processedNodes[3].calculation.lastInputEntry.key, 't');
+        assert.equal(processedNodes[3].calculation.lastInputEntry, 't');
         assert.equal(processedNodes[3].inputSamplingCost, subsetNodes[3].inputSamplingCost);
         assert.equal(processedNodes[3].currentCost, subsetNodes[3].currentCost);
 
         // Sorted indices 2, 3:  both had 2 inserts.
         assert.isTrue(processedNodes[1].hasPartialInput);
         assert.equal(processedNodes[1].editCount, 1);
-        assert.equal(processedNodes[1].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[1].inputSamplingCost, subsetNodes[1].inputSamplingCost);
         assert.isAbove(processedNodes[1].currentCost, subsetNodes[1].currentCost);
 
         assert.isTrue(processedNodes[2].hasPartialInput);
         assert.equal(processedNodes[2].editCount, 1);
-        assert.equal(processedNodes[2].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(processedNodes[2].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         assert.equal(processedNodes[2].inputSamplingCost, subsetNodes[2].inputSamplingCost);
         assert.isAbove(processedNodes[2].currentCost, subsetNodes[2].currentCost);
       });
@@ -568,7 +566,7 @@ describe('Correction Distance Modeler', function() {
             assert.isFalse(processedNode.hasPartialInput);
             assert.equal(processedNode.editCount, 2);
             assert.equal(processedNode.calculation.inputSequence.length, 4 - dl);
-            assert.equal(processedNode.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+            assert.equal(processedNode.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
             assert.equal(processedNode.inputSamplingCost, baseNode.inputSamplingCost);
             assert.isAbove(processedNode.currentCost, baseNode.currentCost);
           });
@@ -634,11 +632,11 @@ describe('Correction Distance Modeler', function() {
 
         ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
-        assert.equal(ins1_dl0[0].calculation.lastInputEntry.key, 't');
-        assert.equal(ins1_dl0[0].calculation.lastMatchEntry.key, 't');
+        assert.equal(ins1_dl0[0].calculation.lastInputEntry, 't');
+        assert.equal(ins1_dl0[0].calculation.lastMatchEntry, 't');
         assert.equal(ins1_dl0[0].editCount, 0);
-        assert.equal(ins1_dl0[1].calculation.lastInputEntry.key, 'h');
-        assert.equal(ins1_dl0[1].calculation.lastMatchEntry.key, 'h');
+        assert.equal(ins1_dl0[1].calculation.lastInputEntry, 'h');
+        assert.equal(ins1_dl0[1].calculation.lastMatchEntry, 'h');
         assert.equal(ins1_dl0[1].editCount, 0);
         assert.isBelow(ins1_dl0[0].inputSamplingCost, ins1_dl0[1].inputSamplingCost);
         assert.isBelow(ins1_dl0[0].currentCost, ins1_dl0[1].currentCost);
@@ -646,16 +644,16 @@ describe('Correction Distance Modeler', function() {
         // Correction of _other_ input characters to the 't' and the 'h' come
         // after ALL other corrections - these don't get both 't' and 'h' input
         // weights merged into them!
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         // 't' input is more likely, so 't' gives more edit-contribution to 'h' than
         // 'h' gives to 't'
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastMatchEntry.key, 'h');
+        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].calculation.lastMatchEntry, 'h');
         assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS].editCount, 1);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS-1].inputSamplingCost, ins1_dl0[FIRST_CHAR_VARIANTS].inputSamplingCost);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS-1].currentCost, ins1_dl0[FIRST_CHAR_VARIANTS].currentCost);
 
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
-        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastMatchEntry.key, 't');
+        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+        assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].calculation.lastMatchEntry, 't');
         assert.equal(ins1_dl0[FIRST_CHAR_VARIANTS+1].editCount, 1);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS].inputSamplingCost, ins1_dl0[FIRST_CHAR_VARIANTS+1].inputSamplingCost);
         assert.isBelow(ins1_dl0[FIRST_CHAR_VARIANTS].currentCost, ins1_dl0[FIRST_CHAR_VARIANTS+1].currentCost);
@@ -667,7 +665,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
 
         // END:  the ins 1, del 0 subset.
@@ -697,8 +695,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl1[0].calculation.lastInputEntry.key, 't');
-        assert.equal(ins2_dl1[0].calculation.lastMatchEntry.key, 't');
+        assert.equal(ins2_dl1[0].calculation.lastInputEntry, 't');
+        assert.equal(ins2_dl1[0].calculation.lastMatchEntry, 't');
         assert.equal(ins2_dl1[0].editCount, 0);
         // The subset hasn't yet split!
         assert.equal(ins2_dl1[0].currentCost, subsetNodes[1].currentCost);
@@ -713,7 +711,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes1.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost1);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
 
 
@@ -728,8 +726,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl0[0].calculation.lastInputEntry.key, 'c');
-        assert.equal(ins2_dl0[0].calculation.lastMatchEntry.key, 'c');
+        assert.equal(ins2_dl0[0].calculation.lastInputEntry, 'c');
+        assert.equal(ins2_dl0[0].calculation.lastMatchEntry, 'c');
         assert.equal(ins2_dl0[0].editCount, 0);
         // The subset won't split.
         assert.equal(ins2_dl0[0].currentCost, subsetNodes[2].currentCost);
@@ -744,7 +742,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes2.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost2);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
       });
 
@@ -785,18 +783,18 @@ describe('Correction Distance Modeler', function() {
 
         // We should also have single-char replacement entries for cases where one char matches...
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'ty' && n.calculation.inputSequence.map(i => i.key).join('') == 't' + SENTINEL_CODE_UNIT && n.editCount == 1
+          return n.resultKey == 'ty' && n.calculation.inputSequence.map(i => i).join('') == 't' + SENTINEL_CODE_UNIT && n.editCount == 1
         }).length, 1, "did not find expected result type");
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'ch' && n.calculation.inputSequence.map(i => i.key).join('') == SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
+          return n.resultKey == 'ch' && n.calculation.inputSequence.map(i => i).join('') == SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
         }).length, 1, "did not find expected result type");
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'ar' && n.calculation.inputSequence.map(i => i.key).join('') == SENTINEL_CODE_UNIT + 'r' && n.editCount == 1
+          return n.resultKey == 'ar' && n.calculation.inputSequence.map(i => i).join('') == SENTINEL_CODE_UNIT + 'r' && n.editCount == 1
         }).length, 1, "did not find expected result type");
 
         // And even cases where none match, though at twice the edit cost.
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'an' && n.calculation.inputSequence.map(i => i.key).join('') == SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
+          return n.resultKey == 'an' && n.calculation.inputSequence.map(i => i).join('') == SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
         }).length, 1, "did not find expected result type");
 
         // *****
@@ -806,15 +804,15 @@ describe('Correction Distance Modeler', function() {
 
         // We should also have single-char replacement entries for cases where one char matches...
         assert.isAtLeast(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'ca' && n.calculation.inputSequence.map(i => i.key).join('') == 'c' + SENTINEL_CODE_UNIT && n.editCount == 1
+          return n.resultKey == 'ca' && n.calculation.inputSequence.map(i => i).join('') == 'c' + SENTINEL_CODE_UNIT && n.editCount == 1
         }).length, 1, "did not find expected result type");
         assert.isAtLeast(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'th' && n.calculation.inputSequence.map(i => i.key).join('') == SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
+          return n.resultKey == 'th' && n.calculation.inputSequence.map(i => i).join('') == SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
         }).length, 1, "did not find expected result type");
 
         // And even cases where none match, though at twice the edit cost.
         assert.isAtLeast(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'an' && n.calculation.inputSequence.map(i => i.key).join('') == SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
+          return n.resultKey == 'an' && n.calculation.inputSequence.map(i => i).join('') == SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
         }).length, 1, "did not find expected result type");
       });
     });
@@ -873,11 +871,11 @@ describe('Correction Distance Modeler', function() {
 
         ins1_dl0.sort((a, b) => a.currentCost - b.currentCost);
         ins1_dl0.forEach(n => assert.isFalse(n.hasPartialInput)); // all fully-processed.
-        assert.equal(ins1_dl0[0].calculation.lastInputEntry.key, 'r');
-        assert.equal(ins1_dl0[0].calculation.lastMatchEntry.key, 'r');
+        assert.equal(ins1_dl0[0].calculation.lastInputEntry, 'r');
+        assert.equal(ins1_dl0[0].calculation.lastMatchEntry, 'r');
         assert.equal(ins1_dl0[0].editCount, 0);
-        assert.equal(ins1_dl0[1].calculation.lastInputEntry.key, 'l');
-        assert.equal(ins1_dl0[1].calculation.lastMatchEntry.key, 'l');
+        assert.equal(ins1_dl0[1].calculation.lastInputEntry, 'l');
+        assert.equal(ins1_dl0[1].calculation.lastMatchEntry, 'l');
         assert.equal(ins1_dl0[1].editCount, 0);
         assert.isBelow(ins1_dl0[0].inputSamplingCost, ins1_dl0[1].inputSamplingCost);
         assert.isBelow(ins1_dl0[0].currentCost, ins1_dl0[1].currentCost);
@@ -885,16 +883,16 @@ describe('Correction Distance Modeler', function() {
         // Correction of _other_ input characters to the 't' and the 'h' come
         // after ALL other corrections - these don't get both 't' and 'h' input
         // weights merged into them!
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         // 't' input is more likely, so 't' gives more edit-contribution to 'h' than
         // 'h' gives to 't'
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastMatchEntry.key, 'l');
+        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].calculation.lastMatchEntry, 'l');
         assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT].editCount, 1);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT-1].inputSamplingCost, ins1_dl0[TE_CHILD_PATH_COUNT].inputSamplingCost);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT-1].currentCost, ins1_dl0[TE_CHILD_PATH_COUNT].currentCost);
 
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
-        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastMatchEntry.key, 'r');
+        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastInputEntry, SENTINEL_CODE_UNIT);
+        assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].calculation.lastMatchEntry, 'r');
         assert.equal(ins1_dl0[TE_CHILD_PATH_COUNT+1].editCount, 1);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT].inputSamplingCost, ins1_dl0[TE_CHILD_PATH_COUNT+1].inputSamplingCost);
         assert.isBelow(ins1_dl0[TE_CHILD_PATH_COUNT].currentCost, ins1_dl0[TE_CHILD_PATH_COUNT+1].currentCost);
@@ -906,7 +904,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
 
         // END:  the ins 1, del 0 subset.
@@ -921,7 +919,7 @@ describe('Correction Distance Modeler', function() {
 
         // No insert string => no sentinel char to delete.
         assert.equal(ins0_dl1[0].editCount, 0);
-        assert.equal(ins0_dl1[0].calculation.lastInputEntry.key, 't');
+        assert.equal(ins0_dl1[0].calculation.lastInputEntry, 't');
         assert.equal(ins0_dl1[0].inputSamplingCost, subsetNodes[3].inputSamplingCost);
         assert.equal(ins0_dl1[0].currentCost, subsetNodes[3].currentCost);
 
@@ -937,8 +935,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl1.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl1[0].calculation.lastInputEntry.key, 'a');
-        assert.equal(ins2_dl1[0].calculation.lastMatchEntry.key, 'a');
+        assert.equal(ins2_dl1[0].calculation.lastInputEntry, 'a');
+        assert.equal(ins2_dl1[0].calculation.lastMatchEntry, 'a');
         assert.equal(ins2_dl1[0].editCount, 0);
         // The subset hasn't yet split!
         assert.equal(ins2_dl1[0].currentCost, subsetNodes[1].currentCost);
@@ -953,7 +951,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes1.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost1);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
 
 
@@ -968,8 +966,8 @@ describe('Correction Distance Modeler', function() {
         // only one char is processed at this stage.
         ins2_dl0.forEach(n => assert.isTrue(n.hasPartialInput));
 
-        assert.equal(ins2_dl0[0].calculation.lastInputEntry.key, 'c');
-        assert.equal(ins2_dl0[0].calculation.lastMatchEntry.key, 'c');
+        assert.equal(ins2_dl0[0].calculation.lastInputEntry, 'c');
+        assert.equal(ins2_dl0[0].calculation.lastMatchEntry, 'c');
         assert.equal(ins2_dl0[0].editCount, 0);
         // The subset won't split.
         assert.equal(ins2_dl0[0].currentCost, subsetNodes[2].currentCost);
@@ -984,7 +982,7 @@ describe('Correction Distance Modeler', function() {
         fullProbEditNodes2.forEach(n => {
           assert.equal(n.inputSamplingCost, fullInputCost2);
           assert.equal(n.editCount, 1);
-          assert.equal(n.calculation.lastInputEntry.key, SENTINEL_CODE_UNIT);
+          assert.equal(n.calculation.lastInputEntry, SENTINEL_CODE_UNIT);
         });
       });
 
@@ -1025,19 +1023,19 @@ describe('Correction Distance Modeler', function() {
 
         // We should also have single-char replacement entries for cases where one char matches...
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'tax' && n.calculation.inputSequence.map(i => i.key).join('') == 'ta' + SENTINEL_CODE_UNIT && n.editCount == 1
+          return n.resultKey == 'tax' && n.calculation.inputSequence.map(i => i).join('') == 'ta' + SENTINEL_CODE_UNIT && n.editCount == 1
         }).length, 1, "did not find expected result type"); // 'tax'
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'tol' && n.calculation.inputSequence.map(i => i.key).join('') == 't' + SENTINEL_CODE_UNIT + 'l' && n.editCount == 1
+          return n.resultKey == 'tol' && n.calculation.inputSequence.map(i => i).join('') == 't' + SENTINEL_CODE_UNIT + 'l' && n.editCount == 1
         }).length, 1, "did not find expected result type");
         assert.equal(fin_in2_dl1.filter(n => {
         // No other 't_k' entries. :()
-          return n.resultKey == 'tir' && n.calculation.inputSequence.map(i => i.key).join('') == 't' + SENTINEL_CODE_UNIT + 'r' && n.editCount == 1
+          return n.resultKey == 'tir' && n.calculation.inputSequence.map(i => i).join('') == 't' + SENTINEL_CODE_UNIT + 'r' && n.editCount == 1
         }).length, 0, "found unexpected result type");
 
         // And even cases where none match, though at twice the edit cost.
         assert.isAtLeast(fin_in2_dl1.filter(n => {
-          return n.resultKey == 'tim' && n.calculation.inputSequence.map(i => i.key).join('') == 't' + SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
+          return n.resultKey == 'tim' && n.calculation.inputSequence.map(i => i).join('') == 't' + SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
         }).length, 1, "did not find expected result type");
 
         // *****
@@ -1046,15 +1044,15 @@ describe('Correction Distance Modeler', function() {
         assert.equal(fin_in2_dl0[0].editCount, 0);
 
         assert.equal(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'tec_' && n.calculation.inputSequence.map(i => i.key).join('') == 'tec' + SENTINEL_CODE_UNIT && n.editCount == 1
+          return n.resultKey == 'tec_' && n.calculation.inputSequence.map(i => i).join('') == 'tec' + SENTINEL_CODE_UNIT && n.editCount == 1
         }).length, 0, "found unexpected result type"); // No other 'tec'-prefixed entries.
         assert.isAtLeast(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'te_h' && n.calculation.inputSequence.map(i => i.key).join('') == 'te' + SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
+          return n.resultKey == 'te_h' && n.calculation.inputSequence.map(i => i).join('') == 'te' + SENTINEL_CODE_UNIT + 'h' && n.editCount == 1
         }).length, 0, "found unexpected result type"); // No other 'te_h' entries here.
 
         // Cases where none match should exist, though at twice the edit cost.
         assert.isAtLeast(fin_in2_dl0.filter(n => {
-          return n.resultKey == 'temp' && n.calculation.inputSequence.map(i => i.key).join('') == 'te' + SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
+          return n.resultKey == 'temp' && n.calculation.inputSequence.map(i => i).join('') == 'te' + SENTINEL_CODE_UNIT + SENTINEL_CODE_UNIT && n.editCount == 2
         }).length, 1, "did not find expected result type"); // temperature
       });
     });
@@ -1120,7 +1118,7 @@ describe('Correction Distance Modeler', function() {
       let bestEdge;
       do {
         bestEdge = layer3Queue.dequeue();
-      } while(bestEdge.calculation.lastMatchEntry.traversal.entries.length == 0);
+      } while(bestEdge.currentTraversal.entries.length == 0);
 
       assertEdgeChars(bestEdge, 'n', 'n'); // 'ten' - perfect edit distance of 0, though less-likely input sequence.
       // No cost assumptions here.
@@ -1128,7 +1126,7 @@ describe('Correction Distance Modeler', function() {
       var sibling1;
       do {
         sibling1 = layer3Queue.dequeue();
-      } while(sibling1.calculation.lastMatchEntry.traversal.entries.length == 0);
+      } while(sibling1.currentTraversal.entries.length == 0);
 
       // Both have a raw edit distance of 1 while using the same input-sequence root. ('th')
       let tenFlag = edgeHasChars(sibling1, SENTINEL_CODE_UNIT, 'n'); // subs out the 'h' entirely.  Could also occur with 'a', but is too unlikely.
@@ -1140,7 +1138,7 @@ describe('Correction Distance Modeler', function() {
       var sibling2;
       do {
         sibling2 = layer3Queue.dequeue();
-      } while(sibling2.calculation.lastMatchEntry.traversal.entries.length == 0);
+      } while(sibling2.currentTraversal.entries.length == 0);
 
       tenFlag = tenFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'n');
       theFlag = theFlag || edgeHasChars(sibling2, SENTINEL_CODE_UNIT, 'e');

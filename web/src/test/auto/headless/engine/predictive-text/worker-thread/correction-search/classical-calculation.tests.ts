@@ -32,28 +32,20 @@ function compute(input: string, match: string, mode?: string, bandSize?: number)
   switch(mode || "InputThenMatch") {
     case "InputThenMatch":
       for(let i = 0; i < input.length; i++) {
-        buffer = buffer.addInputChar({
-          key: input.charAt(i)
-        });
+        buffer = buffer.addInputChar(input.charAt(i));
       }
 
       for(let j = 0; j < match.length; j++) {
-        buffer = buffer.addMatchChar({
-          key: match.charAt(j)
-        });
+        buffer = buffer.addMatchChar(match.charAt(j));
       }
       break;
     case "MatchThenInput":
       for(let j = 0; j < match.length; j++) {
-        buffer = buffer.addMatchChar({
-          key: match.charAt(j)
-        });
+        buffer = buffer.addMatchChar(match.charAt(j));
       }
 
       for(let i = 0; i < input.length; i++) {
-        buffer = buffer.addInputChar({
-          key: input.charAt(i)
-        });
+        buffer = buffer.addInputChar(input.charAt(i));
       }
       break;
     default:
@@ -402,12 +394,12 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       let expectedInput = ['t', 'e', 'a'];
       for(let i=0; i < expectedInput.length; i++) {
-        assert.equal(trimmedBuffer.inputSequence[i].key, expectedInput[i]);
+        assert.equal(trimmedBuffer.inputSequence[i], expectedInput[i]);
       }
 
       let expectedMatch = ['t', 'h', 'e'];
       for(let i=0; i < expectedMatch.length; i++) {
-        assert.equal(trimmedBuffer.matchSequence[i].key, expectedMatch[i]);
+        assert.equal(trimmedBuffer.matchSequence[i], expectedMatch[i]);
       }
     });
 
