@@ -186,9 +186,9 @@ if [ "$action" == "commit" ]; then
     # If HISTORY.md has been updated, then we want to create a branch and push
     # it for review
     if git status --porcelain=v1 | grep -q HISTORY.md; then
-      git switch -c "auto/cherry-pick-$NEWVERSION-history-to-alpha" master
+      git switch -c "auto/cherry-pick-$KEYMAN_VERSION-history-to-alpha" master
       git add HISTORY.md
-      git commit -m "auto: cherry-pick $NEWVERSION history to alpha
+      git commit -m "auto: cherry-pick $KEYMAN_VERSION history to alpha
 
 Build-bot: skip
 Test-bot: skip
