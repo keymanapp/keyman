@@ -656,6 +656,12 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.240 stable 2025-08-27
+
+* maint(resources): automatically cherry-pick history updates to master (#14596)
+* maint(linux): fix lintian warnings (#14591)
+* maint(linux): ignore generate patch directories (#14601)
+
 ## 18.0.239 stable 2025-08-22
 
 * docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
