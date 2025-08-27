@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.106 alpha 2025-08-27
+
+* fix(windows): check if automatic updates off before prompt (#14295)
+* refactor(linux): use bash testing framework for packaging tests (#14603)
+* maint(resources): use correct version for PR title for history cherry-pick (#14610)
+* refactor(common): fix shellcheck warnings (#14580)
+
 ## 19.0.105 alpha 2025-08-25
 
 * maint(linux): ignore generate patch directories (#14600)
