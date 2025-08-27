@@ -12,7 +12,7 @@ import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts } from "../converter-artifacts.js";
-import { ConverterToKmnArtifacts } from "../converter-artifacts.js"
+import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { KeylayoutXMLSourceFile } from '../../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 
 
@@ -33,20 +33,54 @@ export interface ConverterToKmnResult extends ConverterResult {
 };
 
 
-export interface convert_object {
+
+
+export interface ProcesData {
   keylayout_filename: string,
   kmn_filename: string,
   arrayOf_Modifiers: string[][],
   arrayOf_Rules: Rule[],
 };
 
-export class KeylayoutToKmnConverter {
+export interface KeylayoutFileData {
+  actionId?: string,
+  keyCode?: string,
+  key?: string,
+  behaviour?: string,
+  modifier?: string,
+  outchar?: string;
+};
 
+export interface ActionStateOutput {
+  id: string,
+  state: string,
+  output: string,
+};
+
+/**
+ * @brief  member function to find the number of keys defined in a .keykayout file.
+ *         We process 'MAX_KEY_COUNT' keys at maximum. In case a keylayout has fewer keys defined, we use that smaller number of keys (USE_KEY_COUNT)
+ * @param  data data read from keylayout file 
+ * @param  pos the nth keyMap to be examined
+ * @return usedKeyCount holding the number of keys of a certain keyMap used in a .keykayout file.
+ */
+export function find_usedKeysCount(data: any, pos: number): number {
+
+  let usedKeyCount = KeylayoutToKmnConverter.MAX_KEY_COUNT;
+  if (data.keyboard.keyMapSet[0].keyMap[pos].key.length < usedKeyCount) {
+    // set max to n-1 (keys are zero indexed )
+    usedKeyCount = data.keyboard.keyMapSet[0].keyMap[pos].key.length - 1;
+  }
+  return usedKeyCount;
+}
+
+export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly USED_KEYS_COUNT = 49;               // we use key Nr 0 (A) -> key Nr 49 (Space)
-  static readonly MAX_CTRL_CHARACTER = 32;
   static readonly SKIP_COMMENTED_LINES = false;
+  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint
+  static readonly MAX_KEY_COUNT = 49;                             // At most we use key Nr 0 (A) -> key Nr 49 (Space)
+  static USE_KEY_COUNT = KeylayoutToKmnConverter.MAX_KEY_COUNT;   // we use key Nr 0 (A) -> highest available key of .keylayout file
 
   private options: CompilerOptions;
 
@@ -71,7 +105,10 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
+    if (outputFilename === null) {
+      this.callbacks.reportMessage(ConverterMessages.Error_OutputFilenameIsRequired());
+      return null;
+    }
 
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
     const jsonO: KeylayoutXMLSourceFile = KeylayoutReader.read(inputFilename);
@@ -85,51 +122,32 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
-    if (!jsonO) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ inputFilename }));
-      return null;
-    }
+    outputFilename = outputFilename ?? inputFilename.replace(/\.keylayout$/, '.kmn');
 
-    const outArray: convert_object = await this.convert(jsonO, outputFilename);
-    if (!outArray) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
-      return null;
-    }
+    const outArray: ProcesData = await this.convert(jsonO, outputFilename);
 
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    // _S2 still write to file - will be removed later
-    const out_text_ok: boolean = kmnFileWriter.writeToFile(outArray);
-    if (!out_text_ok) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
-      return null;
-    }
-
     // write to object/ConverterToKmnResult
     const out_Uint8: Uint8Array = kmnFileWriter.write(outArray);
-    const Result_toBeReturned: ConverterToKmnResult = {
+    const result: ConverterToKmnResult = {
       artifacts: {
         kmn: { data: out_Uint8, filename: outputFilename }
       }
     };
-
-    if (!out_Uint8) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename }));
-      return null;
-    }
-    return Result_toBeReturned;
+    return result;
   }
 
   /**
-   * @brief  member function to read filename and behaviour of a json object into a convert_object
+   * @brief  member function to read filename and behaviour of a json object into a ProcesData
    * @param  jsonObj containing filename, behaviour and rules of a json object
-   * @return an convert_object containing all data ready to print out
+   * @return an ProcesData containing all data ready to print out
    */
-  private convert(jsonObj: any, outputfilename: string): convert_object {
+  private convert(jsonObj: any, outputfilename: string): ProcesData {
     const modifierBehavior: string[][] = [];           // modifier for each behaviour
     const rules: Rule[] = [];                          // an array of data for a kmn rule
 
-    const data_object: convert_object = {
+    const data_object: ProcesData = {
       keylayout_filename: "",
       kmn_filename: "",
       arrayOf_Modifiers: [],
@@ -137,7 +155,6 @@ export class KeylayoutToKmnConverter {
     };
 
     if ((jsonObj !== null) && (jsonObj.hasOwnProperty("keyboard"))) {
-
       data_object.keylayout_filename = outputfilename.replace(/\.kmn$/, '.keylayout');
       data_object.kmn_filename = outputfilename;
       data_object.arrayOf_Modifiers = modifierBehavior;  // ukelele uses behaviours e.g. 18 modifiersCombinations in 8 KeyMapSelect(behaviors)
@@ -151,51 +168,73 @@ export class KeylayoutToKmnConverter {
         }
         modifierBehavior.push(singleModifierSet);
       }
+      const behav = 0;
+      // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
+      KeylayoutToKmnConverter.USE_KEY_COUNT = find_usedKeysCount(jsonObj, behav);
+
       // fill rules into arrayOf_Rules of data_object
       return this.createRuleData(data_object, jsonObj);
     }
-    return data_object;
+    else {
+      const inputFilename = data_object.keylayout_filename;
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename }));
+      return data_object;
+    }
   }
 
   /**
-    * @brief  member function to read the rules contained in a json object and add array of Rules[] to an convert_object
-    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an (empty) array of Rules
+    * @brief  member function to read the rules contained in a json object and add array of Rules[] to an ProcesData
+    * @param  data_ukelele: an object containing the name of the in/output file, an array of behaviours and an (empty) array of Rules
     * @param  jsonObj: json Object containing all data read from a keylayout file
     * @return an object containing the name of the input file, an array of behaviours and a populated array of Rules[]
     */
-  public createRuleData(data_ukelele: convert_object, jsonObj: any): convert_object {
+  public createRuleData(data_ukelele: ProcesData, jsonObj: any): ProcesData {
 
     const object_array: Rule[] = [];
     let dk_counter_C3: number = 0;
     let dk_counter_C2: number = 0;
     let action_id: string;
 
+    //find_max_used_keycount(data_ukelele)
     // check if we use CAPS in a modifier throughout the .keylayout file. In this case we need to add NCAPS
     const isCapsused: boolean = this.checkIfCapsIsUsed(data_ukelele.arrayOf_Modifiers);
 
-    // loop keys 0-50 (= all keys we use)
-    for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+    // if there are different amounts of keyMapSelect vs keyMap
+    if (jsonObj.keyboard.modifierMap?.keyMapSelect.length !== jsonObj.keyboard.keyMapSet[0].keyMap.length) {
+      const errorText = data_ukelele.keylayout_filename;
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText }));
+    }
+
+    for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_COUNT; j++) {
 
       // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
 
+        // if index of keys and behaviours exist
+        const isItAvailable = ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length) && (i < jsonObj.keyboard.keyMapSet[0].keyMap.length));
+        if (!isItAvailable) {
+          continue;
+        }
+
         let rule_obj: Rule;
 
-        // ...............................................................................................................................
-        // case C0: output ...............................................................................................................
-        // C0 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
-        // a key is mapped to a character directly ( code -> output) .....................................................................
-        // ...............e. g. <key code="1" output="s"/> ...............................................................................
-        // ...............................................................................................................................
+        if ((j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length)) {
+          // ...............................................................................................................................
+          // case C0: output ...............................................................................................................
+          // C0 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
+          // a key is mapped to a character directly ( code -> output) .....................................................................
+          // ...............e. g. <key code="1" output="s"/> ...............................................................................
+          // ...............................................................................................................................
 
-        if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined)
-          && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")) {
+          if ((jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== undefined)
+            && (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")) {
 
-          // loop behaviours
-          for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
-            if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
+            // loop modifiers
+            for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
 
-              rule_obj = new Rule(
+              if (this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))) {
+
+                rule_obj = new Rule(
                   /*   rule_type */               "C0",
 
                   /*   modifier_prev_deadkey*/    "",
@@ -211,73 +250,74 @@ export class KeylayoutToKmnConverter {
                   /*   modifier_key*/             this.create_kmn_modifier(data_ukelele.arrayOf_Modifiers[i][l], isCapsused),
                   /*   key */                     this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
                   /*   output */                  new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output']),
-              );
-              object_array.push(rule_obj);
-            }
-          }
-
-        }
-        else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] !== undefined) {
-
-          action_id = jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'];
-          // ...............................................................................................................................
-          // case C1: action + state none + output .........................................................................................
-          // C1 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
-          // a key is mapped to an action and then to an output ............................................................................
-          // KeyMap:code -> KeyMap:action->action:action_state(none) -> action_output ......................................................
-          // ...............e. g. <when state="none" output="a" ............................................................................
-          // ...............................................................................................................................
-
-          for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
-
-            if ((this.get_Output__From__ActionId_None(jsonObj, action_id) !== undefined)
-              && (this.get_Output__From__ActionId_None(jsonObj, action_id) !== "")) {
-
-              const outputchar: string = this.get_Output__From__ActionId_None(jsonObj, action_id);
-              const b1_modifierKey_arr: string[][] =
-                this.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused);
-
-              for (let m = 0; m < b1_modifierKey_arr.length; m++) {
-
-                rule_obj = new Rule(
-                  /*   rule_type */               "C1",
-
-                  /*   modifier_prev_deadkey*/    "",
-                  /*   prev_deadkey */            "",
-                  /*   id_prev_deadkey */         0,
-                  /*   unique A */                0,
-
-                  /*   modifier_deadkey */        "",
-                  /*   deadkey */                 "",
-                  /*   dk for C2*/                0,
-                  /*   unique B */                0,
-
-                  /*   modifier_key*/             b1_modifierKey_arr[m][5],
-                  /*   key */                     b1_modifierKey_arr[m][4],
-                  /*   output */                  new TextEncoder().encode(outputchar)
                 );
-                if ((outputchar !== undefined) && (outputchar !== "undefined") && (outputchar !== "")) {
-                  object_array.push(rule_obj);
-                }
+                object_array.push(rule_obj);
               }
             }
+            // }
 
+          }
+          else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] !== undefined) {
+
+            action_id = jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'];
             // ...............................................................................................................................
-            // case C2: action + none + next .................................................................................................
-            // ...............e. g.<when state="none" next="20"/> ............................................................................
-            // replace state x with all rules that result in 14 (<when state="x" next="14") ..................................................
-            // ...............................................................................................................................
-            // Definition of C2 and Blocks 1-6 see ...........................................................................................
-            // https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd   .........
+            // case C1: action + state none + output .........................................................................................
+            // C1 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
+            // a key is mapped to an action and then to an output ............................................................................
+            // KeyMap:code -> KeyMap:action->action:action_state(none) -> action_output ......................................................
+            // ...............e. g. <when state="none" output="a" ............................................................................
             // ...............................................................................................................................
 
-            const b1_actionIndex: number = this.get_ActionIndex__From__ActionId(jsonObj, action_id);
+            for (let l = 0; l < data_ukelele.arrayOf_Modifiers[i].length; l++) {
 
-            // with action_id from above loop all 'action' and search for a state(none)-next-pair ............................................................................................................
-            // e.g. in Block 5: find <when state="none" next="1"/> for action id a18 ......................................................................................................................
-            for (let l = 0; l < jsonObj.keyboard.actions.action[b1_actionIndex].when.length; l++) {
-              if ((jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_state'] === "none")         // find "none"
-                && (jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_next'] !== undefined)) {   // find "next"
+              if ((this.get_Output__From__ActionId_None(jsonObj, action_id) !== undefined)
+                && (this.get_Output__From__ActionId_None(jsonObj, action_id) !== "")) {
+
+                const outputchar: string = this.get_Output__From__ActionId_None(jsonObj, action_id);
+
+                const b1_modifierKey_obj: KeylayoutFileData[] =
+                  this.get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(jsonObj, data_ukelele.arrayOf_Modifiers, action_id, outputchar, isCapsused);
+
+                for (let m = 0; m < b1_modifierKey_obj.length; m++) {
+                  rule_obj = new Rule(
+                    /*   rule_type */               "C1",
+
+                    /*   modifier_prev_deadkey*/    "",
+                    /*   prev_deadkey */            "",
+                    /*   id_prev_deadkey */         0,
+                    /*   unique A */                0,
+
+                    /*   modifier_deadkey */        "",
+                    /*   deadkey */                 "",
+                    /*   dk for C2*/                0,
+                    /*   unique B */                0,
+
+                    /*   modifier_key*/             b1_modifierKey_obj[m].modifier,
+                    /*   key */                     b1_modifierKey_obj[m].key,
+                    /*   output */                  new TextEncoder().encode(outputchar)
+                  );
+                  if ((outputchar !== undefined) && (outputchar !== "undefined") && (outputchar !== "")) {
+                    object_array.push(rule_obj);
+                  }
+                }
+              }
+
+              // ...............................................................................................................................
+              // case C2: action + none + next .................................................................................................
+              // ...............e. g.<when state="none" next="20"/> ............................................................................
+              // replace state x with all rules that result in 14 (<when state="x" next="14") ..................................................
+              // ...............................................................................................................................
+              // Definition of C2 and Blocks 1-6 see ...........................................................................................
+              // https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd   .........
+              // ...............................................................................................................................
+
+              const b1_actionIndex: number = this.get_ActionIndex__From__ActionId(jsonObj, action_id);
+
+              // with action_id from above loop all 'action' and search for a state(none)-next-pair ............................................................................................................
+              // e.g. in Block 5: find <when state="none" next="1"/> for action id a18 ......................................................................................................................
+              for (let l = 0; l < jsonObj.keyboard.actions.action[b1_actionIndex].when.length; l++) {
+                if ((jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_state'] === "none")         // find "none"
+                  && (jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_next'] !== undefined)) {   // find "next"
 
               // Data of Block Nr 5 .....................................................................................................................................................................
               // of this state(none)-next-pair get value of next (next="1") .............................................................................................................................
@@ -288,73 +328,73 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 .....................................................................................................................................................................
               // with present action_id (a18) find all keycode-behaviour-pairs that use this action (a18) => (keymapIndex 0/keycode 24 and keymapIndex 3/keycode 24) ....................................
               // from these create an array of modifier combinations  e.g. [['','caps?'], ['Caps']] .....................................................................................................
-              /* eg: [['24', 0], ['24', 3]] */        const b4_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
-              /* e.g. [['','caps?'], ['Caps']]*/      const b4_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);
+              /* eg: [['24', 0], ['24', 3]] */        const b4_deadkey_obj: KeylayoutFileData[] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
+              /* e.g. [['','caps?'], ['Caps']]*/      const b4_deadkeyModifier_obj: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_obj);
               // ........................................................................................................................................................................................
 
 
               // Data of Block Nr 6 .....................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5_value_next (e.g. use 1 in  <when state="1" output="â"/> ) ......................................
-              /*  eg: [ 'a9','1','â'] */              const b6_actionId_arr: string[][] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
+              /*  eg: [ 'a9','1','â'] */              const b6_actionId_obj: ActionStateOutput[] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
               // ........................................................................................................................................................................................
 
 
               // Data of Block Nr 1  ....................................................................................................................................................................
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] ......................................................................
-              /*  eg: ['0','K_A','a9','0','â'] */     const b1_keycode_arr: string[][] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_arr);
-              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);
-                // .......................................................................................................................................................................................
+              /*  eg: ['0','K_A','a9','0','â'] */    const b1_keycode_obj: KeylayoutFileData[] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_obj);
+              /*  eg: ['K_A','a9','0','NCAPS','â']*/  const b1_modifierKey_obj: KeylayoutFileData[] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_obj, isCapsused);
+                  // .......................................................................................................................................................................................
 
-                for (let n1 = 0; n1 < b4_deadkeyModifier_arr.length; n1++) {
-                  for (let n2 = 0; n2 < b4_deadkeyModifier_arr[n1].length; n2++) {
-                    for (let n3 = 0; n3 < b4_deadkey_arr.length; n3++) {
-                      for (let n4 = 0; n4 < b1_modifierKey_arr.length; n4++) {
+                  for (let n1 = 0; n1 < b4_deadkeyModifier_obj.length; n1++) {
+                    for (let n2 = 0; n2 < b4_deadkeyModifier_obj[n1].length; n2++) {
+                      for (let n3 = 0; n3 < b4_deadkey_obj.length; n3++) {
+                        for (let n4 = 0; n4 < b1_modifierKey_obj.length; n4++) {
 
-                        rule_obj = new Rule(
-                        /*   rule_type */             "C2",
+                          rule_obj = new Rule(
+                            /*   rule_type */             "C2",
 
-                        /*   modifier_prev_deadkey*/  "",
-                        /*   prev_deadkey */          "",
-                        /*   id_prev_deadkey */       0,
-                        /*   unique A */              0,
+                            /*   modifier_prev_deadkey*/  "",
+                            /*   prev_deadkey */          "",
+                            /*   id_prev_deadkey */       0,
+                            /*   unique A */              0,
 
-                        /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_arr[n1][n2], isCapsused),
-                        /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n3][0])),
-                        /*   dk for C2*/              dk_counter_C2++,
-                        /*   unique B */              0,
+                            /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_obj[n1][n2], isCapsused),
+                            /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_obj[n3].key)),
+                            /*   dk for C2*/              dk_counter_C2++,
+                            /*   unique B */              0,
 
-                        /*   modifier_key*/           b1_modifierKey_arr[n4][3],
-                        /*   key */                   b1_modifierKey_arr[n4][0],
-                        /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n4][4]),
-                        );
-                        if ((b1_modifierKey_arr[n4][4] !== undefined)
-                          && (b1_modifierKey_arr[n4][4] !== "undefined")
-                          && (b1_modifierKey_arr[n4][4] !== "")) {
-                          object_array.push(rule_obj);
+                            /*   modifier_key*/           b1_modifierKey_obj[n4].modifier,
+                            /*   key */                   b1_modifierKey_obj[n4].key,
+                            /*   output */                new TextEncoder().encode(b1_modifierKey_obj[n4].outchar),
+                          );
+                          if ((b1_modifierKey_obj[n4].outchar !== undefined)
+                            && (b1_modifierKey_obj[n4].outchar !== "undefined")
+                            && (b1_modifierKey_obj[n4].outchar !== "")) {
+                            object_array.push(rule_obj);
+                          }
                         }
                       }
                     }
                   }
                 }
               }
-            }
 
-            // ...............................................................................................................................
-            // case C3: action + state Nr + Next .............................................................................................
-            // ...............e. g.<when state="3" next="1"/> ................................................................................
-            // replace state x with all rules that result in 1 (<when state="x" next="1") ....................................................
-            // ...............................................................................................................................
-            // Definition of C3 and Blocks 1-6 see ...........................................................................................
-            // https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd  ..........
-            // ...............................................................................................................................
+              // ...............................................................................................................................
+              // case C3: action + state Nr + Next .............................................................................................
+              // ...............e. g.<when state="3" next="1"/> ................................................................................
+              // replace state x with all rules that result in 1 (<when state="x" next="1") ....................................................
+              // ...............................................................................................................................
+              // Definition of C3 and Blocks 1-6 see ...........................................................................................
+              // https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd  ..........
+              // ...............................................................................................................................
 
-            // loop all action-when and find state-next-pair
+              // loop all action-when and find state-next-pair
 
-            // with action_id from above loop all 'action' and search for a state-next-pair ...................................................................................................................
-            // e.g. in Block 5: find <when state="3" next="1"/> for action id a16 .............................................................................................................................
-            for (let l = 0; l < jsonObj.keyboard.actions.action[b1_actionIndex].when.length; l++) {
-              if ((jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_state'] !== "none")
-                && (jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_next'] !== undefined)) {
+              // with action_id from above loop all 'action' and search for a state-next-pair ...................................................................................................................
+              // e.g. in Block 5: find <when state="3" next="1"/> for action id a16 .............................................................................................................................
+              for (let l = 0; l < jsonObj.keyboard.actions.action[b1_actionIndex].when.length; l++) {
+                if ((jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_state'] !== "none")
+                  && (jsonObj.keyboard.actions.action[b1_actionIndex].when[l]['@_next'] !== undefined)) {
 
               // Data of Block Nr 5 ........................................................................................................................................................................
               // of this state-next-pair get value of next (next="1") and state="3" ........................................................................................................................
@@ -365,8 +405,8 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 4 ........................................................................................................................................................................
               // with present action_id (a16) find all keycode-behaviour-pairs that use this action (a16) => (keymapIndex 3/keycode 32) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* e.g. [['32', 3]] */                      const b4_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
-              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_arr);
+              /* e.g. [['32', 3]] */                      const b4_deadkey_obj: KeylayoutFileData[] = this.get_KeyModifier_array__From__ActionID(jsonObj, action_id);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ]*/       const b4_deadkeyModifier_obj: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b4_deadkey_obj);
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 3 ........................................................................................................................................................................
@@ -377,49 +417,49 @@ export class KeylayoutToKmnConverter {
               // Data of Block Nr 2  .......................................................................................................................................................................
               // with present action_id (a17) find all key names and behaviours that use this action (a17) => (keymapIndex 3/keycode 28) ....................................................................
               // from these create an array of modifier combinations  e.g. [ [ 'anyOption', 'Caps' ] ] .....................................................................................................
-              /* eg: index=3 */                           const b2_prev_deadkey_arr: number[][] = this.get_KeyModifier_array__From__ActionID(jsonObj, String(b3_actionId));   // conversion not necessary
-              /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2_prev_deadkeyModifier_arr: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_arr);
+              /* eg: index=3 */                           const b2_prev_deadkey_obj: KeylayoutFileData[] = this.get_KeyModifier_array__From__ActionID(jsonObj, b3_actionId);
+              /* e.g. [ [ 'anyOption', 'Caps' ] ] */      const b2_prev_deadkeyModifier_obj: string[] = this.get_Modifier_array__From__KeyModifier_array(data_ukelele.arrayOf_Modifiers, b2_prev_deadkey_obj);
               // ...........................................................................................................................................................................................
               // Data of Block Nr 6 ........................................................................................................................................................................
               // create an array[action id,state,output] from all state-output-pairs that use state = b5_value_next (e.g. use 1 in  <when state="1" output="â"/> ) .........................................
-              /*  eg:[ [ 'a9','1','â'] ]*/                const b6_actionId_arr: string[][] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next);
+              /*  eg:[ [ 'a9','1','â'] ]*/                const b6_actionId_obj: ActionStateOutput[] = this.get_ActionStateOutput_array__From__ActionState(jsonObj, b5_value_next); /*  eg:[ [ 'a9','1','â'] ]*/
               // ...........................................................................................................................................................................................
 
               // Data of Block Nr 1  .......................................................................................................................................................................
               // create array[Keycode,Keyname,action id,actionIndex,output] and array[Keyname,action id,behaviour,modifier,output] .........................................................................
-              /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1_keycode_arr: string[][] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_arr);
-              /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1_modifierKey_arr: string[][] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_arr, isCapsused);
-                // ...........................................................................................................................................................................................
+              /*  eg: ['49','K_SPACE','a0','0','Â'] */    const b1_keycode_obj: KeylayoutFileData[] = this.get_KeyActionOutput_array__From__ActionStateOutput_array(jsonObj, b6_actionId_obj);
+              /*  eg: ['K_SPACE','a0','0','NCAPS','Â'] */ const b1_modifierKey_obj: KeylayoutFileData[] = this.get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(jsonObj, b1_keycode_obj, isCapsused);
+                  // ...........................................................................................................................................................................................
 
-                for (let n1 = 0; n1 < b2_prev_deadkeyModifier_arr.length; n1++) {
-                  for (let n2 = 0; n2 < b2_prev_deadkeyModifier_arr[n1].length; n2++) {
-                    for (let n3 = 0; n3 < b2_prev_deadkey_arr.length; n3++) {
-                      for (let n4 = 0; n4 < b4_deadkeyModifier_arr.length; n4++) {
-                        for (let n5 = 0; n5 < b4_deadkeyModifier_arr[n4].length; n5++) {
-                          for (let n6 = 0; n6 < b4_deadkey_arr.length; n6++) {
-                            for (let n7 = 0; n7 < b1_modifierKey_arr.length; n7++) {
+                  for (let n1 = 0; n1 < b2_prev_deadkeyModifier_obj.length; n1++) {
+                    for (let n2 = 0; n2 < b2_prev_deadkeyModifier_obj[n1].length; n2++) {
+                      for (let n3 = 0; n3 < b2_prev_deadkey_obj.length; n3++) {
+                        for (let n4 = 0; n4 < b4_deadkeyModifier_obj.length; n4++) {
+                          for (let n5 = 0; n5 < b4_deadkeyModifier_obj[n4].length; n5++) {
+                            for (let n6 = 0; n6 < b4_deadkey_obj.length; n6++) {
+                              for (let n7 = 0; n7 < b1_modifierKey_obj.length; n7++) {
 
-                              rule_obj = new Rule(
-                              /*   rule_type */             "C3",
-                              /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_arr[n1][n2], isCapsused),
-                              /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_arr[n3][0])),
-                              /*   id_prev_deadkey */        dk_counter_C3++,
-                              /*   unique A */              0,
+                                rule_obj = new Rule(
+                                  /*   rule_type */             "C3",
+                                  /*   modifier_prev_deadkey*/  this.create_kmn_modifier(b2_prev_deadkeyModifier_obj[n1][n2], isCapsused),
+                                  /*   prev_deadkey */          this.map_UkeleleKC_To_VK(Number(b2_prev_deadkey_obj[n3].key)),
+                                  /*   id_prev_deadkey */        dk_counter_C3++,
+                                  /*   unique A */              0,
 
-                              /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_arr[n4][n5], isCapsused),
-                              /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_arr[n6][0])),
-                              /*   dk for C2*/              0,
-                              /*   unique B */              0,
+                                  /*   modifier_deadkey */      this.create_kmn_modifier(b4_deadkeyModifier_obj[n4][n5], isCapsused),
+                                  /*   deadkey */               this.map_UkeleleKC_To_VK(Number(b4_deadkey_obj[n6].key)),
+                                  /*   dk for C2*/              0,
+                                  /*   unique B */              0,
 
-                              /*   modifier_key*/           b1_modifierKey_arr[n7][3],
-                              /*   key */                   b1_modifierKey_arr[n7][0],
-                              /*   output */                new TextEncoder().encode(b1_modifierKey_arr[n7][4]),
-                              );
-
-                              if ((b1_modifierKey_arr[n7][4] !== undefined)
-                                && (b1_modifierKey_arr[n7][4] !== "undefined")
-                                && (b1_modifierKey_arr[n7][4] !== "")) {
-                                object_array.push(rule_obj);
+                                  /*   modifier_key*/           b1_modifierKey_obj[n7].modifier,
+                                  /*   key */                   b1_modifierKey_obj[n7].key,
+                                  /*   output */                new TextEncoder().encode(b1_modifierKey_obj[n7].outchar),
+                                );
+                                if ((b1_modifierKey_obj[n7].outchar !== undefined)
+                                  && (b1_modifierKey_obj[n7].outchar !== "undefined")
+                                  && (b1_modifierKey_obj[n7].outchar !== "")) {
+                                  object_array.push(rule_obj);
+                                }
                               }
                             }
                           }
@@ -430,24 +470,15 @@ export class KeylayoutToKmnConverter {
                 }
               }
             }
+          } else {
+            this.callbacks.reportMessage(ConverterMessages.Info_UnsupportedCharactersDetected({
+              inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
+              keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
+              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              KeyName: this.map_UkeleleKC_To_VK(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])
+            }));
           }
-        } else {
-
-          /* QUESTION
-          // _S2 why does this not work here? Correct data in this.callback.messages is available !?!?!
-           this.callbacks.reportMessage(ConverterMessages.Error_UnsupportedCharactersDetected({
-               inputFilename: jsonObj.keyboard['@_name'] + ".keylayout",
-               keymap_index: jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'],
-               output: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'],
-               key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']
-             }));
-           return null;*/
-
-          console.log("ERROR : some output characters can not be used in Keyman \"",
-            (jsonObj.keyboard['@_name'] + ".keylayout\""),
-            "\"<keyMap index=\"", jsonObj.keyboard.keyMapSet[0].keyMap[i]['@_index'], "\">\" :",
-            jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]);
-          continue;
         }
       }
     }
@@ -457,10 +488,10 @@ export class KeylayoutToKmnConverter {
 
   /**
     * @brief  member function to review data in array of Rules[] of data_ukelele: remove duplicate rules and mark first occurance of a rule in object_array
-    * @param  data_ukelele: an object containing the name of the input file, an array of behaviours and an array of Rules
+    * @param  data_ukelele: an object containing the name of the in/output file, an array of behaviours and an array of Rules
     * @return an object containing the name of the input file, an array of behaviours and the revised array of Rules[]
     */
-  public reviewRuleInputData(data_ukelele: convert_object): convert_object {
+  public reviewRuleInputData(data_ukelele: ProcesData): ProcesData {
 
     // check for duplicate C2 and C3 rules in object_array (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
     // then compare to object_array and mark first occurrence  of a rule in object_array
@@ -477,7 +508,12 @@ export class KeylayoutToKmnConverter {
     unique_dkB_count++;
 
     for (let i = 0; i < object_array.length; i++) {
-      if ((object_array[i].modifier_deadkey !== "") && (object_array[i].deadkey !== "")) {
+
+
+      if (
+        ((object_array[i].modifier_deadkey !== undefined) && (object_array[i].modifier_deadkey !== "")) &&
+        ((object_array[i].deadkey !== undefined) && (object_array[i].deadkey !== ""))
+      ) {
         let isFirstUsedHere_dk: boolean = true;
 
         // check if not used before
@@ -594,7 +630,7 @@ export class KeylayoutToKmnConverter {
       else if (!isCAPSused && (modifier_state[i].toUpperCase().includes('CAPS?'))) {
         add_modifier = "";
       }
-      else if (modifier_state[i].toUpperCase().includes('CAPS')) {
+      else if ((modifier_state[i].toUpperCase().includes('CAPS') && (!(modifier_state[i].toUpperCase().includes('NCAPS'))))) {
         add_modifier = "CAPS ";
       }
       else if (isCAPSused && (modifier_state[i].toUpperCase().includes('NCAPS'))) {
@@ -632,7 +668,7 @@ export class KeylayoutToKmnConverter {
       }
 
       else {
-        add_modifier = String(modifier_state[i]) + " ";
+        add_modifier = modifier_state[i] + " ";
       }
       kmn_modifier += kmn_ncaps + add_modifier;
     }
@@ -649,14 +685,14 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to check if CAPS is used throughout a keylayout file or not
    * @param  keylayout_modifier the modifier string used in the .keylayout-file
-   * @return kmn_modifier the modifier string used in the .kmn-file
+   * @return kmn_modifier: the modifier string used in the .kmn-file
    */
   public checkIfCapsIsUsed(keylayout_modifier: string[][]): boolean {
     return JSON.stringify(keylayout_modifier).toUpperCase().includes("CAPS");
   }
 
   /**
-  * @brief  member function to check if a modifier can be used in keyman
+  * @brief  member function to check if a modifier can be used in Keyman
   * @param  keylayout_modifier the modifier string used in the .keylayout-file
   * @return true if the modifier can be used in keyman; false if not
   */
@@ -691,7 +727,7 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to map Ukelele keycodes to Windows Keycodes
    * @param  pos Ukelele (=mac) keycodes
-   * @return keycode on a Windows Keyboard
+   * @return VK
    */
   public map_UkeleleKC_To_VK(pos: number): string {
     const vk = [
@@ -754,11 +790,12 @@ export class KeylayoutToKmnConverter {
     }
   }
 
-  /* @brief  member function to return an index for a given actionID
-    * @param  data   :any - an object containing all data read from a .keylayout file
-    * @param  search :string - value 'id' to be found
-    * @return a number specifying the index of an actionId
-    */
+  /**
+  * @brief  member function to return an index for a given actionID
+  * @param  data   :any - an object containing all data read from a .keylayout file
+  * @param  search :string - value 'id' to be found
+  * @return a number specifying the index of an actionId
+  */
   public get_ActionIndex__From__ActionId(data: any, search: string): number {
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
@@ -772,7 +809,7 @@ export class KeylayoutToKmnConverter {
   * @brief  member function to  find the actionID of a certain state-next pair
   * @param  data   :any an object containing all data read from a .keylayout file
   * @param  search :string value 'next' to be found
-  * @return a string containing the actionId of a certain state-next pair
+  * @return a string containing the actionId of a certain state(none)-next pair
   */
   public get_ActionID__From__ActionNext(data: any, search: string): string {
     if (search !== "none") {
@@ -788,18 +825,19 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-   * @brief  member function to create an array of modifier behaviours for a given keycode in [keycode,modifier]
+   * @brief  member function to create an array of (modifier) behaviours for a given keycode in [{keycode,modifier}]
    * @param  data    : any - an object containing all data read from a .keylayout file
-   * @param  search  : (string | number)[][] - an array[keycode,modifier]  to be found
-   * @return an array: string[] containing modifiers
+   * @param  search  : KeylayoutFileData[] - an array[{keycode,modifier}]  to be found
+   * @return a string[] containing modifiers
    */
-  public get_Modifier_array__From__KeyModifier_array(data: any, search: (string | number)[][]): string[] {
-    const mapIndexArray_2D: string[] = [];
+  public get_Modifier_array__From__KeyModifier_array(data: any, search: KeylayoutFileData[]): string[] {
+    const returnString1D: string[] = [];
     for (let i = 0; i < search.length; i++) {
-      mapIndexArray_2D.push(data[search[i][1]]);
+      returnString1D.push(data[search[i].behaviour]);
     }
-    return mapIndexArray_2D;
+    return returnString1D;
   }
+
 
   /**
    * @brief  member function to find the output for a certain actionID for state 'none'
@@ -809,12 +847,13 @@ export class KeylayoutToKmnConverter {
    */
   public get_Output__From__ActionId_None(data: any, search: string): string {
     let OutputValue: string = "";
-
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       if (data.keyboard.actions.action[i]['@_id'] === search) {
         for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
           if (data.keyboard.actions.action[i].when[j]['@_state'] === "none") {
-            OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
+            if (data.keyboard.actions.action[i].when[j]['@_output'] !== undefined) {
+              OutputValue = data.keyboard.actions.action[i].when[j]['@_output'];
+            }
           }
         }
       }
@@ -825,98 +864,105 @@ export class KeylayoutToKmnConverter {
   /**
   * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
   * @param  data   :any - an object containing all data read from a .keylayout file
-  * @param  search :string[][] - array of [ actionID,state,output]
-  * @return a string[][] containing [Keycode,Keyname,actionId,actionIDIndex, output]
+  * @param  search :idStateOutput_object[] - array of [{ actionID,state,output }]
+  * @return a KeylayoutFileData[] containing [{Keycode,Keyname,actionId,actionID, output}]
   */
-  public get_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: string[][]): string[][] {
+  public get_KeyActionOutput_array__From__ActionStateOutput_array(data: any, search: ActionStateOutput[]): KeylayoutFileData[] {
 
     if ((search === undefined) || (search === null))
       return [];
 
-    const returnarray2D: string[][] = [];
+    const returnObjarray1D = [];
+    let returnObject: KeylayoutFileData;
+
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k][0] &&
-            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.USED_KEYS_COUNT) {
-            returnarray2D.push([
-              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
-              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
-              data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
-              search[k][2]
-            ]);
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&
+            data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
+            returnObject = {
+              keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              key: this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              outchar: search[k].output
+            };
+            returnObjarray1D.push(returnObject);
           }
         }
       }
     }
-    return returnarray2D;
+    return returnObjarray1D;
   }
 
   /**
    * @brief  member function to get an array of all actionId-output pairs for a certain state
    * @param  data    : any an object containing all data read from a .keylayout file
    * @param  search  : string a 'state' to be found
-   * @return an array: string[][] containing all [actionId, state, output] for a certain state
+   * @return an array: idStateOutput_object[] containing all [{actionId, state, output}] for a certain state
    */
-  public get_ActionStateOutput_array__From__ActionState(data: any, search: string): string[][] {
-    const returnarray2D: string[][] = [];
+  public get_ActionStateOutput_array__From__ActionState(data: any, search: string): ActionStateOutput[] {
+    const returnObjarray1D: ActionStateOutput[] = [];
+    let returnObject: ActionStateOutput;
 
     for (let i = 0; i < data.keyboard.actions.action.length; i++) {
       for (let j = 0; j < data.keyboard.actions.action[i].when.length; j++) {
         if ((data.keyboard.actions.action[i].when[j]['@_state'] === search)) {
-          returnarray2D.push([
-            data.keyboard.actions.action[i]['@_id'],
-            data.keyboard.actions.action[i].when[j]['@_state'],
-            data.keyboard.actions.action[i].when[j]['@_output']
-          ]);
+          if (data.keyboard.actions.action[i].when[j]['@_output'] !== undefined) {
+            returnObject = {
+              id: data.keyboard.actions.action[i]['@_id'],
+              state: data.keyboard.actions.action[i].when[j]['@_state'],
+              output: data.keyboard.actions.action[i].when[j]['@_output']
+            };
+            returnObjarray1D.push(returnObject);
+          }
         }
       }
     }
-    return returnarray2D;
+    return returnObjarray1D;
   }
 
   /**
    * @brief  member function to create an 2D array of [KeyName,actionId,behaviour,modifier,output]
    * @param  data    : any an object containing all data read from a .keylayout file
-   * @param  search  : array of [keycode,keyname,actionId,behaviour,output] to be found
+   * @param  search  : array of [{keycode,keyname,actionId,behaviour,output}] to be found
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: string[][] containing [KeyName,actionId,behaviour,modifier,output]
+   * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behaviour,modifier,output}]
    */
-  public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: (boolean | string)[][], isCAPSused: boolean): string[][] {
-    const returnarray: string[][] = [];
+  public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
+    const returnObjarray1D = [];
+    let returnObject: KeylayoutFileData;
 
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
-        const behaviour: number = Number(search[i][3]);
-        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour].modifier.length; j++) {
-          returnarray.push([
-            // KeyName
-            String(search[i][1]),
-            // actionId
-            String(search[i][2]),
-            // behaviour
-            String(search[i][3]),
-            // modifier
-            String(this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour].modifier[j]['@_keys'], isCAPSused)),
-            // output
-            String(search[i][4])
-          ]);
+        const behaviour_idx: number = Number(search[i].behaviour);
+        for (let j = 0; j < data.keyboard.modifierMap.keyMapSelect[behaviour_idx].modifier.length; j++) {
+
+          returnObject = {
+            actionId: search[i].actionId,
+            key: search[i].key,
+            behaviour: search[i].behaviour,
+            modifier: this.create_kmn_modifier(data.keyboard.modifierMap.keyMapSelect[behaviour_idx].modifier[j]['@_keys'], isCAPSused),
+            outchar: search[i].outchar,
+          };
+          returnObjarray1D.push(returnObject);
         }
       }
     }
     // remove duplicates
-    const [unique_returnarray] = returnarray.reduce((acc, curr) => {
-      const [uniq, set] = acc;
-      if (!set.has(curr.join(','))) {
-        set.add(curr.join(','));
-        uniq.push(curr);
+    const unique_Objarray = returnObjarray1D.reduce((unique, o) => {
+      if (!unique.some(obj =>
+        obj.actionId === o.actionId &&
+        obj.key === o.key &&
+        obj.behaviour === o.behaviour &&
+        obj.modifier === o.modifier &&
+        obj.outchar === o.outchar
+      )) {
+        unique.push(o);
       }
-      return acc;
-    },
-      [[], new Set()],
-    );
-    return unique_returnarray;
+      return unique;
+    }, []);
+    return unique_Objarray;
   }
 
   /**
@@ -926,65 +972,74 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string - an actionId to be found
    * @param  outchar  : string - the output character
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
-   * @return an array: string[][] containing [actionID,output,actionID, behaviour,keyname,modifier]
+   * @return an array: KeylayoutFileData[] containing [{actionID,output, behaviour,keyname,modifier}]
    */
-  public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: any, search: string, outchar: string, isCapsused: boolean): string[][] {
-    const returnarray2D: string[][] = [];
+  public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
+    const returnObjarray1D = [];
+    let returnObject: KeylayoutFileData;
 
     if ((search === "") || (search === undefined) || !((isCapsused === true) || (isCapsused === false))) {
       return [];
     }
-
-    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same)
+    // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
-            const behaviour: string = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
-            const modifierkmn: string = this.create_kmn_modifier(modi[behaviour][k], isCapsused);
-            const keyName: string = this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']));
-            returnarray2D.push([
-              search,
-              outchar,
-              data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
-              behaviour,
-              keyName,
-              modifierkmn]);
+            const behaviour_idx: number = data.keyboard.keyMapSet[0].keyMap[i]['@_index'];
+            returnObject = {
+              outchar: outchar,
+              actionId: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'],
+              behaviour: data.keyboard.keyMapSet[0].keyMap[i]['@_index'],
+              key: this.map_UkeleleKC_To_VK(Number(data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+              modifier: this.create_kmn_modifier(modi[behaviour_idx][k], isCapsused),
+            };
+            returnObjarray1D.push(returnObject);
           }
         }
       }
     }
-    // remove duplicates
-    const [unique_returnarray] = returnarray2D.reduce((acc, curr) => {
-      const [uniq, set] = acc;
-      if (!set.has(curr.join(','))) {
-        set.add(curr.join(','));
-        uniq.push(curr);
-      }
-      return acc;
-    },
-      [[], new Set()],
-    );
 
-    return unique_returnarray;
+    //.............................................................................
+
+    // remove duplicates
+    const unique_Objarray = returnObjarray1D.reduce((unique, o) => {
+      if (!unique.some(obj =>
+        obj.outchar === o.outchar &&
+        obj.actionId === o.actionId &&
+        obj.behaviour === o.behaviour &&
+        obj.key === o.key &&
+        obj.modifier === o.modifier
+      )) {
+        unique.push(o);
+      }
+      return unique;
+    }, []);
+
+    return unique_Objarray;
   }
 
   /**
-   * @brief  member function to create an array of [keycode,behaviour] for a given actionId
+   * @brief  member function to create an array of [{keycode,behaviour}] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : string - an actionId to be found
-   * @return an array: number[][] containing [keycode,behaviour]
+   * @return an array: KeylayoutFileData[] containing [{keycode,behaviour}]
    */
-  public get_KeyModifier_array__From__ActionID(data: any, search: string): number[][] {
-    const mapIndexArray_2D: number[][] = [];
+  public get_KeyModifier_array__From__ActionID(data: any, search: string): KeylayoutFileData[] {
+    let returnObject: KeylayoutFileData;
+    const mapIndexObject1D: KeylayoutFileData[] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-      for (let j = 0; j <= KeylayoutToKmnConverter.USED_KEYS_COUNT; j++) {
+      for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
-          mapIndexArray_2D.push([data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], i]);
+          returnObject = {
+            key: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+            behaviour: String(i),
+          };
+          mapIndexObject1D.push(returnObject);
         }
       }
     }
-    return mapIndexArray_2D;
+    return mapIndexObject1D;
   }
 
   /** @internal */
