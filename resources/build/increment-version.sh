@@ -184,15 +184,15 @@ if [ "$action" == "commit" ]; then
     # If HISTORY.md has been updated, then we want to create a branch and push
     # it for review
     if git status --porcelain=v1 | grep -q HISTORY.md; then
-      # TODO: once we are sure this is stable, rename this to
-      # "$branch-master-history" to get automatic merges with "auto/..." branch
-      # name
-      git switch -c "chore/version-$base-$NEWVERSION-master-history" master
+      git switch -c "auto/cherry-pick-$NEWVERSION-history-to-alpha" master
       git add HISTORY.md
-      git commit -m "$message (history cherry-pick to master)"
-      # TODO: once we are sure this is stable, add `-l auto` to get the "auto:"
-      # label
-      hub pull-request -fp --no-edit
+      git commit -m "auto: cherry-pick $NEWVERSION history to alpha
+
+Build-bot: skip
+Test-bot: skip
+"
+
+      hub pull-request -fp --no-edit -l automerge
     fi
 
     # Return to our best working branch
