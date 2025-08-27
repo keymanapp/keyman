@@ -125,11 +125,15 @@ export class ContextTokenization {
     if(leadTokenShift < 0) {
       tokenization.splice(0, -leadTokenShift);
     } else if(leadTokenShift > 0) {
-      // TODO:  insert token(s) at the start to match the text that's back within the
+      // insert token(s) at the start to match the text that's back within the
       // sliding context window.
-      //
-      // (was not part of original source method [`attemptContextMatch`])
-      return null;
+
+      const reinsertedTokens = tokenizedContext.slice(0, leadTokenShift);
+      while(reinsertedTokens.length > 0) {
+        const reinserted = reinsertedTokens.pop();
+        const token = new ContextToken(lexicalModel, reinserted.text);
+        tokenization.unshift(token);
+      }
     }
 
     // If no TAIL mutations have happened, we're safe to return now.
