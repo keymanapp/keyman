@@ -19,8 +19,6 @@ import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-var emptyInput = (id: number) => [{sample: {insert: '', deleteLeft: 0, id: id}, p: 1}];
-
 describe('ModelCompositor', function() {
   describe('Prediction with 14.0+ models', function() {
     describe('Basic suggestion generation', function() {
@@ -115,6 +113,7 @@ describe('ModelCompositor', function() {
         let context = {
           left: '', startOfBuffer: true, endOfBuffer: true,
         };
+        compositor.initContextTracker(context, 0); // Initialize context tracking first!
 
         // The 'weights' involved imply that we have an edge-case fat finger on the bottom of
         // the 'q' key, slightly in its favor.
@@ -123,7 +122,6 @@ describe('ModelCompositor', function() {
           {sample: {insert: 'a', deleteLeft: 0, id: 1}, p: 0.4}   // but at lower weight than 'and' (998).
         ];
 
-        await compositor.predict({insert: '', deleteLeft: 0, id: 0}, context); // Initialize context tracking first!
         let suggestions = await compositor.predict(inputDistribution, context);
 
         // remove the keep suggestion; we're not testing that here.
@@ -898,12 +896,11 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.transformId, -baseSuggestion.transformId);
       assert.equal(reversion.id, -baseSuggestion.id);
 
-      let postContext = models.applyTransform(baseSuggestion.appendedTransform, models.applyTransform(baseSuggestion.transform, baseContext));
-      const appliedContextState = compositor.contextTracker.analyzeState(model, postContext, emptyInput(15));
+      const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(13);
 
       // Accepting the suggestion rewrites the latest context transition.
-      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
-      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [15, baseSuggestion.transformId]);
+      assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 1);
+      assert.sameMembers(compositor.contextTracker.unitTestEndPoints.cache().keys(), [baseSuggestion.transformId]);
 
       // The replacement should be marked on the context-tracking token for the applied version of the results.
       assert.equal(suggestionContextState.final.appliedSuggestionId, undefined);

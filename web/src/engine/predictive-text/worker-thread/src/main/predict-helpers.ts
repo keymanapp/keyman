@@ -304,8 +304,8 @@ export async function correctAndEnumerate(
   // The amount of text to 'replace' depends upon whatever sort of context change occurs
   // from the received input.
   const postContextTokens = postContextState.tokenization.tokens;
-  // Only use of `contextState`.
-  let contextLengthDelta = postContextTokens.length - contextState.tokenization.tokens.length;
+  const alignment = postContextState.tokenization.alignment;
+
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
   if(transition.preservationTransform) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
@@ -318,13 +318,16 @@ export async function correctAndEnumerate(
     // to be up for correction.
     context = models.applyTransform(transition.preservationTransform, context);
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
-  } else if (contextLengthDelta < 0) {
+  } else if (alignment?.canAlign && alignment.tailTokenShift < 0) {
+    // TODO:  may need adjustment / refactoring for complex, word-boundary crossing transforms
+    // and easier unit testing of this logic!
+
     /* Ooh, we've dropped context here.  Almost certainly from a backspace.
-      * Even if we drop multiple tokens... well, we know exactly how many chars
-      * were actually deleted - `inputTransform.deleteLeft`.
-      * Since we replace a word being corrected/predicted, we take length of the remaining
-      * context's tail token in addition to however far was deleted to reach that state.
-      */
+     * Even if we drop multiple tokens... well, we know exactly how many chars
+     * were actually deleted - `inputTransform.deleteLeft`.
+     * Since we replace a word being corrected/predicted, we take length of the remaining
+     * context's tail token in addition to however far was deleted to reach that state.
+     */
     deleteLeft = KMWString.length(wordbreak(postContext)) + inputTransform.deleteLeft;
   } else {
     // Suggestions are applied to the pre-input context, so get the token's original length.
