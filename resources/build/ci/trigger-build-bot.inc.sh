@@ -27,7 +27,7 @@ function test_bot_check_pr_body() {
   IFS=$'\n'
   prbody="$(echo "${prinfo}" | "${JQ}" -r '.body')"
   prTestCommand="$(echo "${prbody}" | grep 'Test-bot:' | cut -d: -f 2 - | cut -d' ' -f 1 -)"
-  prTestBody="$(echo "${prbody}" | grep -i '# User Testing')"
+  prTestBody="$(echo "${prbody}" | grep -i '# User Testing' || true)"
   unset IFS
   set +o noglob
 
@@ -68,31 +68,32 @@ function build_bot_check_messages() {
 
 
   IFS=$'\n'
-  local buildBotCommands=($(echo "$prcommits" | "${JQ}" -r '.[].commit.message' | grep 'Build-bot:' | cut -c 11- -))
-  local prCommands=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -c 11- -))
+  local buildBotCommandArray prCommandArray
+  buildBotCommandArray=($(echo "$prcommits" | "${JQ}" -r '.[].commit.message' | grep 'Build-bot:' | cut -c 11- -))
+  prCommandArray=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -c 11- -))
   unset IFS
 
   # The PR body Build-bot comment will be read last, which allows it to override
   # all previous commands
 
-  if [[ ${#prCommands[@]} -gt 0 ]]; then
-    buildBotCommands+=("${prCommands[@]}")
+  if [[ ${#prCommandArray[@]} -gt 0 ]]; then
+    buildBotCommandArray+=("${prCommandArray[@]}")
   fi
 
-  for buildBotCommand in "${buildBotCommands[@]}"; do
+  for buildBotCommands in "${buildBotCommandArray[@]}"; do
     # Block illegal Build-bot: commands
-    if [[ ! "${buildBotCommand}" =~ ^[a-z_,\ :,]+$ ]]; then
-      builder_echo warning "WARNING[Build-bot]: ignoring invalid command [2]: '${buildBotCommand}'"
+    if [[ ! "${buildBotCommands}" =~ ^[a-z_,\ :,]+$ ]]; then
+      builder_echo warning "WARNING[Build-bot]: ignoring invalid command [2]: '${buildBotCommands}'"
       continue
     fi
 
-    # debug_echo "buildBotCommand:{$buildBotCommand}"
+    # builder_echo debug "buildBotCommands:{$buildBotCommands}"
 
     # We now know that our command has only a-z, comma, colon, and space, so we
     # can parse without risking escaping our bash jail
 
-    if [[ ! -z "${buildBotCommand// }" ]]; then
-      build_bot_update_commands "${buildBotCommand}"
+    if [[ ! -z "${buildBotCommands// }" ]]; then
+      build_bot_update_commands ${buildBotCommands}
     fi
   done
 

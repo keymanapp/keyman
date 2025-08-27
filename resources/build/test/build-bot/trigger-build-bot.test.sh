@@ -137,10 +137,11 @@ test_build_bot_update_commands() {
 #
 _do_test_build_bot_update_commands() {
   eval "declare -gA build_platforms=($1)"
-  local update_command="$2"
+  local update_commands="$2"
   eval "declare -A expected_build_platforms=($3)"
 
-  build_bot_update_commands "${update_command}"
+  # shellcheck disable=SC2086  # intentionally no quotes
+  build_bot_update_commands ${update_commands}
 
   for i in "${!expected_build_platforms[@]}"; do
     assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "build_platforms[${i}]"
@@ -162,8 +163,10 @@ test_build_bot_verify_platforms() {
 }
 
 _do_test_build_bot_verify_platforms() {
-  local platforms=("$1")
-  local expected_platforms=("$2")
+  # shellcheck disable=SC2206  # intentionally no quotes
+  local platforms=($1)
+  # shellcheck disable=SC2206  # intentionally no quotes
+  local expected_platforms=($2)
 
   build_bot_verify_platforms platforms
 
