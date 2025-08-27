@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 18.0.239 stable 2025-08-22
+
+* docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
+* chore(linux): Update debian changelog (#14118)
+* fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult enum (#14208)
+* fix(web): deploy `web/build/publish` folder (#14238)
+* fix(ios): restore keyboard scale map for iPad Air 2 (#14306)
+* chore(developer): upgrade multer to 2.0.2 (#14417)
+* fix(android): cherry-pick getting default sizes before initializing keyboard (#14473)
+* fix(android): polyfill globalThis for API 28 devices (#14553)
+* fix(android): Update sentry-android dependency to 7.22.6 for 16 KB page alignment (#14560)
+* fix(android): Show system OSK when physical keyboard connected (#14547)
+* fix(android): Add preference to show on-screen keyboard to Keyman and FirstVoices apps (#14561)
+
 ## 18.0.238 stable 2025-06-04
 
 * fix(developer): ldml: make sure .run() calls compile() for validation (#14071)
