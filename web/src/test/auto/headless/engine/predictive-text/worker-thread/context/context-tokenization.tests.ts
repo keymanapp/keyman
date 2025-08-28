@@ -46,6 +46,7 @@ describe('ContextTokenization', function() {
       let alignment: ContextStateAlignment = {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -67,6 +68,7 @@ describe('ContextTokenization', function() {
       let baseTokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))), {
         canAlign: true,
         leadTokenShift: 0,
+        leadEditLength: 0,
         matchLength: 6,
         tailEditLength: 1,
         tailTokenShift: 0
@@ -111,6 +113,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 7,
           tailEditLength: 0,
           tailTokenShift: 2
@@ -138,6 +141,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 6,
           tailEditLength: 1,
           tailTokenShift: 0
@@ -176,6 +180,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 22,
           tailEditLength: 1,
           tailTokenShift: 0
@@ -211,6 +216,7 @@ describe('ContextTokenization', function() {
         targetTokens, {
           canAlign: true,
           leadTokenShift: 0,
+          leadEditLength: 0,
           matchLength: 24,
           tailEditLength: 1,
           tailTokenShift: 0
