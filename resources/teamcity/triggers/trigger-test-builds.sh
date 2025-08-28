@@ -9,29 +9,19 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${THIS_SCRIPT%/*}/ci/trigger-definitions.inc.sh"
-. "${THIS_SCRIPT%/*}/ci/trigger-builds.inc.sh"
-. "${THIS_SCRIPT%/*}/ci/trigger-build-bot.inc.sh"
-. "${THIS_SCRIPT%/*}/jq.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/trigger-definitions.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/trigger-builds.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/trigger-build-bot.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/jq.inc.sh"
 
 builder_describe "Run test builds for the given pull request/primary branch" \
   "--dry-run,-n       Only report back which builds would be started" \
   "--branch,-b=PRNUM  Branch (master,beta,stable-x.y) or pull-request to test"
 
-if [[ $# -eq 1 ]] && [[ "$1" =~ ^([0-9]+|master|beta|stable-[0-9]+\.[0-9]+)$ ]]; then
-  # For transitional period, when build configuration on TC needs to support
-  # both forms, we will pass a modified set of params to builder_parse
-  #
-  # TODO: remove this condition once all branches have received this change,
-  #       and update TC build configuration to pass -b parameter
-  #
-  builder_parse -b "$1"
-else
-  builder_parse "$@"
-fi
+builder_parse "$@"
 
 # Validate parameters
 
@@ -71,7 +61,7 @@ function triggerTestBuilds() {
   if builder_has_option --dry-run; then
     builder_echo "DRY RUN: cancel current builds for $branch"
   else
-    node "$THIS_SCRIPT_PATH/ci/cancel-builds/cancel-test-builds.mjs" "$branch" "$TEAMCITY_TOKEN"
+    node "$KEYMAN_ROOT/resources/build/ci/cancel-builds/cancel-test-builds.mjs" "$branch" "$TEAMCITY_TOKEN"
   fi
 
   for platform in "${!platforms[@]}"; do
