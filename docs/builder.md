@@ -1,4 +1,7 @@
-# Using the build-utils.sh builder functions
+# Using the builder.inc.sh builder functions
+
+Note: see [resources/build/README.md](../resources/build/README.md) for
+distinction on builder-basic.inc.sh and builder-full.inc.sh.
 
 The Keyman repository is standardising on bash scripts for builds. These may
 call project-specific builders, such as `tsc` for Typescript projects, `meson`
@@ -43,7 +46,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # . "$KEYMAN_ROOT/.../foo.inc.sh"     # any other includes, such as jq.inc.sh
@@ -78,7 +81,7 @@ Builder scripts will inherit `set -eu` from builder.inc.sh:
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 ```
 
@@ -100,7 +103,7 @@ search-and-replace) this section in the future as required.
 
 ## Any other includes
 
-Once `build-utils.sh` has been included, the variable `$KEYMAN_ROOT` will be
+Once `builder-basic.inc.sh` has been included, the variable `$KEYMAN_ROOT` will be
 available, so other include scripts should be sourced accordingly, for example:
 
 ```bash
@@ -114,7 +117,7 @@ to `cd` at the start of your script.
 
 ## Standard environment
 
-`build-utils.sh` will prepend `$KEYMAN_ROOT/node_modules/.bin` to the `PATH`
+`builder-basic.inc.sh` will prepend `$KEYMAN_ROOT/node_modules/.bin` to the `PATH`
 variable to ensure that we run the correct versions of npm package commands, so
 there is no need to hard-code path references or add script wrappers to
 package.json (`npm run <script>`).
@@ -228,7 +231,7 @@ The first step in your script is to describe the available parameters, using
 
 ```bash
 builder_describe \
-  "Tests the build-utils.sh builder functions. This is merely an example." \
+  "Tests the builder-basic.inc.sh builder functions. This is merely an example." \
   clean \
   build \
   test \
@@ -266,7 +269,7 @@ for example:
 
 ```bash
 if builder_start_action configure; then
-  verify_npm_setup
+  node_select_version_and_npm_ci
   builder_finish_action success configure
 fi
 
@@ -1089,7 +1092,7 @@ longhand form.
   }
 
   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_run_action configure    verify_npm_setup
+  builder_run_action configure    node_select_version_and_npm_ci
   builder_run_action build        do_build
 ```
 
@@ -1228,7 +1231,7 @@ fi
 
 --------------------------------------------------------------------------------
 
-## `builder_do_typescript_tests` function
+## `typescript_run_eslint_mocha_tests` function
 
 Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
 
@@ -1238,7 +1241,7 @@ be moved to builder.typescript.inc.sh in the future.
 ### Usage
 
 ```bash
-builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+builder_run_action  test    typescript_run_eslint_mocha_tests [coverage_threshold]
 ```
 
 ### Parameters

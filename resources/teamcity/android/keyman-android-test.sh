@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
 
 ################################ Main script ################################
@@ -23,7 +23,8 @@ builder_describe \
   "--fv           additionally build and Test FV Android" \
   "all            run all actions" \
   "clean          clean artifact directories" \
-  "build          configure, build and test Keyman for Android"
+  "build          configure, build and test Keyman for Android" \
+  "publish        publish symbols to Sentry (for release buildLevel)"
 
 builder_parse "$@"
 
@@ -39,7 +40,9 @@ fi
 if builder_has_action all; then
   android_clean_action
   android_build_action "${TARGETS}" --debug
+  android_publish_symbols "${TARGETS}" --debug
 else
-  builder_run_action  clean   android_clean_action
-  builder_run_action  build   android_build_action "${TARGETS}" --debug
+  builder_run_action  clean     android_clean_action
+  builder_run_action  build     android_build_action "${TARGETS}" --debug
+  builder_run_action  publish   android_publish_symbols "${TARGETS}" --debug
 fi

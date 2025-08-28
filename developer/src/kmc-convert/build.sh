@@ -2,11 +2,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Keyman kmc-convert keyboard conversion tools module" \
   "@/developer/src/common/web/utils" \
@@ -30,7 +31,7 @@ builder_parse "$@"
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure   verify_npm_setup
+builder_run_action configure   node_select_version_and_npm_ci
 builder_run_action build       tsc --build
 builder_run_action api         api-extractor run --local --verbose
 
@@ -46,4 +47,4 @@ do_test() {
 }
 
 builder_run_action test        do_test
-builder_run_action publish     builder_publish_npm
+builder_run_action publish     ci_publish_npm
