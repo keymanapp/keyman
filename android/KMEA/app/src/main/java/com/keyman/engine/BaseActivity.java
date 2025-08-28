@@ -121,11 +121,11 @@ public class BaseActivity extends AppCompatActivity {
       WindowInsetsControllerCompat windowInsetsController =
         WindowCompat.getInsetsController(window, window.getDecorView());
       windowInsetsController.setAppearanceLightStatusBars(true);
-    }
 
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-      window.setStatusBarColor(getColor(statusBarColor));
-      window.setNavigationBarColor(getColor(navigationBarColor));
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        window.setStatusBarColor(getColor(statusBarColor));
+        window.setNavigationBarColor(getColor(navigationBarColor));
+      }
     }
   }
 
