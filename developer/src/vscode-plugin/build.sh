@@ -5,10 +5,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/node.inc.sh"
 
 builder_describe "Keyman Developer for VSCode module" \
   "clean" \
@@ -25,10 +25,9 @@ builder_describe_outputs \
 builder_parse "$@"
 
 builder_run_action clean           rm -rf ./out/ ./tsconfig.tsbuildinfo .vscode-test
-builder_run_action configure       verify_npm_setup
+builder_run_action configure       node_select_version_and_npm_ci
 builder_run_action build           npm run compile
 builder_run_action test            npm test
 
 #-------------------------------------------------------------------------------------------------------------------
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
