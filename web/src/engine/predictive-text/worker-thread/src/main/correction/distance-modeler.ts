@@ -36,7 +36,9 @@ enum TimedTaskTypes {
  */
 export interface PartialSearchEdge {
   /**
-   * `subsetSubIndex` indicates the next portion of the subset to be incorporated.
+   * A set of `Transform`s all sharing matching, batchable properties for the full portion
+   * that has been processed, including the portions of the `.insert` property preceding
+   * `subsetSubindex` but not those after.
    */
   transformSubset: TransformSubset<number>;
 
@@ -188,7 +190,7 @@ export class SearchNode {
 
       // TODO:  probably more efficient to instead use actual 'probability space'... but that'll involve extra changes.
       this._inputCost = this.priorInput.map(mass => mass.p > MIN_P ? mass.p : MIN_P).reduce((previous, current) => previous - Math.log(current), 0);
-      // For a partiallly-processed set, we do include the set's full modeled probability mass.
+      // For a partially-processed set, we do include the set's full modelled probability mass.
       if(this.partialEdge) {
         const mass = this.partialEdge.transformSubset.cumulativeMass;
         this._inputCost -= Math.log(mass > MIN_P ? mass : MIN_P);

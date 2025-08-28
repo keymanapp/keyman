@@ -103,8 +103,10 @@ function fetchCommonTENode() {
   const secondLayerNodes = tNode
     .buildSubstitutionEdges(secondLayerTransforms)
     .flatMap(node => node.processSubsetEdge());
-  assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-  firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+  // The field narrows down at this point, but still has a decent number
+  // of variants (11).
+  assert.isAbove(secondLayerNodes.length, 10);
+  secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
 
   const teNode = secondLayerNodes[0];
 
