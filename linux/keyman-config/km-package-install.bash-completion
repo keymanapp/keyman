@@ -54,34 +54,34 @@ _km-package-install_completions()
             local packageId=""
             local packageDir
             packageDir=$(mktemp -d)
-            for ((i=0;i<$COMP_CWORD;i++)); do
-                case ${COMP_WORDS[$i]} in
+            for ((i=0;i<COMP_CWORD;i++)); do
+                case ${COMP_WORDS[${i}]} in
                     "-p"|"--package")
                         packageId="${COMP_WORDS[$i+1]}"
                         # shellcheck disable=SC2086 # doesn't work with quotes
-                        if [ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/$packageId ] && [ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}.kmp ]; then
-                            python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('get_kmp', '$get_kmp_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.get_kmp('$packageId')"
+                        if [[ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId} ]] && [[ ! -f ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}.kmp ]]; then
+                            python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('get_kmp', '${get_kmp_path}');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.get_kmp('${packageId}')"
                         fi
                         break
                     ;;
                     "-f"|"--file")
-                        package="${COMP_WORDS[$i+1]}"
-                        packageId=$(basename "$package")
+                        package="${COMP_WORDS[${i}+1]}"
+                        packageId=$(basename "${package}")
                         # shellcheck disable=SC2086 # doesn't work with quotes
-                        cp "$package" ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}
+                        cp "${package}" ${XDG_CACHE_HOME:-~/.cache}/keyman/${packageId}
                         break
                     ;;
                     *)
                     ;;
                 esac
             done
-            if [ -z "$packageId" ]; then
+            if [[ -z "${packageId}" ]]; then
                 return 0
             fi
             words=""
             while read -r lang; do
-                words="$words $lang"
-            done < <(python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '$pkg_install_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_languages_for_keyboard('$packageId', '$packageDir')")
+                words="${words} ${lang}"
+            done < <(python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '$pkg_install_path');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_languages_for_keyboard('${packageId}', '${packageDir}')")
             # shellcheck disable=SC2207
             COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
             return 0

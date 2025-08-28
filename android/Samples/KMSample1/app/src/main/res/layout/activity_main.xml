@@ -1,7 +1,11 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <com.keyman.engine.KMTextView
@@ -12,8 +16,10 @@
         android:ems="10"
         android:inputType="textMultiLine"
         android:gravity="top"
-        android:scrollbars="vertical" >
+        android:scrollbars="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <requestFocus />
     </com.keyman.engine.KMTextView>
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

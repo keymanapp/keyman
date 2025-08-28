@@ -440,7 +440,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-untagged.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/mac/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/mac/set-bundle-versions-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		37DF007C24595F6F00C73128 /* Run Script */ = {
@@ -459,7 +459,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-untagged.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/mac/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/mac/set-bundle-versions-and-settings-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9800EC5D1C029FCD00BF0FB5 /* ShellScript */ = {
