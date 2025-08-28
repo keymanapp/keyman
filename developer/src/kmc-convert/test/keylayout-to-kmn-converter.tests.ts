@@ -46,33 +46,30 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      /*  [makePathToFixture('../data/Test_C0.keylayout')],
-        [makePathToFixture('../data/Test_C1.keylayout')],
-        [makePathToFixture('../data/Test_C2.keylayout')],
-        [makePathToFixture('../data/Test_C2_several.keylayout')],
-        [makePathToFixture('../data/Test_C3.keylayout')],
-        [makePathToFixture('../data/Test_C3_several.keylayout')],
-        [makePathToFixture('../data/Test_C0_C1_C2_C3.keylayout')],*/
+      [makePathToFixture('../data/Test_C0.keylayout')],
+      [makePathToFixture('../data/Test_C1.keylayout')],
+      [makePathToFixture('../data/Test_C2.keylayout')],
+      [makePathToFixture('../data/Test_C2_several.keylayout')],
+      [makePathToFixture('../data/Test_C3.keylayout')],
+      [makePathToFixture('../data/Test_C3_several.keylayout')],
+      [makePathToFixture('../data/Test_C0_C1_C2_C3.keylayout')],
       [makePathToFixture('../data/Test_maxKeyCode.keylayout')],
-      /*  [makePathToFixture('../data/Test_messages.keylayout')],
-        [makePathToFixture('../data/Test_messages_controlCharacter.keylayout')],
-        [makePathToFixture('../data/Test_messages_superior_C2.keylayout')],
-        [makePathToFixture('../data/Test_messages_superior_C3.keylayout')],
-        [makePathToFixture('../data/Test_duplicate_missing_keycode.keylayout')],
-        [makePathToFixture('../data/Test_modifier.keylayout')],
-        [makePathToFixture('../data/Test_modifierNoCaps.keylayout')],
-        [makePathToFixture('../data/Test_differentAmountOfKeysInBehaviours.keylayout')],
-        [makePathToFixture('../data/Test_duplicate_missing_keys.keylayout')],
-        [makePathToFixture('../data/Test_duplicate_keys.keylayout')],
-        [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
-        [makePathToFixture('../data/Test_nr_elements.keylayout')],
-        [makePathToFixture('../data/Test.keylayout')],*/
+      [makePathToFixture('../data/Test_messages.keylayout')],
+      [makePathToFixture('../data/Test_messages_controlCharacter.keylayout')],
+      [makePathToFixture('../data/Test_messages_superior_C2.keylayout')],
+      [makePathToFixture('../data/Test_messages_superior_C3.keylayout')],
+      [makePathToFixture('../data/Test_duplicate_missing_keycode.keylayout')],
+      [makePathToFixture('../data/Test_modifier.keylayout')],
+      [makePathToFixture('../data/Test_modifierNoCaps.keylayout')],
+      [makePathToFixture('../data/Test_differentAmountOfKeysInBehaviours.keylayout')],
+      [makePathToFixture('../data/Test_duplicate_missing_keys.keylayout')],
+      [makePathToFixture('../data/Test_duplicate_keys.keylayout')],
+      [makePathToFixture('../data/Test_ambiguous_keys.keylayout')],
+      [makePathToFixture('../data/Test_nr_elements.keylayout')],
+      [makePathToFixture('../data/Test.keylayout')],
     ].forEach(function (files_) {
       it(files_ + " should give no errors ", async function () {
         sut.run(files_[0]);
-        console.log(" files_[0]", files_[0]);
-        console.log("compilerTestCallbacks.messages.length ", compilerTestCallbacks.messages.length === 0, compilerTestCallbacks.messages.length, compilerTestCallbacks.messages);
-
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
@@ -82,25 +79,12 @@ describe('KeylayoutToKmnConverter', function () {
     this.timeout(4000);
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-     [makePathToFixture('../data/Test_characters.keylayout')],
+      [makePathToFixture('../data/Test_characters.keylayout')],
       [makePathToFixture('../data/Test_onlyOneKeymap.keylayout')],
     ].forEach(function (files_) {
       it(files_ + " should give Info: unsupported characters ", async function () {
         sut.run(files_[0]);
-
-        console.log("compilerTestCallbacks.messages.length === 1 ", compilerTestCallbacks.messages.length === 1, compilerTestCallbacks.messages.length);
-        assert.isTrue(compilerTestCallbacks.messages.length === 1);
-
-        console.log("compilerTestCallbacks.messages[0] ", compilerTestCallbacks.messages[0].code, compilerTestCallbacks.messages[0]);
-        console.log("info: ", compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007), compilerTestCallbacks.messages[0].code, (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
-
-        console.log("---- ",);
-
-
-
-
-
-        //assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
+        assert.isTrue(compilerTestCallbacks.messages[0].code === (CompilerErrorSeverity.Info | CompilerErrorNamespace.Converter | 0x0007));
       });
     });
   });
