@@ -60,8 +60,7 @@ export interface ActionStateOutput {
 /**
  * @brief  member function to find the number of keys defined in a .keykayout file.
  *         We process 'MAX_KEY_COUNT' keys at maximum. In case a keylayout has fewer keys defined, we use that smaller number of keys (USE_KEY_COUNT)
-
- * @param  data data read from keylayout file
+ * @param  data data read from keylayout file 
  * @param  pos the nth keyMap to be examined
  * @return usedKeyCount holding the number of keys of a certain keyMap used in a .keykayout file.
  */
@@ -169,7 +168,7 @@ export class KeylayoutToKmnConverter {
         }
         modifierBehavior.push(singleModifierSet);
       }
-
+      
       const behav = 0;
       // fix the amount of processable keys to the maximun nr of keys of a keyMap to avoid processing more keys than defined
       KeylayoutToKmnConverter.USE_KEY_COUNT = find_usedKeysCount(jsonObj, behav);
@@ -830,7 +829,6 @@ export class KeylayoutToKmnConverter {
   /**
    * @brief  member function to create an array of (modifier) behaviours for a given keycode in [{keycode,modifier}]
    * @param  data    : any - an object containing all data read from a .keylayout file
-
    * @param  search  : KeylayoutFileData[] - an array[{keycode,modifier}]  to be found
    * @return a string[] containing modifiers
    */
@@ -882,8 +880,7 @@ export class KeylayoutToKmnConverter {
     for (let k = 0; k < search.length; k++) {
       for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
         for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
-          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&
-
+          if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search[k].id &&              
             data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'] <= KeylayoutToKmnConverter.MAX_KEY_COUNT) {
             returnObject = {
               keyCode: data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
@@ -906,7 +903,6 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string a 'state' to be found
    * @return an array: idStateOutput_object[] containing all [{actionId, state, output}] for a certain state
    */
-
   public get_ActionStateOutput_array__From__ActionState(data: any, search: string): ActionStateOutput[] {
     const returnObjarray1D: ActionStateOutput[] = [];
     let returnObject: ActionStateOutput;
@@ -932,7 +928,6 @@ export class KeylayoutToKmnConverter {
    * @param  data    : any an object containing all data read from a .keylayout file
    * @param  search  : array of [{keycode,keyname,actionId,behaviour,output}] to be found
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
-
    * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behaviour,modifier,output}]
    */
   public get_KeyMBehaviourModOutputArray__from__KeyActionBehaviourOutput_array(data: any, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
@@ -978,7 +973,6 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string - an actionId to be found
    * @param  outchar  : string - the output character
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
-
    * @return an array: KeylayoutFileData[] containing [{actionID,output, behaviour,keyname,modifier}]
    */
   public get_ActionOutputBehaviourKeyModi_From__ActionIDStateOutput(data: any, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
@@ -990,7 +984,6 @@ export class KeylayoutToKmnConverter {
     }
     // loop behaviors (in ukelele it is possible to define multiple modifier combinations that behave in the same way)
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
-
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
         if (data.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action'] === search) {
           for (let k = 0; k < modi[data.keyboard.keyMapSet[0].keyMap[i]['@_index']].length; k++) {
@@ -1031,7 +1024,6 @@ export class KeylayoutToKmnConverter {
    * @brief  member function to create an array of [{keycode,behaviour}] for a given actionId
    * @param  data    : any - an object containing all data read from a .keylayout file
    * @param  search  : string - an actionId to be found
-
    * @return an array: KeylayoutFileData[] containing [{keycode,behaviour}]
    */
   public get_KeyModifier_array__From__ActionID(data: any, search: string): KeylayoutFileData[] {

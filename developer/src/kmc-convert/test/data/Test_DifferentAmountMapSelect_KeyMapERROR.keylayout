@@ -34,7 +34,7 @@
             <key code="2" output="d"/>
             <key code="3" output="f"/>
             <key code="4" output="h"/>
-
+          
             <key code="9" output="v"/>
             <key code="10" output="\"/>
         </keyMap>
