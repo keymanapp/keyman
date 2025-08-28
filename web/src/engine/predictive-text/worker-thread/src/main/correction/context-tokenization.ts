@@ -14,6 +14,7 @@ import { Token } from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 import TransformUtils from '../transformUtils.js';
 
@@ -89,7 +90,7 @@ export class ContextTokenization {
     lexicalModel: LexicalModel,
     // FUTURE NOTE:  especially for epic-dict-breaker, we'll want an array of these - to align across multiple transitions
     // in case word boundaries shift back and forth.
-    alignedTransformDistribution: Distribution<Transform[]>
+    alignedTransformDistribution: Distribution<Map<number, Transform>>
   ): ContextTokenization {
     if(!alignment.canAlign) {
       return null;
@@ -162,17 +163,26 @@ export class ContextTokenization {
     // first index:  original sample's tokenization
     // second index:  token index within original sample
     const tokenDistribution = alignedTransformDistribution.map((entry) => {
-      return entry.sample.map((sample) => {
-        return {
-          sample: sample,
+      const remap: Map<number, ProbabilityMass<Transform>> = new Map();
+
+      for(const pair of entry.sample.entries()) {
+        remap.set(pair[0], {
+          sample: pair[1],
           p: entry.p
-        }
-      });
+        });
+      }
+
+      return remap;
     });
 
-    // Using these as base indices...
-    let tailIndex = 0;
+    // The original tail token should match index 0. If tokens have been deleted, that
+    // left-shifts our base indices; we start left of 0. If more than one token was
+    // edited, those edits occur to the left as well - and further left of whatever
+    // the new tail token is *if* tokens were removed.
+    const firstTailEditIndex = Math.min((1 - tailEditLength), 0) + Math.min(tailTokenShift, 0);
     for(let i = 0; i < tailEditLength; i++) {
+      const tailIndex = firstTailEditIndex + i;
+
       // do tail edits
       const incomingIndex = i + incomingTailUpdateIndex;
       const matchingIndex = i + matchingTailUpdateIndex;
@@ -180,7 +190,7 @@ export class ContextTokenization {
       const incomingToken = tokenizedContext[incomingIndex];
       const matchedToken = this.tokens[matchingIndex];
 
-      let primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
+      let primaryInput = hasDistribution ? tokenizedPrimaryInput.get(tailIndex) : null;
       const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
       let token: ContextToken;
 
@@ -193,11 +203,10 @@ export class ContextTokenization {
         token = new ContextToken(matchedToken);
         // Erase any applied-suggestion transition ID; it is no longer valid.
         token.appliedTransitionId = undefined;
-        token.searchSpace.addInput(tokenDistribution.map((seq) => seq[tailIndex] ?? { sample: { insert: '', deleteLeft: 0 }, p: 1 }));
+        token.searchSpace.addInput(tokenDistribution.map((seq) => seq.get(tailIndex) ?? { sample: { insert: '', deleteLeft: 0 }, p: 1 }));
       }
 
       tokenization[incomingIndex] = token;
-      tailIndex++;
     }
 
     if(tailTokenShift < 0) {
@@ -211,19 +220,21 @@ export class ContextTokenization {
         tokenization.pop();
       }
     } else {
-      for(let i = tailEditLength; i < tailEditLength + tailTokenShift; i++) {
+      // First tail insertion index within the tokenized-transform map is always 1.
+      for(let i = 1; i <= tailTokenShift; i++) {
         // create tail tokens
-        const incomingIndex = i + incomingTailUpdateIndex;
+        //                      same original base     after all edited
+        const incomingIndex = incomingTailUpdateIndex + tailEditLength + (i - 1);
         const incomingToken = tokenizedContext[incomingIndex];
         // // Assertion:  there should be no matching token; this should be a newly-appended token.
         // const matchingIndex = i + tailEditLength + matchingTailUpdateIndex;
 
-        const primaryInput = hasDistribution ? tokenizedPrimaryInput[i] : null;
+        const primaryInput = hasDistribution ? tokenizedPrimaryInput.get(i) : null;
         let pushedToken = new ContextToken(lexicalModel);
 
-        // TODO:  assumes that there was no shift in wordbreaking from the
-        // prior context to the current one.  This may actually be a major
-        // issue for dictionary-based wordbreaking!
+        // TODO:  assumes that there was no shift in wordbreaking for the actual
+        // context when transitioning from the prior context to the current one.
+        // This may actually be a major issue for dictionary-based wordbreaking!
         //
         // If there was such a shift, then we may have extra transforms
         // originally on a 'previous' token that got moved into this one!
@@ -233,8 +244,13 @@ export class ContextTokenization {
         // next keystroke results in `butterfli`, this would likely be
         // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
         // we know to properly relocate the `f` and `l` transforms?
+
+        // Build a distribution for transforms aligned to the current token,
+        // then remove any empty / null / undefined entries.
         let tokenDistribComponent = tokenDistribution.map((seq) => {
-          const entry = seq[tailIndex];
+          const entry = seq.get(i);
+          // Do not add empty Transforms into the correction-search input
+          // at this stage.
           if(!entry || TransformUtils.isEmpty(entry.sample)) {
             return null;
           } else {
@@ -243,7 +259,13 @@ export class ContextTokenization {
         }).filter((entry) => !!entry);
         if(primaryInput) {
           let transformDistribution = tokenDistribComponent.length > 0 ? tokenDistribComponent : null;
+
+          // If there are no entries in our would-be distribution, there's no
+          // reason to pass in what amounts to a no-op.
           if(transformDistribution) {
+            // If we ever stop filtering tokenized transform distributions, it may
+            // be worth adding an empty transform here with weight to balance
+            // the distribution back to a cumulative prob sum of 1.
             pushedToken.searchSpace.addInput(transformDistribution);
           }
         } else if(incomingToken.text) {
@@ -256,7 +278,6 @@ export class ContextTokenization {
 
         // Auto-replaces the search space to correspond with the new token.
         tokenization.push(pushedToken);
-        tailIndex++;
       }
     }
 
