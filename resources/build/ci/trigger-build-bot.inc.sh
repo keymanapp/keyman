@@ -107,13 +107,13 @@ function build_bot_check_messages() {
       builder_echo heading "Build-bot: Found command in body of PR #${PRNUM}: '${buildBotCommand}'"
 
       # Block illegal Build-bot: commands
-      if [[ ! "$buildBotCommand" =~ ^[a-z_,\ :,]+$ ]]; then
+      if [[ ! "$buildBotCommand" =~ ^[a-z_\ :,]+$ ]]; then
         builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
         continue
       fi
 
-      # We now know that our command has only a-z, comma, colon, and space, so we
-      # can parse without risking escaping our bash jail
+      # We now know that our command has only a-z, comma, colon, underline, and
+      # space, so we can parse without risking escaping our bash jail
 
       if [[ ! -z "${buildBotCommand// }" ]]; then
         _build_bot_update_commands $buildBotCommand
