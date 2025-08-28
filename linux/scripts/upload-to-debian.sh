@@ -119,13 +119,13 @@ function push_to_github_and_create_pr() {
 }
 
 function cleanup_worktree() {
-  if [[ -d "${WORKTREE_DIR:-}/linux/debianpackage" ]]; then
+  if [[ -d "${WORKTREE_DIR}/linux/debianpackage" ]]; then
     cp -r "${WORKTREE_DIR}/linux/debianpackage" "${KEYMAN_ROOT}/linux"
   fi
 
-  cd "${PREV_DIR:-}"
+  cd "${PREV_DIR}"
 
-  if [[ -n "${WORKTREE_DIR:-}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
+  if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
     builder_echo "Removing temporary worktree"
     git worktree remove -f "${WORKTREE_DIR}"
     git branch -f -D "${WORKTREE_BRANCH}"
