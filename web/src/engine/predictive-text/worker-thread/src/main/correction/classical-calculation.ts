@@ -382,6 +382,7 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
 
       maxM = Math.max(maxM, m);
       maxMS = Math.max(maxMS, ms);
+      maxMST = Math.max(maxMST, ms);
 
       return {
         result,
@@ -467,6 +468,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
           input: this.inputSequence[i-count]?.key,
           match: this.matchSequence[lastMatchIndex]?.key
         });
+        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+        // after the if-else.
         for(let x=count-1; x > 0; x--) {
           ops.push({
             op: 'transpose-delete',
@@ -481,6 +484,8 @@ export class ClassicalDistanceCalculation<TUnit = string, TInput extends EditTok
           input: this.inputSequence[lastInputIndex]?.key,
           match: this.matchSequence[m-count]?.key
         });
+        // Intentional fallthrough on 0 - index 0 is covered by 'transpose-end'
+        // after the if-else.
         for(let y=count-1; y > 0; y--) {
           ops.push({
             op: 'transpose-insert',
