@@ -377,8 +377,8 @@ export default class LMLayerWorker {
             });
             break;
           case 'reset-context':
-            var {context} = payload;
-            compositor.resetContext(context);
+            var {context, stateId} = payload;
+            compositor.resetContext(context, stateId);
             break;
           default:
             throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'reset-context', 'unload'} but got ${payload.message}`);

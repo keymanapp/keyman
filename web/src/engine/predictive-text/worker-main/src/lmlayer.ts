@@ -190,10 +190,11 @@ export default class LMLayer {
     });
   }
 
-  resetContext(context: Context) {
+  resetContext(context: Context, stateId: number) {
     this._worker.postMessage({
       message: 'reset-context',
-      context: context
+      context: context,
+      stateId: stateId
     });
   }
 

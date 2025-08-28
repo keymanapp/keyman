@@ -1,4 +1,5 @@
 import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
+import { RewindableCache } from '@keymanapp/web-utils';
 
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
@@ -13,98 +14,9 @@ import { ContextTokenization } from './context-tokenization.js';
 import { ContextState } from './context-state.js';
 import { ContextTransition } from './context-transition.js';
 
-class CircularArray<Item> {
-  static readonly DEFAULT_ARRAY_SIZE = 5;
-  private circle: Item[];
-  private currentHead: number=0;
-  private currentTail: number=0;
+export class ContextTracker {
+  readonly cache = new RewindableCache<ContextTransition>(5);
 
-  constructor(size: number = CircularArray.DEFAULT_ARRAY_SIZE) {
-    this.circle = Array(size);
-  }
-
-  get count(): number {
-    let diff = this.currentHead - this.currentTail;
-
-    if(diff < 0) {
-      diff = diff + this.circle.length;
-    }
-
-    return diff;
-  }
-
-  get maxCount(): number {
-    return this.circle.length;
-  }
-
-  get oldest(): Item {
-    if(this.count == 0) {
-      return undefined;
-    }
-
-    return this.item(0);
-  }
-
-  get newest(): Item {
-    if(this.count == 0) {
-      return undefined;
-    }
-
-    return this.item(this.count - 1);
-  }
-
-  enqueue(item: Item): Item {
-    var prevItem = null;
-    let nextHead = (this.currentHead + 1) % this.maxCount;
-
-    if(nextHead == this.currentTail) {
-      prevItem = this.circle[this.currentTail];
-      this.currentTail = (this.currentTail + 1) % this.maxCount;
-    }
-
-    this.circle[this.currentHead] = item;
-    this.currentHead = nextHead;
-
-    return prevItem;
-  }
-
-  dequeue(): Item {
-    if(this.currentTail == this.currentHead) {
-      return null;
-    } else {
-      let item = this.circle[this.currentTail];
-      this.currentTail = (this.currentTail + 1) % this.maxCount;
-      return item;
-    }
-  }
-
-  popNewest(): Item {
-    if(this.currentTail == this.currentHead) {
-      return null;
-    } else {
-      let item = this.circle[this.currentHead];
-      this.currentHead = (this.currentHead - 1 + this.maxCount) % this.maxCount;
-      return item;
-    }
-  }
-
-  /**
-   * Returns items contained within the circular array, ordered from 'oldest' to 'newest' -
-   * the same order in which the items will be dequeued.
-   * @param index
-   */
-  item(index: number) {
-    if(index >= this.count) {
-      // JS arrays return `undefined` for invalid array indices.
-      return undefined;
-    }
-
-    let mappedIndex = (this.currentTail + index) % this.maxCount;
-    return this.circle[mappedIndex];
-  }
-}
-
-export class ContextTracker extends CircularArray<ContextState> {
   // Aim:  relocate to ContextTransition in some form?
   // Or can we split it up in some manner across the different types?
   static attemptMatchContext(
@@ -139,6 +51,8 @@ export class ContextTracker extends CircularArray<ContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(tailEditLength == 0 && leadTokenShift == 0 && tailTokenShift == 0) {
+      // Set the 'final' state to match 'base' to signal an intent to reuse the old instance.
+      // TODO:  Fix - this is intended to be temporary during refactor work.
       baseTransition.finalize(matchState, transformDistribution);
       return baseTransition;
     } else {
@@ -320,6 +234,7 @@ export class ContextTracker extends CircularArray<ContextState> {
 
     const state = new ContextState(context, lexicalModel);
     state.tokenization = new ContextTokenization(tokenization, alignmentResults);
+    state.appliedInput = transformDistribution?.[0].sample;
     baseTransition.finalize(state, transformDistribution, preservationTransform);
     return baseTransition;
   }
@@ -355,16 +270,17 @@ export class ContextTracker extends CircularArray<ContextState> {
     const postContext = inputTransform ? applyTransform(inputTransform.sample, context) : context;
 
     const tokenize = determineModelTokenizer(model);
-    const tokenizedPostContext = tokenize(postContext)
+    const tokenizedPostContext = tokenize(postContext);
+    const transitionId = inputTransform?.sample.id;
 
     if(tokenizedPostContext.left.length > 0) {
-      for(let i = this.count - 1; i >= 0; i--) {
-        const priorMatchState = this.item(i);
+      for(const id of this.cache.keys()) {
+        const priorMatchState = this.cache.get(id);
 
         // Skip intermediate multitap-produced contexts.
         // When multitapping, we skip all contexts from prior taps within the same interaction,
         // but not any contexts from before the multitap started.
-        const priorTaggedContext = priorMatchState.context;
+        const priorTaggedContext = priorMatchState.final.context;
         if(priorTaggedContext && transformDistribution && transformDistribution.length > 0) {
           // Using the potential `matchState` + the incoming transform, do the results line up for
           // our observed context?  If not, skip it.
@@ -381,20 +297,17 @@ export class ContextTracker extends CircularArray<ContextState> {
           continue;
         }
 
-        let result = ContextTracker.attemptMatchContext(context, model, this.item(i), transformDistribution);
+        let result = ContextTracker.attemptMatchContext(context, model, priorMatchState.final, transformDistribution);
 
         if(result?.final) {
-          // Keep it reasonably current!  And it's probably fine to have it more than once
-          // in the history.  However, if it's the most current already, there's no need
-          // to refresh it.
-          if(this.newest != result.final && this.newest != priorMatchState) {
-            // Already has a taggedContext.
-            this.enqueue(priorMatchState);
+          if(transitionId !== undefined) {
+            if(priorMatchState.transitionId != transitionId) {
+              // Already has a taggedContext.
+              this.cache.add(priorMatchState.transitionId, priorMatchState);
+            }
+            this.cache.add(transitionId, result);
           }
 
-          if(result.final != this.item(i)) {
-            this.enqueue(result.final);
-          }
           return result;
         }
       }
@@ -406,17 +319,24 @@ export class ContextTracker extends CircularArray<ContextState> {
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
     let state = new ContextState(context, model);
-    this.enqueue(state);
-    const transition = new ContextTransition(state, /* TODO:  we need a clear value here in the future! */ null);
+    const transition = new ContextTransition(state, transitionId);
     // Hacky, but holds the course for now.  This should only really happen from context resets, which can
     // then use a different path.
-    transition.finalize(state, []);
+    transition.finalize(state, transformDistribution);
+    this.cache.add(transitionId, transition);
     return transition;
   }
 
-  clearCache() {
-    while(this.count > 0) {
-      this.dequeue();
+  get newest() {
+    let key = this.cache.keys()[0];
+    if(key === undefined) {
+      return undefined;
+    } else {
+      return this.cache.get(key);
     }
+  }
+
+  clearCache() {
+    this.cache.clear();
   }
 }
