@@ -3,13 +3,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=engine/core-processor
-
-. "${KEYMAN_ROOT}/web/common.inc.sh"
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 # ################################ Main script ################################
 
@@ -36,7 +36,7 @@ do_clean() {
 }
 
 do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   mkdir -p "src/import/core/"
   # we don't need this file for release builds, but it's nice to have
