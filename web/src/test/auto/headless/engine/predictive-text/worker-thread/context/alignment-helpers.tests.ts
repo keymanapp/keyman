@@ -134,6 +134,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength: 5,
       tailEditLength: 0,
       tailTokenShift: 0
@@ -151,6 +152,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength: 4,
       tailEditLength: 1,
       tailTokenShift: 0
@@ -171,6 +173,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength: 0,
       tailEditLength: 1,
       tailTokenShift: 2
@@ -237,7 +240,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
-      matchLength: 5,
+      leadEditLength: 1,
+      matchLength: 4,
       tailEditLength: 0,
       tailTokenShift: 0
     });
@@ -255,6 +259,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: -1,
+      leadEditLength: 0,
       matchLength: 4,
       tailEditLength: 0,
       tailTokenShift: 0
@@ -273,6 +278,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 1,
+      leadEditLength: 0,
       matchLength: 4,
       tailEditLength: 0,
       tailTokenShift: 0
@@ -291,7 +297,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: -2,
-      matchLength: 3,
+      leadEditLength: 1,
+      matchLength: 2,
       tailEditLength: 0,
       tailTokenShift: 0
     });
@@ -309,7 +316,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 1,
-      matchLength: 4,
+      leadEditLength: 1,
+      matchLength: 3,
       tailEditLength: 0,
       tailTokenShift: 0
     });
@@ -327,6 +335,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: -1,
+      leadEditLength: 0,
       matchLength: 4,
       tailEditLength: 0,
       tailTokenShift: 1
@@ -345,7 +354,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
-      matchLength: 4, // we treat 'quick' and 'uick' as the same
+      leadEditLength: 1,
+      matchLength: 3,
       tailEditLength: 1,
       tailTokenShift: 0
     });
@@ -363,7 +373,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
-      matchLength: 4, // we treat 'quick' and 'uick' as the same
+      leadEditLength: 1,
+      matchLength: 3,
       tailEditLength: 1,
       tailTokenShift: 1
     });
@@ -381,6 +392,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 1,
+      leadEditLength: 0,
       matchLength: 4, // we treat 'quick' and 'uick' as the same
       tailEditLength: 1,
       tailTokenShift: 0
@@ -399,6 +411,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 1,
+      leadEditLength: 0,
       matchLength: 4, // we treat 'quick' and 'uick' as the same
       tailEditLength: 0,
       tailTokenShift: -1
@@ -417,6 +430,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 1,
+      leadEditLength: 0,
       matchLength: 3, // we treat 'quick' and 'uick' as the same
       tailEditLength: 1,
       tailTokenShift: -1
@@ -483,6 +497,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength: 8,
       tailEditLength: 3,
       tailTokenShift: 0
@@ -502,6 +517,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computedAlignment, {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength: 10,
       tailEditLength: 1,
       tailTokenShift: 2
@@ -534,7 +550,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computeAlignment(baseContext1, incomingContext1, true), {
       canAlign: true,
       leadTokenShift: 0,
-      matchLength: 22,
+      leadEditLength: 1,
+      matchLength: 21,
       tailEditLength: 1,
       tailTokenShift: 0
     });
@@ -561,7 +578,8 @@ describe('computeAlignment', () => {
     assert.deepEqual(computeAlignment(baseContext2, incomingContext2, true), {
       canAlign: true,
       leadTokenShift: 0,
-      matchLength: 24,
+      leadEditLength: 1,
+      matchLength: 23,
       tailEditLength: 1,
       tailTokenShift: 0
     });
@@ -584,6 +602,7 @@ describe('computeAlignment', () => {
     assert.deepEqual(computeAlignment(baseContext3, incomingContext3, true), {
       canAlign: true,
       leadTokenShift: -1,
+      leadEditLength: 0,
       matchLength: 23,
       tailEditLength: 1,
       tailTokenShift: 0
