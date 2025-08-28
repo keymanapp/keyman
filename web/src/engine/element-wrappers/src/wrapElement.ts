@@ -1,11 +1,11 @@
-import type OutputTarget from './outputTarget.js';
-import Input from './input.js';
-import TextArea from './textarea.js';
-import DesignIFrame from './designIFrame.js';
-import ContentEditable from './contentEditable.js';
+import { type OutputTargetElementWrapper }  from './outputTargetElementWrapper.js';
+import { Input } from './input.js';
+import { TextArea } from './textarea.js';
+import { DesignIFrame } from './designIFrame.js';
+import { ContentEditable } from './contentEditable.js';
 import { nestedInstanceOf } from './utils.js';
 
-export default function wrapElement(e: HTMLElement): OutputTarget<any> {
+export function wrapElement(e: HTMLElement): OutputTargetElementWrapper<any> {
   // Complex type scoping is implemented here so that kmwutils.ts is not a dependency for test compilations.
 
   if(nestedInstanceOf(e, "HTMLInputElement")) {

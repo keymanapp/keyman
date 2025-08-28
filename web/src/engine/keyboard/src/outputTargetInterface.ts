@@ -1,10 +1,11 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-export interface OutputTarget {
+export interface OutputTargetInterface {
   /**
-   * Signifies that this OutputTarget has no default key processing behaviors.  This should be false
-   * for OutputTargets backed by web elements like HTMLInputElement or HTMLTextAreaElement.
+   * Signifies that this OutputTargetInterface has no default key processing behaviors.
+   * This should be false for OutputTargets backed by web elements like HTMLInputElement
+   * or HTMLTextAreaElement.
    */
   get isSynthetic(): boolean;
 
