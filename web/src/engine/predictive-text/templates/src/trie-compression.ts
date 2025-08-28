@@ -17,7 +17,7 @@ const NODE_SIZE_WIDTH = 2;
  */
 const WEIGHT_WIDTH = 2;
 
-export function decompressNumber(str: string, start: number, end: number) {
+export function decompressNumber(str: string, start: number, end?: number) {
   end ??= str.length;
   let num = 0;
 
@@ -78,7 +78,7 @@ export function compressEntry(entry: Entry): string {
   return `${entryLenEnc}${weightEnc}${content}`;
 }
 
-export function decompressEntry(str: string, keyFunction: Wordform2Key, baseIndex: number): Entry {
+export function decompressEntry(str: string, keyFunction: Wordform2Key, baseIndex?: number): Entry {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
@@ -125,7 +125,7 @@ export function compressNode(node: Node) {
   return `${compressNumber(charLength, 2)}${weightEnc}${encodedSpecifics}`;
 }
 
-export function decompressNode(str: string, keyFunction: Wordform2Key, baseIndex: number) {
+export function decompressNode(str: string, keyFunction: Wordform2Key, baseIndex?: number) {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);

@@ -1,9 +1,11 @@
 import { isHighSurrogate, SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
+
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
-import { LexicalModelTypes } from '@keymanapp/common-types';
+
 import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
@@ -74,10 +76,19 @@ export class SearchNode {
     }
   }
 
+  /**
+   * Returns the number of raw text edits (insertions, deletions, replacements) coerced
+   * by the correction-search in order to match the input with the lexical path represented
+   * by the current node.
+   */
   get knownCost(): number {
     return this.calculation.getHeuristicFinalCost();
   }
 
+  /**
+   * Returns the effective "cost" for choosing the inputs leading to the current node.
+   * The less likely the keystroke sequence, the higher the cost.
+   */
   get inputSamplingCost(): number {
     if(this._inputCost !== undefined) {
       return this._inputCost;
@@ -93,6 +104,11 @@ export class SearchNode {
   }
 
   // The part used to prioritize our search.
+  /**
+   * Returns the effective "cost" of the search-path leading to the current search node.
+   * The correction search evaluates Nodes in cost-ascending order based on this property's
+   * return value.
+   */
   get currentCost(): number {
     // - We reintrepret 'known cost' as a psuedo-probability.
     //   - Noting that 1/e = 0.367879441, an edit-distance cost of 1 may be intepreted as -ln(1/e) - a log-space 'likelihood'.
@@ -109,6 +125,14 @@ export class SearchNode {
     return SearchSpace.EDIT_DISTANCE_COST_SCALE * this.knownCost + this.inputSamplingCost;
   }
 
+  /**
+   * Adds outbound paths from the current Node that model the insertion of a character
+   * not seen in the input, as if the user accidentally skipped typing it.  No new input
+   * will be expected, but the search will continue one character deeper in the backing
+   * lexicon.
+   * @returns An array of SearchNodes corresponding to lexical entries that are prefixed
+   * with the lexicon entry represented by the current Node's matchSequence text.
+   */
   buildInsertionEdges(): SearchNode[] {
     let edges: SearchNode[] = [];
 
@@ -132,6 +156,14 @@ export class SearchNode {
     return edges;
   }
 
+  /**
+   * Adds paths that delete the next Transform from the input to better match words from
+   * the lexicon.  This aims to model (and ignore) when the user accidentally double-taps
+   * an input key.
+   *
+   * @returns An array of SearchNodes corresponding to search paths that skip the next
+   * input keystroke.
+   */
   buildDeletionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
     let edges: SearchNode[] = [];
 
@@ -187,6 +219,15 @@ export class SearchNode {
 
   // While this may SEEM to be unnecessary, note that sometimes substitutions (which are computed
   // via insert + delete) may be lower cost than both just-insert and just-delete.
+  /**
+   * Adds paths that seek to:
+   * 1.  Match the next input transform in the sequence with matching prefixes
+   * 2.  Substitute one (or more) characters from the next input transform
+   * from the lexicon to better match viable lexicon prefixes
+   *
+   * @returns An array of SearchNodes corresponding to search paths that match or
+   * replace the next currently-unprocessed input.
+   */
   buildSubstitutionEdges(inputDistribution: Distribution<Transform>): SearchNode[] {
     // Handles the 'input' component.
     let intermediateEdges = this.buildDeletionEdges(inputDistribution);
@@ -218,6 +259,9 @@ export class SearchNode {
    * A key uniquely identifying identical search path nodes.  Replacement of a keystroke's
    * text in a manner that results in identical path to a different keystroke should result
    * in both path nodes sharing the same pathKey value.
+   *
+   * This mostly matters after re-use of a SearchSpace when a token is extended; children of
+   * completed paths are possible, and so children can be re-built in such a case.
    */
   get pathKey(): string {
     let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
@@ -237,11 +281,12 @@ export class SearchNode {
     return this.calculation.matchSequence.map(value => value.key).join('');
   }
 
+  /**
+   * If the known edit-distance cost is equal to the input length and non-zero, this means
+   * that literally every input has been full-on replaced.  Thus, this is likely not a good
+   * 'root' to use for predictions.
+   */
   get isFullReplacement(): boolean {
-    // If the known edit-distance cost is equal to the input length, this means
-    // that literally every input has been full-on replaced.  Thus, this is
-    // likely not a good 'root' to use for predictions.
-    //
     // Logic exception:  0 cost, 0 length != a "replacement".
     return this.knownCost && this.knownCost == this.priorInput.length;
   }
@@ -372,12 +417,25 @@ export class SearchSpace {
 
   // We use an array and not a PriorityQueue b/c batch-heapifying at a single point in time
   // is cheaper than iteratively building a priority queue.
+  /**
+   * This tracks all paths that have reached the end of a viable input-matching path - even
+   * those of lower cost that produce the same correction as other paths.
+   *
+   * When new input is received, its entries are then used to append edges to the path in order
+   * to find potential paths to reach a new viable end.
+   */
   private completedPaths: SearchNode[];
 
-  // Marks all results that have already been returned since the last input was received.
+  /**
+   * Marks all results that have already been returned since the last input was received.
+   * Is cleared after .addInput() calls.
+   */
   private returnedValues: {[resultKey: string]: SearchNode} = {};
 
-  // Signals that the edge has already been processed.
+  /**
+   * Acts as a Map that prevents duplicating a correction-search path if reached
+   * more than once.
+   */
   private processedEdgeSet: {[pathKey: string]: boolean} = {};
 
   /**
@@ -400,6 +458,7 @@ export class SearchSpace {
       this.inputSequence = [].concat(arg1.inputSequence);
       this.minInputCost = [].concat(arg1.minInputCost);
       this.rootNode = arg1.rootNode;
+      // Re-use already-checked Nodes.
       this.completedPaths = [].concat(arg1.completedPaths);
       this.returnedValues = {...arg1.returnedValues};
       this.processedEdgeSet = {...arg1.processedEdgeSet};
@@ -485,6 +544,12 @@ export class SearchSpace {
     return !!this.inputSequence.find((distribution) => distribution.length > 1);
   }
 
+  /**
+   * Extends the correction-search process embodied by this SearchSpace by an extra
+   * input character, according to the characters' likelihood in the distribution.
+   * @param inputDistribution The fat-finger distribution for the incoming keystroke (or
+   * just the raw keystroke if corrections are disabled)
+   */
   addInput(inputDistribution: Distribution<Transform>) {
     this.inputSequence.push(inputDistribution);
 
@@ -522,6 +587,11 @@ export class SearchSpace {
     // 2.  remove the last search tier.  Which may necessitate reconstructing the tier queue, but oh well.
   }
 
+  /**
+   * Indicates if the correction-search has another entry (and thus has not yet
+   * reached its end).
+   * @returns
+   */
   private hasNextMatchEntry(): boolean {
     let topQueue = this.selectionQueue.peek();
     if(topQueue) {
@@ -531,6 +601,12 @@ export class SearchSpace {
     }
   }
 
+  /**
+   * Retrieves the lowest-cost / lowest-distance edge from the selection queue,
+   * checks its validity as a correction to the input text, and reports on what
+   * sort of result the edge's destination node represents.
+   * @returns
+   */
   private handleNextNode(): PathResult {
     if(!this.hasNextMatchEntry()) {
       return { type: 'none' };

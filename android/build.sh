@@ -10,12 +10,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
-. "${KEYMAN_ROOT}/resources/build/build-utils-ci.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
 ################################ Main script ################################
@@ -38,9 +37,9 @@ builder_describe \
   configure \
   build \
   test \
-  "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
+  "publish-symbols                          Publishes symbols to Sentry" \
+  "publish-play-store                       Publishes APKs to the Play Store" \
   "archive                                  Copy release artifacts to upload/ and create zip" \
-  --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
   ":help                                    Online documentation" \
@@ -108,8 +107,18 @@ function archive_artifacts() {
   fi
 }
 
-# Override JAVA_HOME to OpenJDK 11
-set_java_home
+
+# For CI compatibility of building Keyman for Android 18.0 with OpenJDK 11,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 21.
+android_set_java_home() {
+  if [[ ! -z ${JAVA_HOME_21+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_21 (${JAVA_HOME_21})"
+    export JAVA_HOME="${JAVA_HOME_21}"
+  fi
+}
+
+# Override JAVA_HOME
+android_set_java_home
 
 # This script also responsible for cleaning up /android/upload
 builder_run_child_actions clean
@@ -120,6 +129,6 @@ builder_run_child_actions configure build test
 
 builder_run_action        test:help  do_test_help
 
-builder_run_child_actions publish
+builder_run_child_actions publish-symbols publish-play-store
 
 builder_run_action        archive    archive_artifacts

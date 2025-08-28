@@ -1,5 +1,94 @@
 # Keyman Version History
 
+## 19.0.106 alpha 2025-08-27
+
+* fix(windows): check if automatic updates off before prompt (#14295)
+* refactor(linux): use bash testing framework for packaging tests (#14603)
+* maint(resources): use correct version for PR title for history cherry-pick (#14610)
+* refactor(common): fix shellcheck warnings (#14580)
+
+## 19.0.105 alpha 2025-08-25
+
+* maint(linux): ignore generate patch directories (#14600)
+
+## 19.0.104 alpha 2025-08-21
+
+* fix(android): Update sentry-android dependency to 8.19.1 for 16 KB page alignment (#14559)
+* maint(android): Cleanup builder_describe_outputs for configure action (#14566)
+* fix(windows): emit nunit report path correctly and update TeamCity links (#14564)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14568)
+
+## 19.0.103 alpha 2025-08-20
+
+* fix(android): Show system OSK when physical keyboard connected on Android API 36 (#14538)
+* fix(android): Add "Show On-screen keyboard" preference to display OSK when physical keyboard is connected (#14539)
+* fix(android): Add FirstVoices preference to show on-screen keyboard (#14546)
+* fix(linux): normalize language tags from keyboard (#14542)
+* maint(common): fix running docker on Windows (#14154)
+* maint(mac): use mac_ prefix for functions in mac.inc.sh (#14562)
+* maint(android): publish symbols to Sentry on release buildLevel (#14490)
+* maint(linux): add missing `--help.keyman.com` option (#14571)
+* docs(web): improve documentation for SearchSpace and SearchNode (#14555)
+
+## 19.0.102 alpha 2025-08-19
+
+* maint(mac): skip unnecessary network steps when buildLevel is build (#14467)
+* maint(common): cleanup and reorganize ci scripts (#14459)
+* refactor(linux): cleanup some code in bash completion script (#14543)
+* maint(resources): handle build-bot skip correctly (#14551)
+* maint(resources): don't fall back to 'build' action (#14552)
+* maint(resources): handle unset build platform in trigger-build-bot (#14554)
+
+## 19.0.101 alpha 2025-08-18
+
+* maint(android): Update Android Target API to 35 (#14395)
+* fix(android): Convert Keyman app layout to use ConstraintLayout for handling edge-to-edge (#14396)
+* fix(android): Update other activities for edge to edge (#14463)
+* fix(android): Update Sample, Test, and FirstVoices apps for edge to edge (#14514)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14540)
+
+## 19.0.100 alpha 2025-08-14
+
+* maint(resources): add space to test-bot command (#14528)
+* fix(web): improve accuracy of types for suggestions & suggestion-generation (#14517)
+* refactor(web): move applySuggestionCasing to standalone exportable method (#14518)
+* chore(web): convert worker-thread tests to TS (#14510)
+
+## 19.0.99 alpha 2025-08-14
+
+* maint(web): skip unnecessary steps for `build` buildLevel (#14516)
+
+## 19.0.98 alpha 2025-08-14
+
+* maint(resources): specify `keymanapp/keyman` for gh in automerge (#14524)
+
+## 19.0.97 alpha 2025-08-14
+
+* maint(resources): use GH_TOKEN variable for gh calls (#14522)
+
+## 19.0.96 alpha 2025-08-14
+
+* maint(resources): add build-bot commands to increment-version auto PRs (#14504)
+* maint(resources): use GH builtin automerge for auto PRs (#14519)
+
+## 19.0.95 alpha 2025-08-13
+
+* fix(web): use actual legacy model for legacy-model support unit tests (#14460)
+* chore(common): Update Crowdin strings for Spanish (#14464)
+* fix(android): Get default sizes before initializing keyboard (#14472)
+* docs(resources): clarify Build-bot usage (#14282)
+* maint(resources): build.sh-style commands for build-bot (#14461)
+* chore(android): Update keycode test app dependencies (#14474)
+* maint(common): update npm modules brace-expansion to 1.1.12, form-data to 4.0.4 (#14479)
+* chore(android): Specify Java language version 21 (#14491)
+* maint(ios): skip unnecessary network steps when buildLevel is build (#14466)
+* maint(common): rename shellHelperFunctions.sh to utils.inc.sh (#14446)
+* maint(common): consolidate builder scripts (#14449)
+* maint(common): rename and move node-related script functions into node.inc.sh (#14451)
+* maint(common): move typescript script functions into typescript.inc.sh (#14452)
+* maint(common): reorganize mac/ios build script includes (#14458)
+* docs(resources): add note on builder-basic vs builder-full (#14507)
+
 ## 19.0.94 alpha 2025-08-01
 
 * maint(common): use `cpp_std=c++17` in meson project default_options (#14433)
@@ -573,6 +662,26 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.240 stable 2025-08-27
+
+* maint(resources): automatically cherry-pick history updates to master (#14596)
+* maint(linux): fix lintian warnings (#14591)
+* maint(linux): ignore generate patch directories (#14601)
+
+## 18.0.239 stable 2025-08-22
+
+* docs(linux): clarify requirement of patched ibus for Keyman < 18 (#14113)
+* chore(linux): Update debian changelog (#14118)
+* fix(windows): add values wucUpdateAvailable and wucNotChecked to TRemoteUpdateCheckResult enum (#14208)
+* fix(web): deploy `web/build/publish` folder (#14238)
+* fix(ios): restore keyboard scale map for iPad Air 2 (#14306)
+* chore(developer): upgrade multer to 2.0.2 (#14417)
+* fix(android): cherry-pick getting default sizes before initializing keyboard (#14473)
+* fix(android): polyfill globalThis for API 28 devices (#14553)
+* fix(android): Update sentry-android dependency to 7.22.6 for 16 KB page alignment (#14560)
+* fix(android): Show system OSK when physical keyboard connected (#14547)
+* fix(android): Add preference to show on-screen keyboard to Keyman and FirstVoices apps (#14561)
 
 ## 18.0.238 stable 2025-06-04
 
