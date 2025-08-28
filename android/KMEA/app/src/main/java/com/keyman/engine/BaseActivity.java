@@ -93,19 +93,16 @@ public class BaseActivity extends AppCompatActivity {
         // Allocate insets for system bars and display cutout (notch)
         Insets insets = windowInsets.getInsets(
           WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
-        mlp.topMargin = insets.top;
-        mlp.bottomMargin = insets.bottom;
-        mlp.leftMargin = insets.left;
-        mlp.rightMargin = insets.right;
-        view.setLayoutParams(mlp);
+
+        view.setPadding(
+          insets.left,
+          insets.top,
+          insets.right,
+          insets.bottom);
 
         KMManager.applyInsetsToKeyboard(insets.left, insets.right, insets.bottom);
         return windowInsets;
       });
-
-    // Trigger an initial pass
-    ViewCompat.requestApplyInsets(anchor);
   }
 
   /**
@@ -120,11 +117,13 @@ public class BaseActivity extends AppCompatActivity {
     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-    WindowInsetsControllerCompat windowInsetsController =
-      WindowCompat.getInsetsController(window, window.getDecorView());
-    windowInsetsController.setAppearanceLightStatusBars(true);
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM &&
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      WindowInsetsControllerCompat windowInsetsController =
+        WindowCompat.getInsetsController(window, window.getDecorView());
+      windowInsetsController.setAppearanceLightStatusBars(true);
+    }
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
       window.setStatusBarColor(getColor(statusBarColor));
       window.setNavigationBarColor(getColor(navigationBarColor));
     }
