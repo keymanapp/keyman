@@ -14,6 +14,7 @@
     { "path": "../osk" },
     { "path": "../keyboard-storage" },
     { "path": "../interfaces" },
-    { "path": "../js-processor" }
+    { "path": "../js-processor" },
+    { "path": "../core-processor" },
   ]
 }
