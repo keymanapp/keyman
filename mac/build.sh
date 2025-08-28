@@ -27,7 +27,7 @@ builder_describe "Builds Keyman for macOS." \
 
 builder_parse "$@"
 
-verify_on_mac
+mac_verify_on_mac
 
 # Default is release build of Engine and (code-signed) Input Method
 if builder_is_debug_build; then
@@ -110,7 +110,7 @@ execBuildCommand() {
     eval "$cmnd" || ret_code=$?
     set -e
 
-    printXCodeBuildScriptLogs
+    mac_print_xcode_build_script_logs
 
     if [ $ret_code != 0 ]; then
         builder_die "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
@@ -193,11 +193,11 @@ do_update_app_metadata ( ) {
     ENTITLEMENTS_FILE=Keyman.entitlements
 
     # We need to re-sign the app after updating the plist file
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/Sentry.framework"
 
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose --preserve-metadata=identifier,entitlements "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app/Contents/Frameworks/KeymanEngine4Mac.framework"
 
-    execCodeSign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
+    builder_if_release_build_level mac_codesign eval --force --sign $CERTIFICATE_ID --timestamp --verbose -o runtime \
       --entitlements "$KM4MIM_BASE_PATH/$ENTITLEMENTS_FILE" \
       --requirements "'=designated => anchor apple generic and identifier \"\$self.identifier\" and ((cert leaf[field.1.2.840.113635.100.6.1.9] exists) or ( certificate 1[field.1.2.840.113635.100.6.2.6] exists and certificate leaf[field.1.2.840.113635.100.6.1.13] exists and certificate leaf[subject.OU] = \"$DEVELOPMENT_TEAM\" ))'" \
       "$KM4MIM_BASE_PATH/build/$CONFIG/Keyman.app"
@@ -236,7 +236,7 @@ do_notarize() {
     # We may need to re-run the code signing if a custom certificate has been passed in
     if [ ! -z "${CERTIFICATE_ID+x}" ]; then
       builder_heading "Signing with custom certificate (CERTIFICATE_ID environment variable)."
-      execCodeSign direct --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
+      builder_if_release_build_level mac_codesign direct --force --options runtime --entitlements Keyman4MacIM/Keyman.entitlements --deep --sign "${CERTIFICATE_ID}" "$TARGET_APP_PATH"
     fi
 
     builder_heading "Zipping Keyman.app for notarization to $TARGET_ZIP_PATH"
@@ -265,7 +265,9 @@ do_sentry() {
 }
 
 do_install() {
-  if ! builder_has_option --quick; then
+  if builder_is_ci_build; then
+    builder_die "build.sh install should not be run on CI"
+  elif ! builder_has_option --quick; then
     do_notarize
   else
     if [ "$(spctl --status)" == "assessments enabled" ]; then
@@ -283,7 +285,7 @@ do_install() {
 }
 
 do_publish() {
-  do_notarize
+  builder_if_release_build_level do_notarize
 
   builder_heading "Preparing files for release deployment..."
   ./setup/build.sh
@@ -293,7 +295,9 @@ do_publish() {
   local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
   write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION}.dmg" "Keyman4MacIM" dmg mac
 
-  do_sentry
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    do_sentry
+  fi
 }
 
 ### PROCESS COMMAND-LINE ARGUMENTS ###

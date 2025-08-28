@@ -42,6 +42,7 @@ dpkg-source \
   --tar-ignore=experiments \
   --tar-ignore=debian \
   --tar-ignore=.github \
+  --tar-ignore=.pc \
   --tar-ignore=.vscode \
   --tar-ignore=.devcontainer \
   --tar-ignore=__pycache__ \
@@ -89,6 +90,12 @@ dpkg-source \
   --tar-ignore=keyman/resources/devbox \
   --tar-ignore=keyman/resources/docker-images \
   --tar-ignore=keyman/resources/environment.sh \
+  --tar-ignore=keyman/resources/build/ci \
+  --tar-ignore=keyman/resources/build/history \
+  --tar-ignore=keyman/resources/build/mac \
+  --tar-ignore=keyman/resources/build/pr-build-status \
+  --tar-ignore=keyman/resources/build/version \
+  --tar-ignore=keyman/resources/build/win \
   --tar-ignore=keyman/resources/git-hooks \
   --tar-ignore=keyman/resources/scopes \
   --tar-ignore=keyman/resources/teamcity \

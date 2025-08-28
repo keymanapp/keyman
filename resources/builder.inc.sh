@@ -1504,10 +1504,13 @@ _builder_parse_expanded_parameters() {
     shift # past the processed argument
   done
 
+  # Add default action if not specified, but not for child builds
   if (( ! ${#_builder_chosen_action_targets[@]} )); then
-    for e in "${_builder_targets[@]}"; do
-      _builder_chosen_action_targets+=("$_builder_default_action$e")
-    done
+    if ! builder_is_child_build; then
+      for e in "${_builder_targets[@]}"; do
+        _builder_chosen_action_targets+=("$_builder_default_action$e")
+      done
+    fi
   fi
 
   # We only want to define internal dependencies after both builder_parse and builder_describe_outputs have been called

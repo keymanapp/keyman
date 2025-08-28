@@ -25,8 +25,8 @@ function importEnvironment() {
     buildError "KEYMAN_ROOT is not defined.  Recommendation:  define it as a project-wide \"user-defined\" Build Setting for the \"$PROJECT_NAME\" project."
     exit 1
   else
-    # As defined within builder-basic.inc.sh, which this script does NOT call.  (It was already called externally.)
-    ENVIRONMENT_SH="$KEYMAN_ROOT/resources/environment.sh"
+    # As defined within mac.inc.sh, which this script does NOT call.  (It was already called externally.)
+    ENVIRONMENT_SH="$KEYMAN_ROOT/resources/build/mac/xcode-environment.inc.sh"
     . "$ENVIRONMENT_SH"
   fi
 }
@@ -166,10 +166,10 @@ function phaseSentryDsymUpload() {
 #
 # All calls to xcode-utils.inc.sh scripts will have their output redirected to
 # $KEYMAN_ROOT/xcodebuild-scripts.log. This will redirect both stdout and stderr
-# to this log file. See the corresponding printXCodeBuildScriptLogs function in
-# builder-basic.inc.sh to print the log after xcodebuild returns.
+# to this log file. See the corresponding mac_print_xcode_build_script_logs
+# function in mac.inc.sh to print the log after xcodebuild returns.
 #
-# More information in the builder-basic.inc.sh.
+# More information in mac.inc.sh.
 #
 function logScriptsToFile() {
   local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"

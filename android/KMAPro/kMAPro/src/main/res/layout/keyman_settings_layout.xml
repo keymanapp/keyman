@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/keyman_settings_layout"
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
-  <com.google.android.material.appbar.AppBarLayout
+  <androidx.appcompat.widget.Toolbar
+    android:id="@+id/keyman_settings_toolbar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:elevation="0dp">
-
-    <androidx.appcompat.widget.Toolbar
-      android:id="@+id/keyman_settings_toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="?attr/actionBarSize"
-      android:background="@color/keyman_blue">
-
-    </androidx.appcompat.widget.Toolbar>
-  </com.google.android.material.appbar.AppBarLayout>
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/keyman_blue"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
 
   <fragment
     android:layout_marginTop="?attr/actionBarSize"
@@ -26,4 +21,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

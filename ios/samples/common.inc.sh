@@ -16,7 +16,7 @@ function do_build() {
     CODE_SIGN=CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED="NO" CODE_SIGNING_ENTITLEMENTS=""
   fi
 
-  run_xcodebuild -quiet \
+  mac_xcodebuild -quiet \
                  $CODE_SIGN \
                  -target "$TARGET" \
                  -config "$CONFIG"
@@ -36,7 +36,7 @@ function execute_sample_build() {
 
   builder_parse "$@"
 
-  verify_on_mac
+  mac_verify_on_mac
 
   local CONFIG=Release
   if builder_is_debug_build; then
