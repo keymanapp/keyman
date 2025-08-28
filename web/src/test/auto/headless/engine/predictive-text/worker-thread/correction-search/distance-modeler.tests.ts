@@ -205,8 +205,8 @@ describe('Correction Distance Modeler', function() {
         const secondLayerNodes = tNode
           .buildSubstitutionEdges(secondLayerTransforms)
           .flatMap(node => node.processSubsetEdge());
-        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        assert.isAbove(secondLayerNodes.length, 10);
+        secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         const teNode = secondLayerNodes[0];
 
@@ -288,8 +288,8 @@ describe('Correction Distance Modeler', function() {
         const secondLayerNodes = tNode
           .buildSubstitutionEdges(secondLayerTransforms)
           .flatMap(node => node.processSubsetEdge());
-        assert.isAbove(firstLayerNodes.length, FIRST_CHAR_VARIANTS);
-        firstLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
+        assert.isAbove(secondLayerNodes.length, 10);
+        secondLayerNodes.sort((a, b) => a.currentCost - b.currentCost);
 
         const teNode = secondLayerNodes[0];
 
