@@ -121,7 +121,7 @@ export function isSubstitutionAlignable(
     // Use max length in case the word is actually already partly out of
     // the sliding context window.
     Math.max(incomingToken.length, matchingToken.length)
-  ).editPath();
+  ).editPath()[0].map(t => t.op);
 
   const firstInsert = subEditPath.indexOf('insert');
   const firstDelete = subEditPath.indexOf('delete');
@@ -236,7 +236,7 @@ export function computeAlignment(
     3
   );
 
-  let editPath = mapping.editPath();
+  let editPath = mapping.editPath()[0].map(t => t.op);
 
   const failure: ContextStateAlignment = {
     canAlign: false,

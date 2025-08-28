@@ -212,6 +212,9 @@ export class ContextState {
     );
 
     if(!resultTokenization) {
+      if(console && console.error) {
+        console.error(`Transition to alignable tokenization failed:  alignment properties ${JSON.stringify(alignmentResults)}`);
+      }
       return null;
     }
 

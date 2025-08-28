@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation } from '@keymanapp/lm-worker/test-index';
+import { ClassicalDistanceCalculation, EditTuple } from '@keymanapp/lm-worker/test-index';
 
 // Very useful for diagnosing unit test issues when path inspection is needed.
 // Not currently used ('cause that's noisy during test runs).
@@ -459,86 +459,199 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
   });
 
   describe("edit path construction", function() {
-    let op = {
-      s: 'substitute',
-      m: 'match',
-      i: 'insert',
-      d: 'delete',
-      ts: 'transpose-start',
-      te: 'transpose-end',
-      ti: 'transpose-insert',
-      td: 'transpose-delete'
-    }
-
     it("'accomodate' -> 'accommodate'", function() {
       let buffer = compute("accomodate", "accommodate", "InputThenMatch");
 
-      let editSequence = [
-      //  a     c     c     o     m
-        op.m, op.m, op.m, op.m, op.m,
-      // +m    o      d     a     t    e
-        op.i, op.m, op.m, op.m, op.m, op.m
-      ];
+      // While the two 'm's are interchangable, the path will favor
+      // a result with the longest contiguous set of matches.
+      let editSequences: EditTuple<string>[][] = [[
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 'c', match: 'c'},
+        { op: 'match', input: 'c', match: 'c'},
+        { op: 'match', input: 'o', match: 'o'},
+        { op: 'insert', match: 'm'},  // insert is earlier
+        { op: 'match', input: 'm', match: 'm'}, // longer contiguous match sequence
+        { op: 'match', input: 'o', match: 'o'},
+        { op: 'match', input: 'd', match: 'd'},
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 't', match: 't'},
+        { op: 'match', input: 'e', match: 'e'},
+      ], [
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 'c', match: 'c'},
+        { op: 'match', input: 'c', match: 'c'},
+        { op: 'match', input: 'o', match: 'o'},
+        { op: 'match', input: 'm', match: 'm'},
+        { op: 'insert', match: 'm'}, // now inserting later.
+        { op: 'match', input: 'o', match: 'o'},
+        { op: 'match', input: 'd', match: 'd'},
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 't', match: 't'},
+        { op: 'match', input: 'e', match: 'e'},
+      ]];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      assert.sameDeepOrderedMembers(buffer.editPath(), editSequences);
     });
 
     it("'harras' -> 'harass'", function() {
       let buffer = compute("harras", "harass", "InputThenMatch");
 
-      let editSequence = [
-        //  h     a     r    -r     a    s     +s
-          op.m, op.m, op.m, op.d, op.m, op.m, op.i
+      let bestEditSequence: EditTuple<string>[] = [
+        { op: 'match', input: 'h', match: 'h'},
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 'r', match: 'r'},
+        { op: 'substitute', input: 'r', match: 'a'},
+        { op: 'substitute', input: 'a', match: 's'},
+        { op: 'match', input: 's', match: 's'}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      let altSequence: EditTuple<string>[] = [
+        { op: 'match', input: 'h', match: 'h'},
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 'r', match: 'r'},
+        { op: 'delete', input: 'r'},
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'match', input: 's', match: 's'},
+        { op: 'insert', match: 's'}
+      ];
+
+      const viablePaths = buffer.editPath();
+      // Note that the position of the 'delete' and the 'insert' in
+      // `altSequence` may be repositioned +1 way each, making 2x2 = 4 ways in
+      // total... then +1 for the substitute approach.
+      assert.equal(viablePaths.length, 5);
+      assert.deepEqual(viablePaths[0], bestEditSequence);
+      assert.includeDeepMembers(viablePaths, [altSequence]);
     });
 
     it("'access' -> 'assess'", function() {
       let buffer = compute("access", "assess", "InputThenMatch");
 
-      let editSequence = [
-        //  a    c/s   c/s    e     s    s
-          op.m, op.s, op.s, op.m, op.m, op.m
+      let editSequence: EditTuple<string>[] = [
+        { op: 'match', input: 'a', match: 'a'},
+        { op: 'substitute', input: 'c', match: 's'},
+        { op: 'substitute', input: 'c', match: 's'},
+        { op: 'match', input: 'e', match: 'e'},
+        { op: 'match', input: 's', match: 's'},
+        { op: 'match', input: 's', match: 's'}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
     });
 
     it("'ifhs' -> 'fish'", function() {
       let buffer = compute("ifhs", "fish");
 
-      let editSequence = [
-          op.ts, op.te, op.ts, op.te
+      let editSequence: EditTuple<string>[] = [
+        { op: 'transpose-start', input: 'i', match: 'f'},
+        { op: 'transpose-end', input: 'f', match: 'i'},
+        { op: 'transpose-start', input: 'h', match: 's'},
+        { op: 'transpose-end', input: 's', match: 'h'}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
     });
 
     it("'then' -> 'their'", function() {
       let buffer = compute("then", "their");
 
-      let editSequence = [
-          op.m, op.m, op.m, op.s, op.i
+      let editSequence: EditTuple<string>[] = [
+        { op: 'match', input: 't', match: 't'},
+        { op: 'match', input: 'h', match: 'h'}, // best sequence:  continguous matches
+        { op: 'match', input: 'e', match: 'e'}, // + adjacent substitutes
+        { op: 'substitute', input: 'n', match: 'i'},
+        { op: 'insert', match: 'r'},
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      let altSequence: EditTuple<string>[] = [
+        { op: 'match', input: 't', match: 't'},
+        { op: 'match', input: 'h', match: 'h'},
+        { op: 'match', input: 'e', match: 'e'},
+        { op: 'insert', match: 'i'},
+        { op: 'substitute', input: 'n', match: 'r'},
+      ];
+
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 2);
+      assert.deepEqual(viablePaths[0], editSequence);
+      assert.deepEqual(viablePaths[1], altSequence);
     });
 
     // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
     it("'abczdefig' -> 'cazefghi'", function() {
       let buffer = compute("abczdefig", "cazefghi", "InputThenMatch", 2);
 
-      let editSequence = [
-        // --- abc -> ca ----
-        // a/c    b/_    c/a    z     -d    e     f
-          op.ts, op.td, op.te, op.m, op.d, op.m, op.m,
-        // --- ig -> ghi ----
-        // i/g    _/h    g/i
-          op.ts, op.ti, op.te
+      let editSequence: EditTuple<string>[] = [
+        { op: 'transpose-start', input: 'a', match: 'c'},
+        { op: 'transpose-delete', input: 'b'},
+        { op: 'transpose-end', input: 'c', match: 'a'},
+        { op: 'match', input: 'z', match: 'z'},
+        { op: 'delete', input: 'd'},
+        { op: 'match', input: 'e', match: 'e'},
+        { op: 'match', input: 'f', match: 'f'},
+        { op: 'transpose-start', input: 'i', match: 'g'},
+        { op: 'transpose-insert', match: 'h'},
+        { op: 'transpose-end', input: 'g', match: 'i'}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
+    });
+
+    it('works well for whitespaced-context analogues', () => {
+      // Corresponds closely to an actual sliding-context window scenario that
+      // once occurred. I did tweak the end ('r' was actually a 'p') for a bit
+      // more rigor.
+      const src = "a b c d?;e f g, h i j k l m n o p"
+      const dst =   "q c d?;e f g, h i j k l m n o r"
+      const buffer = compute(src, dst, "InputThenMatch", 4);
+
+      let editSequence: EditTuple<string>[] = [
+        { op: 'delete', input: 'a'},
+        { op: 'delete', input: ' '},
+        { op: 'substitute', input: 'b', match: 'q'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'c', match: 'c'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'd', match: 'd'},
+        { op: 'match', input: '?', match: '?'},
+        { op: 'match', input: ';', match: ';'},
+        { op: 'match', input: 'e', match: 'e'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'f', match: 'f'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'g', match: 'g'},
+        { op: 'match', input: ',', match: ','},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'h', match: 'h'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'i', match: 'i'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'j', match: 'j'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'k', match: 'k'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'l', match: 'l'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'm', match: 'm'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'n', match: 'n'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'match', input: 'o', match: 'o'},
+        { op: 'match', input: ' ', match: ' '},
+        { op: 'substitute', input: 'p', match: 'r'},
+      ];
+
+      const viablePaths = buffer.editPath();
+      // There are alternate variations for the first four tokens, but only one
+      // puts the substitute next to the long stretch of matches.
+      assert.equal(viablePaths.length, 4);
+      assert.deepEqual(viablePaths[0], editSequence);
     });
   })
 });
