@@ -157,6 +157,26 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       assert.equal(compute("aadddres", "address", "MatchThenInput").getFinalCost(), 3);
     });
 
+    it("handles empty-char inputs / matches appropriately", () => {
+      let buffer = new ClassicalDistanceCalculation();
+
+      // One transpose ('' vs 'b'), one insert ('' at end)
+      const input = ['a', '', 'b', 'c', 'd'];
+      const match = ['a', 'b', '', 'c', 'd', ''];
+
+      for(let i = 0; i < input.length; i++) {
+        buffer = buffer.addInputChar(input[i]);
+      }
+
+      for(let j = 0; j < match.length; j++) {
+        buffer = buffer.addMatchChar(match[j]);
+      }
+
+      assert.equal(buffer.getFinalCost(), 2);
+      const path = buffer.editPath();
+      assert.includeMembers(path, ['transpose-start', 'transpose-end', 'insert']);
+    });
+
     describe("Intermediate cost tests", function() {
       it("'abc' -> 'cab' (width 1) = 2", function() {
         // Technically a heuristic here, but it gets the right value b/c all changes are on the diagonal.
