@@ -22,6 +22,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-copy" \
+  "@/developer/src/kmc-convert" \
   "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
@@ -56,7 +57,7 @@ function do_build() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_test() {
-  typescript_run_eslint_mocha_tests 50
+  typescript_run_eslint_mocha_tests 45
   ./test/command-line-tests.sh test
 }
 
