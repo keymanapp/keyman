@@ -357,7 +357,10 @@ export class SearchNode {
       node.partialEdge.subsetSubindex++;
       // Append the newly-processed char to the subset's `insert` string.
       node.partialEdge.transformSubset = {...subset, key: startSubset.key, insert: subset.insert + char};
-      node.matchedTraversals.push(childTraversal);
+      // '' inserts do not traverse deeper; do not add an empty traversal entry!
+      if(childTraversal) {
+        node.matchedTraversals.push(childTraversal);
+      }
       nodesToReturn.push(node);
     };
 
