@@ -328,11 +328,22 @@ set_keyman_standard_build_path() {
   PATH="$KEYMAN_ROOT/node_modules/.bin:$PATH"
 }
 
-# For CI compatbility of building Keyman for Android 16.0 with OpenJDK 8,
-# this overrides JAVA_HOME for the builder script to use OpenJDK 11.
+# For CI compatibility of building older versions of Keyman for Android 18.0 with OpenJDK 11,
+# this overrides JAVA_HOME for the builder script to use OpenJDK 21.
 set_java_home() {
+  set_java_home_21
+}
+
+set_java_home_21() {
+  if [[ ! -z ${JAVA_HOME_21+x} ]]; then
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_21 (${JAVA_HOME_21})"
+    export JAVA_HOME="${JAVA_HOME_21}"
+  fi
+}
+
+set_java_home_11() {
   if [[ ! -z ${JAVA_HOME_11+x} ]]; then
-    builder_echo "Setting JAVA_HOME to JAVA_HOME_11 ($JAVA_HOME_11)"
+    builder_echo "Setting JAVA_HOME to JAVA_HOME_11 (${JAVA_HOME_11})"
     export JAVA_HOME="${JAVA_HOME_11}"
   fi
 }
