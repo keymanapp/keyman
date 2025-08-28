@@ -238,6 +238,22 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     }
 
     @Override
+    public boolean onEvaluateInputViewShown() {
+      // On Android API 36+, the OSK defaults to not appearing when a physical keyboard is connected.
+      // If the default implementation returns true, recommend honoring it
+      // Reference: https://android.googlesource.com/platform/frameworks/base/+/7b739a8%5E%21/
+      if (super.onEvaluateInputViewShown()) {
+        return true;
+      };
+
+      SharedPreferences prefs = this.getSharedPreferences(
+        PreferencesManager.fv_prefs_name, Context.MODE_PRIVATE);
+      boolean showOSK = prefs.getBoolean(
+        PreferencesManager.oskWithPhysicalKeyboardKey, false);
+      return showOSK;
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             switch (keyCode) {

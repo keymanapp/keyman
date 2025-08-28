@@ -44,6 +44,9 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
 
     setContentView(R.layout.activity_adjust_keyboard_height);
 
+    setupEdgeToEdge(R.id.adjust_keyboard_layout);
+    setupStatusBarColors(R.color.keyman_blue, android.R.color.white);
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     ActionBar actionBar = getSupportActionBar();

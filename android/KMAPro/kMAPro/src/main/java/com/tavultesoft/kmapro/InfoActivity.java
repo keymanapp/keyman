@@ -34,6 +34,7 @@ public class InfoActivity extends BaseActivity {
     final Context context = this;
 
     setContentView(R.layout.activity_info);
+    setupEdgeToEdge(R.id.info_layout);
 
     // Navigation buttons
     final ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
