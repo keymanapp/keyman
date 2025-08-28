@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.107 alpha 2025-08-28
+
+* maint(resources): fix parse bug in build-bot and add extra logging (#14611)
+* fix(android): Update Gradle files to remove flatDir warnings (#14583)
+* maint(resources): move build trigger scripts into resources/teamcity (#14607)
+* chore(linux): Update debian changelog (#14590)
+* docs: update package-editor page section details tab (#14585)
+* fix(android): polyfill globalThis for API 28 devices (#14541)
+* feat: support pagination in build bot PR commit reading (#14638)
+* refactor(linux): remove shellcheck warnings and reformat (#14572)
+
 ## 19.0.106 alpha 2025-08-27
 
 * fix(windows): check if automatic updates off before prompt (#14295)
