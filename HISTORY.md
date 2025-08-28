@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.106 alpha 2025-08-27
+
+* fix(windows): check if automatic updates off before prompt (#14295)
+* refactor(linux): use bash testing framework for packaging tests (#14603)
+* maint(resources): use correct version for PR title for history cherry-pick (#14610)
+* refactor(common): fix shellcheck warnings (#14580)
+
 ## 19.0.105 alpha 2025-08-25
 
 * maint(linux): ignore generate patch directories (#14600)
@@ -655,6 +662,12 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.240 stable 2025-08-27
+
+* maint(resources): automatically cherry-pick history updates to master (#14596)
+* maint(linux): fix lintian warnings (#14591)
+* maint(linux): ignore generate patch directories (#14601)
 
 ## 18.0.239 stable 2025-08-22
 
