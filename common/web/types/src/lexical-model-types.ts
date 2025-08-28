@@ -303,10 +303,17 @@ export interface Suggestion {
   id?: number;
 
   /**
-   * The suggested update to the buffer. Note that this transform should
-   * be applied AFTER the instigating transform, if any.
+   * Specifies the edits needed to correct and extend the currently-edited word
+   * (within the text buffer) to match the suggested word from the lexicon.
+   * Note that this transform should be applied BEFORE the instigating transform, if any.
    */
   readonly transform: Transform;
+
+  /**
+   * Applies extra language-appropriate whitespace and/or punctuation after the main
+   * Suggestion body as specified by the source LexicalModel.
+   */
+  appendedTransform?: Transform;
 
   /**
    * A string to display the suggestion to the typist.
