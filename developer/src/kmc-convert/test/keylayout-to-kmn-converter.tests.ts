@@ -74,7 +74,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
   describe('RunSpecialTestFiles - create Info', function () {
     this.timeout(4000);
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
@@ -88,7 +87,7 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
+  
   describe('run() ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
@@ -694,7 +693,6 @@ describe('KeylayoutToKmnConverter', function () {
     [[b6_actionId_arr, b1_keycode_arr],
     ].forEach(function (values) {
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array([['" + JSON.stringify(values[0]) + "'],..])").padEnd(73, " ") + '1 should return an array of objects', async function () {
-
         const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
@@ -724,7 +722,6 @@ describe('KeylayoutToKmnConverter', function () {
     [[{ "id": "A_0", "state": "1", "output": "" }], oneEntryResultNoOutput],
     [[{ "id": "A_0", "state": "", "output": "ˆ" }], oneEntryResult],
     ].forEach(function (values) {
-
       it(("get_KeyActionOutput_array__From__ActionStateOutput_array(['" + JSON.stringify(values[0]) + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
         const result = sut.get_KeyActionOutput_array__From__ActionStateOutput_array(read, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));

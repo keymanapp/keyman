@@ -25,7 +25,6 @@
             <modifier keys="shift"/>
         </keyMapSelect>
     </modifierMap>
-
     <!-- different amount of tags MapSelect(2) vs. KeyMap(3) -->
     <keyMapSet id="ANSI">
         <keyMap index="0">
