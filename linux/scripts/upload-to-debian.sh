@@ -128,44 +128,53 @@ function cleanup_worktree() {
   if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
     builder_echo "Removing temporary worktree"
     git worktree remove -f "${WORKTREE_DIR}"
-    git branch -f -D "${WORKTREE_BRANCH}"
+    git branch -D "${WORKTREE_BRANCH}"
   fi
+
+  local TEMP_DIR
+  TEMP_DIR=$(dirname "${WORKTREE_DIR}")
+  rm -rf "${TEMP_DIR}"
 }
 
 builder_heading "Fetching latest changes"
 git fetch -p origin
 
 if ${IS_BETA}; then
-  DEPLOY_BRANCH=origin/beta
+  ORIGIN_DEPLOY_BRANCH=origin/beta
 else
   # shellcheck disable=2311
-  DEPLOY_BRANCH=$(get_latest_stable_branch_name)
+  ORIGIN_DEPLOY_BRANCH=$(get_latest_stable_branch_name)
 fi
+
+DEPLOY_BRANCH="${ORIGIN_DEPLOY_BRANCH#origin/}"
 
 # Create a temporary worktree so that we start with a clean copy of the
 # target branch (stable/beta). Checkout stable/beta branch so that
 # scripts/debian.sh picks up correct version
 
-WORKTREE_BRANCH="maint/linux/tmp-packaging-${DEPLOY_BRANCH#origin/}"
-PREV_DIR="$PWD"
+WORKTREE_BRANCH="maint/linux/tmp-packaging-${DEPLOY_BRANCH}"
+PREV_DIR="${PWD}"
 
-WORKTREE_DIR="$(git worktree list | grep "${WORKTREE_BRANCH}" | cut -d' ' -f1)"
+WORKTREE_DIR="$(git worktree list --porcelain | awk -v name="tmp-packaging-${DEPLOY_BRANCH}" \
+  '$1 == "worktree" && $2 ~ name { print $2 }')"
+
 if [[ -n "${WORKTREE_DIR}" ]] && [[ -d "${WORKTREE_DIR}" ]]; then
   builder_heading "Reusing existing worktree at ${WORKTREE_DIR}"
-  git checkout -B "${WORKTREE_BRANCH}" "${DEPLOY_BRANCH#origin/}"
+  cd "${WORKTREE_DIR}"
+  git checkout -B "${WORKTREE_BRANCH}" "${DEPLOY_BRANCH}"
 else
-  WORKTREE_DIR="$(mktemp -d)"
+  WORKTREE_DIR="$(mktemp -d)/tmp-packaging-${DEPLOY_BRANCH}"
   builder_heading "Creating temporary worktree at ${WORKTREE_DIR}"
   if git branch | grep -q "${WORKTREE_BRANCH}"; then
-    git branch -f -D "${WORKTREE_BRANCH}"
+    git branch -D "${WORKTREE_BRANCH}"
   fi
-  git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH#origin/}"
+  git worktree add -f -b "${WORKTREE_BRANCH}" "${WORKTREE_DIR}" "${DEPLOY_BRANCH}"
 fi
 cd "${WORKTREE_DIR}"
 
 trap cleanup_worktree EXIT
 
-git pull origin "${DEPLOY_BRANCH#origin/}"
+git pull origin "${DEPLOY_BRANCH}"
 
 builder_heading "Building source package"
 cd "${WORKTREE_DIR}/linux"
@@ -180,12 +189,12 @@ cd ..
 builder_heading "Updating changelog"
 
 # base changelog branch on remote stable/beta branch
-git checkout -B chore/linux/changelog "${DEPLOY_BRANCH}"
+git checkout -B chore/linux/changelog "${ORIGIN_DEPLOY_BRANCH}"
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
 COMMIT_MESSAGE="chore(linux): Update debian changelog"
 git commit -m "${COMMIT_MESSAGE}"
-push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE} 🏠" "Test-bot: skip"
+push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH}" "${COMMIT_MESSAGE} 🏠" "Test-bot: skip"
 
 # Create cherry-pick on master branch
 git checkout -B chore/linux/cherry-pick/changelog origin/master
