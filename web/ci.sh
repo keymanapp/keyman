@@ -4,15 +4,15 @@
 # building the Keyman Engine for Web.
 #
 
-# set -x
+# TODO: merge this with resources/teamcity/web scripts
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/pull-requests.inc.sh"
 
@@ -66,16 +66,18 @@ function build_action() {
   # one option:
   ./build.sh configure clean build
 
-  # Upload the sentry-configuration engine used by the mobile apps to sentry
-  # Also, clean 'em first.
-  for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
-    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
-  done
-  web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # Upload the sentry-configuration engine used by the mobile apps to sentry
+    # Also, clean 'em first.
+    for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
+      node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
+    done
+    web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
 
-  # And, of course, the main build-products too
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+    # And, of course, the main build-products too
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+  fi
 }
 
 function test_action() {

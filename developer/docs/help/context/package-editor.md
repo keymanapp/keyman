@@ -43,10 +43,10 @@ section. The fields on the tab are:
 : Currently, this is only applicable to Android, iOS and Web (that is, .js
   format) keyboards. This reflects the checkbox in the [Details tab](./keyboard-editor#details-fields) of the Keyboard editor.
 
-> ### Note
-  **Is right-to-left** will only be true if the following occur:
-  * "Keyboard is right-to-left" is checked in the Keyboard editor
-  * The compiled .js keyboard is added to the package
+> [!NOTE]
+> Is right-to-left will only be true if the following occur:
+> - "Keyboard is right-to-left" is checked in the Keyboard editor
+> - The compiled .js keyboard is added to the package
 
 **Keyboard font**
 
@@ -101,45 +101,72 @@ section. The fields on the tab are:
 
 ## Details tab
 
-![Package Editor - Details tab](../images/ui/frmPackageEditor_Details.png)
+<img src="../images/ui/frmPackageEditor_Details.png" alt="Package Editor - Details tab" style="width: 100%"/>
 
-Enter the name of the package into the Package Name field; this will be
+**Package Name**
+
+: Enter the name of the package into the Package Name field; this will be
 automatically filled from the name of the first keyboard you add to the package.
 
-Select a HTML readme file if you have one to include in the package; this will
+**Welcome file**
+: The generated welcome.htm will be selected by default if there isn't another file to replace it. The welcome file will be displayed once the keyboard is installed.
+
+**Readme file**
+
+: Select a HTML readme file if you have one to include in the package; this will
 be displayed before the package is installed as information about the package.
 
-Version numbers should be in the form `major.minor[.patch]`. Patch is optional
+**License file**
+: The generated MIT LICENSE.md will be selected by default if there isn't another file to replace it.
+
+**Version**
+
+: Version numbers should be in the form `major.minor[.patch]`. Patch is optional
 but is helpful for small bug fix releases. Each of the sections of the version
 should be an integer. Keyman Desktop does integer comparisons on the version
 number components, so, for example, version 2.04 is regarded as newer than
 version 2.1. Alphabetic or date formats should be avoided as the installer for
 the keyboard cannot determine which version is older reliably.
 
-You can also tick the checkbox labelled "Package version follows keyboard
+: You can also tick the checkbox labelled "Package version follows keyboard
 version" to have the package version automatically track the keyboard version.
 
-The Copyright indicates the overall copyright of the package and all its
+**Copyright**
+
+: The Copyright indicates the overall copyright of the package and all its
 contents.
 
-Fill in the individual or organisation who authored the package in the Author
+**Author, E-mail address**
+
+: Fill in the individual or organisation who authored the package in the Author
 field, and a contact email address into the E-mail address field. These fields
 are optional.
 
-A web site is encouraged and should be filled in the web site field, including
+**Web site**
+
+: A web site is encouraged and should be filled in the web site field, including
 the initial "http://" or "https://".
 
-The Description is the keyboard summary that users will see on the keyboard’s 
-overview page at the keyman.com web site. 
-[GitHub style Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-can be used in the description text.  However, HTML tags are not supported.
+**Image file**
 
-
-A package can optionally include a 140x250 JPEG or PNG image file to be shown
+: A package can optionally include a 140x250 JPEG or PNG image file to be shown
 during installation. This image file must be added to the Files list in step 1,
 then selected from the list here.
 
-### Related packages
+**Description**
+
+: The first paragraph of the description appears in the keyboard search result on keyman.com, the full description will be shown in the keyboard page. Writing in the right syntax will ensure your keyboard displays correctly in keyman.com. **"[Markdown](https://www.markdownguide.org/basic-syntax) accepted, no embedded HTML description"**.
+
+: To add images to the description, use the image syntax from Markdown. As long as you know where the images will be, you could specify the path before merging the PR. The URL starts https://raw.githubusercontent.com/keymanapp/keyboards/master/ + the path to the image within the repository. 
+
+  ```md
+  ![GFF Mesobe Fidelat keyboard](https://raw.githubusercontent.com/keymanapp/keyboards/master/release/gff/gff_mesobe_fidelat/source/help/images/gff_mesobe_fidelat-default-1.jpeg)
+  ```
+
+  > [!IMPORTANT]
+  > Images should not be included in the first paragraph.
+
+**Related packages**
 
 If a keyboard package is intended to replace an existing keyboard, or if there
 are related packages, then the identifiers for these packages should be listed
@@ -158,7 +185,7 @@ There are two types of package relationships:
   language with different keying orders; then it would be appropriate to
   cross-reference them with this field.
 
-![Package Editor - Edit Related Packages dialog](../images/ui/frmPackageEditor_EditRelatedPackage.png)
+  ![Package Editor - Edit Related Packages dialog](../images/ui/frmPackageEditor_EditRelatedPackage.png)
 
 ## Shortcuts tab
 
