@@ -9,7 +9,7 @@
  */
 
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { ClassicalDistanceCalculation, EditOperation } from "./classical-calculation.js";
+import { ClassicalDistanceCalculation, EditOperation, EditTuple } from "./classical-calculation.js";
 
 /**
  * Represents token-count values resulting from an alignment attempt between two
@@ -40,6 +40,15 @@ export type ContextStateAlignment = {
    * For the alignment, [base context index] + leadTokenShift = [incoming context index].
    */
   leadTokenShift: number,
+  /**
+   * Notes the number of tokens at the head of the 'incoming'/'new' context,
+   * perfectly aligned but edited for two successfully-alignable contexts. These
+   * tokens directly precede those that need no edits.
+   *
+   * When a token could be considered as either 'lead' or 'tail' edit, it will
+   * only be reported as a 'tail' edit.
+   */
+  leadEditLength: number,
   /**
    * The count of tokens perfectly aligned, with no need for edits, for two successfully-
    * alignable contexts.
@@ -236,7 +245,10 @@ export function computeAlignment(
     3
   );
 
-  let editPath = mapping.editPath()[0].map(t => t.op);
+  // Later iteration:  we could return this itself directly for use in alignment
+  // operations, rather than relying solely on the edit-op names.
+  const editPathTuples = mapping.editPath()[0] as EditTuple<string>[];
+  const editPath = editPathTuples.map(t => t.op);
 
   const failure: ContextStateAlignment = {
     canAlign: false,
@@ -272,6 +284,7 @@ export function computeAlignment(
       canAlign: true,
       matchLength: matchCount,
       leadTokenShift: 0,
+      leadEditLength: 0,
       tailEditLength: subCount,
       tailTokenShift: insertCount - deleteCount
     }
@@ -323,6 +336,7 @@ export function computeAlignment(
     return {
       canAlign: true,
       leadTokenShift: 0,
+      leadEditLength: 0,
       matchLength,
       tailEditLength: tailSubstituteLength,
       tailTokenShift: tailInsertLength - tailDeleteLength
@@ -356,14 +370,6 @@ export function computeAlignment(
         leadTokensRemoved++;
         break;
       case 'substitute':
-        // We only allow for one leading token to be substituted.
-        //
-        // Any extras in the front would be pure inserts, not substitutions, due to
-        // the sliding context window and its implications.
-        if(leadSubstitutions++ > 0) {
-          return failure;
-        }
-
         // Find the word before and after substitution.
         const incomingIndex = i - (leadTokensRemoved > 0 ? leadTokensRemoved : 0);
         const matchingIndex = i + (leadTokensRemoved < 0 ? leadTokensRemoved : 0);
@@ -380,9 +386,7 @@ export function computeAlignment(
           return failure;
         }
 
-        // There's no major need to drop parts of a token being 'slid' out of the context window.
-        // We'll leave it intact and treat it as a 'match'
-        matchLength++;
+        leadSubstitutions++;
         break;
       case 'insert':
         // Only allow an insert at the leading edge, as with 'delete's.
@@ -409,6 +413,7 @@ export function computeAlignment(
     // when aligning the contexts.  Externally, it's more helpful to think in terms of the count added
     // to the incoming context.
     leadTokenShift: -leadTokensRemoved + 0, // add 0 in case of a 'negative zero', which affects unit tests.
+    leadEditLength: leadSubstitutions,
     matchLength,
     tailEditLength: tailSubstituteLength,
     tailTokenShift: tailInsertLength - tailDeleteLength

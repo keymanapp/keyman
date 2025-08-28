@@ -98,6 +98,7 @@ export class ContextTokenization {
 
     const {
       leadTokenShift,
+      leadEditLength,
       matchLength,
       tailEditLength,
       tailTokenShift
@@ -148,9 +149,12 @@ export class ContextTokenization {
 
     // If a word is being slid out of context-window range, start trimming it - we should
     // no longer need to worry about reusing its original correction-search results.
-    if(matchLength > 0 && this.tokens[matchingOffset].exampleInput != tokenizedContext[incomingOffset].text) {
-      //this.tokens[matchingOffset]'s clone is at tokenization[0] after the splice call in a previous block.
-      tokenization[0] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset].text);
+    for(let i = 0; i < leadEditLength; i++) {
+      if(this.tokens[matchingOffset+i].exampleInput != tokenizedContext[incomingOffset+i].text) {
+        //this.tokens[matchingOffset]'s clone is at tokenization[incomingOffset]
+        //after the splice call in a previous block.
+        tokenization[incomingOffset+i] = new ContextToken(lexicalModel, tokenizedContext[incomingOffset+i].text);
+      }
     }
 
     // first non-matched tail index within the incoming context
