@@ -6,11 +6,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/web/common.inc.sh"
 
 WORKER_OUTPUT=build/obj
 WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
@@ -23,6 +24,8 @@ bundle_cmd="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mj
 SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
 
 ################################ Main script ################################
+
+SUBPROJECT_NAME=engine/predictive-text/worker-thread
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
@@ -41,7 +44,7 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   # Configure Web browser-engine testing environments.  As is, this should only
   # make changes when we update the dependency, even on our CI build agents.
@@ -91,12 +94,10 @@ function do_build() {
 }
 
 function do_test() {
-  local MOCHA_FLAGS=
   local WTR_CONFIG=
   local WTR_INSPECT=
 
   if builder_is_ci_build; then
-    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.CI
   fi
 
@@ -104,7 +105,7 @@ function do_test() {
     WTR_INSPECT=" --manual"
   fi
 
-  c8 mocha --recursive $MOCHA_FLAGS ./src/tests/mocha/cases/
+  test-headless-typescript $SUBPROJECT_NAME
 
   web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}
 }

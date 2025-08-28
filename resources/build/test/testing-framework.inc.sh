@@ -104,6 +104,9 @@ teardown_file() {
 # Discover and run all tests in the current script
 #
 # Parameters:
+#  --quiet                  optional first parameter. If specified suppress the
+#                           output of the tests and save it in a logfile in
+#                           /tmp/<testname>.log instead.
 #  [$1 [$2]] / [first [last]] - optional range of lines in the tests script to search for tests.
 #                           This helps to split a test file into several sections where
 #                           each section can have separate setup/teardown functions.
@@ -115,6 +118,13 @@ teardown_file() {
 #   }
 run_tests() {
   local test_count test_fail_count line func
+  if [[ "${1:-}" == "--quiet" ]]; then
+    test_suppress_output=true
+    builder_echo green "(test logs are in /tmp/<testname>.log)"
+    shift
+  else
+    test_suppress_output=false
+  fi
   local first="${1:-1}"
   local last="${2:-$(wc -l < "${BASH_ARGV0}")}"
   local file="${3:-${BASH_ARGV0}}"
@@ -220,9 +230,19 @@ _get_test_func() {
   echo "${name}"
 }
 
+_call() {
+  local func="$1"
+  local testname="$2"
+  if ${test_suppress_output}; then
+    ${func} >> "/tmp/${testname}.log" 2>&1
+  else
+    ${func}
+  fi
+}
+
 _test_wrapper() {
   local func="$1"
-  ${func}
+  _call "${func}" "${func}"
   return "${test_failures}"
 }
 
@@ -235,10 +255,14 @@ _run_single_test() {
     builder_echo_debug "Running test ${func}"
   fi
 
+  if ${test_suppress_output}; then
+    echo "" > "/tmp/${func}.log"
+  fi
+
   set +e
   test_failures=0
   ((test_count++))
-  setup
+  _call setup "${func}"
 
   # shellcheck disable=SC2310
   if _test_wrapper "${func}"; then
@@ -248,7 +272,7 @@ _run_single_test() {
     _failed "${func}"
   fi
 
-  teardown
+  _call teardown "${func}"
   set -e
 }
 

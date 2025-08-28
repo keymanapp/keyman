@@ -1,11 +1,13 @@
 package com.keyman.android.tests.keyboardHarness;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
 import com.keyman.engine.KMManager;
@@ -18,8 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
+public class MainActivity extends BaseActivity implements OnKeyboardEventListener, OnKeyboardDownloadEventListener {
 
+  private ConstraintLayout constraintLayout;
   private KMTextView textView;
 
   @Override
@@ -31,6 +34,12 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     KMManager.initialize(this, KeyboardType.KEYBOARD_TYPE_INAPP);
 
     setContentView(R.layout.activity_main);
+    constraintLayout = findViewById(R.id.constraintLayout);
+    setupEdgeToEdge(R.id.constraintLayout);
+    setupStatusBarColors(
+      android.R.color.white,        // Color for top status bar
+      android.R.color.darker_gray); // Color for bottom navigation bar
+
     textView = (KMTextView) findViewById(R.id.kmTextView);
 
     // Add custom keyboards

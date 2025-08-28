@@ -10,10 +10,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public final class KeyboardListActivity extends AppCompatActivity {
+import com.keyman.engine.BaseActivity;
+
+public final class KeyboardListActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
