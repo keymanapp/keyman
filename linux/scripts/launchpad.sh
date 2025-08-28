@@ -55,7 +55,8 @@ for proj in ${projects:-}; do
   done
   cd ..
   for dist in ${distributions}; do
-    dput ${SIM} "${ppa}" "${proj}_${version}-${packageversion}~${dist}_source.changes"
+    # shellcheck disable=SC2086,SC2248  # no quotes for $SIM - it might not be set
+    dput ${SIM:-} "${ppa}" "${proj}_${version}-${packageversion}~${dist}_source.changes"
   done
   cd "${BASEDIR}"
 done
