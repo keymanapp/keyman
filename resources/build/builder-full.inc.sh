@@ -25,7 +25,7 @@ function __builder_full_not_a_builder_script() {
   fi
 }
 
-trap _builder_full_not_a_builder_script exit
+trap __builder_full_not_a_builder_script exit
 
 # This will also import /resources/builder.inc.sh
 . "${BASH_SOURCE[0]%/*}/builder-basic.inc.sh"
