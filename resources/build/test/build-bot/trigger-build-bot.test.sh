@@ -36,18 +36,18 @@ test_build_bot_check_messages() {
   _do_test_build_bot_check_messages_inline 10 "[windows]=release" '[common]="release" [windows]="build"' '{ "body": "Build-bot: skip:windows build release:common" }' '[]'
 
   # Test some bad inputs
-  _do_test_build_bot_check_messages_inline 1 "[windows]=release" '[windows]="release"' '{}' '[{ "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
+  _do_test_build_bot_check_messages_inline 1 "[windows]=release" '[windows]="release"' '{}' '[{ "sha": "1234", "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
   # empty body, 'foo windows' in commit
-  _do_test_build_bot_check_messages_inline 2 "[windows]=release" '[windows]="release"' '{  "body": "" }' '[{ "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
+  _do_test_build_bot_check_messages_inline 2 "[windows]=release" '[windows]="release"' '{  "body": "" }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\nBuild-bot: foo windows\n" }}]'
   # attempts to escape jail
-  _do_test_build_bot_check_messages_inline 3 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: '"'"'echo foo" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
-  _do_test_build_bot_check_messages_inline 4 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: echo *" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
-  _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: \\0" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 3 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: '"'"'echo foo" }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 4 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: echo *" }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: \\0" }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
   # shellcheck disable=SC2016
-  _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: `echo escaped`" }' '[{ "commit": { "message": "maint(common): test\n" }}]'
-  _do_test_build_bot_check_messages_inline 6 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: ' '[{ "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 5 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: `echo escaped`" }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 6 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: ' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
   # incomplete command
-  _do_test_build_bot_check_messages_inline 7 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: " }' '[{ "commit": { "message": "maint(common): test\n" }}]'
+  _do_test_build_bot_check_messages_inline 7 "[windows]=release" '[windows]="release"' '{  "body": "Build-bot: " }' '[{ "sha": "1234", "commit": { "message": "maint(common): test\n" }}]'
 
   builder_echo end test_build_bot_check_messages success 'SUCCESS: build_bot_check_messages'
 }
@@ -107,7 +107,11 @@ _do_test_build_bot_check_messages_inline() {
 #----------------------------------------------------------------------------------------------------
 
 test_build_bot_update_commands() {
-  builder_echo start test_build_bot_update_commands 'START TEST: build_bot_update_commands'
+  builder_echo start test_build_bot_update_commands 'START TEST: _build_bot_update_commands'
+
+  # added for #14565
+  _do_test_build_bot_update_commands '[common_windows]="build" [windows]="build" [developer]="build"' "skip build:windows,developer" '[common_windows]="skip" [windows]="build" [developer]="build"'
+
   _do_test_build_bot_update_commands '[windows]="release"' "skip:windows" '[windows]="skip"'
   _do_test_build_bot_update_commands '[windows]="release"' "skip windows" '[windows]="skip"'
   _do_test_build_bot_update_commands '[windows]="release"' "skip:windows,developer" '[windows]="skip" [developer]="skip"'
@@ -141,7 +145,7 @@ _do_test_build_bot_update_commands() {
   eval "declare -A expected_build_platforms=($3)"
 
   # shellcheck disable=SC2086  # intentionally no quotes
-  build_bot_update_commands ${update_commands}
+  _build_bot_update_commands ${update_commands}
 
   for i in "${!expected_build_platforms[@]}"; do
     assert-equal "${build_platforms[${i}]}" "${expected_build_platforms[${i}]}" "build_platforms[${i}]"
@@ -154,12 +158,12 @@ _do_test_build_bot_update_commands() {
 #----------------------------------------------------------------------------------------------------
 
 test_build_bot_verify_platforms() {
-  builder_echo start test_build_bot_verify_platforms 'START TEST: build_bot_verify_platforms'
+  builder_echo start test_build_bot_verify_platforms 'START TEST: _build_bot_verify_platforms'
   _do_test_build_bot_verify_platforms "windows mac" "windows mac"
   _do_test_build_bot_verify_platforms "windows foo" "windows"
   _do_test_build_bot_verify_platforms "core" "core"
   _do_test_build_bot_verify_platforms "all" "${available_platforms[*]}"
-  builder_echo end test_build_bot_verify_platforms success 'SUCCESS: build_bot_verify_platforms'
+  builder_echo end test_build_bot_verify_platforms success 'SUCCESS: _build_bot_verify_platforms'
 }
 
 _do_test_build_bot_verify_platforms() {
@@ -168,7 +172,7 @@ _do_test_build_bot_verify_platforms() {
   # shellcheck disable=SC2206  # intentionally no quotes
   local expected_platforms=($2)
 
-  build_bot_verify_platforms platforms
+  _build_bot_verify_platforms platforms
 
   assert-equal ${#platforms[@]} ${#expected_platforms[@]} "#platforms[@]"
   for i in "${!expected_platforms[@]}"; do

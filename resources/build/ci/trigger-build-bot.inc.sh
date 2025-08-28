@@ -67,35 +67,61 @@ function build_bot_check_messages() {
   # Extract the Build-bot commands from commit messages and the PR body
 
 
+  local buildBotShas=($(echo "$prcommits" | "${JQ}" -r '.[].sha'))
   IFS=$'\n'
-  local buildBotCommandArray prCommandArray
-  buildBotCommandArray=($(echo "$prcommits" | "${JQ}" -r '.[].commit.message' | grep 'Build-bot:' | cut -c 11- -))
-  prCommandArray=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -c 11- -))
+  local prCommands=($(echo "$prinfo" | "${JQ}" -r '.body' | tr -d '\r' | grep 'Build-bot:' | cut -c 11- -))
   unset IFS
 
   # The PR body Build-bot comment will be read last, which allows it to override
   # all previous commands
 
-  if [[ ${#prCommandArray[@]} -gt 0 ]]; then
-    buildBotCommandArray+=("${prCommandArray[@]}")
-  fi
+  local buildBotCommand
+  local sha
+  for sha in "${buildBotShas[@]}"; do
 
-  for buildBotCommands in "${buildBotCommandArray[@]}"; do
-    # Block illegal Build-bot: commands
-    if [[ ! "${buildBotCommands}" =~ ^[a-z_,\ :,]+$ ]]; then
-      builder_echo warning "WARNING[Build-bot]: ignoring invalid command [2]: '${buildBotCommands}'"
-      continue
-    fi
+    IFS=$'\n'
+    local buildBotCommands=($(echo "$prcommits" | "${JQ}" -r '.[] | select(.sha | contains("'$sha'")) | .commit.message' | grep 'Build-bot:' | cut -c 11- -))
+    unset IFS
 
-    # builder_echo debug "buildBotCommands:{$buildBotCommands}"
+    for buildBotCommand in "${buildBotCommands[@]}"; do
+      buildBotCommand=$(builder_trim "${buildBotCommand}")
+      builder_echo heading "Build-bot: Found command in commit ${sha}: '${buildBotCommand}'"
 
-    # We now know that our command has only a-z, comma, colon, and space, so we
-    # can parse without risking escaping our bash jail
+      # Block illegal Build-bot: commands
+      if [[ ! "$buildBotCommand" =~ ^[a-z_,\ :,]+$ ]]; then
+        builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
+        continue
+      fi
 
-    if [[ ! -z "${buildBotCommands// }" ]]; then
-      build_bot_update_commands ${buildBotCommands}
-    fi
+      # We now know that our command has only a-z, comma, colon, and space, so we
+      # can parse without risking escaping our bash jail
+
+      if [[ ! -z "${buildBotCommand// }" ]]; then
+        _build_bot_update_commands $buildBotCommand
+      fi
+    done
   done
+
+  if [[ ${#prCommands[@]} -gt 0 ]]; then
+    for buildBotCommand in "${prCommands[@]}"; do
+      buildBotCommand=$(builder_trim "${buildBotCommand}")
+      builder_echo heading "Build-bot: Found command in body of PR #${PRNUM}: '${buildBotCommand}'"
+
+      # Block illegal Build-bot: commands
+      if [[ ! "$buildBotCommand" =~ ^[a-z_\ :,]+$ ]]; then
+        builder_echo warning "WARNING[Build-bot]: ignoring invalid command: '${buildBotCommand}'"
+        continue
+      fi
+
+      # We now know that our command has only a-z, comma, colon, underline, and
+      # space, so we can parse without risking escaping our bash jail
+
+      if [[ ! -z "${buildBotCommand// }" ]]; then
+        _build_bot_update_commands $buildBotCommand
+      fi
+    done
+
+  fi
 
   set +o noglob
 }
@@ -107,7 +133,7 @@ function build_bot_check_messages() {
 # Note that this function assumes that inputs are sanitized, see
 # build_bot_check_messages
 #
-function build_bot_update_commands() {
+function _build_bot_update_commands() {
   local level=
   local platforms=
   local command="$*"
@@ -134,9 +160,9 @@ function build_bot_update_commands() {
       return 0
     fi
 
-    builder_echo blue "Platforms to be updated from command '${command}' are: ${platforms[*]}"
+    builder_echo grey "Build-bot: Platforms to be updated from command '${command}' are: ${platforms[*]}"
 
-    build_bot_verify_platforms platforms
+    _build_bot_verify_platforms platforms
 
     local platform
     for platform in "${platforms[@]}"; do
@@ -154,6 +180,7 @@ function build_bot_update_commands() {
       declare -a params
       IFS=:
       read -r -a params <<< "${command}"
+      unset IFS
       level=${params[0]}
       if [[ ! ${level} =~ ^${valid_build_levels}$ ]]; then
         # Just skip this build command
@@ -162,7 +189,7 @@ function build_bot_update_commands() {
       fi
 
       if [[ ${#params[@]} == 1 ]]; then
-        platforms=("${!build_platforms[@]}")
+        read -r -a platforms <<< "${!build_platforms[@]}"
       else
         # remaining parameters are comma separated platforms
         IFS=','
@@ -170,7 +197,7 @@ function build_bot_update_commands() {
         unset IFS
       fi
 
-      build_bot_verify_platforms platforms
+      _build_bot_verify_platforms platforms
 
       local platform
       for platform in "${platforms[@]}"; do
@@ -189,7 +216,7 @@ function build_bot_update_commands() {
 # Parameters:
 #   1: name of platforms array parameter (byref)
 #
-function build_bot_verify_platforms() {
+function _build_bot_verify_platforms() {
   local -n input_platforms=$1
   local output_platforms=()
   local platform
