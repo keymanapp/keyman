@@ -15,6 +15,7 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   Winapi.ActiveX,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.Test.Console.KeymanAPIHost in 'Keyman.Test.Console.KeymanAPIHost.pas',
   keymanapi_TLB in '..\..\..\engine\kmcomapi\keymanapi_TLB.pas',
   KeymanOptionNames in '..\..\..\global\delphi\general\KeymanOptionNames.pas',
@@ -62,6 +63,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

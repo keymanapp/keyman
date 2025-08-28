@@ -252,7 +252,7 @@ class InstallKmp():
         # TODO: add other keyboards as well (#9757)
         firstKeyboard = keyboards[0]
         if secure_lookup(firstKeyboard, 'languages') and firstKeyboard['languages']:
-            language = self._normalize_language(firstKeyboard['languages'], language)
+            language = CanonicalLanguageCodeUtils.normalize_language(firstKeyboard['languages'], language)
 
         if not language:
             language = self._add_custom_keyboard(firstKeyboard, packageDir, requested_language)

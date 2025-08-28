@@ -24,7 +24,8 @@ KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, i
 bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
 KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
-bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int* sz16);
+extern bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int* sz16);
+extern bool isValidUtf8(KMX_BYTE* str, int sz);
 
 namespace kmcmp {
     extern int nErrors;
@@ -2159,4 +2160,99 @@ TEST(UTF16TempFromUTF8, HandlesEmptyInput) {
   // tempfile should remain nullptr, sz16 should be 0
   EXPECT_EQ(tempfile, nullptr);
   EXPECT_EQ(sz16, 0);
+}
+
+TEST(IsValidUtf8Test, ValidAscii) {
+  std::vector<KMX_BYTE> v = {'h', 'e', 'l', 'l', 'o'};
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Valid2Byte) {
+  std::vector<KMX_BYTE> v = {0xC2, 0xA2};  // U+00A2: ¢
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Valid3Byte) {
+  std::vector<KMX_BYTE> v = {0xE2, 0x82, 0xAC};  // U+20AC: €
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Valid4Byte) {
+  std::vector<KMX_BYTE> v = {0xF0, 0x9F, 0x98, 0x80};  // U+1F600: 😀
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, InvalidOverlongEncoding) {
+  std::vector<KMX_BYTE> v = {0xC1, 0x81};  // Overlong encoding for ASCII
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, InvalidMissingContinuation) {
+  std::vector<KMX_BYTE> v = {0xE2, 0x82};  // Missing one continuation byte
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, InvalidLoneContinuation) {
+  std::vector<KMX_BYTE> v = {0x80};  // Continuation byte without starter
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid4ByteOutOfRange) {
+  std::vector<KMX_BYTE> v = {0xF4, 0x90, 0x80, 0x80};  // > U+10FFFF
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, ValidMixedAsciiAndMultiByte) {
+  std::vector<KMX_BYTE> v = {'A', 0xC2, 0xA2, 0xE2, 0x82, 0xAC, 0xF0, 0x9F, 0x98, 0x80};
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid2ByteBadSecondByte) {
+  std::vector<KMX_BYTE> v = {0xD2, 0x28};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid2ByteBadSecondByteTooHigh) {
+  std::vector<KMX_BYTE> v = {0xD2, 0xC8};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid3ByteBadSecondByte) {
+  std::vector<KMX_BYTE> v = {0xE2, 0x28, 0xA1};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid3ByteBadThirdByte) {
+  std::vector<KMX_BYTE> v = {0xE2, 0xA8, 0xD1};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid4ByteBadSecondByte) {
+  std::vector<KMX_BYTE> v = {0xF2, 0xC8, 0xB2, 0x88};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid4ByteBadThirdByte) {
+  std::vector<KMX_BYTE> v = {0xF2, 0xB8, 0x02, 0x88};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, Invalid4ByteBadFourthByte) {
+  std::vector<KMX_BYTE> v = {0xF2, 0xB8, 0xA2, 0xD8};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, InvalidByteC0) {
+  std::vector<KMX_BYTE> v = {0xC1};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, InvalidByteF5) {
+  std::vector<KMX_BYTE> v = {0xF5};
+  EXPECT_FALSE(isValidUtf8(v.data(), v.size()));
+}
+
+TEST(IsValidUtf8Test, ValidEmptyInput) {
+  std::vector<KMX_BYTE> v = {};
+  EXPECT_TRUE(isValidUtf8(v.data(), v.size()));
 }
