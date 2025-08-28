@@ -42,7 +42,7 @@ export interface TransformSubset<Key> {
    * The currently-processed and commonly-held portion of the `insert` field
    * for all Transforms in this subset.
    */
-  insert: string
+  insert: string;
 }
 
 /**
