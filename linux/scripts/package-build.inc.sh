@@ -82,3 +82,87 @@ function checkAndInstallRequirements()
     apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
   rm -f keyman-build-deps_*
 }
+
+# Generate an array of files and directories to ignore, prefixed with --tar-ignore=keyman/
+function generate_tar_ignore_list() {
+  local directory="$1"
+  local includes_var="$2"
+  local excludes_var="$3"
+  local list_var="$4"
+  local prefix="$5"
+  local includes_array="${includes_var}[@]"
+  local includes=("${!includes_array}")
+  local excludes_array="${excludes_var}[@]"
+  local excludes=("${!excludes_array}")
+  local dir all_dirs found_match inc
+
+  mapfile -t all_dirs < <(find "${directory}" -mindepth 1 -maxdepth 1 -type d | sort)
+  for dir in "${all_dirs[@]}"; do
+    found_match=false
+    for inc in "${includes[@]}"; do
+      if [[ "./${inc}" =~ ^${dir} ]]; then
+        found_match=true
+        if [[ "./${inc}" != "${dir}" ]]; then
+          # check subdirectories
+          generate_tar_ignore_list "${dir}" "${includes_var}" "${excludes_var}" "${list_var}" "${prefix}"
+        fi
+        # check if files/subdir in $dir are in excludes list
+        _generate_excludes_for_dir "${dir}" "${includes_var}" "${excludes_var}" "${list_var}"
+        break
+      fi
+    done
+    if ! ${found_match}; then
+      _add_to_list "${list_var}" "${dir}"
+    fi
+  done
+}
+
+function _generate_excludes_for_dir() {
+  local directory="$1"
+  local includes_var="$2"
+  local excludes_var="$3"
+  local list_var="$4"
+  local includes_array="${includes_var}[@]"
+  local includes=("${!includes_array}")
+  local excludes_array="${excludes_var}[@]"
+  local excludes=("${!excludes_array}")
+  local file all_files excluded included is_match
+
+  mapfile -t all_files < <(find "${directory}" -mindepth 1 -maxdepth 1 | sort)
+  is_match=false
+  for file in "${all_files[@]}"; do
+    for included in "${includes[@]}"; do
+      if [[ "${file}" == ./${included} ]]; then
+        is_match=true
+        break
+      fi
+    done
+    if ${is_match} ; then
+      if [[ "${file}" != ./${included} ]] && [[ -f "${file}" ]]; then
+      _add_to_list "${list_var}" "${file}"
+      fi
+    else
+      for excluded in "${excludes[@]}"; do
+        if [[ "${file}" == ./${excluded} ]]; then
+          _add_to_list "${list_var}" "${file}"
+          break
+        elif [[ "./${excluded}" =~ ^${file} ]]; then
+          # check subdirectories
+          _generate_excludes_for_dir "${file}" "${includes_var}" "${excludes_var}" "${list_var}"
+          break
+        fi
+      done
+    fi
+  done
+}
+
+function _add_to_list() {
+  local list_var="$1"
+  local filename="$2"
+
+  # Note: the files end up in subdirectories under `keyman` (or rather
+  # the directory name of $KEYMAN_ROOT), so we can
+  # include that when matching files and directories to ignore.
+  # shellcheck disable=SC2154
+  eval "${list_var}+=(\"--tar-ignore=${prefix}/${filename#./}\")"
+}
