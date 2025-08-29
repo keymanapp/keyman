@@ -51,6 +51,17 @@ export abstract class SingleChildRule extends Rule {
   public parse(node: ASTNode): boolean {
     return this.rule === null ? false : this.rule.parse(node);
   }
+
+  protected parse_toChildrenOfGivenType(node: ASTNode, nodeType: NodeTypes): boolean {
+    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
+    const parseSuccess: boolean = this.rule.parse(tmp);
+    if (parseSuccess) {
+      const storeNode: ASTNode = tmp.removeSoleChildOfType(nodeType);
+      storeNode.addChildren(tmp.getChildren());
+      node.addChild(storeNode);
+    }
+    return parseSuccess;
+  };
 }
 
 /**

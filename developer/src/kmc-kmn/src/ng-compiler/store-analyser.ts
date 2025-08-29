@@ -11,8 +11,8 @@
 import { TokenTypes } from "./token-types.js";
 import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyser.js";
-import { SingleChildRule, Rule, TokenRule, SequenceRule, AlternateTokenRule, AlternateRule, ManyRule, OptionalRule } from "./recursive-descent.js";
-import { OneOrManyRule  } from "./recursive-descent.js";
+import { AlternateRule, AlternateTokenRule, ManyRule, OptionalRule, Rule } from "./recursive-descent.js";
+import { SingleChildRule, SequenceRule, TokenRule } from "./recursive-descent.js";import { OneOrManyRule  } from "./recursive-descent.js";
 import { NodeTypes } from "./node-types.js";
 import { ASTNode } from "./tree-construction.js";
 
@@ -41,8 +41,8 @@ export class SystemStoreAssignRule extends SingleChildRule {
 export class SystemStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const store                 = new TokenRule(TokenTypes.STORE);
-    const leftBracket           = new TokenRule(TokenTypes.LEFT_BR);
+    const store: Rule           = new TokenRule(TokenTypes.STORE);
+    const leftBracket: Rule     = new TokenRule(TokenTypes.LEFT_BR);
     const systemStoreName: Rule = new SystemStoreNameRule();
     const rightBracket          = new TokenRule(TokenTypes.RIGHT_BR);
     this.rule = new SequenceRule([
@@ -97,14 +97,7 @@ export class NormalStoreAssignRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const storeNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.STORE);
-      storeNode.addChildren(tmp.getChildren());
-      node.addChild(storeNode);
-    }
-    return parseSuccess;
+    return this.parse_toChildrenOfGivenType(node, NodeTypes.STORE)
   }
 }
 
@@ -143,6 +136,7 @@ export class NormalStoreNameRule extends SingleChildRule {
     const parseSuccess: boolean = this.rule.parse(tmp);
     if (parseSuccess) {
       const children = tmp.getChildren();
+      // two structures depending on number of children
       if (children.length === 1) {
         node.addNewChildWithToken(NodeTypes.STORENAME, children[0].token);
       } else {
@@ -196,14 +190,7 @@ export class SetNormalStoreRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const setNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.SET);
-      setNode.addChildren(tmp.getChildren());
-      node.addChild(setNode);
-    }
-    return parseSuccess;
+    return this.parse_toChildrenOfGivenType(node, NodeTypes.SET);
   }
 }
 
@@ -229,14 +216,7 @@ export class SetSystemStoreRule extends SingleChildRule {
   }
 
   public parse(node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeTypes.TMP);
-    const parseSuccess: boolean = this.rule.parse(tmp);
-    if (parseSuccess) {
-      const setNode: ASTNode = tmp.removeSoleChildOfType(NodeTypes.SET);
-      setNode.addChildren(tmp.getChildren());
-      node.addChild(setNode);
-    }
-    return parseSuccess;
+    return this.parse_toChildrenOfGivenType(node, NodeTypes.SET);
   }
 }
 
