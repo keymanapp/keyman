@@ -587,7 +587,7 @@ var
   item: TPair<string,string>;
   n: Integer;
 begin
-  for item in TSetupUILanguageManager.Locales do
+  for item in TSetupUILanguageManager.SortedValues do
   begin
     n := cbLanguage.Items.Add(item.Value);
     if TSetupUILanguageManager.ActiveLocale = item.Key then
@@ -958,8 +958,11 @@ begin
 end;
 
 procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
+var
+  n :  Integer;
 begin
-  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
+  n := TSetupUILanguageManager.IndexMapping[cbLanguage.ItemIndex];
+  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[n];
   FillStrings;
 end;
 
